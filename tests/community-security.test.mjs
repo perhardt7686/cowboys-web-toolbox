@@ -147,6 +147,13 @@ test('community authorization and privacy boundaries in Postgres',async t=>{
       assert.equal((await pg.query('select count(*)::int as n from public.community_members where user_id=$1',[memberID])).rows[0].n,1);
       const queue=await post('owner',{action:'admin_queue'});assert.equal(queue.status,200,JSON.stringify(queue.data));assert.equal(queue.data.reports.length,1);
     });
+    await t.test('an unavailable mail sender preserves a pending request and reports delivery failure',async()=>{
+      const unavailableMail=createCommunityHandler({db,catalog:[],ownerEmail:owner.email,siteURL:'https://toolbox.example/community.html',allowedOrigins:['https://toolbox.example'],sendMail:async()=>{throw new Error('mail service unavailable')},auth:{getUser:async()=>({data:{user:{...member,id:otherID,email:'other@example.com'}},error:null})}});
+      const response=await unavailableMail(new Request('https://backend.example/functions/v1/community-api',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://toolbox.example',Authorization:'Bearer member'},body:JSON.stringify({action:'resend_approval'})}));
+      assert.equal(response.status,200);assert.equal((await response.json()).approvalEmailStatus,'failed');
+      assert.equal((await pg.query('select status from public.community_members where user_id=$1',[otherID])).rows[0].status,'pending');
+      assert.equal((await pg.query('select email_status from public.community_approvals where user_id=$1',[otherID])).rows[0].email_status,'failed');
+    });
     await t.test('database rate limits are atomic; moderation cannot suspend the owner account',async()=>{
       const calls=await Promise.all(Array.from({length:8},()=>db.rpc('community_claim_action',{p_bucket:'test:atomic',p_window_seconds:60,p_limit:3})));
       assert.equal(calls.filter(r=>r.data===true).length,3);
