@@ -7,15 +7,18 @@ const required=(key:string)=>{const value=Deno.env.get(key);if(!value)throw new 
 const url=required('SUPABASE_URL'),serviceKey=required('SUPABASE_SERVICE_ROLE_KEY');
 const db=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
 const ownerEmail=required('OWNER_EMAIL');
-// Supabase Edge Functions block outgoing ports 25 and 587. Use TLS on 465.
-if((Deno.env.get('SMTP_PORT')||'465')!=='465')throw new Error('Owner mail requires SMTP port 465.');
-const transport=nodemailer.createTransport({
-  host:required('SMTP_HOST'),port:465,
-  secure:true,requireTLS:true,
-  auth:{user:required('SMTP_USER'),pass:required('SMTP_PASSWORD')},
-  logger:false,debug:false,connectionTimeout:10000,socketTimeout:10000,
-  tls:{rejectUnauthorized:true}
-});
+// Mail configuration is read only when sending. An unavailable mail sender
+// must not prevent JWT validation or discard a request from the private queue.
+const ownerTransport=()=>{
+  // Supabase Edge Functions block outgoing ports 25 and 587. Use TLS on 465.
+  if((Deno.env.get('SMTP_PORT')||'465')!=='465')throw new Error('Owner mail requires SMTP port 465.');
+  return nodemailer.createTransport({
+    host:required('SMTP_HOST'),port:465,secure:true,requireTLS:true,
+    auth:{user:required('SMTP_USER'),pass:required('SMTP_PASSWORD')},
+    logger:false,debug:false,connectionTimeout:10000,socketTimeout:10000,
+    tls:{rejectUnauthorized:true}
+  });
+};
 const handler=createCommunityHandler({
   db,auth:db.auth,catalog:catalog.sites,ownerEmail,
   siteURL:required('COMMUNITY_URL'),
@@ -23,7 +26,7 @@ const handler=createCommunityHandler({
   sendMail:async({to,subject,text}:{to:string,subject:string,text:string})=>{
     // This transport sends operational notices only to the configured owner.
     if(to.toLowerCase()!==ownerEmail.toLowerCase())throw new Error('Owner mailbox only');
-    await transport.sendMail({from:{name:'Cowboy’s Web Toolbox',address:required('SMTP_FROM')},to,subject,text,disableFileAccess:true,disableUrlAccess:true});
+    await ownerTransport().sendMail({from:{name:'Cowboy’s Web Toolbox',address:required('SMTP_FROM')},to,subject,text,disableFileAccess:true,disableUrlAccess:true});
   }
 });
 Deno.serve(handler);
