@@ -8,7 +8,7 @@ GitHub Pages publishes `/docs` from `main` at https://perhardt7686.github.io/cow
 
 The account and message-board design lives at `docs/community.html`. Each catalog card links to conversations about that website. Add `?preview=1` to explore fictional visitor, pending-member, approved-member and owner states. Preview posts exist only in page memory. It never collects credentials or sends email.
 
-**Registration is closed by default.** `docs/community-config.js` has `enabled: false`. A database project and production email delivery must be configured and tested before enabling it. The catalog remains freely browsable.
+**Registration is closed by default.** `docs/community-config.js` has `enabled: false`. The Supabase database is provisioned with RLS. Production email, private function configuration and live account tests are still required before enabling it. The catalog remains freely browsable.
 
 The optional backend uses Supabase Auth, Postgres with row-level security and a JWT-verifying Edge Function. Verified members await owner approval before posting. Single-use email review links require the verified owner account and a confirmed POST. The board includes categories, full-text search, website-specific discussions, replies, private reports, held-content review, thread closure, membership suspension and account deletion requests.
 

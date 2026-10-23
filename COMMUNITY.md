@@ -4,7 +4,7 @@
 
 The responsive account screens, integrated forum, database migration, authenticated API and automated Edward catalog replies are implemented. The public configuration defaults to **registration closed**. The interactive design at `community.html?preview=1` uses clearly labeled fictional samples and makes no backend or mail requests.
 
-As of October 23, 2026, a backend project has not been provisioned. Project creation awaits the user's organization selection, which the Supabase creation tool explicitly requires. No paid plan, email subscription or real member account was created during design work.
+On October 23, 2026, the user approved project creation. Supabase project `twecuqwetzfweljoxbty` (`cowboys-web-toolbox-community`) is active in US East on the connected organization’s Free plan. The community migration is applied. Public REST reads succeed; anonymous access to approvals and reports is denied. All eight tables have RLS, browser writes are revoked, and privileged functions are service-role-only. No paid plan, mail subscription or real member account has been created. Dashboard authentication, Auth email delivery, function secrets/deployment and live owner/member verification remain before activation.
 
 ## Research and choice
 
@@ -44,7 +44,7 @@ Password recovery sends a generic response and a link to the member's own inbox.
 
 ## Backend setup
 
-Finish the supported organization and cost confirmation flow before project creation. Use an appropriate region, such as US East for this audience. The real project reference must come from the create-project result; do not invent one or confuse it with the local CLI project name.
+Project creation and the initial migration are complete. The project reference returned by Supabase is `twecuqwetzfweljoxbty`. The frontend has its real URL and active publishable key, with `enabled: false` preserved. Server credentials remain private.
 
 1. Inspect existing tables, then apply the reviewed migration in `supabase/migrations/`. Run security and performance advisors and resolve relevant findings. Do not apply this schema over an unrelated existing application.
 2. In Auth, enable email/password signup with email confirmation; set a minimum password length of 15 and a short JWT lifetime. Keep email-change confirmation enabled. Disable anonymous sign-ins and unused providers. Configure rate limits appropriate to the mail sender. Configure supported CAPTCHA protection if needed before attracting public signup traffic; add its public site key and token handling to the UI when enabled.
@@ -75,3 +75,5 @@ Finish the supported organization and cost confirmation flow before project crea
 Browser QA covers desktop and narrow layouts, empty/disabled launch states, account tabs, guidelines/privacy dialogs, categories, search, website links, sample posting and replies, and owner confirmations. These preview checks cannot verify live authentication or real email delivery.
 
 Before enabling registration, test a real owner plus a separately verified member: confirmation, pending status, owner email receipt, decline/approve, token reuse, posting, Edward, private reports, recovery, signout, suspension and unauthorized direct API requests. Check hosted RLS/advisors, SMTP receipt and delivery failures. Use test identities controlled by the user, with their passwords entered by them. Only then set `enabled: true`, deploy and confirm the public flow.
+
+Hosted audit: Supabase’s security advisor reports informational notices for the five intentionally private, default-deny RLS tables. They have no browser grants or policies by design. Its performance advisor reports unused indexes on this new empty database. No warning/error-level findings were returned. Remediation references: [default-deny RLS tables](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy), [unused indexes](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index). Do not open private tables to silence the informational notices.
