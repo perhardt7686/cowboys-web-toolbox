@@ -12,9 +12,10 @@ const ownerEmail=required('OWNER_EMAIL');
 const ownerTransport=()=>{
   // Supabase Edge Functions block outgoing ports 25 and 587. Use TLS on 465.
   if((Deno.env.get('SMTP_PORT')||'465')!=='465')throw new Error('Owner mail requires SMTP port 465.');
+  const host=required('SMTP_HOST'),password=required('SMTP_PASSWORD');
   return nodemailer.createTransport({
-    host:required('SMTP_HOST'),port:465,secure:true,requireTLS:true,
-    auth:{user:required('SMTP_USER'),pass:required('SMTP_PASSWORD')},
+    host,port:465,secure:true,requireTLS:true,
+    auth:{user:required('SMTP_USER'),pass:host==='smtp.gmail.com'?password.replace(/\s+/gu,''):password},
     logger:false,debug:false,connectionTimeout:10000,socketTimeout:10000,
     tls:{rejectUnauthorized:true}
   });
