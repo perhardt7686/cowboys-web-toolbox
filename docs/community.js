@@ -4,12 +4,15 @@ const $=id=>document.getElementById(id);
 const config=window.COWBOY_COMMUNITY_CONFIG||{enabled:false};
 const query=new URLSearchParams(location.search),isPreview=query.get('preview')==='1';
 const configured=config.enabled===true&&/^https:\/\/[a-z0-9-]+\.supabase\.(?:co|in)$/u.test(config.supabaseUrl||'')&&typeof config.publishableKey==='string'&&config.publishableKey.length>20;
+const registrationOpen=configured&&config.registrationOpen!==false;
 const categories=new Map(CATEGORIES.map(c=>[c.id,c]));
 const state={category:'all',search:'',sort:'latest',site:query.get('site')||null,threads:[],member:null,user:null,replies:[],thread:null,offset:0,hasMore:false,loading:false,recovery:false};
 let client=null,catalog=[],authView='login',reviewToken=null,queue=null,previewSequence=10;
 // In-memory sample IDs only; authorization tokens are generated on the server.
 const sampleID=()=>`00000000-0000-4000-8000-${String(++previewSequence).padStart(12,'0')}`;
 const fragment=new URLSearchParams(location.hash.slice(1));
+// Supabase must authenticate the invitation before this form can save a password.
+state.passwordSetup=fragment.get('type')==='invite';
 if(fragment.has('review')){reviewToken=fragment.get('review');history.replaceState(null,'',location.pathname+location.search);}
 const previewRows=[
   {id:'11111111-1111-4111-8111-111111111111',author_name:'Example member',title:'The little tool that finally made diagrams click',body:'I tried Excalidraw from the collection to map out a project. Simple, a little imperfect, and exactly what I needed. What have you made with it?',category:'creative',site_id:'excalidraw',created_at:'2026-10-23T13:25:00Z',reply_count:0,pinned:true,status:'published'},
@@ -38,6 +41,7 @@ function renderAccount(){
 function renderNotice(){
   let html='';
   if(!configured&&!isPreview)html='<div class="membership-banner"><p><b>Membership opens soon.</b><small>The community is being prepared. You can keep exploring the website collection.</small></p><a class="button-quiet" href="./">Browse the collection ↗</a></div>';
+  else if(!state.member&&!registrationOpen&&!isPreview)html='<div class="membership-banner"><p><b>Membership opens soon.</b><small>Owner setup is in progress. You can browse the collection and public conversations.</small></p><a class="button-quiet" href="./">Browse the collection ↗</a></div>';
   else if(state.member?.status==='pending')html='<div class="membership-banner"><p><b>Your email is verified. Your seat is nearly ready.</b><small>Cowboy will review your posting request. You can browse while approval is pending.</small></p><button class="button-quiet" data-check-membership>Check status ↻</button></div>';
   else if(state.member&&state.member.status!=='approved')html='<div class="membership-banner"><p><b>Posting access is unavailable.</b><small>You can still browse the public collection. Account status is controlled by Cowboy.</small></p></div>';
   $('membership-notice').innerHTML=html;
@@ -72,9 +76,10 @@ async function loadFeed(append=false){
   finally{state.loading=false;$('refresh-community').disabled=false;if(state.reloadRequested){state.reloadRequested=false;await loadFeed();}}
 }
 function authFields(view){
-  const disabled=!configured||isPreview?'disabled':'';
-  const password=`<label class="field"><span>${view==='reset'?'New password':'Password'}</span><span class="password-field"><input name="password" type="password" autocomplete="${view==='signup'||view==='reset'?'new-password':'current-password'}" ${view==='login'?'':'minlength="15" maxlength="128"'} required ${disabled}><button type="button" data-show-password aria-label="Show password">Show</button></span>${view==='signup'||view==='reset'?'<small>Use a memorable passphrase of at least 15 characters.</small>':''}</label>`;
-  if(view==='reset')return password+'<button class="button-primary form-full" type="submit" '+disabled+'>Save new password ↗</button>';
+  const disabled=!configured||isPreview||(view==='signup'&&!registrationOpen)?'disabled':'';
+  const newPassword=['signup','reset','setup'].includes(view);
+  const password=`<label class="field"><span>${['reset','setup'].includes(view)?'New password':'Password'}</span><span class="password-field"><input name="password" type="password" autocomplete="${newPassword?'new-password':'current-password'}" ${view==='login'?'':'minlength="15" maxlength="128"'} required ${disabled}><button type="button" data-show-password aria-label="Show password">Show</button></span>${newPassword?'<small>Use a memorable passphrase of at least 15 characters.</small>':''}</label>`;
+  if(['reset','setup'].includes(view))return password+'<button class="button-primary form-full" type="submit" '+disabled+'>Save new password ↗</button>';
   return (view==='signup'?`<label class="field"><span>Display name</span><input name="displayName" autocomplete="nickname" minlength="2" maxlength="36" placeholder="What should we call you?" required ${disabled}><small>Visible to the community. Your email stays private.</small></label>`:'')+`<label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" placeholder="you@example.com" required ${disabled}></label>`+(['forgot','resend'].includes(view)?'':password)+(view==='login'?'<div class="form-options"><label class="check-label"><input type="checkbox" name="remember">Remember this device</label><button type="button" class="text-button" data-auth="forgot">Forgot your password?</button></div>':'')+(view==='signup'?`<label class="check-label"><input name="rules" type="checkbox" required ${disabled}><span>I agree to the <button type="button" class="text-button" data-rules>community guidelines</button> and have read the <button type="button" class="text-button" data-privacy>account privacy notice</button>.</span></label>`:'')+`<button class="button-primary form-full" type="submit" ${disabled}>${view==='signup'?'Create my account':view==='forgot'?'Send a reset link':view==='resend'?'Resend verification':'Welcome back'} <span aria-hidden="true">↗</span></button>`;
 }
 function openAuth(view='login',message=''){
@@ -88,9 +93,9 @@ function openAuth(view='login',message=''){
   let html='';
   if(states[view]){const s=states[view];html=`<div class="state-symbol" aria-hidden="true">${s.icon}</div><h2 id="auth-title">${s.title}</h2><p class="auth-description">${s.description}</p>${view==='check'?'<button class="text-button" data-auth="resend">Resend verification email</button>':''}${view==='pending'?'<ol class="state-steps"><li>Verify your own email address.</li><li>Cowboy reviews your posting request.</li><li>Return here to check your membership status.</li></ol><button class="text-button" data-check-membership>Check status ↻</button> <button class="text-button" data-resend-approval>Remind Cowboy</button>':''}<button class="button-primary form-full" data-auth="login">Back to log in ↗</button><button class="text-button" data-close>Keep exploring</button>`;}
   else {
-    const title=view==='signup'?'A place for you.':view==='forgot'?'Forgot your password?':view==='resend'?'One more email.':view==='reset'?'Make a fresh start.':'Good to see you.';
-    const description=view==='signup'?'A few details, one email check, and a little good company.':view==='forgot'?'We’ll email you a secure link to choose a new passphrase.':view==='resend'?'If your signup is still awaiting confirmation, we’ll send a new verification link.':view==='reset'?'Choose a new passphrase. You’ll sign in again after saving it.':'Log in to pick up the conversation.';
-    html=`<h2 id="auth-title">${title}</h2><p class="auth-description">${description}</p>${['login','signup'].includes(view)?`<div class="auth-tabs" role="tablist" aria-label="Account access"><button data-auth="login" role="tab" aria-selected="${view==='login'}">Log in</button><button data-auth="signup" role="tab" aria-selected="${view==='signup'}">Create an account</button></div>`:''}${isPreview?'<div class="preview-message">Design preview. Account fields are disabled; no credentials are collected. Use “Preview as” on the page to explore member and owner states.</div>':!configured?'<div class="preview-message">Membership opens soon. Registration and sign-in will be available when setup is complete.</div>':''}<form id="auth-form" data-view="${view}">${message?`<div class="form-message" role="alert">${esc(message)}</div>`:''}${authFields(view)}</form><p class="auth-footnote">${view==='signup'?'Verify your own email first. Cowboy approves posting access through his verified owner account.':['forgot','resend'].includes(view)?'<button class="text-button" data-auth="login">Back to log in</button>':'Your email is private. Your display name appears on your posts.'}</p>`;
+    const title=view==='signup'?'A place for you.':view==='forgot'?'Forgot your password?':view==='resend'?'One more email.':view==='reset'?'Make a fresh start.':view==='setup'?'Secure your account.':'Good to see you.';
+    const description=view==='signup'?'A few details, one email check, and a little good company.':view==='forgot'?'We’ll email you a secure link to choose a new passphrase.':view==='resend'?'If your signup is still awaiting confirmation, we’ll send a new verification link.':view==='reset'?'Choose a new passphrase. You’ll sign in again after saving it.':view==='setup'?'Choose your own passphrase to finish your invitation. You’ll sign in again after saving it.':'Log in to pick up the conversation.';
+    html=`<h2 id="auth-title">${title}</h2><p class="auth-description">${description}</p>${['login','signup'].includes(view)?`<div class="auth-tabs" role="tablist" aria-label="Account access"><button data-auth="login" role="tab" aria-selected="${view==='login'}">Log in</button><button data-auth="signup" role="tab" aria-selected="${view==='signup'}">Create an account</button></div>`:''}${isPreview?'<div class="preview-message">Design preview. Account fields are disabled; no credentials are collected. Use “Preview as” on the page to explore member and owner states.</div>':!configured?'<div class="preview-message">Membership opens soon. Registration and sign-in will be available when setup is complete.</div>':view==='signup'&&!registrationOpen?'<div class="preview-message">New accounts open after owner setup is complete.</div>':''}<form id="auth-form" data-view="${view}">${message?`<div class="form-message" role="alert">${esc(message)}</div>`:''}${authFields(view)}</form><p class="auth-footnote">${view==='signup'?'Verify your own email first. Cowboy approves posting access through his verified owner account.':['forgot','resend'].includes(view)?'<button class="text-button" data-auth="login">Back to log in</button>':'Your email is private. Your display name appears on your posts.'}</p>`;
   }
   $('auth-content').innerHTML=html;const dialog=$('auth-dialog');if(!dialog.open)dialog.showModal();
 }
@@ -109,6 +114,7 @@ async function bootstrap(){
   if(!state.user.email_confirmed_at){state.member=null;openAuth('check');return;}
   const result=await api('bootstrap',{displayName:state.user.user_metadata?.display_name,rulesVersion:state.user.user_metadata?.rules_version});
   state.member=result.member;renderFeed();
+  if(state.passwordSetup)openAuth('setup');
   if(reviewToken){if(state.member.role==='owner')await openReviewLink();else toast('This review link is for the verified owner account.');}
 }
 async function submitAuth(form){
@@ -118,6 +124,7 @@ async function submitAuth(form){
     const email=String(values.get('email')||'').trim(),password=String(values.get('password')||'');
     const redirectTo=new URL('community.html',location.href).href;
     if(view==='signup'){
+      if(!registrationOpen)throw new Error('New accounts open after owner setup is complete.');
       const name=displayName(values.get('displayName'));if(password.length<15||password.length>128)throw new Error('Use a passphrase of 15–128 characters.');
       if(!values.get('rules'))throw new Error('Please accept the community guidelines.');
       const {error}=await client.auth.signUp({email,password,options:{emailRedirectTo:redirectTo,data:{display_name:name,rules_version:RULES_VERSION}}});
@@ -126,11 +133,12 @@ async function submitAuth(form){
       const {error}=await client.auth.resend({type:'signup',email,options:{emailRedirectTo:redirectTo}});form.reset();if(error)throw new Error('We couldn’t request that email right now. Please try again shortly.');openAuth('check');
     }else if(view==='forgot'){
       const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo});form.reset();if(error)throw new Error('We couldn’t request a reset right now. Please try again shortly.');openAuth('resetSent');
-    }else if(view==='reset'){
-      if(!state.recovery)throw new Error('Open the newest password-reset email first.');
+    }else if(view==='reset'||view==='setup'){
+      if(view==='reset'&&!state.recovery)throw new Error('Open the newest password-reset email first.');
+      if(view==='setup'&&!state.user)throw new Error('Open your newest invitation email first.');
       if(password.length<15||password.length>128)throw new Error('Use a passphrase of 15–128 characters.');
       const {error}=await client.auth.updateUser({password});form.reset();if(error)throw new Error('That reset could not be completed. Open the newest reset email and try again.');
-      await client.auth.signOut({scope:'global'});state.recovery=false;state.member=null;state.user=null;renderFeed();openAuth('resetDone');
+      await client.auth.signOut({scope:'global'});state.recovery=false;state.passwordSetup=false;state.member=null;state.user=null;renderFeed();openAuth('resetDone');
     }else {
       try{localStorage.setItem('cowboy-community-remember',values.get('remember')?'yes':'no')}catch{}
       const {error}=await client.auth.signInWithPassword({email,password});form.reset();if(error)throw new Error('We couldn’t sign you in. Check your details or request a password reset.');
