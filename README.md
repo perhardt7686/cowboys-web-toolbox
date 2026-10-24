@@ -1,9 +1,30 @@
 # Cowboy’s Web Toolbox
 
-A public static directory of useful websites and internet discoveries. Built with plain HTML, CSS and JavaScript. No backend, accounts, tracking, API keys, dependencies or paid integrations. Favorites stay in each visitor’s browser.
+A public directory of 69 useful websites, 28 tips and 85 source videos, with original illustrated previews and browser-local favorites. The creator archive is still being cataloged. Sources are credited to Matty McTech; this is an independent collection.
 
-69 destinations, 85 source videos, 28 tips/demonstrations as of October 23, 2026. The full creator archive is not complete. Video sources are credited to Matty McTech; this is an independent collection.
+GitHub Pages publishes `/docs` from `main` at https://perhardt7686.github.io/cowboys-web-toolbox/.
 
-Publish the `docs` directory to any static web host. The data in `docs/catalog.json` is public catalog data; no saved-folder identifiers or private business records are included. Run `python3 build.py` after changing the data or `index.template.html`.
+## The Commons
 
-GitHub Pages publishes the `docs` directory from the public `main` branch. Hosting uses the free github.io address.
+The account and message-board design lives at `docs/community.html`. Each catalog card links to conversations about that website. Add `?preview=1` to explore fictional visitor, pending-member, approved-member and owner states. Preview posts exist only in page memory. It never collects credentials or sends email.
+
+**Public registration is closed during owner setup.** `docs/community-config.js` enables sign-in and invitation password setup with `registrationOpen: false`; server signup also stays disabled. The Supabase database and authenticated API are deployed, live privacy checks pass, and the Edge sender’s Gmail authentication and owner-inbox receipt are verified. Auth SMTP and live account/moderation checks remain before opening signup. The catalog remains freely browsable.
+
+The optional backend uses Supabase Auth, Postgres with row-level security and a JWT-verifying Edge Function. Verified members await owner approval before posting. Single-use email review links require the verified owner account and a confirmed POST. The board includes categories, full-text search, website-specific discussions, replies, private reports, held-content review, thread closure, membership suspension and account deletion requests.
+
+Edward is explicitly identified as an **automated moderator**. He gives fixed, catalog-based suggestions and original source links. This is a separate website program, not a persistent connection to the author's ChatGPT conversation. It has no access to private chats or inboxes. Owner decisions are not delegated to him.
+
+See [COMMUNITY.md](COMMUNITY.md) for the research, setup, security boundaries and launch checks.
+
+## Development
+
+The public catalog has no build-time dependencies. Run `python3 build.py` after changing `index.template.html`, catalog data or the shared community module. This rebuilds `docs/index.html`, the standalone catalog preview and the server's public catalog/validation copies.
+
+For backend verification, use Node 22+ and `npm ci`, then:
+
+```sh
+npm test
+npm run check:edge
+```
+
+The tests run actual Postgres constraints, policies and transaction functions in PGlite, with injected authentication and mail transports. They do not claim to verify a live Supabase project or SMTP delivery. Package versions and the npm dependency lockfile are committed. Runtime secrets are never committed or placed in `/docs`.
