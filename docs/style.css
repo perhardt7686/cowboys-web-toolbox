@@ -4,3 +4,19 @@
 @media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}*{transition:none!important}}
 
 .discussion-link{display:block;margin:0 0 16px;color:var(--forest,#243e35);font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:4px}.community-invite{border-top:1px solid #d8dbcd;padding-top:60px;padding-bottom:60px;display:flex;align-items:center;justify-content:space-between;gap:36px}.community-invite h2{font-family:Georgia,serif;font-size:clamp(34px,4vw,52px);font-weight:400;line-height:1.05;margin:12px 0 18px}.community-invite p:not(.eyebrow){max-width:500px;line-height:1.7;color:#62685c}.community-invite .browse-link{white-space:nowrap}@media(max-width:650px){.community-invite{display:block;padding-top:40px;padding-bottom:40px}.community-invite .browse-link{margin-top:20px}}
+
+/* Message board discoverability */
+.masthead nav a.nav-board{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:11px 15px;border:1px solid #b8c98d;border-radius:7px;background:var(--lime);color:var(--ink);font-size:11px;font-weight:800;letter-spacing:.65px;white-space:nowrap;text-decoration:none;box-shadow:0 3px 0 #c4d29f}
+.masthead nav a.nav-board:hover{background:#d4e793;text-decoration:none}
+.nav-board svg,.board-link svg{width:18px;height:18px;flex-shrink:0}
+.hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:20px 24px}
+.board-link{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:14px 18px;border:1px solid var(--ink);border-radius:7px;background:var(--ink);color:var(--white);font-size:12px;font-weight:800;letter-spacing:.65px;text-decoration:none;line-height:1.4}
+.board-link:hover{background:#395744}
+.board-link>span{font-size:18px;margin-left:5px}
+.hero-actions .browse-link{padding-block:9px}
+.community-page .masthead nav a.nav-board[aria-current]{text-decoration:none}
+.community-hero .eyebrow.board-kicker{color:var(--forest);font-size:12px;font-weight:800;letter-spacing:1.25px;line-height:1.7}
+@media(max-width:650px){.toolbox-page .header-inner{height:auto;min-height:88px;flex-wrap:wrap;padding-block:12px;gap:10px}.toolbox-page .masthead nav{width:100%;margin-left:0;justify-content:space-between;gap:15px}.masthead nav a.nav-board{font-size:10px;padding:10px 12px;min-height:42px}.hero-actions{align-items:flex-start;gap:20px}.hero-actions .board-link{min-height:47px}.community-invite .board-link{margin-top:20px}.community-hero .eyebrow.board-kicker{font-size:10px;letter-spacing:1px}}
+
+/* Real destination counters. */
+.click-counter{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#758067;padding:8px 0 4px;line-height:1.4}.click-counter::before{content:'↗';font-size:12px}.click-counter[data-count-unavailable]{color:#8c917e}
