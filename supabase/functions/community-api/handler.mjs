@@ -1,8 +1,10 @@
 import {text,displayName,validatePost,reviewContent,edwardReply,canPost,RULES_VERSION} from './domain.mjs';
+import {validateProfile} from './profile-domain.mjs';
 
 export class HttpError extends Error {constructor(status,message){super(message);this.status=status}}
 const uuid=value=>{if(typeof value!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu.test(value))throw new HttpError(400,'Invalid record.');return value};
 const check=result=>{if(result.error)throw new HttpError(503,'The community could not complete that request. Please try again.');return result.data};
+const changed=result=>{const row=check(result);if(!row)throw new HttpError(404,'That record is unavailable. Refresh the owner dashboard.');return row};
 const hex=bytes=>Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
 export async function tokenHash(value){return hex(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))))}
 export function isVerifiedOwner(user,email){return !!user?.email_confirmed_at&&typeof email==='string'&&email.length>0&&user.email?.toLowerCase()===email.toLowerCase()}
@@ -16,7 +18,7 @@ async function readJSON(request){
   try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes))}catch{throw new HttpError(400,'Invalid request.');}
 }
 
-export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,siteURL,allowedOrigins}){
+export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,siteURL,allowedOrigins,senderConfigured=false}){
   const baseURL=new URL(siteURL);if(baseURL.protocol!=='https:')throw new Error('An HTTPS community URL is required.');
   if(!ownerEmail||!Array.isArray(allowedOrigins)||!allowedOrigins.length)throw new Error('Owner and origin configuration is required.');
   const origins=new Set(allowedOrigins);
@@ -63,7 +65,8 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
     if(action==='bootstrap'){
       const member=await ensureMember(user,payload);let notice=null;
       if(member.status==='pending')notice=await approvalEmail(member);
-      return {member:{...member,role:isVerifiedOwner(user,ownerEmail)?'owner':'member'},approvalEmailStatus:notice};
+      const profile=check(await db.from('community_profiles').select('*').eq('user_id',user.id).maybeSingle());
+      return {member:{...member,role:isVerifiedOwner(user,ownerEmail)?'owner':'member'},profile,approvalEmailStatus:notice};
     }
     const member=await getMember(user);
     if(!member)throw new HttpError(403,'Complete your membership request first.');
@@ -73,8 +76,14 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       return {approvalEmailStatus:await approvalEmail(member,true)};
     }
     if(action==='profile'){
+      await claim(`profile:${user.id}`,60,6);
       const name=isVerifiedOwner(user,ownerEmail)?'Cowboy':displayName(payload.displayName);
-      check(await db.from('community_members').update({display_name:name}).eq('user_id',user.id));return {display_name:name};
+      let profile=null;
+      if(payload.profile!==undefined){try{profile=validateProfile(payload.profile,{userId:user.id,isOwner:isVerifiedOwner(user,ownerEmail)});}catch(error){throw new HttpError(400,error.message);}}
+      if(profile?.published&&reviewContent(profile.headline+'\n'+profile.bio).status==='held')throw new HttpError(400,'Please remove private credentials or link floods before sharing your profile.');
+      const result=await db.rpc('community_save_profile',{p_user:user.id,p_name:name,p_profile:profile});
+      if(result.error?.code==='23505')throw new HttpError(409,'That profile handle is already in use. Choose another.');
+      return {display_name:name,profile:check(result)};
     }
     if(action==='create_thread'){
       requirePosting(member);await claim(`thread:${user.id}`,60,1);await claim(`thread-day:${user.id}`,86400,10);
@@ -117,6 +126,24 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       return {requested:true,emailSent};
     }
     requireOwner(user);
+    if(action==='admin_overview')return {...check(await db.rpc('community_admin_overview',{p_actor:user.id})),senderConfigured};
+    if(action==='admin_members')return check(await db.rpc('community_admin_members',{p_actor:user.id,p_search:payload.search?text(payload.search,80,0):'',p_status:payload.status||'all',p_offset:Number.isInteger(payload.offset)?payload.offset:0}));
+    if(action==='admin_bulk'){
+      if(payload.confirm!==true)throw new HttpError(400,'Confirm the selected member changes.');
+      if(!Array.isArray(payload.userIds)||payload.userIds.length<1||payload.userIds.length>20)throw new HttpError(400,'Choose one to twenty members.');
+      const ids=[...new Set(payload.userIds.map(uuid))];
+      if(!['approved','declined','suspended'].includes(payload.status))throw new HttpError(400,'Choose a valid member status.');
+      return check(await db.rpc('community_bulk_member_status',{p_actor:user.id,p_users:ids,p_status:payload.status}));
+    }
+    if(action==='announcement'){
+      if(payload.confirm!==true||typeof payload.enabled!=='boolean')throw new HttpError(400,'Confirm the announcement change.');
+      return {announcement:check(await db.rpc('community_set_announcement',{p_actor:user.id,p_text:text(payload.text||'',500,0),p_enabled:payload.enabled}))};
+    }
+    if(action==='owner_test_mail'){
+      if(payload.confirm!==true)throw new HttpError(400,'Confirm the owner email test.');
+      await claim('email:owner-test',600,1);
+      return {emailSent:await notifyOwner('Owner notification test','Your message-board notification sender accepted this owner test. No password, session credential or authorization link is included.')};
+    }
     if(action==='admin_queue'){
       const [members,reports,threads,replies,deletions,accounts]=await Promise.all([
         db.from('community_members').select('user_id,display_name,status,created_at').eq('status','pending').order('created_at').limit(50),
@@ -147,17 +174,20 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       const id=uuid(payload.id),kind=payload.kind;
       if(kind==='thread'||kind==='reply'){
         if(!['published','hidden'].includes(payload.status))throw new HttpError(400,'Choose publish or hide.');
-        check(await db.from(kind==='thread'?'community_threads':'community_replies').update({status:payload.status}).eq('id',id));
+        changed(await db.from(kind==='thread'?'community_threads':'community_replies').update({status:payload.status}).eq('id',id).select('id').maybeSingle());
       }else if(kind==='lock'){
         if(typeof payload.locked!=='boolean')throw new HttpError(400,'Choose a conversation state.');
-        check(await db.from('community_threads').update({locked:payload.locked}).eq('id',id));
+        changed(await db.from('community_threads').update({locked:payload.locked}).eq('id',id).select('id').maybeSingle());
+      }else if(kind==='pin'){
+        if(typeof payload.pinned!=='boolean')throw new HttpError(400,'Choose a pin state.');
+        changed(await db.from('community_threads').update({pinned:payload.pinned}).eq('id',id).select('id').maybeSingle());
       }else if(kind==='member'){
         if(id===user.id)throw new HttpError(400,'You cannot suspend your owner account.');
         if(!['suspended','approved'].includes(payload.status))throw new HttpError(400,'Choose suspend or restore.');
-        check(await db.from('community_members').update({status:payload.status}).eq('user_id',id).eq('role','member'));
-      }else if(kind==='report')check(await db.from('community_reports').update({status:'resolved',resolved_at:new Date().toISOString()}).eq('id',id));
+        changed(await db.from('community_members').update({status:payload.status}).eq('user_id',id).eq('role','member').select('user_id').maybeSingle());
+      }else if(kind==='report')changed(await db.from('community_reports').update({status:'resolved',resolved_at:new Date().toISOString()}).eq('id',id).select('id').maybeSingle());
       else throw new HttpError(400,'Unknown moderation action.');
-      await audit(user.id,`moderation.${kind}`,id,{status:payload.status||null,locked:payload.locked??null});return {updated:true};
+      await audit(user.id,`moderation.${kind}`,id,{status:payload.status||null,locked:payload.locked??null,pinned:payload.pinned??null});return {updated:true};
     }
     throw new HttpError(400,'Unknown community action.');
   }

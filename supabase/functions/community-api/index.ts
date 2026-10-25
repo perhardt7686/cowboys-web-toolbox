@@ -24,6 +24,7 @@ const handler=createCommunityHandler({
   db,auth:db.auth,catalog:catalog.sites,ownerEmail,
   siteURL:required('COMMUNITY_URL'),
   allowedOrigins:required('ALLOWED_ORIGINS').split(',').map(v=>v.trim()).filter(Boolean),
+  senderConfigured:['SMTP_HOST','SMTP_USER','SMTP_FROM','SMTP_PASSWORD'].every(key=>!!Deno.env.get(key)),
   sendMail:async({to,subject,text}:{to:string,subject:string,text:string})=>{
     // This transport sends operational notices only to the configured owner.
     if(to.toLowerCase()!==ownerEmail.toLowerCase())throw new Error('Owner mailbox only');

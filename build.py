@@ -9,12 +9,17 @@ html=t.replace('__CATALOG_DATA__',s)
 (r/'docs/index.html').write_text(html)
 standalone=html.replace('<link rel="stylesheet" href="style.css">','<style>'+(r/'docs/style.css').read_text()+'</style>').replace('<script src="app.js" defer></script>','<script>'+(r/'docs/app.js').read_text()+'</script>')
 icon='data:image/svg+xml;base64,'+base64.b64encode((r/'docs/favicon.svg').read_bytes()).decode()
+standalone=standalone.replace('<script src="community-config.js" defer></script>','<script>'+(r/'docs/community-config.js').read_text()+'</script>')
 standalone=standalone.replace('href="favicon.svg"','href="'+icon+'"')
 (r/'docs/Cowboys-Web-Toolbox-Preview.html').write_text(standalone)
 edge=r/'supabase/functions/community-api'
 edge.mkdir(parents=True,exist_ok=True)
 shutil.copyfile(r/'docs/community-core.mjs',edge/'domain.mjs')
+(edge/'profile-domain.mjs').write_text((r/'docs/profile-core.mjs').read_text().replace("'./community-core.mjs'","'./domain.mjs'"))
 videos={v['number']:v for v in d['videos']}
 edge_catalog={'sites':[{**site,'source_urls':[videos[n]['url'] for n in site['sources']]} for site in d['sites']]}
 (edge/'catalog.json').write_text(json.dumps(edge_catalog,ensure_ascii=False,indent=2)+'\n')
+activity=r/'supabase/functions/website-activity'
+activity.mkdir(parents=True,exist_ok=True)
+shutil.copyfile(edge/'catalog.json',activity/'catalog.json')
 print(f"Built website, standalone preview and community assets: {len(d['sites'])} destinations / {len(d['videos'])} source videos / {len(d['tips'])} tips")

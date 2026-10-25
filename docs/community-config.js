@@ -5,5 +5,6 @@ window.COWBOY_COMMUNITY_CONFIG=Object.freeze({
   supabaseUrl:'https://twecuqwetzfweljoxbty.supabase.co',
   publishableKey:'sb_publishable_u7HeFIVkPUjzbx2_OLW3Ow_ZBwwBEK-',
   functionName:'community-api',
+  activityFunctionName:'website-activity',
   requireOwnerApproval:true
 });
