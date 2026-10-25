@@ -1,0 +1,2376 @@
+{
+  "sites": [
+    {
+      "id": "fmhy",
+      "name": "FMHY",
+      "url": "https://fmhy.net/",
+      "category": "Utilities",
+      "description": "A directory of online resources, organized by topic.",
+      "sources": [
+        1
+      ],
+      "monogram": "FM",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The source video shows fmhy.net in the browser address bar.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/this-is-too-helpful-technology-internet-computer/4928603844095744/",
+        "https://www.threads.com/@setupspawn/post/DZnWDvJjDPA/video-did-you-know-about-this-i-found-a-directory-of-useful-tools-on-the-internet/",
+        "https://www.snapchat.com/@setupspawn/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYam5xbHFic294AZ7dpHdJAZ7djbFbAAAAAw",
+        "https://fmhy.net/"
+      ],
+      "destinationCheck": {
+        "url": "https://fmhy.net/",
+        "title": "Welcome • freemediaheckyeah",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Directory of online resources grouped into privacy, AI, streaming, music, gaming, reading, education and other categories. No claim that every linked resource has the same pricing or availability.",
+        "sourceRefs": [
+          "turn129view0"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=4928603844095744"
+      ]
+    },
+    {
+      "id": "123apps",
+      "name": "123apps",
+      "url": "https://123apps.com/",
+      "category": "Utilities",
+      "description": "Edit and convert video, audio, PDF, and other files in your browser.",
+      "sources": [
+        2
+      ],
+      "monogram": "123",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The compilation shows 123apps.com at 0:12.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/3-websites-you-need-to-know/422978859812000/",
+        "https://www.facebook.com/FastEd1988/posts/46b79a89/29330389026546924/",
+        "https://123apps.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://123apps.com/",
+        "title": "Web Apps by 123apps - Edit, Convert, Create",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Browser tools for editing video and audio, manipulating PDFs, converting files, and extracting archives. Homepage includes premium options; no broad claim of unrestricted free use.",
+        "sourceRefs": [
+          "turn128view1"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=422978859812000"
+      ]
+    },
+    {
+      "id": "netflixcodes",
+      "name": "NetflixCodes.net",
+      "url": "https://netflixcodes.net/",
+      "category": "Movies & media",
+      "description": "The Netflix category-code directory shown in the video.",
+      "sources": [
+        2
+      ],
+      "monogram": "NC",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The compilation shows netflixcodes.net in the address bar at 1:18.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/3-websites-you-need-to-know/422978859812000/",
+        "https://netflixcodes.net/",
+        "https://www.facebook.com/jyoti.kabra.16/posts/try-this-amazing-websitetech/28990359637267467/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The exact video address was verified visually. This research tool could not retrieve its current page. The original link is retained; current availability is unverified.",
+        "url": "https://netflixcodes.net/"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=422978859812000"
+      ]
+    },
+    {
+      "id": "hotpot",
+      "name": "Hotpot",
+      "url": "https://hotpot.ai/",
+      "category": "Creative",
+      "description": "AI image tools, photo restoration, colorization, and background removal.",
+      "sources": [
+        2
+      ],
+      "monogram": "HP",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The compilation shows hotpot.ai at 2:11.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/3-websites-you-need-to-know/422978859812000/",
+        "https://www.facebook.com/FastEd1988/posts/46b79a89/29330389026546924/",
+        "https://www.facebook.com/jyoti.kabra.16/posts/try-this-amazing-websitetech/28990359637267467/",
+        "https://hotpot.ai/"
+      ],
+      "destinationCheck": {
+        "url": "https://hotpot.ai/",
+        "title": "AI Image Generator, AI Videos and AI Headshots | Hotpot.ai",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. AI image, video and headshot tools, plus photo editing, upscaling, colorization, restoration and background removal. Feature pricing was not assessed.",
+        "sourceRefs": [
+          "turn128view3"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=422978859812000"
+      ]
+    },
+    {
+      "id": "playphrase",
+      "name": "PlayPhrase.me",
+      "url": "https://www.playphrase.me/",
+      "category": "Movies & media",
+      "description": "Find movie and TV dialogue clips by searching a word or phrase.",
+      "sources": [
+        3
+      ],
+      "monogram": "PP",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact Facebook ID indexes as Websites to Cure Boredom Part 15. Creator's McStumble collection explicitly maps Part 15 to Playphrase and describes movie/TV phrase clips. Creator Snapchat crosspost title and indexed description explicitly name PlayPhrase.me.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/find-clips-from-movies-and-tv-shows-tv-movies-technology/1581989003605175/",
+        "https://mcstumble.com/bored",
+        "https://www.snapchat.com/@setupspawn/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYbnVjeHVyZndwAZ-l8P3cAZ-l8Oq9AAAAAw",
+        "https://www.playphrase.me/",
+        "https://learn.playphrase.me/guides/find-movie-from-partial-quote/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.playphrase.me/",
+        "title": "PlayPhrase.me: Site for cinema archaeologists.",
+        "status": "reachable_javascript_app_interaction_not_tested",
+        "description": "Search words or phrases to find matching movie and TV dialogue clips and identify their source.",
+        "notes": "Official root page title retrieved; text extraction contained no app body. Current first-party guides describe phrase search, source titles and timestamps. No playback or pricing test performed.",
+        "evidenceUrls": [
+          "https://www.playphrase.me/",
+          "https://learn.playphrase.me/guides/find-movie-from-partial-quote/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1581989003605175"
+      ]
+    },
+    {
+      "id": "innerbody",
+      "name": "Innerbody Anatomy Explorer",
+      "url": "https://www.innerbody.com/htm/body.html",
+      "category": "Learning",
+      "description": "Explore illustrations and explanations of the human body’s systems.",
+      "sources": [
+        4
+      ],
+      "monogram": "IB",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Matching-caption creator Facebook post indexes innerbody.com/htm. Creator Snapchat Learn about the body indexed title/description explicitly names innerbody.com. Official Innerbody page describes 12 anatomy systems.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/explore-the-human-bodyi-found-this-fun-tool-where-you-can-find-an-interactive-3d/1023428817210428/",
+        "https://www.facebook.com/SetupSpawn/posts/explore-the-human-bodyi-found-this-fun-tool-where-you-can-find-an-interactive-3d/1740158133839934/",
+        "https://www.snapchat.com/@setupspawn/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYc2dvYWxtYXh6AZ_d8uqHAZ_dbDoBAAAAAw",
+        "https://www.innerbody.com/htm/body.html"
+      ],
+      "destinationCheck": {
+        "url": "https://www.innerbody.com/htm/body.html",
+        "title": "Human Anatomy Explorer | Detailed 3D anatomical illustrations",
+        "status": "reachable_content_verified",
+        "description": "Explore anatomical illustrations and explanations across 12 human body systems.",
+        "notes": "Official page displays the Innerbody Anatomy Explorer heading and links to the skeletal, muscular, nervous and other systems. No redirect or retirement notice observed.",
+        "evidenceUrls": [
+          "https://www.innerbody.com/htm/body.html"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1023428817210428"
+      ]
+    },
+    {
+      "id": "retrogames",
+      "name": "RetroGames.cc",
+      "url": "https://www.retrogames.cc/",
+      "category": "Games",
+      "description": "Browse retro console and arcade games offered for browser play.",
+      "sources": [
+        6,
+        46
+      ],
+      "monogram": "RG",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact Facebook ID and matching-caption post indexed descriptions name retrogames.cc. Creator Snapchat title is Matty McTech Plays Spyro the Dragon on RetroGames.cc. Official site verified as browser retro-game catalog.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/do-you-remember-these-technology-gaming-retrogaming/1581248173269324/",
+        "https://www.facebook.com/SetupSpawn/posts/do-you-remember-these-technology-gaming-retrogaming/1806378060551274/",
+        "https://www.snapchat.com/@setupspawn/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYZnBsZGN6YXRyAZ3AMtnMAZ3AMpdVAAAAAQ",
+        "https://www.retrogames.cc/",
+        "https://www.facebook.com/reel/1816886513070009/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.retrogames.cc/",
+        "title": "RetroGames.cc - Play retro games online in your browser",
+        "status": "reachable_catalog_verified_games_not_launched",
+        "description": "Browse and search a catalog of retro console and arcade games offered for play in the browser.",
+        "notes": "Official catalog and console categories retrieved, including NES, SNES, Nintendo 64 and PlayStation. Site requires JavaScript for game use; no game was launched.",
+        "evidenceUrls": [
+          "https://www.retrogames.cc/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "sourceEvidence": [
+        {
+          "videoNumber": 46,
+          "videoId": "1816886513070009",
+          "evidence": "retrogames.cc is clearly visible in the address bar in the exact Facebook clip."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1581248173269324",
+        "https://www.facebook.com/reel/1816886513070009/"
+      ]
+    },
+    {
+      "id": "windows93",
+      "name": "Windows93",
+      "url": "https://www.windows93.net/",
+      "category": "Games",
+      "description": "Explore a playful retro desktop full of experimental web apps.",
+      "sources": [
+        7
+      ],
+      "monogram": "93",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows the Windows93 desktop at 0:07.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/did-you-know-about-this/1064307386448018/",
+        "https://www.facebook.com/SetupSpawn/videos/did-you-know-about-thisi-found-a-cool-retro-style-windows-operating-system-that/851918417659604/",
+        "https://www.windows93.net/",
+        "https://support.windows93.net/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.windows93.net/",
+        "title": "WINDOWS93",
+        "status": "reachable_javascript_app_interaction_not_tested",
+        "description": "Explore a playful desktop environment inspired by early web culture and retro computing.",
+        "notes": "Official root title retrieved; text extraction says JavaScript is required. Its official support page identifies Windows93 as an experimental operating-system parody and interactive web-art project. No retirement notice observed.",
+        "evidenceUrls": [
+          "https://www.windows93.net/",
+          "https://support.windows93.net/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1064307386448018"
+      ]
+    },
+    {
+      "id": "chattjb",
+      "name": "ChatTJB",
+      "url": "https://chattjb.org/",
+      "category": "Learning",
+      "description": "The human-powered chatbot art project featured in the story.",
+      "sources": [
+        9
+      ],
+      "monogram": "TJ",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact-ID creator result under query Matty McTech ChatTJB: ChatTJB .org. Instead of using actual artificial intelligence, Tucker...",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/genius-or-evilthis-man-trolled-an-entire-city-by-tricking-them-into-thinking-the/1697370131517968/",
+        "https://chattjb.org/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_javascript_app_interaction_not_tested",
+        "url": "https://chattjb.org/",
+        "checkedDate": "2026-10-23",
+        "notes": "The official page title confirms ChatTJB and its human-powered art project. Interactive chat operation was not tested."
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1697370131517968"
+      ]
+    },
+    {
+      "id": "nosignups",
+      "name": "NoSignups",
+      "url": "https://nosignups.net/",
+      "category": "Utilities",
+      "description": "Find open-source browser tools that do not require signup.",
+      "sources": [
+        10
+      ],
+      "monogram": "NS",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The clip shows FckSignups.com at 0:12; its official redirect and repository confirm the rename.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/tired-of-having-to-sign-up-for-thingsi-found-a-place-that-has-tons-of-free-open-/27163560086653915/",
+        "https://www.facebook.com/SetupSpawn/posts/tired-of-having-to-sign-up-for-thingsi-found-a-place-that-has-tons-of-free-open-/1767798274409253/",
+        "https://x.com/setupspawn/status/2097086445211009383",
+        "https://www.youtube.com/shorts/n_mXys12VkY",
+        "https://www.threads.com/@setupspawn/post/DdAJPmNAI1Q/video-tired-of-having-to-sign-up-for-things-i-found-a-place-that-has-tons-of-free/",
+        "https://fcksignups.com/",
+        "https://nosignups.net/",
+        "https://github.com/BraveOPotato/NoSignups"
+      ],
+      "destinationCheck": {
+        "url": "https://nosignups.net/",
+        "title": "NoSignups - Open Source Tools. Zero Bullsh*t.",
+        "status": "redirect_verified_current_destination_reachable",
+        "description": "Browse a curated directory of open-source browser tools that do not require signup.",
+        "notes": "The original https://fcksignups.com/ redirects to https://nosignups.net/. Official repository confirms the former FckSignups name and current homepage. Root page is a JavaScript app shell; individual listed tools were not all tested.",
+        "evidenceUrls": [
+          "https://fcksignups.com/",
+          "https://nosignups.net/",
+          "https://github.com/BraveOPotato/NoSignups"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "previousName": "FckSignups",
+      "originalUrl": "https://fcksignups.com/",
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=27163560086653915"
+      ]
+    },
+    {
+      "id": "excalidraw",
+      "name": "Excalidraw",
+      "url": "https://excalidraw.com/",
+      "category": "Creative",
+      "description": "Sketch diagrams on a collaborative whiteboard.",
+      "sources": [
+        10
+      ],
+      "monogram": "EX",
+      "role": "example",
+      "verification": "video",
+      "evidence": "An Excalidraw card is visible in the directory shown in source video 10.",
+      "evidenceUrls": [
+        "https://excalidraw.com/",
+        "https://plus.excalidraw.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://excalidraw.com/",
+        "title": "Excalidraw Whiteboard",
+        "status": "reachable_javascript_app_interaction_not_tested",
+        "description": "Sketch diagrams on a collaborative whiteboard with a hand-drawn appearance.",
+        "notes": "Official app root/title retrieved; the app requires JavaScript. First-party site description confirms collaborative diagram sketching. No whiteboard content created.",
+        "checkedDate": "2026-10-23",
+        "evidenceUrls": [
+          "https://excalidraw.com/",
+          "https://plus.excalidraw.com/"
+        ]
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=27163560086653915"
+      ]
+    },
+    {
+      "id": "opencut",
+      "name": "OpenCut",
+      "url": "https://opencut.app/",
+      "category": "Creative",
+      "description": "An open-source browser video editor, currently labeled early beta.",
+      "sources": [
+        10
+      ],
+      "monogram": "OC",
+      "role": "example",
+      "verification": "video",
+      "evidence": "An OpenCut card is visible in the directory shown in source video 10.",
+      "evidenceUrls": [
+        "https://opencut.app/",
+        "https://opencut.app/privacy",
+        "https://opencut.app/terms"
+      ],
+      "destinationCheck": {
+        "url": "https://opencut.app/",
+        "title": "OpenCut",
+        "status": "reachable_landing_page_verified_early_beta",
+        "description": "Edit videos in an open-source browser editor.",
+        "notes": "Official landing page describes a video editor and labels its launch link Try early beta. First-party privacy/terms pages describe locally stored browser projects. Editor was not opened and no media was uploaded.",
+        "checkedDate": "2026-10-23",
+        "evidenceUrls": [
+          "https://opencut.app/",
+          "https://opencut.app/privacy",
+          "https://opencut.app/terms"
+        ]
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=27163560086653915"
+      ]
+    },
+    {
+      "id": "keepa",
+      "name": "Keepa",
+      "url": "https://keepa.com/",
+      "category": "Shopping",
+      "description": "Check Amazon price-history charts and price-drop tracking tools.",
+      "sources": [
+        13
+      ],
+      "monogram": "K",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact saved video search-index summary identifies tutorial using Keepa browser extension; same-caption original post has comment discussing Keepa extension and Keepa website. Official site confirms price-history charts and price-drop alerts. Summary itself is weak; discussion adds confidence.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/dont-get-anything-on-amazon-prime-day-without-checking-this-amazon-primeday-onli/28992684500419160/",
+        "https://www.facebook.com/SetupSpawn/posts/dont-get-anything-on-amazon-prime-day-without-checking-this-amazon-primeday-onli/1792560615266352/",
+        "https://keepa.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://keepa.com/",
+        "title": "Keepa - Amazon Price Tracker",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Tracks Amazon products and provides price-history charts and price-drop alerts. Pricing and browser-extension installation were not assessed.",
+        "sourceRefs": [
+          "turn129view1"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=28992684500419160"
+      ]
+    },
+    {
+      "id": "messenger",
+      "name": "Messenger by abeto",
+      "url": "https://messenger.abeto.co/",
+      "category": "Games",
+      "description": "Explore a small planet and make deliveries in a cozy browser game.",
+      "sources": [
+        14
+      ],
+      "monogram": "M",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact Facebook ID indexed description explicitly names Messenger at messenger.abeto.co. Official page and developer's original public announcement corroborate the small-planet mail-delivery game.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/cure-your-boredomthis-cozy-browser-game-will-keep-you-entertained-for-hours-whil/1760313315415365/",
+        "https://messenger.abeto.co/",
+        "https://x.com/abeto_co"
+      ],
+      "destinationCheck": {
+        "url": "https://messenger.abeto.co/",
+        "title": "Messenger",
+        "status": "reachable_javascript_game_interaction_not_tested",
+        "description": "Explore a small planet and make deliveries in a browser game.",
+        "notes": "Official page title and indexed first-party description about making deliveries on a small planet retrieved. Game body is a JavaScript shell; gameplay was not started.",
+        "evidenceUrls": [
+          "https://messenger.abeto.co/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1760313315415365"
+      ]
+    },
+    {
+      "id": "animated",
+      "name": "Animated Drawings",
+      "url": "https://sketch.metademolab.com/",
+      "category": "Creative",
+      "description": "Turn a drawing of a humanlike character into a short animation.",
+      "sources": [
+        15
+      ],
+      "monogram": "AD",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows sketch.metademolab.com at 0:03 and the drawing-animation workflow.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/animate-your-favorite-childs-drawings-animate-doodle-technology/947789371681480/",
+        "https://www.facebook.com/SetupSpawn/posts/animate-your-favorite-childs-drawings-animate-doodle-technology/1755139545675126/",
+        "https://www.snapchat.com/@setupspawn/spotlight/W7_EDlXWTBiXAEEniNoMPwAAYenBta3dkaHZzAZ3edrwRAZ3eRR92AAAAAQ",
+        "https://sketch.metademolab.com/",
+        "https://ai.meta.com/blog/ai-dataset-animation-drawings/"
+      ],
+      "destinationCheck": {
+        "url": "https://sketch.metademolab.com/",
+        "title": "Animated Drawings | Meta FAIR",
+        "status": "reachable_javascript_app_functional_availability_not_verified",
+        "description": "Upload a humanlike character drawing and turn it into a short animation.",
+        "notes": "Official demo page/title is reachable but text extraction only says to enable JavaScript. Meta research article documents the upload, annotation and animation workflow. No official retirement notice was found; current animation processing was not tested.",
+        "evidenceUrls": [
+          "https://sketch.metademolab.com/",
+          "https://ai.meta.com/blog/ai-dataset-animation-drawings/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=947789371681480"
+      ]
+    },
+    {
+      "id": "drivefun",
+      "name": "Make My Drive Fun",
+      "url": "https://makemydrivefun.com/",
+      "category": "Travel",
+      "description": "Find unusual attractions and roadside stops along a road trip.",
+      "sources": [
+        16
+      ],
+      "monogram": "DF",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Matching-caption post names Make My Drive Fun. Original creator road-trip post has direct named comments and creator reply about posting the videos to TikTok. Official site verified as route planner for roadside detours.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/where-will-you-goi-found-this-cool-website-that-will-make-your-road-trips-10x-mo/1568278138375258/",
+        "https://www.facebook.com/SetupSpawn/posts/where-will-you-goi-found-this-cool-website-that-will-make-your-road-trips-10x-mo/1757751748747239/",
+        "https://www.facebook.com/SetupSpawn/posts/use-this-for-your-next-road-trip-roadtrip-travel-vacation/710866223435802/",
+        "https://makemydrivefun.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://makemydrivefun.com/",
+        "title": "Make My Drive Fun",
+        "status": "reachable_content_verified_route_generation_not_tested",
+        "description": "Enter road-trip stops to find unusual attractions and roadside detours along your route.",
+        "notes": "Official page currently offers start/destination fields, additional stops, stop reordering and a Find fun stops action. No route was submitted.",
+        "evidenceUrls": [
+          "https://makemydrivefun.com/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1568278138375258"
+      ]
+    },
+    {
+      "id": "zperiod",
+      "name": "Zperiod",
+      "url": "https://zperiod.app/",
+      "category": "Learning",
+      "description": "Explore the periodic table, 3D atom models, and chemistry tools.",
+      "sources": [
+        17
+      ],
+      "monogram": "Z",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact FB ID indexed result explicitly states the video introduces zperiod.app and its interactive periodic table. Associated post comments refer to aluminum spelling on the website. Official site verified as periodic table with 3D atom models, tools and worksheets.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/i-learned-so-much-from-this/2613292005776379/",
+        "https://www.facebook.com/SetupSpawn/posts/i-learned-so-much-from-this-science-chemistry-technology/1775725296949884/",
+        "https://zperiod.app/"
+      ],
+      "destinationCheck": {
+        "url": "https://zperiod.app/",
+        "title": "Zperiod: Interactive Periodic Table",
+        "status": "reachable_content_verified",
+        "description": "Explore elements and 3D atom models, use chemistry calculators, and generate practice worksheets.",
+        "notes": "Official page describes all 118 elements, ions, equation balancing, molar mass, solubility and worksheet tools. The site requests a desktop browser for the full workspace. Interactive calculations were not tested.",
+        "evidenceUrls": [
+          "https://zperiod.app/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=2613292005776379"
+      ]
+    },
+    {
+      "id": "ninite",
+      "name": "Ninite",
+      "url": "https://ninite.com/",
+      "category": "Utilities",
+      "description": "Select Windows apps to install or update together.",
+      "sources": [
+        18
+      ],
+      "monogram": "N",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows ninite.com and its application checklist at 0:06.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/computer-trick-you-must-know-technology-computer-pcgamer/1725945799156097/",
+        "https://ninite.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://ninite.com/",
+        "title": "Ninite - Install or Update Multiple Apps at Once",
+        "status": "reachable_content_verified_no_installer_created_or_downloaded",
+        "description": "Choose Windows applications to build a combined installer or update them together.",
+        "notes": "Official application checklist and batch-install/update explanation retrieved. No app selections, installer generation, downloads or execution performed.",
+        "evidenceUrls": [
+          "https://ninite.com/"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1725945799156097"
+      ]
+    },
+    {
+      "id": "archive",
+      "name": "Archive.is",
+      "url": "https://archive.is/",
+      "category": "Utilities",
+      "description": "Look up or save archived versions of webpages.",
+      "sources": [
+        19
+      ],
+      "monogram": "AR",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact-ID public creator result title: Bypass NYTimes Paywall With Archive.is Internet Trick. Summary specifically says the video uses the archive.is web service.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/did-you-know-this-trick-technology-internet-computer/1084867834355806/",
+        "https://archive.is/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "url": "https://archive.is/",
+        "checkedDate": "2026-10-23",
+        "notes": "The source identifies Archive.is. The current page returned a rate-limit response to the research tool, so current availability could not be verified."
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1084867834355806"
+      ]
+    },
+    {
+      "id": "wifiqr",
+      "name": "McStumble QR Generator",
+      "url": "https://mcstumble.com/tools/qr-generator",
+      "category": "Utilities",
+      "description": "Create a QR code for sharing your Wi-Fi network details.",
+      "sources": [
+        20
+      ],
+      "monogram": "QR",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows mcstumble.com/tools at 0:03. The creator’s tool page links the Wi-Fi QR generator.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/did-you-know-this-trick-wifi-internet-technology/1736824744283199/",
+        "https://mcstumble.com/tools/qr-generator"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "url": "https://mcstumble.com/tools/qr-generator",
+        "checkedDate": "2026-10-23",
+        "notes": "The official tool page includes a WiFi QR type and instructions for network name, password, encryption, and PNG download. No network details were entered."
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1736824744283199"
+      ]
+    },
+    {
+      "id": "osiris",
+      "name": "OSIRIS",
+      "url": "https://osirisai.live/",
+      "category": "Maps & world",
+      "description": "Explore a global dashboard of public maps, events, and tracking layers.",
+      "sources": [
+        22
+      ],
+      "monogram": "OS",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows OSIRIS and osirisai.live at 0:03.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/posts/spy-on-the-entire-world-world-technology-news/1768676170988130/",
+        "https://x.com/setupspawn/status/2097479166027317481",
+        "https://www.facebook.com/sherry.harrell/photos/10221099451734130/",
+        "https://github.com/simplifaisoul/osiris",
+        "https://osirisai.live/"
+      ],
+      "destinationCheck": {
+        "url": "https://osirisai.live/",
+        "title": "OSIRIS — Open Source Intelligence Platform | Live Flight Tracking, CCTV, OSINT Tools & More",
+        "status": "reachable_dynamic",
+        "notes": "First-party homepage retrieved. Global map dashboard with flight, maritime, satellite, CCTV, weather and cyber-threat views. Retrieved HTML shows STATUS: CONNECTING; live data feeds were not tested. Exact saved-video mapping was confirmed visually by root.",
+        "sourceRefs": [
+          "turn128view4"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1390759533197287"
+      ]
+    },
+    {
+      "id": "ifixit",
+      "name": "iFixit",
+      "url": "https://www.ifixit.com/",
+      "category": "Repair & vehicles",
+      "description": "Find step-by-step repair guides, community answers, tools, and parts.",
+      "sources": [
+        23
+      ],
+      "monogram": "IF",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact saved URL indexed discussion explicitly says iFixit is fantastic / iFixit has been GOAT20+years. Same-caption shared copy description explicitly identifies iFixit free step-by-step repair guides. Official homepage retrieved successfully on 2026-10-23.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/how-to-find-a-fix-for-anything-technology-tech-diy/1038664665876162/",
+        "https://www.facebook.com/ogbgsaint1/posts/ogbgsaint-fyp-fix-ogbgsainttech/1628438462395701/",
+        "https://www.ifixit.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.ifixit.com/",
+        "title": "iFixit: The Free Repair Manual",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Step-by-step repair guides, a community answers forum, teardowns, and a store for repair tools and parts.",
+        "sourceRefs": [
+          "turn129view2"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1038664665876162"
+      ]
+    },
+    {
+      "id": "carcare",
+      "name": "CarCareKiosk",
+      "url": "https://www.carcarekiosk.com/",
+      "category": "Repair & vehicles",
+      "description": "Find vehicle-specific maintenance and repair how-to videos.",
+      "sources": [
+        24
+      ],
+      "monogram": "CK",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows carcarekiosk.com at 0:04.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/need-help-with-your-car-automotive-cars-mechanic/1082854541395539/",
+        "https://www.carcarekiosk.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.carcarekiosk.com/",
+        "title": "CarCareKiosk – Free How-to Videos to Fix Your Car",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Vehicle-specific how-to videos for repair and maintenance tasks, searchable by vehicle; examples include batteries, fuses, fluids, lights and wiper blades. No purchase or account action performed.",
+        "checkedDate": "2026-10-23",
+        "sourceRefs": [
+          "turn135view1"
+        ]
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1082854541395539"
+      ]
+    },
+    {
+      "id": "rockauto",
+      "name": "RockAuto",
+      "url": "https://www.rockauto.com/",
+      "category": "Repair & vehicles",
+      "description": "Browse a vehicle and part-number catalog for replacement auto parts.",
+      "sources": [
+        24
+      ],
+      "monogram": "RA",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The same saved clip shows rockauto.com at approximately 0:22.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/need-help-with-your-car-automotive-cars-mechanic/1082854541395539/",
+        "https://www.rockauto.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.rockauto.com/",
+        "title": "RockAuto | All The Parts Your Car Will Ever Need",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Online automotive-parts retailer with a catalog searchable by vehicle, part type and part number, plus tools and universal parts. No price comparison, purchase or account action performed.",
+        "checkedDate": "2026-10-23",
+        "sourceRefs": [
+          "turn135view2"
+        ]
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1082854541395539"
+      ]
+    },
+    {
+      "id": "startmycar",
+      "name": "StartMyCar",
+      "url": "https://www.startmycar.com/",
+      "category": "Repair & vehicles",
+      "description": "Look up vehicle problems, fuse-box diagrams, and owner manuals.",
+      "sources": [
+        25
+      ],
+      "monogram": "SC",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact caption matches creator Threads post indexed OCR 'Powerful Websites You Should Know! Pt.414'. Public Toyota group share of same caption/part has indexed OCR same Part414 and '2018 Toyota Tacoma fuse box diagram - StartMyCar'. Strong mapping, no direct video viewing by research agent. Official homepage retrieved successfully on 2026-10-23.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/you-will-want-to-remember-this-onei-found-this-useful-tool-that-shows-you-everyt/1736312377596474/",
+        "https://www.threads.com/@setupspawn/post/DbgTaGEkjaA/video-you-will-want-to-remember-this-one-i-found-this-useful-tool-that-shows-you/",
+        "https://www.facebook.com/groups/4870321056422088/posts/27928873690140165/",
+        "https://www.startmycar.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.startmycar.com/",
+        "title": "StartMyCar",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Vehicle troubleshooting reports and community solutions searchable by make and model, with vehicle resources including fuse-box diagrams and owner manuals. Official Tacoma fuse-box and manual pages also retrieved through public search.",
+        "sourceRefs": [
+          "turn128view0",
+          "turn132search0",
+          "turn132search2",
+          "turn132search13"
+        ],
+        "supportingUrls": [
+          "https://www.startmycar.com/toyota/tacoma/info/fusebox/2018",
+          "https://www.startmycar.com/toyota/tacoma/info/manuals"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1736312377596474"
+      ]
+    },
+    {
+      "id": "recoded",
+      "name": "Rec0deD:88",
+      "url": "https://rec0ded88.com/",
+      "category": "Games",
+      "description": "Browse classic console games offered for play in your browser.",
+      "sources": [
+        26
+      ],
+      "monogram": "88",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact saved clip shows rec0ded88.com at 0:04; this uses a zero in rec0ded.",
+      "evidenceUrls": [
+        "https://rec0ded88.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "Official homepage retrieved. Console-game categories and browser-play links are present; no game was launched.",
+        "url": "https://rec0ded88.com/"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1581560750427754"
+      ]
+    },
+    {
+      "id": "electude",
+      "name": "Electude Simulator",
+      "url": "https://simulator.electude.com/",
+      "category": "Repair & vehicles",
+      "description": "Explore an engine-management simulator and diagnostic challenge.",
+      "sources": [
+        27
+      ],
+      "monogram": "ES",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact saved video indexed comment remembers using Electude in college. Creator crosspost has OCR Electude Simulator and same simulation topic. Official site confirms engine simulation and diagnose/repair challenge.",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/fix-your-car-online-automotive-cars-mechanic/1752615345952898/",
+        "https://www.threads.com/@setupspawn/post/DYmuqjjCtmU/video-want-to-learn-about-carsi-found-this-fun-car-repair-simulation-tool-where-you-ca/",
+        "https://simulator.electude.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://simulator.electude.com/",
+        "title": "Electude Simulator Challenge",
+        "status": "reachable",
+        "notes": "First-party homepage retrieved. Internal-combustion-engine and engine-management-system simulation with diagnostic instruments and a troubleshooting challenge. Homepage offers a simulator try-out and challenge signup; the simulator itself was not tested.",
+        "sourceRefs": [
+          "turn129view3"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=1752615345952898"
+      ]
+    },
+    {
+      "id": "bingebrowse",
+      "name": "BingeBrowse",
+      "url": "https://bingebrowse.net/",
+      "category": "Movies & media",
+      "description": "Browse streaming titles through a 3D video-store layout.",
+      "sources": [
+        28
+      ],
+      "monogram": "BB",
+      "role": "featured",
+      "verification": "creator",
+      "evidence": "Exact saved caption 'Who remembers blockbuster?...organizes all your movies...' matches creator Threads post; indexed on-screen OCR '416 bingebuster.net'. Official original URL redirects to bingebrowse.net, titled BingeBrowse (formerly BingeBuster).",
+      "evidenceUrls": [
+        "https://www.facebook.com/SetupSpawn/videos/who-remembers-blockbusteri-found-a-cool-place-that-organizes-all-your-movies-fro/28184039154563104/",
+        "https://www.threads.com/@setupspawn/post/Db1LUIUkv-T/video-who-remembers-blockbuster-i-found-a-cool-place-that-organizes-all-your-movies/",
+        "https://bingebuster.net/"
+      ],
+      "destinationCheck": {
+        "url": "https://bingebrowse.net/",
+        "title": "BingeBrowse (formerly BingeBuster) — your streaming services as a 3D video store",
+        "status": "reachable_dynamic",
+        "notes": "First-party homepage retrieved at current URL. Original https://bingebuster.net/ redirects here. Browses streaming services through a 3D video-store layout; the page says the store needs JavaScript and WebGL. Interactive store behavior was not tested.",
+        "sourceRefs": [
+          "turn129view4",
+          "turn132view0"
+        ],
+        "checkedDate": "2026-10-23"
+      },
+      "previousName": "BingeBuster",
+      "originalUrl": "https://bingebuster.net/",
+      "source_urls": [
+        "https://www.facebook.com/watch/?v=28184039154563104"
+      ]
+    },
+    {
+      "id": "paper-animators",
+      "name": "Paper Animators",
+      "url": "https://paperanimators.com/",
+      "category": "Creative",
+      "description": "Browse paper-style animations and motion templates for videos.",
+      "sources": [
+        30
+      ],
+      "monogram": "PA",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "paperanimators.com is visible in the browser address bar in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1053242967766796/",
+        "https://paperanimators.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://paperanimators.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 30,
+          "videoId": "1053242967766796",
+          "evidence": "paperanimators.com is visible in the browser address bar in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1053242967766796/"
+      ]
+    },
+    {
+      "id": "thaumaturgy",
+      "name": "Thaumaturgy",
+      "url": "https://thaumaturgy.app/",
+      "category": "Games",
+      "description": "Create fantasy and tabletop-game ambience with music and sound effects.",
+      "sources": [
+        39
+      ],
+      "monogram": "T",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "thaumaturgy.app is visible in the browser address bar in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/2297452797683342/",
+        "https://thaumaturgy.app/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://thaumaturgy.app/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 39,
+          "videoId": "2297452797683342",
+          "evidence": "thaumaturgy.app is visible in the browser address bar in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/2297452797683342/"
+      ]
+    },
+    {
+      "id": "artcraft-apps",
+      "name": "ArtCraft Apps",
+      "url": "https://getartcraft.com/apps",
+      "category": "Creative",
+      "description": "Explore the creator's collection of open-source creative apps.",
+      "sources": [
+        45,
+        51
+      ],
+      "monogram": "AA",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "getartcraft.com/apps is visible in the browser address bar in the exact Facebook video; the clip's caption calls these Microsoft alternatives.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1334642271936669/",
+        "https://getartcraft.com/apps",
+        "https://www.facebook.com/reel/4556090481318422/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official app directory was retrieved. Several tools are labeled early alpha or in development. No software was installed or run.",
+        "url": "https://getartcraft.com/apps"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 45,
+          "videoId": "1334642271936669",
+          "evidence": "getartcraft.com/apps is visible in the browser address bar in the exact Facebook video; the clip's caption calls these Microsoft alternatives."
+        },
+        {
+          "videoNumber": 51,
+          "videoId": "4556090481318422",
+          "evidence": "getartcraft.com/apps is visible in a settled frame at 0:20 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1334642271936669/",
+        "https://www.facebook.com/reel/4556090481318422/"
+      ]
+    },
+    {
+      "id": "apex-drawn",
+      "name": "Apex Drawn",
+      "url": "https://apexdrawn.com/",
+      "category": "Games",
+      "description": "Draw a racetrack and race it in a browser.",
+      "sources": [
+        37
+      ],
+      "monogram": "AD",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The Facebook clip shows the Apex Drawn track editor and apexdrawn.com in its browser address bar.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/4638769103018636/",
+        "https://apexdrawn.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://apexdrawn.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 37,
+          "videoId": "4638769103018636",
+          "evidence": "The Facebook clip shows the Apex Drawn track editor and apexdrawn.com in its browser address bar."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/4638769103018636/"
+      ]
+    },
+    {
+      "id": "mcstumble-fake-update",
+      "name": "McStumble Fake Update",
+      "url": "https://mcstumble.com/tools/fake-os-loading",
+      "category": "Games",
+      "description": "A browser-based fake system-update screen demonstrated as an office prank.",
+      "sources": [
+        29
+      ],
+      "monogram": "MF",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact clip shows mcstumble.com/tools and its Fake Windows Update & Blue Screen tool. This is a simulation, not an actual system update.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/2655490184921770/",
+        "https://mcstumble.com/tools/fake-os-loading"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://mcstumble.com/tools/fake-os-loading"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 29,
+          "videoId": "2655490184921770",
+          "evidence": "The exact clip shows mcstumble.com/tools and its Fake Windows Update & Blue Screen tool. This is a simulation, not an actual system update."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/2655490184921770/"
+      ]
+    },
+    {
+      "id": "quenq",
+      "name": "Quenq",
+      "url": "https://quenq.com/",
+      "category": "Games",
+      "description": "Browse an interactive retro-computing museum and browser-game collection.",
+      "sources": [
+        34
+      ],
+      "monogram": "Q",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "quenq.com is visible in the exact Facebook video's address bar.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1480521540608301/",
+        "https://quenq.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://quenq.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 34,
+          "videoId": "1480521540608301",
+          "evidence": "quenq.com is visible in the exact Facebook video's address bar."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1480521540608301/"
+      ]
+    },
+    {
+      "id": "vocalcut",
+      "name": "VocalCut",
+      "url": "https://vocalcut.com/",
+      "category": "Creative",
+      "description": "Separate vocals and instruments and explore browser audio tools.",
+      "sources": [
+        47
+      ],
+      "monogram": "V",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "vocalcut.com and its Vocal Remover / Stem Splitter screens are visible in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1468804368516550/",
+        "https://vocalcut.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://vocalcut.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 47,
+          "videoId": "1468804368516550",
+          "evidence": "vocalcut.com and its Vocal Remover / Stem Splitter screens are visible in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1468804368516550/"
+      ]
+    },
+    {
+      "id": "d-r-cos",
+      "name": "D.R.COS",
+      "url": "https://dr-cos.info/",
+      "category": "Creative",
+      "description": "Find printable sewing and costume patterns and making instructions.",
+      "sources": [
+        50
+      ],
+      "monogram": "D",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "dr-cos.info is visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/956006843723181/",
+        "https://dr-cos.info/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://dr-cos.info/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 50,
+          "videoId": "956006843723181",
+          "evidence": "dr-cos.info is visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/956006843723181/"
+      ]
+    },
+    {
+      "id": "r-pumpkinstencils",
+      "name": "r/PumpkinStencils",
+      "url": "https://www.reddit.com/r/PumpkinStencils/",
+      "category": "Creative",
+      "description": "Browse community-shared pumpkin-carving stencils and patterns.",
+      "sources": [
+        52
+      ],
+      "monogram": "R",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "At about 0:03.5 the exact Facebook video searches for pumpkin stencils Reddit and shows the r/PumpkinStencils result.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/2365172450896764/",
+        "https://www.reddit.com/r/PumpkinStencils/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://www.reddit.com/r/PumpkinStencils/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 52,
+          "videoId": "2365172450896764",
+          "evidence": "At about 0:03.5 the exact Facebook video searches for pumpkin stencils Reddit and shows the r/PumpkinStencils result."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/2365172450896764/"
+      ]
+    },
+    {
+      "id": "3dsvg",
+      "name": "3dsvg",
+      "url": "https://3dsvg.design/",
+      "category": "Creative",
+      "description": "Turn a logo or SVG into a 3D animated design.",
+      "sources": [
+        61
+      ],
+      "monogram": "3",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "3dsvg.design is visible in the address bar in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1446691550649086/",
+        "https://3dsvg.design/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://3dsvg.design/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 61,
+          "videoId": "1446691550649086",
+          "evidence": "3dsvg.design is visible in the address bar in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1446691550649086/"
+      ]
+    },
+    {
+      "id": "entertrained",
+      "name": "Entertrained",
+      "url": "https://entertrained.app/",
+      "category": "Learning",
+      "description": "Practice typing while reading books in an interactive library.",
+      "sources": [
+        64
+      ],
+      "monogram": "E",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "entertrained.app and the Entertrained book library are visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1785978559382657/",
+        "https://entertrained.app/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://entertrained.app/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 64,
+          "videoId": "1785978559382657",
+          "evidence": "entertrained.app and the Entertrained book library are visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1785978559382657/"
+      ]
+    },
+    {
+      "id": "homebyme",
+      "name": "HomeByMe",
+      "url": "https://home.by.me/",
+      "category": "Creative",
+      "description": "Design rooms, furniture layouts and 3D home interiors.",
+      "sources": [
+        36
+      ],
+      "monogram": "H",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "home.by.me and the HomeByMe room-design interface are visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1728698824892993/",
+        "https://home.by.me/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://home.by.me/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 36,
+          "videoId": "1728698824892993",
+          "evidence": "home.by.me and the HomeByMe room-design interface are visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1728698824892993/"
+      ]
+    },
+    {
+      "id": "sprite-fusion-destroy-any-website",
+      "name": "Sprite Fusion - Destroy Any Website",
+      "url": "https://destroy.spritefusion.com/",
+      "category": "Games",
+      "description": "Turn a webpage into a playful visual destruction demo.",
+      "sources": [
+        60
+      ],
+      "monogram": "SF",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "destroy.spritefusion.com and its Destroy Any Website interface are visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1782343392955278/",
+        "https://destroy.spritefusion.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://destroy.spritefusion.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 60,
+          "videoId": "1782343392955278",
+          "evidence": "destroy.spritefusion.com and its Destroy Any Website interface are visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1782343392955278/"
+      ]
+    },
+    {
+      "id": "kadoa-congress",
+      "name": "Kadoa Congress",
+      "url": "https://kadoa.com/congress",
+      "category": "Utilities",
+      "description": "Browse publicly reported Congress and executive-branch trading disclosures.",
+      "sources": [
+        63
+      ],
+      "monogram": "KC",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "kadoa.com/congress is visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1651282509845638/",
+        "https://kadoa.com/congress"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The exact video address was identified. Its current page could not be retrieved; current availability and features remain unverified.",
+        "url": "https://kadoa.com/congress"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 63,
+          "videoId": "1651282509845638",
+          "evidence": "kadoa.com/congress is visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1651282509845638/"
+      ]
+    },
+    {
+      "id": "terraprinter",
+      "name": "TerraPrinter",
+      "url": "https://terraprinter.com/",
+      "category": "Maps & world",
+      "description": "Create 3D terrain and city models from map locations.",
+      "sources": [
+        44
+      ],
+      "monogram": "T",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "terraprinter.com and the TerraPrinter interface are visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1355168249829875/",
+        "https://terraprinter.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://terraprinter.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 44,
+          "videoId": "1355168249829875",
+          "evidence": "terraprinter.com and the TerraPrinter interface are visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1355168249829875/"
+      ]
+    },
+    {
+      "id": "leolabs-orbit-visualization",
+      "name": "LeoLabs Orbit Visualization",
+      "url": "https://platform.leolabs.space/visualization",
+      "category": "Maps & world",
+      "description": "Explore an orbital visualization of satellites and space debris.",
+      "sources": [
+        49
+      ],
+      "monogram": "LO",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "platform.leolabs.space/visualization is visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1609024010732647/",
+        "https://platform.leolabs.space/visualization"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://platform.leolabs.space/visualization"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 49,
+          "videoId": "1609024010732647",
+          "evidence": "platform.leolabs.space/visualization is visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1609024010732647/"
+      ]
+    },
+    {
+      "id": "ztype",
+      "name": "ZType",
+      "url": "https://zty.pe/",
+      "category": "Games",
+      "description": "Practice typing in a browser space-shooter game.",
+      "sources": [
+        68
+      ],
+      "monogram": "Z",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "zty.pe and the ZType page title are visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1746661783733469/",
+        "https://zty.pe/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://zty.pe/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 68,
+          "videoId": "1746661783733469",
+          "evidence": "zty.pe and the ZType page title are visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1746661783733469/"
+      ]
+    },
+    {
+      "id": "spaceplanner",
+      "name": "SpacePlanner",
+      "url": "https://spaceplanner.co/",
+      "category": "Creative",
+      "description": "Draw floor plans and explore home and garden layouts.",
+      "sources": [
+        75
+      ],
+      "monogram": "S",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "spaceplanner.co is visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1616247276798501/",
+        "https://spaceplanner.co/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The landing page was retrieved. Drawing is advertised as free; photorealistic renders are sold separately. No project or paid feature was used.",
+        "url": "https://spaceplanner.co/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 75,
+          "videoId": "1616247276798501",
+          "evidence": "spaceplanner.co is visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1616247276798501/"
+      ]
+    },
+    {
+      "id": "chronas",
+      "name": "Chronas",
+      "url": "https://www.chronas.org/",
+      "category": "Maps & world",
+      "description": "Explore history through an interactive map and timeline.",
+      "sources": [
+        79
+      ],
+      "monogram": "C",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "www.chronas.org is visible in the exact Facebook video.5.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/984881207983109/",
+        "https://www.chronas.org/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The exact video address was identified. Only a page title was retrieved; the current interactive map was not verified.",
+        "url": "https://www.chronas.org/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 79,
+          "videoId": "984881207983109",
+          "evidence": "www.chronas.org is visible in the exact Facebook video.5."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/984881207983109/"
+      ]
+    },
+    {
+      "id": "nuke-simulation",
+      "name": "Nuke Simulation",
+      "url": "https://nukesimulation.com/",
+      "category": "Learning",
+      "description": "View an educational visualization of nuclear-blast effects.",
+      "sources": [
+        85
+      ],
+      "monogram": "NS",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "nukesimulation.com is visible in the exact Facebook video.5. No simulation was run during cataloging.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1218196437191564/",
+        "https://nukesimulation.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://nukesimulation.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 85,
+          "videoId": "1218196437191564",
+          "evidence": "nukesimulation.com is visible in the exact Facebook video.5. No simulation was run during cataloging."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1218196437191564/"
+      ]
+    },
+    {
+      "id": "harvard-mcs-r-sum-resources",
+      "name": "Harvard MCS Résumé Resources",
+      "url": "https://careerservices.fas.harvard.edu/",
+      "category": "Learning",
+      "description": "Find résumé and cover-letter guidance from Harvard's career center.",
+      "sources": [
+        66
+      ],
+      "monogram": "HM",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact video shows Harvard's Resumes & Cover Letters booklet with careerservices.fas.harvard.edu on its cover. This links to that domain; the exact PDF download URL was not captured.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/28932954596301065/",
+        "https://careerservices.fas.harvard.edu/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The domain is printed on the Harvard guide shown in the video. The homepage check was rate-limited, and the exact booklet download address was not captured.",
+        "url": "https://careerservices.fas.harvard.edu/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 66,
+          "videoId": "28932954596301065",
+          "evidence": "The exact video shows Harvard's Resumes & Cover Letters booklet with careerservices.fas.harvard.edu on its cover. This links to that domain; the exact PDF download URL was not captured."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/28932954596301065/"
+      ]
+    },
+    {
+      "id": "cooked-wiki",
+      "name": "Cooked.wiki",
+      "url": "https://cooked.wiki/",
+      "category": "Utilities",
+      "description": "Extract and organize recipes from online pages and videos.",
+      "sources": [
+        84
+      ],
+      "monogram": "C",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "cooked.wiki is visible in the browser address bar in the exact Facebook video, including a recipe extraction from a video URL.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1990897621619386/",
+        "https://cooked.wiki/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The public landing page was retrieved. Some features require an account or patron membership. No recipe was imported and no account was created.",
+        "url": "https://cooked.wiki/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 84,
+          "videoId": "1990897621619386",
+          "evidence": "cooked.wiki is visible in the browser address bar in the exact Facebook video, including a recipe extraction from a video URL."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1990897621619386/"
+      ]
+    },
+    {
+      "id": "timemap",
+      "name": "TimeMap",
+      "url": "https://www.timemap.org/",
+      "category": "Maps & world",
+      "description": "Explore world history, people, rulers and battles through maps.",
+      "sources": [
+        69
+      ],
+      "monogram": "T",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "TimeMap.org - World History Atlas is visible inside the interactive map in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1581158206273111/",
+        "https://www.timemap.org/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The World History Atlas branding is shown in the video. Current page availability could not be verified in this check.",
+        "url": "https://www.timemap.org/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 69,
+          "videoId": "1581158206273111",
+          "evidence": "TimeMap.org - World History Atlas is visible inside the interactive map in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1581158206273111/"
+      ]
+    },
+    {
+      "id": "goblin-tools-magic-todo",
+      "name": "Goblin.tools Magic ToDo",
+      "url": "https://goblin.tools/ToDo",
+      "category": "Utilities",
+      "description": "Break a task into smaller steps using Magic ToDo.",
+      "sources": [
+        81
+      ],
+      "monogram": "GM",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "goblin.tools/ToDo and its Magic ToDo page title are visible in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1069768459284800/",
+        "https://goblin.tools/ToDo"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://goblin.tools/ToDo"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 81,
+          "videoId": "1069768459284800",
+          "evidence": "goblin.tools/ToDo and its Magic ToDo page title are visible in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1069768459284800/"
+      ]
+    },
+    {
+      "id": "simplepdf",
+      "name": "SimplePDF",
+      "url": "https://simplepdf.com/",
+      "category": "Utilities",
+      "description": "Edit and fill PDF documents in a browser.",
+      "sources": [
+        81
+      ],
+      "monogram": "S",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "simplepdf.com and its PDF-editor page title are visible in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1069768459284800/",
+        "https://simplepdf.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://simplepdf.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 81,
+          "videoId": "1069768459284800",
+          "evidence": "simplepdf.com and its PDF-editor page title are visible in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1069768459284800/"
+      ]
+    },
+    {
+      "id": "repair-clinic",
+      "name": "Repair Clinic",
+      "url": "https://www.repairclinic.com/",
+      "category": "Repair & vehicles",
+      "description": "Find appliance-repair guidance and replacement-parts information.",
+      "sources": [
+        81
+      ],
+      "monogram": "RC",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "Repair Clinic's branded model-number lookup is visible in the exact Facebook video; the official homepage provides the matching destination.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1069768459284800/",
+        "https://www.repairclinic.com/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The branded service is shown in the video. The homepage returned an access error; current availability was not verified.",
+        "url": "https://www.repairclinic.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 81,
+          "videoId": "1069768459284800",
+          "evidence": "Repair Clinic's branded model-number lookup is visible in the exact Facebook video; the official homepage provides the matching destination."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1069768459284800/"
+      ]
+    },
+    {
+      "id": "mecabricks",
+      "name": "Mecabricks",
+      "url": "https://www.mecabricks.com/",
+      "category": "Creative",
+      "description": "Build digital brick models in an online 3D workshop.",
+      "sources": [
+        36
+      ],
+      "monogram": "M",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "mecabricks.com and its Workshop are visible in a settled frame at 0:13 of the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1728698824892993/",
+        "https://www.mecabricks.com/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The exact video address was verified. The current check returned only a page title; the 3D workshop was not tested.",
+        "url": "https://www.mecabricks.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 36,
+          "videoId": "1728698824892993",
+          "evidence": "mecabricks.com and its Workshop are visible in a settled frame at 0:13 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1728698824892993/"
+      ]
+    },
+    {
+      "id": "3dtuning",
+      "name": "3DTuning",
+      "url": "https://www.3dtuning.com/",
+      "category": "Repair & vehicles",
+      "description": "Customize vehicle models in a 3D configurator.",
+      "sources": [
+        36
+      ],
+      "monogram": "3",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "3dtuning.com is visible in a settled frame at 0:20 of the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1728698824892993/",
+        "https://www.3dtuning.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://www.3dtuning.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 36,
+          "videoId": "1728698824892993",
+          "evidence": "3dtuning.com is visible in a settled frame at 0:20 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1728698824892993/"
+      ]
+    },
+    {
+      "id": "freesewing",
+      "name": "FreeSewing",
+      "url": "https://freesewing.eu/",
+      "category": "Creative",
+      "description": "Generate sewing patterns customized to body measurements.",
+      "sources": [
+        69
+      ],
+      "monogram": "F",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "freesewing.eu is visible in a settled frame at 0:05 of the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1581158206273111/",
+        "https://freesewing.eu/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://freesewing.eu/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 69,
+          "videoId": "1581158206273111",
+          "evidence": "freesewing.eu is visible in a settled frame at 0:05 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1581158206273111/"
+      ]
+    },
+    {
+      "id": "musclewiki",
+      "name": "MuscleWiki",
+      "url": "https://musclewiki.com/",
+      "category": "Learning",
+      "description": "Browse exercises through an interactive muscle map.",
+      "sources": [
+        69
+      ],
+      "monogram": "M",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "musclewiki.com is visible in a settled frame at 0:18 of the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1581158206273111/",
+        "https://musclewiki.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://musclewiki.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 69,
+          "videoId": "1581158206273111",
+          "evidence": "musclewiki.com is visible in a settled frame at 0:18 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1581158206273111/"
+      ]
+    },
+    {
+      "id": "car-part-com",
+      "name": "Car-Part.com",
+      "url": "https://www.car-part.com/",
+      "category": "Repair & vehicles",
+      "description": "Search recycled and used auto-part inventories.",
+      "sources": [
+        71
+      ],
+      "monogram": "C",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "car-part.com and its vehicle/part search form are visible in the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/973101819173732/",
+        "https://www.car-part.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://www.car-part.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 71,
+          "videoId": "973101819173732",
+          "evidence": "car-part.com and its vehicle/part search form are visible in the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/973101819173732/"
+      ]
+    },
+    {
+      "id": "chatgpt",
+      "name": "ChatGPT",
+      "url": "https://chatgpt.com/",
+      "category": "Utilities",
+      "description": "The AI chat tool used in Matty's flight-planning demonstration.",
+      "sources": [
+        54
+      ],
+      "monogram": "C",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "chatgpt.com is visible in the exact Facebook video. No flight prices, savings or travel recommendations from the clip were independently verified.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1120831813972177/",
+        "https://chatgpt.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official landing page was retrieved. Interactive features, purchases, installation and account-only features were not tested.",
+        "url": "https://chatgpt.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 54,
+          "videoId": "1120831813972177",
+          "evidence": "chatgpt.com is visible in the exact Facebook video. No flight prices, savings or travel recommendations from the clip were independently verified."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1120831813972177/"
+      ]
+    },
+    {
+      "id": "god-s-eye-view-source-project",
+      "name": "God's Eye View - Source Project",
+      "url": "https://github.com/bilawalsidhu/gods-eye-view",
+      "category": "Maps & world",
+      "description": "Source project for a 3D dashboard of public map and tracking data; setup is required.",
+      "sources": [
+        70
+      ],
+      "monogram": "GE",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact video shows God's Eye View in Pinokio's catalog with the identifier bilawalsidhu/gods-eye-view. The linked GitHub repository matches that identifier. No software was installed and no provider keys were supplied.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1071286952356070/",
+        "https://github.com/bilawalsidhu/gods-eye-view"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official source repository was retrieved. This is a project requiring setup; optional provider services may need keys and have separate charges. No installation, API calls or paid services were used.",
+        "url": "https://github.com/bilawalsidhu/gods-eye-view"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 70,
+          "videoId": "1071286952356070",
+          "evidence": "The exact video shows God's Eye View in Pinokio's catalog with the identifier bilawalsidhu/gods-eye-view. The linked GitHub repository matches that identifier. No software was installed and no provider keys were supplied."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1071286952356070/"
+      ]
+    },
+    {
+      "id": "pinokio",
+      "name": "Pinokio",
+      "url": "https://pinokio.co/",
+      "category": "Utilities",
+      "description": "Desktop app launcher used to install and run the project shown in the video.",
+      "sources": [
+        70
+      ],
+      "monogram": "P",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact video shows the Pinokio application catalog and the God's Eye View project. The official Pinokio website is linked as the setup source; no installer was run.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1071286952356070/",
+        "https://pinokio.co/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The official app catalog was retrieved. This is a desktop launcher; no app was installed or run.",
+        "url": "https://pinokio.co/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 70,
+          "videoId": "1071286952356070",
+          "evidence": "The exact video shows the Pinokio application catalog and the God's Eye View project. The official Pinokio website is linked as the setup source; no installer was run."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1071286952356070/"
+      ]
+    },
+    {
+      "id": "famelack",
+      "name": "Famelack",
+      "url": "https://famelack.com/",
+      "category": "Movies & media",
+      "description": "Explore a map-based directory of television streams.",
+      "sources": [
+        74
+      ],
+      "monogram": "F",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "tv.garden is visible in a settled address-bar frame at 0:06 of the exact Facebook video; its on-screen branding reads Famelack.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1075048235444400/",
+        "https://famelack.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "notes": "The original tv.garden address redirects to famelack.com. The landing page was retrieved; stream playback was not tested.",
+        "url": "https://famelack.com/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 74,
+          "videoId": "1075048235444400",
+          "evidence": "tv.garden is visible in a settled address-bar frame at 0:06 of the exact Facebook video; its on-screen branding reads Famelack."
+        }
+      ],
+      "previousName": "TV Garden",
+      "originalUrl": "https://tv.garden/",
+      "source_urls": [
+        "https://www.facebook.com/reel/1075048235444400/"
+      ]
+    },
+    {
+      "id": "retrocrush",
+      "name": "RetroCrush",
+      "url": "https://www.retrocrush.tv/",
+      "category": "Movies & media",
+      "description": "Browse classic anime and the service's streaming lineup.",
+      "sources": [
+        74
+      ],
+      "monogram": "R",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "retrocrush.tv is visible in a settled frame at 0:19 of the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1075048235444400/",
+        "https://www.retrocrush.tv/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The exact video address was verified. The current check returned a page shell; catalog access and playback were not verified.",
+        "url": "https://www.retrocrush.tv/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 74,
+          "videoId": "1075048235444400",
+          "evidence": "retrocrush.tv is visible in a settled frame at 0:19 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1075048235444400/"
+      ]
+    },
+    {
+      "id": "fawesome",
+      "name": "Fawesome",
+      "url": "https://fawesome.tv/",
+      "category": "Movies & media",
+      "description": "Browse the streaming service's movie and television catalog.",
+      "sources": [
+        74
+      ],
+      "monogram": "F",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "fawesome.tv and the Fawesome catalog are visible in a settled frame at 0:30 of the exact Facebook video.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1075048235444400/",
+        "https://fawesome.tv/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "notes": "The video address was identified. The current page check returned a site shell/footer; the catalog and playback were not verified.",
+        "url": "https://fawesome.tv/"
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 74,
+          "videoId": "1075048235444400",
+          "evidence": "fawesome.tv and the Fawesome catalog are visible in a settled frame at 0:30 of the exact Facebook video."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1075048235444400/"
+      ]
+    },
+    {
+      "id": "google-my-activity",
+      "name": "Google My Activity",
+      "url": "https://myactivity.google.com/",
+      "category": "Utilities",
+      "description": "Review and manage activity saved to your Google account.",
+      "sources": [
+        40
+      ],
+      "monogram": "GM",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact video visibly shows the My Activity interface with Web & App Activity, Timeline and Play History controls. The official landing page corroborates the service.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/2229569390935481/",
+        "https://myactivity.google.com/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "url": "https://myactivity.google.com/",
+        "notes": "Official public landing page retrieved. Sign-in and account data were not accessed or changed."
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 40,
+          "videoId": "2229569390935481",
+          "evidence": "The exact video visibly shows the My Activity interface with Web & App Activity, Timeline and Play History controls. The official landing page corroborates the service."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/2229569390935481/"
+      ]
+    },
+    {
+      "id": "mcstumble-mp4-to-gif-converter",
+      "name": "McStumble MP4 to GIF Converter",
+      "url": "https://mcstumble.com/tools/gif-mp4-converter",
+      "category": "Creative",
+      "description": "Turn a short MP4 clip into an animated GIF in the browser.",
+      "sources": [
+        32
+      ],
+      "monogram": "MM",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact Gmail-tip video shows an MP4 to GIF Converter with Upload MP4 & Options and a /tools/gif-mp4-converter address. Matty’s official McStumble tool page matches that title and interface.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/2294909034599738/",
+        "https://mcstumble.com/tools/gif-mp4-converter"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "url": "https://mcstumble.com/tools/gif-mp4-converter",
+        "notes": "Official tool page retrieved. No video was uploaded or conversion run."
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 32,
+          "videoId": "2294909034599738",
+          "evidence": "The exact Gmail-tip video shows an MP4 to GIF Converter with Upload MP4 & Options and a /tools/gif-mp4-converter address. Matty’s official McStumble tool page matches that title and interface."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/2294909034599738/"
+      ]
+    },
+    {
+      "id": "google-earth",
+      "name": "Google Earth",
+      "url": "https://earth.google.com/web/",
+      "category": "Maps & world",
+      "description": "Explore places and imagery in Google Earth for the web.",
+      "sources": [
+        83
+      ],
+      "monogram": "GE",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact Facebook video clearly shows earth.google.com/web/ in the address bar and the Google Earth Tools menu.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/28121967567472732/",
+        "https://earth.google.com/web/"
+      ],
+      "destinationCheck": {
+        "status": "availability_unverified",
+        "checkedDate": "2026-10-23",
+        "url": "https://earth.google.com/web/",
+        "notes": "The official URL returned a device-support notice in text retrieval. The video identifies the service; interactive availability and features were not tested."
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 83,
+          "videoId": "28121967567472732",
+          "evidence": "The exact Facebook video clearly shows earth.google.com/web/ in the address bar and the Google Earth Tools menu."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/28121967567472732/"
+      ]
+    },
+    {
+      "id": "sponsorblock",
+      "name": "SponsorBlock",
+      "url": "https://sponsor.ajay.app/",
+      "category": "Utilities",
+      "description": "An open-source browser extension for skipping community-marked sponsor segments in YouTube videos.",
+      "sources": [
+        56
+      ],
+      "monogram": "S",
+      "role": "featured",
+      "verification": "video",
+      "evidence": "The exact video visibly shows the SponsorBlock for YouTube Chrome Web Store listing and its official sponsor.ajay.app website link.",
+      "evidenceUrls": [
+        "https://www.facebook.com/reel/1949605873111569/",
+        "https://sponsor.ajay.app/"
+      ],
+      "destinationCheck": {
+        "status": "reachable_content_verified",
+        "checkedDate": "2026-10-23",
+        "url": "https://sponsor.ajay.app/",
+        "notes": "Official project landing page retrieved. The extension was not installed or run and no browser permissions were granted."
+      },
+      "addedFromCreatorPage": true,
+      "sourceEvidence": [
+        {
+          "videoNumber": 56,
+          "videoId": "1949605873111569",
+          "evidence": "The exact video visibly shows the SponsorBlock for YouTube Chrome Web Store listing and its official sponsor.ajay.app website link."
+        }
+      ],
+      "source_urls": [
+        "https://www.facebook.com/reel/1949605873111569/"
+      ]
+    }
+  ]
+}
