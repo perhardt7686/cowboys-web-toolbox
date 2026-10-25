@@ -196,7 +196,7 @@ function renderCategories(){el('categories').innerHTML=categories.map(c=>`<butto
 // Anonymous aggregate destination clicks. Navigation never waits for analytics.
 const activityConfig=window.COWBOY_COMMUNITY_CONFIG||{},clickTotals=new Map(),clickCooldown=new Map();
 let countsLoaded=false,countsUnavailable=false;
-const clickLabel=id=>clickTotals.has(id)?new Intl.NumberFormat('en-US').format(clickTotals.get(id))+' clicks':countsUnavailable?'Clicks unavailable':'Loading clicks…';
+const clickLabel=id=>clickTotals.has(id)?new Intl.NumberFormat('en-US').format(clickTotals.get(id))+(clickTotals.get(id)===1?' click':' clicks'):countsUnavailable?'Clicks unavailable':'Loading clicks…';
 function counter(id){return `<span class="click-counter" data-click-count="${esc(id)}" title="Aggregate destination link clicks; not unique visitors">${esc(clickLabel(id))}</span>`;}
 function destinationLink(site,text,css=''){return `<a href="${esc(href(site.url))}" class="${css}" data-site-click="${esc(site.id)}" target="_blank" rel="noopener noreferrer">${text}</a>`;}
 function updateClickCounts(){document.querySelectorAll('[data-click-count]').forEach(node=>{node.textContent=clickLabel(node.dataset.clickCount);node.toggleAttribute('data-count-unavailable',countsUnavailable&&!clickTotals.has(node.dataset.clickCount));});}
