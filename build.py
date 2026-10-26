@@ -7,7 +7,7 @@ t=(r/'index.template.html').read_text()
 assert t.count('__CATALOG_DATA__')==1
 html=t.replace('__CATALOG_DATA__',s)
 (r/'docs/index.html').write_text(html)
-standalone=html.replace('<link rel="stylesheet" href="style.css">','<style>'+(r/'docs/style.css').read_text()+'</style>').replace('<script src="app.js?v=lab1" defer></script>','<script>'+(r/'docs/app.js').read_text()+'</script>')
+standalone=html.replace('<link rel="stylesheet" href="style.css">','<style>'+(r/'docs/style.css').read_text()+'</style>').replace('<script src="app.js?v=clicks1" defer></script>','<script>'+(r/'docs/app.js').read_text()+'</script>')
 standalone=standalone.replace('<link rel="stylesheet" href="community-lab.css">','<style>'+(r/'docs/community-lab.css').read_text()+'</style>')
 icon='data:image/svg+xml;base64,'+base64.b64encode((r/'docs/favicon.svg').read_bytes()).decode()
 standalone=standalone.replace('<script src="community-config.js" defer></script>','<script>'+(r/'docs/community-config.js').read_text()+'</script>')
