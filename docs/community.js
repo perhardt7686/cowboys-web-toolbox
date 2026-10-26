@@ -71,7 +71,7 @@ async function loadFeed(append=false){
     if(isPreview){state.threads=demoThreads.filter(t=>t.status==='published').map(t=>({...t}));state.hasMore=false;}
     else if(configured&&client){
       if(!append)state.offset=0;
-      let request=client.from('community_threads').select('*,community_replies(count)').eq('status','published');
+      let request=client.from('community_threads').select('*,community_replies!community_replies_thread_id_fkey(count)').eq('status','published');
       if(state.category!=='all')request=request.eq('category',state.category);
       if(state.site)request=request.eq('site_id',state.site);
       if(state.search.trim())request=request.textSearch('search_document',state.search.trim(),{type:'websearch',config:'simple'});
