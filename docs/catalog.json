@@ -2164,6 +2164,606 @@
           "evidence": "The exact video visibly shows the SponsorBlock for YouTube Chrome Web Store listing and its official sponsor.ajay.app website link."
         }
       ]
+    },
+    {
+      "id": "squoosh",
+      "name": "Squoosh",
+      "url": "https://squoosh.app/",
+      "category": "Utilities",
+      "description": "Compress images and compare quality in your browser.",
+      "sources": [],
+      "monogram": "S",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Local processing",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://github.com/GoogleChromeLabs/squoosh"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://squoosh.app/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official app and repository describe local image compression. No compression workflow was tested."
+      }
+    },
+    {
+      "id": "photopea",
+      "name": "Photopea",
+      "url": "https://www.photopea.com/",
+      "category": "Creative",
+      "description": "Edit layered images and open or save PSD files in a browser.",
+      "sources": [],
+      "monogram": "P",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free editor",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.photopea.com/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.photopea.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official homepage confirms core editor features and local processing. AI features and paid options were not assessed."
+      }
+    },
+    {
+      "id": "pairdrop",
+      "name": "PairDrop",
+      "url": "https://pairdrop.net/",
+      "category": "Utilities",
+      "description": "Share files and text between phones, computers and other devices.",
+      "sources": [],
+      "monogram": "P",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "No signup",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://github.com/schlagmichdoch/PairDrop"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://pairdrop.net/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official repository confirms sharing, pairing and Internet rooms. A transfer was not performed."
+      }
+    },
+    {
+      "id": "manualslib",
+      "name": "ManualsLib",
+      "url": "https://www.manualslib.com/",
+      "category": "Repair & vehicles",
+      "description": "Find product manuals for appliances, electronics and power tools.",
+      "sources": [],
+      "monogram": "M",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Manual library",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.manualslib.com/"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://www.manualslib.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official catalog confirms online manual reading and downloads. Account and app extras were not assessed."
+      }
+    },
+    {
+      "id": "pdf24",
+      "name": "PDF24 Tools",
+      "url": "https://tools.pdf24.org/en/",
+      "category": "Utilities",
+      "description": "Merge, split, compress, OCR and rearrange PDF documents.",
+      "sources": [],
+      "monogram": "PT",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free · server processing",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://tools.pdf24.org/en/"
+      ],
+      "previewKind": "document",
+      "destinationCheck": {
+        "url": "https://tools.pdf24.org/en/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official page describes free ad-supported tools and server processing. No document was uploaded."
+      }
+    },
+    {
+      "id": "omni-calculator",
+      "name": "Omni Calculator",
+      "url": "https://www.omnicalculator.com/",
+      "category": "Utilities",
+      "description": "Find calculators for measurements, conversions and everyday projects.",
+      "sources": [],
+      "monogram": "OC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free calculators",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.omnicalculator.com/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://www.omnicalculator.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official homepage confirms construction, conversion and other calculators. Results were not independently validated."
+      }
+    },
+    {
+      "id": "phet",
+      "name": "PhET Interactive Simulations",
+      "url": "https://phet.colorado.edu/",
+      "category": "Learning",
+      "description": "Explore science and mathematics through interactive simulations.",
+      "sources": [],
+      "monogram": "PI",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free simulations",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://phet.colorado.edu/en/help-center/account"
+      ],
+      "previewKind": "atom",
+      "destinationCheck": {
+        "url": "https://phet.colorado.edu/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official University of Colorado pages confirm free simulations without a student account. Educator extras can require an account."
+      }
+    },
+    {
+      "id": "justwatch",
+      "name": "JustWatch",
+      "url": "https://www.justwatch.com/us",
+      "category": "Movies & media",
+      "description": "Find where movies and television shows are available to stream.",
+      "sources": [],
+      "monogram": "J",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free core · paid extras",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://support.justwatch.com/article/is-just-watch-free"
+      ],
+      "previewKind": "stream",
+      "destinationCheck": {
+        "url": "https://www.justwatch.com/us",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official support confirms free core search and optional paid features. Streaming services and availability vary by region."
+      }
+    },
+    {
+      "id": "supercook",
+      "name": "SuperCook",
+      "url": "https://www.supercook.com/",
+      "category": "Utilities",
+      "description": "Find recipes using ingredients you already have at home.",
+      "sources": [],
+      "monogram": "S",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Access details unchecked",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.supercook.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.supercook.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official indexed description confirms ingredient-based recipe search. The JavaScript workflow, pricing and account requirements were not tested."
+      }
+    },
+    {
+      "id": "alternativeto",
+      "name": "AlternativeTo",
+      "url": "https://alternativeto.net/",
+      "category": "Utilities",
+      "description": "Find community suggestions for alternatives to apps and services.",
+      "sources": [],
+      "monogram": "A",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free directory",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://alternativeto.net/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://alternativeto.net/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official homepage confirms a free crowdsourced directory. Listed products have their own prices and terms."
+      }
+    },
+    {
+      "id": "have-i-been-pwned",
+      "name": "Have I Been Pwned",
+      "url": "https://haveibeenpwned.com/",
+      "category": "Utilities",
+      "description": "Check whether an email appears in this service’s known breach records.",
+      "sources": [],
+      "monogram": "HI",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free email search",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://haveibeenpwned.com/termsofuse"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://haveibeenpwned.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official homepage and terms confirm public email search. No personal address was queried; absence from known records does not establish account safety."
+      }
+    },
+    {
+      "id": "down-for-everyone",
+      "name": "Down for Everyone or Just Me",
+      "url": "https://downforeveryoneorjustme.com/",
+      "category": "Utilities",
+      "description": "Check whether a website or online service may be having an outage.",
+      "sources": [],
+      "monogram": "DF",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public checker",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://downforeveryoneorjustme.com/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://downforeveryoneorjustme.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official checker page retrieved. No outage query or exhaustive pricing review was performed."
+      }
+    },
+    {
+      "id": "ezgif",
+      "name": "Ezgif",
+      "url": "https://ezgif.com/",
+      "category": "Creative",
+      "description": "Create, resize, optimize and edit GIFs and other animations.",
+      "sources": [],
+      "monogram": "E",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free tools",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://ezgif.com/"
+      ],
+      "previewKind": "video",
+      "destinationCheck": {
+        "url": "https://ezgif.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official tool index confirms GIF editing and mixed local/server workflows. Local processing varies by tool and format."
+      }
+    },
+    {
+      "id": "openverse",
+      "name": "Openverse",
+      "url": "https://openverse.org/",
+      "category": "Creative",
+      "description": "Search openly licensed images and audio for your next project.",
+      "sources": [],
+      "monogram": "O",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Check each license",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://docs.openverse.org/api/reference/made_with_ov.html"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://openverse.org/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Direct homepage retrieval was blocked. Official documentation confirms media search and says to verify each work’s license at its source."
+      }
+    },
+    {
+      "id": "google-fonts",
+      "name": "Google Fonts",
+      "url": "https://fonts.google.com/",
+      "category": "Creative",
+      "description": "Find and preview typefaces for documents, graphics and websites.",
+      "sources": [],
+      "monogram": "GF",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Check font license",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://github.com/google/fonts"
+      ],
+      "previewKind": "document",
+      "destinationCheck": {
+        "url": "https://fonts.google.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official repository confirms font files and per-family licenses. Browser app text was sparse; font downloads were not tested."
+      }
+    },
+    {
+      "id": "svg-repo",
+      "name": "SVG Repo",
+      "url": "https://www.svgrepo.com/",
+      "category": "Creative",
+      "description": "Find vector icons and illustrations and make basic edits.",
+      "sources": [],
+      "monogram": "SR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free · licenses vary",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.svgrepo.com/page/licensing/"
+      ],
+      "previewKind": "model",
+      "destinationCheck": {
+        "url": "https://www.svgrepo.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official site and licensing page confirm open-licensed assets. Check each asset’s license before reuse."
+      }
+    },
+    {
+      "id": "coolors",
+      "name": "Coolors",
+      "url": "https://coolors.co/",
+      "category": "Creative",
+      "description": "Generate coordinated color palettes for your projects.",
+      "sources": [],
+      "monogram": "C",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free core · paid extras",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://coolors.co/pricing"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://coolors.co/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Direct retrieval was blocked. Indexed official generator and pricing pages confirm palette tools; exact current quotas were not checked."
+      }
+    },
+    {
+      "id": "openstax",
+      "name": "OpenStax",
+      "url": "https://openstax.org/",
+      "category": "Learning",
+      "description": "Read or download textbooks across a broad range of subjects.",
+      "sources": [],
+      "monogram": "O",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free digital textbooks",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://openstax.org/higher-education"
+      ],
+      "previewKind": "document",
+      "destinationCheck": {
+        "url": "https://openstax.org/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official education and help pages confirm free online and PDF textbooks. Optional print and learning products can cost money."
+      }
+    },
+    {
+      "id": "instructables",
+      "name": "Instructables",
+      "url": "https://www.instructables.com/",
+      "category": "Creative",
+      "description": "Explore step-by-step projects and practical things to make.",
+      "sources": [],
+      "monogram": "I",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Maker community",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.instructables.com/projects"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://www.instructables.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official indexed project pages confirm the maker community. Downloads, account options and plans were not comprehensively assessed."
+      }
+    },
+    {
+      "id": "fuel-economy",
+      "name": "FuelEconomy.gov",
+      "url": "https://www.fueleconomy.gov/feg/findacar.shtml",
+      "category": "Repair & vehicles",
+      "description": "Compare vehicles using official EPA fuel-economy estimates.",
+      "sources": [],
+      "monogram": "F",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public comparison tool",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.fueleconomy.gov/feg/findacar.shtml"
+      ],
+      "previewKind": "car",
+      "destinationCheck": {
+        "url": "https://www.fueleconomy.gov/feg/findacar.shtml",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official DOE/EPA comparison page retrieved. Estimates differ from measured mileage; a vehicle comparison was not run."
+      }
+    },
+    {
+      "id": "suncalc",
+      "name": "SunCalc",
+      "url": "https://www.suncalc.org/",
+      "category": "Maps & world",
+      "description": "Explore sunlight direction, sunrise, sunset and shadows on a map.",
+      "sources": [],
+      "monogram": "S",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public calculator",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.suncalc.org/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.suncalc.org/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official interface and help describe solar paths and shadows. Calculations were not independently validated."
+      }
+    },
+    {
+      "id": "windy",
+      "name": "Windy",
+      "url": "https://www.windy.com/",
+      "category": "Maps & world",
+      "description": "Explore weather maps and forecasts for places around the world.",
+      "sources": [],
+      "monogram": "W",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free core · Premium extras",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://community.windy.com/topic/23730/be-one-step-ahead-with-the-advanced-features-of-windy-premium-en"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.windy.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official app and provider community confirm free/Premium features. Exact boundaries and forecast performance were not fully checked."
+      }
+    },
+    {
+      "id": "radio-garden",
+      "name": "Radio Garden",
+      "url": "https://radio.garden/",
+      "category": "Movies & media",
+      "description": "Explore live radio stations by moving around the globe.",
+      "sources": [],
+      "monogram": "RG",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Paid extras · limits unchecked",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://radio.garden/settings/radio-garden"
+      ],
+      "previewKind": "audio",
+      "destinationCheck": {
+        "url": "https://radio.garden/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official indexed information confirms radio exploration and a subscription offering. Playback, regional restrictions and free-tier limits were not tested."
+      }
+    },
+    {
+      "id": "neal-fun",
+      "name": "Neal.fun",
+      "url": "https://neal.fun/",
+      "category": "Games",
+      "description": "Explore playful interactive web projects by Neal.",
+      "sources": [],
+      "monogram": "N",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Individual projects unchecked",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://neal.fun/"
+      ],
+      "previewKind": "game",
+      "destinationCheck": {
+        "url": "https://neal.fun/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official creator homepage retrieved. Individual projects and current access requirements were not tested."
+      }
+    },
+    {
+      "id": "windowswap",
+      "name": "WindowSwap",
+      "url": "https://www.window-swap.com/",
+      "category": "Travel",
+      "description": "Explore contributed window views from different places.",
+      "sources": [],
+      "monogram": "W",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Paid extras · limits unchecked",
+      "evidence": "Independent web research. See the official source and the check scope below.",
+      "evidenceUrls": [
+        "https://www.window-swap.com/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.window-swap.com/",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-10-25",
+        "notes": "Official indexed listing confirms window exploration and paid extras. Readable page text was unavailable; free browsing and playback were not tested."
+      }
     }
   ],
   "tips": [
@@ -3620,9 +4220,12 @@
     "videosWithMappings": 57,
     "videosWithTips": 28,
     "videosPending": 0,
-    "destinationLinks": 69,
-    "addedDestinationLinks": 41
+    "destinationLinks": 94,
+    "addedDestinationLinks": 41,
+    "independentWebFinds": 25,
+    "videoDestinationLinks": 69
   },
-  "scope": "69 website destinations and 28 tips or demonstrations, traced to 85 source videos. Based on selected video frames reviewed on October 23, 2026; the creator’s complete archive has not been cataloged.",
-  "method": "Links are identified from the exact source videos and checked against destination pages where possible. A reached page does not establish that its features, prices, availability or downloads have been tested. Unverified destinations are labeled. Some services have paid features; no purchases or installations are required to browse this directory."
+  "scope": "94 website destinations: 69 traced to source videos and 25 independently researched web finds, plus 28 tips and 85 original source videos.",
+  "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
+  "updatedAt": "2026-10-25"
 }
