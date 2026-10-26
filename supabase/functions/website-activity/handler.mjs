@@ -16,7 +16,11 @@ export function createActivityHandler({db,catalog,allowedOrigins}){
       try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>4096){await reader.cancel();return reply(413,{error:'Request too large.'});}chunks.push(value);}}finally{reader.releaseLock();}
       const bytes=new Uint8Array(length);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.byteLength;}
       const payload=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
-      if(!payload||typeof payload!=='object'||!sites.has(payload.siteId)||typeof payload.eventId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(payload.eventId))return reply(400,{error:'Invalid catalog event.'});
+      if(!payload||typeof payload!=='object'||typeof payload.siteId!=='string'||typeof payload.eventId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(payload.eventId))return reply(400,{error:'Invalid catalog event.'});
+      if(!sites.has(payload.siteId)){
+        if(!/^find-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u.test(payload.siteId))return reply(400,{error:'Invalid catalog event.'});
+        const approved=await db.from('community_catalog_additions').select('id').eq('id',payload.siteId).eq('published',true).maybeSingle();if(approved.error||!approved.data)return reply(400,{error:'Invalid catalog event.'});
+      }
       const {data,error}=await db.rpc('community_record_click',{p_site_id:payload.siteId,p_event_id:payload.eventId});
       if(error)return reply(503,{error:'Activity could not be recorded.'});
       return reply(200,{siteId:payload.siteId,clicks:Number(data.clicks)||0,recorded:data.recorded===true});
