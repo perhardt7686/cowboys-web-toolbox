@@ -48,8 +48,7 @@ export async function installUpgradeSchema(pg){
     alter table storage.objects enable row level security;
     grant usage on schema storage to anon,authenticated,service_role;grant select on storage.objects to anon;grant select,insert,update,delete on storage.objects to authenticated;grant all on storage.objects,storage.buckets to service_role;`);
   const files=await readdir(new URL('../../supabase/migrations/',import.meta.url));
-  for(const suffix of ['_community_scheduled_moderation.sql','_community_profiles.sql','_community_owner_controls.sql','_community_click_schema.sql','_community_owner_overview.sql','_community_bounded_clicks.sql']){
-    const file=files.find(f=>f.endsWith(suffix));if(!file)throw new Error('Missing upgrade migration');
-    await pg.exec(await readFile(new URL('../../supabase/migrations/'+file,import.meta.url),'utf8'));
+  for(const file of files.filter(f=>f.endsWith('.sql')&&!f.endsWith('_community.sql')).sort()){ 
+    await pg.exec((await readFile(new URL('../../supabase/migrations/'+file,import.meta.url),'utf8')).replace('create extension if not exists pg_net with schema extensions;','-- pg_net is exercised on the hosted project, not inside the embedded test database.')); 
   }
 }
