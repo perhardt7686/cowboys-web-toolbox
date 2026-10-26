@@ -1,6 +1,18 @@
 # The Commons: accounts and community
 
-## Delivery status
+## Community Lab release
+
+The catalog now has94 base destinations, with25 independent web finds clearly distinguished from69 video discoveries. Official source and access/check notes remain visible; product workflows were not comprehensively tested. Runtime owner-approved community discoveries can extend the collection, including source threads and counters.
+
+The board adds guided requests, unanswered/solved filters, accepted member answers, experience notes, project posts, polls, helpful votes, private bookmarks/follows/notifications, cosmetic badges and an owner community review/editorial desk. Public counts are stored aggregates of real actions, not fabricated activity. Private report and worker tables intentionally have RLS and no browser policies. Authenticated self-read tables expose only the member’s own choices and inbox; unsubscribe tokens are not browser-readable. All mutations pass verified Auth through the Edge API, with a server-side verified owner-email check for administrative actions and service-role-only SQL functions.
+
+The additive hosted migration chain and local files have matching timestamps. community-api v7, website-activity v2 and community-programs v1 are active. The worker dispatcher was checked live: HTTP200, one challenge created, zero emails submitted with zero opt-ins. Three explicitly authored Cowboy welcome prompts were published; the other11 remain in the editorial shelf.41 automated checks pass against the complete Postgres-backed migration chain. All3 Edge entrypoints pass Deno checks. These checks do not establish a private production owner/member login, avatar upload or subscribed-recipient inbox walkthrough.
+
+The5 scheduled-task slots were already full. The existing enabled six-hour Email & Website Monitor now also dispatches the weekly program at a new week’s first check and catches pending eligible work. It preserves the complete Gmail read/alert-only and disclosed automated-moderator instructions. It does not run continuously or promise a particular Monday clock time. Weekly digests require explicit consent, approved posting access and a verified email; the worker uses the private account email internally and never exposes it in public content or status responses. One cohort of at most20 subscribers is selected per New York week; recipients with the oldest successful send are prioritized. Each invocation handles at most5, with2 attempts per job and a bounded dispatcher. Sender acceptance is distinguished from inbox delivery.
+
+The pre-existing Free-project leaked-password-protection warning remains; no paid upgrade was made. Private default-deny RLS advisory information is intentional. Historical setup notes below are retained for context and do not replace this release status.
+
+## Historical delivery status
 
 The responsive account screens, integrated forum, database migration, authenticated API and automated Edward catalog replies are published. Registration is open with email verification and owner approval required before posting. The interactive design at `community.html?preview=1` uses clearly labeled fictional samples and makes no backend or mail requests.
 
