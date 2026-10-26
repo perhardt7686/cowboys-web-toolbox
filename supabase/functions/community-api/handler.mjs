@@ -1,5 +1,7 @@
 import {text,displayName,validatePost,reviewContent,edwardReply,canPost,RULES_VERSION} from './domain.mjs';
 import {validateProfile} from './profile-domain.mjs';
+import {validateLabPost} from './lab-domain.mjs';
+import {handleLabAction,currentCatalog} from './lab-handler.mjs';
 
 export class HttpError extends Error {constructor(status,message){super(message);this.status=status}}
 const uuid=value=>{if(typeof value!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu.test(value))throw new HttpError(400,'Invalid record.');return value};
@@ -85,10 +87,11 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       if(result.error?.code==='23505')throw new HttpError(409,'That profile handle is already in use. Choose another.');
       return {display_name:name,profile:check(result)};
     }
+    if(action.startsWith('hub_')){if(action==='hub_owner')requireOwner(user);return handleLabAction({payload,user,member,db,catalog,notifyOwner});}
     if(action==='create_thread'){
       requirePosting(member);await claim(`thread:${user.id}`,60,1);await claim(`thread-day:${user.id}`,86400,10);
-      const post=validatePost(payload,catalog);const review=reviewContent(post.title+'\n'+post.body);
-      const thread=check(await db.from('community_threads').insert({...post,author_id:user.id,author_name:member.display_name,status:review.status}).select().single());
+      const available=await currentCatalog(db,catalog);const post={...validatePost(payload,available),...validateLabPost(payload,available,{isOwner:isVerifiedOwner(user,ownerEmail)})};const review=reviewContent(post.title+'\n'+post.body+'\n'+JSON.stringify(post.post_data));
+      const thread=check(await db.rpc('community_create_lab_thread',{p_actor:user.id,p_post:{...post,status:review.status}}));
       await audit(user.id,'thread.created',thread.id,{status:thread.status});
       if(review.status==='held')await notifyOwner('A conversation needs review',`A conversation was held for review: ${thread.title}\nReason: ${review.reasons.join('; ')}\n\nSign in to the owner dashboard: ${baseURL.href}`);
       else {
