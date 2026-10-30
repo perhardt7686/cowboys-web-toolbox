@@ -259,6 +259,7 @@ async function initialize(){
   if(query.get('member'))await profiles.showMember(query.get('member'));
   if(isPreview&&query.get('panel')==='profile'&&state.member)await showProfile();
   if(isPreview&&query.get('panel')==='owner'&&state.member?.role==='owner')await showOwner();
+  if(query.get('privacy')==='1')showPrivacy();
   if(query.get('auth')==='login'||query.get('auth')==='signup')openAuth(query.get('auth'));
   if(fragment.has('error')||query.has('error'))openAuth('forgot','That email link could not be used. Request a new link and open it in this browser.');
   if(query.get('thread')&&(isPreview||configured))await openThread(query.get('thread'));
