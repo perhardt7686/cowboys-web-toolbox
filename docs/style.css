@@ -20,3 +20,6 @@
 
 /* Real destination counters. */
 .click-counter{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#758067;padding:8px 0 4px;line-height:1.4}.click-counter::before{content:'↗';font-size:12px}.click-counter[data-count-unavailable]{color:#8c917e}
+
+/* General-audience catalog interests. */
+.collection-origins{flex-wrap:wrap;gap:1rem}.collection-origins label{max-width:100%;min-width:0}.collection-origins select{max-width:100%}#topic-filter{width:clamp(10rem,24vw,22rem)}.research-topic{display:block;font-size:.76rem;line-height:1.45;color:var(--muted,#5e6d64);margin:-.25rem 0 .65rem;font-weight:600}@media(max-width:600px){#topic-filter-label{flex-basis:100%}#topic-filter{width:100%;display:block;margin-top:.35rem}}
