@@ -2764,6 +2764,2470 @@
         "checkedDate": "2026-10-25",
         "notes": "Official indexed listing confirms window exploration and paid extras. Readable page text was unavailable; free browsing and playback were not tested."
       }
+    },
+    {
+      "id": "epa-ppls",
+      "name": "EPA Pesticide Label Search",
+      "url": "https://ordspub.epa.gov/ords/pesticides/f?p=PPLS:1",
+      "category": "Learning",
+      "description": "Find federal pesticide labels by product, ingredient or registration number.",
+      "sources": [],
+      "monogram": "EP",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://ordspub.epa.gov/ords/pesticides/f?p=PPLS:1",
+        "https://www.epa.gov/pesticide-labels/pesticide-product-label-system-ppls-more-information",
+        "https://www.epa.gov/pesticide-labels"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://ordspub.epa.gov/ords/pesticides/f?p=PPLS:1",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Match the exact product and applicable label; federal records do not settle state registration."
+      }
+    },
+    {
+      "id": "npic",
+      "name": "National Pesticide Information Center",
+      "url": "https://npic.orst.edu/",
+      "category": "Learning",
+      "description": "Look up pesticide ingredients, exposure information and professional resources.",
+      "sources": [],
+      "monogram": "NP",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://npic.orst.edu/",
+        "https://npic.orst.edu/npicpro.html"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://npic.orst.edu/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Information supports label reading; it does not replace the product label."
+      }
+    },
+    {
+      "id": "uc-ipm",
+      "name": "UC Integrated Pest Management",
+      "url": "https://ipm.ucanr.edu/",
+      "category": "Learning",
+      "description": "Browse pest guides, identification aids and prevention strategies.",
+      "sources": [],
+      "monogram": "UI",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://ipm.ucanr.edu/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://ipm.ucanr.edu/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "California-focused guidance needs local species and regulatory checks."
+      }
+    },
+    {
+      "id": "vt-pesticide",
+      "name": "Virginia Tech Pesticide Education",
+      "url": "https://www.pubs.ext.vt.edu/tags.resource.html/pubs_ext_vt_edu:pesticide-education",
+      "category": "Learning",
+      "description": "Find Virginia pesticide safety publications and applicator education resources.",
+      "sources": [],
+      "monogram": "VT",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free references; manuals sold",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.pubs.ext.vt.edu/tags.resource.html/pubs_ext_vt_edu:pesticide-education",
+        "https://www.pubs.ext.vt.edu/tags.resource.html/pubs_ext_vt_edu%3Apesticide-education",
+        "https://www.pubs.ext.vt.edu/VTTP/VTTP-2/VTTP-2.html"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.pubs.ext.vt.edu/tags.resource.html/pubs_ext_vt_edu:pesticide-education",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Training manuals have purchase and copyright conditions; no exam completion is implied."
+      }
+    },
+    {
+      "id": "usda-idtools",
+      "name": "USDA IDtools",
+      "url": "https://idtools.org/",
+      "category": "Learning",
+      "description": "Use specialist identification keys for invasive pests and plant problems.",
+      "sources": [],
+      "monogram": "UI",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://idtools.org/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://idtools.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Some keys are technical and need good specimens or photographs."
+      }
+    },
+    {
+      "id": "inaturalist",
+      "name": "iNaturalist",
+      "url": "https://www.inaturalist.org/",
+      "category": "Learning",
+      "description": "Get species suggestions and community identification for observed wildlife.",
+      "sources": [],
+      "monogram": "I",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free; account for contributions",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.inaturalist.org/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.inaturalist.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Observations may reveal locations; suggestions need confirmation before treatment decisions."
+      }
+    },
+    {
+      "id": "bugguide",
+      "name": "BugGuide",
+      "url": "https://bugguide.net/",
+      "category": "Learning",
+      "description": "Compare North American insect photographs and identification discussions.",
+      "sources": [],
+      "monogram": "B",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browsing; account for submissions",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://bugguide.net/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://bugguide.net/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Community identifications can be incomplete; not a pesticide recommendation."
+      }
+    },
+    {
+      "id": "umn-insect-key",
+      "name": "UMN Insect Diagnostic Key",
+      "url": "https://apps.extension.umn.edu/garden/diagnose/insect/",
+      "category": "Learning",
+      "description": "Narrow an insect identification by size, appearance and where it was found.",
+      "sources": [],
+      "monogram": "UI",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://apps.extension.umn.edu/garden/diagnose/insect/",
+        "https://apps.extension.umn.edu/garden/diagnose/insect/indoor/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://apps.extension.umn.edu/garden/diagnose/insect/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Regional species coverage; identification is only as good as the observations supplied."
+      }
+    },
+    {
+      "id": "virginia-wildlife-conflicts",
+      "name": "Virginia DWR Wildlife Conflicts",
+      "url": "https://dwr.virginia.gov/wildlife/nuisance/",
+      "category": "Learning",
+      "description": "Find Virginia-specific prevention guidance and wildlife-control contacts.",
+      "sources": [],
+      "monogram": "VD",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Pest & field work",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://dwr.virginia.gov/wildlife/nuisance/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://dwr.virginia.gov/wildlife/nuisance/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Species rules and professional permissions still need checking for the actual job."
+      }
+    },
+    {
+      "id": "nhtsa-vin",
+      "name": "NHTSA VIN Decoder",
+      "url": "https://vpic.nhtsa.dot.gov/decoder/",
+      "category": "Repair & vehicles",
+      "description": "Decode manufacturer-reported vehicle specifications from a VIN.",
+      "sources": [],
+      "monogram": "NV",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public lookup",
+      "researchTopic": "Repair & vehicles",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://vpic.nhtsa.dot.gov/decoder/"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://vpic.nhtsa.dot.gov/decoder/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Base-vehicle data may not describe later conversions or modifications."
+      }
+    },
+    {
+      "id": "nhtsa-recalls",
+      "name": "NHTSA Recall Lookup",
+      "url": "https://www.nhtsa.gov/recalls",
+      "category": "Repair & vehicles",
+      "description": "Search vehicle and equipment recalls and manufacturer communications.",
+      "sources": [],
+      "monogram": "NR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public lookup",
+      "researchTopic": "Repair & vehicles",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.nhtsa.gov/recalls"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://www.nhtsa.gov/recalls",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "VIN results omit some older, repaired and recently announced recalls; not a complete repair history."
+      }
+    },
+    {
+      "id": "autozone-repair-guides",
+      "name": "AutoZone Repair Guides",
+      "url": "https://www.autozone.com/diy/repair-guides",
+      "category": "Repair & vehicles",
+      "description": "Find vehicle repair articles and diagrams by job or vehicle.",
+      "sources": [],
+      "monogram": "AR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public repair references",
+      "researchTopic": "Repair & vehicles",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.autozone.com/diy/repair-guides"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://www.autozone.com/diy/repair-guides",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Coverage varies by year and model; account-only guide access was not tested."
+      }
+    },
+    {
+      "id": "tire-size-comparison",
+      "name": "TireSize Comparison",
+      "url": "https://tiresize.com/comparison/",
+      "category": "Repair & vehicles",
+      "description": "Compare tire dimensions and calculated speedometer differences.",
+      "sources": [],
+      "monogram": "TC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public calculator",
+      "researchTopic": "Repair & vehicles",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://tiresize.com/comparison/"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://tiresize.com/comparison/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Dimensions do not verify load rating, clearance or vehicle fitment."
+      }
+    },
+    {
+      "id": "ryobi-support",
+      "name": "RYOBI Manuals & Parts Support",
+      "url": "https://www.ryobitools.com/support",
+      "category": "Repair & vehicles",
+      "description": "Find manuals, parts and service information from a tool's model number.",
+      "sources": [],
+      "monogram": "RM",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public support; purchases separate",
+      "researchTopic": "Repair & vehicles",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.ryobitools.com/support",
+        "https://www.ryobitools.com/support/manuals"
+      ],
+      "previewKind": "repair",
+      "destinationCheck": {
+        "url": "https://www.ryobitools.com/support",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Registration and warranty actions may require an account."
+      }
+    },
+    {
+      "id": "blocklayer",
+      "name": "Blocklayer",
+      "url": "https://www.blocklayer.com/",
+      "category": "Utilities",
+      "description": "Create layout calculations and printable cutting templates for practical projects.",
+      "sources": [],
+      "monogram": "B",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public calculators",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.blocklayer.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.blocklayer.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Check units, print scale and job measurements before cutting."
+      }
+    },
+    {
+      "id": "calculator-soup-construction",
+      "name": "CalculatorSoup Construction",
+      "url": "https://www.calculatorsoup.com/calculators/construction/",
+      "category": "Utilities",
+      "description": "Calculate feet and inches, concrete, gravel, area and material volumes.",
+      "sources": [],
+      "monogram": "CC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public calculators",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.calculatorsoup.com/calculators/construction/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.calculatorsoup.com/calculators/construction/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Allow for waste and confirm actual product coverage."
+      }
+    },
+    {
+      "id": "engineering-toolbox",
+      "name": "Engineering ToolBox",
+      "url": "https://www.engineeringtoolbox.com/",
+      "category": "Utilities",
+      "description": "Look up material properties, HVAC relationships and engineering conversions.",
+      "sources": [],
+      "monogram": "ET",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free technical reference",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.engineeringtoolbox.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.engineeringtoolbox.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Reference calculations do not replace job-specific design or code review."
+      }
+    },
+    {
+      "id": "falstad-circuit",
+      "name": "Falstad Circuit Simulator",
+      "url": "https://www.falstad.com/circuit/",
+      "category": "Utilities",
+      "description": "Explore how circuits behave in an animated electronic simulator.",
+      "sources": [],
+      "monogram": "FC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browser simulator",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.falstad.com/circuit/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.falstad.com/circuit/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Educational models do not validate real mains wiring."
+      }
+    },
+    {
+      "id": "all-about-circuits",
+      "name": "All About Circuits Calculators",
+      "url": "https://www.allaboutcircuits.com/tools/",
+      "category": "Utilities",
+      "description": "Use electrical and electronics calculators, including resistor decoding.",
+      "sources": [],
+      "monogram": "AA",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public calculators",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.allaboutcircuits.com/tools/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.allaboutcircuits.com/tools/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Use the right assumptions and verify real component ratings."
+      }
+    },
+    {
+      "id": "southwire-voltage-drop",
+      "name": "Southwire Voltage Drop Calculator",
+      "url": "https://www.southwire.com/calculator-vdrop",
+      "category": "Utilities",
+      "description": "Estimate voltage drop and conductor choices for specified inputs.",
+      "sources": [],
+      "monogram": "SV",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public web calculator",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.southwire.com/calculator-vdrop"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.southwire.com/calculator-vdrop",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "AWG/KCMIL scope; calculations do not establish complete installation compliance."
+      }
+    },
+    {
+      "id": "osha-etools",
+      "name": "OSHA eTools",
+      "url": "https://www.osha.gov/apps-and-etools",
+      "category": "Utilities",
+      "description": "Browse illustrated workplace-safety training and task-specific tools.",
+      "sources": [],
+      "monogram": "OE",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public training",
+      "researchTopic": "Construction & electrical",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.osha.gov/apps-and-etools",
+        "https://www.osha.gov/etools"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.osha.gov/apps-and-etools",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Training resources are not proof that a workplace or worker is compliant."
+      }
+    },
+    {
+      "id": "fmcsa-mover-search",
+      "name": "FMCSA Registered Mover Search",
+      "url": "https://www.fmcsa.dot.gov/protect-your-move/search-mover",
+      "category": "Utilities",
+      "description": "Check an interstate household-goods mover's registration and complaint information.",
+      "sources": [],
+      "monogram": "FR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public lookup",
+      "researchTopic": "Moving & logistics",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.fmcsa.dot.gov/protect-your-move/search-mover"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.fmcsa.dot.gov/protect-your-move/search-mover",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Does not establish that your own business is authorized for a planned service."
+      }
+    },
+    {
+      "id": "safer-snapshot",
+      "name": "FMCSA SAFER Company Snapshot",
+      "url": "https://safer.fmcsa.dot.gov/CompanySnapshot.aspx",
+      "category": "Utilities",
+      "description": "Look up a carrier's identification, size and safety record.",
+      "sources": [],
+      "monogram": "FS",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free individual queries",
+      "researchTopic": "Moving & logistics",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://safer.fmcsa.dot.gov/CompanySnapshot.aspx"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://safer.fmcsa.dot.gov/CompanySnapshot.aspx",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Safety snapshots are different from a complete operating-authority or insurance verification."
+      }
+    },
+    {
+      "id": "routexl",
+      "name": "RouteXL",
+      "url": "https://www.routexl.com/",
+      "category": "Utilities",
+      "description": "Put multiple delivery or service stops into an efficient order.",
+      "sources": [],
+      "monogram": "R",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free up to 20 addresses; paid tiers",
+      "researchTopic": "Moving & logistics",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.routexl.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.routexl.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Routing estimates do not guarantee truck clearances, travel time or current road access."
+      }
+    },
+    {
+      "id": "goodloading",
+      "name": "Goodloading",
+      "url": "https://www.goodloading.com/en/",
+      "category": "Utilities",
+      "description": "Visualize cargo arrangement and estimated occupied vehicle space.",
+      "sources": [],
+      "monogram": "G",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free demo; account; paid features",
+      "researchTopic": "Moving & logistics",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.goodloading.com/en/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.goodloading.com/en/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Demo limits apply; fit planning is not a load-securement or payload approval."
+      }
+    },
+    {
+      "id": "uhaul-truck-selection",
+      "name": "U-Haul Truck Size Reference",
+      "url": "https://www.uhaul.com/Truck-Rentals/",
+      "category": "Utilities",
+      "description": "Compare moving-truck dimensions and rental categories.",
+      "sources": [],
+      "monogram": "UT",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free browsing; rentals cost money",
+      "researchTopic": "Moving & logistics",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.uhaul.com/Truck-Rentals/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.uhaul.com/Truck-Rentals/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Advertised rental rates are not all-in trip prices; confirm payload and terms."
+      }
+    },
+    {
+      "id": "score",
+      "name": "SCORE",
+      "url": "https://www.score.org/",
+      "category": "Utilities",
+      "description": "Find business planning resources and a volunteer mentor.",
+      "sources": [],
+      "monogram": "S",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free mentoring; event terms vary",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.score.org/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.score.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Confirm any individual workshop charge before enrolling."
+      }
+    },
+    {
+      "id": "sba-counseling",
+      "name": "SBA Counseling & Learning",
+      "url": "https://www.sba.gov/sba-learning-platform",
+      "category": "Utilities",
+      "description": "Find small-business counseling, training and local assistance.",
+      "sources": [],
+      "monogram": "SC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free or low-cost resources",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.sba.gov/sba-learning-platform"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.sba.gov/sba-learning-platform",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "The former learning-platform address now presents counseling resources; program terms vary."
+      }
+    },
+    {
+      "id": "virginia-cis",
+      "name": "Virginia SCC Clerk's Information System",
+      "url": "https://cis.scc.virginia.gov/",
+      "category": "Utilities",
+      "description": "Research Virginia business records and reach official filing tools.",
+      "sources": [],
+      "monogram": "VS",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public search; filings may have fees",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://cis.scc.virginia.gov/",
+        "https://www.scc.virginia.gov/businesses/business-faqs/cis-faq/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://cis.scc.virginia.gov/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Filings and payments require deliberate account actions; not completed by this research."
+      }
+    },
+    {
+      "id": "irs-ein",
+      "name": "IRS EIN Application",
+      "url": "https://www.irs.gov/businesses/small-businesses-self-employed/get-an-employer-identification-number",
+      "category": "Utilities",
+      "description": "Reach the IRS's direct employer-identification-number application.",
+      "sources": [],
+      "monogram": "IE",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free official application",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.irs.gov/businesses/small-businesses-self-employed/get-an-employer-identification-number"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.irs.gov/businesses/small-businesses-self-employed/get-an-employer-identification-number",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Eligibility, identity requirements and service hours apply; avoid paid lookalike sites."
+      }
+    },
+    {
+      "id": "cfpb-money-toolkit",
+      "name": "CFPB Your Money, Your Goals",
+      "url": "https://www.consumerfinance.gov/consumer-tools/educator-tool/your-money-your-goals/toolkit/",
+      "category": "Utilities",
+      "description": "Download practical money worksheets for bills, cash flow and financial goals.",
+      "sources": [],
+      "monogram": "CY",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public toolkit",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.consumerfinance.gov/consumer-tools/educator-tool/your-money-your-goals/toolkit/",
+        "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.consumerfinance.gov/consumer-tools/educator-tool/your-money-your-goals/toolkit/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "General education; use actual household numbers and current terms."
+      }
+    },
+    {
+      "id": "annual-credit-report",
+      "name": "AnnualCreditReport.com",
+      "url": "https://www.annualcreditreport.com/",
+      "category": "Utilities",
+      "description": "Obtain credit reports through the federally authorized central site.",
+      "sources": [],
+      "monogram": "A",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free reports; identity verification",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.annualcreditreport.com/",
+        "https://consumer.ftc.gov/articles/free-credit-reports?os=vb..."
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.annualcreditreport.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Credit reports are different from credit scores; enter identity details only at the official service."
+      }
+    },
+    {
+      "id": "unclaimed-money",
+      "name": "USAGov Unclaimed Money",
+      "url": "https://www.usa.gov/unclaimed-money",
+      "category": "Utilities",
+      "description": "Find official state and federal routes to search for unclaimed funds.",
+      "sources": [],
+      "monogram": "UU",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free official guidance",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.usa.gov/unclaimed-money"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.usa.gov/unclaimed-money",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Actual eligibility and claim requirements are determined by the holding agency."
+      }
+    },
+    {
+      "id": "usps-postage",
+      "name": "USPS Postage Calculator",
+      "url": "https://postcalc.usps.com/",
+      "category": "Utilities",
+      "description": "Estimate postage using package dimensions, weight and destination.",
+      "sources": [],
+      "monogram": "UP",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free calculator; postage costs money",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://postcalc.usps.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://postcalc.usps.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Final mailing prices depend on correct measurements and service selection."
+      }
+    },
+    {
+      "id": "invoice-generator",
+      "name": "Invoice Generator",
+      "url": "https://invoice-generator.com/",
+      "category": "Utilities",
+      "description": "Create a basic PDF invoice without starting an accounting subscription.",
+      "sources": [],
+      "monogram": "IG",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free PDF creation; no signup stated",
+      "researchTopic": "Business & money",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://invoice-generator.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://invoice-generator.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Do not assume it is an accounting ledger or a private local-only processor."
+      }
+    },
+    {
+      "id": "usgs-topoview",
+      "name": "USGS topoView",
+      "url": "https://www.usgs.gov/tools/topoview",
+      "category": "Maps & world",
+      "description": "Find current and historical US topographic maps and downloads.",
+      "sources": [],
+      "monogram": "UT",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free map downloads",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.usgs.gov/tools/topoview",
+        "https://www.usgs.gov/programs/national-geospatial-program/topographic-maps"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.usgs.gov/tools/topoview",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Use the official launch page; the map application blocked this research fetch."
+      }
+    },
+    {
+      "id": "caltopo",
+      "name": "CalTopo",
+      "url": "https://caltopo.com/",
+      "category": "Maps & world",
+      "description": "Build outdoor maps with terrain layers and route-planning tools.",
+      "sources": [],
+      "monogram": "C",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free basics; paid subscriptions",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://caltopo.com/",
+        "https://training.caltopo.com/all_users/accounts"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://caltopo.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Offline mobile basemaps require a subscription; use current land-access information."
+      }
+    },
+    {
+      "id": "openstreetmap",
+      "name": "OpenStreetMap",
+      "url": "https://www.openstreetmap.org/",
+      "category": "Maps & world",
+      "description": "Explore community-maintained maps and geographic details.",
+      "sources": [],
+      "monogram": "O",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free map browsing",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.openstreetmap.org/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.openstreetmap.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Map quality varies; data reuse has license and attribution requirements."
+      }
+    },
+    {
+      "id": "fema-flood-maps",
+      "name": "FEMA Flood Map Service Center",
+      "url": "https://msc.fema.gov/portal/home",
+      "category": "Maps & world",
+      "description": "Look up official flood-hazard map products for an address or area.",
+      "sources": [],
+      "monogram": "FF",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free map downloads",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://msc.fema.gov/portal/home",
+        "https://msc.fema.gov/msccontent/FEMA_Hazard_Products_Direct_Download.pdf"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://msc.fema.gov/portal/home",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Official documentation verified; the interactive portal returned a gateway error during retrieval."
+      }
+    },
+    {
+      "id": "nws-weather",
+      "name": "National Weather Service",
+      "url": "https://www.weather.gov/",
+      "category": "Maps & world",
+      "description": "Check official local forecasts, weather alerts and forecast discussions.",
+      "sources": [],
+      "monogram": "NW",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public forecasts",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.weather.gov/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.weather.gov/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Choose the actual location; this research did not obtain live conditions for the user."
+      }
+    },
+    {
+      "id": "airnow",
+      "name": "AirNow",
+      "url": "https://www.airnow.gov/",
+      "category": "Maps & world",
+      "description": "Check regional air-quality readings, forecasts and AQI explanations.",
+      "sources": [],
+      "monogram": "A",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public lookup",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.airnow.gov/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.airnow.gov/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Conditions vary by place and time; no personal exposure measurement is supplied."
+      }
+    },
+    {
+      "id": "virginia-511",
+      "name": "Virginia 511",
+      "url": "https://511.vdot.virginia.gov/",
+      "category": "Maps & world",
+      "description": "Review Virginia traffic, incidents, work zones and road reports.",
+      "sources": [],
+      "monogram": "V5",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public traffic information",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://511.vdot.virginia.gov/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://511.vdot.virginia.gov/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Account features and alerts were not configured; conditions can change quickly."
+      }
+    },
+    {
+      "id": "recreation-gov",
+      "name": "Recreation.gov",
+      "url": "https://www.recreation.gov/",
+      "category": "Maps & world",
+      "description": "Find federal camping, permits, tours and recreation opportunities.",
+      "sources": [],
+      "monogram": "R",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free browsing; reservations may cost money",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.recreation.gov/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.recreation.gov/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Booking fees, availability and cancellation terms vary by facility."
+      }
+    },
+    {
+      "id": "hiking-project",
+      "name": "Hiking Project",
+      "url": "https://www.hikingproject.com/",
+      "category": "Maps & world",
+      "description": "Browse contributed trail descriptions and route maps.",
+      "sources": [],
+      "monogram": "HP",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free browsing; account for contributions",
+      "researchTopic": "Maps & outdoors",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.hikingproject.com/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://www.hikingproject.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Trail reports are not a guarantee of current access or conditions."
+      }
+    },
+    {
+      "id": "gasbuddy",
+      "name": "GasBuddy",
+      "url": "https://www.gasbuddy.com/",
+      "category": "Shopping",
+      "description": "Compare reported fuel prices by city or ZIP code.",
+      "sources": [],
+      "monogram": "G",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public price search; optional paid products",
+      "researchTopic": "Everyday savings",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.gasbuddy.com/",
+        "https://help.gasbuddy.com/hc/en-us/articles/27612659871767-Finding-Prices"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://www.gasbuddy.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Check report time and cash-versus-credit price; the homepage blocked automated retrieval."
+      }
+    },
+    {
+      "id": "flipp",
+      "name": "Flipp",
+      "url": "https://flipp.com/",
+      "category": "Shopping",
+      "description": "Search local weekly ads and organize grocery or household shopping.",
+      "sources": [],
+      "monogram": "F",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public weekly ads; app available",
+      "researchTopic": "Everyday savings",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://flipp.com/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://flipp.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Offers depend on store, location and dates; savings claims are not a guarantee."
+      }
+    },
+    {
+      "id": "findhelp",
+      "name": "Findhelp",
+      "url": "https://www.findhelp.org/",
+      "category": "Shopping",
+      "description": "Search for local food, housing, financial and other support programs.",
+      "sources": [],
+      "monogram": "F",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public service search",
+      "researchTopic": "Everyday savings",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.findhelp.org/",
+        "https://auntbertha.atlassian.net/wiki/spaces/PORTAL/pages/2579071066/Frequently%2BAsked%2BQuestions%2BFAQ?initialAllowedFeatures=&locale=en-US&parentProduct=JSM-Portal&parentProductContentContainerId=10172",
+        "https://company.findhelp.com/blog/2023/08/01/our-expanding-community-of-caring/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://www.findhelp.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Provider documentation checked; root blocked retrieval. Program eligibility must be confirmed."
+      }
+    },
+    {
+      "id": "virginia-211",
+      "name": "211 Virginia",
+      "url": "https://211virginia.org/",
+      "category": "Shopping",
+      "description": "Find Virginia community assistance and information services.",
+      "sources": [],
+      "monogram": "2V",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public service",
+      "researchTopic": "Everyday savings",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://211virginia.org/",
+        "https://211virginia.org/about-us/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://211virginia.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Check current live-assistance hours; referral is not an eligibility approval."
+      }
+    },
+    {
+      "id": "bitwarden",
+      "name": "Bitwarden",
+      "url": "https://bitwarden.com/products/personal/",
+      "category": "Utilities",
+      "description": "Keep passwords in a dedicated password manager.",
+      "sources": [],
+      "monogram": "B",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free personal plan; paid extras",
+      "researchTopic": "Privacy & security",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://bitwarden.com/products/personal/",
+        "https://bitwarden.com/help/password-manager-plans/",
+        "https://bitwarden.com/products/personal/?trk=article-ssr-frontend-pulse_little-text-block"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://bitwarden.com/products/personal/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Requires an account and careful recovery setup; no account was created."
+      }
+    },
+    {
+      "id": "firefox-relay",
+      "name": "Firefox Relay",
+      "url": "https://relay.firefox.com/",
+      "category": "Utilities",
+      "description": "Use email masks to limit sharing of a primary email address.",
+      "sources": [],
+      "monogram": "FR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Limited free tier; paid extras",
+      "researchTopic": "Privacy & security",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://relay.firefox.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://relay.firefox.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Account required; phone and other premium features have separate terms."
+      }
+    },
+    {
+      "id": "cover-your-tracks",
+      "name": "EFF Cover Your Tracks",
+      "url": "https://coveryourtracks.eff.org/",
+      "category": "Utilities",
+      "description": "Inspect browser tracking and fingerprinting characteristics.",
+      "sources": [],
+      "monogram": "EC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browser test",
+      "researchTopic": "Privacy & security",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://coveryourtracks.eff.org/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://coveryourtracks.eff.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Results describe the test environment, not complete anonymity."
+      }
+    },
+    {
+      "id": "virustotal",
+      "name": "VirusTotal",
+      "url": "https://www.virustotal.com/gui/home/upload",
+      "category": "Utilities",
+      "description": "Check suspicious files and URLs against multiple security engines.",
+      "sources": [],
+      "monogram": "V",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public analysis; service limits",
+      "researchTopic": "Privacy & security",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.virustotal.com/gui/home/upload",
+        "https://docs.virustotal.com/docs/how-it-works"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.virustotal.com/gui/home/upload",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Submissions can be shared with security partners. Never submit confidential documents or secret links."
+      }
+    },
+    {
+      "id": "quad9",
+      "name": "Quad9",
+      "url": "https://quad9.net/",
+      "category": "Utilities",
+      "description": "Learn how to use a malware-blocking public DNS resolver.",
+      "sources": [],
+      "monogram": "Q",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free service; device setup needed",
+      "researchTopic": "Privacy & security",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://quad9.net/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://quad9.net/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "A DNS change is required; it does not replace updates, backups or full endpoint protection."
+      }
+    },
+    {
+      "id": "cyberchef",
+      "name": "CyberChef",
+      "url": "https://gchq.github.io/CyberChef/",
+      "category": "Utilities",
+      "description": "Transform, decode and inspect text or data through reusable recipes.",
+      "sources": [],
+      "monogram": "C",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browser app",
+      "researchTopic": "Files & office",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://gchq.github.io/CyberChef/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://gchq.github.io/CyberChef/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Check operations before using sensitive data; encoded information is not automatically encrypted."
+      }
+    },
+    {
+      "id": "it-tools",
+      "name": "IT Tools",
+      "url": "https://it-tools.tech/",
+      "category": "Utilities",
+      "description": "Use small developer utilities for formatting, conversion and validation.",
+      "sources": [],
+      "monogram": "IT",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free open-source project",
+      "researchTopic": "Files & office",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://it-tools.tech/",
+        "https://github.com/CorentinTh/it-tools",
+        "https://github.com/CorentinTh/it-tools/blob/main/index.html"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://it-tools.tech/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Use the original project link; many similarly named tool sites are unrelated."
+      }
+    },
+    {
+      "id": "cloudconvert",
+      "name": "CloudConvert",
+      "url": "https://cloudconvert.com/",
+      "category": "Utilities",
+      "description": "Convert between document, image, audio and other file formats.",
+      "sources": [],
+      "monogram": "C",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free tier: 10 credits/day; paid options",
+      "researchTopic": "Files & office",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://cloudconvert.com/",
+        "https://cloudconvert.com/pricing",
+        "https://cloudconvert.com/security"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://cloudconvert.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Cloud processing; free limits also include processing time and file size. No file was uploaded."
+      }
+    },
+    {
+      "id": "mediainfo-online",
+      "name": "MediaInfoOnline",
+      "url": "https://mediaarea.net/MediaInfoOnline",
+      "category": "Utilities",
+      "description": "Inspect a media file's codec, dimensions and other technical metadata.",
+      "sources": [],
+      "monogram": "M",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Browser inspection; local processing stated",
+      "researchTopic": "Files & office",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://mediaarea.net/MediaInfoOnline"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://mediaarea.net/MediaInfoOnline",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Optional report sharing is a separate action that can expose metadata."
+      }
+    },
+    {
+      "id": "stirling-pdf",
+      "name": "Stirling PDF",
+      "url": "https://www.stirlingpdf.com/",
+      "category": "Utilities",
+      "description": "Edit PDFs using a local or self-hosted workflow.",
+      "sources": [],
+      "monogram": "SP",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free options; paid offerings",
+      "researchTopic": "Files & office",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.stirlingpdf.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.stirlingpdf.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Installation or self-hosting can be required; distinguish local and hosted versions."
+      }
+    },
+    {
+      "id": "diffchecker",
+      "name": "Diffchecker",
+      "url": "https://www.diffchecker.com/",
+      "category": "Utilities",
+      "description": "Compare two versions of text and highlight changes.",
+      "sources": [],
+      "monogram": "D",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free basic comparison; paid extras",
+      "researchTopic": "Files & office",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.diffchecker.com/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://www.diffchecker.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Some comparison and editing features are limited or Pro; avoid confidential online inputs."
+      }
+    },
+    {
+      "id": "svgomg",
+      "name": "SVGOMG",
+      "url": "https://jakearchibald.github.io/svgomg/",
+      "category": "Creative",
+      "description": "Reduce SVG size and inspect the effects of optimization settings.",
+      "sources": [],
+      "monogram": "S",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browser tool",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://jakearchibald.github.io/svgomg/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://jakearchibald.github.io/svgomg/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Optimization can change artwork; inspect the resulting image before replacing an original."
+      }
+    },
+    {
+      "id": "canva",
+      "name": "Canva",
+      "url": "https://www.canva.com/",
+      "category": "Creative",
+      "description": "Make flyers, social graphics, presentations and business designs.",
+      "sources": [],
+      "monogram": "C",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free tier; paid content and plans",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.canva.com/",
+        "https://www.canva.com/pricing/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.canva.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Account and asset-license conditions apply; premium elements are not free."
+      }
+    },
+    {
+      "id": "gimp",
+      "name": "GIMP",
+      "url": "https://www.gimp.org/",
+      "category": "Creative",
+      "description": "Use a full desktop image editor for retouching and compositing.",
+      "sources": [],
+      "monogram": "G",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free software; download required",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.gimp.org/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.gimp.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Desktop installation and a learning curve; no software was installed."
+      }
+    },
+    {
+      "id": "krita",
+      "name": "Krita",
+      "url": "https://krita.org/en/",
+      "category": "Creative",
+      "description": "Paint and illustrate with a dedicated desktop art application.",
+      "sources": [],
+      "monogram": "K",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free software; download required",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://krita.org/en/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://krita.org/en/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Paid store editions may coexist; use the official download route."
+      }
+    },
+    {
+      "id": "remove-bg",
+      "name": "remove.bg",
+      "url": "https://www.remove.bg/",
+      "category": "Creative",
+      "description": "Remove an image background for a quick listing or mockup.",
+      "sources": [],
+      "monogram": "R",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free low-resolution previews; paid high resolution",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.remove.bg/",
+        "https://www.remove.bg/help/a/what-is-the-difference-between-the-free-plan-subscription-and-pay-as-you-go.iso"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.remove.bg/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Images are uploaded; free output is limited to previews up to 0.25 megapixels."
+      }
+    },
+    {
+      "id": "fontshare",
+      "name": "Fontshare",
+      "url": "https://www.fontshare.com/",
+      "category": "Creative",
+      "description": "Find professional typefaces for visual projects.",
+      "sources": [],
+      "monogram": "F",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free personal and commercial fonts",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.fontshare.com/",
+        "https://www.fontshare.com/about"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.fontshare.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Read the supplied license before redistributing font files or modifying them."
+      }
+    },
+    {
+      "id": "haikei",
+      "name": "Haikei",
+      "url": "https://haikei.app/",
+      "category": "Creative",
+      "description": "Generate customizable SVG or PNG patterns, waves and backgrounds.",
+      "sources": [],
+      "monogram": "H",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free generators; paid offerings may exist",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://haikei.app/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://haikei.app/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Use the free workflow; current premium features were not tested."
+      }
+    },
+    {
+      "id": "kleki",
+      "name": "Kleki",
+      "url": "https://kleki.com/",
+      "category": "Creative",
+      "description": "Sketch, paint and work with image layers directly in a browser.",
+      "sources": [],
+      "monogram": "K",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free browser painting",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://kleki.com/",
+        "https://help.kleki.com/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://kleki.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Save/export work deliberately; browser storage is not a durable backup."
+      }
+    },
+    {
+      "id": "audacity",
+      "name": "Audacity",
+      "url": "https://www.audacityteam.org/",
+      "category": "Creative",
+      "description": "Record, edit and clean up audio on a desktop.",
+      "sources": [],
+      "monogram": "A",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free software; download required",
+      "researchTopic": "Audio & video",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.audacityteam.org/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.audacityteam.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Choose the official installer; optional hubs and add-ons are separate choices."
+      }
+    },
+    {
+      "id": "obs-studio",
+      "name": "OBS Studio",
+      "url": "https://obsproject.com/",
+      "category": "Creative",
+      "description": "Record a screen or build live-video scenes with multiple sources.",
+      "sources": [],
+      "monogram": "OS",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Open-source desktop software",
+      "researchTopic": "Audio & video",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://obsproject.com/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://obsproject.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Requires installation and setup; review the screen for private information before recording."
+      }
+    },
+    {
+      "id": "handbrake",
+      "name": "HandBrake",
+      "url": "https://handbrake.fr/",
+      "category": "Creative",
+      "description": "Compress and transcode video to practical sharing formats.",
+      "sources": [],
+      "monogram": "H",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free software; download required",
+      "researchTopic": "Audio & video",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://handbrake.fr/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://handbrake.fr/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Encoding is device-intensive; preserve the original footage."
+      }
+    },
+    {
+      "id": "davinci-resolve",
+      "name": "DaVinci Resolve",
+      "url": "https://www.blackmagicdesign.com/products/davinciresolve",
+      "category": "Creative",
+      "description": "Edit video, sound and color in one desktop application.",
+      "sources": [],
+      "monogram": "DR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free edition; paid Studio edition",
+      "researchTopic": "Audio & video",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.blackmagicdesign.com/products/davinciresolve"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.blackmagicdesign.com/products/davinciresolve",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Hardware demands and edition differences matter; download registration was not tested."
+      }
+    },
+    {
+      "id": "khan-academy",
+      "name": "Khan Academy",
+      "url": "https://www.khanacademy.org/",
+      "category": "Learning",
+      "description": "Practice school subjects and build foundational knowledge.",
+      "sources": [],
+      "monogram": "KA",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free core education; account features",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.khanacademy.org/",
+        "https://en.khanacademy.org/?skipRole=false"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.khanacademy.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Accounts support saved progress; paid AI or institutional products are separate."
+      }
+    },
+    {
+      "id": "mit-ocw",
+      "name": "MIT OpenCourseWare",
+      "url": "https://ocw.mit.edu/",
+      "category": "Learning",
+      "description": "Study published MIT course materials and selected lectures.",
+      "sources": [],
+      "monogram": "MO",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free course materials",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://ocw.mit.edu/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://ocw.mit.edu/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Not admission to MIT and not a credit or degree program."
+      }
+    },
+    {
+      "id": "openlearn",
+      "name": "OpenLearn",
+      "url": "https://www.open.edu/openlearn/",
+      "category": "Learning",
+      "description": "Take free courses from The Open University.",
+      "sources": [],
+      "monogram": "O",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free courses; account for tracking",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.open.edu/openlearn/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.open.edu/openlearn/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Statements or badges differ from accredited course credit."
+      }
+    },
+    {
+      "id": "learnfree",
+      "name": "LearnFree / GCFGlobal",
+      "url": "https://www.learnfree.org/",
+      "category": "Learning",
+      "description": "Learn practical computer, workplace and everyday skills.",
+      "sources": [],
+      "monogram": "L/",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free lessons",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.learnfree.org/",
+        "https://edu.gcfglobal.org/en/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.learnfree.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "The older GCFGlobal education address redirects to LearnFree."
+      }
+    },
+    {
+      "id": "spanishdict",
+      "name": "SpanishDictionary.com",
+      "url": "https://www.spanishdict.com/",
+      "category": "Learning",
+      "description": "Look up Spanish meanings, conjugations, examples and lessons.",
+      "sources": [],
+      "monogram": "S",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free content; paid subscription options",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.spanishdict.com/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.spanishdict.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Check regional usage when choosing Spain Spanish."
+      }
+    },
+    {
+      "id": "rae-dictionary",
+      "name": "RAE Spanish Dictionary",
+      "url": "https://dle.rae.es/",
+      "category": "Learning",
+      "description": "Check Spanish definitions and accepted word forms with the RAE.",
+      "sources": [],
+      "monogram": "RS",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public dictionary",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://dle.rae.es/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://dle.rae.es/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Definitions are in Spanish; colloquial or regional usage may need context."
+      }
+    },
+    {
+      "id": "forvo",
+      "name": "Forvo",
+      "url": "https://forvo.com/",
+      "category": "Learning",
+      "description": "Listen to contributed native-speaker pronunciations.",
+      "sources": [],
+      "monogram": "F",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public listening; account and paid features",
+      "researchTopic": "Learning & Spanish",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://forvo.com/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://forvo.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Choose speaker region for Spain Spanish; individual recordings can vary."
+      }
+    },
+    {
+      "id": "the-pudding",
+      "name": "The Pudding",
+      "url": "https://pudding.cool/",
+      "category": "Learning",
+      "description": "Explore visual essays that make data and culture tangible.",
+      "sources": [],
+      "monogram": "TP",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public interactive essays",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://pudding.cool/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://pudding.cool/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Individual interactive projects can be demanding on a small screen."
+      }
+    },
+    {
+      "id": "explorable-explanations",
+      "name": "Explorable Explanations",
+      "url": "https://explorabl.es/",
+      "category": "Learning",
+      "description": "Discover interactive explanations built around learning through play.",
+      "sources": [],
+      "monogram": "EE",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public directory",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://explorabl.es/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://explorabl.es/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Projects are by different creators; each has its own access and performance characteristics."
+      }
+    },
+    {
+      "id": "human-benchmark",
+      "name": "Human Benchmark",
+      "url": "https://humanbenchmark.com/",
+      "category": "Learning",
+      "description": "Try reaction, memory and other short interactive challenges.",
+      "sources": [],
+      "monogram": "HB",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public tests; account features",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://humanbenchmark.com/",
+        "https://humanbenchmark.com/tests/memory/statistics"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://humanbenchmark.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Input lag and device differences affect results; not a clinical assessment."
+      }
+    },
+    {
+      "id": "nasa-eyes",
+      "name": "NASA Eyes",
+      "url": "https://science.nasa.gov/eyes/",
+      "category": "Learning",
+      "description": "Explore NASA's Earth, planetary and mission data in browser-based 3D.",
+      "sources": [],
+      "monogram": "NE",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browser applications",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://science.nasa.gov/eyes/",
+        "https://science.nasa.gov/eyes/faq/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://science.nasa.gov/eyes/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Individual visualization performance and interactive accuracy were not independently tested."
+      }
+    },
+    {
+      "id": "stellarium-web",
+      "name": "Stellarium Web",
+      "url": "https://stellarium-web.org/",
+      "category": "Learning",
+      "description": "Explore the sky in a browser-based planetarium.",
+      "sources": [],
+      "monogram": "SW",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browser app",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://stellarium-web.org/",
+        "https://www.stellarium-labs.com/stellarium-web/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://stellarium-web.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Provider labels the web project beta; allow for bugs and device limits."
+      }
+    },
+    {
+      "id": "project-gutenberg",
+      "name": "Project Gutenberg",
+      "url": "https://www.gutenberg.org/",
+      "category": "Learning",
+      "description": "Read or download public-domain literature in several formats.",
+      "sources": [],
+      "monogram": "PG",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free; no registration stated",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.gutenberg.org/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.gutenberg.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Copyright status is primarily assessed for the United States."
+      }
+    },
+    {
+      "id": "standard-ebooks",
+      "name": "Standard Ebooks",
+      "url": "https://standardebooks.org/",
+      "category": "Learning",
+      "description": "Download carefully formatted editions of public-domain books.",
+      "sources": [],
+      "monogram": "SE",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free ebooks",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://standardebooks.org/",
+        "https://standardebooks.org/about"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://standardebooks.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "U.S. public-domain status does not automatically cover every country; direct XHTML rendering was unsupported in the research tool."
+      }
+    },
+    {
+      "id": "loc-digital-collections",
+      "name": "Library of Congress Digital Collections",
+      "url": "https://www.loc.gov/collections/",
+      "category": "Learning",
+      "description": "Explore digitized maps, photographs, recordings and documents.",
+      "sources": [],
+      "monogram": "LO",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free browsing; rights vary by item",
+      "researchTopic": "Curiosity & play",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.loc.gov/collections/",
+        "https://www.loc.gov/research-centers/use-the-library/research-anywhere-anytime/",
+        "https://www.loc.gov/collections/selected-digitized-books/about-this-collection/rights-and-access/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.loc.gov/collections/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Read each collection's rights statement before reusing material; the main index blocked retrieval."
+      }
+    },
+    {
+      "id": "auctionzip",
+      "name": "AuctionZip",
+      "url": "https://www.auctionzip.com/",
+      "category": "Shopping",
+      "description": "Find auction calendars and auctioneer listings.",
+      "sources": [],
+      "monogram": "A",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browsing; auction terms vary",
+      "researchTopic": "Auctions & resale",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.auctionzip.com/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://www.auctionzip.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Bidding, premiums, shipping and pickup conditions are specific to each sale."
+      }
+    },
+    {
+      "id": "estatesales-net",
+      "name": "EstateSales.NET",
+      "url": "https://www.estatesales.net/",
+      "category": "Shopping",
+      "description": "Find estate sales and preview their listed contents.",
+      "sources": [],
+      "monogram": "E",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browsing; account for alerts",
+      "researchTopic": "Auctions & resale",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.estatesales.net/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://www.estatesales.net/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Listing dates and pickup rules need confirmation with the sale operator."
+      }
+    },
+    {
+      "id": "hibid",
+      "name": "HiBid",
+      "url": "https://hibid.com/",
+      "category": "Shopping",
+      "description": "Browse online auctions and sale catalogs by category or location.",
+      "sources": [],
+      "monogram": "H",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public browsing; account to bid",
+      "researchTopic": "Auctions & resale",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://hibid.com/"
+      ],
+      "previewKind": "chart",
+      "destinationCheck": {
+        "url": "https://hibid.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Bids are commitments; premiums, taxes and pickup obligations can add substantial cost."
+      }
+    },
+    {
+      "id": "usda-fooddata",
+      "name": "USDA FoodData Central",
+      "url": "https://fdc.nal.usda.gov/",
+      "category": "Learning",
+      "description": "Look up food composition and compare nutrient information.",
+      "sources": [],
+      "monogram": "UF",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public database",
+      "researchTopic": "Food & fitness",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://fdc.nal.usda.gov/"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://fdc.nal.usda.gov/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Advanced search filters are desktop-only in the reviewed interface; entries and portions vary."
+      }
+    },
+    {
+      "id": "food-safety-charts",
+      "name": "FoodSafety.gov Charts",
+      "url": "https://www.foodsafety.gov/food-safety-charts",
+      "category": "Learning",
+      "description": "Find official cooking, chilling and storage reference charts.",
+      "sources": [],
+      "monogram": "FC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public reference",
+      "researchTopic": "Food & fitness",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.foodsafety.gov/food-safety-charts"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://www.foodsafety.gov/food-safety-charts",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Use a food thermometer and the chart for the actual food."
+      }
+    },
+    {
+      "id": "wave-accessibility",
+      "name": "WAVE Accessibility Checker",
+      "url": "https://wave.webaim.org/",
+      "category": "Utilities",
+      "description": "Inspect a public webpage for common accessibility problems.",
+      "sources": [],
+      "monogram": "WA",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free online checks; paid API options",
+      "researchTopic": "Website quality",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://wave.webaim.org/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://wave.webaim.org/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Automated findings do not establish complete accessibility conformance."
+      }
+    },
+    {
+      "id": "webaim-contrast",
+      "name": "WebAIM Contrast Checker",
+      "url": "https://webaim.org/resources/contrastchecker/",
+      "category": "Utilities",
+      "description": "Check contrast between text and background colors.",
+      "sources": [],
+      "monogram": "WC",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free public calculator",
+      "researchTopic": "Website quality",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://webaim.org/resources/contrastchecker/"
+      ],
+      "previewKind": "tasks",
+      "destinationCheck": {
+        "url": "https://webaim.org/resources/contrastchecker/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Color contrast is one part of accessible design, not a complete evaluation."
+      }
+    },
+    {
+      "id": "darebee",
+      "name": "DAREBEE",
+      "url": "https://darebee.com/",
+      "category": "Learning",
+      "description": "Browse visual home-workout references and fitness programs.",
+      "sources": [],
+      "monogram": "D",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free resources; donations support project",
+      "researchTopic": "Food & fitness",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://darebee.com/",
+        "https://darebee.com/pdf/books/built-to-last-by-darebee.pdf"
+      ],
+      "previewKind": "directory",
+      "destinationCheck": {
+        "url": "https://darebee.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Choose activity appropriate to the individual; this is not personalized exercise or medical advice."
+      }
+    },
+    {
+      "id": "sketchfab-viewer",
+      "name": "Sketchfab 3D Viewer",
+      "url": "https://sketchfab.com/features",
+      "category": "Creative",
+      "description": "Explore and embed interactive 3D models in a browser.",
+      "sources": [],
+      "monogram": "S3",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public model viewing; licensing varies",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://sketchfab.com/features"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://sketchfab.com/features",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Some older pages describe a store; verify current purchasing routes and each model's reuse license."
+      }
+    },
+    {
+      "id": "tinkercad",
+      "name": "Tinkercad",
+      "url": "https://www.tinkercad.com/",
+      "category": "Creative",
+      "description": "Experiment with 3D design, circuits and coding in a browser.",
+      "sources": [],
+      "monogram": "T",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Free web app; account features",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.tinkercad.com/",
+        "https://www.tinkercad.com/help-center"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.tinkercad.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Cloud saving and classroom features have account and privacy requirements."
+      }
+    },
+    {
+      "id": "printables",
+      "name": "Printables",
+      "url": "https://www.printables.com/",
+      "category": "Creative",
+      "description": "Find 3D-printable organizers, fixtures and creative projects.",
+      "sources": [],
+      "monogram": "P",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "accessLabel": "Public models; paid clubs/store coexist",
+      "researchTopic": "Design & making",
+      "evidence": "Independent research completed October 29, 2026. Provider content or first-party documentation reviewed; the complete workflow was not tested.",
+      "evidenceUrls": [
+        "https://www.printables.com/"
+      ],
+      "previewKind": "image",
+      "destinationCheck": {
+        "url": "https://www.printables.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-10-29",
+        "notes": "Read each model's license; printer, material and fit requirements still matter."
+      }
     }
   ],
   "tips": [
@@ -4220,12 +6684,19 @@
     "videosWithMappings": 57,
     "videosWithTips": 28,
     "videosPending": 0,
-    "destinationLinks": 94,
+    "destinationLinks": 191,
     "addedDestinationLinks": 41,
-    "independentWebFinds": 25,
+    "independentWebFinds": 122,
     "videoDestinationLinks": 69
   },
-  "scope": "94 website destinations: 69 traced to source videos and 25 independently researched web finds, plus 28 tips and 85 original source videos.",
+  "scope": "191 website destinations: 69 traced to source videos and 122 independently researched web finds, plus 28 tips and 85 original source videos.",
   "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
-  "updatedAt": "2026-10-25"
+  "updatedAt": "2026-10-30",
+  "releases": [
+    {
+      "date": "2026-10-30",
+      "added": 97,
+      "review": "Provider sources reviewed; full workflows untested."
+    }
+  ]
 }

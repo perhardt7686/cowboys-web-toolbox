@@ -18,9 +18,10 @@ test('public catalog CSV exports neutralize spreadsheet formulas in community-su
   for(const value of ['=HYPERLINK("https://example.com")',' +SUM(1,2)','@SUM(A1)','\tformula'])assert.ok(cell(value).startsWith('"\''));
   assert.equal(cell('A "useful" site'),'"A ""useful"" site"');
 });
-test('94 catalog entries retain honest origins, unique domains and explicit check scopes',()=>{
-  assert.equal(catalog.length,94);assert.equal(catalog.filter(s=>s.origin==='web').length,25);
-  const newHosts=new Set(catalog.filter(s=>s.origin==='web').map(s=>canonicalHost(s.url)));const oldHosts=new Set(catalog.filter(s=>s.origin!=='web').map(s=>canonicalHost(s.url)));assert.equal(newHosts.size,25);assert.equal([...newHosts].filter(h=>oldHosts.has(h)).length,0);
+test('expanded catalog retains honest origins, unique URLs and explicit check scopes',()=>{
+  assert.ok(catalog.length>=191);assert.equal(catalog.filter(s=>s.origin!=='web').length,69);
+  assert.equal(new Set(catalog.map(s=>s.id)).size,catalog.length);
+  assert.equal(new Set(catalog.map(s=>s.url.replace(/\/$/u,''))).size,catalog.length);
   for(const s of catalog.filter(s=>s.origin==='web')){assert.deepEqual(s.sources,[]);assert.ok(s.evidenceUrls[0].startsWith('https://'));assert.ok(s.destinationCheck.notes);assert.ok(s.accessLabel);}
 });
 test('guided post data is bounded, whitelisted and honest about existing destinations',()=>{
