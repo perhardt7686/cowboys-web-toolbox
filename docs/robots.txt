@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://perhardt7686.github.io/cowboys-web-toolbox/sitemap.xml

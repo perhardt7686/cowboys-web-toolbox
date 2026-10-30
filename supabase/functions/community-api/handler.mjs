@@ -129,6 +129,7 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       return {requested:true,emailSent};
     }
     requireOwner(user);
+    if(action==='admin_discovery')return check(await db.rpc('community_discovery_overview',{}));
     if(action==='admin_overview')return {...check(await db.rpc('community_admin_overview',{p_actor:user.id})),senderConfigured};
     if(action==='admin_members')return check(await db.rpc('community_admin_members',{p_actor:user.id,p_search:payload.search?text(payload.search,80,0):'',p_status:payload.status||'all',p_offset:Number.isInteger(payload.offset)?payload.offset:0}));
     if(action==='admin_bulk'){

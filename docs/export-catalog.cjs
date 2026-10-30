@@ -1,0 +1,1 @@
+const fs=require('node:fs'),path=require('node:path'),core=require('./discovery-core.js');const data=JSON.parse(fs.readFileSync(path.join(__dirname,'catalog.json'),'utf8'));fs.writeFileSync(path.join(__dirname,'websites.csv'),core.csv(data.sites,data.videos));
