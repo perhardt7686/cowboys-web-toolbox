@@ -1,6 +1,6 @@
 # Cowboy’s Web Toolbox
 
-A public directory of 191 useful websites: 69 video discoveries and 122 independently researched web finds, plus 28 tips and 85 source videos. Original illustrated previews, source labels, access notes and browser-local favorites make it easy to explore. Matty McTech’s video discoveries retain their attribution; community additions have their own source threads.
+A public directory of 415 useful websites: 69 video discoveries and 346 independently researched web finds, plus 28 tips and 85 source videos. Original illustrated previews, source labels, access notes and browser-local favorites make it easy to explore. Matty McTech’s video discoveries retain their attribution; community additions have their own source threads.
 
 GitHub Pages publishes `/docs` from `main` at https://perhardt7686.github.io/cowboys-web-toolbox/.
 
@@ -30,7 +30,7 @@ npm run check:edge
 The tests run actual Postgres constraints, policies and transaction functions in PGlite, with injected authentication and mail transports. They do not claim to verify a live Supabase project or SMTP delivery. Package versions and the npm dependency lockfile are committed. Runtime secrets are never committed or placed in `/docs`.
 
 
-The Commons message boards now include optional member profiles with photo crops, themes, covers, bios and links; a private owner control room for members, moderation, announcements, audit and CSV exports; and aggregate click counters for all 191 base catalog websites and approved dynamic community finds. Email verification and Cowboy's owner approval are required before posting. See COMMUNITY.md for authorization, privacy, deployment and testing details. Interactive preview mode uses explicitly labeled sample data and changes no live account or counters.
+The Commons message boards now include optional member profiles with photo crops, themes, covers, bios and links; a private owner control room for members, moderation, announcements, audit and CSV exports; and aggregate click counters for all 415 base catalog websites and approved dynamic community finds. Email verification and Cowboy's owner approval are required before posting. See COMMUNITY.md for authorization, privacy, deployment and testing details. Interactive preview mode uses explicitly labeled sample data and changes no live account or counters.
 
 ## Community Lab
 
@@ -46,3 +46,7 @@ Weekly challenges and an optional public-thread email digest run through `commun
 ## October 30 catalog expansion
 
 Merged the 97 approved research entries into the existing 94-entry catalog. Original IDs, source videos, tips and browser-local favorite keys remain intact. The public catalog, embedded page, standalone preview, CSV and both server catalog copies are rebuilt together. Access limitations and original provider sources remain attached to every new entry. `supabase/catalog-seed.sql` adds missing click-counter rows without resetting existing totals. All 41 automated checks pass. Provider-source review is not a full workflow or security test of each linked service.
+
+## General-audience expansion, October 30
+
+A second sweep reviewed 235 candidates across 46 research topics: 224 passed editorial inclusion, one was a duplicate, two proposed destinations were obsolete and eight remain on verification hold. The 224 passing entries bring the base catalog to 415. A specific-interest selector, searchable research topics and visible topic labels make the broader collection navigable. All original IDs, 85 source videos, 28 tips, favorites keys, Most clicked default, community links and existing counters are retained. Source review includes provider metadata and explicitly identified official indexed content where dynamic pages were unavailable; full candidate workflows remain untested.
