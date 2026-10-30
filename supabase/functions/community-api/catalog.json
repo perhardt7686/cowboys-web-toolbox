@@ -2891,6 +2891,3154 @@
       "source_urls": [
         "https://www.printables.com/"
       ]
+    },
+    {
+      "id": "ilovepdf",
+      "name": "iLovePDF",
+      "url": "https://www.ilovepdf.com/",
+      "category": "Utilities",
+      "description": "Merge, split, compress and convert PDFs.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.ilovepdf.com/"
+      ]
+    },
+    {
+      "id": "sejda",
+      "name": "Sejda",
+      "url": "https://www.sejda.com/",
+      "category": "Utilities",
+      "description": "Edit and reorganize PDF documents online or with a desktop app.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.sejda.com/"
+      ]
+    },
+    {
+      "id": "pdfescape",
+      "name": "PDFescape",
+      "url": "https://www.pdfescape.com/",
+      "category": "Utilities",
+      "description": "Fill forms and edit PDF files.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.pdfescape.com/"
+      ]
+    },
+    {
+      "id": "libreoffice",
+      "name": "LibreOffice",
+      "url": "https://www.libreoffice.org/",
+      "category": "Utilities",
+      "description": "Create documents, spreadsheets and presentations on a computer.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.libreoffice.org/"
+      ]
+    },
+    {
+      "id": "localsend",
+      "name": "LocalSend",
+      "url": "https://localsend.org/",
+      "category": "Utilities",
+      "description": "Send files between nearby devices on a local network.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://localsend.org/"
+      ]
+    },
+    {
+      "id": "wormhole",
+      "name": "Wormhole",
+      "url": "https://wormhole.app/",
+      "category": "Utilities",
+      "description": "Share files using an encrypted link.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://wormhole.app/"
+      ]
+    },
+    {
+      "id": "languagetool",
+      "name": "LanguageTool",
+      "url": "https://languagetool.org/",
+      "category": "Learning",
+      "description": "Check spelling, grammar and writing style in multiple languages.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://languagetool.org/"
+      ]
+    },
+    {
+      "id": "hemingway-editor",
+      "name": "Hemingway Editor",
+      "url": "https://hemingwayapp.com/",
+      "category": "Learning",
+      "description": "Review readability and sentence complexity.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://hemingwayapp.com/"
+      ]
+    },
+    {
+      "id": "zotero",
+      "name": "Zotero",
+      "url": "https://www.zotero.org/",
+      "category": "Learning",
+      "description": "Collect research sources and organize citations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.zotero.org/"
+      ]
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian",
+      "url": "https://obsidian.md/",
+      "category": "Learning",
+      "description": "Connect notes and build a personal knowledge collection.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://obsidian.md/"
+      ]
+    },
+    {
+      "id": "overleaf",
+      "name": "Overleaf",
+      "url": "https://www.overleaf.com/",
+      "category": "Learning",
+      "description": "Write and collaborate on LaTeX documents.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.overleaf.com/"
+      ]
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity",
+      "url": "https://www.perplexity.ai/",
+      "category": "Learning",
+      "description": "Explore questions with web-linked AI answers.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.perplexity.ai/"
+      ]
+    },
+    {
+      "id": "desmos",
+      "name": "Desmos",
+      "url": "https://www.desmos.com/calculator",
+      "category": "Learning",
+      "description": "Graph functions and explore mathematical relationships.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.desmos.com/calculator"
+      ]
+    },
+    {
+      "id": "geogebra",
+      "name": "GeoGebra",
+      "url": "https://www.geogebra.org/",
+      "category": "Learning",
+      "description": "Explore geometry, graphs and interactive mathematics.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.geogebra.org/"
+      ]
+    },
+    {
+      "id": "wolframalpha",
+      "name": "WolframAlpha",
+      "url": "https://www.wolframalpha.com/",
+      "category": "Learning",
+      "description": "Compute and explore mathematics and structured knowledge.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.wolframalpha.com/"
+      ]
+    },
+    {
+      "id": "mathigon",
+      "name": "Mathigon",
+      "url": "https://mathigon.org/",
+      "category": "Learning",
+      "description": "Learn mathematics through interactive activities and manipulatives.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://mathigon.org/"
+      ]
+    },
+    {
+      "id": "brilliant",
+      "name": "Brilliant",
+      "url": "https://brilliant.org/",
+      "category": "Learning",
+      "description": "Practice interactive mathematics, computing and science lessons.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://brilliant.org/"
+      ]
+    },
+    {
+      "id": "freecodecamp",
+      "name": "freeCodeCamp",
+      "url": "https://www.freecodecamp.org/",
+      "category": "Learning",
+      "description": "Learn coding with lessons, projects and certifications.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.freecodecamp.org/"
+      ]
+    },
+    {
+      "id": "the-odin-project",
+      "name": "The Odin Project",
+      "url": "https://www.theodinproject.com/",
+      "category": "Learning",
+      "description": "Follow a project-based web-development curriculum.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.theodinproject.com/"
+      ]
+    },
+    {
+      "id": "harvard-cs50",
+      "name": "Harvard CS50",
+      "url": "https://cs50.harvard.edu/x/",
+      "category": "Learning",
+      "description": "Study introductory computer science with lectures and problem sets.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://cs50.harvard.edu/x/"
+      ]
+    },
+    {
+      "id": "code-org",
+      "name": "Code.org / CodeAI",
+      "url": "https://code.org/",
+      "category": "Learning",
+      "description": "Explore beginner coding and computer-science lessons.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://code.org/"
+      ]
+    },
+    {
+      "id": "scratch",
+      "name": "Scratch",
+      "url": "https://scratch.mit.edu/",
+      "category": "Learning",
+      "description": "Make and share interactive stories, animations and games.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://scratch.mit.edu/"
+      ]
+    },
+    {
+      "id": "saylor-academy",
+      "name": "Saylor University",
+      "url": "https://www.saylor.org/",
+      "category": "Learning",
+      "description": "Study self-paced online courses.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.saylor.org/"
+      ]
+    },
+    {
+      "id": "edx",
+      "name": "edX",
+      "url": "https://www.edx.org/",
+      "category": "Learning",
+      "description": "Find courses from universities and other providers.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.edx.org/"
+      ]
+    },
+    {
+      "id": "oer-commons",
+      "name": "OER Commons",
+      "url": "https://oercommons.org/",
+      "category": "Learning",
+      "description": "Find and adapt open educational resources.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://oercommons.org/"
+      ]
+    },
+    {
+      "id": "open-culture",
+      "name": "Open Culture",
+      "url": "https://www.openculture.com/",
+      "category": "Learning",
+      "description": "Discover educational media, courses and cultural resources.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.openculture.com/"
+      ]
+    },
+    {
+      "id": "learningapps",
+      "name": "LearningApps",
+      "url": "https://learningapps.org/",
+      "category": "Learning",
+      "description": "Create and use interactive practice activities.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://learningapps.org/"
+      ]
+    },
+    {
+      "id": "be-my-eyes",
+      "name": "Be My Eyes",
+      "url": "https://www.bemyeyes.com/",
+      "category": "Utilities",
+      "description": "Find visual assistance for people who are blind or have low vision.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.bemyeyes.com/"
+      ]
+    },
+    {
+      "id": "nvda",
+      "name": "NVDA",
+      "url": "https://www.nvaccess.org/download/",
+      "category": "Utilities",
+      "description": "Read computer interfaces aloud with a Windows screen reader.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.nvaccess.org/download/"
+      ]
+    },
+    {
+      "id": "bookshare",
+      "name": "Bookshare",
+      "url": "https://www.bookshare.org/",
+      "category": "Utilities",
+      "description": "Access books in accessible reading formats.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.bookshare.org/"
+      ]
+    },
+    {
+      "id": "naturalreader",
+      "name": "NaturalReader",
+      "url": "https://www.naturalreaders.com/",
+      "category": "Utilities",
+      "description": "Listen to written text through text-to-speech tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.naturalreaders.com/"
+      ]
+    },
+    {
+      "id": "wheelmap",
+      "name": "Wheelmap",
+      "url": "https://wheelmap.org/",
+      "category": "Utilities",
+      "description": "Find and contribute wheelchair-accessibility information about places.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://wheelmap.org/"
+      ]
+    },
+    {
+      "id": "deepl-translator",
+      "name": "DeepL Translator",
+      "url": "https://www.deepl.com/translator",
+      "category": "Learning",
+      "description": "Translate text and supported documents.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.deepl.com/translator"
+      ]
+    },
+    {
+      "id": "language-transfer",
+      "name": "Language Transfer",
+      "url": "https://www.languagetransfer.org/",
+      "category": "Learning",
+      "description": "Learn languages through guided audio lessons.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.languagetransfer.org/"
+      ]
+    },
+    {
+      "id": "tatoeba",
+      "name": "Tatoeba",
+      "url": "https://tatoeba.org/",
+      "category": "Learning",
+      "description": "Explore example sentences and translations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://tatoeba.org/"
+      ]
+    },
+    {
+      "id": "youglish",
+      "name": "YouGlish",
+      "url": "https://youglish.com/",
+      "category": "Learning",
+      "description": "Hear words and phrases in video examples.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://youglish.com/"
+      ]
+    },
+    {
+      "id": "wordreference",
+      "name": "WordReference",
+      "url": "https://www.wordreference.com/",
+      "category": "Learning",
+      "description": "Look up definitions, translations and language discussions.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.wordreference.com/"
+      ]
+    },
+    {
+      "id": "libby",
+      "name": "Libby",
+      "url": "https://www.overdrive.com/apps/libby",
+      "category": "Learning",
+      "description": "Borrow ebooks and audiobooks from participating libraries.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.overdrive.com/apps/libby"
+      ]
+    },
+    {
+      "id": "open-library",
+      "name": "Open Library",
+      "url": "https://openlibrary.org/",
+      "category": "Learning",
+      "description": "Search book records and available reading or borrowing options.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://openlibrary.org/"
+      ]
+    },
+    {
+      "id": "librivox",
+      "name": "LibriVox",
+      "url": "https://librivox.org/",
+      "category": "Learning",
+      "description": "Listen to volunteer-read public-domain audiobooks.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://librivox.org/"
+      ]
+    },
+    {
+      "id": "directory-of-open-access-books",
+      "name": "Directory of Open Access Books",
+      "url": "https://www.doabooks.org/",
+      "category": "Learning",
+      "description": "Find scholarly books published with open access.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.doabooks.org/"
+      ]
+    },
+    {
+      "id": "europeana",
+      "name": "Europeana",
+      "url": "https://www.europeana.eu/",
+      "category": "Learning",
+      "description": "Explore digitized European art, heritage and historical records.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.europeana.eu/",
+        "https://www.europeana.eu/en/collections"
+      ]
+    },
+    {
+      "id": "digital-public-library-of-america",
+      "name": "Digital Public Library of America",
+      "url": "https://dp.la/",
+      "category": "Learning",
+      "description": "Search cultural records from libraries, archives and museums.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://dp.la/"
+      ]
+    },
+    {
+      "id": "smithsonian-open-access",
+      "name": "Smithsonian Open Access",
+      "url": "https://www.si.edu/openaccess",
+      "category": "Learning",
+      "description": "Find open-access Smithsonian collection assets.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.si.edu/openaccess"
+      ]
+    },
+    {
+      "id": "google-arts-culture",
+      "name": "Google Arts & Culture",
+      "url": "https://artsandculture.google.com/",
+      "category": "Learning",
+      "description": "Explore artworks, collections and interactive cultural experiences.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://artsandculture.google.com/"
+      ]
+    },
+    {
+      "id": "the-met-open-access",
+      "name": "The Met Open Access",
+      "url": "https://www.metmuseum.org/hubs/open-access",
+      "category": "Learning",
+      "description": "Find museum collection images and open-access information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.metmuseum.org/hubs/open-access"
+      ]
+    },
+    {
+      "id": "our-world-in-data",
+      "name": "Our World in Data",
+      "url": "https://ourworldindata.org/",
+      "category": "Learning",
+      "description": "Explore documented charts and data about global change.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://ourworldindata.org/"
+      ]
+    },
+    {
+      "id": "gapminder-tools",
+      "name": "Gapminder Tools",
+      "url": "https://www.gapminder.org/tools/",
+      "category": "Learning",
+      "description": "Explore country trends through interactive data visualizations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.gapminder.org/tools/"
+      ]
+    },
+    {
+      "id": "google-dataset-search",
+      "name": "Google Dataset Search",
+      "url": "https://datasetsearch.research.google.com/",
+      "category": "Learning",
+      "description": "Find datasets published across the web.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://datasetsearch.research.google.com/"
+      ]
+    },
+    {
+      "id": "data-gov",
+      "name": "Data.gov",
+      "url": "https://data.gov/",
+      "category": "Learning",
+      "description": "Find United States government datasets.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://data.gov/"
+      ]
+    },
+    {
+      "id": "world-bank-open-data",
+      "name": "World Bank Open Data",
+      "url": "https://data.worldbank.org/",
+      "category": "Learning",
+      "description": "Explore economic and development indicators.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://data.worldbank.org/"
+      ]
+    },
+    {
+      "id": "careeronestop",
+      "name": "CareerOneStop",
+      "url": "https://www.careeronestop.org/",
+      "category": "Learning",
+      "description": "Explore careers, training, jobs and employment support.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.careeronestop.org/"
+      ]
+    },
+    {
+      "id": "my-next-move",
+      "name": "My Next Move",
+      "url": "https://www.mynextmove.org/",
+      "category": "Learning",
+      "description": "Explore occupations and interest-based career matches.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.mynextmove.org/"
+      ]
+    },
+    {
+      "id": "o-net-online",
+      "name": "O*NET OnLine",
+      "url": "https://www.onetonline.org/",
+      "category": "Learning",
+      "description": "Research occupation tasks, skills and job requirements.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.onetonline.org/"
+      ]
+    },
+    {
+      "id": "usajobs",
+      "name": "USAJOBS",
+      "url": "https://www.usajobs.gov/",
+      "category": "Learning",
+      "description": "Find and apply for federal government jobs.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.usajobs.gov/"
+      ]
+    },
+    {
+      "id": "job-accommodation-network",
+      "name": "Job Accommodation Network",
+      "url": "https://askjan.org/",
+      "category": "Learning",
+      "description": "Research workplace accommodations and disability-employment resources.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://askjan.org/"
+      ]
+    },
+    {
+      "id": "idealist",
+      "name": "Idealist",
+      "url": "https://www.idealist.org/",
+      "category": "Learning",
+      "description": "Find nonprofit jobs, volunteer roles and mission-based opportunities.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.idealist.org/"
+      ]
+    },
+    {
+      "id": "investor-gov-calculators",
+      "name": "Investor.gov Compound Interest Calculator",
+      "url": "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
+      "category": "Utilities",
+      "description": "Explore how savings can grow under compound-interest assumptions.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
+        "https://www.investor.gov/financial-tools-calculators/calculators"
+      ]
+    },
+    {
+      "id": "sec-edgar-search",
+      "name": "SEC EDGAR Search",
+      "url": "https://www.sec.gov/edgar/search/",
+      "category": "Utilities",
+      "description": "Search public company filings.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.sec.gov/edgar/search/"
+      ]
+    },
+    {
+      "id": "fdic-bankfind",
+      "name": "FDIC BankFind",
+      "url": "https://banks.data.fdic.gov/bankfind-suite/bankfind",
+      "category": "Utilities",
+      "description": "Check information about FDIC-insured banks.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://banks.data.fdic.gov/bankfind-suite/bankfind"
+      ]
+    },
+    {
+      "id": "ncua-credit-union-locator",
+      "name": "NCUA Credit Union Locator",
+      "url": "https://mapping.ncua.gov/",
+      "category": "Utilities",
+      "description": "Find federally insured credit unions and branches.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://mapping.ncua.gov/"
+      ]
+    },
+    {
+      "id": "missingmoney",
+      "name": "MissingMoney",
+      "url": "https://www.missingmoney.com/",
+      "category": "Utilities",
+      "description": "Search participating government unclaimed-property records.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.missingmoney.com/"
+      ]
+    },
+    {
+      "id": "usagov-benefit-finder",
+      "name": "USAGov Benefit Finder",
+      "url": "https://www.usa.gov/benefit-finder",
+      "category": "Utilities",
+      "description": "Find government benefit programs to investigate.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.usa.gov/benefit-finder"
+      ]
+    },
+    {
+      "id": "trello",
+      "name": "Trello",
+      "url": "https://trello.com/",
+      "category": "Utilities",
+      "description": "Organize tasks with collaborative boards.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://trello.com/"
+      ]
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "url": "https://www.notion.com/",
+      "category": "Utilities",
+      "description": "Create notes, documents, databases and shared workspaces.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.notion.com/"
+      ]
+    },
+    {
+      "id": "todoist",
+      "name": "Todoist",
+      "url": "https://www.todoist.com/",
+      "category": "Utilities",
+      "description": "Track tasks, due dates and recurring work.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.todoist.com/"
+      ]
+    },
+    {
+      "id": "pomofocus",
+      "name": "Pomofocus",
+      "url": "https://pomofocus.io/",
+      "category": "Utilities",
+      "description": "Use timed focus and break sessions in the browser.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://pomofocus.io/"
+      ]
+    },
+    {
+      "id": "focusmate",
+      "name": "Focusmate",
+      "url": "https://www.focusmate.com/",
+      "category": "Utilities",
+      "description": "Arrange virtual coworking sessions for accountability.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.focusmate.com/"
+      ]
+    },
+    {
+      "id": "toggl-track",
+      "name": "Toggl Track",
+      "url": "https://toggl.com/track/",
+      "category": "Utilities",
+      "description": "Track working time and review reports.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://toggl.com/track/"
+      ]
+    },
+    {
+      "id": "clockify",
+      "name": "Clockify",
+      "url": "https://clockify.me/",
+      "category": "Utilities",
+      "description": "Track time, projects and timesheets.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://clockify.me/"
+      ]
+    },
+    {
+      "id": "world-time-buddy",
+      "name": "World Time Buddy",
+      "url": "https://www.worldtimebuddy.com/",
+      "category": "Utilities",
+      "description": "Compare time zones and plan meeting times.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.worldtimebuddy.com/"
+      ]
+    },
+    {
+      "id": "doodle",
+      "name": "Doodle",
+      "url": "https://doodle.com/",
+      "category": "Utilities",
+      "description": "Collect availability and schedule meetings.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://doodle.com/"
+      ]
+    },
+    {
+      "id": "when2meet",
+      "name": "When2meet",
+      "url": "https://www.when2meet.com/",
+      "category": "Utilities",
+      "description": "Compare a group's available meeting times.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.when2meet.com/"
+      ]
+    },
+    {
+      "id": "rallly",
+      "name": "Rallly",
+      "url": "https://rallly.co/",
+      "category": "Utilities",
+      "description": "Create scheduling polls for groups.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://rallly.co/"
+      ]
+    },
+    {
+      "id": "wave",
+      "name": "Wave",
+      "url": "https://www.waveapps.com/",
+      "category": "Utilities",
+      "description": "Explore invoicing, bookkeeping and small-business financial tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.waveapps.com/"
+      ]
+    },
+    {
+      "id": "zoho-invoice",
+      "name": "Zoho Invoice",
+      "url": "https://www.zoho.com/invoice/",
+      "category": "Utilities",
+      "description": "Prepare invoices and track customer billing.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.zoho.com/invoice/"
+      ]
+    },
+    {
+      "id": "bplans",
+      "name": "LivePlan (Bplans redirect)",
+      "url": "https://www.liveplan.com/?ref=bplans",
+      "category": "Utilities",
+      "description": "Build business plans and financial forecasts.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.liveplan.com/?ref=bplans",
+        "https://www.bplans.com/"
+      ]
+    },
+    {
+      "id": "jotform",
+      "name": "Jotform",
+      "url": "https://www.jotform.com/",
+      "category": "Utilities",
+      "description": "Build online forms and collect structured responses.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.jotform.com/"
+      ]
+    },
+    {
+      "id": "tally",
+      "name": "Tally",
+      "url": "https://tally.so/",
+      "category": "Utilities",
+      "description": "Build and share online forms.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://tally.so/"
+      ]
+    },
+    {
+      "id": "regex101",
+      "name": "regex101",
+      "url": "https://regex101.com/",
+      "category": "Utilities",
+      "description": "Build and debug regular expressions with explanations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://regex101.com/"
+      ]
+    },
+    {
+      "id": "codepen",
+      "name": "CodePen",
+      "url": "https://codepen.io/",
+      "category": "Utilities",
+      "description": "Prototype and share HTML, CSS and JavaScript experiments.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://codepen.io/"
+      ]
+    },
+    {
+      "id": "stackblitz",
+      "name": "StackBlitz",
+      "url": "https://stackblitz.com/",
+      "category": "Utilities",
+      "description": "Develop supported web projects in the browser.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://stackblitz.com/"
+      ]
+    },
+    {
+      "id": "devdocs",
+      "name": "DevDocs",
+      "url": "https://devdocs.io/",
+      "category": "Utilities",
+      "description": "Search reference documentation for programming tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://devdocs.io/"
+      ]
+    },
+    {
+      "id": "can-i-use",
+      "name": "Can I Use",
+      "url": "https://caniuse.com/",
+      "category": "Utilities",
+      "description": "Check browser support for web-platform features.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://caniuse.com/"
+      ]
+    },
+    {
+      "id": "json-crack",
+      "name": "JSON Crack",
+      "url": "https://jsoncrack.com/",
+      "category": "Utilities",
+      "description": "Visualize structured data as an interactive graph.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://jsoncrack.com/"
+      ]
+    },
+    {
+      "id": "privacy-guides",
+      "name": "Privacy Guides",
+      "url": "https://www.privacyguides.org/",
+      "category": "Utilities",
+      "description": "Compare privacy practices and technology recommendations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.privacyguides.org/"
+      ]
+    },
+    {
+      "id": "privacy-badger",
+      "name": "Privacy Badger",
+      "url": "https://privacybadger.org/",
+      "category": "Utilities",
+      "description": "Reduce tracking with an EFF browser extension.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://privacybadger.org/"
+      ]
+    },
+    {
+      "id": "signal",
+      "name": "Signal",
+      "url": "https://signal.org/",
+      "category": "Utilities",
+      "description": "Use private messaging and calling on supported devices.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://signal.org/"
+      ]
+    },
+    {
+      "id": "tor-browser",
+      "name": "Tor Browser",
+      "url": "https://www.torproject.org/",
+      "category": "Utilities",
+      "description": "Browse using the Tor network.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.torproject.org/"
+      ]
+    },
+    {
+      "id": "browserleaks",
+      "name": "BrowserLeaks",
+      "url": "https://browserleaks.com/",
+      "category": "Utilities",
+      "description": "Inspect information exposed by a browser.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://browserleaks.com/"
+      ]
+    },
+    {
+      "id": "mozilla-monitor",
+      "name": "Mozilla Monitor",
+      "url": "https://monitor.mozilla.org/",
+      "category": "Utilities",
+      "description": "Check exposure in known data breaches.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://monitor.mozilla.org/"
+      ]
+    },
+    {
+      "id": "penpot",
+      "name": "Penpot",
+      "url": "https://penpot.app/",
+      "category": "Creative",
+      "description": "Design interfaces and prototypes collaboratively.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://penpot.app/"
+      ]
+    },
+    {
+      "id": "diagrams-net",
+      "name": "draw.io / diagrams.net",
+      "url": "https://www.drawio.com/",
+      "category": "Creative",
+      "description": "Draw flowcharts, technical diagrams and process maps.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.drawio.com/",
+        "https://www.diagrams.net/"
+      ]
+    },
+    {
+      "id": "figma",
+      "name": "Figma",
+      "url": "https://www.figma.com/",
+      "category": "Creative",
+      "description": "Design interfaces and prototypes with a team.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.figma.com/"
+      ]
+    },
+    {
+      "id": "blender",
+      "name": "Blender",
+      "url": "https://www.blender.org/",
+      "category": "Creative",
+      "description": "Create 3D models, animations and visual effects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.blender.org/"
+      ]
+    },
+    {
+      "id": "freecad",
+      "name": "FreeCAD",
+      "url": "https://www.freecad.org/",
+      "category": "Creative",
+      "description": "Build parametric 3D models and technical designs.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.freecad.org/"
+      ]
+    },
+    {
+      "id": "onshape-free",
+      "name": "Onshape Free",
+      "url": "https://www.onshape.com/en/products/free",
+      "category": "Creative",
+      "description": "Use browser-based parametric CAD for eligible projects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.onshape.com/en/products/free"
+      ]
+    },
+    {
+      "id": "lucide",
+      "name": "Lucide",
+      "url": "https://lucide.dev/",
+      "category": "Creative",
+      "description": "Find consistent open-source interface icons.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://lucide.dev/"
+      ]
+    },
+    {
+      "id": "heroicons",
+      "name": "Heroicons",
+      "url": "https://heroicons.com/",
+      "category": "Creative",
+      "description": "Download SVG icons for user interfaces.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://heroicons.com/"
+      ]
+    },
+    {
+      "id": "tabler-icons",
+      "name": "Tabler Icons",
+      "url": "https://tabler.io/icons",
+      "category": "Creative",
+      "description": "Browse a large consistent SVG icon set.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://tabler.io/icons"
+      ]
+    },
+    {
+      "id": "the-noun-project",
+      "name": "The Noun Project",
+      "url": "https://thenounproject.com/",
+      "category": "Creative",
+      "description": "Find icons and visual symbols.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://thenounproject.com/"
+      ]
+    },
+    {
+      "id": "fontpair",
+      "name": "Fontpair",
+      "url": "https://www.fontpair.co/",
+      "category": "Creative",
+      "description": "Explore typeface pairings for design.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.fontpair.co/"
+      ]
+    },
+    {
+      "id": "pexels",
+      "name": "Pexels",
+      "url": "https://www.pexels.com/",
+      "category": "Creative",
+      "description": "Find stock photographs and videos.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.pexels.com/"
+      ]
+    },
+    {
+      "id": "unsplash",
+      "name": "Unsplash",
+      "url": "https://unsplash.com/",
+      "category": "Creative",
+      "description": "Find photography for creative projects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://unsplash.com/"
+      ]
+    },
+    {
+      "id": "wikimedia-commons",
+      "name": "Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/",
+      "category": "Creative",
+      "description": "Find media with explicit reuse and attribution information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://commons.wikimedia.org/"
+      ]
+    },
+    {
+      "id": "adobe-color",
+      "name": "Adobe Color",
+      "url": "https://color.adobe.com/",
+      "category": "Creative",
+      "description": "Create and explore color themes and accessibility tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://color.adobe.com/"
+      ]
+    },
+    {
+      "id": "realtime-colors",
+      "name": "Realtime Colors",
+      "url": "https://www.realtimecolors.com/",
+      "category": "Creative",
+      "description": "Preview color palettes on a sample interface.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.realtimecolors.com/"
+      ]
+    },
+    {
+      "id": "paletton",
+      "name": "Paletton",
+      "url": "https://paletton.com/",
+      "category": "Creative",
+      "description": "Explore color relationships and palette combinations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://paletton.com/"
+      ]
+    },
+    {
+      "id": "cleanup-pictures",
+      "name": "Cleanup.pictures",
+      "url": "https://cleanup.pictures/",
+      "category": "Creative",
+      "description": "Remove unwanted objects from photographs.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://cleanup.pictures/"
+      ]
+    },
+    {
+      "id": "upscale-media",
+      "name": "Upscale.media",
+      "url": "https://www.upscale.media/",
+      "category": "Creative",
+      "description": "Enlarge images using automated upscaling.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.upscale.media/"
+      ]
+    },
+    {
+      "id": "upscayl",
+      "name": "Upscayl",
+      "url": "https://upscayl.org/",
+      "category": "Creative",
+      "description": "Upscale images with a desktop application and related cloud offering.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://upscayl.org/"
+      ]
+    },
+    {
+      "id": "photomosh",
+      "name": "Mosh-Lite / Mosh-Pro (formerly PhotoMosh)",
+      "url": "https://moshpro.app/",
+      "category": "Creative",
+      "description": "Create glitch and animated visual effects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://moshpro.app/",
+        "https://photomosh.com/"
+      ]
+    },
+    {
+      "id": "tinypng",
+      "name": "TinyPNG",
+      "url": "https://tinypng.com/",
+      "category": "Creative",
+      "description": "Compress supported image files.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://tinypng.com/"
+      ]
+    },
+    {
+      "id": "kdenlive",
+      "name": "Kdenlive",
+      "url": "https://kdenlive.org/",
+      "category": "Movies & media",
+      "description": "Edit multi-track video on a computer.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://kdenlive.org/"
+      ]
+    },
+    {
+      "id": "shotcut",
+      "name": "Shotcut",
+      "url": "https://www.shotcut.org/",
+      "category": "Movies & media",
+      "description": "Edit video with a desktop application.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.shotcut.org/"
+      ]
+    },
+    {
+      "id": "clipchamp",
+      "name": "Clipchamp",
+      "url": "https://clipchamp.com/",
+      "category": "Movies & media",
+      "description": "Edit videos with Microsoft browser and desktop tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://clipchamp.com/"
+      ]
+    },
+    {
+      "id": "veed",
+      "name": "VEED",
+      "url": "https://www.veed.io/",
+      "category": "Movies & media",
+      "description": "Edit and caption video online.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.veed.io/"
+      ]
+    },
+    {
+      "id": "screentogif",
+      "name": "N-Studio (ScreenToGif successor)",
+      "url": "https://nicke.tech/n-studio?migrated=true",
+      "category": "Movies & media",
+      "description": "Record screen or audio and make quick edits before export.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://nicke.tech/n-studio?migrated=true",
+        "https://www.screentogif.com/"
+      ]
+    },
+    {
+      "id": "bandlab",
+      "name": "BandLab",
+      "url": "https://www.bandlab.com/",
+      "category": "Movies & media",
+      "description": "Record and collaborate on music online.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.bandlab.com/"
+      ]
+    },
+    {
+      "id": "chrome-music-lab",
+      "name": "Chrome Music Lab",
+      "url": "https://musiclab.chromeexperiments.com/",
+      "category": "Movies & media",
+      "description": "Explore musical ideas through interactive browser experiments.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://musiclab.chromeexperiments.com/"
+      ]
+    },
+    {
+      "id": "musescore-studio",
+      "name": "MuseScore Studio",
+      "url": "https://musescore.org/",
+      "category": "Movies & media",
+      "description": "Write and play back musical notation.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://musescore.org/"
+      ]
+    },
+    {
+      "id": "freesound",
+      "name": "Freesound",
+      "url": "https://freesound.org/",
+      "category": "Movies & media",
+      "description": "Find sound effects and recordings with license labels.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://freesound.org/"
+      ]
+    },
+    {
+      "id": "mixkit",
+      "name": "Mixkit",
+      "url": "https://mixkit.co/",
+      "category": "Movies & media",
+      "description": "Find stock video, music, sound effects and templates.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://mixkit.co/"
+      ]
+    },
+    {
+      "id": "musicmap",
+      "name": "Musicmap",
+      "url": "https://musicmap.info/",
+      "category": "Movies & media",
+      "description": "Explore relationships between music genres.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://musicmap.info/"
+      ]
+    },
+    {
+      "id": "patatap",
+      "name": "Patatap",
+      "url": "https://patatap.com/",
+      "category": "Games",
+      "description": "Create audiovisual patterns from keyboard or touch input.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://patatap.com/"
+      ]
+    },
+    {
+      "id": "sandspiel",
+      "name": "Sandspiel",
+      "url": "https://sandspiel.club/",
+      "category": "Games",
+      "description": "Experiment with a falling-sand simulation.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://sandspiel.club/"
+      ]
+    },
+    {
+      "id": "thisissand",
+      "name": "Thisissand",
+      "url": "https://thisissand.com/",
+      "category": "Games",
+      "description": "Create digital sand art.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://thisissand.com/"
+      ]
+    },
+    {
+      "id": "bomomo",
+      "name": "Bomomo",
+      "url": "https://bomomo.com/",
+      "category": "Games",
+      "description": "Make abstract art with playful drawing tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://bomomo.com/"
+      ]
+    },
+    {
+      "id": "little-alchemy-2",
+      "name": "Little Alchemy 2",
+      "url": "https://littlealchemy2.com/",
+      "category": "Games",
+      "description": "Combine elements to discover new objects in a puzzle game.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://littlealchemy2.com/"
+      ]
+    },
+    {
+      "id": "zoomquilt",
+      "name": "Zoomquilt",
+      "url": "https://zoomquilt.org/",
+      "category": "Games",
+      "description": "Explore a continuously zooming collaborative artwork.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://zoomquilt.org/"
+      ]
+    },
+    {
+      "id": "mapcrunch",
+      "name": "MapCrunch",
+      "url": "https://www.mapcrunch.com/",
+      "category": "Maps & world",
+      "description": "Explore random street-view locations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.mapcrunch.com/"
+      ]
+    },
+    {
+      "id": "geofs",
+      "name": "GeoFS",
+      "url": "https://www.geo-fs.com/",
+      "category": "Maps & world",
+      "description": "Fly a browser-based flight simulator.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.geo-fs.com/"
+      ]
+    },
+    {
+      "id": "explore-org-livecams",
+      "name": "Explore.org Livecams",
+      "url": "https://explore.org/livecams",
+      "category": "Maps & world",
+      "description": "Watch wildlife and nature cameras.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://explore.org/livecams"
+      ]
+    },
+    {
+      "id": "earthcam",
+      "name": "EarthCam",
+      "url": "https://www.earthcam.com/",
+      "category": "Maps & world",
+      "description": "Explore public webcams around the world.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.earthcam.com/"
+      ]
+    },
+    {
+      "id": "rome2rio",
+      "name": "Rome2Rio",
+      "url": "https://www.rome2rio.com/",
+      "category": "Travel",
+      "description": "Compare transportation options between places.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.rome2rio.com/"
+      ]
+    },
+    {
+      "id": "the-man-in-seat-61",
+      "name": "The Man in Seat 61",
+      "url": "https://www.seat61.com/",
+      "category": "Travel",
+      "description": "Research train journeys and international rail travel.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.seat61.com/"
+      ]
+    },
+    {
+      "id": "flightconnections",
+      "name": "FlightConnections",
+      "url": "https://www.flightconnections.com/",
+      "category": "Travel",
+      "description": "Explore airline route networks and possible connections.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.flightconnections.com/"
+      ]
+    },
+    {
+      "id": "parkopedia",
+      "name": "Parkopedia",
+      "url": "https://www.parkopedia.com/",
+      "category": "Travel",
+      "description": "Research parking options and restrictions.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.parkopedia.com/"
+      ]
+    },
+    {
+      "id": "spothero",
+      "name": "SpotHero",
+      "url": "https://spothero.com/",
+      "category": "Travel",
+      "description": "Find and reserve participating parking spaces.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://spothero.com/"
+      ]
+    },
+    {
+      "id": "alltrails",
+      "name": "AllTrails",
+      "url": "https://www.alltrails.com/",
+      "category": "Maps & world",
+      "description": "Find trails and plan outdoor walks.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.alltrails.com/"
+      ]
+    },
+    {
+      "id": "komoot",
+      "name": "Komoot",
+      "url": "https://www.komoot.com/",
+      "category": "Maps & world",
+      "description": "Plan cycling and hiking routes.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.komoot.com/"
+      ]
+    },
+    {
+      "id": "gaia-gps",
+      "name": "Gaia GPS",
+      "url": "https://www.gaiagps.com/",
+      "category": "Maps & world",
+      "description": "Plan outdoor trips with layered maps.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.gaiagps.com/"
+      ]
+    },
+    {
+      "id": "traillink",
+      "name": "TrailLink",
+      "url": "https://www.traillink.com/",
+      "category": "Maps & world",
+      "description": "Find rail-trails and path information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.traillink.com/"
+      ]
+    },
+    {
+      "id": "national-park-finder",
+      "name": "National Park Finder",
+      "url": "https://www.nps.gov/findapark/index.htm",
+      "category": "Maps & world",
+      "description": "Find parks and official visitor information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.nps.gov/findapark/index.htm"
+      ]
+    },
+    {
+      "id": "gardenia",
+      "name": "Gardenia",
+      "url": "https://www.gardenia.net/",
+      "category": "Creative",
+      "description": "Research plants and plan garden combinations.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.gardenia.net/"
+      ]
+    },
+    {
+      "id": "missouri-botanical-garden-plant-finder",
+      "name": "Missouri Botanical Garden Plant Finder",
+      "url": "https://plantfinder.mobot.org/plantfindersearch.aspx",
+      "category": "Creative",
+      "description": "Research plant characteristics and growing requirements.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://plantfinder.mobot.org/plantfindersearch.aspx",
+        "https://www.missouribotanicalgarden.org/plantfinder/plantfindersearch.aspx"
+      ]
+    },
+    {
+      "id": "growveg",
+      "name": "GrowVeg",
+      "url": "https://www.growveg.com/",
+      "category": "Creative",
+      "description": "Plan vegetable gardens and find growing guidance.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.growveg.com/"
+      ]
+    },
+    {
+      "id": "almanac-planting-calendar",
+      "name": "Almanac Planting Calendar",
+      "url": "https://www.almanac.com/gardening/planting-calendar",
+      "category": "Creative",
+      "description": "Estimate planting dates for a location.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.almanac.com/gardening/planting-calendar"
+      ]
+    },
+    {
+      "id": "floorplanner",
+      "name": "Floorplanner",
+      "url": "https://floorplanner.com/",
+      "category": "Creative",
+      "description": "Create room plans and visualize interior layouts.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://floorplanner.com/"
+      ]
+    },
+    {
+      "id": "planner-5d",
+      "name": "Planner 5D",
+      "url": "https://planner5d.com/",
+      "category": "Creative",
+      "description": "Explore room layouts and interior-design concepts.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://planner5d.com/"
+      ]
+    },
+    {
+      "id": "budget-bytes",
+      "name": "Budget Bytes",
+      "url": "https://www.budgetbytes.com/",
+      "category": "Learning",
+      "description": "Find recipes with budgeting ideas.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.budgetbytes.com/"
+      ]
+    },
+    {
+      "id": "mealime",
+      "name": "Mealime",
+      "url": "https://www.mealime.com/",
+      "category": "Learning",
+      "description": "Plan meals and generate grocery lists.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.mealime.com/"
+      ]
+    },
+    {
+      "id": "paprika-recipe-manager",
+      "name": "Paprika Recipe Manager",
+      "url": "https://www.paprikaapp.com/",
+      "category": "Learning",
+      "description": "Save recipes and organize meal plans and shopping lists.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.paprikaapp.com/"
+      ]
+    },
+    {
+      "id": "eat-this-much",
+      "name": "Eat This Much",
+      "url": "https://www.eatthismuch.com/",
+      "category": "Learning",
+      "description": "Generate meal plans using preferences and targets.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.eatthismuch.com/"
+      ]
+    },
+    {
+      "id": "myfridgefood",
+      "name": "MyFridgeFood",
+      "url": "https://myfridgefood.com/",
+      "category": "Learning",
+      "description": "Find recipe ideas using ingredients on hand.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://myfridgefood.com/"
+      ]
+    },
+    {
+      "id": "medlineplus",
+      "name": "MedlinePlus",
+      "url": "https://medlineplus.gov/",
+      "category": "Learning",
+      "description": "Read patient-friendly health and medicine information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://medlineplus.gov/"
+      ]
+    },
+    {
+      "id": "dailymed",
+      "name": "DailyMed",
+      "url": "https://dailymed.nlm.nih.gov/dailymed/",
+      "category": "Learning",
+      "description": "Read submitted medicine labeling.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://dailymed.nlm.nih.gov/dailymed/"
+      ]
+    },
+    {
+      "id": "goodrx",
+      "name": "GoodRx",
+      "url": "https://www.goodrx.com/",
+      "category": "Learning",
+      "description": "Compare displayed prescription prices and coupon options.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.goodrx.com/"
+      ]
+    },
+    {
+      "id": "healthcare-gov-local-help",
+      "name": "HealthCare.gov Local Help",
+      "url": "https://www.healthcare.gov/find-local-help/",
+      "category": "Learning",
+      "description": "Find local enrollment assistance.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.healthcare.gov/find-local-help/"
+      ]
+    },
+    {
+      "id": "drugs-com-interaction-checker",
+      "name": "Drugs.com Interaction Checker",
+      "url": "https://www.drugs.com/drug_interactions.html",
+      "category": "Learning",
+      "description": "Look up potential medication interactions.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.drugs.com/drug_interactions.html"
+      ]
+    },
+    {
+      "id": "pbs-kids",
+      "name": "PBS Kids",
+      "url": "https://pbskids.org/",
+      "category": "Learning",
+      "description": "Find children's educational games and media.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://pbskids.org/"
+      ]
+    },
+    {
+      "id": "common-sense-media",
+      "name": "Common Sense Media",
+      "url": "https://www.commonsensemedia.org/",
+      "category": "Learning",
+      "description": "Read age-oriented reviews of media and technology.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.commonsensemedia.org/"
+      ]
+    },
+    {
+      "id": "bedtime-math",
+      "name": "Bedtime Math",
+      "url": "https://bedtimemath.org/",
+      "category": "Learning",
+      "description": "Explore short family mathematics activities.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://bedtimemath.org/"
+      ]
+    },
+    {
+      "id": "familysearch",
+      "name": "FamilySearch",
+      "url": "https://www.familysearch.org/",
+      "category": "Learning",
+      "description": "Research family history and historical records.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.familysearch.org/",
+        "https://www.familysearch.org/en/search/"
+      ]
+    },
+    {
+      "id": "find-a-grave",
+      "name": "Find a Grave",
+      "url": "https://www.findagrave.com/",
+      "category": "Learning",
+      "description": "Search burial memorials and cemetery records.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.findagrave.com/"
+      ]
+    },
+    {
+      "id": "camelcamelcamel",
+      "name": "CamelCamelCamel",
+      "url": "https://camelcamelcamel.com/",
+      "category": "Shopping",
+      "description": "Review supported Amazon price-history charts.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://camelcamelcamel.com/"
+      ]
+    },
+    {
+      "id": "slickdeals",
+      "name": "Slickdeals",
+      "url": "https://slickdeals.net/",
+      "category": "Shopping",
+      "description": "Browse community-submitted shopping deals.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://slickdeals.net/"
+      ]
+    },
+    {
+      "id": "buy-nothing-project",
+      "name": "Buy Nothing Project",
+      "url": "https://buynothingproject.org/",
+      "category": "Shopping",
+      "description": "Find community gift-economy participation options.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://buynothingproject.org/"
+      ]
+    },
+    {
+      "id": "freecycle",
+      "name": "Freecycle",
+      "url": "https://www.freecycle.org/",
+      "category": "Shopping",
+      "description": "Give away and request usable items locally.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.freecycle.org/"
+      ]
+    },
+    {
+      "id": "repair-caf",
+      "name": "Repair Café",
+      "url": "https://www.repaircafe.org/en/",
+      "category": "Shopping",
+      "description": "Find community repair events and practical repair support.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.repaircafe.org/en/"
+      ]
+    },
+    {
+      "id": "earth911-recycling-search",
+      "name": "Earth911 Recycling Search",
+      "url": "https://search.earth911.com/",
+      "category": "Shopping",
+      "description": "Look for recycling options by material and location.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://search.earth911.com/"
+      ]
+    },
+    {
+      "id": "lawhelp",
+      "name": "LawHelp",
+      "url": "https://www.lawhelp.org/",
+      "category": "Learning",
+      "description": "Find civil legal-aid resources by state.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.lawhelp.org/"
+      ]
+    },
+    {
+      "id": "courtlistener",
+      "name": "CourtListener",
+      "url": "https://www.courtlistener.com/",
+      "category": "Learning",
+      "description": "Search court opinions and legal records.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.courtlistener.com/"
+      ]
+    },
+    {
+      "id": "vote-gov",
+      "name": "Vote.gov",
+      "url": "https://vote.gov/",
+      "category": "Learning",
+      "description": "Find official voter-registration information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://vote.gov/"
+      ]
+    },
+    {
+      "id": "congress-gov",
+      "name": "Congress.gov",
+      "url": "https://www.congress.gov/",
+      "category": "Learning",
+      "description": "Research federal bills and legislative records.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.congress.gov/"
+      ]
+    },
+    {
+      "id": "regulations-gov",
+      "name": "Regulations.gov",
+      "url": "https://www.regulations.gov/",
+      "category": "Learning",
+      "description": "Find federal regulatory dockets and public-comment opportunities.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.regulations.gov/"
+      ]
+    },
+    {
+      "id": "ready-gov",
+      "name": "Ready.gov",
+      "url": "https://www.ready.gov/plan",
+      "category": "Maps & world",
+      "description": "Find household emergency-planning guidance.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.ready.gov/plan"
+      ]
+    },
+    {
+      "id": "usgs-earthquake-map",
+      "name": "USGS Earthquake Map",
+      "url": "https://earthquake.usgs.gov/earthquakes/map/",
+      "category": "Maps & world",
+      "description": "Explore recent earthquake reports and maps.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://earthquake.usgs.gov/earthquakes/map/"
+      ]
+    },
+    {
+      "id": "national-hurricane-center",
+      "name": "National Hurricane Center",
+      "url": "https://www.nhc.noaa.gov/",
+      "category": "Maps & world",
+      "description": "Read official tropical-weather outlooks and advisories.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.nhc.noaa.gov/"
+      ]
+    },
+    {
+      "id": "noaa-space-weather",
+      "name": "NOAA Space Weather",
+      "url": "https://www.spaceweather.gov/",
+      "category": "Maps & world",
+      "description": "Read official space-weather observations and forecasts.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.spaceweather.gov/",
+        "https://www.swpc.noaa.gov/"
+      ]
+    },
+    {
+      "id": "poweroutage-us",
+      "name": "PowerOutage.us",
+      "url": "https://poweroutage.us/",
+      "category": "Maps & world",
+      "description": "Explore aggregated power-outage reports.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://poweroutage.us/"
+      ]
+    },
+    {
+      "id": "earth-nullschool-net",
+      "name": "earth.nullschool.net",
+      "url": "https://earth.nullschool.net/",
+      "category": "Maps & world",
+      "description": "Explore animated weather and environmental model maps.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://earth.nullschool.net/"
+      ]
+    },
+    {
+      "id": "open-source-alternative-to",
+      "name": "Open Source Alternative To",
+      "url": "https://www.opensourcealternative.to/",
+      "category": "Utilities",
+      "description": "Discover open-source alternatives to commercial software.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.opensourcealternative.to/"
+      ]
+    },
+    {
+      "id": "product-hunt",
+      "name": "Product Hunt",
+      "url": "https://www.producthunt.com/",
+      "category": "Utilities",
+      "description": "Discover newly launched products and software.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.producthunt.com/"
+      ]
+    },
+    {
+      "id": "futuretools",
+      "name": "FutureTools",
+      "url": "https://www.futuretools.io/",
+      "category": "Utilities",
+      "description": "Explore a directory of AI-related tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.futuretools.io/"
+      ]
+    },
+    {
+      "id": "templatemaker",
+      "name": "Templatemaker",
+      "url": "https://www.templatemaker.nl/",
+      "category": "Creative",
+      "description": "Generate printable packaging and paper-model templates.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.templatemaker.nl/"
+      ]
+    },
+    {
+      "id": "makercase",
+      "name": "MakerCase",
+      "url": "https://www.makercase.com/",
+      "category": "Creative",
+      "description": "Generate box designs for laser cutting or CNC workflows.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.makercase.com/"
+      ]
+    },
+    {
+      "id": "boxes-py",
+      "name": "Boxes.py",
+      "url": "https://boxes.hackerspace-bamberg.de/",
+      "category": "Creative",
+      "description": "Generate parametric laser-cut boxes and other projects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://boxes.hackerspace-bamberg.de/"
+      ]
+    },
+    {
+      "id": "gridzzly",
+      "name": "Gridzzly",
+      "url": "https://gridzzly.com/",
+      "category": "Creative",
+      "description": "Make printable graph, dot and lined paper.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://gridzzly.com/"
+      ]
+    },
+    {
+      "id": "flosscross",
+      "name": "FlossCross",
+      "url": "https://flosscross.com/",
+      "category": "Creative",
+      "description": "Create cross-stitch patterns in the browser.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://flosscross.com/"
+      ]
+    },
+    {
+      "id": "stitch-fiddle",
+      "name": "Stitch Fiddle",
+      "url": "https://www.stitchfiddle.com/",
+      "category": "Creative",
+      "description": "Create knitting, crochet and embroidery charts.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.stitchfiddle.com/"
+      ]
+    },
+    {
+      "id": "mapchart",
+      "name": "MapChart",
+      "url": "https://www.mapchart.net/",
+      "category": "Games",
+      "description": "Make custom colored maps from geographic templates.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.mapchart.net/"
+      ]
+    },
+    {
+      "id": "inkarnate",
+      "name": "Inkarnate",
+      "url": "https://inkarnate.com/",
+      "category": "Games",
+      "description": "Create fantasy maps for stories and games.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://inkarnate.com/"
+      ]
+    },
+    {
+      "id": "fantasy-name-generators",
+      "name": "Fantasy Name Generators",
+      "url": "https://www.fantasynamegenerators.com/",
+      "category": "Games",
+      "description": "Generate naming ideas for characters, worlds and projects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.fantasynamegenerators.com/"
+      ]
+    },
+    {
+      "id": "watabou-s-generators",
+      "name": "Watabou's Generators",
+      "url": "https://watabou.itch.io/",
+      "category": "Games",
+      "description": "Explore procedural city, dungeon and fantasy-map generators.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://watabou.itch.io/"
+      ]
+    },
+    {
+      "id": "donjon",
+      "name": "donjon",
+      "url": "https://donjon.bin.sh/",
+      "category": "Games",
+      "description": "Generate tabletop maps, encounters and role-playing material.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://donjon.bin.sh/"
+      ]
+    },
+    {
+      "id": "tabletop-audio",
+      "name": "Tabletop Audio",
+      "url": "https://tabletopaudio.com/",
+      "category": "Games",
+      "description": "Play ambient audio and soundboards for tabletop sessions.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://tabletopaudio.com/"
+      ]
+    },
+    {
+      "id": "mynoise",
+      "name": "myNoise",
+      "url": "https://mynoise.net/",
+      "category": "Utilities",
+      "description": "Shape background sounds for concentration or relaxation.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://mynoise.net/"
+      ]
+    },
+    {
+      "id": "noisli",
+      "name": "Noisli",
+      "url": "https://www.noisli.com/",
+      "category": "Utilities",
+      "description": "Mix ambient sounds for working or relaxing.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.noisli.com/"
+      ]
+    },
+    {
+      "id": "ambient-mixer",
+      "name": "Ambient Mixer",
+      "url": "https://www.ambient-mixer.com/",
+      "category": "Utilities",
+      "description": "Mix and explore themed ambient soundscapes.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.ambient-mixer.com/"
+      ]
+    },
+    {
+      "id": "autodraw",
+      "name": "AutoDraw",
+      "url": "https://www.autodraw.com/",
+      "category": "Creative",
+      "description": "Turn rough sketches into suggested drawings.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.autodraw.com/"
+      ]
+    },
+    {
+      "id": "quick-draw",
+      "name": "Quick, Draw!",
+      "url": "https://quickdraw.withgoogle.com/",
+      "category": "Creative",
+      "description": "Play a drawing-recognition experiment.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://quickdraw.withgoogle.com/"
+      ]
+    },
+    {
+      "id": "teachable-machine",
+      "name": "Teachable Machine",
+      "url": "https://teachablemachine.withgoogle.com/",
+      "category": "Creative",
+      "description": "Train simple machine-learning experiments with images, sound or poses.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://teachablemachine.withgoogle.com/"
+      ]
+    },
+    {
+      "id": "patterninja",
+      "name": "Patterninja",
+      "url": "https://patterninja.com/",
+      "category": "Creative",
+      "description": "Make repeating patterns from shapes and images.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://patterninja.com/"
+      ]
+    },
+    {
+      "id": "monkeytype",
+      "name": "Monkeytype",
+      "url": "https://monkeytype.com/",
+      "category": "Learning",
+      "description": "Practice typing with configurable tests.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://monkeytype.com/",
+        "https://monkeytype.com/about"
+      ]
+    },
+    {
+      "id": "keybr",
+      "name": "keybr",
+      "url": "https://www.keybr.com/",
+      "category": "Learning",
+      "description": "Practice keyboard skills with adaptive lessons.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.keybr.com/"
+      ]
+    },
+    {
+      "id": "typingclub",
+      "name": "TypingClub",
+      "url": "https://www.typingclub.com/",
+      "category": "Learning",
+      "description": "Learn touch typing with guided lessons.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.typingclub.com/"
+      ]
+    },
+    {
+      "id": "zoom-earth",
+      "name": "Zoom Earth",
+      "url": "https://zoom.earth/",
+      "category": "Maps & world",
+      "description": "Explore satellite imagery and weather-map layers.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://zoom.earth/"
+      ]
+    },
+    {
+      "id": "lightningmaps",
+      "name": "LightningMaps",
+      "url": "https://www.lightningmaps.org/",
+      "category": "Maps & world",
+      "description": "View detected lightning activity on a map.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.lightningmaps.org/"
+      ]
+    },
+    {
+      "id": "flightradar24",
+      "name": "Flightradar24",
+      "url": "https://www.flightradar24.com/",
+      "category": "Maps & world",
+      "description": "Explore publicly displayed aircraft movements and route information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.flightradar24.com/",
+        "https://www.flightradar24.com/premium",
+        "https://www.flightradar24.com/blog/tag/subscription/"
+      ]
+    },
+    {
+      "id": "marinetraffic",
+      "name": "MarineTraffic",
+      "url": "https://www.marinetraffic.com/",
+      "category": "Maps & world",
+      "description": "Explore publicly displayed ship positions and maritime information.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.marinetraffic.com/"
+      ]
+    },
+    {
+      "id": "discovery-puzzlemaker",
+      "name": "Discovery Puzzlemaker",
+      "url": "https://puzzlemaker.discoveryeducation.com/",
+      "category": "Learning",
+      "description": "Create printable word searches and other classroom puzzles.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://puzzlemaker.discoveryeducation.com/"
+      ]
+    },
+    {
+      "id": "hooktheory-theorytab",
+      "name": "Hooktheory TheoryTab",
+      "url": "https://www.hooktheory.com/theorytab",
+      "category": "Learning",
+      "description": "Explore chord progressions in songs.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.hooktheory.com/theorytab"
+      ]
+    },
+    {
+      "id": "ptable",
+      "name": "Ptable",
+      "url": "https://ptable.com/",
+      "category": "Learning",
+      "description": "Explore an interactive periodic table.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://ptable.com/"
+      ]
+    },
+    {
+      "id": "godot",
+      "name": "Godot",
+      "url": "https://godotengine.org/",
+      "category": "Games",
+      "description": "Build 2D and 3D games with an open-source engine.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://godotengine.org/"
+      ]
+    },
+    {
+      "id": "gdevelop",
+      "name": "GDevelop",
+      "url": "https://gdevelop.io/",
+      "category": "Games",
+      "description": "Build games with a visual event system.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://gdevelop.io/"
+      ]
+    },
+    {
+      "id": "l-ve",
+      "name": "LÖVE",
+      "url": "https://love2d.org/",
+      "category": "Games",
+      "description": "Create 2D games using Lua.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://love2d.org/"
+      ]
+    },
+    {
+      "id": "microsoft-makecode",
+      "name": "Microsoft MakeCode",
+      "url": "https://www.microsoft.com/en-us/makecode",
+      "category": "Games",
+      "description": "Explore block and text coding for games and supported devices.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.microsoft.com/en-us/makecode"
+      ]
+    },
+    {
+      "id": "twine",
+      "name": "Twine",
+      "url": "https://twinery.org/",
+      "category": "Games",
+      "description": "Create branching interactive stories.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://twinery.org/"
+      ]
+    },
+    {
+      "id": "ldtk",
+      "name": "LDtk",
+      "url": "https://ldtk.io/",
+      "category": "Games",
+      "description": "Design 2D game levels with a dedicated editor.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://ldtk.io/"
+      ]
+    },
+    {
+      "id": "openscad",
+      "name": "OpenSCAD",
+      "url": "https://openscad.org/",
+      "category": "Learning",
+      "description": "Create solid 3D models by writing code.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://openscad.org/"
+      ]
+    },
+    {
+      "id": "wokwi",
+      "name": "Wokwi",
+      "url": "https://wokwi.com/",
+      "category": "Learning",
+      "description": "Simulate supported microcontrollers and electronics projects.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://wokwi.com/"
+      ]
+    },
+    {
+      "id": "kicad",
+      "name": "KiCad",
+      "url": "https://www.kicad.org/",
+      "category": "Learning",
+      "description": "Design electronic schematics and printed circuit boards.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.kicad.org/"
+      ]
+    },
+    {
+      "id": "easyeda",
+      "name": "EasyEDA",
+      "url": "https://easyeda.com/",
+      "category": "Learning",
+      "description": "Design circuits and printed circuit boards with online tools.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://easyeda.com/"
+      ]
     }
   ]
 }
