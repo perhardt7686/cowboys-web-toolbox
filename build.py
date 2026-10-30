@@ -1,9 +1,10 @@
 from pathlib import Path
-import json,base64,shutil,re
+import json,base64,shutil,re,runpy,subprocess
 r=Path(__file__).parent
 d=json.loads((r/'docs/catalog.json').read_text())
 s=json.dumps(d,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
-t=(r/'index.template.html').read_text()
+extras=runpy.run_path(str(r/'discovery-build.py'))['setup'](d)
+t=(r/'index.template.html').read_text().replace('__STARTER_PACKS__',extras['packs']).replace('__DISCOVERY_FILTERS__',extras['filters'])
 assert t.count('__CATALOG_DATA__')==1
 html=t.replace('__CATALOG_DATA__',s).replace('__SITE_TOTAL__',str(len(d['sites']))).replace('__SITE_TOTAL_PADDED__',str(len(d['sites'])).zfill(3)).replace('__COLLECTION_SCOPE__',d['scope'])
 (r/'docs/index.html').write_text(html)
@@ -13,6 +14,9 @@ standalone=standalone.replace('<link rel="stylesheet" href="community-lab.css">'
 icon='data:image/svg+xml;base64,'+base64.b64encode((r/'docs/favicon.svg').read_bytes()).decode()
 standalone=standalone.replace('<script src="community-config.js" defer></script>','<script>'+(r/'docs/community-config.js').read_text()+'</script>')
 standalone=standalone.replace('href="favicon.svg"','href="'+icon+'"')
+for name in ['discovery-core.js','discovery.js']:
+    standalone=re.sub(r'<script src="'+re.escape(name)+r'(?:\?[^"]*)?" defer></script>',lambda _:'<script>'+(r/'docs'/name).read_text()+'</script>',standalone)
+standalone=standalone.replace('<link rel="stylesheet" href="discovery.css">','<style>'+(r/'docs/discovery.css').read_text()+'</style>')
 (r/'docs/Cowboys-Web-Toolbox-Preview.html').write_text(standalone)
 edge=r/'supabase/functions/community-api'
 edge.mkdir(parents=True,exist_ok=True)
@@ -28,10 +32,4 @@ shutil.copyfile(edge/'catalog.json',activity/'catalog.json')
 (r/'supabase/catalog-seed.sql').write_text('insert into public.community_site_totals(site_id) values\n'+',\n'.join("('"+site['id']+"')" for site in d['sites'])+'\non conflict (site_id) do nothing;\n')
 print(f"Built website, standalone preview and community assets: {len(d['sites'])} destinations / {len(d['videos'])} source videos / {len(d['tips'])} tips")
 
-import csv
-def safe_cell(value):
-    text=str(value if value is not None else '')
-    return "'"+text if re.match(r'^\s*[=+\-@]|^[\t\r\n]',text) else text
-with (r/'docs/websites.csv').open('w',newline='',encoding='utf-8-sig') as f:
-    w=csv.writer(f);w.writerow(['Name','Category','Website','Description','Origin','Access','Source URLs','Check scope'])
-    for site in d['sites']: w.writerow([safe_cell(v) for v in [site['name'],site['category'],site['url'],site['description'],site.get('origin','video'),site.get('accessLabel','See provider'),' | '.join([videos[n]['url'] for n in site['sources']]+site.get('evidenceUrls',[])),site['destinationCheck']['notes']]])
+subprocess.run(['node',str(r/'docs/export-catalog.cjs')],check=True)
