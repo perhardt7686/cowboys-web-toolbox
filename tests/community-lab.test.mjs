@@ -10,7 +10,7 @@ import {createActivityHandler} from '../supabase/functions/website-activity/hand
 import {runInNewContext} from 'node:vm';
 
 const ids={owner:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',maker:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',reader:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',pending:'dddddddd-dddd-4ddd-8ddd-dddddddddddd'};
-const catalog=JSON.parse(await readFile(new URL('../docs/catalog.json',import.meta.url),'utf8')).sites;
+const sourceCatalog=JSON.parse(await readFile(new URL('../docs/catalog.json',import.meta.url),'utf8')),catalog=sourceCatalog.sites;
 test('public catalog CSV exports neutralize spreadsheet formulas in community-supplied text',async()=>{
   const source=await readFile(new URL('../docs/app.js',import.meta.url),'utf8');
   const fn=source.match(/function csvCell\(value\)\{[\s\S]*?\n\}/u)?.[0];assert.ok(fn);
@@ -19,7 +19,8 @@ test('public catalog CSV exports neutralize spreadsheet formulas in community-su
   assert.equal(cell('A "useful" site'),'"A ""useful"" site"');
 });
 test('expanded catalog retains honest origins, unique URLs and explicit check scopes',()=>{
-  assert.ok(catalog.length>=191);assert.equal(catalog.filter(s=>s.origin!=='web').length,69);
+  assert.ok(catalog.length>=191);assert.equal(catalog.filter(s=>s.origin!=='web').length,sourceCatalog.coverage.videoDestinationLinks);
+  for(const s of catalog.filter(s=>s.origin!=='web'))assert.ok(s.sources.length&&s.sources.every(n=>sourceCatalog.videos.some(v=>v.number===n&&v.siteIds.includes(s.id))));
   assert.equal(new Set(catalog.map(s=>s.id)).size,catalog.length);
   assert.equal(new Set(catalog.map(s=>s.url.replace(/\/$/u,''))).size,catalog.length);
   for(const s of catalog.filter(s=>s.origin==='web')){assert.deepEqual(s.sources,[]);assert.ok(s.evidenceUrls[0].startsWith('https://'));assert.ok(s.destinationCheck.notes);assert.ok(s.accessLabel);}

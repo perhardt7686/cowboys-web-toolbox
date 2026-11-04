@@ -1,6 +1,6 @@
 # Cowboy’s Web Toolbox
 
-A public directory of 415 useful websites: 69 video discoveries and 346 independently researched web finds, plus 28 tips and 85 source videos. Original illustrated previews, source labels, access notes and browser-local favorites make it easy to explore. Matty McTech’s video discoveries retain their attribution; community additions have their own source threads.
+A public directory of 421 useful websites: 75 video discoveries and 346 independently researched web finds, plus 31 tips/demonstrations and 94 source-video records. Original illustrated previews, source labels, access notes and browser-local favorites make it easy to explore. Matty McTech’s video discoveries retain their attribution; community additions have their own source threads.
 
 GitHub Pages publishes `/docs` from `main` at https://perhardt7686.github.io/cowboys-web-toolbox/.
 
@@ -30,7 +30,7 @@ npm run check:edge
 The tests run actual Postgres constraints, policies and transaction functions in PGlite, with injected authentication and mail transports. They do not claim to verify a live Supabase project or SMTP delivery. Package versions and the npm dependency lockfile are committed. Runtime secrets are never committed or placed in `/docs`.
 
 
-The Commons message boards now include optional member profiles with photo crops, themes, covers, bios and links; a private owner control room for members, moderation, announcements, audit and CSV exports; and aggregate click counters for all 415 base catalog websites and approved dynamic community finds. Email verification and Cowboy's owner approval are required before posting. See COMMUNITY.md for authorization, privacy, deployment and testing details. Interactive preview mode uses explicitly labeled sample data and changes no live account or counters.
+The Commons message boards now include optional member profiles with photo crops, themes, covers, bios and links; a private owner control room for members, moderation, announcements, audit and CSV exports; and aggregate click counters for all 421 base catalog websites and approved dynamic community finds. Email verification and Cowboy's owner approval are required before posting. See COMMUNITY.md for authorization, privacy, deployment and testing details. Interactive preview mode uses explicitly labeled sample data and changes no live account or counters.
 
 ## Community Lab
 
@@ -64,3 +64,9 @@ Optional discovery measurements are off by default. Fixed result, duration and y
 Actual desktop Chrome sample tasks were completed in CyberChef (Base64 round trip), Desmos (quadratic graph) and WebAIM (parameterized 21:1 contrast calculation). Their exact scopes are recorded in the catalog. This is not testing all third-party workflows. Real iPhone/Android hardware, screen-reader sessions, production member verification/recovery/deletion walkthroughs and recruitment of willing human testers remain separate acceptance work. No domain, subscription, account or paid service was purchased. A custom domain requires Cowboy's name and budget choice.
 
 Rollback reference: the preceding known-good public main commit is `daea0a154ac71890f56eb3b0cd58b639eefc36ae`. Revert the new release merge to restore its website files; do not reset existing click totals or drop private statistics as part of a website rollback.
+
+## November 4 saved-reel refresh
+
+Reviewed 44 saved reels against the existing catalog: 35 were already recorded and nine were new source records. Added Movie Scene Map, muted.io, SPELUNKR, CityRT, Myinstants and ShadeMap. Source mappings distinguish readable branding/address evidence from visual-interface matches; provider-page checks do not claim working playback, account, upload or purchase flows. The Word shortcuts remain an app demonstration. The Halloween compilation is labeled as a past event, attributed to Finance Unfolded Page, with its offers unverified. One remote-jobs destination remains on verification hold with no guessed link.
+
+The release preserves all original IDs, URLs, video numbers, tips, favorite keys, Most clicked behavior and existing click totals. Catalog counts now come from the data, and source rows can display the actual creator and review limitations. All generated catalog, offline, CSV and server copies are rebuilt together.

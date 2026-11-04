@@ -20684,6 +20684,336 @@
       },
       "bestFor": "Design circuits and printed circuit boards with online tools.",
       "uploadTool": false
+    },
+    {
+      "id": "movie-scene-map",
+      "name": "Movie Scene Map",
+      "url": "https://moviescenemap.com/",
+      "category": "Movies & media",
+      "description": "Find real filming locations by movie, television title or place.",
+      "sources": [
+        86
+      ],
+      "monogram": "MSM",
+      "role": "featured",
+      "verification": "video",
+      "origin": "video",
+      "evidence": "The source reel visibly shows moviescenemap.com and the Movie Scene Map interface.",
+      "evidenceUrls": [
+        "https://moviescenemap.com/about/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://moviescenemap.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-04",
+        "notes": "First-party About page reviewed: searchable filming locations drawn from cited public sources. Coverage and location precision vary; the map and location workflows were not tested.",
+        "sourceRefs": [
+          "turn157view0"
+        ]
+      },
+      "topic": "Movies & media",
+      "group": "Media & culture",
+      "addedAt": "2026-11-04",
+      "accessLabel": "Free / no signup",
+      "accessReviewedAt": "2026-11-04",
+      "accessNote": "Provider-source review; no completed product, account, upload, download or purchase test.",
+      "access": {
+        "pricing": "free",
+        "signup": "no",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "directory",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Find real filming locations by movie, television title or place.",
+      "uploadTool": false
+    },
+    {
+      "id": "muted-io",
+      "name": "muted.io",
+      "url": "https://muted.io/",
+      "category": "Learning",
+      "description": "Explore interactive piano, chords, scales and ear-training tools.",
+      "sources": [
+        89
+      ],
+      "monogram": "M",
+      "role": "featured",
+      "verification": "video",
+      "origin": "video",
+      "evidence": "The reel’s teal music-tool grid and interval/piano controls match muted.io. This mapping is a visual-interface match, not a legible address-bar reading.",
+      "evidenceUrls": [
+        "https://muted.io/",
+        "https://muted.io/intervals/"
+      ],
+      "previewKind": "audio",
+      "destinationCheck": {
+        "url": "https://muted.io/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-04",
+        "notes": "Official homepage and interval-tool page reviewed. Web music-theory tools are described as free; the optional desktop app is separate. Audio, account, installation and purchase workflows were not tested.",
+        "sourceRefs": [
+          "turn163view2"
+        ]
+      },
+      "topic": "Music theory & practice",
+      "group": "Learn & research",
+      "addedAt": "2026-11-04",
+      "accessLabel": "Free web tools / optional desktop app",
+      "accessReviewedAt": "2026-11-04",
+      "accessNote": "Provider-source review; no completed product, account, upload, download or purchase test.",
+      "access": {
+        "pricing": "free",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "tool",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Explore interactive piano, chords, scales and ear-training tools.",
+      "uploadTool": false
+    },
+    {
+      "id": "spelunkr",
+      "name": "SPELUNKR",
+      "url": "https://spelunkr.tv/",
+      "category": "Movies & media",
+      "description": "Browse a retro television guide and tune into Internet Archive video channels.",
+      "sources": [
+        90
+      ],
+      "monogram": "S",
+      "role": "featured",
+      "verification": "video",
+      "origin": "video",
+      "evidence": "The reel’s SPELUNKR TV Guide branding and blue/yellow channel grid identify the service; the provider’s indexed About page corroborates the Internet Archive channel format.",
+      "evidenceUrls": [
+        "https://spelunkr.tv/",
+        "https://spelunkr.tv/about"
+      ],
+      "previewKind": "stream",
+      "destinationCheck": {
+        "url": "https://spelunkr.tv/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-04",
+        "notes": "Official homepage title and indexed first-party About page reviewed. The provider describes free viewing without an account and video streamed from Internet Archive. Direct About extraction returned no text; actual playback and individual videos’ rights were not independently verified.",
+        "sourceRefs": [
+          "turn158search3"
+        ]
+      },
+      "topic": "Movies & media",
+      "group": "Media & culture",
+      "addedAt": "2026-11-04",
+      "accessLabel": "Free viewing / no account (provider states)",
+      "accessReviewedAt": "2026-11-04",
+      "accessNote": "Provider-source review; no completed product, account, upload, download or purchase test.",
+      "access": {
+        "pricing": "free",
+        "signup": "no",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "experience",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Browse a retro television guide and tune into Internet Archive video channels.",
+      "uploadTool": false
+    },
+    {
+      "id": "cityrt",
+      "name": "CityRT",
+      "url": "https://cityrt.com/en/",
+      "category": "Games",
+      "description": "Build and manage a city in your desktop browser.",
+      "sources": [
+        91
+      ],
+      "monogram": "C",
+      "role": "featured",
+      "verification": "video",
+      "origin": "video",
+      "evidence": "The reel visibly shows CityRT branding and cityrt.com/play/ in its browser address bar.",
+      "evidenceUrls": [
+        "https://cityrt.com/en/",
+        "https://cityrt.com/en/how",
+        "https://cityrt.com/en/rules"
+      ],
+      "previewKind": "game",
+      "destinationCheck": {
+        "url": "https://cityrt.com/en/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-04",
+        "notes": "Official English homepage and indexed first-party how-to/access details reviewed. The provider describes desktop-browser play with a free core and paid extras. Gameplay, sign-in, saved progress and payment were not tested.",
+        "sourceRefs": [
+          "turn159view1"
+        ]
+      },
+      "topic": "Games",
+      "group": "Games & play",
+      "addedAt": "2026-11-04",
+      "accessLabel": "Free core game / paid extras",
+      "accessReviewedAt": "2026-11-04",
+      "accessNote": "Provider-source review; no completed product, account, upload, download or purchase test.",
+      "access": {
+        "pricing": "freemium",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "experience",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Build and manage a city in your desktop browser.",
+      "uploadTool": false,
+      "licenseNote": "Game and account terms apply; paid features were not reviewed through checkout."
+    },
+    {
+      "id": "myinstants",
+      "name": "Myinstants",
+      "url": "https://www.myinstants.com/",
+      "category": "Movies & media",
+      "description": "Find and play trending sound buttons, memes and short audio clips.",
+      "sources": [
+        93
+      ],
+      "monogram": "M",
+      "role": "featured",
+      "verification": "video",
+      "origin": "video",
+      "evidence": "The source reel visibly shows Myinstants branding and its colored sound-button grid. The current first-party page includes the same sound titles and layout labels.",
+      "evidenceUrls": [
+        "https://www.myinstants.com/en/index/us/"
+      ],
+      "previewKind": "audio",
+      "destinationCheck": {
+        "url": "https://www.myinstants.com/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-04",
+        "notes": "Official US trending page retrieved, including sound categories and buttons. Playback, downloads and account functions were not tested. User-uploaded audio can contain mature material; availability does not establish permission to reuse a clip.",
+        "sourceRefs": [
+          "turn164view1"
+        ]
+      },
+      "topic": "Audio & sound effects",
+      "group": "Media & culture",
+      "addedAt": "2026-11-04",
+      "accessLabel": "Free browsing / check reuse rights",
+      "accessReviewedAt": "2026-11-04",
+      "accessNote": "Provider-source review; no completed product, account, upload, download or purchase test.",
+      "access": {
+        "pricing": "free",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "directory",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Find and play trending sound buttons, memes and short audio clips.",
+      "uploadTool": false,
+      "licenseNote": "Check the rights of each audio clip before reusing it."
+    },
+    {
+      "id": "shademap",
+      "name": "ShadeMap",
+      "url": "https://shademap.app/",
+      "category": "Maps & world",
+      "description": "Estimate building, tree and terrain shadows for garden, travel and outdoor planning.",
+      "sources": [
+        94
+      ],
+      "monogram": "S",
+      "role": "featured",
+      "verification": "video",
+      "origin": "video",
+      "evidence": "The reel’s flat shadow map, bottom yellow time slider and date/layer controls match ShadeMap. This is a visual-interface identification corroborated by the official Help page, not a claim that every address-bar character was readable.",
+      "evidenceUrls": [
+        "https://shademap.app/help/"
+      ],
+      "previewKind": "map",
+      "destinationCheck": {
+        "url": "https://shademap.app/",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-04",
+        "notes": "Official Help page reviewed. Base shadows are estimates; missing heights, trees and viewport coverage can affect results. Premium regional data costs extra. Map interactions, uploads and purchases were not tested.",
+        "sourceRefs": [
+          "turn163view0"
+        ]
+      },
+      "topic": "Sunlight & outdoor planning",
+      "group": "Maps & weather",
+      "addedAt": "2026-11-04",
+      "accessLabel": "Free base data / paid premium data",
+      "accessReviewedAt": "2026-11-04",
+      "accessNote": "Provider-source review; no completed product, account, upload, download or purchase test.",
+      "access": {
+        "pricing": "freemium",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "tool",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Estimate building, tree and terrain shadows for garden, travel and outdoor planning.",
+      "uploadTool": false
     }
   ],
   "tips": [
@@ -21021,6 +21351,42 @@
       "evidence": "The exact video visibly shows the Visual Basic editor and a Worksheet_SelectionChange procedure. The sampled code is incomplete; no macro was copied or executed.",
       "evidenceUrls": [
         "https://www.facebook.com/reel/1659687225859023/"
+      ]
+    },
+    {
+      "id": "tip-87",
+      "number": 87,
+      "title": "Microsoft Word shortcuts",
+      "description": "The reel demonstrates Word shortcuts for inserting dates/times and formatting lines.",
+      "label": "Desktop app feature",
+      "note": "No separate website is needed. Shortcuts depend on Word version and keyboard layout.",
+      "evidence": "The sampled frames show Microsoft Word, a date/time insertion example and line-formatting instructions. The shortcuts were not independently tested.",
+      "evidenceUrls": [
+        "https://www.facebook.com/watch/?ref=saved&v=1486803293261817"
+      ]
+    },
+    {
+      "id": "tip-88",
+      "number": 88,
+      "title": "Remote jobs: website not yet verified",
+      "description": "A remote-job-listing demonstration remains on hold because its exact destination could not be verified.",
+      "label": "Verification hold",
+      "note": "No job-board link has been added. This is not a claim the provider is closed or unsafe.",
+      "evidence": "The reel shows remote job cards, but the sampled address text was insufficient to establish an exact, currently reachable first-party destination. No guessed domain is recommended.",
+      "evidenceUrls": [
+        "https://www.facebook.com/watch/?ref=saved&v=1865152577995334"
+      ]
+    },
+    {
+      "id": "tip-92",
+      "number": 92,
+      "title": "Halloween 2026 offers: past event",
+      "description": "A seasonal food-offer compilation for Halloween 2026.",
+      "label": "Past event / offers unverified",
+      "note": "Halloween 2026 has passed. These offers are not presented as currently available, verified discounts or evergreen tools.",
+      "evidence": "The public caption identifies 2026 Halloween freebies and the source page identifies Finance Unfolded Page. No offer was redeemed or independently verified.",
+      "evidenceUrls": [
+        "https://www.facebook.com/watch/?ref=saved&v=2482095258979926"
       ]
     }
   ],
@@ -22128,26 +22494,161 @@
       "reviewStatus": "mapped",
       "onCreatorPage": true,
       "reviewedAt": "2026-10-23"
+    },
+    {
+      "number": 86,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=1004860932615025",
+      "duration": "Duration not recorded",
+      "title": "Movie and television filming locations",
+      "siteIds": [
+        "movie-scene-map"
+      ],
+      "tipId": null,
+      "origin": "saved_collection",
+      "reviewStatus": "mapped",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
+    },
+    {
+      "number": 87,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=1486803293261817",
+      "duration": "00:26",
+      "title": "Microsoft Word shortcuts",
+      "siteIds": [],
+      "tipId": "tip-87",
+      "origin": "saved_collection",
+      "reviewStatus": "tip",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
+    },
+    {
+      "number": 88,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=1865152577995334",
+      "duration": "00:24",
+      "title": "Remote jobs — destination verification hold",
+      "siteIds": [],
+      "tipId": "tip-88",
+      "origin": "saved_collection",
+      "reviewStatus": "tip",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04",
+      "reviewNote": "Destination unverified; no website link added."
+    },
+    {
+      "number": 89,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=2435072027023484",
+      "duration": "00:17",
+      "title": "Music theory and instrument practice tools",
+      "siteIds": [
+        "muted-io"
+      ],
+      "tipId": null,
+      "origin": "saved_collection",
+      "reviewStatus": "mapped",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
+    },
+    {
+      "number": 90,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=1137715468939206",
+      "duration": "00:28",
+      "title": "Retro Internet Archive TV guide",
+      "siteIds": [
+        "spelunkr"
+      ],
+      "tipId": null,
+      "origin": "saved_collection",
+      "reviewStatus": "mapped",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
+    },
+    {
+      "number": 91,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=1590104515768214",
+      "duration": "00:22",
+      "title": "CityRT browser city builder",
+      "siteIds": [
+        "cityrt"
+      ],
+      "tipId": null,
+      "origin": "saved_collection",
+      "reviewStatus": "mapped",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
+    },
+    {
+      "number": 92,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=2482095258979926",
+      "duration": "00:17",
+      "title": "Halloween 2026 offers — past event",
+      "siteIds": [],
+      "tipId": "tip-92",
+      "origin": "saved_collection",
+      "reviewStatus": "tip",
+      "onCreatorPage": false,
+      "creator": "Finance Unfolded Page",
+      "reviewedAt": "2026-11-04",
+      "reviewNote": "Past event; offers not independently verified."
+    },
+    {
+      "number": 93,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=2552335271879753",
+      "duration": "00:21",
+      "title": "Trending sound buttons and audio clips",
+      "siteIds": [
+        "myinstants"
+      ],
+      "tipId": null,
+      "origin": "saved_collection",
+      "reviewStatus": "mapped",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
+    },
+    {
+      "number": 94,
+      "url": "https://www.facebook.com/watch/?ref=saved&v=1444200084348295",
+      "duration": "00:20",
+      "title": "Sunlight and shadow planning",
+      "siteIds": [
+        "shademap"
+      ],
+      "tipId": null,
+      "origin": "saved_collection",
+      "reviewStatus": "mapped",
+      "onCreatorPage": false,
+      "creator": "Matty McTech",
+      "reviewedAt": "2026-11-04"
     }
   ],
   "creatorPageUrl": "https://www.facebook.com/SetupSpawn/videos/",
   "coverage": {
-    "savedCollectionVideos": 28,
+    "savedCollectionVideos": 37,
     "creatorPageVideosIndexed": 69,
     "creatorPageEndReached": false,
     "lastIndexedVideoId": "1218196437191564",
-    "videosIndexed": 85,
-    "videosWithMappings": 57,
-    "videosWithTips": 28,
+    "videosIndexed": 94,
+    "videosWithMappings": 63,
+    "videosWithTips": 31,
     "videosPending": 0,
-    "destinationLinks": 415,
+    "destinationLinks": 421,
     "addedDestinationLinks": 41,
     "independentWebFinds": 346,
-    "videoDestinationLinks": 69
+    "videoDestinationLinks": 75,
+    "savedCollectionLastChecked": "2026-11-04",
+    "savedCollectionLastObservedVideos": 44,
+    "savedCollectionNewRecords": 9,
+    "destinationVerificationHolds": 1
   },
-  "scope": "415 website destinations: 69 traced to source videos and 346 independently researched web finds, plus 28 tips and 85 original source videos.",
+  "scope": "421 website destinations: 75 traced to source videos and 346 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
   "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
-  "updatedAt": "2026-10-30",
+  "updatedAt": "2026-11-04",
   "releases": [
     {
       "date": "2026-10-30",
@@ -22159,6 +22660,13 @@
       "added": 224,
       "topics": 46,
       "review": "General-audience provider-source review; complete workflows untested."
+    },
+    {
+      "date": "2026-11-04",
+      "added": 6,
+      "sourceVideosAdded": 9,
+      "tipsAdded": 3,
+      "review": "Six source-linked destinations; one Word demo, one past-event offer and one destination-verification hold. Provider-source review, not full workflow tests."
     }
   ],
   "discovery": {
