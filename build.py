@@ -6,7 +6,7 @@ s=json.dumps(d,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 extras=runpy.run_path(str(r/'discovery-build.py'))['setup'](d)
 t=(r/'index.template.html').read_text().replace('__STARTER_PACKS__',extras['packs']).replace('__DISCOVERY_FILTERS__',extras['filters'])
 assert t.count('__CATALOG_DATA__')==1
-html=t.replace('__CATALOG_DATA__',s).replace('__SITE_TOTAL__',str(len(d['sites']))).replace('__SITE_TOTAL_PADDED__',str(len(d['sites'])).zfill(3)).replace('__COLLECTION_SCOPE__',d['scope'])
+html=t.replace('__CATALOG_DATA__',s).replace('__SITE_TOTAL__',str(len(d['sites']))).replace('__TIP_TOTAL__',str(len(d['tips']))).replace('__VIDEO_TOTAL__',str(len(d['videos']))).replace('__SITE_TOTAL_PADDED__',str(len(d['sites'])).zfill(3)).replace('__COLLECTION_SCOPE__',d['scope'])
 (r/'docs/index.html').write_text(html)
 standalone=html.replace('<link rel="stylesheet" href="style.css">','<style>'+(r/'docs/style.css').read_text()+'</style>')
 standalone=re.sub(r'<script src="app\.js\?v=[^\"]+" defer></script>',lambda _:'<script>'+(r/'docs/app.js').read_text()+'</script>',standalone)
