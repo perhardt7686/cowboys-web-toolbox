@@ -413,5 +413,11 @@ insert into public.community_site_totals(site_id) values
 ('openscad'),
 ('wokwi'),
 ('kicad'),
-('easyeda')
+('easyeda'),
+('movie-scene-map'),
+('muted-io'),
+('spelunkr'),
+('cityrt'),
+('myinstants'),
+('shademap')
 on conflict (site_id) do nothing;
