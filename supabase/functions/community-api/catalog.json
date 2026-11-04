@@ -6039,6 +6039,100 @@
       "source_urls": [
         "https://easyeda.com/"
       ]
+    },
+    {
+      "id": "movie-scene-map",
+      "name": "Movie Scene Map",
+      "url": "https://moviescenemap.com/",
+      "category": "Movies & media",
+      "description": "Find real filming locations by movie, television title or place.",
+      "origin": "video",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?ref=saved&v=1004860932615025",
+        "https://moviescenemap.com/about/"
+      ]
+    },
+    {
+      "id": "muted-io",
+      "name": "muted.io",
+      "url": "https://muted.io/",
+      "category": "Learning",
+      "description": "Explore interactive piano, chords, scales and ear-training tools.",
+      "origin": "video",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?ref=saved&v=2435072027023484",
+        "https://muted.io/",
+        "https://muted.io/intervals/"
+      ]
+    },
+    {
+      "id": "spelunkr",
+      "name": "SPELUNKR",
+      "url": "https://spelunkr.tv/",
+      "category": "Movies & media",
+      "description": "Browse a retro television guide and tune into Internet Archive video channels.",
+      "origin": "video",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?ref=saved&v=1137715468939206",
+        "https://spelunkr.tv/",
+        "https://spelunkr.tv/about"
+      ]
+    },
+    {
+      "id": "cityrt",
+      "name": "CityRT",
+      "url": "https://cityrt.com/en/",
+      "category": "Games",
+      "description": "Build and manage a city in your desktop browser.",
+      "origin": "video",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?ref=saved&v=1590104515768214",
+        "https://cityrt.com/en/",
+        "https://cityrt.com/en/how",
+        "https://cityrt.com/en/rules"
+      ]
+    },
+    {
+      "id": "myinstants",
+      "name": "Myinstants",
+      "url": "https://www.myinstants.com/",
+      "category": "Movies & media",
+      "description": "Find and play trending sound buttons, memes and short audio clips.",
+      "origin": "video",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?ref=saved&v=2552335271879753",
+        "https://www.myinstants.com/en/index/us/"
+      ]
+    },
+    {
+      "id": "shademap",
+      "name": "ShadeMap",
+      "url": "https://shademap.app/",
+      "category": "Maps & world",
+      "description": "Estimate building, tree and terrain shadows for garden, travel and outdoor planning.",
+      "origin": "video",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.facebook.com/watch/?ref=saved&v=1444200084348295",
+        "https://shademap.app/help/"
+      ]
     }
   ]
 }
