@@ -1,3 +1,8 @@
+/* Carry the royal palette through the owner dashboard entry. */
+.owner-center .owner-tabs [data-owner-tab="core"]{background:#f3edf9;color:#35195a;border-color:#d7c1e8}
+.owner-center .owner-tabs [data-owner-tab="core"][aria-current="page"]{background:#35195a;color:#fffaf1;border-color:#efc978}
+.owner-center .owner-shortcut[data-owner-tab="core"] b{color:#6c4916}
+
 /* Cowboys Core uses its own royal palette; it does not restyle the Commons. */
 .ccore {
   --royal:#35195a;--royal-dark:#241039;--royal-mid:#522b79;--lilac:#f3edf9;
@@ -106,4 +111,8 @@
   .ccore .ccore-row{gap:6px}
   .ccore .ccore-row-meta{max-width:88px}
   .ccore .ccore-values{grid-template-columns:minmax(80px,1fr) minmax(0,2fr)}
+}
+@media (max-width:800px) and (pointer:coarse){
+  .ccore .ccore-category,.ccore .ccore-chip,.ccore .ccore-btn,.ccore .ccore-plain,
+  .ccore .ccore-field input,.ccore .ccore-field select{min-height:44px}
 }
