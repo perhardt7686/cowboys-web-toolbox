@@ -185,7 +185,7 @@ async function openCore(host){
   const generation=coreGeneration;
   host.textContent='Opening Cowboys Core…';
   try{
-    const {mountCowboysCore}=await import('./cowboys-core.mjs?v=1');
+    const {mountCowboysCore}=await import('./cowboys-core.mjs?v=2');
     if(generation!==coreGeneration||!host.isConnected||!canOpenCore())return;
     coreMount=mountCowboysCore(host,{client:()=>client,authorized:canOpenCore});
   }catch{if(host.isConnected&&canOpenCore())host.textContent='Cowboys Core could not load. Try reopening this dashboard tab.';}

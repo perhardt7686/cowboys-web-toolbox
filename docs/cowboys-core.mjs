@@ -1,4 +1,3 @@
-const ARCHIVE='takeout-part-001';
 const PAGE=24;
 const sections=[
   ['all','All records'],['service','Service timeline'],['customers','Customers & properties'],
@@ -7,7 +6,12 @@ const sections=[
 ];
 const label=new Map(sections);
 const num=n=>new Intl.NumberFormat('en-US').format(Number(n)||0);
+const allowedArchiveKey=x=>typeof x==='string'&&/^[a-z0-9-]{1,60}$/.test(x);
 const allowedRecordKey=x=>typeof x==='string'&&/^[a-z-]+-\d{1,6}$/.test(x);
+const sourceLabel=key=>{
+  const part=/^takeout-part-(\d+)$/.exec(key);
+  return part?'Takeout part '+part[1]:key;
+};
 const hasDate=x=>!x||/^\d{4}-\d{2}-\d{2}$/.test(x);
 const node=(tag,cls='',value)=>{
   const e=document.createElement(tag);
@@ -98,7 +102,7 @@ export function mountCowboysCore(host,{client,authorized}){
   const hero=node('header','ccore-hero');
   const heroWords=node('div');
   heroWords.append(node('p','ccore-kicker','PRIVATE WORKSPACE'),node('h3','','Cowboys Core'),
-    node('p','ccore-lead','Find your tickets, source notes, and archived files in one place.'));
+    node('p','ccore-lead','Search your tickets, source notes, and archived files in one library.'));
   const seal=node('div','ccore-seal');
   seal.append(node('span','ccore-crown','♛'),node('span','','OWNER ONLY'));
   seal.setAttribute('aria-hidden','true');
@@ -115,14 +119,14 @@ export function mountCowboysCore(host,{client,authorized}){
   query.placeholder='Name, address, product, amount or record ID';
   const action=node('button','ccore-btn ccore-primary','Search');action.type='submit';
   const searchbar=node('div','ccore-search');
-  searchbar.append(field('Search archive',query),action);
+  searchbar.append(field('Search library',query),action);
   const adv=node('details','ccore-advanced');
   adv.append(node('summary','','Search options'));
   const grid=node('div','ccore-filter-grid');
   const topics=select([['','All topics']]);
   const mode=select([['words','All search terms'],['phrase','Exact phrase'],['id','Exact record or source ID']]);
-  const sort=select([['relevance','Best match'],['newest','Newest dated first'],['oldest','Oldest dated first'],['title','Title A–Z'],['recorded','Workbook order']]);
-  const match=select([['','Any metadata status'],['matched','Matched media'],['unmatched','No match in part 001']]);
+  const sort=select([['relevance','Best match'],['newest','Newest dated first'],['oldest','Oldest dated first'],['title','Title A–Z'],['recorded','Source order']]);
+  const match=select([['','Any metadata status'],['matched','Matched media'],['unmatched','Unmatched metadata']]);
   const from=node('input'),to=node('input');from.type=to.type='date';
   const needs=node('input');needs.type='checkbox';
   const reviewLabel=node('label','ccore-check');reviewLabel.append(needs,node('span','','Only records flagged for review'));
@@ -194,23 +198,28 @@ export function mountCowboysCore(host,{client,authorized}){
     const o=data.coverage?.overview||{};
     metrics.replaceChildren();
     for(const [title,n] of [['Archive entries',o['Archive entries']],['Dated tickets',o['Dated service tickets']],
-      ['Document areas',o['Document areas read']],['Videos reviewed',o['Videos decoded']]]){
+      ['Document areas',o['Document areas read']],['Videos decoded',o['Videos decoded']]]){
       const m=node('div','ccore-metric');m.append(node('b','',num(n)),node('span','',title));metrics.append(m);
     }
-    scope.replaceChildren(node('span','','Takeout part 001 · '+num(data.coverage?.parts_reviewed)+' of '+num(data.coverage?.parts_reported)+' reported parts'));
-    const a=link(data.coverage?.source_workbook,'Open source workbook ↗');
-    if(a)scope.append(a);
+    scope.replaceChildren(node('span','',num(data.coverage?.catalog_records)+' catalog records · '+
+      num(data.coverage?.parts_reviewed)+' of '+num(data.coverage?.parts_reported)+' reported Takeout parts'));
+    for(const source of data.coverage?.source_workbooks||[]){
+      if(!allowedArchiveKey(source.archive_key))continue;
+      const a=link(source.url,sourceLabel(source.archive_key)+' workbook ↗');
+      if(a)scope.append(a);
+    }
   }
   function showRows(items){
     rows.replaceChildren();
     if(!items.length){rows.append(node('p','ccore-empty','No records match these filters. Try a shorter search or clear the filters.'));return;}
     for(const item of items){
-      if(!allowedRecordKey(item.record_key))continue;
-      const card=button('',()=>void showDetail(item.record_key),'ccore-row');
+      if(!allowedArchiveKey(item.archive_key)||!allowedRecordKey(item.record_key))continue;
+      const card=button('',()=>void showDetail(item.archive_key,item.record_key),'ccore-row');
       const desc=node('span','ccore-row-text'), meta=node('span','ccore-row-meta');
       desc.append(node('strong','',item.title),node('small','',item.summary||item.topic));
       meta.append(node('span','ccore-tag',label.get(item.category)||item.category));
       if(item.display_id)meta.append(node('span','ccore-id',item.display_id));
+      meta.append(node('span','ccore-row-date',sourceLabel(item.archive_key)));
       if(item.record_date)meta.append(node('span','ccore-row-date',item.record_date));
       if(item.review_needed)meta.append(node('span','ccore-tag ccore-tag-review','Check source'));
       card.append(desc,meta);rows.append(card);
@@ -226,7 +235,7 @@ export function mountCowboysCore(host,{client,authorized}){
     if(loaded)resultStatus.textContent='Searching…';
     try{
       const {data,error}=await client().rpc('toolbox_archive_search',{
-        p_archive:ARCHIVE,p_query:query.value.trim(),p_category:current==='all'?null:current,
+        p_archive:null,p_query:query.value.trim(),p_category:current==='all'?null:current,
         p_topic:topics.value||null,p_from:from.value||null,p_to:to.value||null,p_review_only:needs.checked,
         p_metadata_status:match.value||null,p_match:mode.value,p_sort:sort.value,p_offset:start,p_limit:PAGE
       });
@@ -249,8 +258,8 @@ export function mountCowboysCore(host,{client,authorized}){
       metrics.replaceChildren();body.hidden=true;loaded=false;
     }finally{if(valid()&&runID===generation)action.disabled=false;}
   }
-  async function showDetail(key){
-    if(!valid()||!allowedRecordKey(key))return;
+  async function showDetail(archiveKey,key){
+    if(!valid()||!allowedArchiveKey(archiveKey)||!allowedRecordKey(key))return;
     const id=++detailGen;
     contents.replaceChildren(node('p','','Loading record…'));
     dtitle.textContent='Archive record';
@@ -258,13 +267,13 @@ export function mountCowboysCore(host,{client,authorized}){
     try{
       const {data,error}=await client().from('toolbox_archive_records')
         .select('record_key,category,topic,display_id,source_id,title,record_date,date_basis,review_needed,metadata_status,related_ids,payload')
-        .eq('archive_key',ARCHIVE).eq('record_key',key).maybeSingle();
+        .eq('archive_key',archiveKey).eq('record_key',key).maybeSingle();
       if(!valid()||id!==detailGen||!dialog.open)return;
       if(error||!data?.payload?.fields)throw new Error('record');
       dtitle.textContent=data.title;
       contents.replaceChildren();
       const details=node('p','ccore-detail-meta',[
-        data.display_id, data.topic, data.record_date&&(data.record_date+' · '+data.date_basis),
+        sourceLabel(archiveKey), data.display_id, data.topic, data.record_date&&(data.record_date+' · '+data.date_basis),
         data.payload.worksheet&&data.payload.worksheet+' · Row '+data.payload.row
       ].filter(Boolean).join('  /  '));
       contents.append(details);
@@ -272,7 +281,7 @@ export function mountCowboysCore(host,{client,authorized}){
       const flat=node('dl','ccore-values'), folds=[];
       for(const [title,value] of Object.entries(data.payload.fields)){
         if(value===null||value==='')continue;
-        if(/^Exact |^Preserved metadata JSON$/.test(title)&&title!=='Exact path in ZIP'){
+        if(/^Exact |^(Preserved|Indexed) metadata JSON$/.test(title)&&title!=='Exact path in ZIP'){
           const isJSON=title.endsWith('JSON')||typeof value==='string'&&/^[{\[]/.test(value.trim());
           folds.push(drawer(title,isJSON?node('pre','ccore-pre',formatRaw(value)):reading(value),title==='Exact transcription'));
         }else{
@@ -284,7 +293,7 @@ export function mountCowboysCore(host,{client,authorized}){
       }
       if(flat.childElementCount)contents.append(flat);
       for(const f of folds)contents.append(f);
-      const rel=(data.related_ids||[]).filter(x=>/^P001-[A-Z0-9]{3,10}$/.test(x));
+      const rel=(data.related_ids||[]).filter(x=>/^P\d{3}-[A-Z0-9]{3,10}$/.test(x));
       if(rel.length){
         const target=node('div','ccore-related');
         target.append(node('p','ccore-kicker','RELATED SOURCE IDS'));
@@ -295,7 +304,7 @@ export function mountCowboysCore(host,{client,authorized}){
         },'ccore-chip'));
         target.append(tags);contents.append(target);
       }
-      contents.append(drawer('Raw workbook row',node('pre','ccore-pre',JSON.stringify(data.payload,null,2))));
+      contents.append(drawer('Raw source row',node('pre','ccore-pre',JSON.stringify(data.payload,null,2))));
       close.focus();
     }catch{
       if(valid()&&id===detailGen&&dialog.open)contents.replaceChildren(node('p','','The record could not be read. Close this panel and try again.'));
