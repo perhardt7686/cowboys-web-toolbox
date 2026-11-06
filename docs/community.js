@@ -1,6 +1,6 @@
 import {CATEGORIES,RULES_VERSION,escapeHTML as esc,renderBody,initials,displayName,validatePost,edwardReply,canPost,safeHttps,reviewContent} from './community-core.mjs';
 import {createProfileStudio} from './community-profiles.mjs?v=lab1';
-import {createOwnerCenter} from './community-owner.mjs?v=lab1';
+import {createOwnerCenter} from './community-owner.mjs?v=lab1-core1';
 import {PROFILE_DEFAULTS} from './profile-core.mjs';
 import {createCommunityLab} from './community-lab.mjs';
 import {validateLabPost} from './lab-core.mjs';
@@ -120,10 +120,10 @@ async function api(action,payload={}){
 async function bootstrap(){
   if(!configured||isPreview||!client)return;
   const {data:{session}}=await client.auth.getSession();state.user=session?.user||null;
-  if(!state.user){state.member=null;state.profile=null;renderFeed();return;}
-  if(!state.user.email_confirmed_at){state.member=null;openAuth('check');return;}
+  if(!state.user){ownerCenter.hide();state.member=null;state.profile=null;renderFeed();return;}
+  if(!state.user.email_confirmed_at){ownerCenter.hide();state.member=null;openAuth('check');return;}
   const result=await api('bootstrap',{displayName:state.user.user_metadata?.display_name,rulesVersion:state.user.user_metadata?.rules_version});
-  state.member=result.member;state.profile=result.profile;await profiles.setOwn(state.profile);renderFeed();
+  state.member=result.member;state.profile=result.profile;if(!canOpenCore())ownerCenter.hide();await profiles.setOwn(state.profile);renderFeed();
   if(state.passwordSetup)openAuth('setup');
   if(reviewToken){if(state.member.role==='owner')await openReviewLink();else toast('This review link is for the verified owner account.');}
 }
@@ -174,7 +174,24 @@ function showGuidelines(){showDialog('<p class="eyebrow">A few good ground rules
 function showPrivacy(){showDialog('<p class="eyebrow">Privacy & your account</p><h2 id="content-title">A public conversation.<br>A private email.</h2><div class="privacy-notice"><p>Your display name, conversations and published replies are public. Your email and password are handled by the authentication provider; passwords are never stored in forum posts or sent to Cowboy.</p><p>Supabase provides account authentication and community storage. Verification and reset emails go to your own address. Membership review and report notices go to the owner’s private mailbox through the configured mail sender.</p><p>Session credentials are managed by the authentication service. “Remember this device” keeps the session in this browser. Catalog favorites remain separate and stay in this browser. Board bookmarks, follows and reply notifications are private to your account. A weekly email digest is off by default and requires an explicit preference; its unsubscribe link opens a confirmation. Helpful votes and poll choices are stored per approved member, while only aggregate counts are public. Community-tested notes are member experiences, not guarantees. Website counters record aggregate destination clicks, not unique visitors. They store no clicker email, account ID or IP address. Random event IDs are retained briefly to avoid duplicate counts; the counter has a short browser cooldown.</p><p>Membership records, private reports, rate-limit counters and an owner moderation log support the board. The on-site Edward assistant uses the public catalog and conversation text for fixed suggestions. The separate scheduled monitor can also check public questions and post disclosed automated replies. Public replies never include private mailbox or account information.</p><p>Request account deletion from My account. The request is sent for owner review; the site will not claim deletion is complete until it has been carried out. Public pages may be indexed or copied by others.</p><p>Registration is open. Verify your own email; Cowboy reviews posting access. Member profiles are private by default. If shared, your profile and chosen picture can be viewed publicly while your membership is approved. You can make your profile private again, but public copies or already-issued short-lived image links may persist briefly.</p></div>');}
 function showEdward(){showDialog('<p class="eyebrow">Your guide to the collection</p><h2 id="content-title">Edward, at your service.</h2><span class="moderator-badge">Automated moderator</span><p class="dialog-lead">Mention @Edward and a concrete task, or name a website from the toolbox. Edward matches your question against the recorded catalog and links relevant entries.</p><ul class="guideline-list"><li>His public replies use the site’s public catalog and public conversation context. Private records stay private.</li><li>He identifies himself as automated and doesn’t pretend to have tested a service.</li><li>Reports, approvals, suspensions and final moderation decisions belong to Cowboy.</li></ul><p class="privacy-notice">On-site catalog suggestions run when mentioned. The separate scheduled monitor also checks public conversations every 6 hours and may add helpful, disclosed replies. It does not run continuously.</p>');}
 const profiles=createProfileStudio({state,isPreview,client:()=>client,api,showDialog,toast,renderAccount,onSaved:()=>loadFeed()});
-const ownerCenter=createOwnerCenter({state,isPreview,api,catalog:()=>catalog,confirm:confirmAction,toast,refreshAnnouncement,lab:()=>hub.ownerPanel()});
+let coreMount=null,coreGeneration=0;
+const canOpenCore=()=>!isPreview&&configured&&!!client&&!state.recovery&&!state.passwordSetup&&
+  state.member?.role==='owner'&&state.member?.status==='approved'&&
+  !!state.user?.email_confirmed_at&&state.user.id===state.member.user_id;
+function clearCore(){coreGeneration++;coreMount?.destroy();coreMount=null;}
+async function openCore(host){
+  clearCore();
+  if(!host?.isConnected||!canOpenCore())return;
+  const generation=coreGeneration;
+  host.textContent='Opening Cowboys Core…';
+  try{
+    const {mountCowboysCore}=await import('./cowboys-core.mjs?v=1');
+    if(generation!==coreGeneration||!host.isConnected||!canOpenCore())return;
+    coreMount=mountCowboysCore(host,{client:()=>client,authorized:canOpenCore});
+  }catch{if(host.isConnected&&canOpenCore())host.textContent='Cowboys Core could not load. Try reopening this dashboard tab.';}
+}
+const ownerCenter=createOwnerCenter({state,isPreview,api,catalog:()=>catalog,confirm:confirmAction,toast,refreshAnnouncement,
+  lab:()=>hub.ownerPanel(),canCore:canOpenCore,openCore,closeCore:clearCore});
 const hub=createCommunityLab({state,isPreview,client:()=>client,catalog:()=>catalog,categories:CATEGORIES,api,openAuth,showDialog,closeDialogs,toast,loadFeed,openThread,sampleID,demoThreads:()=>demoThreads});
 function showProfile(){if(mustSignIn())return;return profiles.show();}
 async function showOwner(){if(state.member?.role!=='owner')return;try{await ownerCenter.show();}catch(error){toast(errorMessage(error));}}
@@ -220,7 +237,7 @@ document.addEventListener('click',async event=>{
     else if(target.id==='open-privacy'||target.matches('[data-privacy]'))showPrivacy();
     else if(target.id==='meet-edward')showEdward();
     else if(target.matches('[data-catalog]')){event.preventDefault();const site=catalog.find(s=>s.id===target.dataset.catalog);if(site)location.href='./?find='+encodeURIComponent(site.name)+'#explore';}
-    else if(target.matches('[data-signout],[data-signout-all]')){if(!isPreview&&client)await client.auth.signOut({scope:target.matches('[data-signout-all]')?'global':'local'});state.member=null;state.user=null;closeDialogs();$('owner-dashboard').hidden=true;if(isPreview)$('preview-role').value='visitor';renderFeed();toast('You’re logged out.');}
+    else if(target.matches('[data-signout],[data-signout-all]')){ownerCenter.hide();if(!isPreview&&client)await client.auth.signOut({scope:target.matches('[data-signout-all]')?'global':'local'});state.member=null;state.user=null;closeDialogs();$('owner-dashboard').hidden=true;if(isPreview)$('preview-role').value='visitor';renderFeed();toast('You’re logged out.');}
     else if(target.matches('[data-profile]'))showProfile();
     else if(target.matches('[data-owner]'))await showOwner();
     else if(target.matches('[data-check-membership]')){if(isPreview)toast('Preview state: approval is still pending.');else{await bootstrap();toast(state.member?.status==='approved'?'You’re approved. Welcome in.':'Your request is still awaiting review.');}}
@@ -250,7 +267,7 @@ async function initialize(){
       const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
       const sessionStore={getItem:key=>{try{return sessionStorage.getItem(key)||localStorage.getItem(key)}catch{return null}},setItem:(key,value)=>{try{const remember=localStorage.getItem('cowboy-community-remember')==='yes';(remember?localStorage:sessionStorage).setItem(key,value);(remember?sessionStorage:localStorage).removeItem(key)}catch{}},removeItem:key=>{try{sessionStorage.removeItem(key);localStorage.removeItem(key)}catch{}}};
       client=createClient(config.supabaseUrl,config.publishableKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:sessionStore}});
-      client.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){state.recovery=true;setTimeout(()=>openAuth('reset'),0);}else setTimeout(()=>bootstrap().catch(error=>toast(errorMessage(error))),0);});
+      client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||(session?.user?.id&&state.user?.id&&session.user.id!==state.user.id))ownerCenter.hide();if(event==='PASSWORD_RECOVERY'){state.recovery=true;setTimeout(()=>openAuth('reset'),0);}else setTimeout(()=>bootstrap().catch(error=>toast(errorMessage(error))),0);});
       await bootstrap();await loadFeed();
     }catch{toast('The community could not connect. Please try again shortly.');renderFeed();}
   }else await loadFeed();
