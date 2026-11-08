@@ -29,8 +29,9 @@ standalone=standalone.replace('<link rel="stylesheet" href="discovery.css">','<s
 edge=r/'supabase/functions/community-api'
 edge.mkdir(parents=True,exist_ok=True)
 shutil.copyfile(r/'docs/community-core.mjs',edge/'domain.mjs')
+(edge/'powers-domain.mjs').write_text((r/'docs/powers-core.mjs').read_text().replace("'./community-core.mjs'","'./domain.mjs'"))
 (edge/'forum-core.mjs').write_text((r/'docs/forum-core.mjs').read_text().replace("'./community-core.mjs'","'./domain.mjs'"))
-(edge/'profile-domain.mjs').write_text((r/'docs/profile-core.mjs').read_text().replace("'./community-core.mjs'","'./domain.mjs'"))
+(edge/'profile-domain.mjs').write_text((r/'docs/profile-core.mjs').read_text().replace("'./community-core.mjs'","'./domain.mjs'").replace("'./forum-core.mjs?v=powers1'","'./forum-core.mjs'"))
 videos={v['number']:v for v in d['videos']}
 edge_catalog={'sites':[{**{k:site[k] for k in ('id','name','url','category','description')},'origin':site.get('origin','video'),'destinationCheck':{'status':site['destinationCheck']['status']},'source_urls':[videos[n]['url'] for n in site['sources']]+site.get('evidenceUrls',[])} for site in d['sites']]}
 (edge/'lab-domain.mjs').write_text((r/'docs/lab-core.mjs').read_text().replace("'./community-core.mjs'","'./domain.mjs'"))
