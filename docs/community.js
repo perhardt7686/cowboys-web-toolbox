@@ -1,9 +1,10 @@
 import {CATEGORIES,RULES_VERSION,escapeHTML as esc,renderBody,initials,displayName,validatePost,edwardReply,canPost,safeHttps,reviewContent} from './community-core.mjs';
-import {createProfileStudio} from './community-profiles.mjs?v=commons1';
+import {createProfileStudio} from './community-profiles.mjs?v=powers1';
 import {createOwnerCenter} from './community-owner.mjs?v=lab1-core1';
-import {PROFILE_DEFAULTS} from './profile-core.mjs?v=commons1';
-import {createForum} from './forum-ui.mjs';
-import {timeHTML,forumBody} from './forum-core.mjs';
+import {PROFILE_DEFAULTS} from './profile-core.mjs?v=powers1';
+import {createPowerHouse} from './community-powers.mjs?v=powers1';
+import {createForum} from './forum-ui.mjs?v=powers1';
+import {timeHTML,forumBody} from './forum-core.mjs?v=powers1';
 import {createCommunityLab} from './community-lab.mjs?v=commons1';
 import {validateLabPost} from './lab-core.mjs';
 
@@ -23,15 +24,15 @@ state.passwordSetup=fragment.get('type')==='invite';
 if(fragment.has('review')){reviewToken=fragment.get('review');history.replaceState(null,'',location.pathname+location.search);}
 const previewRows=[
   {id:'11111111-1111-4111-8111-111111111111',author_id:'77777777-7777-4777-8777-777777777777',author_name:'Example member',title:'The little tool that finally made diagrams click',body:'I tried Excalidraw from the collection to map out a project. Simple, a little imperfect, and exactly what I needed. What have you made with it?',category:'creative',site_id:'excalidraw',created_at:'2026-10-23T13:25:00Z',reply_count:0,pinned:true,status:'published'},
-  {id:'22222222-2222-4222-8222-222222222222',author_name:'Sample explorer',title:'@Edward, where should I look for used auto parts?',body:'I’m looking for a useful starting point for recycled vehicle parts. Is there something in the toolbox that searches those inventories?',category:'repair',site_id:'car-part-com',created_at:'2026-10-23T12:30:00Z',reply_count:0,status:'published'},
-  {id:'33333333-3333-4333-8333-333333333333',author_name:'Example maker',title:'What’s the website you keep coming back to?',body:'The internet has a lot of noise. I’d love to hear about the small, genuinely useful tools you’ve kept in your bookmarks—and what you use them for.',category:'discoveries',site_id:null,created_at:'2026-10-23T11:35:00Z',reply_count:0,status:'published'},
+  {id:'22222222-2222-4222-8222-222222222222',author_id:'88888888-8888-4888-8888-888888888888',author_name:'Sample explorer',title:'@Edward, where should I look for used auto parts?',body:'I’m looking for a useful starting point for recycled vehicle parts. Is there something in the toolbox that searches those inventories?',category:'repair',site_id:'car-part-com',created_at:'2026-10-23T12:30:00Z',reply_count:0,status:'published'},
+  {id:'33333333-3333-4333-8333-333333333333',author_id:'77777777-7777-4777-8777-777777777777',author_name:'Example maker',title:'What’s the website you keep coming back to?',body:'The internet has a lot of noise. I’d love to hear about the small, genuinely useful tools you’ve kept in your bookmarks—and what you use them for.',category:'discoveries',site_id:null,created_at:'2026-10-23T11:35:00Z',reply_count:0,status:'published'},
   {id:'44444444-4444-4444-8444-444444444444',author_name:'Sample member',title:'A good way to turn a daunting project into smaller steps',body:'Has anyone tried Magic ToDo? I’m curious how you use task breakdown tools for practical projects around the house.',category:'help',site_id:'goblin-tools-magic-todo',created_at:'2026-10-22T20:15:00Z',reply_count:0,status:'published'},
   {id:'55555555-5555-4555-8555-555555555555',author_name:'Example visitor',title:'A small idea for making the collection even easier to browse',body:'I like the category filters. A conversation attached to each website would be a nice way to trade tips and flag a changed link.',category:'feedback',site_id:null,created_at:'2026-10-22T18:25:00Z',reply_count:0,status:'published'}
 ];
 let demoThreads=previewRows.map(r=>({...r})),demoReplies=new Map(),demoMembers=[{user_id:'66666666-6666-4666-8666-666666666666',display_name:'Example new member',status:'pending',created_at:'2026-10-23T12:15:00Z'}];
 const timeLabel=value=>{const date=new Date(value);if(!Number.isFinite(date.getTime()))return 'Recently';return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric'}).format(date)};
 function toast(message){$('community-toast').textContent=message;$('community-toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('community-toast').hidden=true,4000)}
-function showDialog(html){$('content-dialog').classList.remove('profile-dialog','member-dialog');$('dialog-content').innerHTML=html;const dialog=$('content-dialog');if(!dialog.open)dialog.showModal();}
+function showDialog(html){$('content-dialog').classList.remove('profile-dialog','member-dialog','power-dialog');$('dialog-content').innerHTML=html;const dialog=$('content-dialog');if(!dialog.open)dialog.showModal();}
 function closeDialogs(){document.querySelectorAll('dialog[open]').forEach(d=>d.close())}
 function formMessage(form,message,success=false){let target=form.querySelector('.form-message');if(!target){target=document.createElement('div');target.className='form-message';target.setAttribute('role','alert');form.prepend(target)}target.classList.toggle('success',success);target.textContent=message;}
 function errorMessage(error){return error instanceof Error?error.message:'Please try again in a moment.';}
@@ -44,7 +45,7 @@ function renderAccount(){
   if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Join the conversation <span aria-hidden="true">↗</span></button>';return}
   const member=state.member;
   $('account-actions').innerHTML=`<details class="account-menu"><summary>${profiles.avatar({...state.profile,display_name:member.display_name})}<span>${esc(member.display_name)}</span><span aria-hidden="true">⌄</span></summary><div class="account-dropdown"><button data-profile>Customize my profile</button>${member.role==='owner'?'<button data-owner>Owner dashboard</button>':''}<button data-signout>Log out</button></div></details>`;
-  hub.decorateAccount();
+  hub.decorateAccount();powers.decorateAccount();
 }
 function renderNotice(){
   let html='';
@@ -64,7 +65,7 @@ function renderFeed(){
   $('feed-count').textContent=`${rows.length} conversation${rows.length===1?'':'s'}${isPreview?' · sample content':''}`;
   $('community-feed').innerHTML=rows.length?rows.map(t=>`<article class="thread-card"><div class="thread-kicker"><span class="category-dot"></span>${esc(categories.get(t.category)?.name||'Conversation')}${t.pinned?'<span>· Pinned</span>':''}${isPreview?'<span class="sample-label">SAMPLE</span>':''}</div><h3><button class="thread-title" data-thread="${esc(t.id)}">${esc(t.title)}</button></h3><p class="thread-excerpt">${esc(t.body.slice(0,190))}${t.body.length>190?'…':''}</p>${siteLink(t.site_id)}<div class="thread-bottom">${profiles.author(t.author_id,t.author_name)}<span class="thread-age">· ${timeLabel(t.created_at)}</span><span class="thread-count">↳ ${Number(t.reply_count||0)} replies</span>${t.locked?'<span class="read-state">Closed</span>':''}</div></article>`).join(''):`<div class="community-empty"><span aria-hidden="true">✳</span><h3>${state.search?'No conversations this time.':'The first good conversation starts somewhere.'}</h3><p>${state.search?'Try a different word or another category.':'Share a useful discovery, ask a thoughtful question, or be the first to talk about a tool from the collection.'}</p><button class="button-primary" data-start>Start a conversation ↗</button></div>`;
   $('load-more').hidden=!state.hasMore;
-  hub.decorateFeed(rows);forum.decorateFeed(rows);
+  hub.decorateFeed(rows);forum.decorateFeed(rows);powers.decorateFeed(rows);
 }
 async function loadFeed(append=false){
   if(state.loading){state.reloadRequested=true;return;}state.loading=true;$('refresh-community').disabled=true;
@@ -82,6 +83,7 @@ async function loadFeed(append=false){
       const rows=data.map(t=>({...t,reply_count:t.visible_reply_count||0}));state.threads=append?[...state.threads,...rows]:rows;state.offset+=rows.length;state.hasMore=rows.length===30;
     }else{state.threads=[];state.hasMore=false;}
     await profiles.load(state.threads.map(t=>t.author_id));
+    await powers.refreshOwn();await powers.loadHonors(state.threads.map(t=>t.author_id));
     renderFeed();
   }catch(error){$('community-feed').innerHTML=`<div class="community-empty"><span aria-hidden="true">↻</span><h3>A little pause in the conversation.</h3><p>${esc(errorMessage(error))}</p><button class="button-quiet" data-refresh>Try again</button></div>`;}
   finally{state.loading=false;$('refresh-community').disabled=false;if(state.reloadRequested){state.reloadRequested=false;await loadFeed();}}
@@ -121,10 +123,10 @@ async function api(action,payload={}){
 async function bootstrap(){
   if(!configured||isPreview||!client)return;
   const {data:{session}}=await client.auth.getSession();state.user=session?.user||null;
-  if(!state.user){ownerCenter.hide();state.member=null;state.profile=null;renderFeed();return;}
+  if(!state.user){ownerCenter.hide();state.member=null;state.profile=null;await powers.refreshOwn(true);renderFeed();return;}
   if(!state.user.email_confirmed_at){ownerCenter.hide();state.member=null;openAuth('check');return;}
   const result=await api('bootstrap',{displayName:state.user.user_metadata?.display_name,rulesVersion:state.user.user_metadata?.rules_version});
-  state.member=result.member;state.profile=result.profile;if(!canOpenCore())ownerCenter.hide();await profiles.setOwn(state.profile);renderFeed();
+  state.member=result.member;state.profile=result.profile;if(!canOpenCore())ownerCenter.hide();await profiles.setOwn(state.profile);await powers.refreshOwn(true);renderFeed();
   if(state.passwordSetup)openAuth('setup');
   if(reviewToken){if(state.member.role==='owner')await openReviewLink();else toast('This review link is for the verified owner account.');}
 }
@@ -164,10 +166,12 @@ async function openThread(id,{page=0,replyId=null,latest=false}={}){
   try{
     let thread,replies,total,quoteReferences=new Map();page=Math.max(0,Math.floor(page)||0);
     if(isPreview){
+      if(replyId){const found=[...demoReplies].find(([,rows])=>rows.some(r=>r.id===replyId));if(found)id=found[0];}
       thread=demoThreads.find(t=>t.id===id);const all=(demoReplies.get(id)||[]).filter(r=>!['held','hidden'].includes(r.status));total=all.length;
       if(latest)page=Math.max(0,Math.ceil(total/50)-1);if(replyId){const at=all.findIndex(r=>r.id===replyId);if(at>=0)page=Math.floor(at/50);}
       replies=all.slice(page*50,page*50+50);for(const r of all)quoteReferences.set(r.id,r);
     }else{
+      if(replyId){const location=await client.from('community_replies').select('thread_id').eq('id',replyId).eq('status','published').maybeSingle();if(location.error)throw new Error('That reply could not load.');if(location.data)id=location.data.thread_id;}
       const a=await client.from('community_threads').select('*').eq('id',id).eq('status','published').single();if(a.error)throw new Error('That conversation is unavailable.');thread=a.data;
       total=thread.visible_reply_count||0;if(latest)page=Math.max(0,Math.ceil(total/50)-1);
       if(replyId){
@@ -178,12 +182,12 @@ async function openThread(id,{page=0,replyId=null,latest=false}={}){
       }
       page=Math.min(page,Math.max(0,Math.ceil(total/50)-1));
       const b=await client.from('community_replies').select('*',{count:'exact'}).eq('thread_id',id).eq('status','published').order('created_at').order('id').range(page*50,page*50+49);if(b.error)throw new Error('The replies could not load.');replies=b.data;total=b.count||0;
-      const refs=[...new Set(replies.map(r=>r.reply_to_id).filter(Boolean))];if(refs.length){const q=await client.from('community_replies').select('id,body,author_name').eq('thread_id',id).eq('status','published').in('id',refs);for(const r of q.data||[])quoteReferences.set(r.id,r);}
+      const refs=[...new Set(replies.map(r=>r.reply_to_id).filter(Boolean))];if(refs.length){const q=await client.from('community_replies').select('id,body,author_name').eq('status','published').in('id',refs);for(const r of q.data||[])quoteReferences.set(r.id,r);}
     }
     if(!thread)throw new Error('That conversation is unavailable.');if(generation!==state.openGeneration)return;
-    state.thread=thread;state.replies=replies;state.replyPage=page;state.replyTotal=total;state.quoteReferences=quoteReferences;await profiles.load([thread.author_id,...replies.map(r=>r.author_id)]);if(generation!==state.openGeneration)return;
+    state.thread=thread;state.replies=replies;state.replyPage=page;state.replyTotal=total;state.quoteReferences=quoteReferences;await profiles.load([thread.author_id,...replies.map(r=>r.author_id)]);await powers.refreshOwn();await powers.loadHonors([thread.author_id,...replies.map(r=>r.author_id)]);if(generation!==state.openGeneration)return;
     showDialog(`<div class="thread-kicker">${esc(categories.get(thread.category)?.name||'Conversation')}${isPreview?'<span class="sample-label">SAMPLE</span>':''}</div><h2 id="content-title">${esc(thread.title)}</h2><div class="thread-meta">${profiles.author(thread.author_id,thread.author_name)}${thread.locked?'<span class="read-state">Closed to replies</span>':''}</div><div class="forum-post-context">${forum.metadata({...thread,author_kind:'member'})}</div>${siteLink(thread.site_id)}<div class="thread-detail-body">${forumBody(thread.body)}</div>${forum.signature(thread.author_id)}<div class="thread-detail-actions"><button class="text-button" data-share-thread="${esc(id)}">Copy topic link ↗</button>${thread.accepted_reply_id?`<button class="button-quiet" data-forum-jump="${esc(thread.accepted_reply_id)}">Jump to accepted answer ✓</button>`:''}<button class="text-button" data-report-thread="${esc(id)}">Report to Cowboy</button>${state.member?.role==='owner'?`<button class="text-button" data-pin-thread="${esc(id)}">${thread.pinned?'Unpin conversation':'Pin conversation'}</button><button class="text-button" data-lock-thread="${esc(id)}">${thread.locked?'Reopen conversation':'Close replies'}</button><button class="text-button danger-link" data-hide-thread="${esc(id)}">Hide conversation</button>`:''}</div><h3 class="replies-heading">The replies</h3>${forum.pager()}<div id="thread-replies">${replies.length?replies.map((reply,i)=>forum.replyHTML(reply,i)).join(''):'<p class="form-hint">There’s room for the first thoughtful reply.</p>'}</div>${total>50?forum.pager():''}${thread.locked?'<p class="form-hint">Cowboy has closed this conversation to new replies.</p>':canPost(state.member)?`<form class="reply-form" id="reply-form"><label class="field"><span>Add your voice</span><textarea name="body" minlength="2" maxlength="6000" placeholder="A useful reply goes a long way…" required></textarea></label><button class="button-primary button-small" type="submit">${isPreview?'Try a sample reply':'Post reply'} ↗</button></form>`:state.member?'<p class="form-hint">Your posting access must be approved before you can reply.</p>':'<p class="form-hint"><button class="text-button" data-auth="login">Log in</button> or <button class="text-button" data-auth="signup">join the community</button> to add your voice.</p>'}`);
-    await hub.decorateThread(thread,replies);forum.afterThread();
+    await hub.decorateThread(thread,replies);forum.afterThread();powers.decorateThread(thread,replies);
     if(replyId){const node=document.getElementById('reply-'+replyId);node?.scrollIntoView({block:'center'});node?.focus();}
   }catch(error){if(generation===state.openGeneration)toast(errorMessage(error));}
 }
@@ -200,7 +204,7 @@ function openReport(threadId,replyId=null){if(mustSignIn())return;showDialog(`<p
 function showGuidelines(){showDialog('<p class="eyebrow">A few good ground rules</p><h2 id="content-title">Good finds. Good company.</h2><ol class="guideline-list"><li><b>Be useful and kind.</b> Questions are welcome. Harassment, scams, impersonation and spam are not.</li><li><b>Give credit.</b> Link the original website or source. Be clear when something is your opinion or hasn’t been tested.</li><li><b>Keep private things private.</b> Never post passwords, access tokens, private contact details or someone else’s personal information.</li><li><b>Help the collection improve.</b> Report a broken link or a concern privately. A report asks for review; it does not automatically ban a member.</li><li><b>Know who is replying.</b> Edward is the automated moderator. He suggests tools from the recorded collection. Cowboy controls approvals and final moderation decisions.</li></ol><p class="privacy-notice">Guidelines version: '+RULES_VERSION+'. Posting requires verification of your own email and Cowboy’s approval.</p>');}
 function showPrivacy(){showDialog('<p class="eyebrow">Privacy & your account</p><h2 id="content-title">A public conversation.<br>A private email.</h2><div class="privacy-notice"><p>Your display name, conversations and published replies are public. Your email and password are handled by the authentication provider; passwords are never stored in forum posts or sent to Cowboy.</p><p>Supabase provides account authentication and community storage. Verification and reset emails go to your own address. Membership review and report notices go to the owner’s private mailbox through the configured mail sender.</p><p>Session credentials are managed by the authentication service. “Remember this device” keeps the session in this browser. Catalog favorites remain separate and stay in this browser. Board bookmarks, follows and reply notifications are private to your account. Unshared forum identity extras and reading preferences are stored separately from public profile data. Browser-local text drafts are scoped to your account and recoverable for 30 days; clear them on shared devices. Unread topic markers are saved on this browser. Reply locations use only a currently shared profile location with explicit author consent; no device or IP location is requested. A weekly email digest is off by default and requires an explicit preference; its unsubscribe link opens a confirmation. Helpful votes and poll choices are stored per approved member, while only aggregate counts are public. Community-tested notes are member experiences, not guarantees. Website counters record aggregate destination clicks, not unique visitors. They store no clicker email, account ID or IP address. Random event IDs are retained briefly to avoid duplicate counts; the counter has a short browser cooldown.</p><p>Membership records, private reports, rate-limit counters and an owner moderation log support the board. The on-site Edward assistant uses the public catalog and conversation text for fixed suggestions. The separate scheduled monitor can also check public questions and post disclosed automated replies. Public replies never include private mailbox or account information.</p><p>Request account deletion from My account. The request is sent for owner review; the site will not claim deletion is complete until it has been carried out. Public pages may be indexed or copied by others.</p><p>Registration is open. Verify your own email; Cowboy reviews posting access. Member profiles are private by default. If shared, your profile and chosen picture can be viewed publicly while your membership is approved. You can make your profile private again, but public copies or already-issued short-lived image links may persist briefly.</p></div>');}
 function showEdward(){showDialog('<p class="eyebrow">Your guide to the collection</p><h2 id="content-title">Edward, at your service.</h2><span class="moderator-badge">Automated moderator</span><p class="dialog-lead">Mention @Edward and a concrete task, or name a website from the toolbox. Edward matches your question against the recorded catalog and links relevant entries.</p><ul class="guideline-list"><li>His public replies use the site’s public catalog and public conversation context. Private records stay private.</li><li>He identifies himself as automated and doesn’t pretend to have tested a service.</li><li>Reports, approvals, suspensions and final moderation decisions belong to Cowboy.</li></ul><p class="privacy-notice">On-site catalog suggestions run when mentioned. The separate scheduled monitor also checks public conversations every 6 hours and may add helpful, disclosed replies. It does not run continuously.</p>');}
-const profiles=createProfileStudio({state,isPreview,client:()=>client,api,showDialog,toast,renderAccount,onSaved:()=>loadFeed()});
+const profiles=createProfileStudio({state,isPreview,client:()=>client,api,showDialog,toast,renderAccount,onSaved:()=>loadFeed(),onMemberShown:id=>powers.decorateMemberCard(id)});
 let coreMount=null,coreGeneration=0;
 const canOpenCore=()=>!isPreview&&configured&&!!client&&!state.recovery&&!state.passwordSetup&&
   state.member?.role==='owner'&&state.member?.status==='approved'&&
@@ -220,6 +224,7 @@ async function openCore(host){
 const ownerCenter=createOwnerCenter({state,isPreview,api,catalog:()=>catalog,confirm:confirmAction,toast,refreshAnnouncement,
   lab:()=>hub.ownerPanel(),canCore:canOpenCore,openCore,closeCore:clearCore});
 const hub=createCommunityLab({state,isPreview,client:()=>client,catalog:()=>catalog,categories:CATEGORIES,api,openAuth,showDialog,closeDialogs,toast,loadFeed,openThread,sampleID,demoThreads:()=>demoThreads});
+const powers=createPowerHouse({state,isPreview,client:()=>client,api,showDialog,toast,loadFeed,openThread,sampleID,demoThreads:()=>demoThreads,demoReplies:()=>demoReplies});
 const forum=createForum({state,isPreview,client:()=>client,profiles,api,showDialog,toast,renderFeed,loadFeed,openThread});
 function showProfile(){if(mustSignIn())return;return profiles.show();}
 async function showOwner(){if(state.member?.role!=='owner')return;try{await ownerCenter.show();}catch(error){toast(errorMessage(error));}}
@@ -230,8 +235,9 @@ async function refreshAnnouncement(){
 }
 async function openReviewLink(){const {member}=await api('review_link',{token:reviewToken});showDialog(`<p class="eyebrow">A request from your inbox</p><h2 id="content-title">A new voice at the table.</h2><p class="dialog-lead"><b>${esc(member.display_name)}</b> has verified their email and requested posting access. Opening this email link has not changed their account.</p><button class="button-primary" data-review-user="${esc(member.user_id)}" data-decision="approved" data-email-review>Approve posting access ↗</button> <button class="button-quiet" data-review-user="${esc(member.user_id)}" data-decision="declined" data-email-review>Decline</button><p class="privacy-notice">Your confirmed decision consumes this single-use review link.</p>`);}
 async function confirmAction(title,description,action){showDialog(`<p class="eyebrow">A deliberate decision</p><h2 id="content-title">${esc(title)}</h2><p class="dialog-lead">${esc(description)}</p><button class="button-primary" id="confirm-action">Confirm ↗</button> <button class="button-quiet" data-close>Cancel</button>`);$('confirm-action').addEventListener('click',async e=>{const button=e.currentTarget;button.disabled=true;try{await action();$('content-dialog').close();toast(isPreview?'Preview action completed. No real records changed.':'Your decision was saved.');await loadFeed();if(state.member?.role==='owner')await showOwner();}catch(error){formMessage($('dialog-content'),errorMessage(error));button.disabled=false;}});}
-function demoRole(role){state.member=role==='visitor'?null:{user_id:'99999999-9999-4999-8999-999999999999',display_name:role==='owner'?'Cowboy':'Example member',role:role==='owner'?'owner':'member',status:role==='pending'?'pending':'approved'};state.user=null;state.profile=role==='visitor'?null:{...PROFILE_DEFAULTS,user_id:state.member.user_id,display_name:state.member.display_name,headline:role==='owner'?'Collector of good finds. Keeper of good company.':'Making things. Finding things. Sharing the good ones.',bio:'A little curious about everything. Here to trade practical ideas and discover the small tools that make a big difference.',interests:['Making','Exploring','Good tools'],theme:role==='owner'?'forest':'copper',cover:'contours',avatar_mode:'icon',avatar_icon:role==='owner'?'compass':'hammer',published:true,account_active:role!=='pending',badge:role==='owner'?'Owner':null};$('owner-dashboard').hidden=true;renderFeed();}
+function demoRole(role){state.member=role==='visitor'?null:{user_id:'99999999-9999-4999-8999-999999999999',display_name:role==='owner'?'Cowboy':'Example member',role:role==='owner'?'owner':'member',status:role==='pending'?'pending':'approved'};state.user=null;state.profile=role==='visitor'?null:{...PROFILE_DEFAULTS,user_id:state.member.user_id,display_name:state.member.display_name,headline:role==='owner'?'Collector of good finds. Keeper of good company.':'Making things. Finding things. Sharing the good ones.',bio:'A little curious about everything. Here to trade practical ideas and discover the small tools that make a big difference.',interests:['Making','Exploring','Good tools'],theme:role==='owner'?'forest':'copper',cover:'contours',avatar_mode:'icon',avatar_icon:role==='owner'?'compass':'hammer',published:true,account_active:role!=='pending',badge:role==='owner'?'Owner':null};$('owner-dashboard').hidden=true;powers.refreshOwn(true).then(()=>renderFeed());}
 async function demoAction(action,payload){
+  if(action.startsWith('power_'))return powers.previewAPI(action,payload);
   if(action.startsWith('hub_'))return hub.previewAPI(action,payload);
   if(action==='bootstrap')return {member:state.member,profile:state.profile};
   if(action==='admin_overview')return {counts:{members:demoMembers.length+1,approved:demoMembers.filter(m=>m.status==='approved').length+1,pending:demoMembers.filter(m=>m.status==='pending').length,suspended:demoMembers.filter(m=>m.status==='suspended').length,threads:demoThreads.filter(t=>t.status==='published').length,replies:[...demoReplies.values()].flat().length,held:demoThreads.filter(t=>t.status==='held').length,reports:0,clicks:312,scheduled_replies:0,failed_notices:0},sites:catalog.map((s,i)=>({site_id:s.id,clicks:i<8?[86,63,49,37,28,23,17,9][i]:0,last_clicked_at:null})),daily:Array.from({length:14},(_,i)=>({day:new Date(Date.UTC(2026,9,11+i)).toISOString().slice(0,10),clicks:[8,15,11,23,18,31,24,19,34,27,22,21,29,30][i]})),audit:[],announcement:state.demoAnnouncement||{announcement_text:'',announcement_enabled:false},senderConfigured:true};
@@ -290,7 +296,7 @@ let searchTimer;
 $('community-search').addEventListener('input',event=>{state.search=event.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(()=>loadFeed(),250)});$('community-sort').addEventListener('change',event=>{state.sort=event.target.value;loadFeed()});$('preview-role').addEventListener('change',event=>demoRole(event.target.value));
 async function initialize(){
   try{const response=await fetch('catalog.json',{credentials:'omit'});if(!response.ok)throw new Error();const data=await response.json();catalog=Array.isArray(data.sites)?data.sites.map(s=>({...s,source_urls:s.sources.map(n=>data.videos.find(v=>v.number===n)?.url).filter(Boolean)})):[];}catch{catalog=[];}
-  if(isPreview){for(const thread of demoThreads){const answer=thread.status==='published'?edwardReply(thread,catalog):null;if(answer){demoReplies.set(thread.id,[{id:'sample-edward-'+thread.id,author_name:'Edward',author_kind:'edward',body:answer,created_at:thread.created_at}]);thread.reply_count=1;}}$('preview-banner').hidden=false;const role=['visitor','pending','member','owner'].includes(query.get('role'))?query.get('role'):'visitor';$('preview-role').value=role;demoRole(role);await loadFeed();}
+  if(isPreview){for(const thread of demoThreads){const answer=thread.status==='published'?edwardReply(thread,catalog):null;if(answer){demoReplies.set(thread.id,[{id:sampleID(),author_name:'Edward',author_kind:'edward',body:answer,created_at:thread.created_at}]);thread.reply_count=1;}}$('preview-banner').hidden=false;const role=['visitor','pending','member','owner'].includes(query.get('role'))?query.get('role'):'visitor';$('preview-role').value=role;demoRole(role);await loadFeed();}
   else if(configured){
     try{
       const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
@@ -305,6 +311,7 @@ async function initialize(){
   if(query.get('member'))await profiles.showMember(query.get('member'));
   if(isPreview&&query.get('panel')==='profile'&&state.member)await showProfile();
   if(isPreview&&query.get('panel')==='owner'&&state.member?.role==='owner')await showOwner();
+  if(query.get('panel')==='powers'&&state.member)await powers.show();
   if(query.get('privacy')==='1')showPrivacy();
   if(query.get('auth')==='login'||query.get('auth')==='signup')openAuth(query.get('auth'));
   if(fragment.has('error')||query.has('error'))openAuth('forgot','That email link could not be used. Request a new link and open it in this browser.');

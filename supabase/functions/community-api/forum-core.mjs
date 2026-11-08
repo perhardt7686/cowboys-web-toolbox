@@ -1,6 +1,6 @@
 import {escapeHTML as esc,renderBody,text} from './domain.mjs';
 
-export const DETAIL_DEFAULTS=Object.freeze({title:'',pronouns:'',occupation:'',status:'',signature:'',skills:[],favorite_tools:[],share_about:false,share_signature:false,reply_location:false,frame:'plain',layout:'classic',density:'comfortable',text_size:'standard',hide_signatures:false,reduce_motion:false});
+export const DETAIL_DEFAULTS=Object.freeze({title:'',pronouns:'',occupation:'',status:'',signature:'',skills:[],favorite_tools:[],share_about:false,share_signature:false,reply_location:false,frame:'plain',layout:'classic',density:'comfortable',text_size:'standard',hide_signatures:false,reduce_motion:false,accept_flair:true});
 export function validateDetails(value={}){
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Check your forum preferences.');
   const out={...DETAIL_DEFAULTS};
@@ -10,7 +10,7 @@ export function validateDetails(value={}){
     const list=value[key]??[];if(!Array.isArray(list)||list.length>max)throw new Error(`Choose up to ${max} ${key==='skills'?'skills':'favorite tools'}.`);
     out[key]=[...new Set(list.map(v=>text(v,length,0)).filter(Boolean))];
   }
-  for(const key of ['share_about','share_signature','reply_location','hide_signatures','reduce_motion']){if(value[key]!==undefined&&typeof value[key]!=='boolean')throw new Error('Check your privacy choices.');out[key]=value[key]??false;}
+  for(const key of ['share_about','share_signature','reply_location','hide_signatures','reduce_motion','accept_flair']){if(value[key]!==undefined&&typeof value[key]!=='boolean')throw new Error('Check your privacy choices.');out[key]=value[key]??DETAIL_DEFAULTS[key];}
   for(const [key,choices] of [['frame',['plain','ring','stamp']],['layout',['classic','showcase','minimal']],['density',['comfortable','compact']],['text_size',['standard','large']]]){
     out[key]=value[key]??DETAIL_DEFAULTS[key];if(!choices.includes(out[key]))throw new Error('Choose a valid forum appearance.');
   }

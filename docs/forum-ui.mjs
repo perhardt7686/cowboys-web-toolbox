@@ -1,5 +1,5 @@
 import {escapeHTML as esc,canPost} from './community-core.mjs';
-import {easternTime,timeHTML,replyLocation,forumBody,draftKey} from './forum-core.mjs';
+import {easternTime,timeHTML,replyLocation,forumBody,draftKey} from './forum-core.mjs?v=powers1';
 import {attachDraft} from './forum-drafts.mjs';
 
 export function createForum(ctx){
