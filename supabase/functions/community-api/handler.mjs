@@ -1,6 +1,7 @@
 import {text,displayName,validatePost,reviewContent,edwardReply,canPost,RULES_VERSION} from './domain.mjs';
 import {validateProfile} from './profile-domain.mjs';
 import {validateLabPost} from './lab-domain.mjs';
+import {handlePowerAction} from './powers-handler.mjs';
 import {handleLabAction,currentCatalog} from './lab-handler.mjs';
 
 export class HttpError extends Error {constructor(status,message){super(message);this.status=status}}
@@ -73,6 +74,7 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
     }
     const member=await getMember(user);
     if(!member)throw new HttpError(403,'Complete your membership request first.');
+    if(action.startsWith('power_'))return handlePowerAction({payload,user,member,db,verifiedOwner:isVerifiedOwner(user,ownerEmail),HttpError,claim});
     if(action==='resend_approval'){
       if(member.status!=='pending')throw new HttpError(409,'This account has already been reviewed.');
       await claim(`approval:${user.id}`,3600,1);
@@ -83,7 +85,7 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       const name=isVerifiedOwner(user,ownerEmail)?'Cowboy':displayName(payload.displayName);
       let profile=null;
       if(payload.profile!==undefined){try{
-        let input=payload.profile;if(input&&typeof input==='object'&&!Array.isArray(input)&&input.details===undefined){const prior=check(await db.from('community_profile_preferences').select('details').eq('user_id',user.id).maybeSingle());input={...input,details:prior?.details||{}};}
+        let input=payload.profile;if(input&&typeof input==='object'&&!Array.isArray(input)&&(input.details===undefined||input.details&&typeof input.details==='object'&&!Array.isArray(input.details))){const prior=check(await db.from('community_profile_preferences').select('details').eq('user_id',user.id).maybeSingle());input={...input,details:{...prior?.details,...input.details}};}
         profile=validateProfile(input,{userId:user.id,isOwner:isVerifiedOwner(user,ownerEmail)});}catch(error){throw new HttpError(400,error.message);}}
       if(profile?.published&&reviewContent(profile.headline+'\n'+profile.bio+'\n'+JSON.stringify(profile.details)).status==='held')throw new HttpError(400,'Please remove private credentials or link floods before sharing your profile.');
       const result=await db.rpc('community_save_profile',{p_user:user.id,p_name:name,p_profile:profile});
