@@ -1,5 +1,5 @@
 import {text,safeHttps} from './community-core.mjs';
-import {validateDetails} from './forum-core.mjs';
+import {validateDetails} from './forum-core.mjs?v=powers1';
 
 export const PROFILE_THEMES=[{id:'forest',name:'Woodland'},{id:'copper',name:'Copper'},{id:'ocean',name:'Ocean'},{id:'midnight',name:'Midnight'},{id:'sunrise',name:'Sunrise'},{id:'plum',name:'Wild plum'}];
 export const PROFILE_COVERS=[{id:'contours',name:'Trail lines'},{id:'dots',name:'Constellation'},{id:'sunburst',name:'Sunburst'},{id:'stripes',name:'Field notes'},{id:'plain',name:'Keep it simple'},{id:'circuit',name:'Circuit'}];
