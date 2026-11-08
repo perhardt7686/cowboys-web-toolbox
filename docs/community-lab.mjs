@@ -1,4 +1,6 @@
 import {escapeHTML as esc,canPost,safeHttps} from './community-core.mjs';
+import {attachDraft} from './forum-drafts.mjs';
+import {draftKey} from './forum-core.mjs';
 import {POST_KINDS,KIND_LABELS,OUTCOMES,SITE_CATEGORIES,validateLabPost,formatPostBody,additionToSite} from './lab-core.mjs';
 
 const $=id=>document.getElementById(id);
@@ -7,7 +9,7 @@ const area=(label,name,{max=800,required=false,placeholder=''}={})=>`<label clas
 const time=value=>{const d=new Date(value);return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:'America/New_York'}).format(d):'—';};
 export function createCommunityLab(ctx){
   let view='all',personal={choices:[],notifications:[],digestEnabled:false},personalAt=0,personalUser=null;
-  let draftKind='discussion',ownerData=null,demoReports=[],demoEditorial=[];
+  let composeDraft=null,draftKind='discussion',ownerData=null,demoReports=[],demoEditorial=[];
   const choices=()=>new Map(personal.choices.map(c=>[c.thread_id,c]));
   const signedIn=()=>{if(!ctx.state.member){ctx.openAuth('login');return false;}if(!canPost(ctx.state.member)){ctx.toast('Your email and posting access must be approved first.');return false;}return true;};
   const banner=()=>ctx.isPreview?'<p class="preview-message">DESIGN PREVIEW · Sample actions stay in this page. No posts, emails or account changes are made.</p>':'';
@@ -61,7 +63,7 @@ export function createCommunityLab(ctx){
   }
   function openComposer(kind='discussion'){
     if(!signedIn())return;draftKind=KIND_LABELS[kind]?kind:'discussion';if(draftKind==='challenge'&&ctx.state.member.role!=='owner')draftKind='project';
-    const chosen=ctx.state.site||'';ctx.showDialog(`<p class="eyebrow">A LITTLE KNOW-HOW GOES A LONG WAY</p><h2 id="content-title">${esc(KIND_LABELS[draftKind])}.</h2>${banner()}<form id="lab-composer"><label class="field"><span>Post format</span><select name="postKind" id="lab-post-kind">${POST_KINDS.filter(([id])=>id!=='challenge'||ctx.state.member.role==='owner').map(([id,label])=>`<option value="${id}" ${draftKind===id?'selected':''}>${label}</option>`).join('')}</select></label>${input('A clear title','title',{max:140,required:true,placeholder:'One task, one good question…'})}<div class="lab-two-fields"><label class="field"><span>Your corner</span><select name="category">${ctx.categories.map(c=>`<option value="${c.id}" ${(draftKind==='request'?c.id==='help':draftKind==='discovery'?c.id==='discoveries':draftKind==='project'?c.id==='creative':ctx.state.category===c.id)?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><label class="field"><span id="lab-site-label">A toolbox website ${draftKind==='review'?'':'· optional'}</span><select name="siteId" ${draftKind==='review'?'required':''}><option value="">A general conversation</option>${ctx.catalog().map(s=>`<option value="${esc(s.id)}" ${chosen===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label></div><div id="lab-compose-fields">${composerFields(draftKind)}</div><p class="privacy-notice">Public posts show your display name. Keep passwords and private information out. New conversations are followed automatically while you have room in your 200 saved/followed limit. Change this in the conversation.</p><button class="button-primary" type="submit">${ctx.isPreview?'Try a sample post':'Post to the board'} ↗</button><p class="form-message" id="lab-composer-message" role="status" hidden></p></form>`);
+    const chosen=ctx.state.site||'';ctx.showDialog(`<p class="eyebrow">A LITTLE KNOW-HOW GOES A LONG WAY</p><h2 id="content-title">${esc(KIND_LABELS[draftKind])}.</h2>${banner()}<form id="lab-composer"><label class="field"><span>Post format</span><select name="postKind" id="lab-post-kind">${POST_KINDS.filter(([id])=>id!=='challenge'||ctx.state.member.role==='owner').map(([id,label])=>`<option value="${id}" ${draftKind===id?'selected':''}>${label}</option>`).join('')}</select></label>${input('A clear title','title',{max:140,required:true,placeholder:'One task, one good question…'})}<div class="lab-two-fields"><label class="field"><span>Your corner</span><select name="category">${ctx.categories.map(c=>`<option value="${c.id}" ${(draftKind==='request'?c.id==='help':draftKind==='discovery'?c.id==='discoveries':draftKind==='project'?c.id==='creative':ctx.state.category===c.id)?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><label class="field"><span id="lab-site-label">A toolbox website ${draftKind==='review'?'':'· optional'}</span><select name="siteId" ${draftKind==='review'?'required':''}><option value="">A general conversation</option>${ctx.catalog().map(s=>`<option value="${esc(s.id)}" ${chosen===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></label></div><div id="lab-compose-fields">${composerFields(draftKind)}</div><p class="privacy-notice">Public posts show your display name. Keep passwords and private information out. New conversations are followed automatically while you have room in your 200 saved/followed limit. Change this in the conversation.</p><button class="button-primary" type="submit">${ctx.isPreview?'Try a sample post':'Post to the board'} ↗</button><p class="form-message" id="lab-composer-message" role="status" hidden></p></form>`);composeDraft=attachDraft($('lab-composer'),draftKey(ctx.state.member?.user_id,'topic',draftKind),{preview:ctx.isPreview,exclude:['postKind']});
   }
   async function submitComposer(form){
     const button=form.querySelector('[type=submit]');button.disabled=true;const message=$('lab-composer-message');message.hidden=true;
@@ -70,7 +72,7 @@ export function createCommunityLab(ctx){
       const extra=validateLabPost({postKind:kind,postData:data,siteId:values.siteId},ctx.catalog(),{isOwner:ctx.state.member.role==='owner'});
       const body=formatPostBody(kind,extra.post_data,values.body||'');
       const result=await ctx.api('create_thread',{title:values.title,category:values.category,siteId:values.siteId,body,postKind:kind,postData:extra.post_data});
-      personalAt=0;await ctx.loadFeed();if(result.thread.status==='held'){ctx.closeDialogs();ctx.toast('Saved privately for Cowboy’s review.');}else{await ctx.openThread(result.thread.id);ctx.toast(ctx.isPreview?'Sample post added to this preview.':'Your post is published.');}
+      composeDraft?.clear();personalAt=0;await ctx.loadFeed();if(result.thread.status==='held'){ctx.closeDialogs();ctx.toast('Saved privately for Cowboy’s review.');}else{await ctx.openThread(result.thread.id);ctx.toast(ctx.isPreview?'Sample post added to this preview.':'Your post is published.');}
     }catch(error){message.hidden=false;message.textContent=error.message;}finally{if(button.isConnected)button.disabled=false;}
   }
   async function decorateThread(thread,replies){
@@ -127,7 +129,7 @@ export function createCommunityLab(ctx){
     }
     return {};
   }
-  document.addEventListener('change',e=>{if(e.target.id==='lab-post-kind'){draftKind=e.target.value;$('content-title').textContent=KIND_LABELS[draftKind]+'.';$('lab-site-label').textContent='A toolbox website'+(draftKind==='review'?'':' · optional');$('lab-compose-fields').innerHTML=composerFields(draftKind);const select=$('lab-composer').elements.siteId;select.required=draftKind==='review';}});
+  document.addEventListener('change',e=>{if(e.target.id==='lab-post-kind'){composeDraft?.save();composeDraft?.destroy();draftKind=e.target.value;$('content-title').textContent=KIND_LABELS[draftKind]+'.';$('lab-site-label').textContent='A toolbox website'+(draftKind==='review'?'':' · optional');$('lab-compose-fields').innerHTML=composerFields(draftKind);const form=$('lab-composer'),select=form.elements.siteId;select.required=draftKind==='review';form.querySelector('.forum-draft')?.remove();composeDraft=attachDraft(form,draftKey(ctx.state.member?.user_id,'topic',draftKind),{preview:ctx.isPreview,exclude:['postKind']});}});
   document.addEventListener('submit',async e=>{
     const form=e.target;if(!['lab-composer','lab-digest-form','lab-site-report','lab-discovery-review'].includes(form.id))return;e.preventDefault();e.stopPropagation();
     if(form.id==='lab-composer'){await submitComposer(form);return;}const button=form.querySelector('[type=submit]');button.disabled=true;
