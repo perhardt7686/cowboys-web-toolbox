@@ -4,16 +4,24 @@ r=Path(__file__).parent
 d=json.loads((r/'docs/catalog.json').read_text())
 s=json.dumps(d,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 extras=runpy.run_path(str(r/'discovery-build.py'))['setup'](d)
+brand=runpy.run_path(str(r/'brand.py'))['apply_brand']
+for page in (r/'docs').glob('*.html'):
+    if page.name!='Cowboys-Web-Toolbox-Preview.html':
+        page.write_text(brand(page.read_text()))
 t=(r/'index.template.html').read_text().replace('__STARTER_PACKS__',extras['packs']).replace('__DISCOVERY_FILTERS__',extras['filters'])
 assert t.count('__CATALOG_DATA__')==1
 html=t.replace('__CATALOG_DATA__',s).replace('__SITE_TOTAL__',str(len(d['sites']))).replace('__TIP_TOTAL__',str(len(d['tips']))).replace('__VIDEO_TOTAL__',str(len(d['videos']))).replace('__SITE_TOTAL_PADDED__',str(len(d['sites'])).zfill(3)).replace('__COLLECTION_SCOPE__',d['scope'])
+html=brand(html)
 (r/'docs/index.html').write_text(html)
 standalone=html.replace('<link rel="stylesheet" href="style.css">','<style>'+(r/'docs/style.css').read_text()+'</style>')
 standalone=re.sub(r'<script src="app\.js\?v=[^\"]+" defer></script>',lambda _:'<script>'+(r/'docs/app.js').read_text()+'</script>',standalone)
 standalone=standalone.replace('<link rel="stylesheet" href="community-lab.css">','<style>'+(r/'docs/community-lab.css').read_text()+'</style>')
-icon='data:image/svg+xml;base64,'+base64.b64encode((r/'docs/favicon.svg').read_bytes()).decode()
+icon='data:image/png;base64,'+base64.b64encode((r/'docs/toolbox-favicon.png').read_bytes()).decode()
 standalone=standalone.replace('<script src="community-config.js" defer></script>','<script>'+(r/'docs/community-config.js').read_text()+'</script>')
-standalone=standalone.replace('href="favicon.svg"','href="'+icon+'"')
+standalone=standalone.replace('href="toolbox-favicon.png"','href="'+icon+'"')
+standalone=standalone.replace('<link rel="stylesheet" href="purple-night.css">','<style>'+(r/'docs/purple-night.css').read_text()+'</style>')
+standalone=standalone.replace('src="toolbox-mark.webp"','src="data:image/webp;base64,'+base64.b64encode((r/'docs/toolbox-mark.webp').read_bytes()).decode()+'"')
+standalone=standalone.replace('href="toolbox-touch.png"','href="data:image/png;base64,'+base64.b64encode((r/'docs/toolbox-touch.png').read_bytes()).decode()+'"')
 for name in ['discovery-core.js','discovery.js']:
     standalone=re.sub(r'<script src="'+re.escape(name)+r'(?:\?[^"]*)?" defer></script>',lambda _:'<script>'+(r/'docs'/name).read_text()+'</script>',standalone)
 standalone=standalone.replace('<link rel="stylesheet" href="discovery.css">','<style>'+(r/'docs/discovery.css').read_text()+'</style>')
