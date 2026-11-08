@@ -68,6 +68,7 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       const member=await ensureMember(user,payload);let notice=null;
       if(member.status==='pending')notice=await approvalEmail(member);
       const profile=check(await db.from('community_profiles').select('*').eq('user_id',user.id).maybeSingle());
+      if(profile){const prefs=check(await db.from('community_profile_preferences').select('details').eq('user_id',user.id).maybeSingle());if(prefs)profile.details=prefs.details;}
       return {member:{...member,role:isVerifiedOwner(user,ownerEmail)?'owner':'member'},profile,approvalEmailStatus:notice};
     }
     const member=await getMember(user);
@@ -81,8 +82,10 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       await claim(`profile:${user.id}`,60,6);
       const name=isVerifiedOwner(user,ownerEmail)?'Cowboy':displayName(payload.displayName);
       let profile=null;
-      if(payload.profile!==undefined){try{profile=validateProfile(payload.profile,{userId:user.id,isOwner:isVerifiedOwner(user,ownerEmail)});}catch(error){throw new HttpError(400,error.message);}}
-      if(profile?.published&&reviewContent(profile.headline+'\n'+profile.bio).status==='held')throw new HttpError(400,'Please remove private credentials or link floods before sharing your profile.');
+      if(payload.profile!==undefined){try{
+        let input=payload.profile;if(input&&typeof input==='object'&&!Array.isArray(input)&&input.details===undefined){const prior=check(await db.from('community_profile_preferences').select('details').eq('user_id',user.id).maybeSingle());input={...input,details:prior?.details||{}};}
+        profile=validateProfile(input,{userId:user.id,isOwner:isVerifiedOwner(user,ownerEmail)});}catch(error){throw new HttpError(400,error.message);}}
+      if(profile?.published&&reviewContent(profile.headline+'\n'+profile.bio+'\n'+JSON.stringify(profile.details)).status==='held')throw new HttpError(400,'Please remove private credentials or link floods before sharing your profile.');
       const result=await db.rpc('community_save_profile',{p_user:user.id,p_name:name,p_profile:profile});
       if(result.error?.code==='23505')throw new HttpError(409,'That profile handle is already in use. Choose another.');
       return {display_name:name,profile:check(result)};
@@ -104,12 +107,25 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       requirePosting(member);await claim(`reply:${user.id}`,30,1);await claim(`reply-day:${user.id}`,86400,40);
       const thread=await publicThread(payload.threadId);if(thread.locked)throw new HttpError(409,'This conversation is closed to new replies.');
       const body=text(payload.body,6000,2),review=reviewContent(body);
-      const reply=check(await db.from('community_replies').insert({thread_id:thread.id,author_id:user.id,author_name:member.display_name,author_kind:'member',body,status:review.status}).select().single());
+      const replyToId=payload.replyToId?uuid(payload.replyToId):null;
+      if(replyToId&&!check(await db.from('community_replies').select('id').eq('id',replyToId).eq('thread_id',thread.id).eq('status','published').maybeSingle()))throw new HttpError(400,'That quoted reply is unavailable. Remove the quote and try again.');
+      const reply=check(await db.from('community_replies').insert({thread_id:thread.id,reply_to_id:replyToId,author_id:user.id,author_name:member.display_name,author_kind:'member',body,status:review.status}).select().single());
       if(review.status==='held')await notifyOwner('A reply needs review',`A reply in “${thread.title}” was held.\n\nReview it in the owner dashboard: ${baseURL.href}`);
       else {
         const answer=edwardReply({title:'',body,site_id:thread.site_id},catalog);
         if(answer)check(await db.from('community_replies').insert({thread_id:thread.id,author_id:null,author_name:'Edward',author_kind:'edward',body:answer}));
       }
+      return {reply};
+    }
+    if(action==='edit_reply'){
+      requirePosting(member);await claim(`edit:${user.id}`,60,6);
+      const target=check(await db.from('community_replies').select('*').eq('id',uuid(payload.replyId)).eq('status','published').maybeSingle());
+      if(!target||target.author_kind!=='member')throw new HttpError(404,'That reply is unavailable.');
+      if(target.author_id!==user.id)requireOwner(user);
+      const thread=await publicThread(target.thread_id);if(thread.locked)throw new HttpError(409,'This conversation is closed to edits.');
+      const body=text(payload.body,6000,2),review=reviewContent(body);
+      const reply=check(await db.rpc('community_edit_reply',{p_actor:user.id,p_reply:target.id,p_body:body,p_status:review.status}));
+      if(review.status==='held')await notifyOwner('An edited reply needs review',`An edited reply was held for review. Review the owner dashboard: ${baseURL.href}`);
       return {reply};
     }
     if(action==='report'){
