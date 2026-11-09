@@ -89,10 +89,10 @@ export function createPowerHouse(ctx){
     if(k==='edit')return (currentTarget.targetKind==='thread'?field('Topic title','title',r.title,140):'')+area('Post text','body',r.body,6000);
     if(k==='note')return area('Editor’s note · appears beside the original text','note',e.note||'',500);
     if(k==='style')return '<div class="power-two-fields">'+select('Accent','accent',e.accent||'violet',POWER_COLORS.map(x=>[x,x]))+select('Post frame','frame',e.frame||'plain',POWER_FRAMES.map(x=>[x,x]))+'</div>';
-    if(k==='label')return field('Public ribbon · clear the text to remove','label',e.label||'',24);
+    if(k==='label')return field('Member ribbon · clear the text to remove','label',e.label||'',24);
     if(k==='organize')return field('Topic title','title',r.title,140)+select('Category','category',r.category,scopeOptions());
     if(['pin','close','spotlight'].includes(k))return select(k==='close'?'Reply state':k==='pin'?'Pin state':'Spotlight','enabled',k==='close'?String(!!r.locked):k==='pin'?String(!!r.pinned):String(!!r.featured),k==='close'?[['true','Pause new replies'],['false','Open replies']]:[['true','Enabled'],['false','Disabled']]);
-    if(k==='review')return '<p class="power-review-notice">The post will leave public view and enter the owner’s review queue. This is reversible. Only Cowboy can release held content.</p>';
+    if(k==='review')return '<p class="power-review-notice">The post will leave member view and enter the owner’s review queue. This is reversible. Only Cowboy can release held content.</p>';
     if(k==='answer')return select('Accepted answer','replyId',r.accepted_reply_id||'',[['','Clear the accepted answer'],...ctx.state.replies.filter(x=>x.author_kind!=='edward'&&x.author_id!==r.author_id).map(x=>[x.id,x.author_name+' · '+x.body.slice(0,75)])]);
     if(k==='honor')return field('Community title · optional','title',h.title||'',48)+field('Honor or ribbon · optional','badge',h.badge||'',32);
     if(k==='member_style')return select('Accent','accent',h.accent||'violet',POWER_COLORS.map(x=>[x,x]))+select('Flourish','aura',h.aura||'plain',POWER_AURAS.map(x=>[x,x]));
