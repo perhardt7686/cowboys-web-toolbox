@@ -7,6 +7,7 @@ import {createForum} from './forum-ui.mjs?v=powers1';
 import {timeHTML,forumBody} from './forum-core.mjs?v=powers1';
 import {createCommunityLab} from './community-lab.mjs?v=commons1';
 import {validateLabPost} from './lab-core.mjs';
+import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
 const $=id=>document.getElementById(id);
 const config=window.COWBOY_COMMUNITY_CONFIG||{enabled:false};
@@ -16,6 +17,7 @@ const registrationOpen=configured&&config.registrationOpen!==false;
 const categories=new Map(CATEGORIES.map(c=>[c.id,c]));
 const state={category:'all',search:'',sort:'active',site:query.get('site')||null,threads:[],member:null,user:null,replies:[],thread:null,offset:0,hasMore:false,loading:false,recovery:false,profile:null};
 let client=null,catalog=[],authView='login',reviewToken=null,queue=null,previewSequence=10;
+let recoveryStep=null,authStorage=null,authStorageKey='',authProblem='',resetCooldownUntil=0,authCooldownTimer=null;
 // In-memory sample IDs only; authorization tokens are generated on the server.
 const sampleID=()=>`00000000-0000-4000-8000-${String(++previewSequence).padStart(12,'0')}`;
 const fragment=new URLSearchParams(location.hash.slice(1));
@@ -36,6 +38,11 @@ function showDialog(html){$('content-dialog').classList.remove('profile-dialog',
 function closeDialogs(){document.querySelectorAll('dialog[open]').forEach(d=>d.close())}
 function formMessage(form,message,success=false){let target=form.querySelector('.form-message');if(!target){target=document.createElement('div');target.className='form-message';target.setAttribute('role','alert');form.prepend(target)}target.classList.toggle('success',success);target.textContent=message;}
 function errorMessage(error){return error instanceof Error?error.message:'Please try again in a moment.';}
+function paintResetCooldown(){
+  clearInterval(authCooldownTimer);const button=document.querySelector('#auth-form[data-view="forgot"] [type="submit"]');if(!button||!configured||isPreview)return;
+  const update=()=>{const remaining=Math.max(0,Math.ceil((resetCooldownUntil-Date.now())/1000));button.disabled=remaining>0;button.textContent=remaining?`Try again in ${remaining} seconds`:'Send a reset link ↗';if(!remaining)clearInterval(authCooldownTimer);};update();if(resetCooldownUntil>Date.now())authCooldownTimer=setInterval(update,1000);
+}
+function clearAuthCallback(){const url=new URL(location.href);for(const key of ['code','sb_flow_id','error','error_code','error_description'])url.searchParams.delete(key);url.hash='';history.replaceState(null,'',url.pathname+url.search);}
 function mustSignIn(){if(!state.member){openAuth('login');return true}return false}
 function publicURL(id){return `community.html?${isPreview?'preview=1&':''}thread=${encodeURIComponent(id)}`;}
 function siteLink(siteId){const site=catalog.find(s=>s.id===siteId);return site?`<a class="thread-site" href="./#explore" data-catalog="${esc(site.id)}">↗ In the collection: ${esc(site.name)}</a>`:'';}
@@ -92,16 +99,16 @@ function authFields(view){
   const disabled=!configured||isPreview||(view==='signup'&&!registrationOpen)?'disabled':'';
   const newPassword=['signup','reset','setup'].includes(view);
   const password=`<label class="field"><span>${['reset','setup'].includes(view)?'New password':'Password'}</span><span class="password-field"><input name="password" type="password" autocomplete="${newPassword?'new-password':'current-password'}" ${view==='login'?'':'minlength="15" maxlength="128"'} required ${disabled}><button type="button" data-show-password aria-label="Show password">Show</button></span>${newPassword?'<small>Use a memorable passphrase of at least 15 characters.</small>':''}</label>`;
-  if(['reset','setup'].includes(view))return password+'<button class="button-primary form-full" type="submit" '+disabled+'>Save new password ↗</button>';
+  if(['reset','setup'].includes(view))return password+`<label class="field"><span>Confirm new password</span><input name="confirmPassword" type="password" autocomplete="new-password" minlength="15" maxlength="128" required ${disabled}></label><button class="button-primary form-full" type="submit" ${disabled}>Save new password ↗</button>`;
   return (view==='signup'?`<label class="field"><span>Display name</span><input name="displayName" autocomplete="nickname" minlength="2" maxlength="36" placeholder="What should we call you?" required ${disabled}><small>Visible to the community. Your email stays private.</small></label>`:'')+`<label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" placeholder="you@example.com" required ${disabled}></label>`+(['forgot','resend'].includes(view)?'':password)+(view==='login'?'<div class="form-options"><label class="check-label"><input type="checkbox" name="remember">Remember this device</label><button type="button" class="text-button" data-auth="forgot">Forgot your password?</button></div>':'')+(view==='signup'?`<label class="check-label"><input name="rules" type="checkbox" required ${disabled}><span>I agree to the <button type="button" class="text-button" data-rules>community guidelines</button> and have read the <button type="button" class="text-button" data-privacy>account privacy notice</button>.</span></label>`:'')+`<button class="button-primary form-full" type="submit" ${disabled}>${view==='signup'?'Create my account':view==='forgot'?'Send a reset link':view==='resend'?'Resend verification':'Welcome back'} <span aria-hidden="true">↗</span></button>`;
 }
 function openAuth(view='login',message=''){
   authView=view;
   const states={
     check:{icon:'✉',title:'Check your inbox.',description:'If a new account can be created for that email, you’ll receive a verification link. Open it in the same browser you used to sign up. Cowboy reviews posting access after verification.'},
-    resetSent:{icon:'✉',title:'A fresh start.',description:'If an account exists for that address, a password-reset email will arrive. Open the newest email in this same browser. Reset links expire.'},
+    resetSent:{icon:'✉',title:'Check your newest email.',description:'If an account exists for that address, a reset email will arrive. Keep this page open. Open only the newest link in this same browser, then enter and confirm your new passphrase. Each link works once.'},
     pending:{icon:'◷',title:'Your seat is nearly ready.',description:'Your email is verified. Your posting request is awaiting Cowboy’s review. You can browse while you wait.'},
-    resetDone:{icon:'✓',title:'A fresh start, secured.',description:'Your password was updated and you’ve been signed out. Log in again with your new passphrase.'}
+    resetDone:{icon:'✓',title:'A fresh start, secured.',description:'Your password was updated. Log in with your new passphrase.'}
   };
   let html='';
   if(states[view]){const s=states[view];html=`<div class="state-symbol" aria-hidden="true">${s.icon}</div><h2 id="auth-title">${s.title}</h2><p class="auth-description">${s.description}</p>${view==='check'?'<button class="text-button" data-auth="resend">Resend verification email</button>':''}${view==='pending'?'<ol class="state-steps"><li>Verify your own email address.</li><li>Cowboy reviews your posting request.</li><li>Return here to check your membership status.</li></ol><button class="text-button" data-check-membership>Check status ↻</button> <button class="text-button" data-resend-approval>Remind Cowboy</button>':''}<button class="button-primary form-full" data-auth="login">Back to log in ↗</button><button class="text-button" data-close>Keep exploring</button>`;}
@@ -110,7 +117,7 @@ function openAuth(view='login',message=''){
     const description=view==='signup'?'A few details, one email check, and a little good company.':view==='forgot'?'We’ll email you a secure link to choose a new passphrase.':view==='resend'?'If your signup is still awaiting confirmation, we’ll send a new verification link.':view==='reset'?'Choose a new passphrase. You’ll sign in again after saving it.':view==='setup'?'Choose your own passphrase to finish your invitation. You’ll sign in again after saving it.':'Log in to pick up the conversation.';
     html=`<h2 id="auth-title">${title}</h2><p class="auth-description">${description}</p>${['login','signup'].includes(view)?`<div class="auth-tabs" role="tablist" aria-label="Account access"><button data-auth="login" role="tab" aria-selected="${view==='login'}">Log in</button><button data-auth="signup" role="tab" aria-selected="${view==='signup'}">Create an account</button></div>`:''}${isPreview?'<div class="preview-message">Design preview. Account fields are disabled; no credentials are collected. Use “Preview as” on the page to explore member and owner states.</div>':!configured?'<div class="preview-message">Membership opens soon. Registration and sign-in will be available when setup is complete.</div>':view==='signup'&&!registrationOpen?'<div class="preview-message">New accounts open after owner setup is complete.</div>':''}<form id="auth-form" data-view="${view}">${message?`<div class="form-message" role="alert">${esc(message)}</div>`:''}${authFields(view)}</form><p class="auth-footnote">${view==='signup'?'Verify your own email first. Cowboy approves posting access through his verified owner account.':['forgot','resend'].includes(view)?'<button class="text-button" data-auth="login">Back to log in</button>':'Your email is private. Your display name appears on your posts.'}</p>`;
   }
-  $('auth-content').innerHTML=html;const dialog=$('auth-dialog');if(!dialog.open)dialog.showModal();
+  $('auth-content').innerHTML=html;const dialog=$('auth-dialog');if(!dialog.open)dialog.showModal();paintResetCooldown();
 }
 async function api(action,payload={}){
   if(isPreview)return demoAction(action,payload);
@@ -123,6 +130,7 @@ async function api(action,payload={}){
 async function bootstrap(){
   if(!configured||isPreview||!client)return;
   const {data:{session}}=await client.auth.getSession();state.user=session?.user||null;
+  if(state.user&&(state.recovery||recoveryStep?.active(state.user.id))){state.recovery=true;ownerCenter.hide();state.member=null;state.profile=null;await powers.refreshOwn(true);renderFeed();if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset');return;}
   if(!state.user){ownerCenter.hide();state.member=null;state.profile=null;await powers.refreshOwn(true);renderFeed();return;}
   if(!state.user.email_confirmed_at){ownerCenter.hide();state.member=null;openAuth('check');return;}
   const result=await api('bootstrap',{displayName:state.user.user_metadata?.display_name,rulesVersion:state.user.user_metadata?.rules_version});
@@ -145,19 +153,21 @@ async function submitAuth(form){
     }else if(view==='resend'){
       const {error}=await client.auth.resend({type:'signup',email,options:{emailRedirectTo:redirectTo}});form.reset();if(error)throw new Error('We couldn’t request that email right now. Please try again shortly.');openAuth('check');
     }else if(view==='forgot'){
-      const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo});form.reset();if(error)throw new Error('We couldn’t request a reset right now. Please try again shortly.');openAuth('resetSent');
+      if(resetCooldownUntil>Date.now())throw new Error('Please wait for the countdown, then request one fresh link.');
+      const {error}=await requestPasswordReset(client.auth,email,redirectTo,authStorage,authStorageKey);if(error){const retry=resetRetrySeconds(error);if(retry)resetCooldownUntil=Date.now()+retry*1000;throw new Error(authErrorMessage(error,'forgot'));}resetCooldownUntil=Date.now()+60000;form.reset();openAuth('resetSent');
     }else if(view==='reset'||view==='setup'){
       if(view==='reset'&&!state.recovery)throw new Error('Open the newest password-reset email first.');
       if(view==='setup'&&!state.user)throw new Error('Open your newest invitation email first.');
       if(password.length<15||password.length>128)throw new Error('Use a passphrase of 15–128 characters.');
-      const {error}=await client.auth.updateUser({password});form.reset();if(error)throw new Error('That reset could not be completed. Open the newest reset email and try again.');
-      await client.auth.signOut({scope:'global'});state.recovery=false;state.passwordSetup=false;state.member=null;state.user=null;renderFeed();openAuth('resetDone');
+      if(password!==String(values.get('confirmPassword')||''))throw new Error('The two new passwords do not match. Enter the same passphrase in both fields.');
+      const {error}=await client.auth.updateUser({password});if(error)throw new Error(authErrorMessage(error,'reset'));form.reset();recoveryStep?.clear();
+      const {error:signoutError}=await client.auth.signOut({scope:'global'});state.recovery=false;state.passwordSetup=false;state.member=null;state.user=null;await powers.refreshOwn(true);renderFeed();openAuth('resetDone');if(signoutError)formMessage($('auth-content'),'Your password was saved, but signing out did not finish. Close this tab and log in with your new passphrase.');
     }else {
       try{localStorage.setItem('cowboy-community-remember',values.get('remember')?'yes':'no')}catch{}
       const {error}=await client.auth.signInWithPassword({email,password});form.reset();if(error)throw new Error('We couldn’t sign you in. Check your details or request a password reset.');
       await bootstrap();if(state.member?.status==='pending')openAuth('pending');else $('auth-dialog').close();
     }
-  }catch(error){formMessage(form,errorMessage(error));}finally{button.disabled=false;}
+  }catch(error){formMessage(form,errorMessage(error));}finally{if(button.isConnected)button.disabled=false;paintResetCooldown();}
 }
 function openComposer(){return hub.openComposer('discussion');}
 async function submitThread(form){const button=form.querySelector('[type=submit]');button.disabled=true;try{const values=Object.fromEntries(new FormData(form));validatePost(values,catalog);const {thread}=await api('create_thread',values);$('content-dialog').close();await loadFeed();if(thread.status==='held')toast('Saved for Cowboy’s review. It is not publicly visible.');else{await openThread(thread.id);toast(isPreview?'Sample conversation added for this preview only.':'Your conversation is posted.');}}catch(error){formMessage(form,errorMessage(error));}finally{button.disabled=false;}}
@@ -300,21 +310,29 @@ async function initialize(){
   else if(configured){
     try{
       const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
-      const sessionStore={getItem:key=>{try{return sessionStorage.getItem(key)||localStorage.getItem(key)}catch{return null}},setItem:(key,value)=>{try{const remember=localStorage.getItem('cowboy-community-remember')==='yes';(remember?localStorage:sessionStorage).setItem(key,value);(remember?sessionStorage:localStorage).removeItem(key)}catch{}},removeItem:key=>{try{sessionStorage.removeItem(key);localStorage.removeItem(key)}catch{}}};
-      client=createClient(config.supabaseUrl,config.publishableKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:sessionStore}});
-      client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||(session?.user?.id&&state.user?.id&&session.user.id!==state.user.id))ownerCenter.hide();if(event==='PASSWORD_RECOVERY'){state.recovery=true;setTimeout(()=>openAuth('reset'),0);}else setTimeout(()=>bootstrap().catch(error=>toast(errorMessage(error))),0);});
+      let local=null,session=null;try{local=window.localStorage}catch{}try{session=window.sessionStorage}catch{}
+      const sessionStore=createAuthStorage({local,session,remember:()=>{try{return local.getItem('cowboy-community-remember')==='yes'}catch{return false}}});
+      authStorage=sessionStore;authStorageKey=`sb-${new URL(config.supabaseUrl).hostname.split('.')[0]}-auth-token`;
+      recoveryStep=createRecoveryStep(session,`cowboy-recovery-step:${new URL(config.supabaseUrl).hostname}`);
+      client=createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:authStorageKey,flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:sessionStore}});
+      client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||(session?.user?.id&&state.user?.id&&session.user.id!==state.user.id))ownerCenter.hide();if(event==='SIGNED_OUT'){state.recovery=false;recoveryStep.clear();}if(event==='PASSWORD_RECOVERY'&&session?.user?.id){state.recovery=true;recoveryStep.mark(session.user.id);setTimeout(()=>{if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset')},0);}else setTimeout(()=>bootstrap().catch(error=>toast(errorMessage(error))),0);});
+      const {error:initError}=await client.auth.initialize();
+      if(initError||new URLSearchParams(location.search).has('code')){authProblem=authErrorMessage(initError,'callback');clearAuthCallback();}
       await bootstrap();await loadFeed();
     }catch{toast('The community could not connect. Please try again shortly.');renderFeed();}
   }else await loadFeed();
   await refreshAnnouncement();
   await hub.initialize();
+  if(authProblem){openAuth('forgot',authProblem);return;}
+  if(state.recovery){if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset');return;}
+  if(state.passwordSetup&&state.user){openAuth('setup');return;}
   if(query.get('member'))await profiles.showMember(query.get('member'));
   if(isPreview&&query.get('panel')==='profile'&&state.member)await showProfile();
   if(isPreview&&query.get('panel')==='owner'&&state.member?.role==='owner')await showOwner();
   if(query.get('panel')==='powers'&&state.member)await powers.show();
   if(query.get('privacy')==='1')showPrivacy();
   if(query.get('auth')==='login'||query.get('auth')==='signup')openAuth(query.get('auth'));
-  if(fragment.has('error')||query.has('error'))openAuth('forgot','That email link could not be used. Request a new link and open it in this browser.');
+  if(fragment.has('error')||query.has('error')){clearAuthCallback();openAuth('forgot',authErrorMessage(null,'callback'));}
   if(query.get('thread')&&(isPreview||configured))await openThread(query.get('thread'),{replyId:query.get('reply')});
   if(reviewToken&&!state.member)openAuth('login','Sign in with the verified owner email to review this request.');
 }
