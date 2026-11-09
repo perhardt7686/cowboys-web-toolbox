@@ -28,7 +28,7 @@ test('profile privacy, owner operations and anonymous aggregate clicks in Postgr
     const post=async(token,payload)=>{const r=await handler(new Request('https://backend.example/community-api',{method:'POST',headers:{Origin:'https://toolbox.example','Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(payload)}));return {status:r.status,data:await r.json()};};
     const setRole=async(role,id='')=>{await pg.exec('reset role');await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[id]);await pg.exec('set role '+role);};
     await t.test('profiles start private; members cannot inspect another private profile or write protected fields',async()=>{
-      await setRole('anon');assert.equal((await pg.query('select * from public.community_profiles')).rows.length,0);
+      await setRole('anon');await assert.rejects(()=>pg.query('select * from public.community_profiles'),e=>e.code==='42501');
       await setRole('authenticated',member);assert.deepEqual((await pg.query('select user_id from public.community_profiles')).rows.map(r=>r.user_id),[member]);
       await assert.rejects(()=>pg.query("update public.community_profiles set badge='Owner',published=true where user_id=$1",[member]));
       for(const fn of ["community_admin_overview('"+member+"')","community_record_click('excalidraw',gen_random_uuid())"])await assert.rejects(()=>pg.query('select public.'+fn));
@@ -41,12 +41,12 @@ test('profile privacy, owner operations and anonymous aggregate clicks in Postgr
       const foreign=await post('member',{action:'profile',displayName:'Maker',profile:{...profile,avatar_path:other+'/avatar.webp'}});assert.equal(foreign.status,400);
       assert.equal((await post('member',{action:'admin_overview'})).status,403);
     });
-    await t.test('private avatar policies enforce own paths; public pictures follow approved profile visibility',async()=>{
+    await t.test('private avatar policies enforce own paths; member pictures follow approved profile visibility',async()=>{
       await setRole('authenticated',member);await pg.query("insert into storage.objects(bucket_id,name) values('community-avatars',$1)",[member+'/avatar.webp']);
       await assert.rejects(()=>pg.query("insert into storage.objects(bucket_id,name) values('community-avatars',$1)",[other+'/avatar.webp']));
-      await setRole('anon');assert.equal((await pg.query('select name from storage.objects')).rows.length,1);assert.equal((await pg.query('select user_id from public.community_profiles')).rows[0].user_id,member);
+      await setRole('anon');assert.equal((await pg.query('select name from storage.objects')).rows.length,0);await setRole('authenticated',owner);assert.equal((await pg.query('select name from storage.objects')).rows.length,1);assert.equal((await pg.query('select user_id from public.community_profiles where user_id=$1',[member])).rows[0].user_id,member);
       await setRole('service_role');const suspended=await post('owner',{action:'admin_bulk',userIds:[owner,member],status:'suspended',confirm:true});assert.equal(suspended.status,200);assert.equal(suspended.data.updated,1);assert.equal((await pg.query('select status from public.community_members where user_id=$1',[owner])).rows[0].status,'approved');
-      await setRole('anon');assert.equal((await pg.query('select * from public.community_profiles')).rows.length,0);assert.equal((await pg.query('select * from storage.objects')).rows.length,0);
+      await setRole('anon');await assert.rejects(()=>pg.query('select * from public.community_profiles'),e=>e.code==='42501');assert.equal((await pg.query('select * from storage.objects')).rows.length,0);
       await setRole('authenticated',member);assert.equal((await pg.query('select name from storage.objects')).rows.length,1,'member can manage their own private picture');
       await setRole('service_role');
     });
@@ -56,7 +56,7 @@ test('profile privacy, owner operations and anonymous aggregate clicks in Postgr
       assert.equal((await post('owner',{action:'moderate',kind:'pin',id:other,pinned:true,confirm:true})).status,404);
       const result=await post('owner',{action:'announcement',text:'Welcome to the Commons.',enabled:true,confirm:true});assert.equal(result.status,200);
       const filtered=await post('owner',{action:'admin_members',search:'public',status:'suspended',offset:0});assert.equal(filtered.status,200);assert.equal(filtered.data.total,1);assert.equal(filtered.data.members[0].user_id,member);assert.equal(filtered.data.members[0].email,undefined);
-      await setRole('anon');assert.equal((await pg.query('select announcement_text from public.community_settings')).rows[0].announcement_text,'Welcome to the Commons.');await setRole('service_role');
+      await setRole('authenticated',owner);assert.equal((await pg.query('select announcement_text from public.community_settings')).rows[0].announcement_text,'Welcome to the Commons.');await setRole('service_role');
       const mail=await post('owner',{action:'owner_test_mail',confirm:true,to:'attacker@example.com'});assert.equal(mail.data.emailSent,true);assert.equal(sent[0].to,'owner@example.com');assert.equal((await post('owner',{action:'owner_test_mail',confirm:true})).status,429);
       const overview=await post('owner',{action:'admin_overview'});assert.equal(overview.status,200,JSON.stringify(overview));assert.equal(overview.data.daily.length,14);assert.equal(overview.data.sites.length,94);assert.ok(overview.data.audit.some(a=>a.action==='announcement.updated'));assert.equal(overview.data.senderConfigured,true);
     });

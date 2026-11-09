@@ -55,7 +55,7 @@ test('community lab transactions, privacy, permissions and subscriber-only progr
       request=await create('maker','request',{goal:'Make a clear room plan',device:'Windows / Firefox',role:'owner'});
       assert.equal(request.post_data.role,undefined);assert.equal(request.post_kind,'request');
       assert.equal((await pg.query('select following from public.community_choices where thread_id=$1',[request.id])).rows[0].following,true);
-      assert.equal((await mutate('pending','following',{threadId:request.id,enabled:true})).status,400);
+      assert.equal((await mutate('pending','following',{threadId:request.id,enabled:true})).status,403);
       assert.equal((await post('maker',{action:'hub_owner',kind:'overview'})).status,403);
     });
     await t.test('helpful votes are idempotent, self-votes fail, choices and saved threads are private',async()=>{
@@ -101,17 +101,17 @@ test('community lab transactions, privacy, permissions and subscriber-only progr
       assert.equal((await post('owner',payload)).status,400);
       const r=await post('owner',{...payload,confirm:true});assert.equal(r.status,200,JSON.stringify(r));addedID=r.data.siteId;
       assert.match(addedID,/^find-/);assert.equal((await pg.query('select credit_name from public.community_catalog_additions where id=$1',[addedID])).rows[0].credit_name,'maker');
-      await as('anon');assert.equal((await pg.query('select count(*) n from public.community_catalog_additions')).rows[0].n,1);await assert.rejects(()=>pg.query('insert into public.community_catalog_additions(id) values(\'fake\')'));await as('service_role');
+      await as('anon');assert.equal((await pg.query('select count(*) n from public.community_catalog_public')).rows[0].n,1);await assert.rejects(()=>pg.query('insert into public.community_catalog_additions(id) values(\'fake\')'));await as('service_role');
       const activity=createActivityHandler({db,catalog,allowedOrigins:['https://toolbox.example']});const click=await activity(new Request('https://api.example/activity',{method:'POST',headers:{Origin:'https://toolbox.example','Content-Type':'application/json'},body:JSON.stringify({siteId:addedID,eventId:crypto.randomUUID()})}));assert.equal(click.status,200);assert.equal((await click.json()).clicks,1);
       assert.equal((await pg.query('select thread_count from public.community_site_activity where site_id=$1',[addedID])).rows[0].thread_count,1);
       await pg.query("update public.community_threads set status='hidden' where id=$1",[discovery.id]);
       assert.equal((await pg.query('select published from public.community_catalog_additions where id=$1',[addedID])).rows[0].published,false);
-      await as('anon');assert.equal((await pg.query('select count(*) n from public.community_catalog_additions')).rows[0].n,0);await as('service_role');
+      await as('anon');assert.equal((await pg.query('select count(*) n from public.community_catalog_public')).rows[0].n,0);await as('service_role');
       await pg.query("update public.community_threads set status='published' where id=$1",[discovery.id]);
       const republish=await post('owner',{...payload,confirm:true,data:{...payload.data,name:'Useful Example Updated',description:'An updated practical description after owner review.'}});assert.equal(republish.status,200,JSON.stringify(republish));
       assert.equal((await pg.query('select name from public.community_catalog_additions where id=$1',[addedID])).rows[0].name,'Useful Example Updated');
       assert.equal((await post('owner',{...payload,confirm:true,data:{threadId:discovery.id,status:'needs-check'}})).status,200);
-      await as('anon');assert.equal((await pg.query('select count(*) n from public.community_catalog_additions')).rows[0].n,0);await as('service_role');
+      await as('anon');assert.equal((await pg.query('select count(*) n from public.community_catalog_public')).rows[0].n,0);await as('service_role');
     });
     await t.test('featured project badges are cosmetic and cannot be granted by members',async()=>{
       project=await create('maker','project',{goal:'Make a practical project plan',tools:['excalidraw'],steps:'Sketch the idea and arrange the important parts.',result:'A useful plan to share with the team.',tip:'Keep the first version simple.'});
