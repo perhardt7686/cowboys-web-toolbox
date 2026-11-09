@@ -92,7 +92,7 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       if(result.error?.code==='23505')throw new HttpError(409,'That profile handle is already in use. Choose another.');
       return {display_name:name,profile:check(result)};
     }
-    if(action.startsWith('hub_')){if(action==='hub_owner')requireOwner(user);return handleLabAction({payload,user,member,db,catalog,notifyOwner});}
+    if(action.startsWith('hub_')){requirePosting(member);if(action==='hub_owner')requireOwner(user);return handleLabAction({payload,user,member,db,catalog,notifyOwner});}
     if(action==='create_thread'){
       requirePosting(member);await claim(`thread:${user.id}`,60,1);await claim(`thread-day:${user.id}`,86400,10);
       const available=await currentCatalog(db,catalog);const post={...validatePost(payload,available),...validateLabPost(payload,available,{isOwner:isVerifiedOwner(user,ownerEmail)})};const review=reviewContent(post.title+'\n'+post.body+'\n'+JSON.stringify(post.post_data));
@@ -131,7 +131,7 @@ export function createCommunityHandler({db,auth,sendMail,catalog,ownerEmail,site
       return {reply};
     }
     if(action==='report'){
-      if(member.status==='suspended')throw new HttpError(403,'This account is suspended.');
+      requirePosting(member);
       await claim(`report:${user.id}`,3600,3);const thread=await publicThread(payload.threadId);
       const reason=payload.reason;if(!['spam','privacy','abuse','broken-link','other'].includes(reason))throw new HttpError(400,'Choose a report reason.');
       const replyId=payload.replyId?uuid(payload.replyId):null;
