@@ -340,6 +340,7 @@ async function initialize(){
   if(authProblem){openAuth('forgot',authProblem);return;}
   if(state.recovery){if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset');return;}
   if(state.passwordSetup&&state.user){openAuth('setup');return;}
+  if(fragment.has('error')||query.has('error')){clearAuthCallback();openAuth('forgot',authErrorMessage(null,'callback'));return;}
   if(!canReadBoard(state.member)){renderFeed();if(query.get('privacy')==='1')showPrivacy();if(['login','signup'].includes(query.get('auth')))openAuth(query.get('auth'));if(reviewToken&&!state.member)openAuth('login','Sign in with the owner account to review this request.');return;}
   if(query.get('member'))await profiles.showMember(query.get('member'));
   if(isPreview&&query.get('panel')==='profile'&&state.member)await showProfile();
@@ -347,7 +348,7 @@ async function initialize(){
   if(query.get('panel')==='powers'&&state.member)await powers.show();
   if(query.get('privacy')==='1')showPrivacy();
   if(query.get('auth')==='login'||query.get('auth')==='signup')openAuth(query.get('auth'));
-  if(fragment.has('error')||query.has('error')){clearAuthCallback();openAuth('forgot',authErrorMessage(null,'callback'));}
+
   if(query.get('thread')&&(isPreview||configured))await openThread(query.get('thread'),{replyId:query.get('reply')});
   if(reviewToken&&!state.member)openAuth('login','Sign in with the verified owner email to review this request.');
 }
