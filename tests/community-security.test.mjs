@@ -80,12 +80,12 @@ test('community authorization and privacy boundaries in Postgres',async t=>{
     await pg.exec('reset role');
     await pg.query("insert into public.community_threads(id,author_id,author_name,title,body,category,status) values ($1,$2,'Example member','Public conversation','A useful public conversation.','help','published'),($3,$2,'Example member','Private conversation','A useful hidden conversation.','help','hidden')",[publishedID,memberID,hiddenID]);
     await pg.query("insert into public.community_replies(thread_id,author_name,body) values ($1,'Example member','Public reply'),($2,'Example member','Hidden parent reply')",[publishedID,hiddenID]);
-    await t.test('anonymous readers see only published threads and replies under published parents; direct browser writes are denied',async()=>{
-      await pg.exec('set role anon');
+    await t.test('anonymous reads are denied; approved readers see only published content and cannot write directly',async()=>{
+      await pg.exec('set role anon');await assert.rejects(()=>pg.query('select * from public.community_threads'),e=>e.code==='42501');await pg.exec('reset role');await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[memberID]);await pg.exec('set role authenticated');
       assert.deepEqual((await pg.query('select id from public.community_threads')).rows.map(r=>r.id),[publishedID]);
       assert.equal((await pg.query('select body from public.community_replies')).rows[0].body,'Public reply');
       assert.equal((await pg.query('select count(*)::int as n from public.community_replies')).rows[0].n,1);
-      for(const table of ['community_members','community_reports','community_approvals','community_audit','community_rate_limits','community_deletion_requests'])await assert.rejects(()=>pg.query('select * from public.'+table));
+      await pg.exec('set role anon');for(const table of ['community_members','community_reports','community_approvals','community_audit','community_rate_limits','community_deletion_requests'])await assert.rejects(()=>pg.query('select * from public.'+table));
       await assert.rejects(()=>pg.query("insert into public.community_members(user_id,display_name,rules_version,status,role) values ($1,'Fake owner','2026-10-23','approved','owner')",[otherID]));
       await assert.rejects(()=>pg.query("select public.community_review_member($1,$2,'approved',null)",[ownerID,otherID]));
       await assert.rejects(()=>pg.query("select public.community_claim_action('bypass',1,100)"));

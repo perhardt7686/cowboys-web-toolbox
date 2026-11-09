@@ -257,12 +257,12 @@ void loadClickCounts();
 async function loadCommunityInsights(){
   if(!activityConfig.enabled)return;
   const read=async table=>{const r=await fetch(activityConfig.supabaseUrl+'/rest/v1/'+table+'?select=*',{headers:{apikey:activityConfig.publishableKey},credentials:'omit',referrerPolicy:'no-referrer'});if(!r.ok)throw new Error();return r.json();};
-  const results=await Promise.allSettled([read('community_site_activity'),read('community_catalog_additions')]);
+  const results=await Promise.allSettled([Promise.resolve([]),read('community_catalog_public')]);
   if(results[0].status==='fulfilled')for(const row of results[0].value)if(typeof row.site_id==='string')communityStats.set(row.site_id,row);
   let added=false;
   if(results[1].status==='fulfilled')for(const row of results[1].value){
     if(!row.published||sitesById.has(row.id)||!/^find-[a-f0-9-]+$/.test(row.id)||href(row.url)==='#'||!categories.includes(row.category))continue;
-    const site={id:row.id,name:row.name,url:row.url,category:row.category,description:row.description,origin:'community',sources:[],monogram:row.name.slice(0,2).toUpperCase(),accessLabel:row.access_label,sourceThreadId:row.source_thread_id,evidence:'A discovery reviewed and published by Cowboy.'+(row.credit_name?' Found by '+row.credit_name+'.':''),destinationCheck:{status:'owner_reviewed_community_find',checkedDate:row.checked_at,notes:'Published after owner review. Member experiences and access details can change.'}};
+    const site={id:row.id,name:row.name,url:row.url,category:row.category,description:row.description,origin:'community',sources:[],monogram:row.name.slice(0,2).toUpperCase(),accessLabel:row.access_label,evidence:'A website listing reviewed and published by Cowboy. Member conversations stay inside the boards.',destinationCheck:{status:'owner_reviewed_community_find',checkedDate:row.checked_at,notes:'Published after owner review. Member experiences and access details can change.'}};
     DATA.sites.push(site);sitesById.set(site.id,site);added=true;
   }
   if(added){document.querySelectorAll('[data-site-total]').forEach(n=>n.textContent=DATA.sites.length);renderCategories();renderTopics();render();await loadClickCounts();}

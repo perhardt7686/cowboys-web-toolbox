@@ -1,5 +1,7 @@
 # The Commons: accounts and community
 
+Current access policy (November 9, 2026): the message board requires approved membership to read or post. This supersedes historical public-read descriptions below. The website collection remains public. See the Members-only board section for the deployed policy and its limits.
+
 ## Community Lab release
 
 The catalog now has94 base destinations, with25 independent web finds clearly distinguished from69 video discoveries. Official source and access/check notes remain visible; product workflows were not comprehensively tested. Runtime owner-approved community discoveries can extend the collection, including source threads and counters.
@@ -130,3 +132,12 @@ The pinned SDK's exact redirect mode also uses a legacy handshake key. A rejecte
 Successful authenticated recovery takes priority over ordinary membership screens, offers new-password confirmation, and resumes for up to 15 minutes after a same-tab reload using account-bound UI state. It does not grant authentication or authority. Unusable/expired/cross-browser callbacks lead to actionable instructions and remove stale callback parameters. A successful password update is reported separately from any sign-out failure. Passwords and callback secrets are never logged or added to records.
 
 Validation: 78 automated tests pass, including the actual pinned Supabase SDK through a fictional recovery request, a throttled resend, cross-tab code exchange, the PASSWORD_RECOVERY event, and tab-local session storage. Additional checks cover handshake expiry, storage failure, legacy migration, remember-device behavior, recovery-step account/expiry bounds and safe error messages. All Edge checks and catalog preservation checks pass. The browser fixture uses fictional Auth responses and sends no real email; it displays both password fields and resumes the recovery form after reload. The real account holder must privately complete the final reset and sign-in. No live password, account status, mail configuration or backend authorization was changed by this repair.
+
+
+## Members-only board — November 9, 2026
+
+This policy supersedes earlier descriptions of public discussion and public profiles. Reading topics, replies, search results, shared profiles, member honors, announcements, polls, notifications and board activity requires a currently approved membership. Anonymous table SELECT access and search execution are revoked. Restrictive RLS checks the protected membership row on each read, so a pending, declined, suspended or unrelated authenticated account cannot read board content. The service-backed hub and report actions enforce the same approval rule. Shared avatars require approved viewer access; an account may still manage its own private avatar. Previously issued signed image URLs may survive for their existing five-minute expiry.
+
+The browser hides private surfaces before startup, shows login or approval status, skips private queries while blocked, clears content on sign-out and invalidates in-flight topic loads. Local fictional design fixtures are restricted to localhost; production preview parameters cannot unlock the boards. Password recovery remains available. Search engines receive noindex/nofollow/noarchive. Existing public copies cannot be recalled.
+
+The 421-site collection stays public. Owner-approved additions expose only separate website metadata in community_catalog_public, without source thread IDs, member credits or conversation excerpts. A source listing being hidden or withdrawn retracts the projection. Public catalog pages no longer request board activity or last topic titles. The owner review form identifies which website information will become public. Existing ranks and grants are preserved.
