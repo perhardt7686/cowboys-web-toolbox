@@ -1,0 +1,41 @@
+name: Repair and activate Coco message board
+on:
+  push:
+    paths:
+      - .github/workflows/coco-board-repair.yml
+permissions:
+  contents: write
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair member-only avatar loader and board links
+        run: |
+          python3 -c '
+          from pathlib import Path
+          import html
+          js = Path("docs/community-coco.mjs")
+          source = js.read_text(encoding="utf-8")
+          assert source.count("&lt;") == 2, "Unexpected avatar script"
+          js.write_text(html.unescape(source), encoding="utf-8")
+          page = Path("docs/community.html")
+          content = page.read_text(encoding="utf-8")
+          quote = chr(34)
+          assert "class="+quote+"community-page"+quote in content, "Not the message board"
+          assert "community-coco.css" not in content, "Already active"
+          anchor = "toolbox-touch.png"+quote+chr(62)
+          assert content.count(anchor) == 1, "Board anchor changed"
+          css = chr(60)+"link rel="+quote+"stylesheet"+quote+" href="+quote+"community-coco.css?v=autumn2"+quote+chr(62)
+          script = chr(60)+"script type="+quote+"module"+quote+" src="+quote+"community-coco.mjs?v=autumn2"+quote+chr(62)+chr(60)+"/script"+chr(62)
+          page.write_text(content.replace(anchor,anchor+css+script,1), encoding="utf-8")
+          '
+      - name: Validate and commit only board files
+        run: |
+          node --check docs/community-coco.mjs
+          git diff --check
+          git config user.name github-actions-bot
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/community-coco.mjs docs/community.html
+          git diff --cached --quiet || (git commit -m 'Activate Coco board-only theme and avatars' && git push origin HEAD:main)
