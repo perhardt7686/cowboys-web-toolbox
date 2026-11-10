@@ -3,7 +3,7 @@
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
-  const safeImage=s=>typeof s==='string'&&/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(s)&&s.length&lt;60000;
+  const safeImage=s=>typeof s==='string'&&/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(s)&&s.length<60000;
   const cast=[['coco','Coco'],['ana','Ana'],['tyler','Tyler · Wizard'],['elliot','Elliot'],['emma','Emma'],['erica','Erica'],['eloy','Eloy'],['evi','Evi']];
   let client=null,fetching=false,loaded=false,lastChecked=0,currentUserId=null,timer=0;
   const pictures=new Map(),identities=new Map();
@@ -51,7 +51,7 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
     const board=document.getElementById('conversations');
     if(!board||board.hidden){if(loaded)clear();return;}
     if(loaded){update();return;}
-    if(Date.now()-lastChecked&lt;3000)return;
+    if(Date.now()-lastChecked<3000)return;
     fetching=true;lastChecked=Date.now();
     try{
       const {data:{session}}=await client.auth.getSession();
