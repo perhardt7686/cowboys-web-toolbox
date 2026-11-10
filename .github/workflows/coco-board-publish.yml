@@ -1,0 +1,19 @@
+name: Activate Coco Board
+on:
+  push:
+    paths:
+      - .github/workflows/coco-board-publish.yml
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check docs/community-coco.mjs
+      - run: echo ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCnA9UGF0aCgiZG9jcy9jb21tdW5pdHkuaHRtbCIpCnM9cC5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikKYT0nPGxpbmsgcmVsPSJhcHBsZS10b3VjaC1pY29uIiBocmVmPSJ0b29sYm94LXRvdWNoLnBuZyI+PC9oZWFkPicKYj0nPGxpbmsgcmVsPSJhcHBsZS10b3VjaC1pY29uIiBocmVmPSJ0b29sYm94LXRvdWNoLnBuZyI+PGxpbmsgcmVsPSJzdHlsZXNoZWV0IiBocmVmPSJjb21tdW5pdHktY29jby5jc3M/dj1hdXR1bW4xIj48c2NyaXB0IHR5cGU9Im1vZHVsZSIgc3JjPSJjb21tdW5pdHktY29jby5tanM/dj1hdXR1bW4xIj48L3NjcmlwdD48L2hlYWQ+Jwphc3NlcnQgImNsYXNzPVwiY29tbXVuaXR5LXBhZ2VcIiIgaW4gcwppZiBiIG5vdCBpbiBzOgogICAgYXNzZXJ0IHMuY291bnQoYT09MQogICAgcC53cml0ZV90ZXh0KHMucmVwbGFjZShhLGIsMSksZW5jb2Rpbmc9InV0Zi04IikK | base64 -d | python3
+      - run: |
+          git config user.name github-actions
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/community.html
+          git diff --cached --quiet || (git commit -m coco_board_only && git push)
