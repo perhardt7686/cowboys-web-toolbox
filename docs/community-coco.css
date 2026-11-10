@@ -1,0 +1,104 @@
+/* Coco's Autumn Commons · message board ONLY.
+   Scoped to body.community-page. Toolbox, Core, index and global assets are untouched.
+   Approved-member artwork is loaded separately from protected Supabase data. */
+body.community-page {
+  color-scheme: light;
+  --paper:#fff3df; --white:#fffdf6; --ink:#39254e; --muted:#67566c;
+  --line:#dfb997; --forest:#562c68; --raised:#fff8ec;
+  --lime:#f7d66c; --clay:#ef8c42; --purple:#783b91;
+  --purple-light:#e5c8eb; --gold:#ffc956; --warm:#ffe0ab;
+  --coco-teal:#147c83; --coco-orange:#e47e30;
+  background:radial-gradient(circle at 8% 15%,#fee9ba 0 0,transparent 26%),radial-gradient(circle at 92% 38%,#d8f4e5 0 0,transparent 30%),#fff3df;
+  color:var(--ink);
+}
+body.community-page::selection{background:#f4ba55;color:#332047}
+body.community-page :is(a,button,summary,input,textarea,select):focus-visible{outline:3px solid #107d86;outline-offset:3px}
+body.community-page .masthead{background:#462252f7;border-bottom:4px solid #eea541;box-shadow:0 9px 26px #4f2a4d22}
+body.community-page .masthead .brand,body.community-page .masthead nav a,body.community-page .masthead .brand-sub{color:#fff3d7}
+body.community-page .masthead nav a.nav-board{background:#f5b343;color:#3b214f;border:2px solid #ffe1a2;border-radius:14px;box-shadow:0 4px 0 #a65439;font-weight:800;transform:rotate(-1deg)}
+body.community-page .masthead nav a.nav-board:hover{background:#ffe184;color:#38204b}
+body.community-page .eyebrow{color:#763b89}
+body.community-page .eyebrow>span{background:#e89438}
+body.community-page .community-hero{position:relative;padding-top:55px;padding-bottom:54px;gap:clamp(28px,5vw,80px)}
+body.community-page .community-hero::before{content:'✿';position:absolute;left:calc(50% - 90px);top:12px;color:#e68c39;font-size:40px;transform:rotate(-17deg);pointer-events:none}
+body.community-page .community-hero h1{color:#4a245e;text-shadow:1px 2px 0 #ffdfa9;font-weight:650}
+body.community-page .community-hero h1 em{color:#10838c}
+body.community-page .community-intro{color:#5d4c62}
+body.community-page .hero-secondary{color:#683478;font-weight:700}
+body.community-page .welcome-art{background:linear-gradient(145deg,#b8ebdc,#89d6e7 53%,#fff0ba);border:4px solid #e99b38;border-radius:26px;box-shadow:9px 10px 0 #54296422;isolation:isolate}
+body.community-page .welcome-art::before{content:'';position:absolute;inset:auto 7% 5% 7%;height:58%;z-index:3;background-image:var(--coco-van-image,none);background-repeat:no-repeat;background-position:center bottom;background-size:contain;pointer-events:none;filter:drop-shadow(0 8px 8px #385e5f33)}
+body.community-page .welcome-art::after{content:'✿';position:absolute;top:-16px;right:17px;z-index:4;font-size:75px;line-height:1;color:#f69f38;text-shadow:4px 5px 0 #fdcf73;pointer-events:none}
+body.community-page .art-margin,body.community-page .welcome-footer{color:#4e3667;font-weight:800}
+body.community-page .welcome-footer{z-index:4;background:#fff4d5c9;padding:4px 10px;border-radius:20px;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.community-page .conversation-note{background:#fff9ef;border:2px solid #d58d4e;box-shadow:5px 8px 0 #f6bc64bb;color:#472653;border-radius:17px}
+body.community-page .note-front{background:#ffe2b6;transform:rotate(5deg)}
+body.community-page .conversation-note p{color:#462653}
+body.community-page .note-initial{background:#57bdba;color:#142f3f;border:1px solid #168a91}
+body.community-page .welcome-star{color:#e68d2c}
+body.community-page .button-primary,body.community-page #hero-new,body.community-page #new-thread{background:linear-gradient(145deg,#f4a546,#f1cb68);color:#392143;border:2px solid #ac6c36;border-radius:13px;font-weight:800;box-shadow:0 4px 0 #9a5a38;transition:transform .16s,filter .16s,box-shadow .16s}
+body.community-page .button-primary:hover,body.community-page #hero-new:hover,body.community-page #new-thread:hover{background:#ffe18c;color:#332047;transform:translateY(-1px);box-shadow:0 5px 0 #9a5a38}
+body.community-page .button-primary:active{transform:translateY(3px);box-shadow:0 1px 0 #9a5a38}
+body.community-page .button-quiet{background:#fff5e4;color:#61346b;border:1.5px solid #dcb17a;border-radius:12px}
+body.community-page .button-quiet:hover{background:#fff0cd;color:#4c205c;border-color:#b87335}
+body.community-page .text-button,body.community-page .guidelines-link,body.community-page .hero-secondary{color:#754080}
+body.community-page .community-layout{border-top:2px dashed #dba36b}
+body.community-page .community-heading h2,body.community-page .community-bottom p{color:#4d285c}
+body.community-page .community-categories button{background:#fffaf2;border:1px solid transparent;border-radius:12px;color:#604869}
+body.community-page .community-categories button:hover{background:#ffe8bc;border-color:#e8b25c}
+body.community-page .community-categories button[aria-pressed=true]{background:#f6c967;color:#382049;border:2px solid #aa713a;box-shadow:0 3px 0 #cca261}
+body.community-page .category-icon{color:#247f89}
+body.community-page .edward-card{background:linear-gradient(160deg,#e2f5e5,#fef0c1);border:2px solid #77b9b0;border-radius:20px;box-shadow:5px 7px 0 #76b6ab33}
+body.community-page .edward-avatar{background:#643376;color:#fff3db;border:3px solid #f5b544}
+body.community-page .edward-avatar span{background:#ffe8bb;color:#583272}
+body.community-page .edward-card p,body.community-page .edward-card .small-note{color:#4f5260}
+body.community-page .moderator-badge{background:#ffd67e;border-color:#b27b43;color:#50305a}
+body.community-page .thread-card{background:#fffdfa;border:2px solid #eac497;border-radius:20px;box-shadow:5px 6px 0 #e2b48e45}
+body.community-page .thread-card:hover{border-color:#d88b37;transform:translateY(-1px)}
+body.community-page .thread-card h3,body.community-page .thread-title{color:#562a65}
+body.community-page .thread-excerpt{color:#61556a}
+body.community-page .thread-kicker,body.community-page .thread-age,body.community-page .forum-last-reply{color:#7c586f}
+body.community-page .thread-kicker .category-dot{background:#e18f32}
+body.community-page .community-search,body.community-page .community-sort select,body.community-page :is(input:not([type='checkbox']):not([type='radio']),select,textarea){background:#fffef9;border:1.5px solid #d1a68c;color:#392b4e;border-radius:12px}
+body.community-page :is(input,textarea)::placeholder{color:#877b87}
+body.community-page select option{background:#fffaf1;color:#392b4e}
+body.community-page :is(input[type='checkbox'],input[type='radio']){accent-color:#7c4296}
+body.community-page .forum-toolbar,body.community-page .forum-post{border-color:#dcaa85}
+body.community-page .forum-toolbar [aria-pressed=true],body.community-page .forum-editor-tools [aria-pressed=true]{background:#5d3676;color:#fff0d3;border-color:#c58a45}
+body.community-page .forum-unread,body.community-page .forum-post-number{color:#83488d}
+body.community-page .forum-last-reply time,body.community-page .forum-post-context{color:#67536a}
+body.community-page .forum-quote,body.community-page .forum-reply-preview{background:#fff0d2;border-color:#d69c5c;color:#51375d}
+body.community-page .reply-body,body.community-page .thread-detail-body,body.community-page .forum-reply-preview{color:#4f425b}
+body.community-page .forum-member{background:#fffaf0;color:#4b285b;border:2px solid #e3b98a;border-radius:18px}
+body.community-page .forum-member:hover{background:#fff0d7;border-color:#d28b3d}
+body.community-page .forum-member small{color:#6e596c}
+body.community-page .forum-directory{gap:15px}
+body.community-page .account-menu>summary{border:2px solid #dfb26e;background:#fff5df;color:#4d285a}
+body.community-page .account-dropdown{background:#fff8eb;border:2px solid #e5b476;color:#4d2e5d}
+body.community-page .account-dropdown button:hover{background:#ffe3ad}
+body.community-page .content-dialog,body.community-page .auth-dialog{background:#fffbf2;color:#412651;border:3px solid #efbe78;border-radius:22px;box-shadow:0 30px 85px #39234d44}
+body.community-page .auth-aside{background:linear-gradient(135deg,#94e0d4,#fce3a1)}
+body.community-page .auth-aside>p,body.community-page .content-dialog h2{color:#462658}
+body.community-page .auth-aside>p em{color:#0b7d85}
+body.community-page .studio-tabs button[aria-selected=true],body.community-page .theme-choices [aria-pressed=true]{background:#673477;color:#fff5df}
+body.community-page .profile-avatar{border:2px solid #eeb455;box-shadow:0 2px 0 #6e426e}
+body.community-page .profile-avatar img{width:100%;height:100%;object-fit:cover}
+body.community-page .member-card{border:2px solid #dcb17e;background:#fff9e9;border-radius:18px;color:#4c3459}
+body.community-page .profile-cover{background-color:#7a3d8d}
+body.community-page .profile-interests span{border-radius:20px}
+body.community-page .footer{border-color:#e8c497;color:#634b69}
+body.community-page .footer a{color:#5b336c}
+body.community-page .toast{background:#482557;color:#fff6df;border:2px solid #ffc65c}
+body.community-page .coco-cast-strip{display:flex;gap:8px;justify-content:center;align-items:center;margin:12px 0 0;flex-wrap:wrap}
+body.community-page .coco-cast-strip figure{margin:0;display:grid;justify-items:center;gap:4px;min-width:60px}
+body.community-page .coco-cast-strip img{width:58px;height:58px;object-fit:cover;border-radius:50%;border:3px solid #f0af4f;background:#ffdfad}
+body.community-page .coco-cast-strip figcaption{font-size:10px;color:#583965;font-weight:700}
+@media(max-width:700px){
+ body.community-page .community-hero{gap:20px;padding-top:37px}
+ body.community-page .community-hero h1{font-size:clamp(56px,14vw,74px)}
+ body.community-page .welcome-art{min-height:245px}
+ body.community-page .welcome-art::before{height:51%}
+ body.community-page .welcome-art::after{font-size:51px}
+ body.community-page .thread-card{padding:18px}
+ body.community-page .forum-directory{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){body.community-page .button-primary,body.community-page .thread-card{transition:none!important;transform:none!important}}
