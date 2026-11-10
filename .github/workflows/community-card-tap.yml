@@ -1,0 +1,78 @@
+name: Improve Commons post tap targets
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/community-card-tap.yml
+permissions:
+  contents: write
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Upgrade only the message board post cards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          js = Path('docs/community.js')
+          css = Path('docs/community-coco.css')
+          source = js.read_text(encoding='utf-8')
+          rules = [
+              ('rows.map(t=>`<article class="thread-card">',
+               'rows.map(t=>`<article class="thread-card" data-thread-card="${esc(t.id)}">'),
+              ('<button class="thread-title" data-thread="${esc(t.id)}">',
+               '<button class="thread-title" data-thread="${esc(t.id)}" aria-label="Open post: ${esc(t.title)}">'),
+              ('${siteLink(t.site_id)}<div class="thread-bottom">',
+               '${siteLink(t.site_id)}<span class="thread-open-cue" aria-hidden="true"><span>👆 Tap anywhere to open</span><span class="thread-open-arrow">→</span></span><div class="thread-bottom">'),
+              ("document.addEventListener('click',async event=>{\n  const target=event.target.closest('button,a');if(!target)return;\n  try{",
+               """document.addEventListener('click',async event=>{
+            // Tapping any non-control part of a card opens its post.
+            const card=event.target instanceof Element?event.target.closest('#community-feed .thread-card[data-thread-card]'):null;
+            const control=event.target instanceof Element?event.target.closest('button,a,input,select,textarea,summary,[role="button"],[role="link"],[contenteditable]'):null;
+            if(card&&!control){
+              try{if(!window.getSelection()?.toString().trim())await openThread(card.dataset.threadCard);}
+              catch(error){toast(errorMessage(error));}
+              return;
+            }
+            const target=event.target.closest('button,a');if(!target)return;
+            try{"""),
+          ]
+          if 'data-thread-card="${esc(t.id)}"' in source:
+              print('Post cards already upgraded; keeping existing JS')
+          else:
+              for original, replacement in rules:
+                  assert source.count(original) == 1, 'Unexpected Commons JS layout: refusing unsafe replacement'
+                  source = source.replace(original, replacement, 1)
+              js.write_text(source, encoding='utf-8')
+          original_css = css.read_text(encoding='utf-8')
+          marker = '/* Commons accessible whole-card tap targets */'
+          if marker not in original_css:
+              style = '''
+          /* Commons accessible whole-card tap targets */
+          body.community-page #community-feed .thread-card[data-thread-card]{cursor:pointer;border:2px solid #c58c57;transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+          body.community-page #community-feed .thread-card[data-thread-card]:is(:hover,:focus-within){background:#fff3df;border-color:#107d86;box-shadow:0 0 0 3px #107d8626,5px 6px 0 #e2b48e45}
+          body.community-page #community-feed .thread-card[data-thread-card]:active{background:#ffdfb4;transform:translateY(1px)}
+          body.community-page #community-feed .thread-card[data-thread-card] .thread-title{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+          body.community-page #community-feed .thread-open-cue{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;width:max-content;max-width:100%;padding:9px 14px;margin:0 0 16px;background:#136d77;border:2px solid #0b5963;border-radius:13px;box-shadow:0 3px 0 #093d45;color:#fffcf4;font:800 16px/1.35 system-ui,sans-serif}
+          body.community-page #community-feed .thread-open-arrow{font-size:24px;line-height:1}
+          body.community-page #community-feed .thread-card[data-thread-card]:focus-within .thread-open-cue{background:#542b67;border-color:#542b67}
+          @media(max-width:700px){body.community-page #community-feed .thread-open-cue{width:100%}}
+          @media(prefers-reduced-motion:reduce){body.community-page #community-feed .thread-card[data-thread-card]{transition:none;transform:none}}
+          '''
+              css.write_text(original_css + '\n' + style, encoding='utf-8')
+          print('Commons child-friendly tap-target changes staged')
+          PY
+      - name: Validate JavaScript and patch
+        run: |
+          node --check docs/community.js
+          git diff --check
+      - name: Publish board-only changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/community.js docs/community-coco.css
+          git diff --cached --quiet || (git commit -m 'Make Commons post cards easy to open on mobile' && git push origin HEAD:main)
