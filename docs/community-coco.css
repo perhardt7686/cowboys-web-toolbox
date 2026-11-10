@@ -102,3 +102,15 @@ body.community-page .coco-cast-strip figcaption{font-size:10px;color:#583965;fon
  body.community-page .forum-directory{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){body.community-page .button-primary,body.community-page .thread-card{transition:none!important;transform:none!important}}
+
+
+/* Commons accessible whole-card tap targets */
+body.community-page #community-feed .thread-card[data-thread-card]{cursor:pointer;border:2px solid #c58c57;transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+body.community-page #community-feed .thread-card[data-thread-card]:is(:hover,:focus-within){background:#fff3df;border-color:#107d86;box-shadow:0 0 0 3px #107d8626,5px 6px 0 #e2b48e45}
+body.community-page #community-feed .thread-card[data-thread-card]:active{background:#ffdfb4;transform:translateY(1px)}
+body.community-page #community-feed .thread-card[data-thread-card] .thread-title{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+body.community-page #community-feed .thread-open-cue{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;width:max-content;max-width:100%;padding:9px 14px;margin:0 0 16px;background:#136d77;border:2px solid #0b5963;border-radius:13px;box-shadow:0 3px 0 #093d45;color:#fffcf4;font:800 16px/1.35 system-ui,sans-serif}
+body.community-page #community-feed .thread-open-arrow{font-size:24px;line-height:1}
+body.community-page #community-feed .thread-card[data-thread-card]:focus-within .thread-open-cue{background:#542b67;border-color:#542b67}
+@media(max-width:700px){body.community-page #community-feed .thread-open-cue{width:100%}}
+@media(prefers-reduced-motion:reduce){body.community-page #community-feed .thread-card[data-thread-card]{transition:none;transform:none}}
