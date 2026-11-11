@@ -1,0 +1,85 @@
+name: Install Mahjong Carved-Tile Facelift
+on:
+  push:
+    paths:
+      - '.github/workflows/install-mahjong-carved-tiles.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: mahjong-carved-facelift
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Patch Mahjong visuals without changing gameplay
+        shell: python
+        run: |
+          from pathlib import Path
+          css = Path('docs/commons-mahjong.css')
+          js = Path('docs/commons-mahjong.mjs')
+          html = Path('docs/community.html')
+          assert css.exists() and js.exists() and html.exists(), 'Mahjong source files missing'
+          style = r'''
+          /* Carved Mahjong facelift v5. Original game rules unchanged. */
+          body.community-page .mahjong-game-zone{border:6px solid #a36e43;border-radius:27px;padding:clamp(8px,2vw,18px);background:radial-gradient(ellipse at 50% -30%,#4b9684,transparent 65%),linear-gradient(145deg,#135547,#083e39 70%,#102f3a);box-shadow:inset 0 0 0 3px #edcb88,inset 0 0 0 8px #2c443f,inset 0 0 40px #061e22,0 10px 0 #4e2d46,0 21px 32px #21152940}
+          body.community-page .mahjong-hud{padding:9px 12px 14px;text-shadow:0 1px 2px #071b25;font-size:clamp(12px,2.6vw,15px)}
+          body.community-page .mahjong-board-wrap{max-width:720px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-inline:contain;scrollbar-color:#e3bd75 #183a3a;scrollbar-width:thin;border:3px solid #cda86a;border-radius:18px;box-shadow:0 10px 26px #052b2db0}
+          body.community-page .mahjong-board{max-width:none!important;min-width:560px;border-radius:14px;background:radial-gradient(ellipse at 50% 35%,#41887865,transparent 68%),repeating-linear-gradient(112deg,#fff8cd08 0 1px,transparent 1px 8px),linear-gradient(145deg,#0b554d,#053932);box-shadow:inset 0 0 0 5px #122f2e,inset 0 0 28px #001e25}
+          body.community-page .mahjong-board:before{content:'✥';font-size:100px;bottom:1px;color:#e9be6430}
+          body.community-page .mahjong-tile{border:2px solid #fffaf0;border-right:6px solid #5b637e;border-bottom:7px solid #36465f;border-radius:12px;background:linear-gradient(125deg,#fffef5,#f6e9cc 53%,#dac9a8);box-shadow:inset 1px 1px 1px #fff,inset -3px -3px 6px #9c916c60,0 3px 0 #182f42,3px 8px 10px #001b2c90;transition:filter .14s,box-shadow .14s,outline-color .14s}
+          body.community-page .mahjong-tile:before{content:'';position:absolute;inset:4px 6px 8px 4px;border:1px solid #cab58a;border-radius:7px;pointer-events:none;box-shadow:inset 0 1px #fff8e7}
+          body.community-page .mahjong-tile .mahjong-glyph{position:relative;z-index:1;font-family:Georgia,'Times New Roman','Apple Color Emoji','Segoe UI Emoji',serif;font-size:clamp(28px,calc(var(--mahjong-size,61px)*.68),48px);font-weight:900;line-height:1;text-shadow:0 2px 0 #fff6e0,1px 3px 2px #30210d55}
+          body.community-page .mahjong-tile .mahjong-mini{z-index:2;top:5px;right:8px;font-size:clamp(10px,calc(var(--mahjong-size,61px)*.19),15px);font-weight:900;color:#946631;text-shadow:0 1px #fffbf0}
+          body.community-page .mahjong-variant-sun{background:linear-gradient(130deg,#fff7e5,#f6dfb0 66%,#c9a574)}
+          body.community-page .mahjong-variant-flower{background:linear-gradient(130deg,#fffefa,#ebf2e6 62%,#aebfae)}
+          body.community-page .mahjong-free:hover{filter:brightness(1.08);box-shadow:inset 1px 1px 1px #fff,0 3px 0 #182f42,3px 8px 10px #001b2c90,0 0 0 2px #f4dca2}
+          body.community-page .mahjong-blocked{filter:brightness(.68) saturate(.7);cursor:not-allowed}
+          body.community-page .mahjong-selected{outline:4px solid #ffda6b;outline-offset:2px;filter:brightness(1.16);box-shadow:0 0 0 6px #eda6426b,0 5px 12px #032121}
+          body.community-page .mahjong-hinted{outline:4px solid #89ffdf;outline-offset:2px;filter:brightness(1.18)}
+          body.community-page .mahjong-pan-help{margin:0 0 10px;text-align:center;font:800 12px/1.4 system-ui,sans-serif;color:#f6e6b5}
+          body.community-page .mahjong-actions button{border:2px solid #b18f60;border-radius:12px;background:linear-gradient(#533968,#302142);box-shadow:0 4px 0 #122b29,0 8px 14px #031e1b65}
+          body.community-page .mahjong-actions button:active{transform:translateY(2px);box-shadow:0 2px 0 #122b29}
+          @media(max-width:720px){body.community-page .mahjong-board-wrap{max-width:100%}body.community-page .mahjong-game-zone{padding:8px}body.community-page .mahjong-board{min-width:560px}}
+          @media(min-width:721px){body.community-page .mahjong-board{min-width:670px}}
+          @media(prefers-reduced-motion:reduce){body.community-page .mahjong-tile{transition:none}}
+          '''
+          original = css.read_text()
+          if 'Carved Mahjong facelift v5' not in original:
+              css.write_text(original + '\n' + style)
+          code = js.read_text()
+          old = 'const width=Math.max(260,el.clientWidth||360);const size=Math.min(66,Math.max(27,Math.floor((width-22)/8.55)));'
+          new = 'const width=Math.max(560,el.clientWidth||560);const size=Math.min(74,Math.max(58,Math.floor((width-24)/8.55)));'
+          assert old in code or new in code, 'Mahjong layout implementation changed; manual review required'
+          code = code.replace(old,new)
+          old_wrap = '<div id="mahjong-board-wrap" class="mahjong-board-wrap">'
+          new_wrap = '<p class="mahjong-pan-help">Large carved tiles · Swipe sideways to explore the board on your phone</p>' + old_wrap
+          assert old_wrap in code, 'Mahjong board wrapper missing'
+          code = code.replace(old_wrap,new_wrap) if 'Large carved tiles · Swipe sideways' not in code else code
+          js.write_text(code)
+          page = html.read_text()
+          assert 'commons-mahjong.css' in page and 'commons-mahjong.mjs' in page, 'Mahjong assets not referenced'
+          import re
+          page = re.sub(r'commons-mahjong\.css\?v=[a-zA-Z0-9]+','commons-mahjong.css?v=facelift5',page)
+          page = re.sub(r'commons-mahjong\.mjs\?v=[a-zA-Z0-9]+','commons-mahjong.mjs?v=facelift5',page)
+          html.write_text(page)
+          assert 'Carved Mahjong facelift v5' in css.read_text()
+          assert 'Math.max(560' in js.read_text()
+          assert 'facelift5' in html.read_text()
+      - name: Validate source
+        run: |
+          node --check docs/commons-mahjong.mjs
+          npm test --if-present
+      - name: Commit installer results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-mahjong.css docs/commons-mahjong.mjs docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Facelift Mahjong with larger carved tiles and a richer board"
+            git push
+          fi
