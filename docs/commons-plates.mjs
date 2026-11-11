@@ -26,7 +26,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     <p class="plate-hint">Research links search public plate designs and possible meanings, not the registered owner's identity. Only Ana and Cowboy can view these photos in the game.</p></div>`;
   main.prepend(root);
   $('plate-game-open').addEventListener('click',()=>{expanded=!expanded;$('plate-game-content').hidden=!expanded;$('plate-game-open').setAttribute('aria-expanded',String(expanded));if(expanded){refresh();$('plate-game-content').scrollIntoView({block:'nearest',behavior:'smooth'});}});
-  $('plate-new').addEventListener('submit',post);
+  $('plate-new').addEventListener('submit',post);$('plate-submit').before($('plate-status'));$('plate-photo').addEventListener('change',()=>{const f=$('plate-photo').files?.[0];if(f)setStatus(`Photo selected (${(f.size/1048576).toFixed(1)} MB). Add the guess and tap Post challenge.`);});
   $('plate-refresh').addEventListener('click',()=>refresh());
  }
  function scores(){
@@ -108,30 +108,39 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  async function vote(id,up,reason){await action(()=>client.rpc('community_plate_vote',{p_id:id,p_up:up,p_reason:reason}));}
  async function revise(id,guess,response){await action(()=>client.rpc('community_plate_revise',{p_id:id,p_guess:guess,p_response:response}));}
  async function compress(file){
-  if(!file.type.startsWith('image/'))throw Error('Please select a photo.');
-  if(file.size>12000000)throw Error('Choose a photo under 12 MB.');
-  const tmp=URL.createObjectURL(file);
+  if(!file || !(file.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name))) throw Error('Choose a camera photo or an image from Photos.');
+  if(file.size > 35*1024*1024) throw Error('This file is over 35 MB. Choose the regular photo instead of ProRAW, or send a screenshot.');
+  const src=URL.createObjectURL(file);
   try{
-   const image=new Image();image.src=tmp;await image.decode();
-   let maxDim=1350,blob;
-   for(const [width,q] of [[1350,.78],[1100,.68],[850,.58]]){
-    maxDim=width;const ratio=Math.min(1,maxDim/Math.max(image.naturalWidth,image.naturalHeight));
-    const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.naturalWidth*ratio));canvas.height=Math.max(1,Math.round(image.naturalHeight*ratio));
-    const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0,canvas.width,canvas.height);
-    blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',q));
-    if(blob?.size&&blob.size<1000000)break;
+   const image=new Image();
+   await new Promise((resolve,reject)=>{
+    image.onload=()=>image.naturalWidth?resolve():reject(Error('Photo could not be decoded.'));
+    image.onerror=()=>reject(Error('This image format could not be opened. In Photos, take a screenshot and upload that instead.'));
+    image.src=src;
+    if(image.complete&&image.naturalWidth)resolve();
+   });
+   for(const [maxDim,quality] of [[1700,.84],[1450,.81],[1200,.76],[1000,.72],[800,.68]]){
+    const ratio=Math.min(1,maxDim/Math.max(image.naturalWidth,image.naturalHeight));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(image.naturalWidth*ratio));
+    canvas.height=Math.max(1,Math.round(image.naturalHeight*ratio));
+    const ctx=canvas.getContext('2d');
+    if(!ctx)throw Error('Photo processing is not available in this browser.');
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(image,0,0,canvas.width,canvas.height);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
+    if(blob?.type==='image/jpeg'&&blob.size>0&&blob.size<=2000000)return blob;
    }
-   if(!blob||blob.size>1000000)throw Error('This photo is too detailed; try a tighter crop.');
-   return blob;
-  }finally{URL.revokeObjectURL(tmp);}
+   throw Error('The photo could not be reduced below 2 MB. Please crop around the plate or take a screenshot.');
+  } finally{URL.revokeObjectURL(src);}
  }
  async function post(ev){
   ev.preventDefault();if(!client||working)return;
   const file=$('plate-photo').files?.[0];if(!file){setStatus('Choose a photo first.');return;}
   working=true;let path=null;$('plate-submit').disabled=true;setStatus('Resizing and uploading the photo…');
   try{
-   const blob=await compress(file);path=`${userId}/${crypto.randomUUID()}.webp`;
-   const up=await client.storage.from('community-plate-game').upload(path,blob,{contentType:'image/webp',upsert:false});
+   const blob=await compress(file);path=`${userId}/${crypto.randomUUID()}.jpg`;setStatus(`Uploading resized JPEG (${Math.round(blob.size/1024)} KB)…`);
+   const up=await client.storage.from('community-plate-game').upload(path,blob,{contentType:'image/jpeg',upsert:false});
    if(up.error)throw up.error;
    const {data,error}=await client.rpc('community_plate_post',{p_plate:$('plate-characters').value,p_region:$('plate-region').value,p_guess:$('plate-guess').value,p_photo_path:path});
    if(error)throw error;
