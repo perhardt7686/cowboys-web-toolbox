@@ -1,0 +1,38 @@
+name: Fix iPhone plate game photo uploads
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/fix-plate-iphone-photos.yml']
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import zlib,base64
+          p=Path('docs/commons-plates.mjs');s=p.read_text()
+          a=s.index(' async function compress(file){');b=s.index(' async function post(ev){',a)
+          f=zlib.decompress(base64.b64decode('eNqNVNtu00AQfecrBoFqG1luEgpUFLfiJoEEoiqgPpQ+bOxxvLDeNbvrXCD9d2YvCUnLA5Fiz45nzp65AjMrWUEzyMpyJaFSXa/RmLThArPf9wB4k953B1iv4b5XF3bVY2Es09ZcctumCe/YDA+TzNkcfivS7z2ezda9nK0XOO3XLfLKPZrs4SEvLBobcCTrMMsysK1WC3irtdJp8rpVyiAwqOirZtC3yipQGpgEfw80WnVw7tSmSLKTwNEDGv4L4RQeP3k0Hk2O/OMW+peWG/Dh0FvNUZMxfHxVQLzWtggaZ4NgOt7MpbHIalANnGt18fIyd2QMypo4mkojSkOGkUmlyByMrsqvFx8K+sosfpp+x8rSOSTVmVm9crmN5j6sUuIC3jsp9SbAFoxbcFq6t+MG05Qqo8Qcc40OMStPPUjwL5QUitVlSuqgkMwOmolLXtv2LLqm2fPgnMaE+DwSj0HUIJWFKUKNlaqxpogCkS0+Ohd/wT6GT2qsjdIds/t4qkdJcPBexqrlYNkP3EsfVbeGoXcRUA0IIab9NgmXWfpHVZMGretagRYPDu5Gnm0j90434UU805D8q44t3/Au/zkwwe3q2hX66mr8bDTKi+Oj6/xqfPTEiWMnTpz22VMnjrw4IfHYSU+Pr6+zUI6AqxkNVPmR2bbouEzHebjnMGjYMr1LNd9TvUM+a+0m/ABaMTlnpqxVNXQobWywtwLdKU3C52Tj4k/FwkGX22vHuRe1GmT9Dw6PPO9sH6L1VP4HI5C+BRKo22UZ4WZoXytpcUmUJ/WGrls0ZJTtzWtoz16ripYSlzM3tq6t2JxxwaZujiU1DGmn5GVQF9vo7bKgeROf7UpgmTxomiY52SgvXPeO8lG+m6N8L9odmFqzRZhMH2v+f44+6qlQ0/LuJMeeLE+jp1WvyHA733Gh0hqdJZvGzP6myYGe+S1cluWu7cGB++TX4Olo5/CipMZ1PxoGKpP0tMI4uMetDYlx8+0NscZ6qLAmUZDtxO/Mc4GMdmalVQ/MN4Pfn72gnnRL8s6Ux+Lc0AaWTIjVb7ckNc7Vj50lSeOdnRCvm3t/ACP3NJc=')).decode()
+          s=s[:a]+f+s[b:]
+          x='const blob=await compress(file);path=`${userId}/${crypto.randomUUID()}.webp`;'
+          y='const blob=await compress(file);path=`${userId}/${crypto.randomUUID()}.jpg`;setStatus(`Uploading resized JPEG (${Math.round(blob.size/1024)} KB)…`);'
+          assert s.count(x)==1;s=s.replace(x,y,1)
+          x=".upload(path,blob,{contentType:'image/webp',upsert:false})"
+          y=".upload(path,blob,{contentType:'image/jpeg',upsert:false})"
+          assert s.count(x)==1;s=s.replace(x,y,1)
+          x="$('plate-new').addEventListener('submit',post);"
+          y=x+"$('plate-submit').before($('plate-status'));$('plate-photo').addEventListener('change',()=>{const f=$('plate-photo').files?.[0];if(f)setStatus(`Photo selected (${(f.size/1048576).toFixed(1)} MB). Add the guess and tap Post challenge.`);});"
+          assert s.count(x)==1;s=s.replace(x,y,1)
+          p.write_text(s)
+          PY
+      - run: |
+          node --check docs/commons-plates.mjs
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-plates.mjs
+          git diff --cached --quiet || (git commit -m "Fix iPhone license plate photo uploads" && git push origin HEAD:main)
