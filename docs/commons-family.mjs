@@ -10,6 +10,7 @@ const esc=s=>safeStr(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   let client=null,activeUser=null,live=null,wordTimer=null,loading=false,mounting=false;
+  let wordObserver=null;
   let avatarMap=new Map();
   const byId=id=>document.getElementById(id);
   function status(message){const n=byId('commons-word-message');if(n)n.textContent=message;}
@@ -22,6 +23,12 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   }
   function renderWord(data){
     live=data;
+    const summary=byId('word-game-summary');
+    if(summary){
+      const count=`${Number(data.attempts||0)} / ${Number(data.max_attempts||12)} team guesses`;
+      summary.textContent=data.solved?`Solved today · ${count}`:
+        data.finished?`Today's puzzle complete · ${count}`:`5-letter team puzzle · ${count}`;
+    }
     const area=byId('commons-word-moves'),ranking=byId('commons-word-ranking');
     if(!area||!ranking)return;
     byId('commons-word-day').textContent='New York · '+safeStr(data.day);
@@ -87,6 +94,16 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     }catch(e){status(safeStr(e.message||'Guess was not saved. Please retry.'));}
     finally{loading=false;if(!live?.finished)byId('commons-word-submit').disabled=false;}
   }
+  function locateWord(){
+    const main=board.querySelector('.community-main');
+    const root=byId('word-game-root');
+    if(!main||!root)return;
+    const mahjong=byId('mahjong-root');
+    const plate=byId('plate-game-root');
+    const after=mahjong?.parentElement===main?mahjong:(plate?.parentElement===main?plate:null);
+    if(after){if(root.previousElementSibling!==after)after.after(root);}
+    else if(root.parentElement!==main||root!==main.firstElementChild)main.prepend(root);
+  }
   function build(){
     if(byId('commons-family-zone'))return;
     const zone=document.createElement('div');zone.id='commons-family-zone';zone.className='community-play-zone';
@@ -104,6 +121,35 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
      </section>
      <section class="family-stage" id="commons-art" aria-label="Family artist drawing board"><div class="family-heading"><div><span class="family-kicker">The Commons · Creative space</span><h2>The Drawing Studio</h2><p>Paint, sketch, create layers, undo mistakes, and download your artwork.</p></div><span class="family-pill">Your art stays on your device until you choose to download it</span></div><div id="commons-drawing-root"></div></section>`;
     const before=board.querySelector('.community-main .community-heading');before?.insertAdjacentElement('beforebegin',zone);
+    // Move the existing word game, keeping all original form and scoreboard IDs,
+    // into the same full-width, closed-by-default button presentation as Mahjong.
+    // Leave the Drawing Studio in the family zone.
+    const wordStage=byId('commons-word');
+    const game=document.createElement('section');
+    game.id='word-game-root';
+    game.className='mahjong-game word-entry-game';
+    game.setAttribute('aria-label','Daily Word Quest');
+    game.innerHTML=`<button id="word-game-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="word-game-inside"><span class="mahjong-entry-icon" aria-hidden="true">🔤</span><span class="mahjong-entry-copy"><strong>Daily Word Quest</strong><small id="word-game-summary">5-letter team puzzle · Scores & daily guesses</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button><div id="word-game-inside" hidden></div>`;
+    game.querySelector('#word-game-inside').append(wordStage);
+    const main=board.querySelector('.community-main');
+    if(!main)throw new Error('Commons game area is missing');
+    main.prepend(game);
+    locateWord();
+    wordObserver?.disconnect();
+    if(main){
+      wordObserver=new MutationObserver(()=>{if(byId('word-game-root'))locateWord();});
+      wordObserver.observe(main,{childList:true});
+    }
+    byId('word-game-toggle').addEventListener('click',()=>{
+      const toggle=byId('word-game-toggle'),content=byId('word-game-inside');
+      const expanded=toggle.getAttribute('aria-expanded')!=='true';
+      toggle.setAttribute('aria-expanded',String(expanded));
+      content.hidden=!expanded;
+      if(expanded){
+        void refreshWord(true);
+        content.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+    });
     byId('commons-word-form').addEventListener('submit',guess);
     byId('commons-word-refresh').addEventListener('click',()=>refreshWord());
   }
@@ -131,6 +177,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   }
   function unmount(){
     activeUser=null;live=null;avatarMap.clear();if(wordTimer){clearInterval(wordTimer);wordTimer=null;}
+    wordObserver?.disconnect();wordObserver=null;
+    byId('word-game-root')?.remove();
     byId('commons-family-zone')?.remove();
   }
   try{

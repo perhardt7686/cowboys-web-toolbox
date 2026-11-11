@@ -83,3 +83,13 @@ body.community-page .word-tile-row>.word-player{grid-column:1/-1;min-width:0;wid
 body.community-page .word-tile-row>.word-tile{width:100%;max-width:48px;min-width:0;height:auto;aspect-ratio:1;font-size:clamp(16px,4vw,23px)}
 body.community-page .word-tile-row>strong{grid-column:6;grid-row:2;margin-inline-start:0!important;justify-self:end;white-space:nowrap}
 @media(max-width:440px){body.community-page .word-panel{padding:11px}body.community-page .word-tile-row{gap:4px}body.community-page .word-tile-row>.word-tile{font-size:clamp(17px,5.2vw,22px)}}
+
+
+/* Daily Word Quest v4: same full-width game button as Mystery Machine Mahjong. */
+body.community-page .word-entry-game{grid-column:1/-1;margin:0 0 22px;min-width:0}
+body.community-page .word-entry-game #word-game-inside{margin-top:12px}
+body.community-page .word-entry-game #word-game-inside[hidden]{display:none!important}
+body.community-page .word-entry-game .family-stage{margin:0}
+body.community-page .word-entry-game #word-game-toggle{width:100%}
+body.community-page .word-entry-game #word-game-toggle:focus-visible{outline:4px solid #e6bf6c;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){body.community-page .word-entry-game #word-game-toggle .mahjong-chevron{transition:none}}
