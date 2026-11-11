@@ -76,3 +76,18 @@ body.community-page .mahjong-game button:focus-visible{outline:4px solid #d29438
 @media(max-width:720px){body.community-page .mahjong-stats{grid-template-columns:repeat(2,minmax(0,1fr))}body.community-page .mahjong-bottom{grid-template-columns:1fr}body.community-page .mahjong-game-zone{padding:7px;border-width:4px}body.community-page .mahjong-board{border-radius:9px}}
 @media(max-width:400px){body.community-page .mahjong-entry-button{gap:10px;padding:13px;min-height:84px}body.community-page .mahjong-entry-button strong{font-size:19px}body.community-page .mahjong-entry-button small{font-size:12px}body.community-page .mahjong-entry-icon{font-size:27px;width:30px}body.community-page #mahjong-achievement-list{grid-template-columns:1fr}body.community-page .mahjong-actions{gap:6px}body.community-page .mahjong-actions button{font-size:12px;padding:9px 10px}}
 @media(prefers-reduced-motion:reduce){body.community-page .mahjong-hinted{animation:none}body.community-page .mahjong-chevron{transition:none}}
+
+
+/* Mahjong Mystery Road 1000-level campaign HUD v2 */
+body.community-page .mahjong-campaign{border:2px solid #ac7a48;border-radius:17px;background:linear-gradient(130deg,#fff1ce,#f4e1f5 70%,#dcf5e8);padding:clamp(12px,3vw,20px);margin:0 0 17px;color:#332345;box-shadow:0 3px 0 #b77a5238}
+body.community-page .mahjong-campaign-heading{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:9px}
+body.community-page .mahjong-campaign-heading h3{font:900 clamp(20px,4vw,28px)/1.15 system-ui,sans-serif;margin:4px 0 8px;color:#38264c}
+body.community-page #mahjong-level-number{background:#3e295b;color:#fff;border-radius:99px;padding:8px 12px;font:900 13px/1.2 system-ui,sans-serif;white-space:nowrap}
+body.community-page #mahjong-progress,body.community-page .mahjong-profile-progress{display:block;width:100%;height:13px;border:0;accent-color:#0e7e75;margin:10px 0}
+body.community-page #mahjong-progress::-webkit-progress-bar,body.community-page .mahjong-profile-progress::-webkit-progress-bar{background:#d6c6d5;border-radius:99px}
+body.community-page #mahjong-progress::-webkit-progress-value,body.community-page .mahjong-profile-progress::-webkit-progress-value{background:linear-gradient(90deg,#1c8e73,#df9f3c);border-radius:99px}
+body.community-page .mahjong-campaign-line{font:750 13px/1.5 system-ui,sans-serif;margin:6px 0;color:#4d3656}
+body.community-page #mahjong-campaign-goal{margin:12px 0 0;font:850 12px/1.5 system-ui,sans-serif;color:#7b3f24}
+body.community-page .mahjong-profile-campaign{border:1px solid #b6a6c4;background:#f9f0de;border-radius:9px;padding:10px 12px}
+body.community-page .mahjong-profile-progress{margin:12px 0 16px}
+@media(max-width:440px){body.community-page .mahjong-campaign-heading h3{font-size:21px}body.community-page #mahjong-level-number{font-size:12px;padding:7px 9px}}

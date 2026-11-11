@@ -20,7 +20,15 @@ const ACHIEVEMENTS=[
  ['ten_wins','Grand Master','Win ten games','✧'],
  ['unassisted','Sharp Eyes','Win without using help','👁'],
  ['speedster','Lightning Round','Win in less than 3 minutes','⚡'],
- ['five_thousand','High Roller','Earn 5,000 points in one game','★']
+ ['five_thousand','High Roller','Earn 5,000 points in one game','★'],
+ ['campaign_5','Roadside Explorer','Clear level 5','🚐'],
+ ['campaign_10','Mystery Mile Master','Clear level 10','🏁'],
+ ['campaign_25','Fog Hunter','Clear level 25','🌫'],
+ ['campaign_50','Orchard Exorcist','Clear level 50','✦'],
+ ['campaign_100','Phantom Conqueror','Clear level 100','👑'],
+ ['campaign_250','Lagoon Sovereign','Clear level 250','🌊'],
+ ['campaign_500','Midnight Myth','Clear level 500','🌙'],
+ ['campaign_1000','The Vanishing Crown','Conquer all 1,000 levels','♛']
 ];
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  let client=null,userId=null,state=null,mounted=false,busy=false,expanded=false,selected=null,highlight=[],timer=null,resize=null,refreshing=false;
@@ -41,6 +49,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   root.innerHTML=`<button id="mahjong-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="mahjong-inside"><span class="mahjong-entry-icon" aria-hidden="true">🀄</span><span class="mahjong-entry-copy"><strong>Mahjong Solitaire</strong><small id="mahjong-button-score">Mystery Machine · High scores & badges</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button>
   <div id="mahjong-inside" hidden>
    <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match two open tiles with identical corner marks. Clear the layered mystery garden to earn points and collect achievements.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
+   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
    <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span></div><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div>
    <div class="mahjong-actions"><button type="button" id="mahjong-new">New game</button><button type="button" id="mahjong-hint">💡 Hint</button><button type="button" id="mahjong-shuffle">⤨ Shuffle</button><button type="button" id="mahjong-undo">↶ Undo</button></div><p class="mahjong-status" id="mahjong-status" role="status" aria-live="polite">Tap New game to begin.</p></div>
@@ -78,10 +87,18 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   if(first.s!==t.s){selected=t.id;highlight=[];renderBoard();setStatus('Not a match. Choose two matching free tiles.');return;}
   const a=first.id,b=t.id;selected=null;highlight=[];run('community_mahjong_pair',{p_a:a,p_b:b},'Matched! Keep exploring the garden.');
  }
- function display(){if(!state||!$('mahjong-root'))return;const p=state.profile||{},runState=state.run,leaders=state.leaders||[],me=leaders.find(e=>e.user_id===userId),record=Math.max(0,...leaders.map(e=>Number(e.best||0)));
-  $('mahjong-button-score').textContent=`My best ${stat(p.best_score)} · Commons record ${stat(record)}`;
+ function display(){if(!state||!$('mahjong-root'))return;const p=state.profile||{},runState=state.run,leaders=state.leaders||[],me=leaders.find(e=>e.user_id===userId),record=Math.max(0,...leaders.map(e=>Number(e.best||0)));const cp=p.campaign||state.campaign||{},rules=cp.rules||{},stage=Number(cp.level||1);
+  $('mahjong-button-score').textContent=`Level ${stage}/1000 · My best ${stat(p.best_score)} · Record ${stat(record)}`;
+  $('mahjong-level-number').textContent=`Level ${stage} / 1000`;
+  $('mahjong-level-name').textContent=rules.name||'Mystery Mile';
+  $('mahjong-progress').value=Math.max(0,Math.min(1000,Number(cp.cleared)||0));
+  const assists=Number(rules.max_assists??99);const clock=rules.max_seconds;
+  const cap=stage>=51&&stage<=100?'No hints or shuffles; maximum one undo':assists>=99?'Practice stage: assistance allowed':assists===0?'No hints, shuffles, or undo':`At most ${assists} total hints, shuffles, or undos`;
+  $('mahjong-level-rules').textContent=`${cap}${clock?` · Clear within ${Math.floor(Number(clock)/60)}:${String(Number(clock)%60).padStart(2,'0')}`:''} · ×${rules.multiplier||1} points`;
+  $('mahjong-level-streak').textContent=`Levels cleared: ${stat(cp.cleared)} · Qualifying streak: ${stat(cp.streak)}${rules.required_streak?` · Crown requires ${rules.required_streak}+ consecutive qualifying clears`:''}`;
+  $('mahjong-campaign-goal').textContent=cp.crown_earned?'♛ The Vanishing Crown is yours. Legend secured.':'Final challenge: 1,000 levels, a 10-win streak, no assistance, and a five-minute finish.';
   const score=$('mahjong-stats');score.replaceChildren();for(const [label,val] of [['CURRENT RUN',stat(runState?.score)],['PERSONAL BEST',stat(p.best_score)],['ALL-TIME POINTS',stat(p.all_time_points)],['COMMONS RECORD',stat(record)]]){const c=node('div','mahjong-stat');c.append(node('small','',label),node('strong','',val));score.append(c);}
-  $('mahjong-run-title').textContent=runState?`Score ${stat(runState.score)} · Combo ${stat(runState.combo)}`:'Your next adventure';
+  $('mahjong-run-title').textContent=runState?`Level ${runState.level||stage} · Score ${stat(runState.score)} · Combo ${stat(runState.combo)}`:`Level ${stage}: Your next adventure`;
   $('mahjong-pairs').textContent=runState?`${runState.pairs} / 36 pairs cleared`:'';
   for(const id of ['mahjong-hint','mahjong-shuffle','mahjong-undo'])$(id).disabled=!runState||busy;
   $('mahjong-new').textContent=runState?'Restart':'New game';$('mahjong-new').disabled=busy;
@@ -91,7 +108,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   for(const [i,e] of leaders.entries()){
    const row=node('div','mahjong-leader');row.append(node('span','mahjong-rank',i===0?'♛':String(i+1)));
    const nm=node('span','mahjong-leader-name',e.name||'Member');if(e.user_id===userId)nm.append(node('small','', ' (you)'));row.append(nm);
-   row.append(node('strong','',stat(e.best)));lst.append(row);
+   row.append(node('strong','',`${stat(e.best)} · Lv ${e.stage||1}`));lst.append(row);
   }
   const badges=$('mahjong-achievement-list');badges.replaceChildren();const earned=new Set((p.badges||[]).map(b=>b.code));
   for(const [code,title,description,icon] of ACHIEVEMENTS){const b=node('div','mahjong-badge '+(earned.has(code)?'earned':'locked'));
@@ -99,9 +116,9 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    const words=node('span','mahjong-badge-copy');words.append(node('strong','',title),node('small','',earned.has(code)?description:'Locked · '+description));b.append(words);badges.append(b);
   }
  }
- async function refresh(silent=false){if(!client||!mounted||refreshing||busy)return;refreshing=true;try{const {data,error}=await client.rpc('community_mahjong_state');if(error)throw error;state=data;if(expanded)display();else if($('mahjong-button-score')){const p=data.profile||{};$('mahjong-button-score').textContent=`My best ${stat(p.best_score)} · All-time ${stat(p.all_time_points)}`;}}catch(e){if(!silent)setStatus(e.message||'Unable to refresh scores.');}finally{refreshing=false;}}
+ async function refresh(silent=false){if(!client||!mounted||refreshing||busy)return;refreshing=true;try{const {data,error}=await client.rpc('community_mahjong_state');if(error)throw error;state=data;if(expanded)display();else if($('mahjong-button-score')){const p=data.profile||{},cp=p.campaign||{};$('mahjong-button-score').textContent=`Level ${cp.level||1}/1000 · My best ${stat(p.best_score)}`;}}catch(e){if(!silent)setStatus(e.message||'Unable to refresh scores.');}finally{refreshing=false;}}
  async function run(method,params,message){if(!client||busy)return null;busy=true;for(const id of ['mahjong-new','mahjong-hint','mahjong-shuffle','mahjong-undo'])if($(id))$(id).disabled=true;setStatus('Saving your move…');
-  try{const {data,error}=await client.rpc(method,params);if(error)throw error;state=data;selected=null;highlight=Array.isArray(data.hint)?data.hint:[];display();if(data.event==='won'){setStatus('🏆 Mystery solved! Your high score and new achievements are saved.');}else setStatus(message);return data;}
+  try{const {data,error}=await client.rpc(method,params);if(error)throw error;state=data;selected=null;highlight=Array.isArray(data.hint)?data.hint:[];display();if(data.event==='won'){setStatus(data.campaign_event==='retry'?`Board cleared, but level ${data.completed_level} requirements were missed. Replay the stage to advance.`:data.campaign_event==='advanced'?`🏆 Level ${data.completed_level} conquered! +${stat(data.campaign_bonus_earned)} campaign points. Next: level ${data.next_level}.`:'🏆 Mystery solved! Your high score and achievements are saved.');}else setStatus(message);return data;}
   catch(e){setStatus('Could not save: '+(e.message||'Please retry.'));return null;}finally{busy=false;display();}
  }
  async function mount(){if(mounted||board.hidden||!client)return;const {data:{session}}=await client.auth.getSession();if(!session?.user?.id)return;
