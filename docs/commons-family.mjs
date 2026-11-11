@@ -103,7 +103,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
        </div><aside class="word-leaderboard"><h3>Family leaderboard</h3><ol class="word-ranking" id="commons-word-ranking"><li>Loading standings…</li></ol><p class="word-rules">Running total, team wins, solves, best daily score and winning streaks are saved on the server.</p></aside></div>
      </section>
      <section class="family-stage" id="commons-art" aria-label="Family artist drawing board"><div class="family-heading"><div><span class="family-kicker">The Commons · Creative space</span><h2>The Drawing Studio</h2><p>Paint, sketch, create layers, undo mistakes, and download your artwork.</p></div><span class="family-pill">Your art stays on your device until you choose to download it</span></div><div id="commons-drawing-root"></div></section>`;
-    const after=byId('load-more')||byId('community-feed');after?.insertAdjacentElement('afterend',zone);
+    const before=board.querySelector('.community-main .community-heading');before?.insertAdjacentElement('beforebegin',zone);
     byId('commons-word-form').addEventListener('submit',guess);
     byId('commons-word-refresh').addEventListener('click',()=>refreshWord());
   }
