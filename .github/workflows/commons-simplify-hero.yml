@@ -1,0 +1,44 @@
+name: Remove Commons Shortcut Cards And Improve Readability
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/commons-simplify-hero.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Simplify Commons intro and improve contrast
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          css=Path('docs/community-readable.css')
+          page=Path('docs/community.html')
+          assert css.is_file() and page.is_file(), 'Expected Commons files are missing'
+          original=css.read_text(encoding='utf-8')
+          marker='/* Commons intro: remove four shortcut cards and improve contrast */'
+          import base64,zlib
+          patch=zlib.decompress(base64.b64decode('eNqtlMuOmzAUhvd5CldRNRcFhou5BKSqUhfddVHNCxjbCdZg7BpnCI3y7j3OPYzUTjTdYfg5/s/3H3vy9Ii+KSlV2yHRWqMKZLhUrxwt1MqgrlbG0pVFlBjWIdIyJKQ27jtVICedRY9Pk0qxwadQZtUKO3iaLDmaNqTydiX909OGiU43ZCiqRtGXcmkE8yyX8Mpyj6pmJduuaFXLS00YE+3Ss0oXtCFS34dYr2fxaz+Lcr1+OAkqZa2SB00UgQaDJk6dRhKzFO1Igo+SXZlKGcbNUQK/I0a6mjM0pdm8yvJy+4/m0K67XytBXzxCrQCQpy5dJ5+AFzAkrX1nqd0jwNDDphfM1kUYBJ+hlbW3X+ZBoNelhL726+DmuqiONgBbmWIa8wjjS48LSNVbECmaofjOFfAjs7tnIXmHfvAe/VSStHezjhux2Gs78Zsf0MYObeJnADdJHNydoOdiWdsiC4KyES336v069ENcNtxaoN9pQiHLwvODKOGytHwNhWvCVP9RhtAr4vLYbkCTeZqN2z04TMHhf9z5iy4aOB4erUXDjgYwjmOcX1Q955phl+uYaQiDPIuAaDgHon9xfs02vd2uzwdeGdUfraZpjLN8vOOltRCshX7uzOFx3HNn6TpdPwxcuNdGcQJOv0rOBLk/s0gTYPGwuX2s34xkDB5z3513HDmPbycudqa2H8n2vKlL63Jk3n0vXl53oZuD0fUWwXkqt9vJHyDzB64=')).decode("utf-8")
+          assert '.lab-intro' in original or marker in original, 'Unexpected Commons stylesheet; no changes made'
+          if marker not in original:
+              css.write_text(original.rstrip()+'\n'+patch, encoding='utf-8')
+          html=page.read_text(encoding='utf-8')
+          old='community-readable.css?v=readability1'
+          new='community-readable.css?v=readability2'
+          assert html.count(old)==1 or html.count(new)==1, 'Expected stylesheet reference missing; no changes made'
+          if old in html:
+              page.write_text(html.replace(old,new,1),encoding='utf-8')
+          PYCODE
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/community-readable.css docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Remove Commons intro cards and improve readability'
+            git push origin HEAD:main
+          fi
