@@ -19,7 +19,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const main=board.querySelector('.community-main');if(!main)return;
   const root=newEl('section','plate-game');root.id='plate-game-root';
   root.innerHTML=`<button type="button" class="plate-entry-button" id="plate-game-open" aria-expanded="false" aria-controls="plate-game-content"><span class="plate-entry-icon" aria-hidden="true">📸</span><span><strong>Our License Plate Game</strong><small id="plate-top-score">Ana 33 · Cowboy 19</small></span><span class="plate-expand" aria-hidden="true">▾</span></button>
-    <div id="plate-game-content" hidden><div class="plate-heading"><div><span class="plate-eyebrow">Private match · Ana vs. Cowboy</span><h2>What Does That Plate Mean?</h2><p>Find a custom plate. Snap a picture. Make your case. The other player decides.</p></div><div class="plate-score" id="plate-score" aria-live="polite"></div></div>
+    <div id="plate-game-content" hidden><section class="commons-score-ribbon" aria-label="Live license plate scores" aria-live="polite">
+      <div class="commons-score-tile is-record"><span class="commons-score-label">LEADING TOTAL</span><strong id="plate-ribbon-lead">…</strong><small id="plate-ribbon-holder">Top player · cumulative points</small></div>
+      <div class="commons-score-tile is-personal"><span class="commons-score-label">YOUR TOTAL</span><strong id="plate-ribbon-mine">…</strong><small>Approved plates and starting points</small></div>
+      <div class="commons-score-tile is-live"><span class="commons-score-label">POINTS BEHIND</span><strong id="plate-ribbon-gap">…</strong><small id="plate-ribbon-gap-caption">Distance from first place</small></div>
+     </section><div class="plate-heading"><div><span class="plate-eyebrow">Private match · Ana vs. Cowboy</span><h2>What Does That Plate Mean?</h2><p>Find a custom plate. Snap a picture. Make your case. The other player decides.</p></div><div class="plate-score" id="plate-score" aria-live="polite"></div></div>
     <div class="plate-rules">👍 Agree = one point for the person who guessed. 👎 Disagree = explain why; the guesser can revise and you vote again. One point maximum per photo.</div>
     <form id="plate-new" class="plate-new"><h3>📷 Post a plate</h3><div class="plate-fields"><label>Photo <input id="plate-photo" type="file" accept="image/*" required></label><label>Characters on the plate <input id="plate-characters" type="text" maxlength="18" placeholder="e.g. ODIN1" autocomplete="off" required></label><label>State / region <input id="plate-region" type="text" maxlength="60" placeholder="e.g. Virginia"></label></div><label>What do you think it means? <textarea id="plate-guess" rows="2" maxlength="600" placeholder="My best argument is…" required></textarea></label><p class="plate-hint">Crop out people, house numbers and other unnecessary details. Photos are resized and their original metadata is removed before upload.</p><button class="plate-button" type="submit" id="plate-submit">Post challenge</button></form>
     <div class="plate-list-header"><h3>Our plate debates</h3><button type="button" class="plate-button secondary" id="plate-refresh">Refresh</button></div><div id="plate-status" role="status" aria-live="polite"></div><div id="plate-list"></div>
@@ -32,6 +36,18 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  function scores(){
   const players=game?.players||[];const ana=players.find(p=>p.seat==='ana');const cowboy=players.find(p=>p.seat==='cowboy');
   $('plate-top-score').textContent=`Ana ${ana?.total??33} · Cowboy ${cowboy?.total??19}`;
+  const valid=players.filter(p=>Number.isFinite(Number(p.total)));
+  const highest=valid.length?Math.max(...valid.map(p=>Number(p.total))):0;
+  const leaders=valid.filter(p=>Number(p.total)===highest);
+  const mine=players.find(p=>p.seat===seat);
+  const personal=Number(mine?.total||0);
+  if(mine&&leaders.length){$('plate-top-score').textContent=`Leader ${leaders.length>1?'Tied':nameFor(leaders[0].seat)} ${highest.toLocaleString('en-US')} · Yours ${personal.toLocaleString('en-US')}`;}
+  $('plate-ribbon-lead').textContent=highest.toLocaleString('en-US');
+  $('plate-ribbon-holder').textContent=leaders.length>1?'Tied lead · cumulative points':leaders.length?`${nameFor(leaders[0].seat)} leads · cumulative points`:'No scores available';
+  $('plate-ribbon-mine').textContent=mine?personal.toLocaleString('en-US'):'—';
+  const gap=Math.max(0,highest-personal);
+  $('plate-ribbon-gap').textContent=mine?gap.toLocaleString('en-US'):'—';
+  $('plate-ribbon-gap-caption').textContent=mine?(gap===0?'You are tied for first or leading':'Points to catch the leader'):'Your account is not a plate player';
   const div=$('plate-score');div.replaceChildren();
   for(const [who,score] of [['ana',ana?.total??33],['cowboy',cowboy?.total??19]]){
    const n=newEl('div','plate-scorecard');n.append(newEl('span','',nameFor(who)),newEl('strong','',score));div.append(n);

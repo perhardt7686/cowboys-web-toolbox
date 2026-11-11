@@ -29,6 +29,20 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       summary.textContent=data.solved?`Solved today · ${count}`:
         data.finished?`Today's puzzle complete · ${count}`:`5-letter team puzzle · ${count}`;
     }
+    const rows=Array.isArray(data.ranking)?data.ranking:[];
+    const best=Math.max(0,...rows.map(row=>Number(row.best)||0));
+    const top=rows.filter(row=>Number(row.best||0)===best);
+    const mine=Number(data.my?.best)||0;
+    const fmt=n=>Number(n||0).toLocaleString('en-US');
+    const lead=byId('word-ribbon-record'),own=byId('word-ribbon-mine'),team=byId('word-ribbon-team');
+    if(lead&&own&&team){
+      lead.textContent=fmt(best);
+      byId('word-ribbon-holder').textContent=best===0?'No daily record yet':top.length>1?'Shared best day':`${safeStr(top[0]?.name)||'Member'} · best single day`;
+      own.textContent=fmt(mine);
+      team.textContent=fmt(data.team_score);
+      byId('word-ribbon-team-note').textContent=`Today · ${Number(data.attempts||0)}/${Number(data.max_attempts||12)} guesses`;
+    }
+    const mini=byId('word-game-summary');if(mini)mini.textContent=`Best day ${fmt(best)} · Yours ${fmt(mine)} · Today ${fmt(data.team_score)}`;
     const area=byId('commons-word-moves'),ranking=byId('commons-word-ranking');
     if(!area||!ranking)return;
     byId('commons-word-day').textContent='New York · '+safeStr(data.day);
@@ -130,6 +144,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     game.className='mahjong-game word-entry-game';
     game.setAttribute('aria-label','Daily Word Quest');
     game.innerHTML=`<button id="word-game-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="word-game-inside"><span class="mahjong-entry-icon" aria-hidden="true">🔤</span><span class="mahjong-entry-copy"><strong>Daily Word Quest</strong><small id="word-game-summary">5-letter team puzzle · Scores & daily guesses</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button><div id="word-game-inside" hidden></div>`;
+    game.querySelector('#word-game-inside').innerHTML=`<section class="commons-score-ribbon" aria-label="Live Word Quest scores" aria-live="polite">
+      <div class="commons-score-tile is-record"><span class="commons-score-label">BEST DAY</span><strong id="word-ribbon-record">…</strong><small id="word-ribbon-holder">Highest single-day score</small></div>
+      <div class="commons-score-tile is-personal"><span class="commons-score-label">YOUR BEST DAY</span><strong id="word-ribbon-mine">…</strong><small>Your highest one-day score</small></div>
+      <div class="commons-score-tile is-live"><span class="commons-score-label">TEAM TODAY</span><strong id="word-ribbon-team">…</strong><small id="word-ribbon-team-note">Current puzzle points</small></div>
+     </section>`;
     game.querySelector('#word-game-inside').append(wordStage);
     const main=board.querySelector('.community-main');
     if(!main)throw new Error('Commons game area is missing');

@@ -48,6 +48,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const root=node('section','mahjong-game');root.id='mahjong-root';
   root.innerHTML=`<button id="mahjong-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="mahjong-inside"><span class="mahjong-entry-icon" aria-hidden="true">🀄</span><span class="mahjong-entry-copy"><strong>Mahjong Solitaire</strong><small id="mahjong-button-score">Mystery Machine · High scores & badges</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button>
   <div id="mahjong-inside" hidden>
+   <section class="commons-score-ribbon" aria-label="Live Mahjong scores" aria-live="polite">
+    <div class="commons-score-tile is-record"><span class="commons-score-label">RECORD RUN</span><strong id="mahjong-ribbon-record">…</strong><small id="mahjong-ribbon-holder">Best completed game</small></div>
+    <div class="commons-score-tile is-personal"><span class="commons-score-label">YOUR BEST RUN</span><strong id="mahjong-ribbon-mine">…</strong><small>Personal completed game record</small></div>
+    <div class="commons-score-tile is-live"><span class="commons-score-label">CURRENT RUN</span><strong id="mahjong-ribbon-current">…</strong><small id="mahjong-ribbon-current-note">No game in progress</small></div>
+   </section>
    <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match two open tiles with identical corner marks. Clear the layered mystery garden to earn points and collect achievements.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
    <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
@@ -91,7 +96,13 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const a=first.id,b=t.id;selected=null;highlight=[];run('community_mahjong_pair',{p_a:a,p_b:b},'Matched! Keep exploring the garden.');
  }
  function display(){if(!state||!$('mahjong-root'))return;const p=state.profile||{},runState=state.run,leaders=state.leaders||[],me=leaders.find(e=>e.user_id===userId),record=Math.max(0,...leaders.map(e=>Number(e.best||0)));const cp=p.campaign||state.campaign||{},rules=cp.rules||{},stage=Number(cp.level||1);
-  $('mahjong-button-score').textContent=`Level ${stage}/1000 · My best ${stat(p.best_score)} · Record ${stat(record)}`;
+  $('mahjong-button-score').textContent=`Level ${stage}/1000 · Record ${stat(record)} · Yours ${stat(p.best_score)}`;
+  const tied=leaders.filter(e=>Number(e.best||0)===record);
+  $('mahjong-ribbon-record').textContent=stat(record);
+  $('mahjong-ribbon-holder').textContent=record<=0?'No completed game yet':tied.length>1?'Shared record · best game':`${tied[0]?.name||'Member'} · best game`;
+  $('mahjong-ribbon-mine').textContent=stat(p.best_score);
+  $('mahjong-ribbon-current').textContent=runState?stat(runState.score):'—';
+  $('mahjong-ribbon-current-note').textContent=runState?(runState.paused?'Paused · progress saved':`${runState.pairs||0}/36 pairs · Level ${runState.level||stage}`):'No game in progress';
   $('mahjong-level-number').textContent=`Level ${stage} / 1000`;
   $('mahjong-level-name').textContent=rules.name||'Mystery Mile';
   $('mahjong-progress').value=Math.max(0,Math.min(1000,Number(cp.cleared)||0));
@@ -161,7 +172,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   }
   root.append(list);
  }
- async function refresh(silent=false){if(!client||!mounted||refreshing||busy)return;refreshing=true;try{const {data,error}=await client.rpc('community_mahjong_state');if(error)throw error;state=data;if(expanded)display();else if($('mahjong-button-score')){const p=data.profile||{},cp=p.campaign||{};$('mahjong-button-score').textContent=`Level ${cp.level||1}/1000 · My best ${stat(p.best_score)}`;}}catch(e){if(!silent)setStatus(e.message||'Unable to refresh scores.');}finally{refreshing=false;}}
+ async function refresh(silent=false){if(!client||!mounted||refreshing||busy)return;refreshing=true;try{const {data,error}=await client.rpc('community_mahjong_state');if(error)throw error;state=data;if(expanded)display();else if($('mahjong-button-score')){const p=data.profile||{},cp=p.campaign||{},leaders=data.leaders||[],record=Math.max(0,...leaders.map(e=>Number(e.best||0)));$('mahjong-button-score').textContent=`Level ${cp.level||1}/1000 · Record ${stat(record)} · Yours ${stat(p.best_score)}`;}}catch(e){if(!silent)setStatus(e.message||'Unable to refresh scores.');}finally{refreshing=false;}}
  async function run(method,params,message){if(!client||busy)return null;busy=true;for(const id of ['mahjong-new','mahjong-pause','mahjong-overlay-resume','mahjong-hint','mahjong-shuffle','mahjong-undo'])if($(id))$(id).disabled=true;setStatus('Saving your move…');
   try{const {data,error}=await client.rpc(method,params);if(error)throw error;state=data;selected=null;highlight=Array.isArray(data.hint)?data.hint:[];display();if(data.event==='won'){setStatus(data.campaign_event==='retry'?`Board cleared, but level ${data.completed_level} requirements were missed. Replay the stage to advance.`:data.campaign_event==='advanced'?`🏆 Level ${data.completed_level} conquered! +${stat(data.campaign_bonus_earned)} campaign points. Next: level ${data.next_level}.`:'🏆 Mystery solved! Your high score and achievements are saved.');}else setStatus(message);return data;}
   catch(e){setStatus('Could not save: '+(e.message||'Please retry.'));return null;}finally{busy=false;display();}
