@@ -116,3 +116,17 @@ body.community-page .mahjong-profile-history{margin-top:16px;padding-top:14px;bo
 body.community-page .mahjong-profile-history .mahjong-history-rows{max-height:260px}
 @media(max-width:430px){body.community-page .mahjong-pause-card{padding:16px 12px;gap:8px}body.community-page .mahjong-hud{font-size:12px;gap:6px}body.community-page .mahjong-remaining{font-size:12px}}
 @media(prefers-reduced-motion:reduce){body.community-page .mahjong-board-wrap.is-paused #mahjong-board{transition:none}}
+
+/* Mahjong Mystery Road: current level for every approved Commons member v4 */
+body.community-page .mahjong-level-help{font:650 13px/1.5 system-ui,sans-serif;color:#5d5066;margin:-6px 0 10px}
+body.community-page .mahjong-level-list{display:grid;gap:8px;margin:11px 0 18px}
+body.community-page .mahjong-level-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;border:1px solid #d5bad6;border-radius:13px;background:#fcf7fd;padding:10px 11px}
+body.community-page .mahjong-level-entry.is-me{border-color:#4d9d94;background:#eaf8ef}
+body.community-page .mahjong-level-copy{display:grid;min-width:0;gap:2px}
+body.community-page .mahjong-level-player{font:850 14px/1.3 system-ui,sans-serif;color:#3c294c;overflow-wrap:anywhere}
+body.community-page .mahjong-level-player small{font:750 11px/1.3 system-ui,sans-serif;color:#126d6c}
+body.community-page .mahjong-level-caption{font:650 11px/1.4 system-ui,sans-serif;color:#665770;overflow-wrap:anywhere}
+body.community-page .mahjong-level-pill{flex-shrink:0;white-space:nowrap;padding:7px 10px;border:2px solid #745399;border-radius:999px;background:#493265;color:#fff;font:900 12px/1.2 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+body.community-page .mahjong-level-entry.is-me .mahjong-level-pill{background:#176e67;border-color:#176e67}
+body.community-page .mahjong-score-divider{height:1px;background:#e5d8e8;margin:12px 0 16px}
+@media(max-width:400px){body.community-page .mahjong-level-entry{padding:8px;gap:7px}body.community-page .mahjong-level-pill{font-size:11px;padding:6px 8px}}

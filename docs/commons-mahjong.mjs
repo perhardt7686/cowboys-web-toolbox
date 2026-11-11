@@ -53,7 +53,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
    <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span><strong id="mahjong-remaining" class="mahjong-remaining" aria-live="polite"></strong></div><div id="mahjong-board-wrap" class="mahjong-board-wrap"><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div><div id="mahjong-pause-screen" class="mahjong-pause-screen" hidden><div class="mahjong-pause-card"><span class="mahjong-pause-symbol" aria-hidden="true">⏸</span><strong>Game paused</strong><p>Your tiles, matches, and score are saved to your Commons account.</p><button type="button" id="mahjong-overlay-resume">▶ Resume game</button></div></div></div>
    <div class="mahjong-actions"><button type="button" id="mahjong-new">New game</button><button type="button" id="mahjong-pause">⏸ Pause</button><button type="button" id="mahjong-hint">💡 Hint</button><button type="button" id="mahjong-shuffle">⤨ Shuffle</button><button type="button" id="mahjong-undo">↶ Undo</button></div><p class="mahjong-status" id="mahjong-status" role="status" aria-live="polite">Tap New game to begin.</p></div>
-   <div class="mahjong-bottom"><section class="mahjong-leaders"><h3>Commons hall of fame</h3><div id="mahjong-leader-list"></div></section><section class="mahjong-badges"><div class="mahjong-badge-head"><h3>Achievements</h3><button type="button" class="mahjong-profile-link" id="mahjong-profile-open">View on my profile ↗</button></div><div id="mahjong-achievement-list"></div></section></div>
+   <div class="mahjong-bottom"><section class="mahjong-leaders"><h3>Current player levels</h3><p class="mahjong-level-help">Mystery Road levels for everyone in The Commons, updated from saved games.</p><div id="mahjong-level-list" class="mahjong-level-list" aria-live="polite"></div><div class="mahjong-score-divider" aria-hidden="true"></div><h3>High scores</h3><div id="mahjong-leader-list"></div></section><section class="mahjong-badges"><div class="mahjong-badge-head"><h3>Achievements</h3><button type="button" class="mahjong-profile-link" id="mahjong-profile-open">View on my profile ↗</button></div><div id="mahjong-achievement-list"></div></section></div>
    <section class="mahjong-history" aria-label="Mahjong run history"><div class="mahjong-history-heading"><h3>My previous games</h3><p>Finished boards and retired runs, saved automatically. Your latest game appears first.</p></div><div id="mahjong-history-list" aria-live="polite"></div></section>
    <p class="mahjong-footnote">A tile is free when no tile covers it and at least one horizontal side is open. Match both the tile picture and its flower or sun corner mark. Hints and shuffles reduce your score, but you never lose an earned achievement. Progress is saved to your Commons account.</p>
   </div>`;
@@ -115,12 +115,27 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   for(const id of ['mahjong-hint','mahjong-shuffle','mahjong-undo'])$(id).disabled=!runState||busy||paused;
   $('mahjong-new').textContent=runState?'Restart':'New game';$('mahjong-new').disabled=busy;
   $('mahjong-undo').disabled=!runState||runState.moves<1||busy||paused;
-  renderBoard();const lst=$('mahjong-leader-list');lst.replaceChildren();
+  renderBoard();
+  const levelList=$('mahjong-level-list');levelList.replaceChildren();
+  const players=Array.isArray(state.progress_leaders)?state.progress_leaders:[];
+  if(!players.length)levelList.append(node('p','mahjong-empty','No player levels available yet.'));
+  for(const player of players){
+   const current=player.user_id===userId;
+   const entry=node('div','mahjong-level-entry'+(current?' is-me':''));
+   const info=node('div','mahjong-level-copy');
+   const name=node('strong','mahjong-level-player',player.name||'Member');
+   if(current)name.append(node('small','', ' (you)'));
+   const detail=node('small','mahjong-level-caption',player.started?`${stat(player.cleared)} stages cleared · Best ${stat(player.best)} points`:'Not started');
+   info.append(name,detail);
+   const level=node('span','mahjong-level-pill',`Level ${Math.max(1,Number(player.level)||1)}`);
+   entry.append(info,level);levelList.append(entry);
+  }
+  const lst=$('mahjong-leader-list');lst.replaceChildren();
   if(!leaders.length)lst.append(node('p','mahjong-empty','First completed game claims the first record.'));
   for(const [i,e] of leaders.entries()){
    const row=node('div','mahjong-leader');row.append(node('span','mahjong-rank',i===0?'♛':String(i+1)));
    const nm=node('span','mahjong-leader-name',e.name||'Member');if(e.user_id===userId)nm.append(node('small','', ' (you)'));row.append(nm);
-   row.append(node('strong','',`${stat(e.best)} · Lv ${e.stage||1}`));lst.append(row);
+   row.append(node('strong','',`${stat(e.best)} pts`));lst.append(row);
   }
   renderHistory(p.history||[]);
   const badges=$('mahjong-achievement-list');badges.replaceChildren();const earned=new Set((p.badges||[]).map(b=>b.code));
