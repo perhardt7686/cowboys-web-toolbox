@@ -1,0 +1,33 @@
+name: Fix Word Quest Mobile Letter Spacing
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/wordquest-mobile-layout.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep every five-letter guess on one mobile row
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          css=Path('docs/commons-family.css')
+          html=Path('docs/community.html')
+          s=css.read_text()
+          assert '.word-tile-row{display:flex' in s, 'Word Quest stylesheet changed; refusing blind fix'
+          if '/* Word Quest: five tiles stay on one row v2 */' not in s:
+           css.write_text(s+'\n/* Word Quest: five tiles stay on one row v2 */\nbody.community-page .word-tile-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(32px,auto);gap:6px;align-items:center;min-width:0}\nbody.community-page .word-tile-row>.word-player{grid-column:1/-1;min-width:0;width:auto;max-width:100%;font-size:14px;overflow-wrap:anywhere}\nbody.community-page .word-tile-row>.word-tile{width:100%;max-width:48px;min-width:0;height:auto;aspect-ratio:1;font-size:clamp(16px,4vw,23px)}\nbody.community-page .word-tile-row>strong{grid-column:6;grid-row:2;margin-inline-start:0!important;justify-self:end;white-space:nowrap}\n@media(max-width:440px){body.community-page .word-panel{padding:11px}body.community-page .word-tile-row{gap:4px}body.community-page .word-tile-row>.word-tile{font-size:clamp(17px,5.2vw,22px)}}\n')
+          page=html.read_text()
+          if 'commons-family.css?v=2' not in page:
+           assert 'commons-family.css?v=1' in page, 'Stylesheet link changed; refusing blind fix'
+           html.write_text(page.replace('commons-family.css?v=1','commons-family.css?v=2',1))
+          PYCODE
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-family.css docs/community.html
+          git diff --cached --quiet || (git commit -m "Fix Word Quest mobile tile wrapping" && git push origin HEAD:main)
