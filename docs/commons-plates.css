@@ -1,0 +1,31 @@
+/* Two-person license plate game, contained inside Commons only. */
+body.community-page .plate-game{color:#281f35;margin:0 0 24px;grid-column:1/-1;min-width:0;}
+body.community-page .plate-entry-button{display:flex;width:100%;align-items:center;gap:14px;padding:16px 20px;text-align:left;border:3px solid #6f4ca4;border-radius:20px;background:linear-gradient(115deg,#1e142e,#41305a 70%,#145c6d);box-shadow:0 6px 0 #563f79aa;color:#fff;cursor:pointer;}
+body.community-page .plate-entry-button strong{font-size:clamp(19px,3vw,25px);display:block;font-weight:900;line-height:1.1;}body.community-page .plate-entry-button small{display:block;font-size:15px;margin-top:4px;font-weight:650;color:#f7e9ff}
+body.community-page .plate-entry-icon{font-size:33px}body.community-page .plate-expand{font-size:30px;margin-left:auto;transition:transform .2s}body.community-page .plate-entry-button[aria-expanded=true] .plate-expand{transform:rotate(180deg)}
+body.community-page #plate-game-content{border:3px solid #b790d0;border-radius:20px;background:#fffaf4;padding:clamp(15px,3vw,26px);margin-top:12px;box-shadow:0 6px 0 #51326126}
+body.community-page #plate-game-content[hidden]{display:none}
+body.community-page .plate-heading{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
+body.community-page .plate-heading h2{font-size:clamp(25px,4vw,35px);line-height:1.12;margin:6px 0}.plate-heading p{font-size:16px;line-height:1.45;margin:5px 0}.plate-eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;color:#69478a}
+body.community-page .plate-score{display:flex;gap:10px}.plate-scorecard{padding:8px 14px;background:#f3e8ff;border-radius:14px;display:grid;text-align:center;min-width:94px}.plate-scorecard span{font-weight:800}.plate-scorecard strong{font-size:30px;line-height:1.25}
+body.community-page .plate-rules{padding:13px 16px;background:#e7f5f3;border-left:5px solid #0c7c78;border-radius:12px;font-size:15px;line-height:1.5;margin:16px 0}
+body.community-page .plate-new{padding:18px;border:2px solid #e1c9e8;border-radius:17px;background:#fff}body.community-page .plate-new h3{font-size:22px;margin:0 0 12px}
+body.community-page .plate-new label,body.community-page .plate-disagree label,body.community-page .plate-revise label{display:grid;gap:6px;font-size:15px;font-weight:800;margin:10px 0}
+body.community-page .plate-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+body.community-page .plate-new :is(input,textarea),body.community-page .plate-disagree textarea,body.community-page .plate-revise textarea{font:inherit;font-size:16px;line-height:1.4;border:2px solid #a88cb3;border-radius:10px;padding:10px;min-width:0;width:100%;background:#fff;color:#281f35}
+body.community-page .plate-new :is(input,textarea):focus-visible,body.community-page .plate-game button:focus-visible,body.community-page .plate-game a:focus-visible{outline:4px solid #0a797a;outline-offset:3px}
+body.community-page .plate-hint{font-size:13px;line-height:1.5;color:#655875}
+body.community-page .plate-button{padding:11px 15px;background:#51336b;color:#fff;font-size:15px;font-weight:850;border:2px solid #51336b;border-radius:12px;cursor:pointer;min-height:42px}
+body.community-page .plate-button.secondary{background:#fff;color:#51336b}.plate-button.yes{background:#11644f;border-color:#11644f}.plate-button.no{background:#8e3956;border-color:#8e3956}.plate-button:disabled{opacity:.5;cursor:wait}
+body.community-page .plate-list-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:23px 0 12px}.plate-list-header h3{font-size:23px;margin:0}
+body.community-page .plate-card{background:#fff;border:2px solid #bfa7ca;border-radius:18px;padding:17px;margin:15px 0;box-shadow:0 4px 0 #51336b20}
+body.community-page .plate-card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:9px;margin-bottom:13px}.plate-by{display:flex;align-items:center;gap:8px}.plate-by strong{font-size:19px}
+body.community-page .plate-pill{display:inline-block;background:#efe0f5;color:#432959;font-size:12px;font-weight:900;padding:6px 9px;border-radius:999px}
+body.community-page .plate-preview{background:#e9e1ef;border-radius:12px;overflow:hidden;min-height:90px;display:flex;justify-content:center;align-items:center}.plate-photo{display:block;max-height:410px;width:100%;object-fit:contain}
+body.community-page .plate-plate{font-size:23px;font-weight:900;letter-spacing:.06em;margin:12px 0 5px}.plate-card-info strong{font-size:14px}.plate-guess{font-size:17px;line-height:1.5;white-space:pre-wrap;margin:7px 0}
+body.community-page .plate-links{display:flex;flex-wrap:wrap;gap:14px;margin:13px 0}.plate-research{font-size:15px!important;font-weight:800;color:#0b616b!important;text-decoration:underline!important}
+body.community-page .plate-actions{display:flex;flex-wrap:wrap;gap:10px;margin:15px 0}.plate-done,.plate-waiting,.plate-reason{padding:11px 13px;border-radius:10px;background:#eaf5e8;font-size:15px;font-weight:700}.plate-reason{background:#fff1dd}.plate-waiting{background:#eceaf6}
+body.community-page .plate-disagree,body.community-page .plate-revise{padding:15px;background:#fcf5ed;border:2px solid #e6c6a9;border-radius:12px;margin:12px 0}.plate-history{padding:10px;font-size:14px;color:#46384e}.plate-history summary{font-weight:850;cursor:pointer}.plate-history-row{padding:5px 0;border-bottom:1px solid #eee}
+body.community-page #plate-status{font-size:14px;min-height:12px;line-height:1.5;font-weight:800;color:#533a6a}
+@media(max-width:760px){body.community-page .plate-fields{grid-template-columns:1fr}body.community-page .plate-game .plate-heading{align-items:flex-start}body.community-page .plate-scorecard{min-width:86px}body.community-page .plate-entry-button{padding:13px}}
+@media(prefers-reduced-motion:reduce){body.community-page .plate-expand{transition:none}}
