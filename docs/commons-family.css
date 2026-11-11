@@ -76,3 +76,10 @@ body.community-page .art-status{font:750 13px/1.5 system-ui,sans-serif!important
 @media(prefers-reduced-motion:reduce){body.community-page .family-btn{transition:none}}
 body.community-page .word-player .word-initials{width:28px;height:28px;min-width:28px;border-radius:50%;display:grid;place-items:center;background:#70427c;color:white;font:850 10px/1 system-ui,sans-serif;border:2px solid #d5a75f;}
 body.community-page .content-dialog>.thread-meta .avatar,body.community-page .content-dialog>.thread-meta .profile-avatar{min-width:60px!important;width:60px!important;height:60px!important;border:3px solid #ddad51!important;}
+
+/* Word Quest: five tiles stay on one row v2 */
+body.community-page .word-tile-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(32px,auto);gap:6px;align-items:center;min-width:0}
+body.community-page .word-tile-row>.word-player{grid-column:1/-1;min-width:0;width:auto;max-width:100%;font-size:14px;overflow-wrap:anywhere}
+body.community-page .word-tile-row>.word-tile{width:100%;max-width:48px;min-width:0;height:auto;aspect-ratio:1;font-size:clamp(16px,4vw,23px)}
+body.community-page .word-tile-row>strong{grid-column:6;grid-row:2;margin-inline-start:0!important;justify-self:end;white-space:nowrap}
+@media(max-width:440px){body.community-page .word-panel{padding:11px}body.community-page .word-tile-row{gap:4px}body.community-page .word-tile-row>.word-tile{font-size:clamp(17px,5.2vw,22px)}}
