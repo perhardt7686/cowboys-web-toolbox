@@ -29,3 +29,17 @@ body.community-page .plate-disagree,body.community-page .plate-revise{padding:15
 body.community-page #plate-status{font-size:14px;min-height:12px;line-height:1.5;font-weight:800;color:#533a6a}
 @media(max-width:760px){body.community-page .plate-fields{grid-template-columns:1fr}body.community-page .plate-game .plate-heading{align-items:flex-start}body.community-page .plate-scorecard{min-width:86px}body.community-page .plate-entry-button{padding:13px}}
 @media(prefers-reduced-motion:reduce){body.community-page .plate-expand{transition:none}}
+
+/* Plate photo review fix: display photos after DOM insertion, zoom to inspect, retry failed downloads. */
+body.community-page .plate-preview{flex-direction:column;gap:7px;padding:7px}
+body.community-page .plate-photo-open{display:block;width:100%;border:0;padding:0;margin:0;background:transparent;border-radius:9px;cursor:zoom-in;min-height:80px}
+body.community-page .plate-photo-open img{display:block;width:100%;max-height:410px;object-fit:contain}
+body.community-page .plate-photo-tap-hint{font:800 12px/1.35 system-ui,sans-serif;color:#503669;margin:1px 0 4px}
+body.community-page .plate-photo-loading{margin:6px 0;font:750 13px/1.45 system-ui,sans-serif;color:#463655;text-align:center}
+body.community-page .plate-photo-retry{margin:0 auto 8px}
+body.community-page .plate-photo-dialog{box-sizing:border-box;position:fixed;inset:0;margin:auto;border:3px solid #d3aa64;border-radius:17px;padding:12px;width:min(96vw,1100px);max-width:96vw;max-height:94dvh;overflow:auto;background:#fbf6ed;color:#382747;box-shadow:0 24px 90px #0008}
+body.community-page .plate-photo-dialog::backdrop{background:rgba(17,12,25,.88)}
+body.community-page .plate-photo-close{display:block;margin:0 0 10px auto;position:sticky;top:0;z-index:2}
+body.community-page .plate-photo-full{display:block;max-width:100%;max-height:75dvh;height:auto;width:auto;object-fit:contain;margin:0 auto;border-radius:8px;touch-action:pinch-zoom}
+body.community-page .plate-photo-caption{font:850 15px/1.4 system-ui,sans-serif;text-align:center;overflow-wrap:anywhere;margin:10px 0 4px}
+@media(max-width:500px){body.community-page .plate-photo-dialog{padding:8px;max-height:98dvh;width:98vw;max-width:98vw}body.community-page .plate-photo-full{max-height:78dvh}}

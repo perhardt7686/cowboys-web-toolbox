@@ -64,6 +64,18 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   if(!src){const {data,error}=await client.storage.from('community-plate-game').download(path);if(error)throw error;src=URL.createObjectURL(data);urls.set(path,src);}
   if(img.isConnected)img.src=src;
  }
+ function reviewPhoto(img,caption){
+  if(!img.src||!img.complete||!img.naturalWidth){setStatus('Photo is still loading. Please retry shortly.');return;}
+  const dialog=newEl('dialog','plate-photo-dialog');dialog.id='plate-photo-viewer';
+  dialog.setAttribute('aria-label','Full-size license plate photograph');
+  const close=button('Close photo ✕',()=>dialog.close(),'secondary');close.classList.add('plate-photo-close');
+  const full=newEl('img','plate-photo-full');full.alt=img.alt;full.src=img.src;
+  dialog.append(close,full,ptext(caption,'plate-photo-caption'));
+  document.body.append(dialog);
+  dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+  dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
+  dialog.showModal();
+ }
  function display(){
   scores();const list=$('plate-list');list.replaceChildren();
   const entries=game?.entries||[];
@@ -76,8 +88,26 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    const status=entry.status==='approved'?'👍 Approved · +1':entry.status==='needs_revision'?'👎 Explanation needed':'Awaiting vote';
    head.append(by,pill(status));card.append(head);
    const img=newEl('img','plate-photo');img.alt='License plate challenge posted by '+nameFor(entry.seat);img.loading='lazy';
-   const preview=newEl('div','plate-preview');preview.append(img);card.append(preview);
-   picture(img,entry.photo_path).catch(()=>{img.alt='Photo temporarily unavailable. Refresh to retry.';});
+   const preview=newEl('div','plate-preview');
+   const open=newEl('button','plate-photo-open');open.type='button';
+   open.setAttribute('aria-label','Review full-size photo of '+entry.plate);
+   open.append(img);preview.append(open);
+   const inspectHint=ptext('Tap photo to enlarge','plate-photo-tap-hint');inspectHint.hidden=true;preview.append(inspectHint);
+   const loading=ptext('Loading saved photo…','plate-photo-loading');preview.append(loading);
+   const retry=button('Retry photo',()=>{void loadPhoto();},'secondary');
+   retry.classList.add('plate-photo-retry');retry.hidden=true;preview.append(retry);
+   const loadPhoto=async()=>{
+    loading.hidden=false;loading.textContent='Loading saved photo…';retry.hidden=true;inspectHint.hidden=true;
+    try{
+     // Photo must be attached before storage returns; the old code skipped detached images.
+     await picture(img,entry.photo_path);
+     if(img.complete&&img.naturalWidth){loading.hidden=true;inspectHint.hidden=false;return;}
+     img.addEventListener('load',()=>{loading.hidden=true;retry.hidden=true;inspectHint.hidden=false;},{once:true});
+     img.addEventListener('error',()=>{loading.textContent='Photo could not be displayed.';retry.hidden=false;},{once:true});
+    }catch(error){loading.textContent='Could not download the saved photo. Retry below.';retry.hidden=false;}
+   };
+   open.addEventListener('click',()=>reviewPhoto(img,entry.plate+' · '+nameFor(entry.seat)));
+   card.append(preview);
    const info=newEl('div','plate-card-info');info.append(ptext(`${entry.plate}${entry.region?' · '+entry.region:''}`,'plate-plate'));
    const guess=ptext(entry.guess,'plate-guess');info.append(labelText('The interpretation'),guess);
    const refs=newEl('div','plate-links');
@@ -108,6 +138,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     card.append(details);
    }
    list.append(card);
+   void loadPhoto();
   }
  }
  async function refresh(quiet=false){
@@ -171,7 +202,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   userId=id;seat=data.seat;game=data;mounted=true;frame();if(!$('plate-game-root'))return;display();
   if(timer)clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&mounted)refresh(true);},25000);
  }
- function unmount(){mounted=false;seat=null;userId=null;game=null;expanded=false;if(timer){clearInterval(timer);timer=null;}clean();$('plate-game-root')?.remove();}
+ function unmount(){$('plate-photo-viewer')?.close();mounted=false;seat=null;userId=null;game=null;expanded=false;if(timer){clearInterval(timer);timer=null;}clean();$('plate-game-root')?.remove();}
  try{
   const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
   const local=window.localStorage,session=window.sessionStorage;
