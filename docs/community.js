@@ -5,7 +5,7 @@ import {PROFILE_DEFAULTS} from './profile-core.mjs?v=powers1';
 import {createPowerHouse} from './community-powers.mjs?v=private1';
 import {createForum} from './forum-ui.mjs?v=private1';
 import {timeHTML,forumBody} from './forum-core.mjs?v=powers1';
-import {createCommunityLab} from './community-lab.mjs?v=private1';
+import {createCommunityLab} from './community-lab.mjs?v=hero4';
 import {validateLabPost} from './lab-core.mjs';
 import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
