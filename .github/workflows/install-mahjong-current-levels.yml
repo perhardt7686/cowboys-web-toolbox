@@ -1,0 +1,31 @@
+name: Install Mahjong Current Player Levels
+'on':
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/install-mahjong-current-levels.yml
+permissions:
+  contents: write
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add current levels for every Commons member
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          import base64, zlib
+          source=zlib.decompress(base64.b64decode('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'))
+          exec(compile(source,'mahjong_player_levels_patch.py','exec'))
+          PYCODE
+          node --check docs/commons-mahjong.mjs
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/commons-mahjong.mjs docs/commons-mahjong.css docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Show every Commons player current Mahjong level'
+            git push origin HEAD:main
+          fi
