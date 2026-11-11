@@ -73,6 +73,7 @@ jobs:
       - name: Validate source
         run: |
           node --check docs/commons-mahjong.mjs
+          npm ci
           npm test --if-present
       - name: Commit installer results
         run: |
