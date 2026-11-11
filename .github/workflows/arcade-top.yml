@@ -1,0 +1,28 @@
+name: Put Family Arcade Above Commons Messages
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/arcade-top.yml']
+permissions:
+  contents: write
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('docs/commons-family.mjs')
+          s=p.read_text()
+          old="    const after=byId('load-more')||byId('community-feed');after?.insertAdjacentElement('afterend',zone);"
+          new="    const before=board.querySelector('.community-main .community-heading');before?.insertAdjacentElement('beforebegin',zone);"
+          assert s.count(old)==1 or (old not in s and new in s), 'Unexpected source. No changes made.'
+          if old in s:p.write_text(s.replace(old,new,1))
+          PY
+          node --check docs/commons-family.mjs
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/commons-family.mjs
+          git diff --cached --quiet || (git commit -m 'Put Family Arcade above Commons messages' && git push origin HEAD:main)
