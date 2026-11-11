@@ -43,6 +43,23 @@ export async function showAchievements(ctx,userId){
  box.append(el('span','mahjong-badge-symbol',unlocked.has(code)?icon:'♙'));
  const copy=el('span','mahjong-badge-copy');copy.append(el('strong','',name),el('small','',unlocked.has(code)?'Unlocked · '+detail:'Locked · '+detail));box.append(copy);grid.append(box);}
  section.append(grid);
+ const history=el('section','mahjong-profile-history');
+ history.append(el('h4','','Previous Mahjong games'));
+ const runs=Array.isArray(data.history)?data.history:[];
+ if(!runs.length)history.append(el('p','','No finished games yet.'));
+ else{
+  const list=el('ol','mahjong-history-rows');
+  for(const game of runs.slice(0,12)){
+   const item=el('li','mahjong-history-row');
+   const top=el('div','mahjong-history-score');
+   top.append(el('strong','',stat(game.score)+' pts'),el('span','',`Level ${game.level||1} · ${game.status==='won'?'Victory':'Retired'} · ${Number(game.pairs)||0}/36 pairs`));
+   let when='';try{const date=new Date(game.finished_at||game.started_at);if(!Number.isNaN(date.getTime()))when=date.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});}catch{}
+   const seconds=Math.max(0,Number(game.active_seconds)||0);
+   item.append(top,el('small','',`${when} · ${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} active`));list.append(item);
+  }
+  history.append(list);
+ }
+ section.append(history);
  if(current.classList.contains('profile-studio')){const aside=current.querySelector('.studio-preview');if(aside)aside.append(section);else content.append(section);}
  else content.append(section);
 }

@@ -91,3 +91,28 @@ body.community-page #mahjong-campaign-goal{margin:12px 0 0;font:850 12px/1.5 sys
 body.community-page .mahjong-profile-campaign{border:1px solid #b6a6c4;background:#f9f0de;border-radius:9px;padding:10px 12px}
 body.community-page .mahjong-profile-progress{margin:12px 0 16px}
 @media(max-width:440px){body.community-page .mahjong-campaign-heading h3{font-size:21px}body.community-page #mahjong-level-number{font-size:12px;padding:7px 9px}}
+/* Mahjong pause + history v3 */
+body.community-page .mahjong-board-wrap{position:relative;width:100%;max-width:670px;margin:0 auto;isolation:isolate}
+body.community-page .mahjong-board-wrap .mahjong-board{max-width:none}
+body.community-page .mahjong-board-wrap.is-paused #mahjong-board{filter:blur(14px) brightness(.55);pointer-events:none;user-select:none;transition:filter .15s ease}
+body.community-page .mahjong-pause-screen{position:absolute;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(14,23,40,.28)}
+body.community-page .mahjong-pause-screen[hidden]{display:none!important}
+body.community-page .mahjong-pause-card{width:min(100%,360px);display:grid;justify-items:center;gap:12px;text-align:center;padding:22px 18px;border:3px solid #e6bf6c;border-radius:20px;background:linear-gradient(145deg,#fff6db,#f5e6f6);box-shadow:0 12px 40px #111323aa;color:#3e2853}
+body.community-page .mahjong-pause-symbol{font-size:35px;line-height:1;color:#523b77}
+body.community-page .mahjong-pause-card strong{font:900 clamp(21px,4vw,28px)/1.2 system-ui,sans-serif;color:#35224e}
+body.community-page .mahjong-pause-card p{font:650 14px/1.5 system-ui,sans-serif;color:#51415e;margin:0}
+body.community-page .mahjong-pause-card button{padding:12px 19px;border:2px solid #f1c76e;border-radius:12px;background:#38284e;color:#fff;font:850 15px/1.25 system-ui,sans-serif;cursor:pointer}
+body.community-page .mahjong-remaining{color:#fff8d0;background:#483153;border:1px solid #d2ba72;border-radius:999px;padding:5px 9px;font:900 13px/1.2 system-ui,sans-serif}
+body.community-page .mahjong-history{margin:18px 0 16px;padding:15px;border:2px solid #c7b0d2;background:#fffdf8;border-radius:16px;color:#39264c}
+body.community-page .mahjong-history-heading h3,body.community-page .mahjong-profile-history h4{font:900 20px/1.25 system-ui,sans-serif;color:#38254b;margin:0 0 5px}
+body.community-page .mahjong-history-heading p{font:650 13px/1.5 system-ui,sans-serif;color:#5d5066;margin:0 0 12px}
+body.community-page .mahjong-history-rows{display:grid;gap:8px;list-style:none;margin:0;padding:0;max-height:340px;overflow:auto}
+body.community-page .mahjong-history-row{padding:11px 12px;border:1px solid #d7c5d8;background:#f7f1fa;border-radius:11px}
+body.community-page .mahjong-history-score{display:flex;align-items:baseline;justify-content:space-between;gap:9px;flex-wrap:wrap}
+body.community-page .mahjong-history-score strong{font:900 17px/1.3 system-ui,sans-serif;color:#35234f}
+body.community-page .mahjong-history-score span{font:800 12px/1.45 system-ui,sans-serif;color:#185f6c}
+body.community-page .mahjong-history-row small{display:block;font:650 12px/1.55 system-ui,sans-serif;color:#59496b;margin-top:4px}
+body.community-page .mahjong-profile-history{margin-top:16px;padding-top:14px;border-top:1px solid #c9b5d5}
+body.community-page .mahjong-profile-history .mahjong-history-rows{max-height:260px}
+@media(max-width:430px){body.community-page .mahjong-pause-card{padding:16px 12px;gap:8px}body.community-page .mahjong-hud{font-size:12px;gap:6px}body.community-page .mahjong-remaining{font-size:12px}}
+@media(prefers-reduced-motion:reduce){body.community-page .mahjong-board-wrap.is-paused #mahjong-board{transition:none}}
