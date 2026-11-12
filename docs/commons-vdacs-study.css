@@ -1,0 +1,42 @@
+/* Cowboy's Work Academy: VDACS/7A public-source flashcards. */
+body.community-page .vdacs-study{margin:18px 0;min-width:0}
+body.community-page .vdacs-study .mahjong-entry-button{background:linear-gradient(115deg,#201531,#483267 63%,#276a62);border-color:#d7ae61}
+body.community-page .vdacs-inner{padding:clamp(16px,3vw,27px);border:3px solid #b49356;border-radius:0 0 23px 23px;background:linear-gradient(145deg,#fffdf6,#f4f0fd);color:#37264b;box-shadow:0 9px 22px #2b154b24}
+body.community-page .vdacs-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+body.community-page .vdacs-kicker{font:900 11px/1.5 system-ui,sans-serif;color:#12685d;letter-spacing:.09em}
+body.community-page .vdacs-head h2{font:900 clamp(23px,4vw,35px)/1.17 system-ui,sans-serif;color:#38224e;margin:5px 0 9px}
+body.community-page .vdacs-head p{font:650 14px/1.6 system-ui,sans-serif;color:#574b64;max-width:66ch;margin:0}
+body.community-page .vdacs-grade{padding:9px 12px;border:2px solid #b68d42;border-radius:99px;background:#fff0bd;color:#523a2b;font:900 12px/1.3 system-ui,sans-serif;white-space:nowrap}
+body.community-page .vdacs-resources{display:flex;flex-wrap:wrap;gap:9px;margin:15px 0}
+body.community-page .vdacs-resources a{display:inline-block;padding:9px 13px;border:1px solid #9785b1;border-radius:11px;background:#f1eaf8;color:#422a63;text-decoration:underline;text-underline-offset:3px;font:800 12px/1.4 system-ui,sans-serif}
+body.community-page .vdacs-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:15px 0}
+body.community-page .vdacs-metric{padding:11px 8px;text-align:center;background:#e9f6ec;border:2px solid #94b7ab;border-radius:11px;min-width:0}
+body.community-page .vdacs-metric:nth-child(even){background:#f3e9fa;border-color:#baa6ca}
+body.community-page .vdacs-metric small{display:block;font:900 9px/1.4 system-ui,sans-serif;letter-spacing:.03em;color:#4c4263}
+body.community-page .vdacs-metric strong{display:block;font:900 clamp(17px,2.6vw,25px)/1.35 system-ui,sans-serif;color:#3d2850;margin-top:4px}
+body.community-page .vdacs-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+body.community-page .vdacs-controls label{font:850 13px/1.3 system-ui,sans-serif;color:#3d2e4a}
+body.community-page .vdacs-controls select{min-height:43px;padding:8px 10px;font:750 14px/1.3 system-ui,sans-serif;color:#352848;background:#fff;border:2px solid #a894b4;border-radius:10px;max-width:100%}
+body.community-page .vdacs-card{min-height:255px;padding:clamp(19px,4vw,32px);border:4px solid #b08f52;border-radius:23px;background:radial-gradient(circle at 90% 0,#e6cf9e77,transparent 47%),linear-gradient(150deg,#fffbee,#e9f5ee);box-shadow:inset 0 0 0 3px #ffffff,0 8px 0 #5c4d6680;color:#2e2543}
+body.community-page .vdacs-topic-label{font:900 11px/1.4 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:#367469}
+body.community-page .vdacs-question{font:850 clamp(18px,3.2vw,26px)/1.36 system-ui,sans-serif;color:#382653;margin:18px 0 15px}
+body.community-page .vdacs-answer{font:750 clamp(16px,2.5vw,21px)/1.55 system-ui,sans-serif;color:#185448;border-top:2px solid #a4bea8;margin:17px 0 0;padding-top:17px}
+body.community-page .vdacs-tap-hint{font:650 13px/1.5 system-ui,sans-serif;color:#6b5b71;margin:20px 0 0}
+body.community-page .vdacs-empty{font:850 17px/1.5 system-ui,sans-serif;color:#493b5d}
+body.community-page .vdacs-actions{display:flex;gap:9px;align-items:stretch;justify-content:center;flex-wrap:wrap;margin:21px 0 10px}
+body.community-page .vdacs-actions button{min-height:47px;border:2px solid #a68b61;border-radius:12px;padding:10px 14px;background:#45315e;color:#fff7df;font:850 13px/1.25 system-ui,sans-serif;cursor:pointer}
+body.community-page .vdacs-actions #vdacs-reveal,body.community-page .vdacs-actions #vdacs-know{background:#187368;color:#fff;border-color:#126157}
+body.community-page .vdacs-actions #vdacs-again{background:#925544;border-color:#8b5445}
+body.community-page .vdacs-actions button[hidden]{display:none!important}
+body.community-page .vdacs-actions button:disabled{opacity:.4;cursor:not-allowed}
+body.community-page .vdacs-card-source{min-height:27px;text-align:center;margin:9px 0}
+body.community-page .vdacs-source-link{font:800 13px/1.5 system-ui,sans-serif;color:#305c83;text-decoration:underline;text-underline-offset:3px}
+body.community-page .vdacs-status{font:700 13px/1.5 system-ui,sans-serif;color:#4a4162;text-align:center}
+body.community-page .vdacs-badges{margin-top:20px;padding:16px;border:2px solid #d9c5a7;border-radius:15px;background:#fff}
+body.community-page .vdacs-badges h3{font:900 18px/1.3 system-ui,sans-serif;color:#352248;margin:0 0 12px}
+body.community-page #vdacs-badges-list{display:flex;gap:9px;flex-wrap:wrap}
+body.community-page .vdacs-badge{padding:8px 12px;border:1px solid #9786ae;border-radius:99px;background:#eee7f2;color:#655d6b;font:750 12px/1.3 system-ui,sans-serif}
+body.community-page .vdacs-badge.earned{border-color:#c28b44;background:#fff0b8;color:#68492a}
+body.community-page .vdacs-footnote{font:600 12px/1.55 system-ui,sans-serif;color:#675d73;margin-top:17px}
+@media(max-width:640px){body.community-page .vdacs-metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}body.community-page .vdacs-inner{padding:14px}body.community-page .vdacs-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}body.community-page #vdacs-reveal{grid-column:1/-1}body.community-page .vdacs-controls{display:grid;grid-template-columns:auto 1fr;align-items:center}body.community-page .vdacs-controls select{width:100%;min-width:0}body.community-page .vdacs-card{min-height:250px;padding:17px}body.community-page .vdacs-resources a{flex:1;text-align:center}}
+@media(prefers-reduced-motion:reduce){body.community-page .vdacs-study *,body.community-page .vdacs-study *:before{animation:none!important;transition:none!important}}
