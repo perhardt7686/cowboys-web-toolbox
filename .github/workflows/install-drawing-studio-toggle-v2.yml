@@ -1,0 +1,106 @@
+name: Repair Collapsible Drawing Studio Game Button
+'on':
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/install-drawing-studio-toggle-v2.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: commons-drawing-toggle-v2-installer
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install isolated, reversible drawing-studio wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import base64, zlib, re
+          payloads = {
+              'docs/commons-drawing-toggle.mjs': (
+                  'eNqNWM2S2zYSvs9TwJMqU/RKnFSOljVbTpwfV9lxdsdVqdqtHCCyJSEDEQoASlGSeYUc97rXfYp9mH2CfYR8DYAUOCOP44OG'
+                  'JLob/fPh64avnokvzGFpjoXDw3ZrWvdcvLLyoNq1uPFdo4xYyy2JZee9acXEyRWJg5W7Hdmp2H9WVhfimXi/UU5okntywm9I'
+                  'GKvWqpVaNMkUtXgn0bXedPWGmkq89mJrevln9LNyHoLP2NrWQI6aQdl5uSahWqcaElLURmu5c2qpKfg2FTtLjuyeZWvZ7qVj'
+                  'FU/Bte831IY9ZOc38OsXGHbknDItYl7JrdJH8YuBcwjBEvvUTIXywpO0TjTmENTZVENesvOwHhLjjQl776n1YW9rnJvJumb/'
+                  'RaPcTsujMCth9BCMY6euLiaTUiyuxa8XQhSdI1i0qvbFHO81auBDYK8bsRBFUpzFTWe8MLPG5MLsfhSuYw1nMa4ZL2RyIZFj'
+                  'QWlzQ/j1CObsxjH/mbA367U+72RcCrKavDBLLg/Z/t1xFjtNrLqS2lG/sETmmn9wMRai7bSeX2Bh1bW1R7nEVt7S1wh/EuIo'
+                  'Q/byfEGpMXW3RQRVbQkI+FITv00KR8FEUc6DDktXirePec6+1lo69220Vmzl5keDsIL1M4UoMkVH/qVHGXFSaFJIq+RMyyXp'
+                  'YiqK8YliLzLX09H6sPNRoPc9vkXv+xKMVs5GAEP2OEuWRuL+uAuS59bOxEQ/72TbUMNhhdrd8+uMCqPKGu2gMgDsXjBtS/ab'
+                  '92/fsCMvHHYQIYrF5dh/Bf1LEYxuVNNQu7j0tqPL6///+/f/vLhixetC/CWYFo9aqs3ueHn9AucO367H9YGh+Hlkaiu1vv5O'
+                  'qtZPhbslX2+mAuebQBJP5XY3BxOoPcomHGiwgZMedoLSn3QMh2JvPxDf//71397KCDspn4+Ap1H7vkJJOEJnqMR4LW7L0MK+'
+                  '4yXm/LZJhy8DfvoeSzmUuMd4qrBsmi+ZJ9+A5wnFnhS1VvUtIHFiwlNYZhd8SLrrR1BYiicLYIa9TdD9k+C9wUq7nvBOZTk/'
+                  '7T7OwhNe71evrsQrI1rjU5+4srTsFLid20tqPIbLahxV4qU+tb+Ikyn6X2NOxpDJ+nYq4BHUZg3tVU2Mm4Oxt7wFsIauN26o'
+                  'qfWAjL1sa25x+HeXArDkO9uGqvCHuxF7umNbT8akuTTSNjl2kOkEnM+PrxvUyLSgbSfZgMtglHrOI6qxJSUNpva+wz+iE7k4'
+                  '6aiVmDyJDv72W/S0Lwven7D9ckANkvk+zxJ3t65V/ohZghsNWjcf6WOcNvKmL73QZm06nxXZdDbNHBtUdEnYMowFWOCzb8SB'
+                  'xLZzPQx4WACwAGflYXZDNpVFDEH/tYqikwFpDztd/B5LGN/uhkQEVxnog9oo9pdihQlo0wcW5id0yyN812AWtAmAzCB0K3BY'
+                  'bYhlS9sl2Up8i/HFnkxZ4nGEs8SDjTKdS5IYlob5J2FdhoEHwjJ1bmmPH488A0IeeJ4QDjdPQURcOA+LBIWfOrLHG9Lo6wZk'
+                  'Ug0Vn7HYGKqxlh/GXRqLRjrp5H5jnH/8gMQxqp8NwmCWIzg4zYCNTvBTbhrv2WvVSC9BW8iZbI4Zs5UDLobzlAaePpvZlrxy'
+                  'gkeSuzc79Vln93oCD3op7YLQ2e+RMpMjxAGiODbdr8EnaHAPGnz06aT69GksR7WTFnIpmSHUQag8PZ5rOncxCQDrd1oyYzLG'
+                  'w90gMGWAebrL5HcX0K9ceawdPrWNZrIQf+tAC1VWdVAq7ggOAf6zQJIhPdOmvo1lxcADZm6yCXx6mq/6d4z8njKRH+YPzMN6'
+                  '2qfayt2Eu/H1BxGmmrJMiaxWCpkgzeL4RSZJ30vjYrGIxyQshqxmVeVKxJ1P8OBvoZgP69FDNy4nNkgCN7h98Rlmud5k/FuF'
+                  'JJ8B00d2KiMWsU8Oxr7S73pmz7m7NYfA0K0RexXvg/UG/Rjm5+KWaMfMLF28vkU7A/nEvgBSS3dB/OVLHOmpOChcFDsf7rMs'
+                  'KsVSy/YWedhVp1PGHlQJp27yUYJg5BRlyYW5pxqhPa5IFIntrhTZy2gwO/WGyvmjpqq/cgbiaPnul5THy/3iiWLvTQrpejZM'
+                  'C7zNcGcrRz0qv8qdPLP0Ex+tl63ahtnhK8vUM570zl4Cw0IYVObZZHM38s5jRHowyDTHnKb5fTRGYJmplx/i/Yjn0FMNilP7'
+                  '2KEaXKg8yP7+yi2LDuJt50NU79LnITflWLxKDxPedip+dd3SW6LnIVHTiFX2I31I4ct+ZnW94PDlK6Vxtp6DnCIamHC4ZcxC'
+                  'vyh+6OdAHgkwfUYqDBQY4Y6W3TRh3oSCtbJdB85UtqdInBYkf4NbCI66Ts0c1v4+TAXDAUozwAFB4MoDrgx8gJMDQYCMD1C9'
+                  '4R1cNQLKZKgol2aoWIjghv/XJpBYoY1sYLDo6zwIPrxIvHr39ovYdd5AKQz3ASPIuMGIHLOYgBSpKEFofnFX8u8fViI+TA=='
+              ),
+              'docs/commons-drawing-toggle.css': (
+                  'eNqVkkFuwjAQRfecYirUDaohoVRCybY36LLqwokn6aiOx7IdSIp699qAKlhQhaXtb783X14t4NXJPZkW3kKviKGVHULVh8Cm'
+                  'gKbXeoSatZbWU6XxCXAgH1Jecy01qPNt69Cj26FawmI1q1iNy5q7rjcURmFlizA/R4U/gkQCCcccDjOAPanwWeRZ9lh2ZMRp'
+                  'mZWdHMTFUcWD8PQdHykqdgqdiDsx5Np4p4pCX0W+tgPkWzuUs59JGmQ8KXz/JKXQfBwUeavlWBg2+ECdZRekCfc8lca5IXp7'
+                  'MiuVSul8E/UzWE/3/6sR5inJxgvpwjSJy9avfU6dxsj9FpEudoT7VN0/Gte8iZjAbauxaLjufYQcv2RicB80GSyeY3ueNSmY'
+                  '46bavmB5PhHcNB5DCiTWL9WtD58='
+              ),
+          }
+          for path, chunks in payloads.items():
+              target=Path(path)
+              target.parent.mkdir(parents=True,exist_ok=True)
+              target.write_bytes(zlib.decompress(base64.b64decode(''.join(chunks))))
+          html_path=Path('docs/community.html')
+          html=html_path.read_text(encoding='utf-8')
+          assert '</head>' in html and 'commons-family.mjs' in html and 'commons-family.css' in html, 'Unexpected Commons template; no page edit'
+          html=re.sub(r'<link rel="stylesheet" href="commons-drawing-toggle.css\?v=[^"<>]+">\s*', '', html)
+          html=re.sub(r'<script type="module" src="commons-drawing-toggle.mjs\?v=[^"<>]+"></script>\s*', '', html)
+          version='studio2'
+          tags='<link rel="stylesheet" href="commons-drawing-toggle.css?v='+version+'">\n' + '<script type="module" src="commons-drawing-toggle.mjs?v='+version+'"></script>\n'
+          html=html.replace('</head>',tags+'</head>',1)
+          html_path.write_text(html,encoding='utf-8')
+          assert html.count('commons-drawing-toggle.mjs?v=studio2')==1
+          assert html.count('commons-drawing-toggle.css?v=studio2')==1
+          js=Path('docs/commons-drawing-toggle.mjs').read_text(encoding='utf-8')
+          assert 'content.append(stage)' in js and 'content.hidden = !open' in js
+          assert 'boundZone = null' in js and 'existing?.remove()' in js
+          assert 'startDrawingStudio(' not in js, 'Must not reinitialize existing canvas'
+          print('Drawing Studio game button installed; existing canvas remains intact.')
+          PYCODE
+      - name: Validate unchanged drawing engine and run repository tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/commons-drawing-toggle.mjs
+          node --check docs/commons-drawing.mjs
+          node --check docs/commons-family.mjs
+          git diff --check
+          npm ci
+          npm test --if-present
+      - name: Commit Drawing Studio collapsible button
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-drawing-toggle.mjs docs/commons-drawing-toggle.css docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Wrap existing Drawing Studio in persistent collapsible game button"
+            git push origin HEAD:main
+          fi
