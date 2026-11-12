@@ -1,0 +1,137 @@
+name: Install shared word guess visibility and dictionary history
+'on':
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/install-commons-shared-guesses.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: commons-shared-guesses-installer
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install live shared guessing ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import base64, zlib, re
+          assets = {
+              'docs/commons-shared-guesses.mjs': '''
+          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
+          my+0g7XYreHcsgY8GEomMU9ffXO0YZ/BKUJ2wHeiqjGd9mqqteqYCOwKzfT6uzJ7tGgoe+2HHhAYmpkYQuK5rvNgdtYMcwWJAOT5
+          Ts63DN99m3JCHPpYbL9b6bQXv6OsTD5pYEs91EkpTa+cFb2/+P16/kf3k/7Lq+Tlyz8mR71DqYu1+2m8TUndpyg0cJ/CxC7++jU3
+          dKvh+wFNpFvf0nSeiJynA92BDTx91CwtobOeGUnx+XFYzbutdXc9MI98d7AMmIYkm3I9hKSJL/vXH993rFZDVUcJHgM+rSZ6livQ
+          GtQGN0e3h5xeYLumuvdNvv0YIFT4Dnqxm1o/t9jd4QBFSKBWcJjuA4cxfj10NZ/JPp/d0wcvEDfAnl0G7WOoifFJxHnOFTJkv7fw
+          ng/NF0Q9h3BWAhdu3e20bK9ZN78/ALV8aAx9enQxhJz2ANlh7ZZ3lT9/VV5ZevyVm3cD73/9p2+OjqLW434HvjbYw2NSWb46eEzx
+          k26GppbSaoVKZrwspqHFbiP89mUy4Bb49Qe+Q5lARhq75w0sR9CURvZDNFt74echfLHYBRd+7ERgK6levjxyYq0uu7/AHX1Kp8AC
+          5/YbNHfdjoFiIxeutniFO1i5nftt0x0DsrbEVnig8Ghl07Zqq0rrlWjdxEFnp6JQ6suzd+enb+8urq+erV1cUYJXPvvOG7wb74Qh
+          aXf2irweYgfLGJTr1NuS/YYmli8I1sXaxPYXRBe3+x/5vhqv
+          ''',
+              'docs/commons-shared-guesses.css': '''
+          eNqFVttu5DYMfc9XuAgW2ATxrO/jC7BoP0WWKI8a2TIkTSbpIP9eypeJ7XHaFwOWxCPy8JDUr2fvLyn9FtoatGdORAPzmjMY40nV
+          vHhvwohagqfO1ggGHhB68qhUxh0jLXg96UAevOdfD4fR2r8ozXwJrAF9ffC8mtDXRqtzx0opOiDabzRhAjr7M0xSBs3LY5iGcRS+
+          PEZBFMSxlwU/cC0J0yh6qhCBKql0+chjHnHqFmq8AXQZ9u+eUVIw7zEL0zrPv/Z8q/oyWPy7K8+mDLzACzO0cx+33RPGRNeUYeQW
+          k8VOS3QjutEiGpdq9e5jkExdynHRi5zFYxAEcfXwuceAfwLCrkyYXpKPkkt4r/4+Gyv4h09VZ5GF0vSEgl+DvQB0FZGi6XxhoTUl
+          xW3QVUP6MgzQBWfuXzT+us/+fVZYCVeO2L4R/0B5yCMNbSXBIpTv7nLhHoIMFydiIWIx5xs4ihlDiyXSsdBfRixmBWyNTiD7lUU+
+          3I1pxy3RnGwZHpJ0hqAFLVhRTUQfkclg68RZa+Tgxl+jBRvocDlqCZIhmD0hOcGPGcYRdYczCHqdhW94Pt7RXK01/BjUAQtzQqp7
+          FaZpGme0WkuuQMRZZS7GvH/feNedXfFdJ1YI1BmtqyWLmWOxFd0c7sEtbEDI2Z7UlK7LyHWWBkuYPB1gFqy5f4zuckIaBmlA2akh
+          Zgvv1ldvoLlEsYOUojfCVLeVk2AMxTpXZgKUszs9OsV9sS66QQcD+Y7puN9NwkC+OWnRvZbbNFqB0t7D25bUhLUD78IdoqeStP3P
+          KO3fX7K3y0uMhfxUTSKNXb2vs5iOHWBBZ5E4+pZ850EwMTIwWi3ahegMWNdJXM9wLYNzHu9Ed6AKFU/tdam4sMijLNw73Wswrj6W
+          p0l6rKNo7zSp7w5nSRYctzT3SnTWrOr4uKj8OsIhwKsd1YwliJnntkQ9qm01S0VfV7DxEpbTlB13YDco0Pb2Yy4WmmELye9VPhdc
+          MvK9hdBa3eqN87quyQoi2SkvTU/iDa6L8bIs/CQNMzbHP2wGX2V/W9jH/G3OLVp+vOxt+kOi5iNunmJPNOj3kCQU9NyOKc04X0WR
+          LYlwnSdeaHjRIqQwaGM/JJQasMDtvptzcd034+K7yEbnV4ILIOAh2+mdSZJEaf0/vfN7EvGqi7l3LR3mxLfzBV8jUrjrBj/nCeIK
+          FMf+7ebcdYNFDFGBz5RiJ4asSFmebGJw1nvz679c+W2sVl2zGuOLUuF301pJvHFFdJxGNfK57kdbh/P0GNfZjsNz6IUj3XXDrWgm
+          rnJH1TCaptaZYMVVa4nuuVoiIwTfleyq3IvEfpSH7PPhzxaYID+/RlSSY8KfUPV7b8ulj7Ofn5uj4+CflLDdnEbm13XHkeUN61uz
+          YQpN4UZOoauBEk8Dxe08raDiHaydVhvtHLvvnMOhG2M4BzjOWh8NzhSNWmWF6srx9+m6w573fDVUK3z613AibwLT5Tr2H6Ltlbak
+          s5+fD+u8GXXWFOauWWcQYr8Z3gkMcGqR4UaUHmg3l8ed26+vOMcJWA4p+hdNim6j
+          ''',
+          }
+          for name, packed in assets.items():
+              destination=Path(name)
+              destination.parent.mkdir(parents=True,exist_ok=True)
+              destination.write_bytes(zlib.decompress(base64.b64decode(''.join(packed.split()))))
+          html=Path('docs/community.html')
+          content=html.read_text(encoding='utf-8')
+          assert 'commons-family.mjs' in content and 'commons-letter-lock.mjs' in content and '</head>' in content, 'Expected Commons page not found'
+          content=re.sub(r'<link rel="stylesheet" href="commons-shared-guesses.css\?v=[^"<>]+">', '', content)
+          content=re.sub(r'<script type="module" src="commons-shared-guesses.mjs\?v=[^"<>]+"></script>', '', content)
+          style='<link rel="stylesheet" href="commons-shared-guesses.css?v=ledger1">'
+          module='<script type="module" src="commons-shared-guesses.mjs?v=ledger1"></script>'
+          content=content.replace('</head>',style+'\n'+module+'\n</head>',1)
+          html.write_text(content,encoding='utf-8')
+          assert content.count('commons-shared-guesses.mjs?v=ledger1')==1
+          assert content.count('commons-shared-guesses.css?v=ledger1')==1
+          assert 'community_word_shared_history' in Path('docs/commons-shared-guesses.mjs').read_text(encoding='utf-8')
+          PYCODE
+      - name: Validate sources and existing release tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/commons-shared-guesses.mjs
+          git diff --check
+          npm ci
+          npm test --if-present
+      - name: Commit shared word ledger to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-shared-guesses.mjs docs/commons-shared-guesses.css docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Show every team word guess and browsable history; preserve dictionary validation"
+            git push origin HEAD:main
+          fi
