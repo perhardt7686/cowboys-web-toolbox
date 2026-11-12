@@ -1,0 +1,90 @@
+name: Collapse Shared Guess Logs with Word Games
+'on':
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/install-collapsible-word-logs.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: commons-collapsible-word-logs
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Keep both guess histories inside the game's collapsed state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import re
+
+          css_file = Path('docs/commons-shared-guesses.css')
+          js_file = Path('docs/commons-shared-guesses.mjs')
+          html_file = Path('docs/community.html')
+          for item in (css_file, js_file, html_file):
+              if not item.is_file():
+                  raise SystemExit(f'Expected game source missing: {item}')
+
+          css = css_file.read_text(encoding='utf-8')
+          style_marker = '/* Collapsible team guess log v2: follows game expand state. */'
+          style = '''
+          /* Collapsible team guess log v2: follows game expand state. */
+          #word-game-toggle[aria-expanded="false"] + .shared-word-ledger,
+          #letter-lock-toggle[aria-expanded="false"] + .shared-word-ledger {
+            display: none !important;
+          }
+          '''
+          if style_marker not in css:
+              css_file.write_text(css.rstrip() + '\n' + style, encoding='utf-8')
+
+          js = js_file.read_text(encoding='utf-8')
+          if 'toggle.after(panel)' not in js or "toggle.getAttribute('aria-expanded')" not in js:
+              # The game itself owns this flag. Confirm the ledger still sits
+              # immediately after the game toggle; do not silently change UX.
+              if 'toggle.after(panel)' not in js:
+                  raise SystemExit('Unexpected shared log placement; stop rather than break UI')
+          old_text = 'Every member sees every guess, even when the game is closed. Refreshed automatically.'
+          new_text = 'Every teammate can review all shared guesses when this game is open. Refreshed automatically.'
+          if old_text in js:
+              js_file.write_text(js.replace(old_text,new_text), encoding='utf-8')
+          elif new_text not in js:
+              raise SystemExit('Unexpected shared log description; review source')
+
+          html = html_file.read_text(encoding='utf-8')
+          for ext in ('css','mjs'):
+              pattern = rf'(commons-shared-guesses\.{ext}\?v=)[a-zA-Z0-9_-]+'
+              if not re.search(pattern, html):
+                  raise SystemExit(f'Missing {ext} asset reference; stop')
+              html = re.sub(pattern, r'\g<1>ledger2', html)
+          html_file.write_text(html, encoding='utf-8')
+          assert 'commons-shared-guesses.css?v=ledger2' in html
+          assert 'commons-shared-guesses.mjs?v=ledger2' in html
+          assert style_marker in css_file.read_text(encoding='utf-8')
+          PYCODE
+      - name: Validate and run existing tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/commons-shared-guesses.mjs
+          git diff --check
+          npm ci
+          npm test --if-present
+      - name: Commit updated game appearance
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/commons-shared-guesses.css docs/commons-shared-guesses.mjs docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Collapse shared guess history with both word games'
+            git push origin HEAD:main
+          fi
