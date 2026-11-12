@@ -33,6 +33,9 @@ const ACHIEVEMENTS=[
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  let client=null,userId=null,state=null,mounted=false,busy=false,expanded=false,selected=null,highlight=[],timer=null,resize=null,refreshing=false;
  let dialogTimer=null;
+ // Default = entire board in view. Opt-in zoom keeps touch targets legible.
+ let boardZoomIndex=0;
+ const boardZoomLevels=[1,1.25,1.55,1.9];
  const $=id=>document.getElementById(id);
  const node=(tag,cls='',txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=String(txt);return n;};
  const setStatus=(txt)=>{const n=$('mahjong-status');if(n)n.textContent=txt;};
@@ -56,7 +59,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match two open tiles with identical corner marks. Clear the layered mystery garden to earn points and collect achievements.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
    <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
-   <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span><strong id="mahjong-remaining" class="mahjong-remaining" aria-live="polite"></strong></div><p class="mahjong-pan-help">Large carved tiles · Swipe sideways to explore the board on your phone</p><div id="mahjong-board-wrap" class="mahjong-board-wrap"><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div><div id="mahjong-pause-screen" class="mahjong-pause-screen" hidden><div class="mahjong-pause-card"><span class="mahjong-pause-symbol" aria-hidden="true">⏸</span><strong>Game paused</strong><p>Your tiles, matches, and score are saved to your Commons account.</p><button type="button" id="mahjong-overlay-resume">▶ Resume game</button></div></div></div>
+   <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span><strong id="mahjong-remaining" class="mahjong-remaining" aria-live="polite"></strong></div><div class="mahjong-view-tools" role="group" aria-label="Mahjong board view controls"><button type="button" id="mahjong-fit-button" aria-label="Fit entire board on screen">Fit board</button><button type="button" id="mahjong-zoom-out" aria-label="Zoom out">−</button><strong id="mahjong-zoom-label" aria-live="polite">100%</strong><button type="button" id="mahjong-zoom-in" aria-label="Zoom in">+</button></div><p class="mahjong-pan-help" id="mahjong-view-hint">Every tile visible. Zoom in for a closer look.</p><div id="mahjong-board-wrap" class="mahjong-board-wrap"><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div><div id="mahjong-pause-screen" class="mahjong-pause-screen" hidden><div class="mahjong-pause-card"><span class="mahjong-pause-symbol" aria-hidden="true">⏸</span><strong>Game paused</strong><p>Your tiles, matches, and score are saved to your Commons account.</p><button type="button" id="mahjong-overlay-resume">▶ Resume game</button></div></div></div>
    <div class="mahjong-actions"><button type="button" id="mahjong-new">New game</button><button type="button" id="mahjong-pause">⏸ Pause</button><button type="button" id="mahjong-hint">💡 Hint</button><button type="button" id="mahjong-shuffle">⤨ Shuffle</button><button type="button" id="mahjong-undo">↶ Undo</button></div><p class="mahjong-status" id="mahjong-status" role="status" aria-live="polite">Tap New game to begin.</p></div>
    <div class="mahjong-bottom"><section class="mahjong-leaders"><h3>Current player levels</h3><p class="mahjong-level-help">Mystery Road levels for everyone in The Commons, updated from saved games.</p><div id="mahjong-level-list" class="mahjong-level-list" aria-live="polite"></div><div class="mahjong-score-divider" aria-hidden="true"></div><h3>High scores</h3><div id="mahjong-leader-list"></div></section><section class="mahjong-badges"><div class="mahjong-badge-head"><h3>Achievements</h3><button type="button" class="mahjong-profile-link" id="mahjong-profile-open">View on my profile ↗</button></div><div id="mahjong-achievement-list"></div></section></div>
    <section class="mahjong-history" aria-label="Mahjong run history"><div class="mahjong-history-heading"><h3>My previous games</h3><p>Finished boards and retired runs, saved automatically. Your latest game appears first.</p></div><div id="mahjong-history-list" aria-live="polite"></div></section>
@@ -73,8 +76,22 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   $('mahjong-undo').addEventListener('click',()=>run('community_mahjong_undo',{},'Last match restored (75-point penalty).'));
   $('mahjong-pause').addEventListener('click',()=>{if(!state?.run)return;const pausing=!Boolean(state.run.paused);run('community_mahjong_pause',{p_pause:pausing},pausing?'Game paused. Your progress is safely saved.':'Welcome back. Your board is ready.');});
   $('mahjong-overlay-resume').addEventListener('click',()=>run('community_mahjong_pause',{p_pause:false},'Welcome back. Your board is ready.'));
+  const changeBoardZoom=delta=>{
+    const next=Math.max(0,Math.min(boardZoomLevels.length-1,delta));
+    if(next===boardZoomIndex)return;
+    boardZoomIndex=next;
+    renderBoard();
+    const wrap=$('mahjong-board-wrap');
+    if(wrap){
+      if(boardZoomIndex===0)wrap.scrollLeft=0;
+      else wrap.scrollLeft=Math.max(0,Math.round((wrap.scrollWidth-wrap.clientWidth)/2));
+    }
+  };
+  $('mahjong-fit-button').addEventListener('click',()=>changeBoardZoom(0));
+  $('mahjong-zoom-out').addEventListener('click',()=>changeBoardZoom(boardZoomIndex-1));
+  $('mahjong-zoom-in').addEventListener('click',()=>changeBoardZoom(boardZoomIndex+1));
   $('mahjong-profile-open').addEventListener('click',()=>{if(userId){const el=document.createElement('button');el.dataset.memberProfile=userId;el.hidden=true;document.body.append(el);el.click();el.remove();}});
-  if('ResizeObserver' in window){resize=new ResizeObserver(()=>renderBoard());resize.observe($('mahjong-board'));}
+  if('ResizeObserver' in window){resize=new ResizeObserver(()=>renderBoard());resize.observe($('mahjong-board-wrap'));}
   const watcher=new MutationObserver(()=>{if($('mahjong-root'))locate();else watcher.disconnect()});watcher.observe(main,{childList:true});
  }
  function boardTile(t,w){const [glyph,label,tone]=skin(t.s);const b=node('button','mahjong-tile mahjong-tone-'+tone+' '+(Number(t.s)>18?'mahjong-variant-sun':'mahjong-variant-flower'));b.type='button';b.setAttribute('aria-label',`${label}, ${Number(t.s)>18?'sun':'flower'} mark, ${t.z?'layer '+(t.z+1):'bottom layer'}, ${canPlay(t)?'free':'blocked'}`);b.title=label;b.style.width=`${w}px`;b.style.height=`${Math.round(w*1.14)}px`;b.style.left=`${Math.round(9+(t.x+.12*t.z)*w)}px`;b.style.top=`${Math.round(20+(t.y-.12*t.z)*w*1.14)}px`;b.style.zIndex=String(10+t.z*100+t.y);
@@ -83,9 +100,22 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   b.append(node('span','mahjong-glyph',glyph),node('span','mahjong-mini',mark(t.s)));
   b.addEventListener('click',()=>tap(t));return b;
  }
- function renderBoard(){const el=$('mahjong-board');if(!el||!el.isConnected||!state)return;const runState=state.run;if(!runState){el.replaceChildren(node('div','mahjong-board-empty','A mystery is waiting. Tap New game to begin.'));el.style.height='260px';return;}
-  const width=Math.max(560,el.clientWidth||560);const size=Math.min(74,Math.max(58,Math.floor((width-24)/8.55)));
-  el.style.setProperty('--mahjong-size',size+'px');el.style.height=Math.ceil(38+size*1.14*6.4)+'px';const frag=document.createDocumentFragment();
+ function renderBoard(){const el=$('mahjong-board');if(!el||!el.isConnected||!state)return;const runState=state.run;if(!runState){el.replaceChildren(node('div','mahjong-board-empty','A mystery is waiting. Tap New game to begin.'));el.style.width='100%';el.style.minWidth='0';el.style.height='260px';return;}
+  // Eight tile columns: fit the entire layout before any optional magnification.
+  const wrap=$('mahjong-board-wrap');
+  const available=Math.max(180,(wrap?.clientWidth||el.clientWidth||360)-6);
+  const fitted=Math.max(21,Math.floor((available-26)/8.55));
+  const size=Math.min(102,Math.max(21,Math.round(fitted*boardZoomLevels[boardZoomIndex])));
+  const naturalWidth=Math.ceil(22+8.4*size);
+  el.style.width=boardZoomIndex===0?'100%':Math.max(available,naturalWidth)+'px';
+  el.style.minWidth='0';
+  el.style.setProperty('--mahjong-size',size+'px');
+  el.style.height=Math.ceil(34+size*1.14*6.4)+'px';
+  const zLabel=$('mahjong-zoom-label');if(zLabel)zLabel.textContent=`${Math.round(boardZoomLevels[boardZoomIndex]*100)}%`;
+  const zIn=$('mahjong-zoom-in');if(zIn)zIn.disabled=boardZoomIndex===boardZoomLevels.length-1;
+  const zOut=$('mahjong-zoom-out');if(zOut)zOut.disabled=boardZoomIndex===0;
+  const hint=$('mahjong-view-hint');if(hint)hint.textContent=boardZoomIndex===0?'Entire board visible. Use + for a closer look.':'Zoomed in. Swipe the board to explore, or tap Fit board.';
+  const frag=document.createDocumentFragment();
   for(const t of runState.tiles||[]){if(t.gone)continue;frag.append(boardTile(t,size));}el.replaceChildren(frag);
  }
  function tap(t){if(busy||!state?.run||state.run.paused)return;if(!canPlay(t)){setStatus('That tile is blocked. Choose one with an open side and nothing on top.');return;}

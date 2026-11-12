@@ -154,3 +154,19 @@ body.community-page .mahjong-actions button:active{transform:translateY(2px);box
 @media(max-width:720px){body.community-page .mahjong-board-wrap{max-width:100%}body.community-page .mahjong-game-zone{padding:8px}body.community-page .mahjong-board{min-width:560px}}
 @media(min-width:721px){body.community-page .mahjong-board{min-width:670px}}
 @media(prefers-reduced-motion:reduce){body.community-page .mahjong-tile{transition:none}}
+
+
+/* Mahjong responsive fit view v6: no forced sideways scroll at default zoom. */
+body.community-page .mahjong-view-tools{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:3px 0 9px;color:#ffebbd}
+body.community-page .mahjong-view-tools button{min-width:43px;min-height:43px;padding:9px 14px;border:2px solid #d2b87c;border-radius:11px;background:linear-gradient(#46335c,#302240);color:#fff9ed;font:850 15px/1.2 system-ui,sans-serif;box-shadow:0 3px 0 #0c2826;cursor:pointer}
+body.community-page #mahjong-fit-button{background:linear-gradient(#f9dda0,#e6b462);color:#342440;border-color:#fff0bd}
+body.community-page .mahjong-view-tools button:disabled{opacity:.45;cursor:default}
+body.community-page #mahjong-zoom-label{min-width:51px;text-align:center;font:850 14px/1.2 system-ui,sans-serif;color:#fff5d5;font-variant-numeric:tabular-nums}
+body.community-page .mahjong-board-wrap{max-width:100%;width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-behavior:auto}
+body.community-page .mahjong-board-wrap .mahjong-board,body.community-page .mahjong-board{min-width:0!important;max-width:none!important;touch-action:manipulation}
+body.community-page .mahjong-tile{border-right-width:clamp(3px,calc(var(--mahjong-size,36px)*.085),6px);border-bottom-width:clamp(3px,calc(var(--mahjong-size,36px)*.095),7px);border-radius:clamp(6px,calc(var(--mahjong-size,36px)*.15),12px)}
+body.community-page .mahjong-tile:before{inset:3px 4px 5px 3px}
+body.community-page .mahjong-tile .mahjong-glyph{font-size:clamp(16px,calc(var(--mahjong-size,36px)*.67),48px)}
+body.community-page .mahjong-tile .mahjong-mini{font-size:clamp(7px,calc(var(--mahjong-size,36px)*.19),15px);top:clamp(2px,calc(var(--mahjong-size,36px)*.08),5px);right:clamp(3px,calc(var(--mahjong-size,36px)*.13),8px)}
+body.community-page .mahjong-tile:focus-visible{outline:3px solid #ffe18f;outline-offset:2px}
+@media(max-width:430px){body.community-page .mahjong-view-tools{gap:8px}body.community-page .mahjong-view-tools button{min-height:42px;min-width:42px;padding:8px 10px}body.community-page .mahjong-pan-help{font-size:11px}}

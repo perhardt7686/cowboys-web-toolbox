@@ -1,4 +1,5 @@
-/* The Commons Arcade: individual Daily Letter Lock and persistent cross-game Passport. */
+/* w0rdle shared co-op v2 */
+/* Shared clues and daily answer; personal credits and progress. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 
 const host=document.getElementById('conversations');
@@ -15,14 +16,18 @@ const BADGES={
   ['oracle_of_words','Oracle of Words','Accumulate 5,000 Quest points','👁️']
  ],
  letters:[
-  ['first_lockpick','First Lockpick','Play your first personal puzzle','🗝️'],
-  ['verdant_key','Verdant Key','Solve your first daily lock','💚'],
-  ['lightning_unlock','Lightning Unlock','Solve any lock in 3 guesses or fewer','⚡'],
-  ['nightmare_tamer','Nightmare Tamer','Crack a Nightmare daily lock','🐉'],
-  ['last_key','The Last Key','Win on your final allowed guess','⏳'],
-  ['seven_seals','Seven Seals','Win 7 daily locks','🔐'],
-  ['flamekeeper','Flamekeeper','Build a 5-day winning streak','🕯️'],
-  ['master_locksmith','Master Locksmith','Win 30 daily locks','👑']
+  ['first_lockpick','First Signal','Make your first w0rdle team guess','🗝️'],
+  ['verdant_key','Team Lantern','Help your team solve its first w0rdle','💚'],
+  ['lightning_unlock','Lightning Unlock','Personally solve the answer within 3 team guesses','⚡'],
+  ['nightmare_tamer','Nightmare Tamer','Personally solve a Nightmare daily word','🐉'],
+  ['last_key','The Last Key','Solve the word on your team’s final guess','⏳'],
+  ['seven_seals','Seven Seals','Contribute to 7 w0rdle team victories','🔐'],
+  ['flamekeeper','Flamekeeper','Contribute to a 5-day team win streak','🕯️'],
+  ['master_locksmith','Master Locksmith','Contribute to 30 daily team victories','👑'],
+   ['green_flash','Green Thumb','Find 25 letters in their exact positions','🍀'],
+   ['golden_finder','Golden Compass','Find 25 letters that belong elsewhere','🧭'],
+   ['word_weaver','Word Weaver','Earn 1,000 personal w0rdle points','🪡'],
+   ['team_anchor','The Team Anchor','Join 10 different w0rdle days','⚓']
  ],
  arcade:[
   ['double_agent','Double Agent','Earn progress in 2 different games','🎭'],
@@ -58,11 +63,12 @@ if(host && config?.enabled===true && location.pathname.endsWith('community.html'
   const pass=el('section','arcade-passport');pass.id='arcade-passport';pass.setAttribute('aria-label','Your Commons Arcade Passport');
   pass.innerHTML=`<div class="arcade-passport-header"><span class="arcade-passport-symbol" aria-hidden="true">✦</span><div><p class="arcade-eyebrow">THE COMMONS · PLAYER PASSPORT</p><h2 id="arcade-passport-title">Your ongoing adventure</h2><p id="arcade-passport-subtitle">Your words, tiles and discoveries all count.</p></div></div><div id="arcade-passport-level"></div><div id="arcade-passport-modes" class="arcade-mode-list"></div><details class="arcade-badge-details"><summary>See my Arcade honors <span id="arcade-badge-count"></span></summary><div id="arcade-badge-list"></div></details>`;
   main.prepend(pass);
-  const root=el('section','mahjong-game letter-lock-game');root.id='letter-lock-root';root.setAttribute('aria-label','Daily Letter Lock');
-  root.innerHTML=`<button id="letter-lock-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="letter-lock-content"><span class="mahjong-entry-icon" aria-hidden="true">🔐</span><span class="mahjong-entry-copy"><strong>Daily Letter Lock</strong><small id="letter-lock-summary">A fresh personal letter puzzle every day</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button><div id="letter-lock-content" hidden><div class="letter-lock-inner"><div class="letter-lock-heading"><div><span class="arcade-eyebrow">THE COMMONS · YOUR DAILY CIPHER</span><h2>Crack the Letter Lock</h2><p>Six guesses, five letters, one new mystery every midnight Eastern. Nightmare days give you seven attempts.</p></div><span id="letter-lock-difficulty" class="arcade-difficulty">Today’s mystery</span></div><div id="letter-lock-personal-progress"></div><div class="letter-lock-layout"><section class="letter-lock-panel" aria-label="Your puzzle"><div id="letter-lock-statline" class="arcade-game-metrics"></div><div id="letter-lock-grid" class="letter-lock-grid" role="group" aria-label="Today’s guesses"></div><form id="letter-lock-form" class="letter-lock-form"><label for="letter-lock-guess" class="sr-only">Your five-letter guess</label><input id="letter-lock-guess" type="text" aria-label="Five-letter guess" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" minlength="5" maxlength="5" pattern="[A-Za-z]{5}" placeholder="TYPE A WORD" required><button id="letter-lock-submit" type="submit">Unlock ↗</button></form><div id="letter-lock-keyboard" class="letter-lock-keyboard" aria-label="Letter keyboard"></div><p id="letter-lock-status" class="letter-lock-message" aria-live="polite" role="status">Loading today's puzzle…</p><p class="letter-lock-rules">Green: correct spot. Gold: right letter, different spot. Charcoal: not in the word. Duplicate letters count only as often as they appear in the answer. The answer stays secret until you finish.</p></section><aside class="letter-lock-aside"><h3>Personal Leaderboard</h3><ol id="letter-lock-leaders" class="arcade-leader-list"><li>No scores yet.</li></ol><h3>Achievement Cabinet</h3><p id="letter-lock-medal-count" class="arcade-subtle">Earned badges stay yours forever.</p><div id="letter-lock-awards"></div></aside></div></div></div>`;
+  const root=el('section','mahjong-game letter-lock-game');root.id='letter-lock-root';root.setAttribute('aria-label','w0rdle co-op word challenge');
+  root.innerHTML=`<button id="letter-lock-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="letter-lock-content"><span class="mahjong-entry-icon" aria-hidden="true">🔐</span><span class="mahjong-entry-copy"><strong>w0rdle</strong><small id="letter-lock-summary">A shared daily word · individual scores & achievements</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button><div id="letter-lock-content" hidden><div class="letter-lock-inner"><div class="letter-lock-heading"><div><span class="arcade-eyebrow">THE COMMONS · DAILY TEAM CIPHER</span><h2>w0rdle · one word, one team</h2><p>Everyone sees the same five-letter answer in Daily Word Quest and w0rdle. All teammates share the clues. You earn individual points for correct letters and solving. 10 team guesses, or 12 on Nightmare days.</p></div><span id="letter-lock-difficulty" class="arcade-difficulty">Today’s mystery</span></div><div id="letter-lock-personal-progress"></div><div class="letter-lock-layout"><section class="letter-lock-panel" aria-label="Shared w0rdle puzzle"><div id="letter-lock-statline" class="arcade-game-metrics"></div><div id="letter-lock-grid" class="letter-lock-grid" role="group" aria-label="Today’s team guesses"></div><form id="letter-lock-form" class="letter-lock-form"><label for="letter-lock-guess" class="sr-only">Your five-letter guess</label><input id="letter-lock-guess" type="text" aria-label="Five-letter guess" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" minlength="5" maxlength="5" pattern="[A-Za-z]{5}" placeholder="TYPE A WORD" required><button id="letter-lock-submit" type="submit">Send team guess ↗</button><button id="letter-lock-refresh" type="button">Refresh team</button></form><div id="letter-lock-keyboard" class="letter-lock-keyboard" aria-label="Letter keyboard"></div><p id="letter-lock-status" class="letter-lock-message" aria-live="polite" role="status">Loading today's puzzle…</p><p class="letter-lock-rules">Green = +12 personal points for a letter in the right spot. Gold = +5 for a letter elsewhere in the answer. The person who solves earns a larger bonus, and everybody who contributed gets +35 team-victory points. This is the SAME answer as Daily Word Quest, shared with all Commons members until midnight Eastern.</p></section><aside class="letter-lock-aside"><h3>Individual player scores</h3><ol id="letter-lock-leaders" class="arcade-leader-list"><li>No scores yet.</li></ol><h3>Achievement Cabinet</h3><p id="letter-lock-medal-count" class="arcade-subtle">Earned badges stay yours forever.</p><div id="letter-lock-awards"></div></aside></div></div></div>`;
   const after=by('word-game-root')||by('mahjong-root')||by('plate-game-root');if(after?.parentElement===main)after.after(root);else main.prepend(root);
   root.querySelector('#letter-lock-toggle').addEventListener('click',()=>{const content=by('letter-lock-content'),toggle=by('letter-lock-toggle');const expanded=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(expanded));content.hidden=!expanded;if(expanded){void refresh(true);content.scrollIntoView({behavior:'smooth',block:'nearest'});}});
   by('letter-lock-form').addEventListener('submit',submit);
+  by('letter-lock-refresh').addEventListener('click',()=>{void refresh(false);});
   by('letter-lock-keyboard').addEventListener('click',e=>{const key=e.target.closest('button[data-key]')?.dataset.key;if(!key)return;const input=by('letter-lock-guess');if(!input||input.disabled)return;if(key==='ENTER'){by('letter-lock-form').requestSubmit();return;}if(key==='BACK'){input.value=input.value.slice(0,-1);}else if(input.value.length<5)input.value+=key;input.focus();});
   document.addEventListener('submit',questSubmitted,true);
   position();mountWatch?.disconnect();mountWatch=new MutationObserver(()=>{position();addQuestExtras();});mountWatch.observe(main,{childList:true});
@@ -80,10 +86,10 @@ if(host && config?.enabled===true && location.pathname.endsWith('community.html'
   by('arcade-passport-title').textContent=`Level ${data.level} · ${data.title}`;
   by('arcade-passport-subtitle').textContent=`${fmt(data.xp)} XP earned · ${fmt(data.days_played)} word days · ${data.modes_played}/4 adventures started`;
   const level=by('arcade-passport-level');level.replaceChildren(progressNode('Arcade Passport',data.level,data.xp,data.next_xp));
-  const modes=by('arcade-passport-modes');modes.replaceChildren();for(const [name,mode,text] of [['Word Quest','quest','team wins'],['Letter Lock','letters','daily wins'],['Mahjong','mahjong','boards cleared'],['License Plates','plates','accepted photos']]){const part=gameInfo[mode]||{};const v=mode==='quest'?part.wins:mode==='letters'?part.wins:mode==='mahjong'?part.cleared:part.approved;const line=el('div','arcade-mode-pill');line.append(el('strong','',name),el('small','',`${fmt(part.xp)} XP · ${fmt(v)} ${text}`));modes.append(line);}
+  const modes=by('arcade-passport-modes');modes.replaceChildren();for(const [name,mode,text] of [['Word Quest','quest','team wins'],['w0rdle','letters','team wins'],['Mahjong','mahjong','boards cleared'],['License Plates','plates','accepted photos']]){const part=gameInfo[mode]||{};const v=mode==='quest'?part.wins:mode==='letters'?part.wins:mode==='mahjong'?part.cleared:part.approved;const line=el('div','arcade-mode-pill');line.append(el('strong','',name),el('small','',`${fmt(part.xp)} XP · ${fmt(v)} ${text}`));modes.append(line);}
   const earned=new Set(data.badges||[]);by('arcade-badge-count').textContent=`${earned.size}/${BADGES.arcade.length}`;paintMedals('arcade-badge-list','arcade',earned);
   renderQuestProgress(data);
-  if(by('letter-lock-personal-progress')){const lock=gameInfo.letters||{};const container=by('letter-lock-personal-progress');container.replaceChildren(progressNode('Letter Lock',lock.level,lock.xp,lock.next_xp));}
+  if(by('letter-lock-personal-progress')){const lock=gameInfo.letters||{};const container=by('letter-lock-personal-progress');container.replaceChildren(progressNode('w0rdle',lock.level,lock.xp,lock.next_xp));}
   if(by('letter-lock-medal-count'))by('letter-lock-medal-count').textContent=`${(gameInfo.letters?.badges||[]).length} of ${BADGES.letters.length} badges unlocked`;
   paintMedals('letter-lock-awards','letters',gameInfo.letters?.badges||[]);
   for(const [id,mode] of [['mahjong-toggle','mahjong'],['plate-game-open','plates']]){const button=by(id);if(!button)continue;let chip=button.querySelector('.arcade-contribution-chip');if(!chip){chip=el('span','arcade-contribution-chip');button.querySelector('.mahjong-entry-copy')?.append(chip);if(!chip.parentElement)button.append(chip);}chip.textContent=`Arcade Passport +${fmt(gameInfo[mode]?.xp)} XP`;}
@@ -95,16 +101,48 @@ if(host && config?.enabled===true && location.pathname.endsWith('community.html'
  function toast(message){const area=by('arcade-toast-area')||(()=>{const n=el('div','arcade-toast');n.id='arcade-toast-area';n.setAttribute('role','status');n.setAttribute('aria-live','polite');document.body.append(n);return n;})();area.textContent=message;area.classList.add('visible');if(toastTimeout)clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>area.classList.remove('visible'),4500);}
  function makeKeyboard(){const root=by('letter-lock-keyboard');if(!root)return;root.replaceChildren();for(const letters of ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM']){const line=el('div','letter-lock-keyboard-row');if(letters==='ZXCVBNM'){const key=el('button','letter-lock-key wide','ENTER');key.type='button';key.dataset.key='ENTER';line.append(key);}for(const char of letters){const key=el('button','letter-lock-key',char);key.type='button';key.dataset.key=char;key.setAttribute('aria-label',`Type ${char}`);line.append(key);}if(letters==='ZXCVBNM'){const del=el('button','letter-lock-key wide','⌫');del.type='button';del.dataset.key='BACK';del.setAttribute('aria-label','Backspace');line.append(del);}root.append(line);}}
  function keyColors(){const used={};for(const row of (game?.guesses||[])){for(let i=0;i<5;i++){const ch=row.guess?.[i],status=row.feedback?.[i];if(ch&&status&&ACCENT.indexOf(status)>ACCENT.indexOf(used[ch]||'absent'))used[ch]=status;else if(ch&&!used[ch])used[ch]=status;}}by('letter-lock-keyboard')?.querySelectorAll('button[data-key]')?.forEach(b=>{const key=b.dataset.key;const state=used[key];b.classList.toggle('correct',state==='correct');b.classList.toggle('present',state==='present');b.classList.toggle('absent',state==='absent');});}
- function drawBoard(data){const target=by('letter-lock-grid');if(!target)return;target.replaceChildren();const max=Number(data.max_attempts||6),guesses=data.guesses||[];for(let row=0;row<max;row++){const line=el('div','letter-lock-grid-row');line.setAttribute('aria-label',`Guess ${row+1}`);const entry=guesses[row];for(let i=0;i<5;i++){const cell=el('span','letter-lock-tile'+(entry?' '+(ACCENT.includes(entry.feedback?.[i])?entry.feedback[i]:'absent'):''),entry?.guess?.[i]||'');cell.setAttribute('aria-label',entry?`${entry.guess[i]} ${entry.feedback[i]}`:`Empty tile ${i+1}`);line.append(cell);}target.append(line);}}
- function renderGame(data){game=data;const done=Boolean(data.finished);const input=by('letter-lock-guess');if(!input)return;input.disabled=done;by('letter-lock-submit').disabled=done;
-  by('letter-lock-summary').textContent=`${tier(data.difficulty)} · ${data.attempts}/${data.max_attempts} guesses · ${data.solved?'Unlocked!':done?'Try tomorrow':'Your daily cipher'}`;
-  by('letter-lock-difficulty').textContent=tier(data.difficulty);
-  const line=by('letter-lock-statline');line.replaceChildren(pill('DAY',isDay(data.day)?data.day:'Today'),pill('GUESSES LEFT',data.remaining),pill('DIFFICULTY',tier(data.difficulty)));
+ function drawBoard(data){
+  const target=by('letter-lock-grid');if(!target)return;target.replaceChildren();
+  const max=Number(data.max_attempts||10),guesses=data.guesses||[];
+  for(let row=0;row<max;row++){
+   const entry=guesses[row];const item=el('div','letter-lock-guess-entry');
+   const line=el('div','letter-lock-grid-row');line.setAttribute('aria-label',`Team guess ${row+1}`);
+   for(let i=0;i<5;i++){
+    const value=entry?.guess?.[i]||'';
+    const color=ACCENT.includes(entry?.feedback?.[i])?entry.feedback[i]:'absent';
+    const cell=el('span','letter-lock-tile'+(entry?' '+color:''),value);
+    cell.setAttribute('aria-label',entry?`${value} ${color}`:`Empty tile ${i+1}`);line.append(cell);
+   }
+   item.append(line);
+   if(entry){const caption=el('div','letter-lock-guess-caption');
+    caption.append(el('strong','',`${entry.name||'Member'} · Guess ${row+1}`),el('span','',`+${fmt(entry.points)} personal pts`));
+    item.append(caption);
+   }
+   target.append(item);
+  }
+ }
+ function renderGame(data){game=data;const done=Boolean(data.finished);const input=by('letter-lock-guess');if(!input)return;
+  input.disabled=done;by('letter-lock-submit').disabled=done;
+  by('letter-lock-summary').textContent=`${tier(data.difficulty)} · ${data.attempts}/${data.max_attempts} team guesses · ${data.solved?'Team victory!':done?'Try tomorrow':'Play together'}`;
+  by('letter-lock-difficulty').textContent=`${tier(data.difficulty)} · TEAM PUZZLE`;
+  const line=by('letter-lock-statline');line.replaceChildren(
+   pill('DAY',isDay(data.day)?data.day:'Today'),
+   pill('TEAM GUESSES LEFT',data.remaining),
+   pill('TEAM SCORE',fmt(data.team_points)),
+   pill('YOUR POINTS TODAY',fmt(data.my?.today_points)),
+   pill('DIFFICULTY',tier(data.difficulty)));
   drawBoard(data);keyColors();
-  if(done)status(data.solved?`🏆 Vault opened! You cracked it in ${data.attempts} ${data.attempts===1?'guess':'guesses'}. Your rewards and streak are saved.`:`The lock survives today. Answer: ${data.answer||'unavailable'}. Your attempt still counts toward Arcade XP.`);
-  else status(data.attempts?'Keep going. Every color is a clue.':'Your first guess awaits. Crack the five-letter lock.');
-  const leaders=by('letter-lock-leaders');leaders.replaceChildren();if(!data.ranking?.length)leaders.append(el('li','','Your name can claim the first record.'));
-  for(const [i,entry] of (data.ranking||[]).entries()){const item=el('li','arcade-leader'+(entry.user_id===member?' is-me':''));item.append(el('strong','',`${i+1}. ${entry.name||'Member'}`),el('small','',`${fmt(entry.points)} pts · ${entry.wins} wins · best streak ${entry.best||0}`));leaders.append(item);}
+  if(done)status(data.solved?`🏆 Your team solved w0rdle! Everyone who contributed earned a shared win. Answer: ${data.answer||'unavailable'}.`:
+     `Today’s team attempts are finished. Answer: ${data.answer||'unavailable'}. Your correct letters still earned personal points.`);
+  else status(data.attempts?'Team clues are updated. Find the next promising five-letter word!':'Be the first to guess. Your teammates will see your clues.');
+  const leaders=by('letter-lock-leaders');leaders.replaceChildren();
+  if(!data.ranking?.length)leaders.append(el('li','','Start the first team puzzle to reach the scoreboard.'));
+  for(const [i,entry] of (data.ranking||[]).entries()){
+   const item=el('li','arcade-leader'+(entry.user_id===member?' is-me':''));
+   item.append(el('strong','',`${i+1}. ${entry.name||'Member'}`),
+     el('small','',`${fmt(entry.points)} total · +${fmt(entry.today_points)} today · ${fmt(entry.wins)} team wins · ${fmt(entry.solves)} solves`));
+   leaders.append(item);
+  }
  }
  async function refresh(quiet=false){if(!client||!member||!by('letter-lock-root'))return;try{const [a,b,c]=await Promise.all([client.rpc('community_wordle_state'),client.rpc('community_arcade_profile'),client.rpc('community_word_state')]);
   if(a.error)throw a.error;if(b.error)throw b.error;renderGame(a.data);renderPassport(b.data);
@@ -112,7 +150,7 @@ if(host && config?.enabled===true && location.pathname.endsWith('community.html'
   if(!quiet)status('Progress updated. Your adventure is saved.');
  }catch(e){if(!quiet)status('The puzzle could not load. '+String(e.message||'Try refreshing.'));}}
  async function submit(e){e.preventDefault();if(submitting||game?.finished)return;const input=by('letter-lock-guess'),word=(input?.value||'').trim().toUpperCase();if(!/^[A-Z]{5}$/.test(word)){status('Enter exactly five letters.');input.focus();return;}
-  submitting=true;by('letter-lock-submit').disabled=true;status('Testing the lock…');try{const {data,error}=await client.rpc('community_wordle_submit',{p_guess:word});if(error)throw error;input.value='';renderGame(data);const {data:rank,error:rankError}=await client.rpc('community_arcade_profile');if(!rankError&&rank)renderPassport(rank);if(data.solved)toast('🔓 Vault unlocked! Your personal win is saved.');}catch(ex){status('Not saved: '+String(ex.message||'Try again.'));}finally{submitting=false;if(!game?.finished)by('letter-lock-submit').disabled=false;}}
+  submitting=true;by('letter-lock-submit').disabled=true;status('Scoring your team guess…');try{const {data,error}=await client.rpc('community_wordle_submit',{p_guess:word});if(error)throw error;input.value='';renderGame(data);const {data:rank,error:rankError}=await client.rpc('community_arcade_profile');if(!rankError&&rank)renderPassport(rank);if(data.solved)toast('🏆 Your team solved w0rdle! Shared win recorded.');else{const last=(data.guesses||[]).at(-1);status(`Team guess shared! +${fmt(last?.points)} personal points. Your teammates can now use the clues.`);}}catch(ex){status('Not saved: '+String(ex.message||'Try again.'));}finally{submitting=false;if(!game?.finished)by('letter-lock-submit').disabled=false;}}
  function questSubmitted(e){if(e.target?.id==='commons-word-form')setTimeout(()=>{void refresh(true);},1400);}
  function unmount(){member=null;game=null;passport=null;lastAwards=null;loadedFor=null;if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;mountWatch?.disconnect();mountWatch=null;by('letter-lock-root')?.remove();by('arcade-passport')?.remove();by('arcade-team-progress')?.remove();by('arcade-quest-rank-chip')?.remove();by('arcade-toast-area')?.remove();document.removeEventListener('submit',questSubmitted,true);}
  async function mount(){if(mounting||host.hidden||!client)return;mounting=true;try{const {data:{session}}=await client.auth.getSession();const id=session?.user?.id;if(!id){if(member)unmount();return;}const {data,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();if(error||data?.status!=='approved'){if(member)unmount();return;}if(member===id&&by('letter-lock-root')){addQuestExtras();return;}if(member)unmount();member=id;build();await refresh(true);refreshTimer=setInterval(()=>{if(!document.hidden&&member)void refresh(true);},30000);

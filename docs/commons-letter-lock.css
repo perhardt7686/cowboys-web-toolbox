@@ -79,3 +79,14 @@ body.community-page .letter-lock-key:focus-visible,body.community-page .letter-l
 @media(max-width:840px){body.community-page .arcade-mode-list{grid-template-columns:repeat(2,minmax(0,1fr));}body.community-page .letter-lock-layout{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-grid{max-width:380px}}
 @media(max-width:490px){body.community-page .arcade-passport{padding:14px;}body.community-page .arcade-passport-symbol{width:49px;height:49px;font-size:27px;}body.community-page .arcade-medal-shelf,body.community-page .arcade-team-progress .arcade-medal-shelf{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-inner{padding:12px}body.community-page .letter-lock-grid{gap:5px;max-width:350px;}body.community-page .letter-lock-grid-row{gap:5px}body.community-page .letter-lock-tile{border-radius:8px;font-size:clamp(24px,7vw,31px);}body.community-page .letter-lock-key{min-height:43px;border-radius:5px}body.community-page .arcade-metric small{font-size:9px}body.community-page .arcade-metric strong{font-size:12px}}
 @media(prefers-reduced-motion:reduce){body.community-page .arcade-toast,body.community-page .arcade-meter-fill{transition:none}}
+
+
+/* w0rdle co-op visual v2: show who contributed each shared guess. */
+body.community-page .letter-lock-guess-entry{display:grid;gap:4px;min-width:0}
+body.community-page .letter-lock-guess-caption{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 2px 4px;color:#eddfef;font:700 11px/1.4 system-ui,sans-serif}
+body.community-page .letter-lock-guess-caption strong{color:#f9e2a5;overflow-wrap:anywhere}
+body.community-page .letter-lock-guess-caption span{font-variant-numeric:tabular-nums;color:#c2f0de}
+body.community-page .arcade-game-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+body.community-page #letter-lock-refresh{background:#372a4c;color:#f5e4ff;border-color:#a891bb}
+body.community-page .letter-lock-grid{gap:12px}
+@media(max-width:430px){body.community-page .arcade-game-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}body.community-page .letter-lock-guess-caption{font-size:10px}}
