@@ -1,0 +1,81 @@
+/* Commons Arcade Passport + Daily Letter Lock v1: no change to existing games. */
+body.community-page .arcade-passport{margin:12px 0 20px;padding:clamp(18px,3vw,26px);border:3px solid #a97c46;border-radius:24px;color:#fff5dc;background:radial-gradient(circle at 95% 5%,#6a409555,transparent 42%),linear-gradient(135deg,#211632,#31214e 58%,#144d54);box-shadow:0 8px 0 #160d26,0 20px 35px #06040a66;}
+body.community-page .arcade-passport-header{display:flex;align-items:center;gap:15px;margin-bottom:14px;}
+body.community-page .arcade-passport-symbol{display:grid;place-items:center;flex:none;width:65px;height:65px;border-radius:18px;border:2px solid #deb473;background:linear-gradient(135deg,#84519b,#28193a);box-shadow:inset 0 3px #ffffff44,0 4px 0 #0c071b;font-size:36px;color:#fbd880;}
+body.community-page .arcade-eyebrow{font:900 12px/1.35 system-ui,sans-serif!important;letter-spacing:.1em;color:#ecbd6e!important;margin:0 0 5px;text-transform:uppercase;}
+body.community-page .arcade-passport h2{color:#fff5ee!important;font:900 clamp(23px,4vw,32px)/1.18 system-ui,sans-serif!important;margin:0 0 6px;}
+body.community-page .arcade-passport-header p:last-child{color:#e8dfeb!important;margin:0;font:600 14px/1.4 system-ui,sans-serif!important;}
+body.community-page .arcade-level-meter{border:1px solid #a384b385;background:#f8efff12;padding:11px 13px;border-radius:14px;min-width:0;margin:9px 0;}
+body.community-page .arcade-meter-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;font:800 13px/1.4 system-ui,sans-serif;}
+body.community-page .arcade-passport .arcade-meter-heading{color:#fff4e6;}
+body.community-page .arcade-meter-heading span{font-variant-numeric:tabular-nums;}
+body.community-page .arcade-meter-track{height:13px;background:#101320;border:2px solid #7d667d;border-radius:30px;overflow:hidden;margin-top:9px;}
+body.community-page .arcade-meter-fill{height:100%;min-width:0;border-radius:30px;background:linear-gradient(90deg,#30bea6,#f9c966 65%,#fff2aa);box-shadow:inset 0 1px #ffffff88;transition:width .4s ease;}
+body.community-page .arcade-mode-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:14px 0;}
+body.community-page .arcade-mode-pill{padding:12px 10px;border:1px solid #927fae;border-radius:13px;background:#130e2266;min-width:0;display:flex;flex-direction:column;gap:5px;}
+body.community-page .arcade-mode-pill strong{color:#fff3d6;font-size:13px;}
+body.community-page .arcade-mode-pill small{color:#e7d4f7;font-size:12px;font-weight:600;overflow-wrap:anywhere;}
+body.community-page .arcade-badge-details{margin-top:12px;border-radius:14px;border:1px solid #bb9dc6;background:#fff7e817;color:inherit;}
+body.community-page .arcade-badge-details>summary{padding:12px 14px;cursor:pointer;font:850 14px/1.4 system-ui,sans-serif;color:inherit;}
+body.community-page .arcade-badge-details>summary:focus-visible{outline:3px solid #eabe6d;outline-offset:2px;}
+body.community-page .arcade-medal-shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;}
+body.community-page .arcade-medal{display:flex;gap:10px;align-items:center;border-radius:12px;border:1px solid #bb9dc1;background:#ffffff0f;min-width:0;padding:10px;}
+body.community-page .arcade-medal.earned{border-color:#e2b55b;background:linear-gradient(140deg,#235e5499,#2b1a4e99);box-shadow:inset 0 0 0 1px #fcebd338;}
+body.community-page .arcade-medal.locked{opacity:.65;filter:saturate(.45);}
+body.community-page .arcade-medal-symbol{font-size:26px;flex:none;width:34px;text-align:center;}
+body.community-page .arcade-medal-copy{display:flex;flex-direction:column;gap:3px;min-width:0;}
+body.community-page .arcade-medal-copy strong{font:850 13px/1.2 system-ui,sans-serif;color:inherit;overflow-wrap:anywhere;}
+body.community-page .arcade-medal-copy small{font:600 11px/1.4 system-ui,sans-serif;color:inherit;opacity:.89;}
+body.community-page .arcade-team-progress{margin:16px 0 14px;padding:14px;border:2px solid #c1a3cf;border-radius:15px;background:linear-gradient(145deg,#f9efff,#fff9ef);color:#362445;}
+body.community-page .arcade-team-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:#443059;font:800 14px/1.4 system-ui,sans-serif;}
+body.community-page .arcade-team-progress .arcade-meter-track{background:#32283f;}
+body.community-page .arcade-team-progress .arcade-medal-shelf{grid-template-columns:repeat(2,minmax(0,1fr));}
+body.community-page .arcade-team-progress .arcade-medal{background:#efe4f3;border-color:#cdb3d4;}
+body.community-page .arcade-team-progress .arcade-medal.earned{background:#e3f9e6;border-color:#43a68e;}
+body.community-page .arcade-team-progress .arcade-badge-details{background:#f4eef9;border-color:#bb9dc6;}
+body.community-page .arcade-game-chip,body.community-page .arcade-contribution-chip{display:block;margin-top:6px;font:750 12px/1.4 system-ui,sans-serif;color:#ffe1a8;}
+body.community-page .letter-lock-game{margin-bottom:18px;}
+body.community-page .letter-lock-inner{padding:clamp(14px,3vw,24px);background:linear-gradient(155deg,#21162e,#342251);border:2px solid #a28abb;border-radius:0 0 19px 19px;color:#f9f1ff;}
+body.community-page .letter-lock-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap;}
+body.community-page .letter-lock-heading h2{font:900 clamp(24px,4vw,34px)/1.17 system-ui,sans-serif;color:#fff4dd;margin:0 0 6px;}
+body.community-page .letter-lock-heading p{max-width:600px;font:600 15px/1.5 system-ui,sans-serif;color:#e9daeb;}
+body.community-page .arcade-difficulty{display:inline-flex;align-self:flex-start;align-items:center;padding:7px 13px;border-radius:99px;border:1px solid #cba75e;background:#ead18d;color:#33233e;font:900 12px/1.4 system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;}
+body.community-page .letter-lock-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(225px,1fr);gap:16px;align-items:start;margin-top:15px;}
+body.community-page .letter-lock-panel,body.community-page .letter-lock-aside{border:2px solid #7c6a9d;border-radius:18px;padding:clamp(12px,2vw,18px);background:linear-gradient(145deg,#160f26,#261a3c);min-width:0;}
+body.community-page .arcade-game-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:15px;}
+body.community-page .arcade-metric{display:flex;flex-direction:column;gap:3px;padding:9px 7px;text-align:center;border:1px solid #6e5e85;border-radius:11px;background:#362749;min-width:0;}
+body.community-page .arcade-metric small{font:850 10px/1.4 system-ui,sans-serif;letter-spacing:.03em;color:#d1c2e0;}
+body.community-page .arcade-metric strong{font:900 14px/1.25 system-ui,sans-serif;color:#fff2cc;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;}
+body.community-page .letter-lock-grid{display:grid;gap:7px;max-width:405px;margin:10px auto 18px;}
+body.community-page .letter-lock-grid-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;}
+body.community-page .letter-lock-tile{display:grid;place-items:center;min-width:0;aspect-ratio:1;border:2px solid #78678d;border-radius:11px;background:linear-gradient(150deg,#4f4165,#271e3c);box-shadow:inset 0 2px #ffffff18,0 3px 0 #080613;color:#f7eef9;font:900 clamp(23px,5vw,34px)/1 system-ui,sans-serif;}
+body.community-page .letter-lock-tile.correct{background:linear-gradient(150deg,#17986b,#116e55);border-color:#75d6ad;color:white;}
+body.community-page .letter-lock-tile.present{background:linear-gradient(150deg,#f2bb49,#b57722);border-color:#ffe0a0;color:#22150d;}
+body.community-page .letter-lock-tile.absent{background:linear-gradient(150deg,#5e5867,#3a3546);border-color:#756b7a;color:#fff;}
+body.community-page .letter-lock-form{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:0 auto 14px;max-width:440px;}
+body.community-page .letter-lock-form input{flex:1;min-width:130px;min-height:49px;padding:8px 12px;border:2px solid #aa92c8;border-radius:11px;background:#f8f3ff;color:#22182c;font:900 18px/1.4 monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;}
+body.community-page .letter-lock-form button{min-height:49px;padding:9px 16px;border:2px solid #ffe5a9;border-radius:11px;background:linear-gradient(135deg,#ffd77a,#bfa5e5);color:#2b1b37;font:900 15px/1.2 system-ui,sans-serif;cursor:pointer;}
+body.community-page .letter-lock-form button:disabled{cursor:not-allowed;opacity:.6;}
+body.community-page .letter-lock-keyboard{display:grid;gap:6px;max-width:475px;margin:14px auto 12px;user-select:none;}
+body.community-page .letter-lock-keyboard-row{display:flex;justify-content:center;gap:4px;min-width:0;}
+body.community-page .letter-lock-key{flex:1;min-width:0;min-height:45px;padding:4px 0;border:1px solid #bdafcc;border-radius:6px;background:#d3c9e0;color:#211932;font:900 clamp(12px,2.8vw,16px)/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 0 #251c39;}
+body.community-page .letter-lock-key.wide{flex:1.4;font-size:12px;}
+body.community-page .letter-lock-key.correct{background:#14835f;color:#fff;border-color:#49c99d;}
+body.community-page .letter-lock-key.present{background:#d9992d;color:#22160a;border-color:#f9d17a;}
+body.community-page .letter-lock-key.absent{background:#5c5266;color:#fff;border-color:#746d7c;}
+body.community-page .letter-lock-message{min-height:2em;font:750 14px/1.5 system-ui,sans-serif;color:#f8d58f;}
+body.community-page .letter-lock-rules{font:600 12px/1.55 system-ui,sans-serif;color:#d9cfe7;}
+body.community-page .letter-lock-aside h3{color:#fff2d5;font:900 20px/1.3 system-ui,sans-serif;margin:8px 0 12px;}
+body.community-page .letter-lock-aside h3:not(:first-child){margin-top:22px;}
+body.community-page .arcade-leader-list{list-style:none;padding:0;margin:0;display:grid;gap:7px;}
+body.community-page .arcade-leader{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:11px;border:1px solid #6a5a83;border-radius:12px;background:#372749;color:#fff4df;font-size:13px;}
+body.community-page .arcade-leader.is-me{border-color:#e9bf6a;background:#244e4c;}
+body.community-page .arcade-leader small{color:#decfe5;}
+body.community-page .arcade-subtle{font:600 12px/1.4 system-ui,sans-serif;color:#d7c1de;}
+body.community-page .letter-lock-aside .arcade-medal-shelf{display:grid;grid-template-columns:minmax(0,1fr);padding:0;margin-top:10px;}
+body.community-page .arcade-toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translate(-50%,130%);z-index:9999;max-width:min(92vw,520px);padding:14px 20px;border:2px solid #f6d582;border-radius:16px;background:#281e3c;color:#fff7d5;box-shadow:0 8px 32px #07040dbb;font:900 16px/1.35 system-ui,sans-serif;transition:transform .3s ease;text-align:center;}
+body.community-page .arcade-toast.visible{transform:translate(-50%,0);}
+body.community-page .letter-lock-key:focus-visible,body.community-page .letter-lock-form button:focus-visible,body.community-page .letter-lock-form input:focus-visible{outline:3px solid #f8d17c;outline-offset:3px;}
+@media(max-width:840px){body.community-page .arcade-mode-list{grid-template-columns:repeat(2,minmax(0,1fr));}body.community-page .letter-lock-layout{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-grid{max-width:380px}}
+@media(max-width:490px){body.community-page .arcade-passport{padding:14px;}body.community-page .arcade-passport-symbol{width:49px;height:49px;font-size:27px;}body.community-page .arcade-medal-shelf,body.community-page .arcade-team-progress .arcade-medal-shelf{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-inner{padding:12px}body.community-page .letter-lock-grid{gap:5px;max-width:350px;}body.community-page .letter-lock-grid-row{gap:5px}body.community-page .letter-lock-tile{border-radius:8px;font-size:clamp(24px,7vw,31px);}body.community-page .letter-lock-key{min-height:43px;border-radius:5px}body.community-page .arcade-metric small{font-size:9px}body.community-page .arcade-metric strong{font-size:12px}}
+@media(prefers-reduced-motion:reduce){body.community-page .arcade-toast,body.community-page .arcade-meter-fill{transition:none}}
