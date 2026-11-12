@@ -1,0 +1,174 @@
+name: Install Collapsible Drawing Studio Game Button
+'on':
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/install-collapsible-drawing-studio.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: commons-drawing-studio-installer
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Make Drawing Studio a closed game button without losing the canvas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import re
+          
+          js_path = Path('docs/commons-family.mjs')
+          css_path = Path('docs/commons-family.css')
+          html_path = Path('docs/community.html')
+          src = js_path.read_text(encoding='utf-8')
+          mark = '/* Drawing Studio game button · keeps the canvas alive when collapsed */'
+          
+          def replace_one(text, before, after, label):
+              count=text.count(before)
+              if count != 1:
+                  raise RuntimeError(f'{label}: expected exactly one anchor, got {count}. File not changed.')
+              return text.replace(before,after,1)
+          
+          if mark not in src:
+              locate_studio = '''   /* Drawing Studio is a sibling of the other games, never a permanent open panel. */
+             function locateStudio(){
+               const main=board.querySelector('.community-main');
+               const art=byId('drawing-studio-game-root');
+               const word=byId('word-game-root');
+               if(!main||!art||!word)return;
+               const lock=byId('letter-lock-root');
+               const previous=(lock?.parentElement===main)?lock:word;
+               if(previous.parentElement===main && art.previousElementSibling!==previous)previous.after(art);
+             }
+          '''
+              src=replace_one(src, '   function build(){\n', locate_studio+'   function build(){\n', 'drawing locator')
+              src=replace_one(src,
+                '     // Leave the Drawing Studio in the family zone.',
+                '     // Drawing Studio is moved into its own closed-by-default game button.',
+                'outdated drawing comment')
+          
+              game_code = '''     // Drawing Studio uses the same game-button family as Mahjong and Word Quest.
+               // Reparent the existing stage; never clone or recreate an active drawing.
+               const studioStage=byId('commons-art');
+               if(!studioStage)throw new Error('Drawing Studio stage not found');
+               const studioGame=document.createElement('section');
+               studioGame.id='drawing-studio-game-root';
+               studioGame.className='mahjong-game drawing-studio-game';
+               studioGame.setAttribute('aria-label','Drawing Studio');
+               studioGame.innerHTML=`<button id="drawing-studio-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="drawing-studio-inside"><span class="mahjong-entry-icon" aria-hidden="true">🎨</span><span class="mahjong-entry-copy"><strong>Drawing Studio</strong><small>Sketch, paint, layers & saved art · Open your canvas</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button><div id="drawing-studio-inside" hidden></div>`;
+               studioGame.querySelector('#drawing-studio-inside').append(studioStage);
+               game.after(studioGame);
+               // Retain the empty zone as the approved-session mount sentinel, with zero footprint.
+               zone.replaceChildren();zone.hidden=true;zone.style.display='none';
+               locateStudio();
+               byId('drawing-studio-toggle').addEventListener('click',()=>{
+                 const button=byId('drawing-studio-toggle');
+                 const inside=byId('drawing-studio-inside');
+                 if(!button||!inside)return;
+                 const expanded=button.getAttribute('aria-expanded')!=='true';
+                 button.setAttribute('aria-expanded',String(expanded));
+                 inside.hidden=!expanded;
+                 if(expanded){
+                   const drawingHost=byId('commons-drawing-root');
+                   if(drawingHost && !drawingHost.dataset.ready && activeUser){
+                     startDrawingStudio(drawingHost,activeUser);
+                     drawingHost.dataset.ready='true';
+                   }
+                 }
+               });
+          '''
+              src=replace_one(src,
+                "     byId('commons-word-refresh').addEventListener('click',()=>refreshWord());\n",
+                "     byId('commons-word-refresh').addEventListener('click',()=>refreshWord());\n"+mark+'\n'+game_code,
+                'game button insertion')
+              src=replace_one(src,
+                "wordObserver=new MutationObserver(()=>{if(byId('word-game-root'))locateWord();});",
+                "wordObserver=new MutationObserver(()=>{if(byId('word-game-root')){locateWord();locateStudio();}});",
+                'dynamic game positioning')
+              src=replace_one(src,
+                "       if(!byId('commons-drawing-root').dataset.ready){startDrawingStudio(byId('commons-drawing-root'),id);byId('commons-drawing-root').dataset.ready='true';}",
+                '       // The canvas is initialized only when Drawing Studio opens the first time.',
+                'avoid mounting hidden canvas')
+              src=replace_one(src,
+                "     byId('word-game-root')?.remove();\n     byId('commons-family-zone')?.remove();",
+                "     byId('word-game-root')?.remove();\n     byId('drawing-studio-game-root')?.remove();\n     byId('commons-family-zone')?.remove();",
+                'session teardown')
+              js_path.write_text(src,encoding='utf-8')
+          
+          css = css_path.read_text(encoding='utf-8')
+          css_marker='/* Closed-by-default Drawing Studio game · v1 */'
+          if css_marker not in css:
+              css+='''
+          
+          /* Closed-by-default Drawing Studio game · v1 */
+          body.community-page #drawing-studio-game-root{min-width:0;width:100%;box-sizing:border-box}
+          body.community-page #drawing-studio-inside[hidden]{display:none!important}
+          body.community-page #drawing-studio-inside{max-width:100%;min-width:0;padding-top:15px}
+          body.community-page #drawing-studio-game-root #commons-art{min-width:0;width:100%;max-width:100%;box-sizing:border-box;margin:0}
+          body.community-page #drawing-studio-game-root .art-canvas-wrap{max-width:100%;box-sizing:border-box}
+          '''
+              css_path.write_text(css,encoding='utf-8')
+          
+          html=html_path.read_text(encoding='utf-8')
+          for f,ver in [('commons-family.css','studio1'),('commons-family.mjs','studio1')]:
+              pattern=r'('+re.escape(f)+r'\?v=)[a-zA-Z0-9_-]+'
+              match_count=len(re.findall(pattern,html))
+              if match_count!=1:
+                  raise RuntimeError(f'{f}: expected 1 versioned reference, got {match_count}')
+              html=re.sub(pattern,lambda m:m.group(1)+ver,html,count=1)
+          html_path.write_text(html,encoding='utf-8')
+          
+          assert src.count("id='drawing-studio-game-root'")==1
+          assert src.count('startDrawingStudio(drawingHost,activeUser)')==1
+          assert "byId('drawing-studio-game-root')?.remove();" in src
+          assert "studioGame.querySelector('#drawing-studio-inside').append(studioStage)" in src
+          assert "zone.replaceChildren();zone.hidden=true;zone.style.display='none';" in src
+          assert 'body.community-page #drawing-studio-inside[hidden]{display:none!important}' in css
+          assert 'commons-family.mjs?v=studio1' in html
+          assert 'commons-family.css?v=studio1' in html
+          print('Drawing Studio button: present, collapsible, reuses existing stage, lazy initialized, removed on signout.')
+          PYCODE
+      - name: Validate site structure, JavaScript, and regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/commons-family.mjs
+          node --check docs/commons-drawing.mjs
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          js=Path('docs/commons-family.mjs').read_text(encoding='utf-8')
+          css=Path('docs/commons-family.css').read_text(encoding='utf-8')
+          html=Path('docs/community.html').read_text(encoding='utf-8')
+          assert js.count('id='drawing-studio-game-root'') == 1
+          assert js.count('startDrawingStudio(drawingHost,activeUser)') == 1
+          assert "studioGame.querySelector('#drawing-studio-inside').append(studioStage)" in js
+          assert "zone.replaceChildren();zone.hidden=true;zone.style.display='none';" in js
+          assert "byId('drawing-studio-game-root')?.remove();" in js
+          assert '#drawing-studio-inside[hidden]{display:none!important}' in css
+          assert 'commons-family.mjs?v=studio1' in html
+          assert 'commons-family.css?v=studio1' in html
+          print('Drawing Studio is closed by default, mounted once, and removed on sign-out.')
+          PYCODE
+          git diff --check
+          npm ci
+          npm test --if-present
+      - name: Commit studio button and refreshed assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-family.mjs docs/commons-family.css docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Make Drawing Studio a collapsible Commons game button"
+            git push origin HEAD:main
+          fi
