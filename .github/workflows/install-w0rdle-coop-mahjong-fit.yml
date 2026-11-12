@@ -1,0 +1,192 @@
+name: Install w0rdle Co-op and Full-Screen Mahjong
+'on':
+  push:
+    branches:
+    - main
+    paths:
+    - .github/workflows/install-w0rdle-coop-mahjong-fit.yml
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: cowboy-w0rdle-coop-mahjong-fit
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: true
+    - name: Fit Mahjong board by default with optional zoom
+      shell: bash
+      run: "set -euo pipefail\npython3 - <<'PYCODE'\nfrom pathlib import Path\nimport re\n\njs_path = Path('docs/commons-mahjong.mjs')\n\
+        css_path = Path('docs/commons-mahjong.css')\nhtml_path = Path('docs/community.html')\njs = js_path.read_text(encoding='utf-8')\n\
+        css = css_path.read_text(encoding='utf-8')\nhtml = html_path.read_text(encoding='utf-8')\n\nassert 'mahjong-board-wrap'\
+        \ in js and 'function renderBoard()' in js, 'Unexpected Mahjong source'\nassert 'Carved Mahjong facelift v5'\
+        \ in css, 'Expected carved Mahjong source not found'\n\ndef replace_once(src, old, new, reason):\n    assert\
+        \ src.count(old) == 1, f'{reason}: expected one occurrence, got {src.count(old)}'\n    return src.replace(old,\
+        \ new, 1)\n\nif 'boardZoomLevels' not in js:\n    js = replace_once(js, ' let dialogTimer=null;', ''' let dialogTimer=null;\n\
+        \ // Default = entire board in view. Opt-in zoom keeps touch targets legible.\n let boardZoomIndex=0;\n const\
+        \ boardZoomLevels=[1,1.25,1.55,1.9];''', 'zoom state')\n    js = replace_once(js,\n      '<p class=\"mahjong-pan-help\"\
+        >Large carved tiles · Swipe sideways to explore the board on your phone</p><div id=\"mahjong-board-wrap\"',\n\
+        \      '''<div class=\"mahjong-view-tools\" role=\"group\" aria-label=\"Mahjong board view controls\"><button\
+        \ type=\"button\" id=\"mahjong-fit-button\" aria-label=\"Fit entire board on screen\">Fit board</button><button\
+        \ type=\"button\" id=\"mahjong-zoom-out\" aria-label=\"Zoom out\">−</button><strong id=\"mahjong-zoom-label\"\
+        \ aria-live=\"polite\">100%</strong><button type=\"button\" id=\"mahjong-zoom-in\" aria-label=\"Zoom in\">+</button></div><p\
+        \ class=\"mahjong-pan-help\" id=\"mahjong-view-hint\">Every tile visible. Zoom in for a closer look.</p><div\
+        \ id=\"mahjong-board-wrap\"''', 'view controls')\n    js = replace_once(js,\n      \"  $('mahjong-overlay-resume').addEventListener('click',()=>run('community_mahjong_pause',{p_pause:false},'Welcome\
+        \ back. Your board is ready.'));\",\n      '''  $('mahjong-overlay-resume').addEventListener('click',()=>run('community_mahjong_pause',{p_pause:false},'Welcome\
+        \ back. Your board is ready.'));\n  const changeBoardZoom=delta=>{\n    const next=Math.max(0,Math.min(boardZoomLevels.length-1,delta));\n\
+        \    if(next===boardZoomIndex)return;\n    boardZoomIndex=next;\n    renderBoard();\n    const wrap=$('mahjong-board-wrap');\n\
+        \    if(wrap){\n      if(boardZoomIndex===0)wrap.scrollLeft=0;\n      else wrap.scrollLeft=Math.max(0,Math.round((wrap.scrollWidth-wrap.clientWidth)/2));\n\
+        \    }\n  };\n  $('mahjong-fit-button').addEventListener('click',()=>changeBoardZoom(0));\n  $('mahjong-zoom-out').addEventListener('click',()=>changeBoardZoom(boardZoomIndex-1));\n\
+        \  $('mahjong-zoom-in').addEventListener('click',()=>changeBoardZoom(boardZoomIndex+1));''', 'zoom listeners')\n\
+        \    js = replace_once(js,\n      \"resize.observe($('mahjong-board'));\",\n      \"resize.observe($('mahjong-board-wrap'));\"\
+        , 'stable resize observation')\n    js = replace_once(js,\n      \"if(!runState){el.replaceChildren(node('div','mahjong-board-empty','A\
+        \ mystery is waiting. Tap New game to begin.'));el.style.height='260px';return;}\",\n      \"if(!runState){el.replaceChildren(node('div','mahjong-board-empty','A\
+        \ mystery is waiting. Tap New game to begin.'));el.style.width='100%';el.style.minWidth='0';el.style.height='260px';return;}\"\
+        , 'empty board dimensions')\n    js = replace_once(js,\n      '''  const width=Math.max(560,el.clientWidth||560);const\
+        \ size=Math.min(74,Math.max(58,Math.floor((width-24)/8.55)));\n  el.style.setProperty('--mahjong-size',size+'px');el.style.height=Math.ceil(38+size*1.14*6.4)+'px';const\
+        \ frag=document.createDocumentFragment();''',\n      '''  // Eight tile columns: fit the entire layout before\
+        \ any optional magnification.\n  const wrap=$('mahjong-board-wrap');\n  const available=Math.max(180,(wrap?.clientWidth||el.clientWidth||360)-6);\n\
+        \  const fitted=Math.max(21,Math.floor((available-26)/8.55));\n  const size=Math.min(102,Math.max(21,Math.round(fitted*boardZoomLevels[boardZoomIndex])));\n\
+        \  const naturalWidth=Math.ceil(22+8.4*size);\n  el.style.width=boardZoomIndex===0?'100%':Math.max(available,naturalWidth)+'px';\n\
+        \  el.style.minWidth='0';\n  el.style.setProperty('--mahjong-size',size+'px');\n  el.style.height=Math.ceil(34+size*1.14*6.4)+'px';\n\
+        \  const zLabel=$('mahjong-zoom-label');if(zLabel)zLabel.textContent=`${Math.round(boardZoomLevels[boardZoomIndex]*100)}%`;\n\
+        \  const zIn=$('mahjong-zoom-in');if(zIn)zIn.disabled=boardZoomIndex===boardZoomLevels.length-1;\n  const zOut=$('mahjong-zoom-out');if(zOut)zOut.disabled=boardZoomIndex===0;\n\
+        \  const hint=$('mahjong-view-hint');if(hint)hint.textContent=boardZoomIndex===0?'Entire board visible. Use +\
+        \ for a closer look.':'Zoomed in. Swipe the board to explore, or tap Fit board.';\n  const frag=document.createDocumentFragment();''',\
+        \ 'dynamic responsive board')\n\nif 'Mahjong responsive fit view v6' not in css:\n    css += '''\\n\\n/* Mahjong\
+        \ responsive fit view v6: no forced sideways scroll at default zoom. */\nbody.community-page .mahjong-view-tools{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:3px\
+        \ 0 9px;color:#ffebbd}\nbody.community-page .mahjong-view-tools button{min-width:43px;min-height:43px;padding:9px\
+        \ 14px;border:2px solid #d2b87c;border-radius:11px;background:linear-gradient(#46335c,#302240);color:#fff9ed;font:850\
+        \ 15px/1.2 system-ui,sans-serif;box-shadow:0 3px 0 #0c2826;cursor:pointer}\nbody.community-page #mahjong-fit-button{background:linear-gradient(#f9dda0,#e6b462);color:#342440;border-color:#fff0bd}\n\
+        body.community-page .mahjong-view-tools button:disabled{opacity:.45;cursor:default}\nbody.community-page #mahjong-zoom-label{min-width:51px;text-align:center;font:850\
+        \ 14px/1.2 system-ui,sans-serif;color:#fff5d5;font-variant-numeric:tabular-nums}\nbody.community-page .mahjong-board-wrap{max-width:100%;width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-behavior:auto}\n\
+        body.community-page .mahjong-board-wrap .mahjong-board,body.community-page .mahjong-board{min-width:0!important;max-width:none!important;touch-action:manipulation}\n\
+        body.community-page .mahjong-tile{border-right-width:clamp(3px,calc(var(--mahjong-size,36px)*.085),6px);border-bottom-width:clamp(3px,calc(var(--mahjong-size,36px)*.095),7px);border-radius:clamp(6px,calc(var(--mahjong-size,36px)*.15),12px)}\n\
+        body.community-page .mahjong-tile:before{inset:3px 4px 5px 3px}\nbody.community-page .mahjong-tile .mahjong-glyph{font-size:clamp(16px,calc(var(--mahjong-size,36px)*.67),48px)}\n\
+        body.community-page .mahjong-tile .mahjong-mini{font-size:clamp(7px,calc(var(--mahjong-size,36px)*.19),15px);top:clamp(2px,calc(var(--mahjong-size,36px)*.08),5px);right:clamp(3px,calc(var(--mahjong-size,36px)*.13),8px)}\n\
+        body.community-page .mahjong-tile:focus-visible{outline:3px solid #ffe18f;outline-offset:2px}\n@media(max-width:430px){body.community-page\
+        \ .mahjong-view-tools{gap:8px}body.community-page .mahjong-view-tools button{min-height:42px;min-width:42px;padding:8px\
+        \ 10px}body.community-page .mahjong-pan-help{font-size:11px}}\n'''\nif 'commons-mahjong.css?v=fit6' not in html:\n\
+        \    assert 'commons-mahjong.css?v=facelift5' in html and 'commons-mahjong.mjs?v=facelift5' in html, 'Unexpected\
+        \ HTML cache versions'\n    html=html.replace('commons-mahjong.css?v=facelift5','commons-mahjong.css?v=fit6').replace('commons-mahjong.mjs?v=facelift5','commons-mahjong.mjs?v=fit6')\n\
+        \njs_path.write_text(js,encoding='utf-8')\ncss_path.write_text(css,encoding='utf-8')\nhtml_path.write_text(html,encoding='utf-8')\n\
+        assert 'boardZoomLevels' in js and 'Math.max(560' not in js\nassert 'min-width:0!important' in css and 'mahjong-view-tools'\
+        \ in css\nassert 'commons-mahjong.mjs?v=fit6' in html\nprint('Responsive Mahjong v6 installed: fit by default,\
+        \ manual zoom optional.')\n\nPYCODE\n"
+    - name: Rename w0rdle and show shared team scores
+      shell: bash
+      run: "set -euo pipefail\npython3 - <<'PYCODE'\nfrom pathlib import Path\nimport re\njs_path = Path('docs/commons-letter-lock.mjs')\n\
+        css_path = Path('docs/commons-letter-lock.css')\nhtml_path = Path('docs/community.html')\njs=js_path.read_text(encoding='utf8')\n\
+        css=css_path.read_text(encoding='utf8')\nhtml=html_path.read_text(encoding='utf8')\nassert 'community_wordle_submit'\
+        \ in js, 'Missing w0rdle source'\nassert 'letter-lock-grid' in css, 'Missing letter game styles'\nassert 'commons-letter-lock.mjs'\
+        \ in html, 'Unexpected Commons site'\n\ndef change(old, new, why):\n    global js\n    count=js.count(old)\n\
+        \    if count!=1: raise RuntimeError(f'{why}: expected one match, got {count}')\n    js=js.replace(old,new,1)\n\
+        \nif '/* w0rdle shared co-op v2 */' not in js:\n    js=js.replace('/* The Commons Arcade: individual Daily Letter\
+        \ Lock and persistent cross-game Passport. */',\n                  '/* w0rdle shared co-op v2 */\\n/* Shared\
+        \ clues and daily answer; personal credits and progress. */',1)\n    change(\"['first_lockpick','First Lockpick','Play\
+        \ your first personal puzzle','\U0001F5DD️']\", \"['first_lockpick','First Signal','Make your first w0rdle team\
+        \ guess','\U0001F5DD️']\",'badge1')\n    change(\"['verdant_key','Verdant Key','Solve your first daily lock','\U0001F49A\
+        ']\", \"['verdant_key','Team Lantern','Help your team solve its first w0rdle','\U0001F49A']\",'badge2')\n   \
+        \ change(\"['lightning_unlock','Lightning Unlock','Solve any lock in 3 guesses or fewer','⚡']\", \"['lightning_unlock','Lightning\
+        \ Unlock','Personally solve the answer within 3 team guesses','⚡']\",'badge3')\n    change(\"['nightmare_tamer','Nightmare\
+        \ Tamer','Crack a Nightmare daily lock','\U0001F409']\", \"['nightmare_tamer','Nightmare Tamer','Personally solve\
+        \ a Nightmare daily word','\U0001F409']\",'badge4')\n    change(\"['last_key','The Last Key','Win on your final\
+        \ allowed guess','⏳']\", \"['last_key','The Last Key','Solve the word on your team’s final guess','⏳']\",'badge5')\n\
+        \    change(\"['seven_seals','Seven Seals','Win 7 daily locks','\U0001F510']\", \"['seven_seals','Seven Seals','Contribute\
+        \ to 7 w0rdle team victories','\U0001F510']\",'badge6')\n    change(\"['flamekeeper','Flamekeeper','Build a 5-day\
+        \ winning streak','\U0001F56F️']\", \"['flamekeeper','Flamekeeper','Contribute to a 5-day team win streak','\U0001F56F\
+        ️']\",'badge7')\n    change(\"['master_locksmith','Master Locksmith','Win 30 daily locks','\U0001F451']\", \"\
+        ['master_locksmith','Master Locksmith','Contribute to 30 daily team victories','\U0001F451'],\\n   ['green_flash','Green\
+        \ Thumb','Find 25 letters in their exact positions','\U0001F340'],\\n   ['golden_finder','Golden Compass','Find\
+        \ 25 letters that belong elsewhere','\U0001F9ED'],\\n   ['word_weaver','Word Weaver','Earn 1,000 personal w0rdle\
+        \ points','\U0001FAA1'],\\n   ['team_anchor','The Team Anchor','Join 10 different w0rdle days','⚓']\",'badge8')\n\
+        \    change(\"root.setAttribute('aria-label','Daily Letter Lock')\", \"root.setAttribute('aria-label','w0rdle\
+        \ co-op word challenge')\",'game accessibility')\n    change('<strong>Daily Letter Lock</strong>', '<strong>w0rdle</strong>','game\
+        \ title')\n    change('A fresh personal letter puzzle every day', 'A shared daily word · individual scores &\
+        \ achievements','game summary')\n    change('THE COMMONS · YOUR DAILY CIPHER', 'THE COMMONS · DAILY TEAM CIPHER','section\
+        \ eyebrow')\n    change('<h2>Crack the Letter Lock</h2>', '<h2>w0rdle · one word, one team</h2>','section heading')\n\
+        \    change('Six guesses, five letters, one new mystery every midnight Eastern. Nightmare days give you seven\
+        \ attempts.',\n           'Everyone sees the same five-letter answer in Daily Word Quest and w0rdle. All teammates\
+        \ share the clues. You earn individual points for correct letters and solving. 10 team guesses, or 12 on Nightmare\
+        \ days.','rules heading')\n    change('aria-label=\"Your puzzle\"','aria-label=\"Shared w0rdle puzzle\"','panel\
+        \ aria label')\n    change('aria-label=\"Today’s guesses\"','aria-label=\"Today’s team guesses\"','guess grid\
+        \ aria')\n    change('Unlock ↗','Send team guess ↗','submit action')\n    change('</button></form><div id=\"\
+        letter-lock-keyboard\"', '</button><button id=\"letter-lock-refresh\" type=\"button\">Refresh team</button></form><div\
+        \ id=\"letter-lock-keyboard\"','refresh UI')\n    change('Green: correct spot. Gold: right letter, different\
+        \ spot. Charcoal: not in the word. Duplicate letters count only as often as they appear in the answer. The answer\
+        \ stays secret until you finish.',\n           'Green = +12 personal points for a letter in the right spot. Gold\
+        \ = +5 for a letter elsewhere in the answer. The person who solves earns a larger bonus, and everybody who contributed\
+        \ gets +35 team-victory points. This is the SAME answer as Daily Word Quest, shared with all Commons members\
+        \ until midnight Eastern.','scoring rules')\n    change('<h3>Personal Leaderboard</h3>','<h3>Individual player\
+        \ scores</h3>','leaderboard title')\n    change(\"  by('letter-lock-form').addEventListener('submit',submit);\"\
+        , \"  by('letter-lock-form').addEventListener('submit',submit);\\n  by('letter-lock-refresh').addEventListener('click',()=>{void\
+        \ refresh(false);});\",'refresh listener')\n    change(\"['Letter Lock','letters','daily wins']\", \"['w0rdle','letters','team\
+        \ wins']\",'Arcade title')\n    change(\"progressNode('Letter Lock',lock.level,lock.xp,lock.next_xp)\", \"progressNode('w0rdle',lock.level,lock.xp,lock.next_xp)\"\
+        ,'XP header')\n    start=js.index(' function drawBoard(data){')\n    end=js.index(' async function refresh(quiet=false){',start)\n\
+        \    assert start>0 and end>start,'Cannot find Wordle render functions'\n    code=''' function drawBoard(data){\n\
+        \  const target=by('letter-lock-grid');if(!target)return;target.replaceChildren();\n  const max=Number(data.max_attempts||10),guesses=data.guesses||[];\n\
+        \  for(let row=0;row<max;row++){\n   const entry=guesses[row];const item=el('div','letter-lock-guess-entry');\n\
+        \   const line=el('div','letter-lock-grid-row');line.setAttribute('aria-label',`Team guess ${row+1}`);\n   for(let\
+        \ i=0;i<5;i++){\n    const value=entry?.guess?.[i]||'';\n    const color=ACCENT.includes(entry?.feedback?.[i])?entry.feedback[i]:'absent';\n\
+        \    const cell=el('span','letter-lock-tile'+(entry?' '+color:''),value);\n    cell.setAttribute('aria-label',entry?`${value}\
+        \ ${color}`:`Empty tile ${i+1}`);line.append(cell);\n   }\n   item.append(line);\n   if(entry){const caption=el('div','letter-lock-guess-caption');\n\
+        \    caption.append(el('strong','',`${entry.name||'Member'} · Guess ${row+1}`),el('span','',`+${fmt(entry.points)}\
+        \ personal pts`));\n    item.append(caption);\n   }\n   target.append(item);\n  }\n }\n function renderGame(data){game=data;const\
+        \ done=Boolean(data.finished);const input=by('letter-lock-guess');if(!input)return;\n  input.disabled=done;by('letter-lock-submit').disabled=done;\n\
+        \  by('letter-lock-summary').textContent=`${tier(data.difficulty)} · ${data.attempts}/${data.max_attempts} team\
+        \ guesses · ${data.solved?'Team victory!':done?'Try tomorrow':'Play together'}`;\n  by('letter-lock-difficulty').textContent=`${tier(data.difficulty)}\
+        \ · TEAM PUZZLE`;\n  const line=by('letter-lock-statline');line.replaceChildren(\n   pill('DAY',isDay(data.day)?data.day:'Today'),\n\
+        \   pill('TEAM GUESSES LEFT',data.remaining),\n   pill('TEAM SCORE',fmt(data.team_points)),\n   pill('YOUR POINTS\
+        \ TODAY',fmt(data.my?.today_points)),\n   pill('DIFFICULTY',tier(data.difficulty)));\n  drawBoard(data);keyColors();\n\
+        \  if(done)status(data.solved?`\U0001F3C6 Your team solved w0rdle! Everyone who contributed earned a shared win.\
+        \ Answer: ${data.answer||'unavailable'}.`:\n     `Today’s team attempts are finished. Answer: ${data.answer||'unavailable'}.\
+        \ Your correct letters still earned personal points.`);\n  else status(data.attempts?'Team clues are updated.\
+        \ Find the next promising five-letter word!':'Be the first to guess. Your teammates will see your clues.');\n\
+        \  const leaders=by('letter-lock-leaders');leaders.replaceChildren();\n  if(!data.ranking?.length)leaders.append(el('li','','Start\
+        \ the first team puzzle to reach the scoreboard.'));\n  for(const [i,entry] of (data.ranking||[]).entries()){\n\
+        \   const item=el('li','arcade-leader'+(entry.user_id===member?' is-me':''));\n   item.append(el('strong','',`${i+1}.\
+        \ ${entry.name||'Member'}`),\n     el('small','',`${fmt(entry.points)} total · +${fmt(entry.today_points)} today\
+        \ · ${fmt(entry.wins)} team wins · ${fmt(entry.solves)} solves`));\n   leaders.append(item);\n  }\n }\n'''\n\
+        \    js=js[:start]+code+js[end:]\n    change(\"status('Testing the lock…');\", \"status('Scoring your team guess…');\"\
+        , 'submit status')\n    change(\"if(data.solved)toast('\U0001F513 Vault unlocked! Your personal win is saved.');\"\
+        , \"if(data.solved)toast('\U0001F3C6 Your team solved w0rdle! Shared win recorded.');else{const last=(data.guesses||[]).at(-1);status(`Team\
+        \ guess shared! +${fmt(last?.points)} personal points. Your teammates can now use the clues.`);}\", 'submit toast')\n\
+        \nif 'w0rdle co-op visual v2' not in css:\n    css+='''\\n\\n/* w0rdle co-op visual v2: show who contributed\
+        \ each shared guess. */\nbody.community-page .letter-lock-guess-entry{display:grid;gap:4px;min-width:0}\nbody.community-page\
+        \ .letter-lock-guess-caption{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 2px 4px;color:#eddfef;font:700\
+        \ 11px/1.4 system-ui,sans-serif}\nbody.community-page .letter-lock-guess-caption strong{color:#f9e2a5;overflow-wrap:anywhere}\n\
+        body.community-page .letter-lock-guess-caption span{font-variant-numeric:tabular-nums;color:#c2f0de}\nbody.community-page\
+        \ .arcade-game-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}\nbody.community-page #letter-lock-refresh{background:#372a4c;color:#f5e4ff;border-color:#a891bb}\n\
+        body.community-page .letter-lock-grid{gap:12px}\n@media(max-width:430px){body.community-page .arcade-game-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}body.community-page\
+        \ .letter-lock-guess-caption{font-size:10px}}\n'''\n# Bump assets to sidestep iPhone caches.\nhtml=re.sub(r'commons-letter-lock.css\\\
+        ?v=[a-zA-Z0-9]+','commons-letter-lock.css?v=coop2',html)\nhtml=re.sub(r'commons-letter-lock.mjs\\?v=[a-zA-Z0-9]+','commons-letter-lock.mjs?v=coop2',html)\n\
+        assert 'w0rdle · one word, one team' in js\nassert 'Refresh team' in js\nassert 'letter-lock-guess-caption' in\
+        \ css\nassert 'commons-letter-lock.mjs?v=coop2' in html\njs_path.write_text(js,encoding='utf8')\ncss_path.write_text(css,encoding='utf8')\n\
+        html_path.write_text(html,encoding='utf8')\nprint('w0rdle co-op v2 installed; uses existing server-backed team\
+        \ word & individual score RPCs.')\n\nPYCODE\n"
+    - name: Check source and unit tests
+      shell: bash
+      run: 'set -euo pipefail
+
+        node --check docs/commons-mahjong.mjs
+
+        node --check docs/commons-letter-lock.mjs
+
+        git diff --check
+
+        npm ci
+
+        npm test --if-present
+
+        '
+    - name: Commit and publish games
+      shell: bash
+      run: "set -euo pipefail\ngit config user.name \"github-actions[bot]\"\ngit config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\
+        \ngit add docs/commons-mahjong.mjs docs/commons-mahjong.css docs/commons-letter-lock.mjs docs/commons-letter-lock.css\
+        \ docs/community.html\nif ! git diff --cached --quiet; then\n  git commit -m \"Fit Mahjong to phone and upgrade\
+        \ w0rdle to cooperative daily play\"\n  git push origin HEAD:main\nfi\n"
