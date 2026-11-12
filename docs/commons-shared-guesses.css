@@ -52,3 +52,9 @@
 @media(prefers-reduced-motion:reduce){.shared-word-ledger *{scroll-behavior:auto!important}}
 
 .shared-word-source{color:#b6e1ff;text-decoration:underline;text-underline-offset:2px}
+
+/* Collapsible team guess log v2: follows game expand state. */
+#word-game-toggle[aria-expanded="false"] + .shared-word-ledger,
+#letter-lock-toggle[aria-expanded="false"] + .shared-word-ledger {
+  display: none !important;
+}

@@ -66,7 +66,7 @@ function ensureLedger(mode) {
   const counter=node('span','shared-word-counter','Loading shared guesses…');
   counter.dataset.role='counter';
   head.append(title,counter);
-  const status=node('p','shared-word-help','Every member sees every guess, even when the game is closed. Refreshed automatically.');
+  const status=node('p','shared-word-help','Every teammate can review all shared guesses when this game is open. Refreshed automatically.');
   const guesses=node('div','shared-word-current');guesses.dataset.role='current';
   const foot=node('p','shared-word-help','Only dictionary-approved five-letter words count as guesses. Invalid words cost no turns. ');
   const license=node('a','shared-word-source','Guess-list source and MIT license');
