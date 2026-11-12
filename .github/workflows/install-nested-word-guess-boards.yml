@@ -1,0 +1,110 @@
+name: Fix guess boards collapsing with their games
+'on':
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/install-nested-word-guess-boards.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: commons-nested-word-guess-boards-installer
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Nest both guess boards inside their actual hidden game panels
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import re
+          js=Path('docs/commons-shared-guesses.mjs')
+          css=Path('docs/commons-shared-guesses.css')
+          html=Path('docs/community.html')
+          assert js.exists() and css.exists() and html.exists(), 'Commons source files not found'
+          source=js.read_text(encoding='utf-8')
+          old_find="  let panel=root.querySelector(':scope > .shared-word-ledger');\n  if(panel)return panel;"
+          new_find="""  // Put the ledger inside the GAME's hidden container, not beside the toggle.
+            // The same hidden state now governs both the game and its entire guess history.
+            const inside=document.getElementById(mode==='quest'?'word-game-inside':'letter-lock-content');
+            if(!inside || !root.contains(inside))return null;
+            let panel=root.querySelector('.shared-word-ledger');
+            if(panel){
+              if(panel.parentElement!==inside)inside.append(panel);
+              return panel;
+            }"""
+          if old_find in source:
+              source=source.replace(old_find,new_find,1)
+          elif new_find not in source:
+              raise RuntimeError('Unexpected source: unable to find existing ledger lookup')
+          old_add="  toggle.after(panel);\n  return panel;"
+          new_add="  inside.append(panel);\n  return panel;"
+          if old_add in source:
+              source=source.replace(old_add,new_add,1)
+          elif new_add not in source:
+              raise RuntimeError('Unexpected source: unable to find insertion point')
+          assert 'toggle.after(panel);' not in source
+          assert "root.querySelector('.shared-word-ledger')" in source
+          assert "inside.append(panel);" in source
+          js.write_text(source,encoding='utf-8')
+          
+          style=css.read_text(encoding='utf-8')
+          block="""\n/* Nested game-board guarantee v3: hidden games never display guess ledgers. */
+          #word-game-inside[hidden],
+          #letter-lock-content[hidden] { display:none !important; }
+          #word-game-inside[hidden] .shared-word-ledger,
+          #letter-lock-content[hidden] .shared-word-ledger { display:none !important; }
+          """
+          if 'Nested game-board guarantee v3' not in style:
+              style += block
+          css.write_text(style,encoding='utf-8')
+          
+          page=html.read_text(encoding='utf-8')
+          for ext in ('css','mjs'):
+              pattern=r'(commons-shared-guesses\\.'+ext+r'\\?v=)[a-zA-Z0-9_-]+'
+              # Avoid relying on a particular previous cache key; change exactly one instance.
+              pattern=r'(commons-shared-guesses\.'+ext+r'\?v=)[a-zA-Z0-9_-]+'
+              page,count=re.subn(pattern,lambda m:m.group(1)+'ledger3',page)
+              if count!=1: raise RuntimeError('Expected one shared-guesses '+ext+' asset tag; found '+str(count))
+          assert 'commons-shared-guesses.css?v=ledger3' in page
+          assert 'commons-shared-guesses.mjs?v=ledger3' in page
+          html.write_text(page,encoding='utf-8')
+          print('Installed game-contained word ledgers and cache-busted assets (ledger3)')
+          PYCODE
+      - name: Check JavaScript, nesting, and release integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/commons-shared-guesses.mjs
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          code=Path('docs/commons-shared-guesses.mjs').read_text()
+          assert 'toggle.after(panel)' not in code
+          assert "inside.append(panel)" in code
+          assert "root.querySelector('.shared-word-ledger')" in code
+          assert "word-game-inside" in code and "letter-lock-content" in code
+          assert 'commons-shared-guesses.css?v=ledger3' in Path('docs/community.html').read_text()
+          assert 'commons-shared-guesses.mjs?v=ledger3' in Path('docs/community.html').read_text()
+          print('PASS: both game logs nest in the closed game container')
+          PYCODE
+          git diff --check
+          npm ci
+          npm test --if-present
+      - name: Publish corrected collapsed guess boards
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/commons-shared-guesses.mjs docs/commons-shared-guesses.css docs/community.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Nest w0rdle and Daily Quest guess boards inside collapsible game panels"
+            git push origin HEAD:main
+          fi
