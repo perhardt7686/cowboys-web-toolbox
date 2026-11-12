@@ -1,0 +1,54 @@
+/* All-member shared guess log, visible outside each closed game panel. */
+.shared-word-ledger{
+  background:linear-gradient(145deg,#151321,#202033 60%,#141522);
+  color:#f3f2fc;
+  border:1px solid #615b88;
+  border-top:0;
+  border-radius:0 0 16px 16px;
+  padding:12px 14px 16px;
+  margin:0 0 12px;
+  box-shadow:0 12px 24px #0003;
+}
+.shared-word-ledger-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.shared-word-ledger-title{font-size:.82rem;letter-spacing:.06em;color:#e2d3ff}
+.shared-word-counter{font-size:.79rem;color:#d3d9ef}
+.shared-word-help{font-size:.78rem;line-height:1.45;color:#c9c9d9;margin:7px 0}
+.shared-word-current{display:grid;gap:6px;max-width:100%;margin:10px 0}
+.shared-word-guess{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  background:#0b0d18aa;border:1px solid #55536c;border-radius:9px;padding:7px 8px}
+.shared-word-number{color:#aeb6cb;font-size:.76rem;min-width:1.6rem}
+.shared-word-author{font-weight:650;font-size:.85rem;max-width:10rem;
+  white-space:nowrap;text-overflow:ellipsis;overflow:hidden;color:#f4ecfd}
+.shared-word-letters{display:inline-flex;gap:3px;align-items:center;flex-shrink:0}
+.shared-word-tile{display:inline-flex;justify-content:center;align-items:center;
+  width:clamp(25px,6vw,34px);height:32px;border-radius:5px;
+  font-size:.94rem;font-weight:800;color:white;box-shadow:inset 0 1px 2px #fff3}
+.shared-word-tile.correct{background:#198261}
+.shared-word-tile.present{background:#a57b22}
+.shared-word-tile.absent{background:#646070}
+.shared-word-points{font-size:.77rem;color:#b2eacf;white-space:nowrap;margin-left:auto}
+.shared-word-clock{font-size:.73rem;color:#bfc5d7;white-space:nowrap}
+.shared-word-empty{color:#c6c9d8;font-size:.85rem;padding:4px 2px}
+.shared-word-error{color:#ffbbba;font-size:.84rem}
+.shared-word-archive{border-top:1px solid #54516d;margin-top:10px;padding-top:10px}
+.shared-word-archive>summary,.shared-word-archive-round>summary{
+  cursor:pointer;color:#dcc6ff;font-size:.86rem;padding:7px 3px;
+  font-weight:650;list-style:revert}
+.shared-word-archive-content{display:grid;gap:9px}
+.shared-word-archive-round{background:#0e0f1d;border:1px solid #44425b;border-radius:9px;padding:7px 10px}
+.shared-word-archive-rows{display:grid;gap:5px;margin:7px 0}
+.shared-word-earlier-round{margin:12px 0 0;padding:8px;background:#292039;border:1px solid #695d84;border-radius:8px;display:grid;gap:6px}
+.shared-word-earlier-round>strong{font-size:.8rem;color:#fff}
+.shared-word-older{background:#352b5b;color:white;border:1px solid #8573b6;border-radius:8px;padding:9px 12px;font-weight:650;margin:8px 0;min-height:44px;cursor:pointer}
+.shared-word-older:disabled{opacity:.6}
+@media(max-width:480px){
+ .shared-word-ledger{padding:9px 9px 12px}
+ .shared-word-guess{gap:5px}
+ .shared-word-author{max-width:7.8rem;font-size:.8rem}
+ .shared-word-tile{height:29px;width:clamp(23px,6vw,29px);font-size:.83rem}
+ .shared-word-points{font-size:.72rem}
+ .shared-word-clock{font-size:.7rem}
+}
+@media(prefers-reduced-motion:reduce){.shared-word-ledger *{scroll-behavior:auto!important}}
+
+.shared-word-source{color:#b6e1ff;text-decoration:underline;text-underline-offset:2px}
