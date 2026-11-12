@@ -1,0 +1,17 @@
+/* Drawing Studio game button: fully collapsible, existing local drawing preserved. */
+body.community-page #drawing-studio-game-root{
+  width:100%;min-width:0;max-width:100%;box-sizing:border-box;margin-block:12px 18px;
+}
+body.community-page #drawing-studio-inside[hidden]{display:none!important}
+body.community-page #drawing-studio-inside{
+  box-sizing:border-box;min-width:0;max-width:100%;padding:14px 0 2px;
+}
+body.community-page #drawing-studio-game-root #commons-art{
+  box-sizing:border-box;min-width:0;width:100%;max-width:100%;margin:0;
+}
+body.community-page #drawing-studio-game-root #art-viewport{
+  box-sizing:border-box;max-width:100%;
+}
+body.community-page #drawing-studio-toggle:focus-visible{
+  outline:3px solid #e4b85e;outline-offset:3px;
+}
