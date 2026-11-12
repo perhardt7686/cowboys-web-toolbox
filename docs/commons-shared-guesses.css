@@ -58,3 +58,9 @@
 #letter-lock-toggle[aria-expanded="false"] + .shared-word-ledger {
   display: none !important;
 }
+
+/* Nested game-board guarantee v3: hidden games never display guess ledgers. */
+#word-game-inside[hidden],
+#letter-lock-content[hidden] { display:none !important; }
+#word-game-inside[hidden] .shared-word-ledger,
+#letter-lock-content[hidden] .shared-word-ledger { display:none !important; }

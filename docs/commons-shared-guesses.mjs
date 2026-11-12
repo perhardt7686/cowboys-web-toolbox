@@ -54,8 +54,15 @@ function ensureLedger(mode) {
   const spec=MODES[mode],root=document.getElementById(spec.root);
   const toggle=document.getElementById(spec.toggle);
   if(!root||!toggle || host?.hidden)return null;
-  let panel=root.querySelector(':scope > .shared-word-ledger');
-  if(panel)return panel;
+  // Put the ledger inside the GAME's hidden container, not beside the toggle.
+  // The same hidden state now governs both the game and its entire guess history.
+  const inside=document.getElementById(mode==='quest'?'word-game-inside':'letter-lock-content');
+  if(!inside || !root.contains(inside))return null;
+  let panel=root.querySelector('.shared-word-ledger');
+  if(panel){
+    if(panel.parentElement!==inside)inside.append(panel);
+    return panel;
+  }
   panel=node('section','shared-word-ledger');
   panel.id='shared-word-ledger-'+mode;
   panel.setAttribute('aria-label','All team guesses for '+spec.label);
@@ -85,7 +92,7 @@ function ensureLedger(mode) {
   });
   load.addEventListener('click',()=>void loadHistory(panel,false));
   panel.append(head,status,guesses,foot,archive);
-  toggle.after(panel);
+  inside.append(panel);
   return panel;
 }
 
