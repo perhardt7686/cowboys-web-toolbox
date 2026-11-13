@@ -12,7 +12,7 @@ function dial(ctx,x,y,r,value,max,title){
  ctx.fillStyle='#f7eacb';ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(title,0,14);ctx.font='800 8px system-ui';ctx.fillText(max===160?'MPH':'RPM',0,25);
  const angle=PI*.78+Math.min(1,Math.max(0,value/max))*PI*1.45;ctx.rotate(angle);ctx.fillStyle='#db735c';path(ctx,[[-2,5],[-2,-r*.72],[1,-r*.72],[2,5]],'#ed7052');ctx.restore();
 }
-export function drawClassicCockpit(ctx,{width=960,height=340,progress=0,live=false,seed=1,own={},rival={},boss=false,clock=0}={}){
+export function drawClassicCockpit(ctx,{width=960,height=340,progress=0,live=false,seed=1,own={},rival={},boss=false,clock=0,speed=null,rpm=null,steer=0,damage=0}={}){
  const w=width,h=height, p=Math.max(0,Math.min(1,Number(progress)||0)),t=Number(clock)||0;
  ctx.save();ctx.clearRect(0,0,w,h);
  let sky=ctx.createLinearGradient(0,0,0,235);sky.addColorStop(0,'#121628');sky.addColorStop(.60,'#3e324c');sky.addColorStop(1,'#c17966');ctx.fillStyle=sky;ctx.fillRect(0,0,w,218);
@@ -24,7 +24,7 @@ export function drawClassicCockpit(ctx,{width=960,height=340,progress=0,live=fal
  }
  path(ctx,[[0,189],[42,176],[126,182],[184,170],[252,189],[318,175],[392,187],[477,171],[559,185],[622,167],[711,184],[790,175],[861,183],[960,166],[960,249],[0,249]],'#252a30');
  ctx.fillStyle='#141d23';ctx.fillRect(0,216,w,120);
- const van=216, horizon=460;
+ const van=216, horizon=460+Math.max(-1,Math.min(1,Number(steer)||0))*58;
  path(ctx,[[0,h],[960,h],[565,van],[420,van]],'#49474a');
  path(ctx,[[75,h],[885,h],[542,van],[439,van]],'#343b40');
  // Perspective road lane marks and moving stripes.
@@ -50,11 +50,12 @@ export function drawClassicCockpit(ctx,{width=960,height=340,progress=0,live=fal
  ctx.strokeStyle='#e8dec78c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(406,239);ctx.quadraticCurveTo(452,224,512,231);ctx.stroke();
  // Dark embossed dashboard surface, twin period analog instruments.
  const dash=ctx.createLinearGradient(0,259,0,340);dash.addColorStop(0,'#51575a');dash.addColorStop(.15,'#b2ada3');dash.addColorStop(.22,'#3a4245');dash.addColorStop(1,'#15191c');path(ctx,[[0,270],[93,256],[227,259],[341,286],[608,279],[747,260],[863,259],[960,273],[960,340],[0,340]],dash,'#15181d',5);
- dial(ctx,374,305,28,live?45+p*110:0,160,'SPEED');dial(ctx,582,305,28,live?2000+p*4500:900,8000,'REV');
+ dial(ctx,374,305,28,speed==null?live?45+p*110:0:Number(speed),160,'SPEED');dial(ctx,582,305,28,rpm==null?live?2000+p*4500:900:Number(rpm),8000,'REV');
  // Steering wheel ring and center do not obscure the road entirely.
  ctx.strokeStyle='#0b1116';ctx.lineWidth=19;ctx.beginPath();ctx.arc(476,343,79,PI*1.04,PI*1.96);ctx.stroke();ctx.strokeStyle='#c7bcb3';ctx.lineWidth=6;ctx.beginPath();ctx.arc(476,343,79,PI*1.04,PI*1.96);ctx.stroke();
  path(ctx,[[445,334],[459,319],[494,319],[511,334],[499,343],[453,343]],'#b8b6ae','#43484a',2);
  rr(ctx,446,329,63,18,5,'#171c1f','#9b9385');
+ if(Number(damage)>.35){ctx.save();ctx.strokeStyle='#e8ebed99';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(760,17);ctx.lineTo(695,78);ctx.lineTo(748,114);ctx.lineTo(710,151);ctx.moveTo(695,78);ctx.lineTo(629,49);ctx.moveTo(748,114);ctx.lineTo(824,146);ctx.stroke();ctx.restore();}
  // Gauges for the original-style gameplay, never score authoritative.
  rr(ctx,19,10,197,28,5,'#151c25dd','#c3a36b');ctx.fillStyle='#ffdf96';ctx.font='800 13px monospace';ctx.textAlign='left';ctx.fillText('RIVERSIDE NIGHT RUN',30,29);
  rr(ctx,758,10,173,28,5,'#151c25e0','#aa9b8e');ctx.fillStyle='#f3dfba';ctx.fillText('SUMMER OF 1963',769,29);
