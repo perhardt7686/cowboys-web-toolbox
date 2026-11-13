@@ -1,4 +1,6 @@
 /* ONE SCREEN / COMMONS ARCADE. Independent game logic and server saves are untouched. */
+body.community-page #arcade-shell,body.community-page #arcade-shell *,body.community-page #arcade-shell *::before,body.community-page #arcade-shell *::after,
+body.community-page #arcade-hud,body.community-page #arcade-hud *,body.community-page #arcade-hud *::before,body.community-page #arcade-hud *::after{box-sizing:border-box}
 body.community-page.arcade-ready #arcade-station{display:block;margin:12px 0 20px;position:relative;z-index:1}
 body.community-page.arcade-ready #arcade-launch{
  display:flex;align-items:center;gap:14px;width:100%;min-height:88px;padding:16px;
