@@ -3,7 +3,7 @@
    Compatible visual/boot layer: credits, bolts, races and RPCs remain authoritative.
 */
 const EGA=['#000000','#0000aa','#00aa00','#00aaaa','#aa0000','#aa00aa','#aa5500','#aaaaaa','#555555','#5555ff','#55ff55','#55ffff','#ff5555','#ff55ff','#ffff55','#ffffff'];
-const ROOT=document.getElementById('streetrod-root');
+let ROOT=null;
 let booted=false,booting=false,scheduled=false,decorated=new WeakSet();
 const W=320,H=200;
 const col=n=>EGA[Math.max(0,Math.min(15,n))];
@@ -234,11 +234,18 @@ function capture(event){
  if(!btn||booted||booting||!ROOT?.contains(btn))return;
  event.preventDefault();event.stopImmediatePropagation();void bootAndOpen(btn);
 }
-if(ROOT){
+function install(){
+ if(ROOT?.isConnected)return true;
+ ROOT=document.getElementById('streetrod-root');
+ if(!ROOT)return false;
  window.COWBOY_STREETROD_RETRO=true;
  ROOT.classList.add('sr-ega-mode');
  document.addEventListener('click',capture,true);
  const observer=new MutationObserver(schedule);
  observer.observe(ROOT,{subtree:true,childList:true});
- schedule();
+ schedule();return true;
+}
+if(!install()){
+ const wait=new MutationObserver(()=>{if(install())wait.disconnect();});
+ wait.observe(document.body,{subtree:true,childList:true});
 }
