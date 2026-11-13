@@ -10,7 +10,7 @@ const games=[
  {id:'wordle',root:'letter-lock-root',toggle:'letter-lock-toggle',name:'w0rdle',tag:'CO-OP WORD CIPHER',symbol:'▤',scenes:[['play','PLAY'],['scores','SCORES'],['awards','AWARDS']]},
  {id:'wordquest',root:'word-game-root',toggle:'word-game-toggle',name:'Word Quest',tag:'DAILY TEAM PUZZLE',symbol:'▥',scenes:[['play','PLAY'],['scores','LEADERBOARD']]},
  {id:'plates',root:'plate-game-root',toggle:'plate-game-open',name:'License Plates',tag:'ANA VS. COWBOY',symbol:'▧',scenes:[['post','POST'],['vote','REVIEW'],['scores','SCORES']]},
- {id:'drawing',root:'commons-art',toggle:null,name:'Drawing Studio',tag:'ORIGINAL ART DESK',symbol:'▦',scenes:[['draw','CANVAS']]},
+ {id:'drawing',root:'drawing-studio-game-root',toggle:'drawing-studio-toggle',name:'Drawing Studio',tag:'ORIGINAL ART DESK',symbol:'▦',scenes:[['draw','CANVAS']]},
  {id:'study',root:'vdacs-study-root',toggle:'vdacs-study-toggle',name:'7A Study Cards',tag:'PEST CONTROL PREP',symbol:'▨',scenes:[['cards','CARDS'],['awards','MILESTONES']]}
 ];
 let active=null,scene='',mode='menu',settings=null,menu=null,hud=null,station=null,plateIndex=0;
@@ -289,25 +289,15 @@ const watchCards=new MutationObserver(()=>{if(pagerSelector())updatePlatePaging(
 const entryButtons=games.filter(g=>g.toggle).map(g=>'#'+g.toggle).join(',');
 function boardGameClick(e){
  if(document.body.classList.contains('arcade-on')||board?.hidden)return;
- const button=e.target?.closest?.(entryButtons+', [data-arcade-open]');
+ const button=e.target?.closest?.(entryButtons);
  if(!button||!board.contains(button)||button.disabled)return;
- const g=game(button.dataset.arcadeOpen)||games.find(g=>g.toggle===button.id);
+ const g=games.find(g=>g.toggle===button.id);
  if(!g||!available(g))return;
  // Capture on window before original modules' document handlers and DOS boot.
  e.preventDefault();e.stopImmediatePropagation();
  launch(g.id);
 }
-function drawingButton(){
- const main=board?.querySelector('.community-main'),art=$('commons-art');
- const existing=$('arcade-drawing-entry');
- if(!main||!art||board.hidden){existing?.remove();return;}
- if(existing?.isConnected)return;
- const section=document.createElement('section');
- section.id='arcade-drawing-entry';section.className='mahjong-game arcade-drawing-entry';
- section.innerHTML='<button type="button" data-arcade-open="drawing" aria-label="Open Drawing Studio full screen" class="mahjong-entry-button"><span class="mahjong-entry-icon" aria-hidden="true">▦</span><span class="mahjong-entry-copy"><strong>Drawing Studio</strong><small>Your canvas · Original artwork · Full screen</small></span><span class="mahjong-chevron" aria-hidden="true">▶</span></button>';
- const anchor=$('word-game-root')||$('letter-lock-root')||$('mahjong-root');
- if(anchor?.parentElement===main)anchor.after(section);else main.prepend(section);
-}
+
 function start(){
  if(!board||!config?.enabled)return;
  build();
@@ -315,11 +305,9 @@ function start(){
  const timer=setInterval(()=>{
   if(!board.isConnected){clearInterval(timer);return;}
   if(!menu)build();
-  drawingButton();
   const list=$('plate-list');
   if(list&&!list.dataset.arcadeObserved){list.dataset.arcadeObserved='1';watchCards.observe(list,{childList:true});}
   if(active&&mode==='game')sync();
  },900);
- drawingButton();
 }
 start();
