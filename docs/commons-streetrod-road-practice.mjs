@@ -3,7 +3,7 @@
  * server-score changes, or unearned achievements: this is training only.
  * Original code and graphics, not a copy of historic game assets.
  */
-import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=practice1';
+import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=dos1';
 const $=id=>document.getElementById(id);
 const MAX_DISTANCE=2.5*5280;
 let cleanup=null;
