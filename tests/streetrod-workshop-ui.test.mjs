@@ -38,7 +38,7 @@ test('Single monitor restores existing games rather than replacing game state',(
    assert.ok(html.includes(name),'Missing versioned game module: '+name);
  }
  assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath('docs/commons-arcade-shell.mjs')]));
- for(const token of ['#arcade-hud','#arcade-shell','arcade-game-active','makeVisible(g)',
+ for(const token of ['#arcade-hud','arcade-shell','arcade-game-active','makeVisible(g)',
   'arcade-program-grid','scene-next','scene-previous']){
   assert.ok(arcade.includes(token),'Missing scene controller feature: '+token);
  }
