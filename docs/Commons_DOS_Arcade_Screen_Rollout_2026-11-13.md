@@ -1,5 +1,21 @@
 # Cowboy's Commons DOS Arcade · one-screen navigation rollout
 
+## Revision · Individual launch buttons (latest user direction)
+
+The shared **THE COMMONS ARCADE** selection launcher has been retired from the visible board. The original **separate Commons game buttons** are visible again for Street r0d, Mahjong, w0rdle, Daily Word Quest, License Plates, and 7A Study Cards. Drawing Studio receives its own standalone launch button alongside those cards.
+
+Clicking a game's own button now opens **that game's dedicated full-viewport monitor directly**. No shared selection screen is required. Street r0d retains Garage/Tune/Classifieds/Parts/Diner/Road/Calendar/Junior internal scenes. Mahjong retains Play/Levels/Scores/Awards/History. Other games retain their own scene tabs, settings, scoreboards, and save pipelines. The HUD returns to the original individual buttons with **GAMES** or **EXIT**, while **SETUP** changes only display preferences. Closing uses each game's original button handler to keep in-memory expanded state synchronized.
+
+Styling was made more compact for phone portrait and short landscape layouts. The Wordle 12-row board, keyboard, and form were checked at 390×844 and 375×667 in synthetic Chromium QA. The same browser test also covers all seven buttons and game screen transitions at 844×390 landscape. Long photographic records and large catalogs retain bounded scrolling *inside* the game window instead of scrolling the entire Commons page.
+
+Assets are versioned in `docs/community.html` as `commons-arcade-shell.css?v=dos-screen3` and `commons-arcade-shell.mjs?v=dos-screen3` to refresh iPhone Safari caches. The original member-only server-backed state, awards, game credits, race history, and plate photos are preserved, not migrated or reset.
+
+**Acceptance limit:** Synthetic browser checks and GitHub Pages publication do not replace a signed-in Safari walk-through. No claim of complete cross-account or all-game backend acceptance without live credentials.
+
+---
+
+
+
 **Date:** November 13, 2026  
 **Repository:** `perhardt7686/cowboys-web-toolbox` (`main`)  
 **Scope:** Commons game presentation, streetrod garage mechanics, and browser regression tests  
