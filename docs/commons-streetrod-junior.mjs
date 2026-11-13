@@ -78,12 +78,14 @@ const jrRGB=jrEga.map(h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),pa
 let jrPixelCanvas=null,jrPixelCtx=null,jrLast=0;
 function egaJunior(){
  if(!window.COWBOY_STREETROD_RETRO||!ctx?.canvas)return;
- const now=performance.now();if(now-jrLast<95)return;jrLast=now;
+ const now=performance.now();const recompute=!jrPixelCanvas||now-jrLast>=95;
  if(!jrPixelCanvas){
   jrPixelCanvas=document.createElement('canvas');jrPixelCanvas.width=320;jrPixelCanvas.height=128;
   jrPixelCtx=jrPixelCanvas.getContext('2d',{willReadFrequently:true});
  }
  if(!jrPixelCtx)return;
+ if(recompute){
+ jrLast=now;
  jrPixelCtx.imageSmoothingEnabled=true;
  jrPixelCtx.drawImage(ctx.canvas,0,0,320,128);
  const image=jrPixelCtx.getImageData(0,0,320,128),a=image.data;
@@ -97,6 +99,7 @@ function egaJunior(){
   a[i]=jrRGB[best][0];a[i+1]=jrRGB[best][1];a[i+2]=jrRGB[best][2];a[i+3]=255;
  }
  jrPixelCtx.putImageData(image,0,0);
+ }
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
  ctx.drawImage(jrPixelCanvas,0,0,ctx.canvas.width,ctx.canvas.height);ctx.restore();
 }
