@@ -74,6 +74,24 @@ body.community-page #content-dialog .dialog-close:hover{
  background:#dfd0e9!important;color:#261a31!important;
 }
 
+/* The topic starter and owner ribbon sit ABOVE the reply cards. */
+body.community-page #content-dialog .thread-meta :is(.member-author,.author-title){
+ color:var(--cb-ink)!important;
+}
+body.community-page #content-dialog .thread-meta .member-author>span:not(.avatar){
+ color:var(--cb-ink)!important;
+ font-weight:750;
+}
+body.community-page #content-dialog .thread-meta :is(.profile-badge,.moderator-badge){
+ background:#ecddf3!important;color:#502568!important;
+ border:1px solid #aa8cb8!important;border-radius:8px;
+ opacity:1!important;font-size:.75rem!important;font-weight:800;
+}
+body.community-page #content-dialog .thread-meta :is(.avatar,.profile-avatar){
+ /* Do not force dark ink onto custom dark user avatars. */
+ color:var(--profile-ink,#fffaf2);
+}
+
 /* A single consistent light surface for posts. Personalization affects
    accent trims, not text/background contrast. */
 body.community-page #content-dialog #thread-replies .forum-post,
@@ -109,7 +127,7 @@ body.community-page #content-dialog .forum-post :is(.forum-post-context,.forum-l
  font-size:clamp(.82rem,2vw,.95rem)!important;
  line-height:1.5!important;
 }
-body.community-page #content-dialog .forum-post .thread-meta :is(b,strong,button,span,time),
+body.community-page #content-dialog .forum-post .thread-meta :is(b,strong,button,time),
 body.community-page #content-dialog .forum-post .member-author>span:not(.avatar){
  color:var(--cb-ink)!important;
  font-size:clamp(.9rem,2.2vw,1rem)!important;
