@@ -70,6 +70,13 @@ async def main():
    await page.locator('#arcade-hud [data-arcade-action="options"]').click()
    await page.locator('#arcade-options-form input[name="contrast"][value="bright"]').check()
    assert await page.locator("body").get_attribute("data-arcade-contrast")=="bright"
+   debug=await page.locator('#arcade-options-view [data-arcade-action="options-back"]').evaluate("""el=>{
+    const chain=[];for(let n=el;n&&chain.length<7;n=n.parentElement){
+      const st=getComputedStyle(n),r=n.getBoundingClientRect();
+      chain.push({name:n.tagName+'#'+(n.id||''),hidden:n.hidden,display:st.display,visibility:st.visibility,overflow:st.overflow,
+        rect:{x:r.x,y:r.y,w:r.width,h:r.height},scroll:n.scrollHeight,client:n.clientHeight});
+    }return chain;}""")
+   print("ARCADE SETTINGS VISIBILITY DIAGNOSTIC",debug,flush=True)
    await page.locator('#arcade-options-view [data-arcade-action="options-back"]').click()
    assert await page.locator("body").get_attribute("data-arcade-game")=="mahjong"
    await page.locator('#arcade-hud [data-arcade-action="home"]').click()
