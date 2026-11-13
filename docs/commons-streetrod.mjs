@@ -189,6 +189,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
    const {data,error}=await client.rpc(endpoint,args);if(error)throw error;
    race={...data,stage:'countdown',localStarted:performance.now(),goAt:performance.now()+3100,
     launch:null,shifts:[],nitro:null,finished:false,showProgress:0};
+   void decorateRace(targetID,duelID,race.id);
    $('sr-mode-chip').textContent=mode==='boss'?'CIPHER VAN X · CHAMPIONSHIP':mode==='duel'?'REAL MEMBER CHALLENGE':'SINGLE PLAYER';
    $('sr-start-solo').hidden=$('sr-start-duel').hidden=$('sr-start-boss').hidden=true;
    $('sr-launch').hidden=false;$('sr-launch').disabled=true;
@@ -198,6 +199,42 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
    cancelAnimationFrame(raceRaf);raceRaf=requestAnimationFrame(tick);
   }catch(e){setStatus(e.message||'Could not stage race','warn')}
   finally{busy=false;if(!race){$('sr-start-solo').disabled=$('sr-start-duel').disabled=$('sr-start-boss').disabled=false;}}
+ }
+ async function decorateRace(targetID,duelID,runID){
+  try{
+   const {data,error}=await client.rpc('community_streetrod_showroom');
+   if(error||!data?.drivers||!race||race.id!==runID)return;
+   const own=data.drivers.find(p=>p.id===uid);
+   const dueling=duelID?state?.duels?.find(d=>d.id===duelID):null;
+   const opponentID=targetID||dueling?.creator_id||null;
+   const opponent=opponentID?data.drivers.find(p=>p.id===opponentID):null;
+   if(own)race.driver_name=own.name;
+   if(!opponent)return;
+   race.opponent_name=opponent.name||'Commons rival';
+   race.opponent_car=opponent.selected_car;
+   race.opponent_icon=opponent.avatar_mode==='icon'?opponent.avatar_icon:null;
+   race.opponent_initials=String(opponent.name||'R').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('');
+   if(opponent.avatar_mode==='photo'&&opponent.avatar_path){
+    const {data:signed,error:signedError}=await client.storage.from('community-avatars').createSignedUrl(opponent.avatar_path,300);
+    if(!signedError&&signed?.signedUrl&&race?.id===runID){
+     const picture=new Image();picture.src=signed.signedUrl;race.opponent_picture=picture;
+    }
+   }
+  }catch{/* Avatar decoration never affects the authoritative race. */}
+ }
+ function paintDriverBadge(ctx,x,y){
+  const current=race;if(!current||current.mode!=='duel'||!current.opponent_name)return;
+  ctx.save();ctx.translate(x,y);
+  ctx.beginPath();ctx.arc(0,0,17,0,Math.PI*2);ctx.fillStyle='#382b4d';ctx.fill();
+  ctx.lineWidth=3;ctx.strokeStyle='#f7d6a1';ctx.stroke();
+  if(current.opponent_picture?.complete&&current.opponent_picture.naturalWidth>0){
+   ctx.save();ctx.beginPath();ctx.arc(0,0,14,0,2*Math.PI);ctx.clip();
+   ctx.drawImage(current.opponent_picture,-14,-14,28,28);ctx.restore();
+  }else{
+   ctx.fillStyle='#fff2e0';ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.font='bold 13px system-ui';ctx.fillText((current.opponent_initials||'R').slice(0,2),0,0);
+  }
+  ctx.restore();
  }
  function raceTime(){return race?performance.now()-race.goAt:0}
  function handleLaunch(){
@@ -291,19 +328,19 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   for(let y=181;y<314;y+=14)for(let j=0;j<2;j++)if(((y/14|0)+j)%2===0){ctx.fillStyle='#161222';ctx.fillRect(finishX+j*5,y,5,14)}
   ctx.fillStyle='#e8e6e6';ctx.font='bold 15px system-ui';ctx.fillText('1/4 MILE',753,194);
   const me=CAR(race?.car||state?.cars?.find(c=>c.selected)?.key);const driveX=live?clamp(90+progress*690,70,785):120;
-  drawCar(ctx,driveX,230,me.accent||'#ebbb58',1);
+  drawCar(ctx,driveX,230,me.accent||'#ebbb58',1,me.body);
   const other=(live?clamp(90+progress*670+(seed%13-6)*5,70,780):135);
-  if(race?.mode==='boss')drawCipherVan(ctx,other,278,.88);else drawCar(ctx,other,278,'#9a80df',.88);
+  if(race?.mode==='boss')drawCipherVan(ctx,other,278,.88);else {const otherModel=state?.catalog?.find(v=>v.key===race?.opponent_car);drawCar(ctx,other,278,otherModel?.accent||'#9a80df',.88,otherModel?.body);paintDriverBadge(ctx,other-19,218);}
   ctx.font='800 18px system-ui';ctx.fillStyle='#fff';ctx.fillText('YOU',clamp(driveX-25,5,w-80),193);
   if(race?.mode==='boss'){ctx.font='bold 13px system-ui';ctx.fillStyle='#f4c487';ctx.fillText('CIPHER VAN X',Math.max(8,other-42),294);}
   if(progress>=1){ctx.fillStyle='#ffd67e';ctx.font='900 26px system-ui';ctx.fillText('FINISH!',w-145,245)}
  }
- function drawCar(ctx,x,y,color,scale){
+ function drawCar(ctx,x,y,color,scale,body='coupe'){
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   ctx.fillStyle='#0006';ctx.beginPath();ctx.ellipse(0,9,85,13,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#14131b';for(const xx of [-55,52]){ctx.beginPath();ctx.arc(xx,8,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ddd';ctx.beginPath();ctx.arc(xx,8,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#14131b';}
-  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-80,6);ctx.lineTo(-80,-15);ctx.lineTo(-43,-22);ctx.lineTo(-24,-49);ctx.lineTo(33,-49);ctx.lineTo(53,-22);ctx.lineTo(73,-17);ctx.lineTo(87,1);ctx.lineTo(79,7);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#0a1024';ctx.lineWidth=5;ctx.stroke();ctx.fillStyle='#151d33';ctx.beginPath();ctx.moveTo(-20,-43);ctx.lineTo(29,-43);ctx.lineTo(44,-22);ctx.lineTo(-31,-22);ctx.closePath();ctx.fill();ctx.strokeStyle='#c1dff8';ctx.lineWidth=3;ctx.stroke();ctx.strokeStyle='#fff9';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-73,-13);ctx.lineTo(72,-13);ctx.stroke();
+  ctx.fillStyle=color;ctx.beginPath();if(body==='van'){ctx.moveTo(-82,6);ctx.lineTo(-82,-58);ctx.quadraticCurveTo(-80,-67,-68,-68);ctx.lineTo(46,-68);ctx.quadraticCurveTo(67,-62,71,-43);ctx.lineTo(86,-13);ctx.lineTo(87,7);}else if(body==='truck'){ctx.moveTo(-80,6);ctx.lineTo(-80,-15);ctx.lineTo(-2,-15);ctx.lineTo(10,-51);ctx.lineTo(50,-51);ctx.lineTo(62,-20);ctx.lineTo(87,-10);ctx.lineTo(87,7);}else if(body==='wagon'){ctx.moveTo(-80,6);ctx.lineTo(-80,-18);ctx.lineTo(-59,-25);ctx.lineTo(-53,-55);ctx.lineTo(44,-55);ctx.lineTo(59,-23);ctx.lineTo(84,-13);ctx.lineTo(87,7);}else{ctx.moveTo(-80,6);ctx.lineTo(-80,-15);ctx.lineTo(-43,-22);ctx.lineTo(-24,-49);ctx.lineTo(33,-49);ctx.lineTo(53,-22);ctx.lineTo(73,-17);ctx.lineTo(87,1);ctx.lineTo(79,7);}ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#0a1024';ctx.lineWidth=5;ctx.stroke();ctx.fillStyle='#151d33';ctx.beginPath();if(body==='van'){ctx.moveTo(-61,-61);ctx.lineTo(43,-61);ctx.lineTo(61,-36);ctx.lineTo(-61,-36);}else if(body==='truck'){ctx.moveTo(16,-45);ctx.lineTo(45,-45);ctx.lineTo(56,-23);ctx.lineTo(7,-23);}else if(body==='wagon'){ctx.moveTo(-47,-49);ctx.lineTo(38,-49);ctx.lineTo(51,-22);ctx.lineTo(-47,-22);}else{ctx.moveTo(-20,-43);ctx.lineTo(29,-43);ctx.lineTo(44,-22);ctx.lineTo(-31,-22);}ctx.closePath();ctx.fill();ctx.strokeStyle='#c1dff8';ctx.lineWidth=3;ctx.stroke();ctx.strokeStyle='#fff9';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-73,-13);ctx.lineTo(72,-13);ctx.stroke();
   ctx.fillStyle='#ffe5b5';ctx.fillRect(76,-13,10,8);ctx.fillStyle='#fc6f75';ctx.fillRect(-80,-11,7,8);
   ctx.restore();
  }
