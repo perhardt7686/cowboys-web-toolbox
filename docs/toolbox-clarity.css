@@ -1,0 +1,281 @@
+/* Toolbox clarity layer - 2026-11-13
+   Incremental, native CSS instead of framework migration.  Keeps the Cocodrilo
+   artwork and the current catalog/search/favorite/filter logic unchanged.
+   This stylesheet is intentionally scoped to body.toolbox-page only. */
+body.toolbox-page{
+ --clarity-ink:#25192f;
+ --clarity-paper:#fffaf1;
+ --clarity-plum:#502568;
+ --clarity-on-dark:#f6eefb;
+ --clarity-muted:#e0d5e8;
+ --clarity-teal:#a5eee3;
+ --clarity-gold:#f2cf8f;
+ --clarity-outline:#a78cba;
+}
+/* Cohesive information hierarchy. No low-contrast text over gradients. */
+body.toolbox-page :is(.toolbox-map-heading p:last-child,.catalog-top p,.search-hint,.filter-note,
+ .sort-context,#result-count,.research-topic,.catalog-summary,.about-notes p){
+ color:var(--clarity-muted)!important;
+ opacity:1;
+}
+body.toolbox-page :is(.hero .intro,.about>div>p:not(.eyebrow),.community-invite p){
+ line-height:1.65;
+}
+body.toolbox-page .toolbox-search-label,
+body.toolbox-page .catalog-top .eyebrow,
+body.toolbox-page .toolbox-map-heading .eyebrow{
+ color:var(--clarity-gold)!important;
+}
+/* Clear search remains the primary task, with high-contrast input and placeholder. */
+body.toolbox-page #search{
+ color:var(--clarity-ink)!important;
+ background:var(--clarity-paper)!important;
+ border:2px solid #9067a7!important;
+ border-radius:13px!important;
+ font-size:16px!important;
+ line-height:1.45!important;
+ min-height:54px!important;
+}
+body.toolbox-page #search::placeholder{
+ color:#64546d!important;
+ opacity:1!important;
+}
+body.toolbox-page .search-wrap>svg{color:var(--clarity-plum)!important}
+body.toolbox-page :is(.saved-button,#clear-search){
+ color:var(--clarity-ink)!important;
+ background:#f2e3f9!important;
+ border:2px solid #a785bd!important;
+ border-radius:10px!important;
+ font-weight:800;
+ min-height:46px;
+}
+body.toolbox-page .saved-button[aria-pressed="true"]{
+ color:#24162d!important;
+ background:#f2cf8f!important;
+ border-color:#ba934a!important;
+}
+body.toolbox-page .saved-button b{
+ background:#502568!important;color:#fffaf1!important;
+}
+/* The static navigation cards use real, visible borders, consistent type and
+   familiar active/inactive states, not glassy pale text. */
+body.toolbox-page .toolbox-map-card,
+body.toolbox-page .pack-link{
+ color:var(--clarity-ink)!important;
+ border:2px solid #8f6aa1!important;
+ box-shadow:0 5px 0 #09050e,0 12px 24px #0006;
+}
+body.toolbox-page .toolbox-map-card :is(strong,small,.toolbox-route-arrow),
+body.toolbox-page .pack-link :is(strong,span){
+ color:var(--clarity-ink)!important;
+ opacity:1;
+}
+body.toolbox-page .toolbox-map-card small,
+body.toolbox-page .pack-link span{
+ font-size:clamp(.88rem,1.7vw,.97rem)!important;
+ line-height:1.5;
+}
+body.toolbox-page .toolbox-map-card:is(:hover,:focus-visible),
+body.toolbox-page .pack-link:is(:hover,:focus-visible){
+ border-color:#502568!important;
+ box-shadow:0 0 0 2px #c9a5d7,0 5px 0 #09050e!important;
+}
+/* Results: favor 1 strong heading, 1 readable description, and separated
+   metadata, instead of several near-identical low contrast labels. */
+body.toolbox-page .site-card{
+ background:linear-gradient(145deg,#291c36,#20162b)!important;
+ border:2px solid #86679a!important;
+ color:var(--clarity-on-dark)!important;
+}
+body.toolbox-page .site-card :is(h4,h4 a){
+ color:#fff8ff!important;
+ font-weight:850!important;
+}
+body.toolbox-page .site-card .card-description{
+ color:#f0e5f4!important;
+ font-size:clamp(.94rem,1.7vw,1rem)!important;
+ line-height:1.65!important;
+}
+body.toolbox-page .site-card :is(.domain,.notes,.check-line,.source-num,.click-counter,.collection-origins,.source-tags){
+ color:#ded1e8!important;
+ font-size:max(.79rem,12px);
+}
+body.toolbox-page .site-card .card-topic{
+ color:#b4f3e8!important;
+}
+body.toolbox-page .site-card .access-label{
+ color:#fff8fa!important;
+ background:#573568!important;
+ border:1px solid #bd9ad2!important;
+ font-weight:750!important;
+}
+body.toolbox-page .site-card :is(.video-link,.source-tags a,.site-board-actions a){
+ color:#b4f3e8!important;
+ text-underline-offset:3px;
+}
+body.toolbox-page .site-card .open-link{
+ background:#f2cf8f!important;
+ color:#291a37!important;
+ border:2px solid #ba934a!important;
+ border-radius:10px;
+ min-height:46px;
+ font-weight:850!important;
+}
+body.toolbox-page .site-card .open-link:hover{
+ background:#ffe3ae!important;
+ color:#291a37!important;
+}
+body.toolbox-page .site-card .star{
+ color:#fff1ce!important;
+ border:1px solid #ab87c0;
+ min-width:44px;min-height:44px;
+}
+body.toolbox-page .site-card .star[aria-pressed="true"]{
+ color:#fff8ff!important;
+ background:#57316e!important;
+ border-color:#e9cc90!important;
+}
+body.toolbox-page .site-card :is(.card-secondary button,.plain-button){
+ color:#fff8ff!important;
+ background:#4b3060!important;
+ border-color:#b99bca!important;
+ min-height:44px;
+}
+body.toolbox-page .site-card :is(.card-secondary button,.plain-button):hover{
+ background:#68417b!important;
+}
+/* Filters: consistent accessible chips and dropdowns; selected state
+   never depends on color alone because aria-pressed remains in markup. */
+body.toolbox-page .category-chip{
+ color:#fff5fa!important;
+ background:#3b284a!important;
+ border:2px solid #a280b7!important;
+ border-radius:999px!important;
+ min-height:45px!important;
+ padding:10px 13px!important;
+ font-size:clamp(.86rem,1.8vw,.94rem)!important;
+ font-weight:800!important;
+}
+body.toolbox-page .category-chip[aria-pressed="true"]{
+ color:#25192f!important;
+ background:#f2cf8f!important;
+ border-color:#f2cf8f!important;
+}
+body.toolbox-page .category-chip[aria-pressed="true"]::before{
+ content:"✓";display:inline;margin-right:6px;font-weight:900;
+}
+body.toolbox-page .category-chip:hover:not([aria-pressed="true"]){
+ background:#62407a!important;
+}
+body.toolbox-page :is(.filter-row select,.personal-toolbar select,#sort,#topic-filter){
+ color:var(--clarity-ink)!important;
+ background:var(--clarity-paper)!important;
+ border:2px solid #a488b5!important;
+ border-radius:10px!important;
+ min-height:46px;
+ font-size:16px!important;
+}
+body.toolbox-page :is(.filter-row label,.personal-toolbar label){
+ color:#f6e8fa!important;
+ font-size:.94rem!important;
+ font-weight:780!important;
+}
+body.toolbox-page .active-filters button{
+ color:#19383a!important;
+ background:#bcf3e7!important;
+ border:2px solid #4bada3!important;
+ min-height:44px;
+ font-weight:800!important;
+}
+/* Tab navigation: clearly selected as a raised light surface. */
+body.toolbox-page .view-tabs button{
+ min-height:48px;
+ border:1px solid #7e6395!important;
+ border-radius:10px 10px 0 0;
+ color:#f5e7fa!important;
+ background:#2b1c3c!important;
+ font-size:.9rem!important;
+ font-weight:750!important;
+}
+body.toolbox-page .view-tabs button[aria-selected="true"]{
+ color:#281934!important;
+ background:#fff3df!important;
+ border-color:#c69acb!important;
+ font-weight:850!important;
+ box-shadow:inset 0 -4px 0 #70418a;
+}
+body.toolbox-page .view-tabs button[aria-selected="true"] span{
+ color:#281934!important;background:#e4cce9!important;
+}
+body.toolbox-page .view-tabs button:hover:not([aria-selected="true"]){
+ color:#fffaf2!important;background:#503466!important;
+}
+body.toolbox-page .personal-toolbar button,
+body.toolbox-page .collection-controls .plain-button{
+ color:#fff8ff!important;
+ background:#4b3060!important;
+ border:2px solid #b99bca!important;
+ border-radius:10px!important;
+ min-height:45px;
+ font-weight:780!important;
+}
+body.toolbox-page .personal-toolbar button:hover,
+body.toolbox-page .collection-controls .plain-button:hover{
+ background:#68417b!important;
+}
+body.toolbox-page .result-options #result-count{
+ color:#e8d8ef!important;
+ font-weight:780;
+}
+/* Secondary help and disclosure patterns keep visible link labels. */
+body.toolbox-page :is(.download summary,.more-filters>summary,.collection-controls>summary){
+ color:#f7e9ff!important;
+ font-weight:800;
+}
+body.toolbox-page :is(.empty p,.footer,.about-notes p,.community-invite p){
+ line-height:1.65;
+}
+body.toolbox-page .community-invite :is(p,span),
+body.toolbox-page .community-invite h2{
+ color:#30203d!important;
+}
+body.toolbox-page .community-invite .board-link{
+ color:#fffaf2!important;background:#502568!important;
+ border:2px solid #805c95!important;
+}
+body.toolbox-page .community-invite .board-link:hover{
+ color:#25192f!important;background:#f2cf8f!important;
+}
+/* Accessible focus and touch targets, including on iPhone Safari. */
+body.toolbox-page :is(a,button,summary,input,select,textarea):focus-visible{
+ outline:3px solid #f2cf8f!important;
+ outline-offset:3px!important;
+ box-shadow:0 0 0 2px #23132d!important;
+}
+body.toolbox-page :is(.category-chip,.saved-button,.star,.view-tabs button,.open-link){
+ touch-action:manipulation;
+}
+@media(max-width:650px){
+ body.toolbox-page .toolbox-map-grid{gap:11px}
+ body.toolbox-page .site-card{padding:16px!important}
+ body.toolbox-page .category-chip{
+  min-height:46px!important;padding:10px 11px!important;
+ }
+ body.toolbox-page .view-tabs{gap:4px}
+ body.toolbox-page .view-tabs button{
+  font-size:.82rem!important;padding:11px 9px!important;
+ }
+ body.toolbox-page .toolbox-map-card{
+  padding:15px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.toolbox-page :is(.site-card,.toolbox-map-card,.pack-link,.category-chip){
+  transition:none!important;transform:none!important;
+ }
+}
+@media(forced-colors:active){
+ body.toolbox-page :is(.category-chip,.site-card,.open-link){
+  border:2px solid ButtonText!important;
+ }
+}
