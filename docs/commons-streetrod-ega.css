@@ -274,3 +274,49 @@ body.community-page #streetrod-root.sr-ega-mode .src-diner-racer :is(strong,smal
 body.community-page #streetrod-root.sr-ega-mode :is(.srj-canvas,.srj-track,#srj-track){
  image-rendering:pixelated!important;image-rendering:crisp-edges!important;
 }
+
+
+/* Full-viewport simulated 1989 PC monitor. CSS-only to work in iPhone Safari
+ * without fullscreen permissions. A persistent EXIT key restores the board. */
+body.community-page #streetrod-root.sr-ega-mode.sr-dos-fullscreen{
+ position:fixed!important;inset:0!important;z-index:2147480000!important;
+ display:block!important;width:100vw!important;max-width:none!important;
+ height:100vh!important;height:100dvh!important;max-height:none!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ overscroll-behavior:contain!important;
+ border:6px ridge #aaaaaa!important;
+ padding:6px!important;margin:0!important;
+ background:#000!important;color:#fff!important;
+ border-radius:0!important;
+ box-shadow:inset 0 0 0 5px #555555,0 0 0 200vmax #000b!important;
+}
+body.community-page #streetrod-root.sr-ega-mode.sr-dos-fullscreen #sr-inside{
+ display:block!important;max-width:980px!important;
+ margin:0 auto!important;padding:4px 10px 24px!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .sr-dos-monitor-toggle{
+ display:block!important;position:sticky!important;top:0!important;z-index:60!important;
+ margin:2px 0 10px auto!important;min-height:48px!important;
+ max-width:100%!important;
+ color:#ffff55!important;background:#0000aa!important;
+ border:3px outset #aaaaaa!important;border-radius:0!important;
+ padding:9px 15px!important;cursor:pointer!important;
+ font:900 .83rem/1.25 'Courier New',monospace!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .sr-dos-monitor-toggle:focus-visible{
+ outline:3px solid #ffff55!important;outline-offset:4px!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .sr-dos-monitor-toggle[aria-pressed=true]{
+ background:#aa0000!important;color:#fff!important;
+}
+@media(max-width:540px){
+ body.community-page #streetrod-root.sr-dos-fullscreen{
+ padding:2px!important;border-width:3px!important;
+ }
+ body.community-page #streetrod-root.sr-dos-fullscreen #sr-inside{
+ padding:4px 5px 30px!important
+ }
+ body.community-page #streetrod-root.sr-dos-fullscreen .sr-dos-monitor-toggle{
+ top:0!important;min-height:48px!important;font-size:.77rem!important;
+ }
+}
