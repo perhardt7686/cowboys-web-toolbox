@@ -64,14 +64,35 @@ function reveal(target,click=false){
  target.scrollIntoView?.({behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
  return true;
 }
+function showIntegratedWorkshop(tab='hood',upgrade=null){
+ active='garage';
+ render();
+ const message=hub?.querySelector('#src-message');
+ if(message)message.textContent='Opening the hood and your saved mechanical work order…';
+ void openWorkshop(tab,upgrade).then(opened=>{
+  const pane=S('streetrod-mechanical-bay');
+  if(!opened||!pane||pane.hidden){
+   if(message)message.textContent='Could not open the workbench. Check your Commons sign-in and select a car.';
+   return;
+  }
+  const scene=hub?.querySelector('#src-scene');
+  if(!scene)return;
+  scene.after(pane);
+  pane.classList.add('src-integrated-workbench');
+  hub.querySelector('.src-garage-stage')?.classList.add('src-hood-open');
+  if(message)message.textContent='Hood raised. Work on real saved engine, carburetor, manifold, wheels and gearbox. Loosen the fasteners before removing parts.';
+  pane.scrollIntoView?.({behavior:'smooth',block:'start'});
+ }).catch(error=>{
+  if(message)message.textContent='Mechanical bay error: '+String(error?.message||'Please try again').slice(0,140);
+ });
+}
 function doAction(action){
  const known={garage:'#srw-garage',parts:'#srw-garage',shop:'#scc-motor-vault',club:'#srm-club',racing:'#sr-track'};
  if(action==='cars'||action==='diner'||action==='road'){active=action;render();return;}
  if(action==='shop'){const node=S('scc-motor-vault');reveal(node);return;}
  if(['garage','parts','hood','tires','gearbox','inspect'].includes(action)){
   const tab=action==='tires'?'tires':action==='gearbox'?'gearbox':action==='inspect'?'inspect':'hood';
-  const work=S('srw-garage');if(work)reveal(work);
-  void openWorkshop(tab);
+  showIntegratedWorkshop(tab);
   return;
  }
  if(action==='club'){const c=document.querySelector('#srm-club');if(c)reveal(c);else reveal(S('sr-start-duel'));return;}
@@ -123,7 +144,7 @@ function attach(){
   else if(b.dataset.srcDriverPage){dinerPage=Math.max(0,dinerPage+Number(b.dataset.srcDriverPage));render();}
   else if(b.dataset.srcRival){challengeRival(b.dataset.srcRival);}
   else if(b.dataset.srcRivalInspect){inspectRival(b.dataset.srcRivalInspect);}
-  else if(b.dataset.srcUpgrade){const kind=b.dataset.srcUpgrade;const garage=S('srw-garage');if(garage)reveal(garage);void openWorkshop(kind==='tires'?'tires':kind==='gearbox'?'gearbox':'hood',kind);}
+  else if(b.dataset.srcUpgrade){const kind=b.dataset.srcUpgrade;showIntegratedWorkshop(kind==='tires'?'tires':kind==='gearbox'?'gearbox':'hood',kind);}
  });
  const credits=S('sr-credits'),name=S('sr-car-name'),owned=S('sr-garage-cars'),parts=S('sr-parts');
  if(credits)new MutationObserver(()=>{const cash=hub?.querySelector('#src-bankroll');if(cash)cash.textContent=credits.textContent;}).observe(credits,{childList:true});
