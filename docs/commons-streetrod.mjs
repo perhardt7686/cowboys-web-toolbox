@@ -208,7 +208,14 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
    const dueling=duelID?state?.duels?.find(d=>d.id===duelID):null;
    const opponentID=targetID||dueling?.creator_id||null;
    const opponent=opponentID?data.drivers.find(p=>p.id===opponentID):null;
-   if(own)race.driver_name=own.name;
+   if(own){
+    race.driver_name=own.name;
+    race.driver_initials=String(own.name||'R').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('');
+    if(own.avatar_mode==='photo'&&own.avatar_path){
+     const {data:ownLink,error:ownErr}=await client.storage.from('community-avatars').createSignedUrl(own.avatar_path,300);
+     if(!ownErr&&ownLink?.signedUrl&&race?.id===runID){const img=new Image();img.src=ownLink.signedUrl;race.driver_picture=img;}
+    }
+   }
    if(!opponent)return;
    race.opponent_name=opponent.name||'Commons rival';
    race.opponent_car=opponent.selected_car;
@@ -221,6 +228,15 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
     }
    }
   }catch{/* Avatar decoration never affects the authoritative race. */}
+ }
+ function paintOwnBadge(ctx,x,y){
+  const r=race;if(!r)return;
+  ctx.save();ctx.translate(x,y);
+  ctx.beginPath();ctx.arc(0,0,17,0,Math.PI*2);ctx.fillStyle='#323347';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ffe0a4';ctx.stroke();
+  if(r.driver_picture?.complete&&r.driver_picture.naturalWidth>0){
+   ctx.save();ctx.beginPath();ctx.arc(0,0,14,0,2*Math.PI);ctx.clip();ctx.drawImage(r.driver_picture,-14,-14,28,28);ctx.restore();
+  }else{ctx.fillStyle='#fff2e0';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 13px system-ui';ctx.fillText((r.driver_initials||'YOU').slice(0,2),0,0);}
+  ctx.restore();
  }
  function paintDriverBadge(ctx,x,y){
   const current=race;if(!current||current.mode!=='duel'||!current.opponent_name)return;
@@ -328,7 +344,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   for(let y=181;y<314;y+=14)for(let j=0;j<2;j++)if(((y/14|0)+j)%2===0){ctx.fillStyle='#161222';ctx.fillRect(finishX+j*5,y,5,14)}
   ctx.fillStyle='#e8e6e6';ctx.font='bold 15px system-ui';ctx.fillText('1/4 MILE',753,194);
   const me=CAR(race?.car||state?.cars?.find(c=>c.selected)?.key);const driveX=live?clamp(90+progress*690,70,785):120;
-  drawCar(ctx,driveX,230,me.accent||'#ebbb58',1,me.body);
+  drawCar(ctx,driveX,230,me.accent||'#ebbb58',1,me.body);paintOwnBadge(ctx,driveX-20,174);
   const other=(live?clamp(90+progress*670+(seed%13-6)*5,70,780):135);
   if(race?.mode==='boss')drawCipherVan(ctx,other,278,.88);else {const otherModel=state?.catalog?.find(v=>v.key===race?.opponent_car);drawCar(ctx,other,278,otherModel?.accent||'#9a80df',.88,otherModel?.body);paintDriverBadge(ctx,other-19,218);}
   ctx.font='800 18px system-ui';ctx.fillStyle='#fff';ctx.fillText('YOU',clamp(driveX-25,5,w-80),193);
