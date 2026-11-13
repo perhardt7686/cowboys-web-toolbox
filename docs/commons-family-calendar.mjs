@@ -37,9 +37,22 @@ if(board&&location.pathname.endsWith('community.html')){
    frame.title='Family Calendar events from Google Calendar';
    frame.loading='lazy';frame.referrerPolicy='no-referrer';frame.allowFullscreen=false;
    const params=new URLSearchParams({src:id,ctz:cfg.timezone||'America/New_York',mode:'AGENDA',showTitle:'0',showCalendars:'0',showTabs:'0',showPrint:'0',showTz:'1',bgcolor:'#fffdf6'});
-   frame.src='https://calendar.google.com/calendar/embed?'+params.toString();
+   const modes=document.createElement('div');modes.className='family-calendar-modes';
+   const setMode=mode=>{
+    params.set('mode',mode);frame.src='https://calendar.google.com/calendar/embed?'+params.toString();
+    modes.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
+   };
+   for(const [mode,title] of [['AGENDA','Agenda'],['MONTH','Month']]){
+    const button=document.createElement('button');button.type='button';button.textContent=title;button.dataset.mode=mode;
+    button.setAttribute('aria-pressed',String(mode==='AGENDA'));
+    button.addEventListener('click',()=>setMode(mode));modes.append(button);
+   }
+   controls.append(modes);
    frame.className='family-calendar-frame';frame.setAttribute('scrolling','auto');
-   slot.replaceChildren(controls,frame);
+   const safety=document.createElement('p');safety.className='family-calendar-caution';
+   safety.textContent='Only put shareable events on this separate calendar. If made public through Google, event details may also be discoverable outside this message board.';
+   slot.replaceChildren(controls,frame,safety);
+   setMode('AGENDA');
   }else{
    const card=document.createElement('div');card.className='family-calendar-setup';
    const title=document.createElement('h3');title.textContent='The Family Calendar is ready to connect.';
