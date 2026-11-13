@@ -100,6 +100,7 @@ function renderMenu(){
 }
 function openMenu(){
  if(!menu||board.hidden)return;
+ $('streetrod-root')?.classList.remove('sr-dos-fullscreen');
  if(!document.body.classList.contains('arcade-on')){
   lastFocus=document.activeElement;savedScroll=window.scrollY;
   document.body.classList.add('arcade-on');document.documentElement.classList.add('arcade-on');
@@ -116,6 +117,11 @@ function openMenu(){
 }
 function closeArcade(){
  if(!menu)return;
+ const racing=$('streetrod-root');
+ if(racing?.classList.contains('sr-dos-fullscreen')){
+  racing.classList.remove('sr-dos-fullscreen');
+  const monitor=$('sr-dos-maximize');if(monitor){monitor.setAttribute('aria-pressed','false');monitor.textContent='EXPAND DOS DISPLAY';}
+ }
  waiting=false;active=null;scene='';mode='menu';
  for(const g of games)$(g.root)?.classList.remove('arcade-game-active');
  document.body.dataset.arcadeGame='';
@@ -284,6 +290,7 @@ function start(){
  const t=setInterval(()=>{
   if(!board.isConnected){clearInterval(t);return;}
   if(!station)build();
+  if(station?.isConnected){const main=board.querySelector('.community-main');if(main&&main.firstElementChild!==station)main.prepend(station);}
   const list=$('plate-list');
   if(list&&!list.dataset.arcadeObserved){list.dataset.arcadeObserved='1';watchCards.observe(list,{childList:true});}
   if(active&&mode==='game')sync();
