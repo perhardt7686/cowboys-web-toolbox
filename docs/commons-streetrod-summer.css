@@ -213,3 +213,70 @@ body.community-page .ss-journal li small{color:#c5b9c9;font-size:.7rem}
 @media(prefers-reduced-motion:reduce){
  body.community-page .ss-summer *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+/* A period-style distributor dial replaces ambiguous bare timing options. */
+body.community-page #ss-scene .ss-timing-bench{
+ display:grid;justify-items:center;gap:12px;padding:15px;
+ margin:10px auto;max-width:650px;border:4px ridge #aaaaaa;
+ background:#08091a;color:#fff;font-family:'Courier New',Courier,monospace
+}
+body.community-page #ss-scene .ss-timing-bench header{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+ width:100%;border-bottom:2px solid #555;padding-bottom:8px
+}
+body.community-page #ss-scene .ss-timing-bench header strong{
+ color:#ffff55;font:900 .94rem/1.3 'Courier New',monospace
+}
+body.community-page #ss-scene .ss-timing-bench header span{
+ color:#55ffff;font:900 .67rem/1.3 'Courier New',monospace
+}
+body.community-page #ss-scene .ss-timing-controls{
+ display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:14px
+}
+body.community-page #ss-scene .ss-distributor{
+ position:relative;display:grid;place-items:center;flex:0 0 104px;
+ width:104px;height:104px;border-radius:50%;border:7px ridge #aaaaaa;
+ background:radial-gradient(circle,#343a42 0 26%,#7e898a 27% 40%,#2b323a 41% 70%,#141823 71%);
+ box-shadow:inset 0 0 0 5px #111,0 6px 0 #000
+}
+body.community-page #ss-scene .ss-distributor-rotor{
+ position:absolute;inset:11px;transform:rotate(var(--distributor-angle,0deg));
+ border:3px dashed #c0c8bf;border-radius:50%;transition:transform .17s steps(5,end)
+}
+body.community-page #ss-scene .ss-distributor-rotor:before{
+ content:"";position:absolute;top:-8px;left:calc(50% - 6px);
+ width:12px;height:21px;background:#ffff55;border:2px solid #000
+}
+body.community-page #ss-scene .ss-distributor-center{
+ position:relative;display:grid;place-items:center;width:38px;height:38px;
+ border:3px ridge #ddd;background:#0000aa;color:#fff;border-radius:50%;
+ font:900 .66rem/1 'Courier New',monospace
+}
+body.community-page #ss-scene .ss-timing-steps{
+ display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:7px;max-width:320px
+}
+body.community-page #ss-scene .ss-timing-steps output{
+ grid-column:1/-1;grid-row:1;padding:8px;border:2px solid #55ffff;
+ color:#ffff55;background:#000;text-align:center;font:900 .9rem/1.4 monospace
+}
+body.community-page #ss-scene .ss-timing-steps button{
+ min-height:46px!important;background:#0000aa!important;color:#fff!important;
+ border:3px outset #aaa!important;font:900 .76rem/1.2 monospace!important;
+ border-radius:0!important
+}
+body.community-page #ss-scene .ss-timing-bench p{
+ color:#ddd!important;text-align:center;max-width:580px;margin:0!important;
+ font:.8rem/1.5 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=garage] #ss-scene .ss-timing-bench{
+ display:none!important
+}
+@media(max-width:470px){
+ body.community-page #ss-scene .ss-timing-bench{gap:5px;padding:7px;border-width:2px}
+ body.community-page #ss-scene .ss-distributor{width:72px;height:72px;flex-basis:72px}
+ body.community-page #ss-scene .ss-distributor-rotor{inset:5px}
+ body.community-page #ss-scene .ss-timing-steps{grid-template-columns:repeat(2,minmax(92px,1fr))}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #ss-scene .ss-distributor-rotor{transition:none}
+}
