@@ -3,6 +3,7 @@
  * No direct writes to protected tables. No scraped assets or original game art.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {drawPhotoCar} from './streetrod-photo-sprites.mjs?v=photoreal1';
 
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const $=id=>document.getElementById(id);
@@ -182,6 +183,35 @@ function drawGarage(){if(!ctx)return;const w=1152,h=648;ctx.clearRect(0,0,w,h);
 }
 function drawDetail(title,subtitle,x,y){roundRect(x,y,550,68,10,'#111a1ddd','#daa96f');ctx.fillStyle='#ffe4aa';ctx.font='900 22px system-ui';ctx.fillText(title,x+23,y+29);ctx.fillStyle='#cdd1cb';ctx.font='600 13px system-ui';ctx.fillText(subtitle,x+23,y+52);}
 function drawCar(x,y){ctx.save();ctx.translate(x,y);const c=model();const typ=c.type;const owned=activeCar();const tireLvl=Number(owned?.tires||0);const engLvl=Number(owned?.engine||0);
+ // Photoreal car body at the same garage coordinates; repair interactions continue
+ // working with the original stateful hood, lift and installation workflow.
+ const photographed=drawPhotoCar(ctx,-336,-282,670,470,c.type,selected);
+ if(photographed){
+   if(hood>.02){
+     ctx.save();
+     ctx.globalAlpha=.96;
+     roundRect(102,-105,196,93,7,'#131d24ee','#e6bf83');
+     ctx.fillStyle='#d4d5cd';
+     for(let i=0;i<4;i++){roundRect(119+i*39,-80,31,48,5,'#5a6269','#a8a79d');line(124+i*39,-53,140+i*39,-53,'#252e36',3);}
+     ctx.fillStyle='#e7c38a';ctx.font='800 15px system-ui';ctx.fillText('ENGINE BAY',119,-87);
+     ctx.restore();
+   }
+   if(lift>.01){
+     ctx.save();ctx.globalAlpha=Math.min(.94,lift);
+     roundRect(-249,65,28,74,4,'#ad8e55','#342a24');
+     roundRect(213,65,28,74,4,'#ad8e55','#342a24');
+     line(-241,139,241,139,'#c5a15c',11);ctx.restore();
+   }
+   if(tireLvl>0){
+     ctx.fillStyle='#ffe6b9';ctx.font='800 11px system-ui';
+     ctx.fillText('PERFORMANCE TIRES LV '+tireLvl,-240,88);
+   }
+   if(engLvl>0){
+     ctx.fillStyle='#ffe6b9';ctx.font='800 11px system-ui';
+     ctx.fillText('POWER PACKAGE LV '+engLvl,78,105);
+   }
+   ctx.restore();return;
+ }
  const rear=-192,front=209,R=43+Math.min(10,tireLvl*2);ellipse(25,40,329,30,'#080b10ab');
  // Tire undercarriage and cast shadow
  polygon([[-285,4],[265,-4],[281,24],[-292,24]],'#121719');
