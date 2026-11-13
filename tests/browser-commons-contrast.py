@@ -61,6 +61,7 @@ async def main():
                 latest=page.locator('#community-feed .thread-card .forum-last-reply button[data-forum-latest]').first
                 assert await latest.count()
                 findings.append(('latest button exists',True))
+            (ROOT/'reports').mkdir(parents=True,exist_ok=True)
             await page.screenshot(path=str(ROOT/'reports'/'commons-mobile-legibility.png'),
                                   full_page=False,animations='disabled')
             print('Mobile sample-feed computed contrast checks:',findings)
