@@ -64,12 +64,6 @@ function build(){
  if(!board||!config?.enabled||!location.pathname.endsWith('community.html'))return;
  const main=board.querySelector('.community-main');
  if(!main)return;
- if(!station){
-  station=document.createElement('section');station.id='arcade-station';
-  station.innerHTML='<button id="arcade-launch" type="button"><span class="arcade-station-icon" aria-hidden="true">▣</span><span><strong>THE COMMONS ARCADE</strong><small>ONE SCREEN · SEVEN PROGRAMS · SAVED PROGRESS</small></span><b>PLAY ▶</b></button>';
-  main.prepend(station);
-  station.querySelector('button').addEventListener('click',openMenu);
- }
  if(!menu){
   menu=document.createElement('section');menu.id='arcade-shell';menu.hidden=true;
   menu.setAttribute('role','dialog');menu.setAttribute('aria-modal','true');
@@ -78,7 +72,7 @@ function build(){
   document.body.append(menu);
   menu.addEventListener('click',onMenuClick);
   hud=document.createElement('header');hud.id='arcade-hud';hud.hidden=true;
-  hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" title="Arcade main menu">◀ MENU</button><strong id="arcade-hud-title">COMMONS / ARCADE</strong><div class="arcade-hud-right"><button type="button" data-arcade-action="options" title="Display settings">SETUP</button><button type="button" data-arcade-action="exit" title="Exit arcade">EXIT ✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous scene">◀</button><nav id="arcade-hud-scenes" aria-label="Game scenes"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next scene">▶</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous">◀ PREV</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next">NEXT ▶</button></div><div class="arcade-hud-footer" aria-live="polite" id="arcade-hud-footer">ESC: MENU · F2: SETTINGS · NO PAGE SCROLL</div>';
+  hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" title="Return to individual game buttons">◀ GAMES</button><strong id="arcade-hud-title">COMMONS / ARCADE</strong><div class="arcade-hud-right"><button type="button" data-arcade-action="options" title="Display settings">SETUP</button><button type="button" data-arcade-action="exit" title="Exit arcade">EXIT ✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous scene">◀</button><nav id="arcade-hud-scenes" aria-label="Game scenes"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next scene">▶</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous">◀ PREV</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next">NEXT ▶</button></div><div class="arcade-hud-footer" aria-live="polite" id="arcade-hud-footer">ESC: GAMES · F2: SETTINGS · ONE SCREEN</div>';
   document.body.append(hud);
   hud.addEventListener('click',onMenuClick);
   settings=loadSettings();saveSettings();
@@ -98,25 +92,12 @@ function renderMenu(){
   return '<button type="button" data-arcade-game="'+g.id+'" '+(ready?'':'disabled')+'><span class="arcade-program-number">0'+(i+1)+'</span><span class="arcade-program-mark">'+g.symbol+'</span><span class="arcade-program-name"><strong>'+escapeHTML(g.name)+'</strong><small>'+escapeHTML(g.tag)+'</small></span><span class="arcade-program-state">'+(ready?'ENTER ▶':'SIGN IN')+'</span></button>';
  }).join('');
 }
-function openMenu(){
- if(!menu||board.hidden)return;
- $('streetrod-root')?.classList.remove('sr-dos-fullscreen');
- if(!document.body.classList.contains('arcade-on')){
-  lastFocus=document.activeElement;savedScroll=window.scrollY;
-  document.body.classList.add('arcade-on');document.documentElement.classList.add('arcade-on');
- }
- active=null;scene='';mode='menu';waiting=false;
- for(const g of games)$(g.root)?.classList.remove('arcade-game-active');
- document.body.dataset.arcadeGame='';
- document.body.dataset.arcadeScene='';
- hud.hidden=true;
- menu.hidden=false;
- $('arcade-menu-view').hidden=false;
- $('arcade-options-view').hidden=true;
- renderMenu();drawArt();$('arcade-program-grid')?.querySelector('button:not([disabled])')?.focus({preventScroll:true});
-}
+function openMenu(){closeArcade();}
+
 function closeArcade(){
  if(!menu)return;
+ const openToggle=$(game(active)?.toggle);
+ if(openToggle?.getAttribute('aria-expanded')==='true'&&!document.querySelector('.sr-dos-overlay'))openToggle.click();
  const racing=$('streetrod-root');
  if(racing?.classList.contains('sr-dos-fullscreen')){
   racing.classList.remove('sr-dos-fullscreen');
@@ -148,15 +129,20 @@ function makeVisible(g){
  return true;
 }
 function launch(id){
- const g=game(id);if(!g)return;
- if(!available(g)){$('arcade-menu-status').textContent='This program is not loaded for your account yet.';return;}
+ const g=game(id);if(!g||!menu||!available(g))return;
+ if(document.body.classList.contains('arcade-on')&&active!==g.id)closeArcade();
+ lastFocus=document.activeElement;savedScroll=window.scrollY;
+ document.body.classList.add('arcade-on');
+ document.documentElement.classList.add('arcade-on');
  active=g.id;scene=g.scenes[0][0];mode='game';plateIndex=0;
  document.body.dataset.arcadeGame=active;
  document.body.dataset.arcadeScene=scene;
- menu.hidden=false;$('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=true;
+ menu.hidden=true;
+ $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=true;
  hud.hidden=false;
  hud.querySelector('#arcade-hud-title').textContent=g.name.toUpperCase()+' / '+g.tag;
  waiting=true;makeVisible(g);renderTabs();sync();
+ requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
 }
 function renderTabs(){
  const nav=$('arcade-hud-scenes');if(!nav)return;
@@ -168,8 +154,8 @@ function renderTabs(){
  paging.hidden=!pagerSelector();
  updatePlatePaging();
  const foot=$('arcade-hud-footer');
- if(foot)foot.textContent=active==='streetrod'?'SCENES REPLACE THIS SCREEN · YOUR GARAGE AND RACES STAY SAVED':
-  'ESC: MENU · F2: SETTINGS · RESULTS SAVE WITH YOUR EXISTING GAME';
+ if(foot)foot.textContent=active==='streetrod'?'SCENES REPLACE THIS SCREEN · GARAGE AND RACES REMAIN SAVED':
+  'ESC: GAMES · F2: SETTINGS · YOUR SCORES STAY SAVED';
 }
 function stepScene(delta){
  if(mode!=='game'||!active)return;
@@ -231,7 +217,7 @@ function paging(delta){
 }
 function showOptions(){
  if(!menu||!document.body.classList.contains('arcade-on'))return;
- returnMode=mode;mode='options';
+ returnMode=mode;mode='options';menu.hidden=false;
  $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=false;hud.hidden=true;
  for(const g of games)$(g.root)?.classList.remove('arcade-game-active');
  const options=$('arcade-options-form');
@@ -253,8 +239,8 @@ function showOptions(){
 function backOptions(){
  $('arcade-options-view').hidden=true;
  if(returnMode==='game'&&active){
-  mode='game';menu.hidden=false;hud.hidden=false;makeVisible(game(active));renderTabs();sync();
- }else{openMenu();}
+  mode='game';menu.hidden=true;hud.hidden=false;makeVisible(game(active));renderTabs();sync();
+ }else{closeArcade();}
 }
 function onMenuClick(e){
  const target=e.target.closest('[data-arcade-game], [data-arcade-scene], [data-arcade-action]');
@@ -269,7 +255,7 @@ function onMenuClick(e){
  }
  if(mode==='options'&&target.dataset.arcadeAction!=='options-back')return;
  switch(target.dataset.arcadeAction){
-  case 'home':openMenu();break;
+  case 'home':closeArcade();break;
   case 'exit':closeArcade();break;
   case 'options':showOptions();break;
   case 'options-back':backOptions();break;
@@ -287,7 +273,7 @@ function onKeyDown(e){
   // Let the active racing display handle ESC first; MENU remains available.
   if(e.target?.closest('input,textarea,select')){e.target.blur();return;}
   e.preventDefault();
-  if(mode==='options')backOptions();else if(mode==='game')openMenu();else closeArcade();
+  if(mode==='options')backOptions();else closeArcade();
  }
 }
 // Existing game menus update the arcade scene indicator without replacing their events.
@@ -300,16 +286,40 @@ document.addEventListener('click',e=>{
 },true);
 // License cards are re-rendered on server refresh, so reselect the visible card.
 const watchCards=new MutationObserver(()=>{if(pagerSelector())updatePlatePaging();});
+const entryButtons=games.filter(g=>g.toggle).map(g=>'#'+g.toggle).join(',');
+function boardGameClick(e){
+ if(document.body.classList.contains('arcade-on')||board?.hidden)return;
+ const button=e.target?.closest?.(entryButtons+', [data-arcade-open]');
+ if(!button||!board.contains(button)||button.disabled)return;
+ const g=game(button.dataset.arcadeOpen)||games.find(g=>g.toggle===button.id);
+ if(!g||!available(g))return;
+ // Capture on window before original modules' document handlers and DOS boot.
+ e.preventDefault();e.stopImmediatePropagation();
+ launch(g.id);
+}
+function drawingButton(){
+ const main=board?.querySelector('.community-main'),art=$('commons-art');
+ const existing=$('arcade-drawing-entry');
+ if(!main||!art||board.hidden){existing?.remove();return;}
+ if(existing?.isConnected)return;
+ const section=document.createElement('section');
+ section.id='arcade-drawing-entry';section.className='mahjong-game arcade-drawing-entry';
+ section.innerHTML='<button type="button" data-arcade-open="drawing" aria-label="Open Drawing Studio full screen" class="mahjong-entry-button"><span class="mahjong-entry-icon" aria-hidden="true">▦</span><span class="mahjong-entry-copy"><strong>Drawing Studio</strong><small>Your canvas · Original artwork · Full screen</small></span><span class="mahjong-chevron" aria-hidden="true">▶</span></button>';
+ const anchor=$('word-game-root')||$('letter-lock-root')||$('mahjong-root');
+ if(anchor?.parentElement===main)anchor.after(section);else main.prepend(section);
+}
 function start(){
  if(!board||!config?.enabled)return;
  build();
- const t=setInterval(()=>{
-  if(!board.isConnected){clearInterval(t);return;}
-  if(!station)build();
-  if(station?.isConnected){const main=board.querySelector('.community-main');if(main&&main.firstElementChild!==station)main.prepend(station);}
+ window.addEventListener('click',boardGameClick,true);
+ const timer=setInterval(()=>{
+  if(!board.isConnected){clearInterval(timer);return;}
+  if(!menu)build();
+  drawingButton();
   const list=$('plate-list');
   if(list&&!list.dataset.arcadeObserved){list.dataset.arcadeObserved='1';watchCards.observe(list,{childList:true});}
   if(active&&mode==='game')sync();
  },900);
+ drawingButton();
 }
 start();
