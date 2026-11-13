@@ -42,3 +42,6 @@
 
 ## Audit conclusion
 Source-level design and defect fixes are committed. A full real-user integration and accessibility audit is **not** complete until the hands-on checks above pass. This distinction is intentional.
+
+## Final calendar identity check (important)
+A later `list_calendars` check showed a Google calendar **named “Family”** but with `primary: true` and the same ID as the account's primary Google Calendar. This is **not** the requested new secondary Family calendar. To avoid accidentally exposing personal appointments, `commons-family-calendar-config.js` is intentionally blank and no primary calendar ID was written. The user must create a genuinely separate calendar using Google Calendar **Other calendars > + > Create new calendar**, not rename the primary. Do not make the primary calendar public.
