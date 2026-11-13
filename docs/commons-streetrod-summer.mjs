@@ -149,7 +149,11 @@ function garage(){
  action('repair','Repair damage ($'+Math.ceil((100-c.condition)*4.5)+')',c.condition===100?'disabled':'')+
  action('bumpers','Toggle bumpers')+action('roof','Chop / restore roof')+'</div>'+
  '<form class="ss-inline-form" data-ss-form="paint"><label>Fresh paint job ($110) <input type="color" name="color" value="'+esc(/^#[0-9a-fA-F]{6}$/.test(shade)?shade:'#68777e')+'"></label><button type="submit">Apply paint</button></form>'+
- '<form class="ss-inline-form" data-ss-form="tune"><label>Engine timing <select name="setting">'+
+ '<section class="ss-timing-bench"><header><strong>DISTRIBUTOR / IGNITION TIMING</strong><span>SIMULATED ADJUSTMENT</span></header>'+
+ '<div class="ss-timing-controls"><div class="ss-distributor" aria-hidden="true"><div class="ss-distributor-rotor" style="--distributor-angle:'+((c.tune||0)*17)+'deg"></div><div class="ss-distributor-center">IGN</div></div>'+
+ '<div class="ss-timing-steps"><button type="button" data-ss-timing-step="-1">↶ RETARD</button><output id="ss-timing-number" aria-live="polite">'+(c.tune===0?'0 · BASELINE':c.tune>0?'+'+c.tune+' · ADVANCED':c.tune+' · RETARDED')+'</output><button type="button" data-ss-timing-step="1">ADVANCE ↷</button></div></div>'+
+ '<p>Rotate the distributor one setting at a time, then press SAVE TIMING below. Neutral is the baseline. This game models timing in seven steps, not real degrees; real ignition timing requires a timing light and vehicle specifications.</p></section>'+
+ '<form class="ss-inline-form" data-ss-form="tune"><label>Timing setting <select name="setting">'+
  [-3,-2,-1,0,1,2,3].map(n=>'<option value="'+n+'" '+(c.tune===n?'selected':'')+'>'+(
  n===0?'Neutral':n<0?'Retard '+n:'Advance +'+n)+'</option>').join('')+
  '</select></label><button type="submit">Set timing</button></form>'+
@@ -283,6 +287,15 @@ function navigate(next){
 }
 function onClick(event){
  const btn=event.target.closest('button');if(!btn||btn.disabled)return;
+ if(btn.dataset.ssTimingStep!==undefined){
+  const input=root.querySelector('[data-ss-form="tune"] select[name="setting"]');
+  if(!input)return;
+  const next=cap(Number(input.value)+Number(btn.dataset.ssTimingStep),-3,3);
+  input.value=String(next);
+  const dial=root.querySelector('.ss-distributor-rotor');if(dial)dial.style.setProperty('--distributor-angle',String(next*17)+'deg');
+  const output=root.querySelector('#ss-timing-number');if(output)output.textContent=next===0?'0 · BASELINE':next>0?'+'+next+' · ADVANCED':next+' · RETARDED';
+  return;
+ }
  if(btn.dataset.ssTab){navigate(btn.dataset.ssTab);return;}
  const cmd=btn.dataset.ssAction;if(!cmd)return;
  const car=btn.dataset.car,rival=btn.dataset.rival;
