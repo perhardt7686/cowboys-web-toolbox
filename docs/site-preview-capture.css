@@ -110,6 +110,16 @@ body.toolbox-page #preview-motion[aria-pressed="false"]{
 body.toolbox-page #preview-motion:hover{
  background:#f1cc85!important;color:#2b1c38!important;
 }
+/* GIF-like motion pans a genuine capture; it does not invent on-site actions.
+   Existing Play/Pause and reduced-motion preferences control this effect. */
+@keyframes captured-homepage-glance{
+  0%,12%,100%{transform:scale(1) translateY(0)}
+  46%,64%{transform:scale(1.07) translateY(-1.2%)}
+}
+body.toolbox-page.previews-enabled .site-preview.is-visible[data-preview-source="capture"] .preview-capture{
+ animation:captured-homepage-glance 7.5s ease-in-out infinite;
+ transform-origin:center top;
+}
 @media(prefers-reduced-motion:reduce){
  body.toolbox-page .site-preview *,
  body.toolbox-page .site-preview svg *{
