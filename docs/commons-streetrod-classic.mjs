@@ -3,8 +3,9 @@
  * Backend racing, credit balances, profiles and upgrades remain unchanged.
  */
 import {carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
-import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=classic1';
+import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=practice1';
 import {openWorkshop} from './commons-streetrod-mechanics.mjs?v=mech1';
+import {mountRoadPractice} from './commons-streetrod-road-practice.mjs?v=practice1';
 const S=id=>document.getElementById(id);
 const H=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PHOTO={garage:'coupe',cars:'hardtop',parts:'muscle',diner:'muscle',road:'coupe'};
@@ -52,7 +53,8 @@ function render(){if(!hub)return;
   stage.querySelector('.src-paper-main')?.append(pagesNav);
  }
  if(active==='road'){
-  const cv=hub.querySelector('#src-road-preview');if(cv){const ctx=cv.getContext('2d');if(ctx)drawClassicCockpit(ctx,{width:cv.width,height:cv.height,own:{accent:'#5a6d7e'},rival:{body:'muscle',key:'meteor'},seed:7});}
+  const cv=hub.querySelector('#src-road-preview');
+  if(cv)mountRoadPractice(cv);
  }
 }
 function reveal(target,click=false){
