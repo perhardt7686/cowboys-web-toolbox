@@ -37,7 +37,7 @@ function render(){
  ui.querySelector('#srm-count').textContent=order.length+' verified racers · '+order.filter(p=>p.playing).length+' on the track';
  ui.querySelector('#srm-meta').textContent='BUILD RECORDS & ACHIEVEMENTS · ASYNCHRONOUS HEAD-TO-HEAD';
  const inbound=ui.querySelector('#srm-incoming');
- if(inbound){const state=roster||{};const invites=(state.duels||[]).filter(d=>d.target_user===me&&d.status==='open');inbound.textContent=invites.length?invites.length+' direct challenge'+(invites.length===1?'':'s')+' awaiting your race. Use the challenge board below to join.':'Direct invitations appear on the challenge board when a racer calls you out.';}
+ if(inbound){const state=roster||{};const invites=(state.duels||[]).filter(d=>d.target_user===me&&d.status==='open');inbound.innerHTML=invites.length?'<strong>'+invites.length+' direct rival invitation'+(invites.length===1?'':'s')+'</strong>'+invites.map(d=>'<div class="srm-invite"><span>Challenge from '+safe(d.creator||'Commons racer')+'</span><button type="button" class="srm-challenge" data-sr-action="join" data-duel-id="'+safe(d.id)+'">Race this rival</button></div>').join(''):'Direct invitations appear here when another racer calls you out.';}
 }
 function mount(){
  const inside=document.getElementById('sr-inside');
