@@ -37,7 +37,7 @@ test('Single monitor restores existing games rather than replacing game state',(
    'commons-streetrod-season-bay.mjs?v=mechanic5','commons-streetrod-summer.mjs?v=ega2']){
    assert.ok(html.includes(name),'Missing versioned game module: '+name);
  }
- assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath('docs/commons-arcade-shell.mjs')]));
+ assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(url('docs/commons-arcade-shell.mjs'))]));
  for(const token of ['#arcade-hud','arcade-shell','arcade-game-active','makeVisible(g)',
   'arcade-program-grid','scene-next','scene-previous']){
   assert.ok(arcade.includes(token),'Missing scene controller feature: '+token);
