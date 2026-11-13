@@ -187,7 +187,7 @@ export async function openWorkshop(tab='hood',upgrade=null,fromExistingHotspot=f
   active=upgrade==='engine'?'hood':upgrade==='tires'?'tires':'gearbox';render();
   if(!wb.plan)await change('plan',upgrade);
   else if(wb.plan!==upgrade)status('Another repair is already active. Finish or reset it before switching packages.',true);
- }}catch(error){wb=null;status(String(error.message||'Unable to open workshop.').slice(0,160),true);render()}
+ }}catch(error){wb=null;status(String(error.message||'Unable to open workshop.').slice(0,160),true);render();root.scrollIntoView?.({block:'start'});return false;}
  root.scrollIntoView?.({behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
  return true;
 }
