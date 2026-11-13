@@ -67,3 +67,10 @@ body.community-page .family-calendar-panel :is(summary,a):focus-visible{outline:
  body.community-page .family-calendar-intro{padding:13px}
 }
 @media(prefers-reduced-motion:reduce){body.community-page .family-calendar-panel *{transition:none!important}}
+
+
+body.community-page .family-calendar-modes{display:inline-flex;align-items:center;gap:4px;border:1px solid #ad97a9;background:#1c1726;border-radius:10px;padding:4px}
+body.community-page .family-calendar-modes button{min-height:38px;padding:7px 13px;border:0;border-radius:7px;background:transparent;color:#f2e3ee;font-size:.86rem;font-weight:850;cursor:pointer}
+body.community-page .family-calendar-modes button[aria-pressed=true]{background:#f3d599;color:#271a2f}
+body.community-page .family-calendar-panel .family-calendar-content>.family-calendar-caution{color:#eed9bd;font-size:.8rem;line-height:1.55;margin:11px 3px 0}
+body.community-page .family-calendar-modes button:focus-visible{outline:3px solid #15b7b7;outline-offset:2px}
