@@ -56,7 +56,7 @@ const UI=`
 let client,garage,ui,stage='OUTSIDE',door=0,position=0,hood=0,lift=0,animating=false,working=false,job=null,selected='rattler',view='exterior',draft=null;
 let canvas,ctx,loop,loggedIn=false,lastPaint=0;
 const activeCar=()=>garage?.cars?.find(c=>c.selected)||garage?.cars?.[0];
-const model=()=>catalog[selected]||catalog.rattler;
+const model=()=>{if(catalog[selected])return catalog[selected];const info=garage?.catalog?.find(c=>c.key===selected);const spec=garage?.engineering?.specs?.[selected]||{};const paint=info?.accent||'#596c7a';return {name:info?.name||selected,type:info?.body||'coupe',body:paint,highlight:paint,roof:'#27313a',redline:Number(spec.redline||6250),caption:(info?.year||'Custom')+' · '+(info?.class||'original vehicle')};};
 const perCarTune=()=>garage?.engineering?.tunes?.[selected]||{};
 const tuningRange=()=>({min:Math.round(model().redline*.65/100)*100,max:model().redline});
 const cost=(key,level)=>250+level*250+(key==='engine'?100:key==='gearbox'?50:0);
@@ -186,10 +186,10 @@ function drawCar(x,y){ctx.save();ctx.translate(x,y);const c=model();const typ=c.
  // Tire undercarriage and cast shadow
  polygon([[-285,4],[265,-4],[281,24],[-292,24]],'#121719');
  // Body shell original model geometry
- let top=typ==='wagon'?-118:typ==='prostreet'?-83:-107;
+ let top=typ==='van'?-153:typ==='truck'?-124:typ==='wagon'?-118:typ==='prostreet'?-83:-107;
  let hoodStart=typ==='coupe'?35:typ==='muscle'?70:typ==='wagon'?74:32;
- let roofFront=typ==='coupe'?56:typ==='wagon'?134:typ==='muscle'?108:typ==='prostreet'?122:108;
- let roofBack=typ==='wagon'?-242:typ==='muscle'?-114:typ==='hardtop'?-154:-165;
+ let roofFront=typ==='van'?173:typ==='truck'?45:typ==='coupe'?56:typ==='wagon'?134:typ==='muscle'?108:typ==='prostreet'?122:108;
+ let roofBack=typ==='van'?-248:typ==='truck'?-112:typ==='wagon'?-242:typ==='muscle'?-114:typ==='hardtop'?-154:-165;
  if(typ==='prostreet')top=-82;
  const bodyGrad=linear(-200,-100,180,55,[[0,c.highlight],[.18,c.body],[.63,c.body],[1,'#131b22']]);
  polygon([[-302,-21],[-280,-63],[roofBack-31,-73],[roofBack,top-12],[roofFront-54,top-12],[roofFront,typ==='prostreet'?-60:-71],[250,-53],[286,-39],[304,-10],[292,26],[-298,26]],bodyGrad,'#171b1e',5);
@@ -199,7 +199,7 @@ function drawCar(x,y){ctx.save();ctx.translate(x,y);const c=model();const typ=c.
  const glass=linear(-80,top,85,-64,[[0,'#7494a3'],[.4,'#233842'],[1,'#0c202b']]);
  polygon([[roofBack+9,top-2],[roofFront-68,top-1],[roofFront-29,-75],[roofBack-30,-75]],glass,'#c2d0c7',3);
  // Cabin B-pillars and rear window details
- if(typ==='wagon'){line(-98,top,-89,-73,'#d0c9ae',8);line(35,top,43,-73,'#d0c9ae',9)}
+ if(typ==='wagon'||typ==='van'){line(-98,top,-89,-73,'#d0c9ae',8);line(35,top,43,-73,'#d0c9ae',9)}
  else{line(-38,top,-26,-74,'#c2bdaf',8)}
  // Reflection streaks, body character line and chrome
  ctx.strokeStyle='#ffffff70';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-245,-46);ctx.lineTo(251,-40);ctx.stroke();
