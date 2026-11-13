@@ -4,7 +4,7 @@
  */
 import {carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
 import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=practice1';
-import {openWorkshop} from './commons-streetrod-mechanics.mjs?v=mech1';
+import {openWorkshop} from './commons-streetrod-mechanics.mjs?v=mech2';
 import {mountRoadPractice} from './commons-streetrod-road-practice.mjs?v=practice1';
 const S=id=>document.getElementById(id);
 const H=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
