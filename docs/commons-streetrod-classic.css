@@ -191,3 +191,28 @@ body.community-page .src-rival-spec b{font-size:.95rem;color:#f6e8d8}
  body.community-page .src-diner-racer-actions button{flex:1}
  body.community-page .src-diner-patrons{padding:13px}
 }
+
+/* Integrated engine-bay repair: clicking the Classic garage hood opens the
+   actual saved bolt-by-bolt workbench immediately beneath the car scene. */
+body.community-page #src-classic-hub #streetrod-mechanical-bay.src-integrated-workbench{
+ display:block;
+ margin:0 12px 15px;
+ border-color:#d6ac77;
+ box-shadow:0 0 0 3px #0c1014,0 15px 40px #0009;
+ scroll-margin-top:18px;
+}
+body.community-page #src-classic-hub #streetrod-mechanical-bay.src-integrated-workbench[hidden]{display:none!important}
+body.community-page .src-garage-stage.src-hood-open::after{
+ content:'HOOD OPEN • ENGINE SERVICE';
+ position:absolute;left:50%;top:5%;transform:translateX(-50%);
+ z-index:8;max-width:92%;text-align:center;
+ border:1px solid #ffe4ac;border-radius:7px;
+ color:#fff2d2;background:#1a2229e8;
+ padding:9px 15px;font:850 clamp(.7rem,1.8vw,.94rem)/1.3 system-ui,sans-serif;
+ letter-spacing:.06em;pointer-events:none;
+}
+body.community-page .src-integrated-workbench .mw-scene{min-height:350px}
+@media(max-width:680px){
+ body.community-page #src-classic-hub #streetrod-mechanical-bay.src-integrated-workbench{margin:0 6px 10px}
+ body.community-page .src-integrated-workbench .mw-scene{min-height:300px}
+}
