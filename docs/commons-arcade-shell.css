@@ -1,0 +1,447 @@
+/* ONE SCREEN / COMMONS ARCADE. Independent game logic and server saves are untouched. */
+body.community-page.arcade-ready #arcade-station{display:block;margin:12px 0 20px;position:relative;z-index:1}
+body.community-page.arcade-ready #arcade-launch{
+ display:flex;align-items:center;gap:14px;width:100%;min-height:88px;padding:16px;
+ border:4px solid #ffff55;border-radius:0;background:#000044;color:#fff;text-align:left;
+ box-shadow:inset 0 0 0 3px #5555ff,5px 5px 0 #10102a;cursor:pointer;
+ font-family:'Courier New',monospace
+}
+body.community-page #arcade-launch .arcade-station-icon{font-size:2.3rem;color:#55ffff}
+body.community-page #arcade-launch span:nth-child(2){display:grid;gap:5px;flex:1;min-width:0}
+body.community-page #arcade-launch strong{font:900 clamp(1.2rem,3vw,1.55rem)/1.2 'Courier New',monospace;color:#ffff55}
+body.community-page #arcade-launch small{font:.72rem/1.4 'Courier New',monospace;color:#f4f4ff}
+body.community-page #arcade-launch b{color:#000;background:#ffff55;padding:9px;white-space:nowrap;font:900 .83rem 'Courier New',monospace}
+body.community-page #arcade-launch:focus-visible{outline:4px solid #55ffff;outline-offset:4px}
+/* The old inline expanding cards no longer form a vertically scrolling arcade. */
+body.community-page.arcade-ready:not(.arcade-on) :is(
+ #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
+ #streetrod-root,#vdacs-study-root,#arcade-passport,#commons-family-zone
+){display:none!important}
+body.community-page.arcade-ready:not(.arcade-on) #arcade-station{display:block}
+html.arcade-on,html.arcade-on body.community-page{
+ overflow:hidden!important;overscroll-behavior:none!important;height:100%!important
+}
+body.community-page.arcade-on{--arcade-top:98px;--arcade-bottom:29px}
+body.community-page.arcade-on #arcade-station{display:none!important}
+body.community-page #arcade-shell[hidden],
+body.community-page #arcade-hud[hidden],
+body.community-page #arcade-shell [hidden],
+body.community-page #arcade-hud [hidden]{display:none!important}
+body.community-page #arcade-shell{
+ position:fixed;inset:0;z-index:2147481100!important;
+ overflow:hidden;background:#000;color:#fff;font-family:'Courier New',Courier,monospace;
+ touch-action:pan-x
+}
+body.community-page #arcade-shell::before{
+ content:"";pointer-events:none;position:absolute;inset:0;
+ background:repeating-linear-gradient(0deg,transparent 0 4px,#0b112b27 4px 5px);
+ z-index:0
+}
+body.community-page #arcade-shell .arcade-computer{
+ position:relative;z-index:1;width:min(100%,1100px);height:100%;margin:auto;
+ padding:clamp(8px,2vh,17px);background:#050515;
+ border-inline:6px ridge #aaaaaa;display:flex;flex-direction:column;min-height:0;gap:6px
+}
+body.community-page #arcade-menu-view{
+ width:100%;height:100%;min-height:0;display:grid;
+ grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
+ grid-template-rows:auto 1fr auto;gap:10px;align-content:stretch;align-items:center
+}
+body.community-page #arcade-title-art{
+ display:block;grid-column:1;grid-row:1/3;width:100%;height:auto;
+ max-height:min(69dvh,590px);aspect-ratio:8/5;object-fit:contain;image-rendering:pixelated;
+ border:5px ridge #aaaaaa;background:#000044
+}
+body.community-page .arcade-menu-intro{grid-column:2;grid-row:1;min-height:0}
+body.community-page .arcade-menu-intro span{display:block;color:#55ffff;font:900 .7rem/1.4 'Courier New',monospace;letter-spacing:.06em}
+body.community-page .arcade-menu-intro h2,
+body.community-page #arcade-options-view h2{
+ font:900 clamp(1.2rem,3vw,2rem)/1.25 'Courier New',monospace;
+ color:#ffff55;text-shadow:3px 3px 0 #aa0000;margin:7px 0!important
+}
+body.community-page .arcade-menu-intro p,
+body.community-page #arcade-options-view p{color:#ddd;line-height:1.45;font-size:clamp(.7rem,1.5vw,.9rem);margin:6px 0!important}
+body.community-page #arcade-program-grid{
+ grid-column:2;grid-row:2;min-height:0;display:grid;align-content:center;gap:7px
+}
+body.community-page #arcade-program-grid button{
+ display:flex;align-items:center;gap:10px;min-width:0;min-height:54px;
+ color:#fff;background:#0000aa;border:3px outset #aaaaaa;border-radius:0;
+ padding:5px 9px;text-align:left;font-family:'Courier New',monospace;
+ cursor:pointer;box-shadow:inset 1px 1px 0 #fff
+}
+body.community-page #arcade-program-grid button:focus-visible,
+body.community-page #arcade-program-grid button:hover{
+ color:#000;background:#ffff55;border-color:#fff
+}
+body.community-page #arcade-program-grid button:disabled{
+ opacity:.45;background:#3a3a3a;cursor:not-allowed
+}
+body.community-page .arcade-program-number{font-size:.7rem;color:inherit}
+body.community-page .arcade-program-mark{font:bold 1.5rem/1 monospace;min-width:24px;color:#55ffff}
+body.community-page #arcade-program-grid button:hover .arcade-program-mark,
+body.community-page #arcade-program-grid button:focus-visible .arcade-program-mark{color:#aa0000}
+body.community-page .arcade-program-name{display:grid;flex:1;gap:3px;min-width:0}
+body.community-page .arcade-program-name strong{font:bold clamp(.88rem,1.6vw,1.05rem)/1.15 monospace;color:inherit}
+body.community-page .arcade-program-name small{font:.65rem/1.3 monospace;color:inherit}
+body.community-page .arcade-program-state{font:bold .68rem/1.2 monospace;white-space:nowrap}
+body.community-page .arcade-menu-bottom{
+ grid-column:1/3;grid-row:3;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap
+}
+body.community-page .arcade-menu-bottom button,
+body.community-page #arcade-options-view button,
+body.community-page #arcade-hud button{
+ background:#0000aa;color:#fff;border:2px outset #aaaaaa;border-radius:0;
+ padding:7px 10px;min-height:39px;cursor:pointer;
+ font:900 .78rem/1.25 'Courier New',Courier,monospace
+}
+body.community-page :is(#arcade-menu-view,#arcade-options-view,#arcade-hud) button:focus-visible{
+ outline:3px solid #ffff55;outline-offset:3px
+}
+body.community-page .arcade-menu-status{position:absolute;bottom:4px;left:16px;color:#ffff55;font:700 .7rem monospace}
+body.community-page #arcade-options-view{
+ width:min(100%,680px);margin:auto;display:grid;align-content:center;gap:16px;height:100%;
+ color:#fff;overflow:hidden
+}
+body.community-page #arcade-options-form{display:grid;gap:16px}
+body.community-page #arcade-options-form fieldset{
+ display:flex;flex-wrap:wrap;align-items:center;gap:9px;
+ border:2px solid #aaaaaa;min-width:0;padding:14px
+}
+body.community-page #arcade-options-form legend{color:#55ffff;font:900 .9rem monospace;padding:0 8px}
+body.community-page #arcade-options-form label{display:flex;align-items:center;gap:6px;min-height:46px;padding:9px;background:#191943;color:#fff;border:2px solid #777;font-size:.79rem}
+body.community-page #arcade-options-form label:has(input:checked){background:#0000aa;border-color:#ffff55;color:#ffff55}
+body.community-page #arcade-options-form input{accent-color:#ffff55;width:19px;height:19px}
+body.community-page #arcade-hud{
+ position:fixed;top:0;left:0;right:0;bottom:auto;z-index:2147482500!important;
+ height:auto;background:#000;color:#fff;box-shadow:0 3px 0 #aaaaaa;
+ font-family:'Courier New',Courier,monospace
+}
+body.community-page #arcade-hud .arcade-hud-main{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:50px;
+ padding:4px clamp(5px,2vw,13px);border-bottom:2px solid #555
+}
+body.community-page #arcade-hud #arcade-hud-title{
+ font:900 clamp(.76rem,2.3vw,1.05rem)/1.25 'Courier New',monospace;color:#ffff55;
+ text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis
+}
+body.community-page #arcade-hud .arcade-hud-right{display:flex;gap:5px}
+body.community-page #arcade-hud button{white-space:nowrap}
+body.community-page #arcade-hud #arcade-hud-scenes{
+ display:flex;align-items:center;justify-content:center;gap:4px;overflow-x:auto;
+ scrollbar-width:none;min-height:42px;padding:3px 5px;
+ border-bottom:2px solid #555
+}
+body.community-page #arcade-hud #arcade-hud-scenes::-webkit-scrollbar{display:none}
+body.community-page #arcade-hud #arcade-hud-scenes button{
+ flex:0 0 auto;font-size:.71rem;min-height:33px;padding:5px 10px
+}
+body.community-page #arcade-hud #arcade-hud-scenes button[aria-current=page]{
+ background:#ffff55;color:#000;border-color:#fff
+}
+body.community-page #arcade-hud .arcade-hud-footer{
+ position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #aaaaaa;
+ text-align:center;min-height:var(--arcade-bottom);color:#55ffff;
+ padding:6px 8px;font:800 .64rem/1.2 'Courier New',monospace;
+}
+body.community-page #arcade-hud #arcade-hud-paging{
+ position:fixed;right:8px;bottom:calc(var(--arcade-bottom) + 6px);
+ display:flex;align-items:center;gap:5px;background:#000;
+ padding:4px;border:2px solid #aaaaaa;z-index:3
+}
+body.community-page #arcade-hud #arcade-hud-paging button{
+ padding:6px;min-height:38px;font-size:.7rem
+}
+body.community-page #arcade-hud #arcade-hud-paging button:disabled{opacity:.4}
+body.community-page #arcade-hud-pagecount{font:900 .75rem monospace;min-width:56px;text-align:center;color:#ffff55}
+/* One active game occupies one arcade monitor; root nodes stay in their
+   original DOM locations so auth, event listeners, timers and saves survive. */
+body.community-page.arcade-on :is(
+ #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
+ #streetrod-root,#vdacs-study-root,#commons-art
+):not(.arcade-game-active){display:none!important}
+body.community-page.arcade-on :is(
+ #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
+ #streetrod-root,#vdacs-study-root,#commons-art
+).arcade-game-active{
+ position:fixed!important;inset:var(--arcade-top) 0 var(--arcade-bottom) 0!important;
+ z-index:2147481900!important;display:block!important;
+ width:100vw!important;max-width:100vw!important;min-width:0!important;
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ max-height:none!important;margin:0!important;padding:4px clamp(5px,1.5vw,15px)!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:#000!important;color:#fff!important;overflow:hidden!important;
+ font-family:'Courier New',Courier,monospace!important
+}
+body.community-page.arcade-on :is(
+ #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
+ #streetrod-root,#vdacs-study-root
+).arcade-game-active > :is(.mahjong-entry-button,.plate-entry-button){display:none!important}
+body.community-page.arcade-on :is(
+ #mahjong-inside,#letter-lock-content,#word-game-inside,
+ #plate-game-content,#vdacs-study-inside
+){height:100%!important;min-height:0!important;max-height:100%!important;
+ overflow:hidden!important;padding:0!important;margin:0!important}
+body.community-page.arcade-on .arcade-game-active button,
+body.community-page.arcade-on .arcade-game-active select,
+body.community-page.arcade-on .arcade-game-active input{touch-action:manipulation}
+body.community-page.arcade-on .arcade-game-active :is(button,select,input,textarea):focus-visible{
+ outline:3px solid #ffff55!important;outline-offset:2px
+}
+body.community-page.arcade-on[data-arcade-contrast=bright] :is(#arcade-shell,#arcade-hud){
+ background:#000!important;color:#fff!important
+}
+body.community-page.arcade-on[data-arcade-size=large] :is(
+ #arcade-hud,#arcade-shell,.arcade-game-active
+){font-size:115%!important}
+body.community-page.arcade-on[data-arcade-motion=reduce] *,
+body.community-page.arcade-on[data-arcade-motion=reduce] *::before,
+body.community-page.arcade-on[data-arcade-motion=reduce] *::after{
+ animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important
+}
+/* MAHJONG: one scene per dashboard, with the playable board front and center. */
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-inside{
+ display:flex!important;flex-direction:column;min-height:0
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-inside > *{display:none!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-inside > :is(.mahjong-game-zone,.mahjong-stats){display:flex!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-inside > .mahjong-stats{flex:0 0 auto;gap:4px;flex-wrap:wrap;padding:2px!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-inside > .mahjong-game-zone{
+ flex:1 1 auto;min-height:0;overflow:hidden!important;padding:4px!important;
+ display:flex!important;flex-direction:column;gap:5px
+}
+body.community-page.arcade-on #mahjong-board-wrap{
+ flex:1 1 auto;min-height:0!important;max-height:none!important;
+ width:100%!important;overflow:auto!important;touch-action:pan-x pan-y
+}
+body.community-page.arcade-on #mahjong-board{margin:auto!important}
+body.community-page.arcade-on :is(.mahjong-hud,.mahjong-actions,.mahjong-view-tools){
+ flex:0 0 auto!important;margin:0!important
+}
+body.community-page.arcade-on :is(.mahjong-head,.mahjong-pan-help,.mahjong-footnote){display:none!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels] #mahjong-inside > .mahjong-campaign{display:grid!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=scores] #mahjong-inside > .mahjong-bottom,
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=badges] #mahjong-inside > .mahjong-bottom{
+ display:block!important;overflow:auto!important;min-height:0;height:100%;padding:10px
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=scores] #mahjong-inside .mahjong-badges,
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=badges] #mahjong-inside .mahjong-leaders{display:none!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=history] #mahjong-inside > .mahjong-history{
+ display:block!important;overflow:auto!important;height:100%;min-height:0;padding:10px
+}
+/* WORD QUEST: puzzle and leaderboard are distinct full-size screen pages. */
+body.community-page.arcade-on[data-arcade-game=wordquest] #word-game-inside{display:block!important}
+body.community-page.arcade-on[data-arcade-game=wordquest] #word-game-inside > .commons-score-ribbon{display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordquest] :is(.family-heading,.word-rules){display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordquest] #commons-word{height:100%!important;margin:0!important;padding:4px!important}
+body.community-page.arcade-on[data-arcade-game=wordquest] #commons-word .word-layout{display:block!important;height:100%;min-height:0}
+body.community-page.arcade-on[data-arcade-game=wordquest] #commons-word .word-panel{height:100%;display:flex;flex-direction:column;gap:5px;min-height:0;overflow:hidden}
+body.community-page.arcade-on[data-arcade-game=wordquest] #commons-word #commons-word-moves{
+ flex:1 1 auto;min-height:0;overflow:auto!important
+}
+body.community-page.arcade-on[data-arcade-game=wordquest][data-arcade-scene=play] #commons-word .word-leaderboard{display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordquest][data-arcade-scene=scores] #commons-word .word-panel{display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordquest][data-arcade-scene=scores] #commons-word .word-leaderboard{display:block!important;max-width:720px;margin:0 auto;height:100%;overflow:auto!important}
+/* W0RDLE: keyboard board first; sidebar and trophy screen on separate pages. */
+body.community-page.arcade-on[data-arcade-game=wordle] .letter-lock-inner{height:100%;min-height:0;overflow:hidden;padding:4px!important}
+body.community-page.arcade-on[data-arcade-game=wordle] :is(.letter-lock-heading,.letter-lock-rules,#letter-lock-personal-progress){display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordle] .letter-lock-layout{display:block!important;height:100%;min-height:0}
+body.community-page.arcade-on[data-arcade-game=wordle] .letter-lock-panel{
+ height:100%;min-height:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;padding:4px!important
+}
+body.community-page.arcade-on[data-arcade-game=wordle] #letter-lock-grid{flex:1 1 auto;min-height:0!important;overflow:hidden}
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=play] .letter-lock-aside{display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=scores] .letter-lock-panel,
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=awards] .letter-lock-panel{display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=scores] .letter-lock-aside,
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=awards] .letter-lock-aside{
+ display:block!important;max-width:740px;height:100%;margin:auto;overflow:auto!important
+}
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=scores] .letter-lock-aside #letter-lock-awards,
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=scores] .letter-lock-aside #letter-lock-medal-count{display:none!important}
+body.community-page.arcade-on[data-arcade-game=wordle][data-arcade-scene=awards] .letter-lock-aside #letter-lock-leaders{display:none!important}
+/* LICENSE PLATES: post, one-card-at-a-time review, scores. */
+body.community-page.arcade-on[data-arcade-game=plates] #plate-game-content{overflow:hidden!important}
+body.community-page.arcade-on[data-arcade-game=plates] #plate-game-content > *{display:none!important}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=post] #plate-game-content > #plate-new{
+ display:flex!important;flex-direction:column;gap:6px;height:100%;overflow:auto!important;max-width:760px;margin:0 auto!important;padding:8px!important
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=vote] #plate-game-content > #plate-list{
+ display:block!important;height:100%;max-width:760px;margin:0 auto!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=vote] #plate-list > :not(.arcade-current-card){display:none!important}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=vote] #plate-list > .arcade-current-card{
+ display:block!important;height:100%;overflow:auto!important;padding:6px 8px 75px!important
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=scores] #plate-game-content > :is(.commons-score-ribbon,.plate-heading){
+ display:flex!important;max-width:920px;margin:12px auto!important;flex-wrap:wrap
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=scores] #plate-game-content > .plate-heading > div:first-child{display:none!important}
+body.community-page.arcade-on[data-arcade-game=plates] #plate-game-content .plate-rules{display:none!important}
+/* Drawing studio stays functional, only its art canvas is foregrounded. */
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-art{
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ overflow:auto!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-art .family-heading{display:none!important}
+/* Study deck: only a study card or milestone panel on the monitor. */
+body.community-page.arcade-on[data-arcade-game=study] #vdacs-study-inside{display:block!important}
+body.community-page.arcade-on[data-arcade-game=study] #vdacs-study-inside > .vdacs-inner{
+ display:flex!important;flex-direction:column;height:100%;min-height:0;
+ overflow:hidden!important;gap:5px!important;padding:5px!important
+}
+body.community-page.arcade-on[data-arcade-game=study] :is(.vdacs-head,.vdacs-resources,.vdacs-footnote){display:none!important}
+body.community-page.arcade-on[data-arcade-game=study][data-arcade-scene=cards] .vdacs-badges{display:none!important}
+body.community-page.arcade-on[data-arcade-game=study][data-arcade-scene=cards] #vdacs-study-card{
+ flex:1 1 auto;min-height:0;overflow:auto!important
+}
+body.community-page.arcade-on[data-arcade-game=study][data-arcade-scene=awards] :is(
+ .vdacs-controls,.vdacs-card,.vdacs-actions,.vdacs-card-source
+){display:none!important}
+body.community-page.arcade-on[data-arcade-game=study][data-arcade-scene=awards] .vdacs-badges{
+ display:block!important;height:100%;overflow:auto!important
+}
+/* STREET R0D: the full summer campaign is the scene navigator; old page
+   sections are retained in DOM for scores, upgrades and other modules. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-root.sr-ega-mode.sr-dos-fullscreen{
+ inset:var(--arcade-top) 0 var(--arcade-bottom) 0!important;
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ z-index:2147481900!important;width:100vw!important;max-width:none!important;
+ box-shadow:none!important;border:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-root #sr-inside{
+ height:100%!important;max-height:100%!important;min-height:0!important;
+ padding:2px!important;margin:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-root #sr-inside > :not(#src-classic-hub):not(#srj-junior){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-root #sr-dos-maximize{display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #src-classic-hub{
+ display:block!important;height:100%!important;min-height:0!important;
+ max-width:none!important;padding:0!important;margin:0!important;
+ border:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #src-classic-hub > :not(#streetrod-summer){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-summer{
+ display:block!important;height:100%!important;min-height:0!important;
+ margin:0!important;padding:4px!important;border:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-summer > :is(.ss-top,.ss-metrics,.ss-tabs){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene{
+ display:block!important;height:calc(100% - 30px)!important;min-height:0!important;
+ max-height:none!important;overflow:auto!important;padding:4px!important;
+ overscroll-behavior:contain
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-status{
+ font-size:.71rem!important;margin:0!important;padding:2px 6px!important;
+ min-height:22px!important;border:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-scene-head{
+ display:flex!important;align-items:baseline;gap:10px;padding:2px!important;margin:0 0 5px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-scene-head p,
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-scene-head small{display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-scene-head h4{
+ font:900 1rem/1.2 'Courier New',monospace!important;margin:2px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .sr-ega-scene{
+ max-height:min(49dvh,380px)!important;width:auto!important;max-width:100%!important;
+ aspect-ratio:8/5!important;object-fit:contain!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=garage] #ss-scene :is(
+ .ss-inline-form,.ss-workshop-preview
+){display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=tune] #ss-scene :is(
+ .ss-garage-stage,.ss-garage-stats,.ss-workshop-preview,.ss-actions
+){display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=tune] #ss-scene .ss-inline-form{
+ display:flex!important;gap:10px;justify-content:center;flex-wrap:wrap;
+ max-width:800px;margin:16px auto!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=paper] #ss-scene .ss-ad:not(.arcade-current-card),
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=diner] #ss-scene .ss-rival:not(.arcade-current-card){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=paper] #ss-scene .ss-ads,
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=diner] #ss-scene .ss-rivals{
+ display:block!important;max-width:760px;margin:8px auto!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-newspaper{
+ max-width:820px;margin:0 auto!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-diner-hero{
+ max-width:640px;margin:0 auto!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene :is(.ss-ad,.ss-rival){
+ max-width:720px;margin:4px auto!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay:not([hidden]){
+ position:absolute!important;inset:0!important;z-index:15!important;
+ height:100%!important;max-height:100%!important;overflow:auto!important;
+ padding:6px!important;background:#000!important;
+ margin:0!important;box-sizing:border-box!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod]:has(#ss-season-bay:not([hidden])) #ss-scene{visibility:hidden}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=junior] #src-classic-hub{display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #srj-junior{display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=junior] #srj-junior{
+ display:block!important;height:100%!important;max-height:100%!important;
+ overflow:auto!important;padding:5px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=junior] #srj-junior details{
+ display:block!important;overflow:auto!important;height:100%!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=junior] #srj-junior summary{display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=junior] #srj-junior .srj-inside{
+ display:block!important;overflow:auto!important;max-height:100%
+}
+body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=junior] #srj-junior .srj-welcome{display:none!important}
+@media(max-width:680px){
+ body.community-page.arcade-on{--arcade-top:90px;--arcade-bottom:23px}
+ body.community-page #arcade-hud .arcade-hud-main{min-height:45px}
+ body.community-page #arcade-hud #arcade-hud-scenes{min-height:40px;justify-content:flex-start}
+ body.community-page #arcade-hud #arcade-hud-scenes button{min-height:31px;padding:4px 7px;font-size:.66rem}
+ body.community-page #arcade-hud .arcade-hud-footer{font-size:.57rem}
+ body.community-page #arcade-hud .arcade-hud-main button{min-height:36px;padding:5px;font-size:.67rem}
+ body.community-page #arcade-hud #arcade-hud-title{font-size:.68rem}
+ body.community-page #arcade-menu-view{grid-template-columns:minmax(0,1fr);grid-template-rows:120px 46px minmax(0,1fr) 42px;gap:5px}
+ body.community-page #arcade-title-art{grid-column:1;grid-row:1;height:120px;width:auto;max-width:100%;justify-self:center;border-width:3px}
+ body.community-page .arcade-menu-intro{grid-column:1;grid-row:2;text-align:center}
+ body.community-page .arcade-menu-intro h2{margin:2px!important;font-size:1.03rem}
+ body.community-page .arcade-menu-intro p{display:none!important}
+ body.community-page #arcade-program-grid{
+  grid-column:1;grid-row:3;grid-template-columns:repeat(2,minmax(0,1fr));
+  align-content:center;gap:5px
+ }
+ body.community-page #arcade-program-grid button{min-height:52px;padding:5px;gap:5px;border-width:2px}
+ body.community-page .arcade-program-number{display:none}
+ body.community-page .arcade-program-mark{font-size:1.15rem;min-width:16px}
+ body.community-page .arcade-program-name strong{font-size:.78rem}
+ body.community-page .arcade-program-name small{font-size:.55rem}
+ body.community-page .arcade-program-state{display:none}
+ body.community-page .arcade-menu-bottom{grid-column:1;grid-row:4;gap:5px}
+ body.community-page .arcade-menu-bottom button{min-height:34px;padding:5px;font-size:.67rem}
+ body.community-page.arcade-on #mahjong-inside .mahjong-actions{gap:3px;display:flex;flex-wrap:wrap}
+ body.community-page.arcade-on #mahjong-inside .mahjong-actions button{min-height:37px;padding:4px 6px;font-size:.7rem}
+ body.community-page.arcade-on #mahjong-inside .mahjong-hud{padding:3px!important}
+ body.community-page.arcade-on[data-arcade-game=wordle] .letter-lock-keyboard{padding:0!important}
+ body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=post] #plate-new{padding:2px!important}
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .sr-ega-scene{max-height:35dvh!important}
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene .ss-actions{gap:4px!important}
+}
+@media(max-height:620px){
+ body.community-page #arcade-menu-view{grid-template-rows:80px 38px minmax(0,1fr) 35px}
+ body.community-page #arcade-title-art{height:80px}
+ body.community-page #arcade-program-grid button{min-height:39px}
+ body.community-page .arcade-menu-intro span{display:none}
+ body.community-page #arcade-hud #arcade-hud-scenes{min-height:36px}
+ body.community-page.arcade-on{--arcade-top:85px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #arcade-shell *,body.community-page #arcade-hud *{animation:none!important;transition:none!important}
+}
