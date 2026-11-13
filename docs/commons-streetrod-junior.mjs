@@ -69,6 +69,38 @@ function drawCar(x,y,c){
 function drawStar(x,y,glow){
  ctx.save();ctx.translate(x,y);const radius=glow?20:16;ctx.beginPath();for(let j=0;j<10;j++){const a=-Math.PI/2+j*Math.PI/5,r=j%2?radius*.45:radius;const xx=Math.cos(a)*r,yy=Math.sin(a)*r;j?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);}ctx.closePath();ctx.fillStyle='#ffe68c';ctx.shadowBlur=glow?24:0;ctx.shadowColor='#ffdf67';ctx.fill();ctx.restore();
 }
+/* Family arcade shares the DOS-era graphics adapter, without changing its
+   junior points, stars or member-visible scores. Draw at 320x128 then enlarge
+   using nearest-neighbour pixels and a fixed 16-colour colour table. */
+const jrEga=['#000000','#0000aa','#00aa00','#00aaaa','#aa0000','#aa00aa','#aa5500','#aaaaaa',
+ '#555555','#5555ff','#55ff55','#55ffff','#ff5555','#ff55ff','#ffff55','#ffffff'];
+const jrRGB=jrEga.map(h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]);
+let jrPixelCanvas=null,jrPixelCtx=null,jrLast=0;
+function egaJunior(){
+ if(!window.COWBOY_STREETROD_RETRO||!ctx?.canvas)return;
+ const now=performance.now();if(now-jrLast<95)return;jrLast=now;
+ if(!jrPixelCanvas){
+  jrPixelCanvas=document.createElement('canvas');jrPixelCanvas.width=320;jrPixelCanvas.height=128;
+  jrPixelCtx=jrPixelCanvas.getContext('2d',{willReadFrequently:true});
+ }
+ if(!jrPixelCtx)return;
+ jrPixelCtx.imageSmoothingEnabled=true;
+ jrPixelCtx.drawImage(ctx.canvas,0,0,320,128);
+ const image=jrPixelCtx.getImageData(0,0,320,128),a=image.data;
+ for(let i=0;i<a.length;i+=4){
+  let d=Infinity,best=0;
+  for(let j=0;j<16;j++){
+   const c=jrRGB[j],dr=a[i]-c[0],dg=a[i+1]-c[1],db=a[i+2]-c[2];
+   const v=dr*dr*.3+dg*dg*.59+db*db*.11;
+   if(v<d){d=v;best=j;}
+  }
+  a[i]=jrRGB[best][0];a[i+1]=jrRGB[best][1];a[i+2]=jrRGB[best][2];a[i+3]=255;
+ }
+ jrPixelCtx.putImageData(image,0,0);
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+ ctx.drawImage(jrPixelCanvas,0,0,ctx.canvas.width,ctx.canvas.height);ctx.restore();
+}
+
 function draw(ms){
  if(!ctx)return;
  const w=900,h=360;ctx.clearRect(0,0,w,h);
@@ -86,6 +118,7 @@ function draw(ms){
  drawCar(168,lanesY[lane],car());
  ctx.fillStyle='#fdf5e7';ctx.font='900 17px system-ui';ctx.fillText(run?'STAR ROAD · '+Math.max(0,(15-ms/1000)).toFixed(1)+' s':'CHOOSE A CAR TO BEGIN',24,32);
  ctx.fillStyle='#153046aa';round(12,43,876,8,4,'#1d3c4688');if(run)round(12,43,clamp(ms/15000,0,1)*876,8,4,'#ffdf75');
+ egaJunior();
 }
 function setLane(next){
  if(!run||working)return;
