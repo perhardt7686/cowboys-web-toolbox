@@ -16,7 +16,7 @@ if(fridgeBoard&&fridgeConfig?.enabled&&location.pathname.endsWith('community.htm
   {key:'groceries',title:'Groceries',icon:'🛒',hint:'Food, drinks, and things for the pantry',placeholder:'Eggs, cheese, coffee…'},
   {key:'household',title:'Household',icon:'🧽',hint:'Cleaning, paper goods, and home essentials',placeholder:'Laundry pods, dish soap…'}
  ];
- const state={items:[],client:null,connectPromise:null,loading:false,busy:false,mounted:false,refreshTimer:null};
+ const state={items:[],client:null,connectPromise:null,loading:false,busy:false,mounted:false,refreshTimer:null,revision:0};
  let fridge=null,fold=null;
  function status(message,isError=false){
   const output=fridge?.querySelector('#family-fridge-status');if(!output)return;
@@ -176,17 +176,21 @@ if(fridgeBoard&&fridgeConfig?.enabled&&location.pathname.endsWith('community.htm
   if(fridge.querySelector('.family-fridge-edit'))return;
   state.loading=true;
   if(showStatus)status('Checking the family fridge…');
+  const revision=state.revision;
   try{
-   state.items=await fetchServer();
+   const items=await fetchServer();
+   if(revision!==state.revision)return;
+   state.items=items;
    renderItems();
    if(showStatus)status('Up to date. Changes are shared with approved family members.');
   }catch(error){
+   if(error.code==='42501'||/Approved Commons membership required/i.test(String(error.message||''))){state.items=[];renderItems();}
    if(showStatus)status('Could not load the shared note: '+String(error.message||'Try again.').slice(0,125),true);
   }finally{state.loading=false;}
  }
  async function change(action,params,message){
   if(state.busy||!fridge)return false;
-  state.busy=true;
+  state.busy=true;state.revision++;
   fridge.querySelectorAll('button,input').forEach(e=>e.disabled=true);
   status('Saving to the family fridge…');
   try{
@@ -198,6 +202,7 @@ if(fridgeBoard&&fridgeConfig?.enabled&&location.pathname.endsWith('community.htm
    status(message||'Shared list updated.');
    return true;
   }catch(error){
+   if(error.code==='42501'||/Approved Commons membership required/i.test(String(error.message||''))){state.items=[];}
    status('Not saved: '+String(error.message||'Please try again.').slice(0,160),true);
    renderItems();
    return false;
