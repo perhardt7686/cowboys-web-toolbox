@@ -3,7 +3,7 @@
  * No original Street Rod game art, trademark imagery, copied source, or music.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {drawPhotoCar} from './streetrod-photo-sprites.mjs?v=photoreal1';
+import {drawPhotoCar,carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
 import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=classic1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
@@ -133,7 +133,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   const price=Number(model.price||0);
   const b=owned?active?'<span class="sr-owned">SELECTED</span>':`<button class="sr-action sr-mini" data-sr-action="select" data-car="${ESC(model.key)}">Drive this</button>`:
    `<button class="sr-action sr-mini" data-sr-action="buy" data-item="car:${ESC(model.key)}" ${state.garage.credits<price?'disabled':''}>Buy ${credits(price)}</button>`;
-  return `<article class="sr-car-card ${active?'is-selected':''}"><div class="sr-car-icon" style="--sr-accent:${ESC(model.accent)}"><span class="sr-car-pic">${carSVG(model.accent)}</span></div><strong>${ESC(model.name)}</strong><small>${ESC(model.class)}</small><span class="sr-car-spec">Base ${ms(model.base)} · PWR ${model.power} · GRIP ${model.grip}</span>${b}</article>`;
+  return `<article class="sr-car-card ${active?'is-selected':''}"><div class="sr-car-icon" style="--sr-accent:${ESC(model.accent)}"><span class="sr-car-pic"><img class="sr-real-car" src="${ESC(carPhotoUrl(model.body||model.class,model.key))}" alt="" loading="lazy" decoding="async"></span></div><strong>${ESC(model.name)}</strong><small>${ESC(model.class)}</small><span class="sr-car-spec">Base ${ms(model.base)} · PWR ${model.power} · GRIP ${model.grip}</span>${b}</article>`;
  }
  function carSVG(c){return `<svg viewBox="0 0 158 63" aria-hidden="true" focusable="false"><ellipse cx="80" cy="54" rx="70" ry="6" fill="#0004"/><path d="M9 37 24 30 40 29 52 14 Q59 8 78 9 L106 9 124 30 142 33 150 42 144 50 12 50Z" fill="${c}" stroke="#16142c" stroke-width="4"/><path d="M52 29 60 15 102 15 115 30Z" fill="#232946"/><path d="M83 15V31" stroke="#fff7" stroke-width="3"/><path d="M20 40H145" stroke="#f9efb4" stroke-width="3"/><circle cx="42" cy="48" r="13" fill="#14131b" stroke="#d5cfe4" stroke-width="5"/><circle cx="119" cy="48" r="13" fill="#14131b" stroke="#d5cfe4" stroke-width="5"/><circle cx="42" cy="48" r="4" fill="#fff"/><circle cx="119" cy="48" r="4" fill="#fff"/></svg>`}
  function render(){
