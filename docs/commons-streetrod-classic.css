@@ -116,3 +116,8 @@ body.community-page .src-sign{top:17%}body.community-page .src-stage-car{inset:8
 body.community-page .src-garage-clock{left:41%}body.community-page .src-scene-actions{padding:9px;gap:8px}
 body.community-page .src-scene-actions button{min-height:45px;flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){body.community-page .src-classic-hub *,body.community-page .src-classic-hub *:before,body.community-page .src-classic-hub *:after{scroll-behavior:auto!important;transition:none!important}}
+body.community-page .src-paper .src-listing[hidden]{display:none!important}
+body.community-page .src-paper-pages{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:12px 1px 6px;border-top:2px solid #3c342d;margin-top:9px}
+body.community-page .src-paper-pages button{min-height:44px;padding:9px 13px;border:1px solid #2a2928;border-radius:4px;background:#38312d;color:#ffefce;font:850 .82rem/1.3 system-ui,sans-serif;cursor:pointer}
+body.community-page .src-paper-pages span{color:#3b3029;font:900 .82rem/1.4 Georgia,serif}
+body.community-page .src-paper-pages button:disabled{opacity:.36;cursor:not-allowed}
