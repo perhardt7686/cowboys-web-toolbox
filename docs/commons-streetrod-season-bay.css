@@ -107,3 +107,30 @@ body.community-page #streetrod-root .ssb-component-controls{
 body.community-page #streetrod-root .ssb-bolts small{
  color:#ffff55!important
 }
+
+/* Directional wrench strokes animate a socket, while server-side mechanical
+   torque order and persistent fastener state remain authoritative. */
+body.community-page .ssb-bolts button[data-ssb=bolt]{
+ position:relative;touch-action:none;user-select:none;
+ cursor:grab!important;transition:box-shadow .13s ease
+}
+body.community-page .ssb-bolts button[data-ssb=bolt] > span{
+ display:inline-block;transform:rotate(var(--ssb-turn,0deg));
+ transition:transform .09s linear;font:900 1.35rem/1 monospace
+}
+body.community-page .ssb-bolts button[data-ssb=bolt].ssb-wrench-dragging{
+ cursor:grabbing!important;border-color:#ffff55!important;
+ box-shadow:0 0 0 3px #55ffff,inset 0 2px 4px #12191f!important
+}
+body.community-page .ssb-next-bolt{
+ display:block;padding:5px 8px;margin:4px 0 2px!important;
+ border:2px solid #aaaaaa;background:#202037;color:#ffff55!important;
+ font:900 .7rem/1.35 'Courier New',monospace;letter-spacing:.04em
+}
+body.community-page .ssb-component:has(.ssb-next-bolt) .ssb-bolts{
+ border-color:#ffff55!important
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .ssb-bolts button[data-ssb=bolt],
+ body.community-page .ssb-bolts button[data-ssb=bolt] > span{transition:none!important}
+}
