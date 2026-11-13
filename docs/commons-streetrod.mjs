@@ -5,6 +5,7 @@
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {drawPhotoCar,carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
 import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=classic1';
+import {openWorkshop} from './commons-streetrod-mechanics.mjs?v=mech1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const ROOT_ID='streetrod-root';
@@ -149,7 +150,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   $('sr-garage-cars').innerHTML=(state.catalog||[]).map(model=>carCard(model,owned.find(x=>x.key===model.key))).join('');
   $('sr-parts').innerHTML=['engine','tires','gearbox'].map(key=>{
    const level=Number(chosen?.[key]||0),price=250+level*250+(key==='engine'?100:key==='gearbox'?50:0);
-   return `<div class="sr-part"><div><strong>${{engine:'Engine tuning',tires:'Street tires',gearbox:'Close-ratio gearbox'}[key]}</strong><small>Level ${level} / 5 · ${level===5?'MAX':credits(price)}</small></div><button class="sr-action sr-mini" data-sr-action="buy" data-item="${key}" ${level===5||garage.credits<price?'disabled':''}>${level===5?'MAXED':'+ Upgrade'}</button></div>`;
+   return `<div class="sr-part"><div><strong>${{engine:'Engine tuning',tires:'Street tires',gearbox:'Close-ratio gearbox'}[key]}</strong><small>Level ${level} / 5 · ${level===5?'MAX':credits(price)}</small></div><button class="sr-action sr-mini" data-sr-action="buy" data-item="${key}" ${level===5||garage.credits<price?'disabled':''}>${level===5?'MAXED':'Open workbench'}</button></div>`;
   }).join('');
   const me=uid;
   $('sr-duels').innerHTML=(state.duels?.length?state.duels.map(d=>{
@@ -176,6 +177,9 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
  }
  async function purchase(item){
   if(busy||race||!item)return;
+  if(['engine','tires','gearbox'].includes(item)){
+   await openWorkshop(item==='engine'?'hood':item==='tires'?'tires':'gearbox',item);return;
+  }
   busy=true;setStatus('Working on the car…');try{const {data,error}=await client.rpc('community_streetrod_buy',{p_item:item});if(error)throw error;state=data;setStatus('Garage updated. Take it out for a spin!','good');render();}catch(e){setStatus(e.message||'Purchase failed','warn')}finally{busy=false;render()}
  }
  async function selectCar(key){
