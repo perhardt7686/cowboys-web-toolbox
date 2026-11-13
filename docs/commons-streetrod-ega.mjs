@@ -183,7 +183,7 @@ function decorate(){
  }
  spriteImages();
 }
-function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;decorate()});}
+function schedule(){if(scheduled)return;scheduled=true;window.setTimeout(()=>{scheduled=false;decorate()},120);}
 const preamble=[
  'COWBOY COMPUTER SYSTEMS 286 BIOS             (C) 1989',
  'CPU: 80286 @ 12 MHZ  /  MEMORY TEST: 640K OK',
