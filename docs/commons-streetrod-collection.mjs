@@ -194,7 +194,7 @@ async function connect(){
 function attach(){
  if(!document.getElementById('sr-inside')){if(root){root.remove();root=null;ready=false;profiles=[];self=null;}return;}
  if(!root){mount();void connect();}
- else if(self)renderRoster();
+ else if(self && ((document.querySelector('#srw-garage .srw-header')&&!document.querySelector('#srw-garage .srw-header .scc-live-driver'))||(document.querySelector('#streetrod-root .sr-race-heading')&&!document.querySelector('#streetrod-root .sr-race-heading .scc-live-driver'))))renderRoster();
 }
 if(window.COWBOY_COMMUNITY_CONFIG?.enabled&&location.pathname.endsWith('community.html')){
  const obs=new MutationObserver(()=>{if(!document.getElementById('scc-motor-vault')&&root)root=null;attach();});
