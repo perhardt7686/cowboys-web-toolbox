@@ -99,7 +99,11 @@ async def capture(browser,sem,site,results,force):
             if not public_url(page.url):
                 raise RuntimeError('Redirected to nonpublic page')
             await page.wait_for_timeout(1850)
-            visible=(await page.locator('body').inner_text(timeout=4000))[:2000].strip()
+            try:
+                visible=(await page.locator('body').inner_text(timeout=4000))[:2000].strip()
+            except Exception:
+                # Heavy canvas/SVG/SPA pages may render while innerText stalls.
+                visible=''
             low=visible.lower()
             if not visible and (await page.locator('canvas, img, video, svg').count())==0:
                 raise RuntimeError('No visible page content')
@@ -128,6 +132,7 @@ async def main():
     parser.add_argument('--max-sites',type=int,default=0,
                         help='0 means every catalog site; otherwise first N')
     parser.add_argument('--workers',type=int,default=4)
+    parser.add_argument('--browser',choices=['chromium','firefox'],default='chromium')
     parser.add_argument('--force',action='store_true')
     args=parser.parse_args()
     TARGET.mkdir(parents=True,exist_ok=True)
@@ -137,7 +142,7 @@ async def main():
     before=existing_manifest()
     results=[]
     async with async_playwright() as playwright:
-        browser=await playwright.chromium.launch(headless=True)
+        browser=await getattr(playwright,args.browser).launch(headless=True)
         try:
             sem=asyncio.Semaphore(min(5,max(1,args.workers)))
             await asyncio.gather(*(capture(browser,sem,s,results,args.force) for s in sites))
