@@ -150,3 +150,17 @@ body.community-page .community-main .forum-post-context{font-variant-numeric:tab
 @media(prefers-reduced-motion:reduce){
  body.community-page .thread-card{transform:none!important;transition:none!important}
 }
+
+/* Safeguard member names and automated-moderator metadata on dark reply cards. */
+body.community-page .forum-post :is(.thread-meta,.forum-post-header,.forum-post-context),
+body.community-page .forum-post .thread-meta :is(b,strong,button,span),
+body.community-page .forum-post .forum-post-context :is(span,time){
+ color:#f3e7ef!important;
+}
+body.community-page .forum-post .moderator-badge{
+ background:#ead59f!important;border-color:#e9d29f!important;color:#281a31!important;
+}
+body.community-page .thread-card .thread-author,
+body.community-page .thread-card .thread-bottom :is(button,a,span,time){
+ color:#e8dce9!important;
+}
