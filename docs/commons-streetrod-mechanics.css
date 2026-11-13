@@ -1,0 +1,134 @@
+/* Original interactive engine-bay styling. Body/assembly details are new artwork. */
+body.community-page #streetrod-mechanical-bay{color:#f5efe9;margin:18px 0 22px;background:linear-gradient(148deg,#16191e,#292b30 56%,#1c1e26);border:2px solid #a48658;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #08070a8c;min-width:0}
+body.community-page #streetrod-mechanical-bay[hidden]{display:none!important}
+body.community-page #streetrod-mechanical-bay *,body.community-page #streetrod-mechanical-bay *:before,body.community-page #streetrod-mechanical-bay *:after{box-sizing:border-box}
+body.community-page .mw-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(#554a39,#302c2b);border-bottom:2px solid #b49768;padding:13px 19px;color:#ffe5b2;font:800 12px/1.5 system-ui,sans-serif;letter-spacing:.12em}
+body.community-page .mw-heading button{color:#f9e7cb;background:#322b30;border:1px solid #c0a27d;border-radius:8px;min-height:44px;padding:10px 13px;cursor:pointer;font-weight:750}
+body.community-page .mw-content{padding:clamp(12px,2vw,23px);display:grid;gap:17px}
+body.community-page .mw-loading{padding:30px;color:#fff2d9;text-align:center}
+body.community-page .mw-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+body.community-page .mw-topbar>div{min-width:0;flex:1 1 240px}
+body.community-page .mw-eyebrow{font-size:10px;font-weight:900;color:#d4ac7d;letter-spacing:.15em;line-height:1.5}
+body.community-page .mw-topbar h3{margin:6px 0!important;color:#ffe3ac!important;font:900 clamp(1.6rem,3vw,2.4rem)/1.2 Georgia,Cambria,serif!important;letter-spacing:-.03em}
+body.community-page .mw-topbar p{margin:0;color:#dedbd7;font-size:.88rem;line-height:1.55}
+body.community-page .mw-traffic{flex:0 1 auto;min-height:37px;display:flex;align-items:center;border-radius:8px;padding:10px 13px;font:900 .69rem/1.3 system-ui;letter-spacing:.1em;border:1px solid #b7888c}
+body.community-page .mw-green{color:#c3fad7;background:#17412f;border-color:#4a9565}
+body.community-page .mw-red{color:#ffdcbe;background:#5d2b34;border-color:#d27f80;box-shadow:0 0 17px #e75c463b}
+body.community-page .mw-tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #776951;padding-bottom:12px}
+body.community-page .mw-tabs button{min-height:44px;flex:1 1 135px;cursor:pointer;border:1px solid #7f765f;border-radius:8px;color:#e8ded0;background:linear-gradient(#424147,#23252a);padding:9px 11px;font-weight:800;font-size:.82rem}
+body.community-page .mw-tabs button[aria-pressed=true]{background:#f2d08b;border-color:#ffe2a7;color:#2b2523}
+body.community-page .mw-main-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:15px;align-items:start}
+body.community-page .mw-scene{position:relative;min-width:0;min-height:395px;padding:40px 18px 26px;border:3px solid #8b8072;border-radius:13px;overflow:hidden;background:linear-gradient(155deg,#4b5054,#1b252b 67%);box-shadow:inset 0 1px 20px #0008,0 9px 25px #0005;isolation:isolate}
+body.community-page .mw-scene:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(35deg,#fff1 0 2px,transparent 2px 24px);opacity:.16;pointer-events:none}
+body.community-page .mw-hood-lid{position:absolute;top:-85px;left:-4%;width:108%;height:175px;z-index:4;transform-origin:center top;transform:perspective(440px) rotateX(-22deg);border:3px solid #9f9d90;border-radius:3px 3px 36px 36px;box-shadow:0 16px 18px #0009;background:repeating-linear-gradient(90deg,#202830,#36434a 22%,#708188 43%,#26353d 60%);display:flex;align-items:end;justify-content:center;padding:0 15px 15px}
+body.community-page .mw-hood-lid span{padding:7px 13px;border:1px solid #d1bf9b;background:#19222e;color:#ffdd9b;font:800 .64rem/1.3 system-ui;letter-spacing:.08em;border-radius:5px;text-align:center;max-width:95%}
+body.community-page .mw-hood-ribs{position:absolute;inset:7px 19px 30px;display:flex;justify-content:space-around;border:2px solid #a5aba9;border-radius:18px}
+body.community-page .mw-hood-ribs i{display:block;width:6px;background:linear-gradient(90deg,#4a555d,#c1c7c6,#35454c);box-shadow:2px 1px 6px #0005}
+body.community-page .mw-visual{position:relative;margin:55px auto 12px;max-width:570px;height:260px;min-width:0;overflow:hidden;isolation:isolate;border:5px solid #556268;border-radius:44px 44px 19px 19px;background:radial-gradient(ellipse at center,#3e4a4b,#151d22 77%);box-shadow:inset 0 0 22px #02070c,inset 0 3px 6px #a1a6a6}
+body.community-page .mw-visual:before{content:'';position:absolute;inset:0;opacity:.12;background:repeating-linear-gradient(90deg,transparent 0 26px,#fff 27px 29px);pointer-events:none}
+body.community-page .mw-chrome-rail{position:absolute;left:8%;top:8%;width:84%;height:4%;border-radius:8px;background:linear-gradient(#e0dbbd,#526574,#b4b9b4)}
+body.community-page .mw-engine-block{position:absolute;z-index:1;left:23%;top:25%;width:54%;height:65%;border:4px solid #8b9496;border-radius:23px 23px 30px 30px;background:linear-gradient(115deg,#222b30,#94a1a3 23%,#535d61 43%,#181d20 60%,#91a0a0 85%);box-shadow:inset 0 -8px 20px #000a,0 6px 14px #0009;transform:perspective(300px) rotateX(9deg);display:flex;flex-direction:column;align-items:center;justify-content:space-around}
+body.community-page .mw-engine-block>b{font-size:clamp(.68rem,1.2vw,.91rem);color:#f4ebd6;text-shadow:0 2px 3px #000;letter-spacing:.07em}
+body.community-page .mw-valvebank{display:flex;gap:8px;justify-content:space-around;width:82%;height:24%}
+body.community-page .mw-valvebank i{flex:1;border-radius:7px;border:2px solid #cad1ca;background:linear-gradient(90deg,#343f45,#9eaaad 50%,#384146);box-shadow:inset 0 -3px 5px #0008}
+body.community-page .mw-belt{position:absolute;right:-9%;top:30%;width:23%;height:45%;border-radius:50%;border:8px ridge #303d42;background:radial-gradient(circle,#222 0 32%,#b4b8b6 35% 47%,#1b2325 49% 67%,#858f93 69%)}
+body.community-page .mw-intake{position:absolute;z-index:2;left:31%;top:39%;width:38%;height:35%;border:3px solid #d1d0c3;border-radius:11px;background:linear-gradient(100deg,#454e51,#9ea5a2,#536164 70%,#303b41);box-shadow:0 5px 9px #0009;display:flex;flex-direction:column;align-items:center;justify-content:space-around}
+body.community-page .mw-intake>span{font:850 clamp(.55rem,1.12vw,.72rem)/1.2 system-ui;color:#fae7be;text-shadow:0 2px 4px #000}
+body.community-page .mw-intake>i{display:block;width:84%;height:5px;border-radius:4px;background:linear-gradient(#d6d9d6,#58686a)}
+body.community-page .mw-carburetor{position:absolute;z-index:3;left:41%;top:33%;width:19%;height:34%;border:3px solid #e2cea0;border-radius:9px;background:linear-gradient(100deg,#7f6b4e,#e8d7ad 45%,#826f52);box-shadow:0 4px 14px #000c;display:flex;flex-direction:column;justify-content:space-around;align-items:center;transform:perspective(250px) rotateX(8deg)}
+body.community-page .mw-carburetor>span{font:900 clamp(.47rem,.95vw,.58rem)/1.2 system-ui;color:#463327;letter-spacing:.025em}
+body.community-page .mw-carburetor>div{display:flex;gap:5px}
+body.community-page .mw-carburetor>div i{width:26px;height:25px;max-width:5vw;border:3px solid #453627;border-radius:50%;background:radial-gradient(circle,#242b2f 0 44%,#bca679 51%,#635236 74%)}
+body.community-page .mw-wires{position:absolute;z-index:4;left:3%;top:21%;width:28%;height:68%;pointer-events:none}
+body.community-page .mw-wires i{position:absolute;left:20%;top:10%;width:100%;height:3px;background:#c04935;border-radius:9px;transform-origin:0 50%;box-shadow:0 1px 2px #000}
+body.community-page .mw-wires i:nth-child(1){transform:rotate(24deg)}body.community-page .mw-wires i:nth-child(2){transform:rotate(40deg);top:22%}body.community-page .mw-wires i:nth-child(3){transform:rotate(53deg);top:35%}body.community-page .mw-wires i:nth-child(4){transform:rotate(65deg);top:49%}
+body.community-page .mw-wires.is-disconnected{opacity:.22;transform:translateX(-24px) rotate(-10deg)}
+body.community-page .mw-battery{position:absolute;z-index:2;left:4%;bottom:13%;width:16%;height:21%;border:2px solid #c9cec7;border-radius:4px;background:linear-gradient(#48585d,#121c26);color:#ffde8f;display:grid;place-items:center;font-size:.72rem}
+body.community-page .mw-battery i{position:absolute;top:-4px;left:12%;width:75%;border-top:5px solid #bb9d64}
+body.community-page .mw-radiator{position:absolute;z-index:1;right:4%;top:25%;height:51%;width:15%;border:5px solid #b5b7ae;background:repeating-linear-gradient(90deg,#34474c 0 3px,#7e8888 4px 6px);display:grid;place-items:center}
+body.community-page .mw-radiator>span{writing-mode:vertical-rl;font:.64rem system-ui;color:#fff}
+body.community-page .mw-visual .is-removed{opacity:.09;filter:grayscale(1)}
+body.community-page .mw-engine-shadow{position:absolute;bottom:0;left:5%;width:90%;height:5%;border-radius:100%;background:#080b0f44;pointer-events:none}
+body.community-page .mw-graphic-caption{color:#fae2b3;font:850 .75rem/1.4 system-ui;letter-spacing:.09em;text-align:center;margin-top:10px}
+body.community-page .mw-scene-gearbox .mw-visual,body.community-page .mw-scene-tires .mw-visual{background:radial-gradient(ellipse,#515962,#111a1d 78%)}
+body.community-page .mw-gearbox-graphic{position:absolute;inset:9%;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)}
+body.community-page .mw-gearbox-housing{width:38%;height:70%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:linear-gradient(115deg,#576369,#c0c6c2,#3f4c53 68%,#95a4a3);border:9px ridge #9aa5a6;border-radius:31% 16% 22% 29%;box-shadow:inset 0 3px 10px #0009,0 9px 15px #0007;z-index:2}
+body.community-page .mw-gearbox-housing>span{font:.7rem system-ui;color:#13242a;font-weight:900;text-align:center}
+body.community-page .mw-gearbox-housing i{display:block;width:70%;height:8px;border:2px ridge #e2dbc4;border-radius:4px}
+body.community-page .mw-driveshaft{width:37%;height:24px;border-radius:7px;background:linear-gradient(#a7b3b2,#3e4a4c,#c4c6bd);border:3px solid #737f84;box-shadow:0 4px 9px #0008;z-index:1}
+body.community-page .mw-driveshaft.is-disconnected{transform:translateX(18px) translateY(-18px);opacity:.3}
+body.community-page .mw-shifter{position:absolute;bottom:11%;left:4%;padding:6px 9px;border-radius:3px;background:#1b2630;color:#e6cf9a;font:800 .65rem system-ui}
+body.community-page .mw-wheel-graphic{position:absolute;inset:7%;display:grid;place-items:center}
+body.community-page .mw-tire-sidewall{width:min(240px,56%);aspect-ratio:1;border:27px solid #101416;border-radius:50%;box-shadow:0 0 0 7px #343b3c,inset 0 0 14px #000,0 14px 18px #0009;background:repeating-conic-gradient(#3d474b 0 13deg,#13191c 14deg 27deg)}
+body.community-page .mw-rim{width:100%;height:100%;border-radius:50%;border:13px ridge #c5c9c9;background:repeating-conic-gradient(#a2b5bd 0 20deg,#4c5a61 22deg 38deg);display:grid;place-items:center;position:relative}
+body.community-page .mw-rim span{position:absolute;bottom:7px;font:800 .6rem system-ui;color:#112128}
+body.community-page .mw-lugs{width:44%;height:44%;border:9px ridge #7e888c;border-radius:50%;background:#292e33;position:relative}
+body.community-page .mw-lugs i{position:absolute;background:#c7c8bb;width:12px;height:12px;border-radius:50%;box-shadow:inset 0 2px 3px #3d4746}
+body.community-page .mw-lugs .lug-0{top:9%;left:45%}.mw-lugs .lug-1{top:44%;right:9%}.mw-lugs .lug-2{bottom:9%;left:45%}.mw-lugs .lug-3{top:44%;left:9%}
+body.community-page .mw-inspection-graphic{margin:30px auto;max-width:80%;min-height:170px;display:grid;place-items:center;text-align:center;background:linear-gradient(#d5c49c,#9d8d68);color:#2b2926;border:6px ridge #59492f;border-radius:9px;font:900 1.6rem Georgia,serif;box-shadow:0 11px 16px #0007}
+body.community-page .mw-inspection-graphic small{display:block;font:850 .65rem system-ui;letter-spacing:.1em}
+body.community-page .mw-inspector{padding:16px;background:#eee3ca;border:2px solid #a88c64;border-radius:11px;color:#2c3033;margin-top:10px}
+body.community-page .mw-inspector h4{color:#322b2e!important;font:850 1.35rem Georgia,serif!important;margin:0 0 8px!important}
+body.community-page .mw-inspector p{color:#424044!important;font-size:.83rem!important;line-height:1.55}
+body.community-page .mw-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+body.community-page .mw-stats>div{padding:8px;border:1px solid #b4a07a;border-radius:8px;display:grid;gap:2px;background:#f9f2de}
+body.community-page .mw-stats small{font-size:.64rem;color:#695b49}.mw-stats strong{font-size:.91rem;color:#262a2d}
+body.community-page .mw-inspector ul{list-style:none;margin:8px 0;padding:0}
+body.community-page .mw-inspector li{padding:7px 2px;display:flex;gap:7px;justify-content:space-between;border-bottom:1px dotted #c4b79b;font-size:.83rem;color:#2a3339}
+body.community-page .mw-hardware{display:grid;gap:10px;min-width:0}
+body.community-page .mw-tool-selector{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:12px;border:1px solid #6c6660;border-radius:10px;background:#22262a}
+body.community-page .mw-tool-selector strong{color:#ebd09c;flex:1 1 120px;font-size:.8rem}
+body.community-page .mw-tool-selector button{padding:9px 11px;min-height:44px;border-radius:7px;border:1px solid #958771;background:#353a41;color:#f9f3e6;font-size:.81rem;font-weight:750;cursor:pointer}
+body.community-page .mw-tool-selector button[aria-pressed=true]{background:#e8c98f;color:#281e1c;border-color:#ffe2a4}
+body.community-page .mw-part-card{min-width:0;padding:14px;border:1px solid #847363;border-radius:11px;background:linear-gradient(145deg,#343739,#242a2f);box-shadow:inset 0 2px 0 #fff1}
+body.community-page .mw-part-card.mw-part-removed{border-style:dashed;border-color:#d6a779}
+body.community-page .mw-part-heading{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+body.community-page .mw-part-icon{flex:none;width:36px;height:36px;display:grid;place-items:center;border:2px ridge #a9a9a0;border-radius:8px;background:linear-gradient(#757b7b,#343d40);color:#ffdda4;font-size:21px}
+body.community-page .mw-part-heading>div{flex:1 1 110px;min-width:0}
+body.community-page .mw-part-heading h4{color:#ffdeb0!important;margin:0!important;font:900 1rem/1.2 system-ui!important}
+body.community-page .mw-part-heading small{color:#d5d8d2;font-size:.72rem}
+body.community-page .mw-condition{font-size:.63rem;letter-spacing:.07em;color:#ffb29c;border-radius:5px;border:1px solid #af776c;padding:5px 7px}
+body.community-page .mw-condition.mw-ready{color:#c1e6c3;border-color:#639c78}
+body.community-page .mw-part-card>p{font-size:.77rem!important;color:#d8d8d3!important;line-height:1.45!important;margin:9px 0!important}
+body.community-page .mw-bolt-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center;min-height:44px;padding:7px 0}
+body.community-page .mw-bolt{width:48px;height:48px;border:3px ridge #8e9794;border-radius:50%;background:radial-gradient(circle at 33% 31%,#e5ecdd,#898e88 50%,#394349 78%);color:#17202a;display:grid;place-items:center;font:900 1.4rem system-ui;cursor:pointer;box-shadow:0 4px 6px #0006}
+body.community-page .mw-bolt-1{border-color:#e2a75e;background:radial-gradient(circle,#eac688,#8c6335 60%,#4e4438);color:#2f211a}
+body.community-page .mw-bolt-0{border-color:#dc8e80;background:#292a31;color:#e8c39e}
+body.community-page .mw-removed-message{color:#f7ce9f;font-weight:800;font-size:.8rem}
+body.community-page .mw-part-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+body.community-page .mw-part-actions button{min-height:44px;padding:9px 12px;border:1px solid #c5af86;border-radius:7px;background:#464143;color:#fff0d2;font:750 .79rem/1.4 system-ui;cursor:pointer}
+body.community-page .mw-part-actions .mw-install{background:#6b503b;border-color:#e7c181}
+body.community-page .mw-packages{padding:14px;border:1px solid #81755e;border-radius:11px;background:#282b2e}
+body.community-page .mw-section-heading{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:13px}
+body.community-page .mw-section-heading b{color:#ffe0a3;font:850 1.05rem Georgia,serif}
+body.community-page .mw-section-heading span{color:#e5ded4;font-size:.76rem;line-height:1.45}
+body.community-page .mw-package-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+body.community-page .mw-package-grid button{min-height:106px;padding:12px 10px;text-align:left;display:grid;gap:4px;border:1px solid #a49477;border-radius:9px;background:linear-gradient(140deg,#454849,#272c30);color:#f6e9d9;cursor:pointer;font-family:system-ui}
+body.community-page .mw-package-grid strong{font-size:.78rem;line-height:1.3;color:#ffdb97}
+body.community-page .mw-package-grid small{font-size:.71rem;color:#d5d4d0}
+body.community-page .mw-package-grid b{font-size:.86rem}
+body.community-page .mw-package-grid em{font-size:.65rem;color:#b8e7c3;font-style:normal;font-weight:850}
+body.community-page .mw-package-grid button[aria-pressed=true]{border:2px solid #f9d296;box-shadow:inset 0 0 10px #ecc17721}
+body.community-page .mw-workorder{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:15px 17px;border:2px solid #8c744c;border-radius:10px;background:linear-gradient(125deg,#49402e,#30302d)}
+body.community-page .mw-workorder>div:first-child{flex:1 1 260px}
+body.community-page .mw-workorder b{color:#ffe1a7;font-size:.89rem;letter-spacing:.025em}
+body.community-page .mw-workorder p{font-size:.84rem!important;line-height:1.55!important;color:#eee4d4!important;margin:6px 0 0!important}
+body.community-page .mw-workorder-actions{display:flex;gap:8px;flex-wrap:wrap}
+body.community-page .mw-workorder-actions button{min-height:45px;padding:9px 13px;border-radius:8px;border:1px solid #b8a888;background:#34383d;color:#f9ead5;font:800 .8rem system-ui;cursor:pointer}
+body.community-page .mw-workorder-actions .mw-complete{background:#d3ad73;color:#28272a;border-color:#ffdda6}
+body.community-page .mw-status{font:.88rem/1.55 system-ui;color:#bfe2c9!important;min-height:25px;padding:0 20px 14px;margin:0!important}
+body.community-page .mw-status.mw-error{color:#ffbcb5!important;font-weight:850}
+body.community-page .mw-bay.mw-busy :is(button){opacity:.54;pointer-events:none}
+body.community-page .mw-bay button:disabled{opacity:.42;cursor:not-allowed}
+body.community-page .mw-bay button:focus-visible{outline:3px solid #0de0e5!important;outline-offset:3px!important}
+@media(max-width:970px){body.community-page .mw-main-grid{grid-template-columns:minmax(0,1fr)}body.community-page .mw-scene{min-height:355px}body.community-page .mw-visual{height:255px}}
+@media(max-width:550px){body.community-page .mw-content{padding:12px}body.community-page .mw-hood-lid{height:165px}body.community-page .mw-visual{height:220px;margin:65px auto 5px}body.community-page .mw-scene{min-height:310px;padding:28px 8px 12px}body.community-page .mw-package-grid{grid-template-columns:minmax(0,1fr)}body.community-page .mw-bolt{width:46px;height:46px}body.community-page .mw-workorder-actions button{width:100%}body.community-page .mw-workorder-actions{width:100%}body.community-page .mw-workorder-actions{flex:1 1 100%}body.community-page .mw-carburetor>span{font-size:.45rem}}
+@media(prefers-reduced-motion:reduce){body.community-page .mw-bay *,body.community-page .mw-bay *:before{transition:none!important;animation:none!important}}
+body.community-page .mw-diagram-bolt{position:absolute;z-index:7;transform:translate(-50%,-50%);width:33px;height:33px;border:3px ridge #eee1bc;border-radius:50%;background:radial-gradient(circle at 35% 25%,#f8f0d9,#a7ada4 54%,#434e50);font:900 18px/1 system-ui;color:#253033;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 5px #000b}
+body.community-page .mw-diagram-bolt-1{background:#ca9857;border-color:#f9d091;color:#432e20}
+body.community-page .mw-diagram-bolt-0{background:#2c363e;color:#efdaa9;border-color:#866d5d}
+body.community-page .mw-diagram-label{position:absolute;z-index:8;padding:5px 7px;border:1px solid #e7bc76;border-radius:3px;background:#161d24d9;color:#fff0cf;font:900 .59rem/1.2 system-ui;cursor:pointer}
+body.community-page .mw-label-engine{left:38%;bottom:5%}
+body.community-page .mw-label-carb{left:40%;top:15%}
+body.community-page .mw-label-intake{right:5%;top:48%}
+@media(max-width:460px){body.community-page .mw-diagram-bolt{width:29px;height:29px;font-size:16px}body.community-page .mw-diagram-label{font-size:.49rem;padding:4px}}
