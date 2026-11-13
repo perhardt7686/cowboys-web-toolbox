@@ -93,7 +93,7 @@ body.community-page #streetrod-root.sr-ega-mode .sr-ega-scene{
  display:block!important;
  width:min(100%,740px)!important;height:auto!important;max-height:none!important;
  margin:0 auto!important;
- aspect-ratio:4/3;
+ aspect-ratio:8/5;
  image-rendering:pixelated!important;
  image-rendering:crisp-edges!important;
  background:#000!important;
@@ -156,7 +156,7 @@ body.community-page #streetrod-root.sr-ega-mode :is(
  .ss-cockpit canvas,#sr-track
 ){
  display:block!important;image-rendering:pixelated!important;image-rendering:crisp-edges!important;
- width:100%!important;height:auto!important;aspect-ratio:4/3!important;max-height:none!important;
+ width:100%!important;height:auto!important;aspect-ratio:8/5!important;max-height:none!important;
  background:#000!important;
 }
 body.community-page #streetrod-root.sr-ega-mode .ss-cockpit{max-width:740px!important;margin:0 auto!important}
