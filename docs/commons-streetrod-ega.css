@@ -252,3 +252,25 @@ body.community-page .sr-dos-skip:focus-visible{outline:4px solid #ffff55;outline
  body.community-page .sr-dos-boot-log::after{animation:none}
  body.community-page .sr-dos-overlay *{animation:none!important;transition:none!important}
 }
+
+
+/* Drive-in environmental objects are now EGA-drawn. Rival listing, profile
+ * imagery and challenge controls stay present for actual interaction. */
+body.community-page #streetrod-root.sr-ega-mode .src-diner-scene.sr-ega-active{
+ background:#000!important;border:3px solid #aaaaaa!important;border-radius:0!important
+}
+body.community-page #streetrod-root.sr-ega-mode .src-diner-scene.sr-ega-active > :is(
+ .src-diner-neon,.src-diner-window,.src-drive-cars,.src-diner-parking,.src-diner-patrons
+){display:none!important}
+body.community-page #streetrod-root.sr-ega-mode .src-diner-scene.sr-ega-active > .sr-ega-scene{
+ width:100%!important;max-width:720px!important;margin:auto!important
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.src-diner-racers,.src-diner-racer,.src-diner-pagination){
+ background:#000!important;color:#fff!important;border-color:#aaaaaa!important;border-radius:0!important
+}
+body.community-page #streetrod-root.sr-ega-mode .src-diner-racer :is(strong,small,p){
+ color:#ffff55!important
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.srj-canvas,.srj-track,#srj-track){
+ image-rendering:pixelated!important;image-rendering:crisp-edges!important;
+}
