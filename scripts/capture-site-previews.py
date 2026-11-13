@@ -12,7 +12,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 from PIL import Image
@@ -60,15 +60,21 @@ def existing_manifest():
     except (TypeError,ValueError,json.JSONDecodeError):
         return {}
 
-async def capture(browser,sem,site,results,force):
+async def capture(browser,sem,site,results,force,prior):
     sid,url=site.get('id',''),site.get('url','')
     if not ID_PATTERN.fullmatch(sid) or not public_url(url):
         results.append((sid,'skipped: nonpublic URL or invalid id'))
         return
     final=TARGET/(sid+'.webp')
     if final.is_file() and not force:
-        results.append((sid,'already captured'))
-        return
+        try:
+            previous=date.fromisoformat(prior[sid]['captured'])
+            age=(datetime.now(timezone.utc).date()-previous).days
+        except (KeyError,TypeError,ValueError):
+            age=999
+        if 0<=age<30:
+            results.append((sid,'already captured'))
+            return
     async with sem:
         context=None
         try:
@@ -145,7 +151,7 @@ async def main():
         browser=await getattr(playwright,args.browser).launch(headless=True)
         try:
             sem=asyncio.Semaphore(min(5,max(1,args.workers)))
-            await asyncio.gather(*(capture(browser,sem,s,results,args.force) for s in sites))
+            await asyncio.gather(*(capture(browser,sem,s,results,args.force,before) for s in sites))
         finally:
             await browser.close()
     today=datetime.now(timezone.utc).strftime('%Y-%m-%d')
