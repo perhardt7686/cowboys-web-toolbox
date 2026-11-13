@@ -88,6 +88,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
    const action=btn.dataset.srAction;
    if(action==='solo')void startRace('solo');
    else if(action==='challenge')void startRace('duel');
+   else if(action==='challenge-target')void startRace('duel',null,safeUUID(btn.dataset.memberId));
    else if(action==='join')void startRace('duel',safeUUID(btn.dataset.duelId));
    else if(action==='launch')handleLaunch();
    else if(action==='shift')handleShift();
@@ -171,13 +172,14 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
  async function selectCar(key){
   if(busy||race)return;busy=true;try{const {data,error}=await client.rpc('community_streetrod_select',{p_car:key});if(error)throw error;state=data;setStatus('New ride selected.','good');render();drawTrack(0,false)}catch(e){setStatus(e.message||'Unable to switch cars','warn')}finally{busy=false}
  }
- async function startRace(mode,duelID=null){
+ async function startRace(mode,duelID=null,targetID=null){
   if(busy||race||!client||!state)return;
   if(mode==='duel'&&duelID!==null&&!safeUUID(duelID))return;
+  if(targetID!==null&&!safeUUID(targetID))return;
   busy=true;setStatus(mode==='duel'?'Preparing a real member challenge…':'Staging on the starting line…');
   $('sr-start-solo').disabled=$('sr-start-duel').disabled=true;
   try{
-   const {data,error}=await client.rpc('community_streetrod_start',{p_mode:mode,p_duel_id:duelID});if(error)throw error;
+   const {data,error}=await client.rpc(targetID?'community_streetrod_start_targeted':'community_streetrod_start',targetID?{p_target:targetID}:{p_mode:mode,p_duel_id:duelID});if(error)throw error;
    race={...data,stage:'countdown',localStarted:performance.now(),goAt:performance.now()+3100,
     launch:null,shifts:[],nitro:null,finished:false,showProgress:0};
    $('sr-mode-chip').textContent=mode==='duel'?'REAL MEMBER CHALLENGE':'SINGLE PLAYER';
