@@ -24,6 +24,41 @@ const currentMonth=()=>{
 const longMonth=(y,m)=>monthFmt.format(new Date(Date.UTC(y,m-1,1)));
 const numberDate=(y,m,d)=>String(y)+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
 const normMonth=(y,m)=>{const d=new Date(Date.UTC(y,m-1,1));return {year:d.getUTCFullYear(),month:d.getUTCMonth()+1}};
+
+/* Selected month drives seasonal art, not the browser's current month.
+ * Decorative holiday markers do not create or modify Google events.
+ */
+const familyMonthThemes=Object.freeze({
+ 1:{season:'winter',icon:'❄️',heading:'Winter days, warm company.',tag:'Snowy beginnings · Family time'},
+ 2:{season:'hearts',icon:'💗',heading:'A month for the people we love.',tag:'Hearts & family traditions'},
+ 3:{season:'spring',icon:'🌷',heading:'A fresh chapter together.',tag:'Early blooms · Spring plans'},
+ 4:{season:'spring',icon:'🌼',heading:'Let the good days bloom.',tag:'Springtime in the Commons'},
+ 5:{season:'spring',icon:'🌻',heading:'Sunshine and shared plans.',tag:'Flowers · Family weekends'},
+ 6:{season:'summer',icon:'☀️',heading:'Long days, good memories.',tag:'Welcome, summer'},
+ 7:{season:'summer',icon:'🎆',heading:'Summer nights, family lights.',tag:'Summer celebrations'},
+ 8:{season:'summer',icon:'🍉',heading:'Make the most of summer.',tag:'Late-summer family time'},
+ 9:{season:'autumn',icon:'🍁',heading:'A new season to gather.',tag:'Golden days · Back-to-routine'},
+ 10:{season:'spooky',icon:'🎃',heading:'A little autumn magic.',tag:'Pumpkins · October adventures'},
+ 11:{season:'harvest',icon:'🦃',heading:'Grateful for time together.',tag:'Thanksgiving month · Cozy memories'},
+ 12:{season:'holiday',icon:'🎄',heading:'Home for the holidays.',tag:'Christmas lights · Winter traditions'}
+});
+function familyHoliday(year,month,day){
+ if(month===11){
+  const first=new Date(Date.UTC(year,10,1)).getUTCDay();
+  const fourthThursday=1+(4-first+7)%7+21;
+  if(day===fourthThursday)return {icon:'🦃',label:'Thanksgiving Day'};
+ }
+ const notable={
+  1:{1:['✨',"New Year's Day"]},
+  2:{14:['💗',"Valentine's Day"]},
+  7:{4:['🎆','Independence Day']},
+  10:{31:['🎃','Halloween']},
+  12:{25:['🎄','Christmas Day']}
+ };
+ const val=notable[month]?.[day];
+ return val?{icon:val[0],label:val[1]}:null;
+}
+
 if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
  let panel=document.getElementById('family-calendar-panel');
  if(!panel){
@@ -46,6 +81,22 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
  }
  const fold=panel.querySelector('#family-calendar-fold'),content=panel.querySelector('#family-calendar-content');
  const state={month:currentMonth(),view:'agenda',events:[],loading:false,queued:false,client:null,connected:false,synced:null};
+
+ function paintSeason(){
+  const theme=familyMonthThemes[state.month.month];
+  if(!theme)return;
+  panel.dataset.season=theme.season;
+  panel.dataset.selectedMonth=String(state.month.month);
+  const summaryIcon=panel.querySelector('.family-calendar-icon');
+  const subhead=panel.querySelector('.family-calendar-copy small');
+  const intro=panel.querySelector('.family-calendar-intro');
+  if(summaryIcon)summaryIcon.textContent=theme.icon;
+  if(subhead)subhead.textContent=longMonth(state.month.year,state.month.month)+' '+state.month.year+' · '+theme.tag;
+  const headline=intro?.querySelector('h2'),caption=intro?.querySelector('p');
+  if(headline)headline.textContent=theme.heading;
+  if(caption)caption.textContent='THE COMMONS · THE FAMILY CALENDAR · '+longMonth(state.month.year,state.month.month).toUpperCase();
+ }
+
  const buildShell=()=>{
   content.replaceChildren();
   const toolbar=el('div','family-calendar-toolbar');
@@ -104,6 +155,15 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
    const cell=el('div','family-calendar-day');
    if(key===dayKey(new Date()))cell.classList.add('is-today');
    cell.append(el('strong','',day));
+   const holiday=familyHoliday(year,month,day);
+   if(holiday){
+    cell.classList.add('is-holiday');
+    cell.setAttribute('aria-label',longMonth(year,month)+' '+day+': '+holiday.label);
+    const mark=el('span','family-calendar-holiday-marker',holiday.icon);
+    mark.title=holiday.label;
+    mark.setAttribute('aria-hidden','true');
+    cell.append(mark);
+   }
    const matches=events.filter(item=>{const end=new Date(item.end).getTime(),start=new Date(item.start).getTime();const last=dayKey(new Date(Math.max(start,end-1)));return dayKey(item.start)<=key&&last>=key;});
    const n=Math.min(matches.length,3);
    for(let i=0;i<n;i++)cell.append(el('span','family-calendar-day-event',matches[i].title||'Event'));
@@ -120,6 +180,7 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
  function render(){
   const name=panel.querySelector('#family-calendar-month'),list=panel.querySelector('#family-calendar-list');
   if(!name||!list)return;
+  paintSeason();
   name.textContent=longMonth(state.month.year,state.month.month)+' '+state.month.year;
   panel.querySelectorAll('button[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===state.view)));
   list.replaceChildren();
@@ -182,6 +243,7 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
   if(shown&&fold.open)void refresh();
  }
  buildShell();
+ paintSeason();
  fold.addEventListener('toggle',()=>{if(fold.open)void refresh();});
  new MutationObserver(visibility).observe(host,{attributes:true,attributeFilter:['hidden']});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!panel.hidden&&fold.open)void refresh();});
