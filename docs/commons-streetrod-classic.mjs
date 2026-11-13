@@ -36,6 +36,8 @@ function dinerScene(){
 function roadScene(){return '<div class="src-road-screen"><canvas id="src-road-preview" width="960" height="340" role="img" aria-label="Night-road driver view with an analog dashboard"></canvas><div class="src-road-caption">LOOK THROUGH THE WINDSHIELD. WATCH THE LIGHTS. NAIL YOUR SHIFT.</div></div><div class="src-scene-actions"><button type="button" data-src-action="solo">Stage a solo race</button><button type="button" data-src-action="racing">Show the real race controls</button><button type="button" data-src-action="diner">Back to the drive-in</button></div>';
 }
 function render(){if(!hub)return;
+ const mechanicPanel=hub.querySelector('.src-integrated-workbench');
+ if(mechanicPanel&&active!=='garage')mechanicPanel.hidden=true;
  hub.querySelector('#src-bankroll').textContent=document.getElementById('sr-credits')?.textContent||'—';
  const nav=hub.querySelector('.src-scene-menu');nav.querySelectorAll('button[data-src-tab]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.srcTab===active)));
  const stage=hub.querySelector('#src-scene');
@@ -137,6 +139,7 @@ function attach(){
  if(garage)garage.before(hub);else if(market)market.before(hub);else if(race)race.before(hub);else inside.prepend(hub);
  hub.addEventListener('click',event=>{
   const b=event.target.closest('button');if(!b)return;
+  if(b.dataset.mwAction==='close'){hub.querySelector('.src-garage-stage')?.classList.remove('src-hood-open');return;}
   if(b.dataset.srcTab){active=b.dataset.srcTab;render();}
   else if(b.dataset.srcAction){doAction(b.dataset.srcAction);}
   else if(b.dataset.srcInspect)inspectCar(b.dataset.srcInspect,b.dataset.srcName||'');
