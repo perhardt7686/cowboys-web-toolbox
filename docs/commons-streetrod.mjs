@@ -9,6 +9,7 @@ const ROOT_ID='streetrod-root';
 const $=id=>document.getElementById(id);
 const BADGES=[
  ['first_key','First Ignition','Complete your first race','🔑'],
+ ['cipher_breaker','Cipher Breaker','Defeat the final mystery van','👑'],
  ['first_win','Victory Lane','Win your first race','🏆'],
  ['night_shift','Night Shift','Finish five races','🌙'],
  ['ten_races','Road Warrior','Complete ten races','🛣️'],
@@ -60,6 +61,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
       <div class="sr-controls">
        <button class="sr-action sr-primary" type="button" id="sr-start-solo" data-sr-action="solo">🏁 Solo Race</button>
        <button class="sr-action sr-outline" type="button" id="sr-start-duel" data-sr-action="challenge">⚔️ Post Member Challenge</button>
+       <button class="sr-action sr-outline sr-boss-button" type="button" id="sr-start-boss" data-sr-action="boss">👑 Challenge Cipher Van X</button>
        <button class="sr-action sr-primary" type="button" id="sr-launch" data-sr-action="launch" hidden>LAUNCH!</button>
        <button class="sr-action sr-primary" type="button" id="sr-shift" data-sr-action="shift" hidden>SHIFT!</button>
        <button class="sr-action sr-nitro" type="button" id="sr-nitro" data-sr-action="nitro" hidden>NITRO</button>
@@ -88,6 +90,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
    const action=btn.dataset.srAction;
    if(action==='solo')void startRace('solo');
    else if(action==='challenge')void startRace('duel');
+   else if(action==='boss')void startRace('boss');
    else if(action==='challenge-target')void startRace('duel',null,safeUUID(btn.dataset.memberId));
    else if(action==='join')void startRace('duel',safeUUID(btn.dataset.duelId));
    else if(action==='launch')handleLaunch();
@@ -177,20 +180,22 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   if(mode==='duel'&&duelID!==null&&!safeUUID(duelID))return;
   if(targetID!==null&&!safeUUID(targetID))return;
   busy=true;setStatus(mode==='duel'?'Preparing a real member challenge…':'Staging on the starting line…');
-  $('sr-start-solo').disabled=$('sr-start-duel').disabled=true;
+  $('sr-start-solo').disabled=$('sr-start-duel').disabled=$('sr-start-boss').disabled=true;
   try{
-   const {data,error}=await client.rpc(targetID?'community_streetrod_start_targeted':'community_streetrod_start',targetID?{p_target:targetID}:{p_mode:mode,p_duel_id:duelID});if(error)throw error;
+   const endpoint=mode==='boss'?'community_streetrod_start_boss':targetID?'community_streetrod_start_targeted':'community_streetrod_start';
+   const args=mode==='boss'?{}:targetID?{p_target:targetID}:{p_mode:mode,p_duel_id:duelID};
+   const {data,error}=await client.rpc(endpoint,args);if(error)throw error;
    race={...data,stage:'countdown',localStarted:performance.now(),goAt:performance.now()+3100,
     launch:null,shifts:[],nitro:null,finished:false,showProgress:0};
-   $('sr-mode-chip').textContent=mode==='duel'?'REAL MEMBER CHALLENGE':'SINGLE PLAYER';
-   $('sr-start-solo').hidden=$('sr-start-duel').hidden=true;
+   $('sr-mode-chip').textContent=mode==='boss'?'CIPHER VAN X · CHAMPIONSHIP':mode==='duel'?'REAL MEMBER CHALLENGE':'SINGLE PLAYER';
+   $('sr-start-solo').hidden=$('sr-start-duel').hidden=$('sr-start-boss').hidden=true;
    $('sr-launch').hidden=false;$('sr-launch').disabled=true;
    $('sr-shift').hidden=true;$('sr-nitro').hidden=true;$('sr-abandon').hidden=false;
    $('sr-result').hidden=true;
    setStatus('Watch the tree… 3 · 2 · 1 · GREEN');
    cancelAnimationFrame(raceRaf);raceRaf=requestAnimationFrame(tick);
   }catch(e){setStatus(e.message||'Could not stage race','warn')}
-  finally{busy=false;if(!race){$('sr-start-solo').disabled=$('sr-start-duel').disabled=false;}}
+  finally{busy=false;if(!race){$('sr-start-solo').disabled=$('sr-start-duel').disabled=$('sr-start-boss').disabled=false;}}
  }
  function raceTime(){return race?performance.now()-race.goAt:0}
  function handleLaunch(){
@@ -218,7 +223,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
  function renderControls(){
   $('sr-abandon').hidden=!(race||state?.active);
   $('sr-abandon').textContent=race?'Abandon Run':'Clear Unfinished Run';
-  $('sr-start-solo').hidden=!!race;$('sr-start-duel').hidden=!!race;
+  $('sr-start-solo').hidden=!!race;$('sr-start-duel').hidden=!!race;$('sr-start-boss').hidden=!!race;
   $('sr-launch').hidden=!(race?.stage==='countdown'||race?.stage==='live'&&race.launch===null);
   $('sr-shift').hidden=!(race?.stage==='live'&&race.launch!==null&&race.shifts.length<3);
   $('sr-nitro').hidden=!(race?.stage==='live'&&race.launch!==null&&race.nitro===null);
@@ -253,8 +258,8 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
     const {data,error}=await client.rpc('community_streetrod_finish',{p_run_id:r.id,p_launch_ms:r.launch??1600,p_shifts:r.shifts,p_nitro_ms:r.nitro});
     if(error){if(/still running/i.test(error.message)&&i<3){await new Promise(resolve=>setTimeout(resolve,700));continue;}throw error;}
     state=data.state;
-    const verdict=data.mode==='duel'?(data.win===null?'RIVAL CHALLENGE POSTED':data.win?'DUEL VICTORY':'DUEL RESULT'):(data.win?'VICTORY LANE':'FINISH LINE');
-    $('sr-result').innerHTML=`<strong>${ESC(verdict)}</strong><div><span><b>${ms(data.total_ms)}</b><small>TOTAL TIME</small></span><span><b>${ms(data.reaction_ms)}</b><small>REACTION</small></span><span><b>+${num(data.points)}</b><small>POINTS</small></span><span><b>+${credits(data.credits_earned)}</b><small>GARAGE</small></span></div><p>${data.mode==='duel'&&data.win===null?'Your real-player challenge is posted. Another member can accept it from the board.':data.opponent_ms==null?'Check the challenge board for the other racer.':`Opponent total: ${ms(data.opponent_ms)}.`}</p>`;
+    const verdict=data.mode==='boss'?(data.win?'CIPHER CHAMPION':'CIPHER VAN SURVIVES'):data.mode==='duel'?(data.win===null?'RIVAL CHALLENGE POSTED':data.win?'DUEL VICTORY':'DUEL RESULT'):(data.win?'VICTORY LANE':'FINISH LINE');
+    $('sr-result').innerHTML=`<strong>${ESC(verdict)}</strong><div><span><b>${ms(data.total_ms)}</b><small>TOTAL TIME</small></span><span><b>${ms(data.reaction_ms)}</b><small>REACTION</small></span><span><b>+${num(data.points)}</b><small>POINTS</small></span><span><b>+${credits(data.credits_earned)}</b><small>GARAGE</small></span></div><p>${data.mode==='boss'?`Cipher Van X: ${ms(data.opponent_ms)}. ${data.win?'Victory! Cipher Breaker trophy unlocked.':'Upgrade and tune your build, then challenge the van again.'}`:data.mode==='duel'&&data.win===null?'Your real-player challenge is posted. Another member can accept it from the board.':data.opponent_ms==null?'Check the challenge board for the other racer.':`Opponent total: ${ms(data.opponent_ms)}.`}</p>`;
     $('sr-result').hidden=false;
     setStatus('Results saved to your Commons racing profile.','good');
     race=null;renderControls();$('sr-nitro').disabled=false;$('sr-nitro').textContent='NITRO';$('sr-gear').textContent='N';$('sr-mode-chip').textContent='GARAGE OPEN';render();return;
@@ -286,8 +291,9 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   const me=CAR(race?.car||state?.cars?.find(c=>c.selected)?.key);const driveX=live?clamp(90+progress*690,70,785):120;
   drawCar(ctx,driveX,230,me.accent||'#ebbb58',1);
   const other=(live?clamp(90+progress*670+(seed%13-6)*5,70,780):135);
-  drawCar(ctx,other,278,'#9a80df',.88);
+  if(race?.mode==='boss')drawCipherVan(ctx,other,278,.88);else drawCar(ctx,other,278,'#9a80df',.88);
   ctx.font='800 18px system-ui';ctx.fillStyle='#fff';ctx.fillText('YOU',clamp(driveX-25,5,w-80),193);
+  if(race?.mode==='boss'){ctx.font='bold 13px system-ui';ctx.fillStyle='#f4c487';ctx.fillText('CIPHER VAN X',Math.max(8,other-42),294);}
   if(progress>=1){ctx.fillStyle='#ffd67e';ctx.font='900 26px system-ui';ctx.fillText('FINISH!',w-145,245)}
  }
  function drawCar(ctx,x,y,color,scale){
@@ -297,6 +303,17 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-80,6);ctx.lineTo(-80,-15);ctx.lineTo(-43,-22);ctx.lineTo(-24,-49);ctx.lineTo(33,-49);ctx.lineTo(53,-22);ctx.lineTo(73,-17);ctx.lineTo(87,1);ctx.lineTo(79,7);ctx.closePath();ctx.fill();
   ctx.strokeStyle='#0a1024';ctx.lineWidth=5;ctx.stroke();ctx.fillStyle='#151d33';ctx.beginPath();ctx.moveTo(-20,-43);ctx.lineTo(29,-43);ctx.lineTo(44,-22);ctx.lineTo(-31,-22);ctx.closePath();ctx.fill();ctx.strokeStyle='#c1dff8';ctx.lineWidth=3;ctx.stroke();ctx.strokeStyle='#fff9';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-73,-13);ctx.lineTo(72,-13);ctx.stroke();
   ctx.fillStyle='#ffe5b5';ctx.fillRect(76,-13,10,8);ctx.fillStyle='#fc6f75';ctx.fillRect(-80,-11,7,8);
+  ctx.restore();
+ }
+ function drawCipherVan(ctx,x,y,scale){
+  ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+  ctx.fillStyle='#090c16ad';ctx.beginPath();ctx.ellipse(0,11,97,13,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#191521';
+  for(const a of [-63,62]){ctx.beginPath();ctx.arc(a,10,17,0,2*Math.PI);ctx.fill();ctx.strokeStyle='#d5b887';ctx.lineWidth=4;ctx.stroke();ctx.fillStyle='#c3bcc5';ctx.beginPath();ctx.arc(a,10,7,0,2*Math.PI);ctx.fill();ctx.fillStyle='#191521';}
+  ctx.fillStyle='#4b315e';ctx.strokeStyle='#151421';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-91,6);ctx.lineTo(-91,-51);ctx.quadraticCurveTo(-90,-64,-68,-66);ctx.lineTo(57,-65);ctx.quadraticCurveTo(78,-60,84,-37);ctx.lineTo(96,-12);ctx.lineTo(95,8);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#1a323c';ctx.fillRect(-69,-55,63,22);ctx.fillRect(10,-55,43,22);
+  ctx.strokeStyle='#d1ad79';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-77,-24);ctx.lineTo(-47,-39);ctx.lineTo(-20,-22);ctx.lineTo(9,-42);ctx.lineTo(34,-22);ctx.lineTo(68,-43);ctx.stroke();
+  ctx.fillStyle='#f5d5a3';ctx.fillRect(86,-30,11,9);ctx.fillStyle='#d67a71';ctx.fillRect(-95,-26,8,10);
   ctx.restore();
  }
  function onKey(ev){
