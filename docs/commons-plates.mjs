@@ -35,7 +35,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  }
  function scores(){
   const players=game?.players||[];const ana=players.find(p=>p.seat==='ana');const cowboy=players.find(p=>p.seat==='cowboy');
-  $('plate-top-score').textContent=`Ana ${ana?.total??33} · Cowboy ${cowboy?.total??19}`;
+  $('plate-top-score').textContent=`Ana ${ana?.total??'—'} · Cowboy ${cowboy?.total??'—'}`;
   const valid=players.filter(p=>Number.isFinite(Number(p.total)));
   const highest=valid.length?Math.max(...valid.map(p=>Number(p.total))):0;
   const leaders=valid.filter(p=>Number(p.total)===highest);
@@ -49,7 +49,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   $('plate-ribbon-gap').textContent=mine?gap.toLocaleString('en-US'):'—';
   $('plate-ribbon-gap-caption').textContent=mine?(gap===0?'You are tied for first or leading':'Points to catch the leader'):'Your account is not a plate player';
   const div=$('plate-score');div.replaceChildren();
-  for(const [who,score] of [['ana',ana?.total??33],['cowboy',cowboy?.total??19]]){
+  for(const [who,score] of [['ana',ana?.total??'—'],['cowboy',cowboy?.total??'—']]){
    const n=newEl('div','plate-scorecard');n.append(newEl('span','',nameFor(who)),newEl('strong','',score));div.append(n);
   }
  }
