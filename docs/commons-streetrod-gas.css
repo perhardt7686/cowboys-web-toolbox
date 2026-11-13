@@ -1,0 +1,40 @@
+/* Original vintage gas pump for Summer Championship. Fictional fuel and cash.
+   This station lives inside the existing private, authenticated racing UI. */
+body.community-page .ssg-station{display:grid;gap:16px;min-width:0;margin:12px 0 19px;padding:clamp(14px,2.7vw,24px);border:3px solid #b99a70;border-radius:14px;background:linear-gradient(145deg,#27343e,#182229 68%,#37333c);color:#f7e9d6;box-shadow:0 17px 32px #030608af}
+body.community-page .ssg-station[hidden]{display:none!important}
+body.community-page .ssg-station *{box-sizing:border-box}
+body.community-page .ssg-station>header{display:grid;gap:5px}
+body.community-page .ssg-station>header small{font:900 .7rem/1.4 system-ui;letter-spacing:.12em;color:#ecc69c}
+body.community-page .ssg-station>header h4{margin:0!important;font:900 clamp(1.6rem,3.2vw,2.4rem)/1.2 Georgia,serif!important;color:#ffe5b3!important}
+body.community-page .ssg-station>header p{margin:0!important;font-size:.91rem!important;line-height:1.5!important;color:#dfd6d3!important}
+body.community-page .ssg-forecourt{display:grid;grid-template-columns:1fr 1.3fr;align-items:end;gap:clamp(12px,3vw,32px);min-height:280px;padding:22px clamp(10px,2.2vw,25px);overflow:hidden;border:2px solid #797b7c;border-radius:12px;background:linear-gradient(180deg,#293a4d,#545b61 65%,#34383d 65%,#1c252c 100%);position:relative}
+body.community-page .ssg-forecourt:before{content:"HILLSIDE SERVICE · OPEN 24 HOURS";position:absolute;left:12px;right:12px;top:12px;color:#e8ce9b;letter-spacing:.13em;font-size:.68rem;font-weight:900;text-align:center}
+body.community-page .ssg-pump{position:relative;margin:28px auto 0;max-width:200px;width:90%;height:225px;padding:10px 12px 14px;border:5px solid #dccba8;border-radius:40px 40px 9px 9px;background:linear-gradient(100deg,#6e353b,#de7a65 28%,#a8484a 61%,#612d36);box-shadow:11px 15px 0 #060b1180,inset 0 3px 11px #f1c0a188;display:grid;align-content:start;justify-items:center;gap:8px;z-index:1}
+body.community-page .ssg-top{width:100%;border:2px solid #fff2c7;border-radius:32px;padding:8px 6px;text-align:center;font:900 .9rem Georgia,serif;letter-spacing:.15em;background:#b95050;color:#fff7d9;text-shadow:0 2px 1px #59282b}
+body.community-page .ssg-dial{width:100%;min-height:63px;border:5px solid #d8d6c4;border-radius:8px;background:linear-gradient(#f6efcb,#d6dfd2);color:#282d32;display:grid;place-content:center;text-align:center;gap:3px;box-shadow:inset 0 0 6px #5d6c6080}
+body.community-page .ssg-dial small{font:900 .64rem system-ui;letter-spacing:.05em}
+body.community-page .ssg-dial strong{font:900 clamp(.8rem,1.8vw,1.08rem) system-ui;font-variant-numeric:tabular-nums}
+body.community-page .ssg-meter{height:56px;width:30px;position:relative;overflow:hidden;border:3px solid #a38c75;border-radius:8px;background:#241f23;box-shadow:inset 0 0 10px #0009}
+body.community-page .ssg-meter span{position:absolute;inset:auto 0 0;height:0;background:linear-gradient(#f3dcb0,#e8a74d,#9d7e45);transition:height .16s ease}
+body.community-page .ssg-handle{position:absolute;right:-24px;top:80px;width:36px;height:77px;display:grid;place-content:center;border:2px solid #c9d0c4;border-radius:10px;background:linear-gradient(#383e44,#121920);font-size:1.35rem;box-shadow:4px 6px 0 #0006;transform-origin:top;transition:transform .2s ease}
+body.community-page .ssg-hose{position:absolute;right:-37px;top:139px;width:52px;height:74px;border:8px solid #22222a;border-left:0;border-top:0;border-radius:0 0 50px 0;pointer-events:none}
+body.community-page .ssg-base{position:absolute;left:-11px;right:-11px;bottom:-9px;height:13px;background:#a9a89a;border:2px solid #574b47;border-radius:3px}
+body.community-page .ssg-connected .ssg-handle{transform:translate(28px,33px) rotate(17deg);background:#658775}
+body.community-page .ssg-car-side{display:grid;align-content:end;justify-items:center;gap:10px;margin-bottom:12px;min-height:185px;padding:15px;border:3px solid #bcc7c0;border-radius:80px 16px 11px 15px;background:linear-gradient(140deg,#a4bdc2,#425c66 48%,#263e4b 78%,#71858a);box-shadow:inset 0 8px 12px #fff3,0 13px 0 #0b111985}
+body.community-page .ssg-car-side>span{font:900 clamp(.7rem,1.7vw,1rem) Georgia,serif;color:#fff4d8;letter-spacing:.1em;text-shadow:0 3px 2px #172732}
+body.community-page .ssg-fuel-door{border:4px solid #c6d0cb;border-radius:50%;width:89px;height:89px;display:grid;place-items:center;text-align:center;padding:10px;background:linear-gradient(#60737a,#364a52);color:#ffe8bd;font:900 .63rem/1.25 system-ui;box-shadow:inset 0 0 12px #0b1825}
+body.community-page .ssg-tank-bar{height:18px;width:min(100%,270px);border:2px solid #eff0db;border-radius:11px;overflow:hidden;background:#18252d}
+body.community-page .ssg-tank-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#e7b15b,#e2db9d);transition:width .3s}
+body.community-page #ssg-form{display:grid;gap:10px;border:1px solid #7b6f74;background:#272c37;border-radius:9px;padding:15px}
+body.community-page #ssg-form label{display:grid;gap:9px;color:#ffe5af;font-weight:850;font-size:.9rem}
+body.community-page #ssg-target{width:100%;min-height:33px;accent-color:#ddab6e;cursor:pointer}
+body.community-page .ssg-current-label{color:#e4d7d2!important;margin:0!important;font-size:.82rem!important}
+body.community-page .ssg-buttons{display:flex;flex-wrap:wrap;gap:9px}
+body.community-page .ssg-buttons button{flex:1 1 145px;min-height:47px;border:1px solid #e4c898;border-radius:8px;padding:10px 14px;background:#57424c;color:#fff2d7;font-weight:850;font-size:.86rem;cursor:pointer}
+body.community-page .ssg-buttons #ssg-submit{background:#d8b577;color:#24292b}
+body.community-page .ssg-buttons button:disabled{opacity:.46;cursor:not-allowed}
+body.community-page .ssg-status{margin:0!important;min-height:45px;padding:11px 13px;background:#2f373f;border:1px solid #79818c;border-radius:8px;color:#fff0d7!important;font-size:.87rem!important;line-height:1.5!important}
+body.community-page .ssg-status.error{border-color:#ce897f;color:#ffdacb!important;background:#55353b}
+body.community-page .ssg-station :is(button,input):focus-visible{outline:3px solid #16c9c6!important;outline-offset:3px!important}
+@media(max-width:590px){body.community-page .ssg-forecourt{grid-template-columns:1fr 1fr;min-height:250px;padding:26px 6px 12px;gap:7px}body.community-page .ssg-pump{max-width:145px;height:200px;padding:9px}body.community-page .ssg-handle{right:-12px;width:29px;font-size:1rem}body.community-page .ssg-top{font-size:.67rem}body.community-page .ssg-dial strong{font-size:.72rem}body.community-page .ssg-car-side{min-height:160px;padding:6px}body.community-page .ssg-fuel-door{width:75px;height:75px}}
+@media(prefers-reduced-motion:reduce){body.community-page .ssg-station *{transition:none!important}}
