@@ -1,0 +1,346 @@
+/* Commons contrast system | 2026-11-13
+   A final, board-scoped cascade layer, loaded after existing seasonal/arcade CSS.
+   The old light-autumn and purple-night styles used dark-surface text on
+   cream/mint reply cards. Don't recolor games, calendars, Core or member covers.
+
+   WCAG contrast targets (normal text):
+   body ink/paper 16.1:1 | muted/paper 8.79:1 | muted/lavender >7:1
+   primary action 11.19:1 | action hover 9.1:1 | focus 6.01:1.
+*/
+body.community-page{
+ --cb-deep:#211429;
+ --cb-plum:#502568;
+ --cb-berry:#653a80;
+ --cb-paper:#fffcf7;
+ --cb-lavender:#f3edf7;
+ --cb-ink:#261a31;
+ --cb-muted:#51445d;
+ --cb-edge:#baa4c4;
+ --cb-teal:#096b73;
+ --cb-harvest:#e9b968;
+ --cb-gold-ink:#72440f;
+}
+
+/* The thread reader stays a warm, near-white writing surface.
+   Only the actual conversation reader gets these typography rules. */
+body.community-page #content-dialog.content-dialog{
+ background:#fbf7f0!important;
+ color:var(--cb-ink)!important;
+ border:2px solid #966ab0!important;
+ box-shadow:0 26px 90px #12091bb3,0 0 0 5px #d6c0e44d!important;
+ padding:clamp(18px,4vw,38px);
+ max-width:min(820px,calc(100vw - 24px));
+ overflow-x:hidden;
+}
+body.community-page #content-dialog #content-title,
+body.community-page #content-dialog .replies-heading{
+ color:var(--cb-ink)!important;
+ font-family:Georgia,Cambria,'Times New Roman',serif;
+ font-weight:750;
+ line-height:1.22;
+ overflow-wrap:anywhere;
+}
+body.community-page #content-dialog .replies-heading{
+ font-size:clamp(1.35rem,3vw,1.7rem);
+ margin:24px 0 12px;
+ padding-bottom:9px;
+ border-bottom:2px solid #b99cc6;
+}
+body.community-page #content-dialog :is(.thread-kicker,.thread-meta,.forum-post-context,.dialog-lead,.form-hint,.forum-draft,.forum-pager>span){
+ color:var(--cb-muted)!important;
+}
+body.community-page #content-dialog :is(.thread-detail-body,.forum-reply-preview){
+ color:var(--cb-ink)!important;
+ line-height:1.66!important;
+ font-size:clamp(1rem,2.2vw,1.075rem)!important;
+}
+body.community-page #content-dialog :is(.thread-detail-body,.reply-body) a{
+ color:#54256e!important;
+ text-decoration:underline;
+ text-underline-offset:3px;
+ text-decoration-thickness:1.5px;
+}
+body.community-page #content-dialog :is(.thread-detail-body,.reply-body) a:hover{
+ color:#096b73!important;
+}
+body.community-page #content-dialog .dialog-close{
+ background:#efe6f4!important;
+ color:#3e234d!important;
+ border:1px solid #af94b9!important;
+ width:44px;height:44px;top:10px;right:10px;
+ display:grid;place-items:center;
+}
+body.community-page #content-dialog .dialog-close:hover{
+ background:#dfd0e9!important;color:#261a31!important;
+}
+
+/* A single consistent light surface for posts. Personalization affects
+   accent trims, not text/background contrast. */
+body.community-page #content-dialog #thread-replies .forum-post,
+body.community-page #content-dialog .forum-post{
+ --post-accent:#5d3578;
+ position:relative;
+ background:var(--cb-paper)!important;
+ color:var(--cb-ink)!important;
+ border:1.5px solid var(--cb-edge)!important;
+ border-left:5px solid var(--post-accent)!important;
+ border-radius:14px!important;
+ box-shadow:0 5px 0 #2b174312,0 8px 20px #23152f14!important;
+ padding:clamp(14px,3.2vw,22px)!important;
+ margin:15px 0!important;
+ overflow-wrap:anywhere;
+}
+body.community-page #content-dialog #thread-replies .forum-post:nth-child(even){
+ --post-accent:#0e777a;
+ background:var(--cb-lavender)!important;
+}
+body.community-page #content-dialog .forum-post:focus-within{
+ border-color:var(--cb-plum)!important;
+ box-shadow:0 0 0 2px #0e777a77,0 8px 25px #23152f20!important;
+}
+body.community-page #content-dialog .forum-post .forum-post-header{
+ display:flex;gap:10px;align-items:flex-start;justify-content:space-between;
+}
+body.community-page #content-dialog .forum-post :is(.member-author,.thread-meta,.forum-post-header,.forum-post-context,.forum-location,.forum-edited,.author-title,.member-status,.profile-extras){
+ color:var(--cb-ink)!important;
+}
+body.community-page #content-dialog .forum-post :is(.forum-post-context,.forum-location,.forum-edited,.author-title){
+ color:var(--cb-muted)!important;
+ font-size:clamp(.82rem,2vw,.95rem)!important;
+ line-height:1.5!important;
+}
+body.community-page #content-dialog .forum-post .thread-meta :is(b,strong,button,span,time),
+body.community-page #content-dialog .forum-post .member-author>span:not(.avatar){
+ color:var(--cb-ink)!important;
+ font-size:clamp(.9rem,2.2vw,1rem)!important;
+ font-weight:750;
+}
+body.community-page #content-dialog .forum-post .forum-post-context :is(span,time),
+body.community-page #content-dialog .forum-post .forum-post-context{
+ color:var(--cb-muted)!important;
+ font-weight:650;
+}
+body.community-page #content-dialog .forum-post .forum-post-number{
+ color:var(--cb-plum)!important;
+ background:#eadbf1!important;
+ border:1px solid #ae90bc!important;
+ border-radius:8px;
+ font:800 .85rem/1.4 ui-monospace,SFMono-Regular,Consolas,monospace!important;
+ padding:6px 9px;
+ flex:0 0 auto;
+}
+body.community-page #content-dialog .forum-post :is(.reply-body,.reply-body p,.reply-body li,.reply-body strong,.reply-body em){
+ color:var(--cb-ink)!important;
+ font-size:clamp(1rem,2.3vw,1.075rem)!important;
+ font-weight:inherit;
+ line-height:1.65!important;
+}
+body.community-page #content-dialog .forum-post .reply-body strong{font-weight:800!important}
+body.community-page #content-dialog .forum-post :is(.reply-body,.forum-signature){
+ overflow-wrap:anywhere;
+}
+body.community-page #content-dialog .forum-post .forum-signature{
+ border-top:1px dashed #bea6c7!important;
+ color:var(--cb-muted)!important;
+ font-size:.9rem;
+}
+body.community-page #content-dialog .forum-post :is(.moderator-badge,.profile-badge){
+ display:inline-flex;align-items:center;
+ color:var(--cb-plum)!important;
+ background:#ecddf3!important;
+ border:1px solid #aa8cb8!important;
+ border-radius:8px;
+ font-size:.75rem!important;
+ font-weight:850;
+ line-height:1.4;
+ letter-spacing:.025em;
+ padding:5px 9px;
+ opacity:1!important;
+}
+body.community-page #content-dialog .forum-post :is(.power-rank-chip,.power-honor-chip,.power-ribbon){
+ background:#49245f!important;
+ color:#fffaf2!important;
+ border-color:#49245f!important;
+}
+body.community-page #content-dialog .forum-post :is(.power-member-title,.power-editor-credit,.power-editor-note){
+ color:var(--cb-muted)!important;
+}
+body.community-page #content-dialog .forum-post .power-editor-note{
+ border-left:3px solid #4e2469!important;
+ background:#efe4f4!important;
+}
+body.community-page #content-dialog .forum-post .power-editor-note strong{
+ color:#502568!important;
+}
+
+/* Accessible touch targets. Underlines are for links, not every action chip. */
+body.community-page #content-dialog .forum-post .forum-post-actions{
+ display:flex;flex-wrap:wrap;align-items:stretch;gap:9px!important;
+ margin-top:18px;padding-top:14px;
+ border-top:1px solid #d7c8db;
+}
+body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a){
+ appearance:none;
+ display:inline-flex;align-items:center;justify-content:center;
+ flex:0 1 auto;min-width:0;min-height:46px;
+ padding:11px 14px!important;
+ border:1.5px solid #46205e!important;
+ border-radius:10px!important;
+ background:#502568!important;
+ color:#fffaf2!important;
+ font:750 clamp(.87rem,2.4vw,.96rem)/1.3 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+ text-decoration:none!important;
+ text-align:center;
+ overflow-wrap:anywhere;
+ white-space:normal;
+ box-shadow:0 2px 0 #21142924;
+ cursor:pointer;
+}
+body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a):is(:hover,:active){
+ background:var(--cb-harvest)!important;
+ color:var(--cb-ink)!important;
+ border-color:#975c1e!important;
+}
+body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a):disabled{
+ opacity:.58!important;cursor:not-allowed;
+}
+/* Keep actual report action discernible without a disruptive red block. */
+body.community-page #content-dialog .forum-post .forum-post-actions [data-report-reply]{
+ background:#fff7e8!important;
+ border-color:#8b5074!important;
+ color:#63274b!important;
+}
+body.community-page #content-dialog .forum-post .forum-post-actions [data-report-reply]:hover{
+ background:#f5d3cf!important;color:#522235!important;
+}
+
+/* Quoted content, reply editor and contextual actions are all on LIGHT surfaces. */
+body.community-page #content-dialog .forum-post :is(.forum-quote,.reply-body blockquote),
+body.community-page #content-dialog .forum-reply-preview,
+body.community-page #content-dialog .forum-quote-target{
+ background:#f7edda!important;
+ color:var(--cb-ink)!important;
+ border:1px solid #d1af83!important;
+ border-left:4px solid #a27529!important;
+ border-radius:0 10px 10px 0;
+ padding:12px 15px;
+}
+body.community-page #content-dialog :is(.forum-quote p,.reply-body blockquote,.forum-reply-preview,.forum-quote-target){
+ color:var(--cb-ink)!important;
+}
+body.community-page #content-dialog :is(.reply-body code,.thread-detail-body code){
+ color:#351844!important;
+ background:#ede4f1!important;
+ border:1px solid #d3bedb;
+ padding:2px 5px;
+ border-radius:4px;
+}
+body.community-page #content-dialog .thread-detail-actions{
+ flex-wrap:wrap;gap:8px!important;
+ border-color:#cbb6d2!important;
+}
+body.community-page #content-dialog .thread-detail-actions :is(button,a),
+body.community-page #content-dialog .forum-editor-tools button,
+body.community-page #content-dialog .forum-pager button{
+ color:#502568!important;
+ background:#efe5f4!important;
+ border:1px solid #b49bbf!important;
+ border-radius:9px;
+ padding:10px 13px;
+ min-height:44px;
+ font-size:.9rem!important;
+ font-weight:750;
+}
+body.community-page #content-dialog .thread-detail-actions :is(button,a):hover,
+body.community-page #content-dialog .forum-editor-tools button:hover,
+body.community-page #content-dialog .forum-pager button:hover{
+ color:#fffaf2!important;
+ background:#502568!important;
+}
+body.community-page #content-dialog .thread-detail-actions .danger-link{
+ color:#872b3f!important;
+ background:#f9edf0!important;
+ border-color:#cba1ab!important;
+}
+body.community-page #content-dialog .reply-form .field>span{
+ color:var(--cb-ink)!important;
+ font-weight:750;
+}
+body.community-page #content-dialog .reply-form textarea{
+ background:#fffefa!important;
+ color:var(--cb-ink)!important;
+ border:2px solid #9578a4!important;
+ font-size:16px!important;
+ line-height:1.6!important;
+}
+body.community-page #content-dialog .reply-form [type=submit]{
+ background:#502568!important;color:#fffaf2!important;
+ border-color:#502568!important;font-size:1rem;
+ min-height:48px;
+}
+body.community-page #content-dialog .reply-form [type=submit]:hover{
+ background:#694082!important;color:#fffaf2!important;
+}
+
+/* Dark list cards keep white text, instead of inheriting cream-dialog ink. */
+body.community-page .thread-card .member-author,
+body.community-page .thread-card .member-author>span:not(.avatar),
+body.community-page .thread-card :is(.thread-author,.thread-age,.thread-bottom,.thread-kicker){
+ color:#eee4f1!important;
+}
+body.community-page .thread-card .thread-title{
+ color:#fff1da!important;
+}
+body.community-page .thread-card .thread-excerpt{
+ color:#e6dce8!important;
+}
+body.community-page .thread-card .forum-last-reply{
+ color:#e8dbe9!important;
+}
+body.community-page .thread-card :is(.forum-unread,.moderator-badge,.profile-badge){
+ color:#321e42!important;
+ background:#f3d69c!important;
+ border-color:#f3d69c!important;
+}
+body.community-page :is(#content-dialog,#conversations) :is(button,a,summary,textarea,input,select):focus-visible{
+ outline:3px solid var(--cb-teal)!important;
+ outline-offset:3px!important;
+ box-shadow:0 0 0 2px #fffaf2!important;
+}
+
+/* Prevent overflow and the giant pale action tiles shown in the iPhone screenshot. */
+@media(max-width:600px){
+ body.community-page #content-dialog.content-dialog{
+  padding:62px 15px 22px;
+  max-width:calc(100vw - 16px);
+  border-radius:18px!important;
+ }
+ body.community-page #content-dialog .forum-post,
+ body.community-page #content-dialog #thread-replies .forum-post{padding:15px 13px!important}
+ body.community-page #content-dialog .forum-post .forum-post-header{gap:7px;flex-wrap:wrap}
+ body.community-page #content-dialog .forum-post .forum-post-actions{gap:8px!important}
+ body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a){
+  flex:1 1 calc(50% - 8px);
+  min-width:min(100%,135px);
+  font-size:.875rem!important;
+  padding:10px 8px!important;
+  min-height:46px;
+ }
+ body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a):last-child:nth-child(odd){flex-grow:0}
+ body.community-page #content-dialog .forum-post .forum-post-context{margin-bottom:14px}
+}
+@media(max-width:340px){
+ body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a){
+  flex:1 1 100%;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #content-dialog .forum-post *{
+  transition:none!important;animation:none!important;
+ }
+}
+@media(forced-colors:active){
+ body.community-page #content-dialog .forum-post .forum-post-actions :is(button,a){
+  border:1px solid ButtonText!important;
+ }
+}
