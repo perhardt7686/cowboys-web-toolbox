@@ -1,0 +1,87 @@
+/* Motor Vault: original vehicle concept showroom + Toolbox member driver characters */
+body.community-page .scc-vault{box-sizing:border-box;margin:14px 0 24px;color:#f6f3ec}
+body.community-page .scc-vault *{box-sizing:border-box}
+body.community-page .scc-vault>details{border:1px solid #8b7fa8;border-radius:19px;overflow:hidden;background:linear-gradient(150deg,#211b2b,#181e26 60%,#241c30);box-shadow:0 14px 48px #07091170}
+body.community-page .scc-vault>details>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:21px 22px;background:linear-gradient(110deg,#41304c,#2c3241 62%,#4d304b);border-bottom:1px solid transparent}
+body.community-page .scc-vault>details[open]>summary{border-color:#746a80}
+body.community-page .scc-vault summary::-webkit-details-marker{display:none}
+body.community-page .scc-heading{display:grid;gap:5px;min-width:0}
+body.community-page .scc-heading>b{font:900 clamp(18px,3.5vw,26px)/1.14 system-ui,sans-serif;letter-spacing:.045em;color:#ffe1a0}
+body.community-page .scc-heading>small{color:#ded3dd;font:600 13px/1.45 system-ui,sans-serif}
+body.community-page .scc-chevron{font-size:23px;color:#e6bb8d;transition:transform .2s}
+body.community-page .scc-vault>details[open] .scc-chevron{transform:rotate(180deg)}
+body.community-page .scc-inner{padding:clamp(14px,2.6vw,24px);display:grid;gap:17px}
+body.community-page .scc-intro{border:1px solid #5e5c63;border-radius:15px;background:linear-gradient(120deg,#282d31,#252334);padding:18px;display:grid;gap:10px}
+body.community-page .scc-intro h3{margin:0;font-size:clamp(21px,4vw,30px)!important;line-height:1.14;color:#ffdfad!important}
+body.community-page .scc-intro>p{margin:0;color:#e0dce2;max-width:740px;line-height:1.55;font-size:14px}
+body.community-page .scc-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+body.community-page .scc-tools label{display:grid;gap:7px;flex:1 1 170px;font-size:12px;font-weight:800;letter-spacing:.035em;color:#e8d6bb}
+body.community-page .scc-tools .scc-search{flex:3 1 235px}
+body.community-page .scc-tools input,body.community-page .scc-tools select{width:100%;min-height:46px;border-radius:9px;border:1px solid #877785;background:#0f171d;color:#fff;padding:11px 13px;font:600 15px system-ui,sans-serif;outline-offset:3px}
+body.community-page #scc-filters{display:flex;gap:7px;flex-wrap:wrap}
+body.community-page #scc-filters button{min-height:40px;background:#302b3c;color:#f3e9ed;border:1px solid #756477;border-radius:100px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}
+body.community-page #scc-filters button[aria-pressed=true]{background:#f1c577;color:#231e20;border-color:#ffeba4}
+body.community-page #scc-count{margin:0;color:#e8c99a;font-size:12px;font-weight:800;letter-spacing:.065em}
+body.community-page .scc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+body.community-page .scc-car{display:grid;grid-template-rows:auto 1fr;min-width:0;text-align:left;padding:0;cursor:pointer;border-radius:13px;overflow:hidden;border:1px solid #67626f;background:#2b2d35;color:#fff;box-shadow:0 6px 12px #06070c38;transition:transform .15s ease,border-color .15s ease}
+body.community-page .scc-car:hover{border-color:#f1c577;transform:translateY(-2px)}
+body.community-page .scc-car:focus-visible{outline:3px solid #ffe0a4;outline-offset:3px}
+body.community-page .scc-car.scc-boss{border:2px solid #bd8753;background:linear-gradient(150deg,#3c2a4a,#272636)}
+body.community-page .scc-picture{display:flex;align-items:center;justify-content:center;min-height:118px;padding:6px;background:radial-gradient(ellipse at 45% 90%,#8a7d7445,transparent 66%),linear-gradient(#353b45,#202630)}
+body.community-page .scc-car.scc-boss .scc-picture{background:radial-gradient(circle at 60% 70%,#a0758559,transparent 70%),#29213b}
+body.community-page .scc-car-svg{display:block;width:100%;height:auto;max-width:460px;filter:drop-shadow(0 7px 9px #0007)}
+body.community-page .scc-car-info{padding:11px 12px 13px;display:grid;align-content:start;gap:4px}
+body.community-page .scc-car-info strong{color:#fff5e5;font-size:15px;line-height:1.2;letter-spacing:.01em}
+body.community-page .scc-car-info>small{font-size:12px;color:#bfc6cd}
+body.community-page .scc-status{justify-self:start;margin-top:5px;border-radius:5px;background:#464252;color:#efe5f2;padding:5px 6px;font-size:9px;letter-spacing:.055em;font-weight:900}
+body.community-page .scc-boss .scc-status{color:#1c1723;background:#f5bd69}
+body.community-page .scc-empty{grid-column:1/-1;padding:20px;border:1px dashed #7b7280;border-radius:11px;color:#e4d9df}
+body.community-page .scc-roster{margin-top:5px;border:1px solid #696275;border-radius:13px;background:#252533;padding:0 14px 14px}
+body.community-page .scc-roster>summary{list-style:none;cursor:pointer;padding:15px 3px;color:#ffe3ad;font-size:16px;font-weight:900}
+body.community-page .scc-roster>p{font-size:13px;color:#d9d6dc;line-height:1.5}
+body.community-page .scc-driver-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px}
+body.community-page .scc-driver{display:flex;align-items:center;gap:11px;min-width:0;background:#1d2730;border:1px solid #606873;border-radius:11px;padding:11px;color:#fff}
+body.community-page .scc-driver>div{min-width:0;display:grid;gap:5px}
+body.community-page .scc-driver b{font-size:14px;line-height:1.2;overflow-wrap:anywhere}
+body.community-page .scc-driver small{font-size:9px;letter-spacing:.07em;color:#ddc28f;font-weight:900}
+body.community-page .scc-character{position:relative;display:inline-block;flex:0 0 54px;width:54px;height:68px}
+body.community-page .scc-head{position:absolute;z-index:2;top:0;left:6px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #edd6ab;background:linear-gradient(#4f5869,#383e4c);color:#fff6db;font-size:18px;font-weight:900;box-shadow:0 2px 8px #0009}
+body.community-page .scc-head img{width:100%;height:100%;display:block;object-fit:cover}
+body.community-page .scc-suit{position:absolute;z-index:1;bottom:0;left:2px;width:50px;height:35px;background:linear-gradient(125deg,#424c65,#121a26);border:2px solid #c9b88b;border-radius:20px 20px 7px 7px}
+body.community-page .scc-suit:after{content:"";position:absolute;top:6px;left:22px;width:5px;height:23px;background:#c6a76e;border-radius:2px}
+body.community-page .scc-your-driver{display:flex;align-items:center;min-height:68px}
+body.community-page .scc-your-driver .scc-driver{max-width:310px;width:100%;background:#31303d}
+body.community-page .scc-live-driver{display:flex;align-items:center;gap:7px;max-width:190px;min-width:0}
+body.community-page .scc-live-driver .scc-character{transform:scale(.74);transform-origin:center;width:46px;flex-basis:46px;margin:-9px -5px}
+body.community-page .scc-live-driver>span:last-child{display:grid;gap:3px;min-width:0}
+body.community-page .scc-live-driver b{font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff1d6}
+body.community-page .scc-live-driver small{font-size:9px;color:#efd49f;font-weight:800;letter-spacing:.08em}
+body.community-page .scc-legal{margin:5px 0 0!important;font-size:12px;line-height:1.55;color:#c8c2cc}
+body.community-page .scc-dialog{position:fixed;inset:auto;max-width:min(96vw,640px);width:min(96vw,640px);max-height:88vh;overflow:auto;border:1px solid #b9a17f;border-radius:15px;background:linear-gradient(140deg,#30303b,#20252c);color:#f4eee8;padding:19px;box-shadow:0 30px 120px #000b}
+body.community-page .scc-dialog::backdrop{background:#060b17dd}
+body.community-page .scc-close{display:block;margin-left:auto;border:1px solid #a3a0a4;background:#443e46;color:#fff;padding:10px 14px;border-radius:8px;font-weight:800;cursor:pointer}
+body.community-page .scc-detail-art{padding:15px;background:linear-gradient(#3c414c,#151b21);border-radius:10px;margin:8px 0 14px}
+body.community-page .scc-dialog h3{font-size:30px!important;color:#f9dc9d!important;margin:5px 0 10px}
+body.community-page .scc-dialog p{color:#e6e1df;line-height:1.55}
+body.community-page .scc-dialog .scc-label{color:#eec286;font-size:10px;letter-spacing:.15em;font-weight:900}
+body.community-page .scc-dialog dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+body.community-page .scc-dialog dl div{border:1px solid #686672;border-radius:8px;padding:10px;display:grid;gap:5px}
+body.community-page .scc-dialog dt{font-size:10px;text-transform:uppercase;color:#c7b9a5;font-weight:800}
+body.community-page .scc-dialog dd{margin:0;font-weight:900;color:#ffeed2;font-size:14px}
+body.community-page .scc-explain{padding:14px;border-radius:10px;background:#39323f;border-left:3px solid #e7b779}
+@media(max-width:750px){
+ body.community-page .scc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.community-page .scc-car-info{padding:10px}
+ body.community-page .scc-picture{min-height:80px}
+ body.community-page .scc-car-info strong{font-size:13px}
+ body.community-page .scc-car-info>small{font-size:10px}
+ body.community-page .scc-vault>details>summary{padding:16px}
+ body.community-page .scc-live-driver{max-width:110px}
+}
+@media(max-width:360px){
+ body.community-page .scc-grid{grid-template-columns:1fr}
+ body.community-page .scc-picture{min-height:120px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .scc-vault *,body.community-page .scc-vault *::before,body.community-page .scc-vault *::after{transition:none!important;scroll-behavior:auto!important}
+}
