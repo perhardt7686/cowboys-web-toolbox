@@ -21,6 +21,7 @@ standalone=standalone.replace('<script src="community-config.js" defer></script>
 standalone=standalone.replace('href="toolbox-favicon.png"','href="'+icon+'"')
 standalone=standalone.replace('<link rel="stylesheet" href="purple-night.css">','<style>'+(r/'docs/purple-night.css').read_text()+'</style>')
 standalone=standalone.replace('<link rel="stylesheet" href="toolbox-depth.css?v=depth7">','<style>'+(r/'docs/toolbox-depth.css').read_text()+'</style>')
+standalone=standalone.replace('<link rel="stylesheet" href="toolbox-clarity.css?v=clarity1">','<style>'+(r/'docs/toolbox-clarity.css').read_text()+'</style>')
 standalone=standalone.replace('src="toolbox-mark.webp"','src="data:image/webp;base64,'+base64.b64encode((r/'docs/toolbox-mark.webp').read_bytes()).decode()+'"')
 standalone=standalone.replace('href="toolbox-touch.png"','href="data:image/png;base64,'+base64.b64encode((r/'docs/toolbox-touch.png').read_bytes()).decode()+'"')
 for name in ['discovery-core.js','discovery.js']:
