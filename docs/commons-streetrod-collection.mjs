@@ -72,7 +72,7 @@ const groups=['All','Classic','Muscle','Modern','Utility','Exotic','Junior'];
 const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const initial=v=>String(v||'Driver').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
 const ICONS={compass:'◈',spark:'✳',leaf:'❧',hammer:'⚒',bolt:'ϟ',mountain:'△',coffee:'☕',fox:'🦊',planet:'◉',rocket:'🚀',paw:'🐾'};
-let root,modal,filter='All',query='',order='family',profiles=[],self=null,photoLinks=new Map(),client=null,authId=null,ready=false;
+let root,modal,filter='All',query='',order='family',profiles=[],self=null,photoLinks=new Map(),client=null,authId=null,ready=false,liveState=null,pendingSale=false;
 const shade=hex=>hex;
 const bodies={
  coupe:['M42 113 L59 94 L130 87 L166 50 L255 50 L301 87 L389 96 L419 111 L420 128 L40 128Z','M161 87 L187 57 L249 57 L280 87Z'],
@@ -119,7 +119,7 @@ function renderCatalog(){
  const shown=visibleCars();
  document.getElementById('scc-count').textContent=shown.length+' of '+catalog.length+' original vehicles';
  document.getElementById('scc-grid').innerHTML=shown.map(car=>{
- const status=car.boss?'FINAL RIVAL':car.live?'LIVE RACING CAR':car.junior?'KID-FRIENDLY CONCEPT':'FUTURE VEHICLE';
+ const status=car.boss?'FINAL RIVAL':car.live?'RACEABLE · GARAGE':car.junior?'JUNIOR CREATIVE':'ROADMAP';
  return '<button type="button" class="scc-car '+(car.boss?'scc-boss':'')+'" data-scc-car="'+esc(car.key)+'" aria-label="Inspect '+esc(car.name)+'"><span class="scc-picture">'+carArt(car)+'</span><span class="scc-car-info"><strong>'+esc(car.name)+'</strong><small>'+esc(car.year)+' · '+esc(car.body)+'</small><span class="scc-status">'+status+'</span></span></button>';
  }).join('')||'<p class="scc-empty">No vehicles match. Try another search.</p>';
 }
@@ -140,15 +140,37 @@ function renderRoster(){
 }
 function inspectCar(key){
  const car=catalog.find(c=>c.key===key);if(!car)return;
- const line=car.boss?'THE FINAL CHALLENGE: A one-off mystery-themed super-van, with a wholly original silhouette, copper maze graphics and a fictional powertrain. The showdown itself is in development.':car.junior?'Junior imagination vehicle: intended for a future non-competitive, kid-friendly creative mode. No real-world driving, wagers or purchases.':car.live?'Available in the existing server-backed garage. Select or purchase it using the original garage panel to race.':'Catalog prototype only: the silhouette and specification are design targets. Purchasing and racing are not yet enabled.';
- modal.querySelector('.scc-dialog-content').innerHTML='<div class="scc-detail-art">'+carArt(car,true)+'</div><p class="scc-label">'+(car.boss?'FINAL RIVAL · CIPHER VAN X':'MOTOR VAULT / '+esc(car.group))+'</p><h3>'+esc(car.name)+'</h3><p>'+esc(car.tagline)+'</p><dl><div><dt>Era</dt><dd>'+esc(car.year)+'</dd></div><div><dt>Body</dt><dd>'+esc(car.body)+'</dd></div><div><dt>Concept power</dt><dd>'+(car.junior?'Play mode':car.hp+' hp (provisional)')+'</dd></div><div><dt>Status</dt><dd>'+(car.live?'Playable in current garage':'Preview / not purchasable')+'</dd></div></dl><p class="scc-explain">'+esc(line)+'</p>';
+ const shop=liveState?.catalog?.find(v=>v.key===key);
+ const owned=liveState?.cars?.find(v=>v.key===key);
+ const credits=Number(liveState?.garage?.credits||0);
+ const line=car.boss?'THE FINAL RIVAL: An original mystery-themed super-van with copper maze graphics, over 1,100 fictional horsepower, and a separate race challenge.':car.junior?'Junior imagination vehicle: a creative, non-purchasable vehicle in the separate kid-friendly collection.':shop?'This original car is available for purchase, upgrades and server-timed quarter-mile races.':'A future vehicle concept.';
+ const buy=shop?(owned?(owned.selected?'<p class="scc-current">Already selected for your garage.</p>':'<button type="button" class="scc-market" data-scc-action="select" data-car="'+esc(key)+'">Drive this owned car</button>'):'<button type="button" class="scc-market" data-scc-action="buy" data-car="'+esc(key)+'" '+(credits<Number(shop.price)||pendingSale?'disabled':'')+'>Buy for '+Number(shop.price||0).toLocaleString('en-US')+' game credits</button>'):'';
+ modal.querySelector('.scc-dialog-content').innerHTML='<div class="scc-detail-art">'+carArt(car,true)+'</div><p class="scc-label">'+(car.boss?'FINAL RIVAL · CIPHER VAN X':'MOTOR VAULT / '+esc(car.group))+'</p><h3>'+esc(car.name)+'</h3><p>'+esc(car.tagline)+'</p><dl><div><dt>Era</dt><dd>'+esc(car.year)+'</dd></div><div><dt>Body</dt><dd>'+esc(car.body)+'</dd></div><div><dt>Concept power</dt><dd>'+(car.junior?'Play mode':car.hp+' hp')+'</dd></div><div><dt>Status</dt><dd>'+(car.live?'Raceable':'Special collection')+'</dd></div></dl><p class="scc-explain">'+esc(line)+'</p>'+buy+'<p class="scc-purchase-note" role="status">Game credits only. No real-money purchase.</p>';
  if(typeof modal.showModal==='function')modal.showModal();else modal.setAttribute('open','');
+}
+async function market(action,key){
+ if(pendingSale||!client||!liveState||!authId)return;
+ const car=catalog.find(x=>x.key===key);
+ if(!car?.live||car.junior||car.boss)return;
+ pendingSale=true;const status=modal.querySelector('.scc-purchase-note');
+ if(status)status.textContent='Saving garage transaction…';
+ try{
+  const task=action==='buy'?client.rpc('community_streetrod_buy',{p_item:'car:'+key}):client.rpc('community_streetrod_select',{p_car:key});
+  const {data,error}=await task;
+  if(error)throw error;
+  liveState=data;catalog.forEach(v=>{v.live=!!liveState.catalog?.find(z=>z.key===v.key);});
+  document.querySelector('#streetrod-root [data-sr-action="refresh"]')?.click();
+  document.getElementById('srw-reload')?.click();
+  inspectCar(key);
+  const note=modal.querySelector('.scc-purchase-note');if(note)note.textContent=action==='buy'?'Purchased and saved. Select it in the garage to drive.':'Selected and saved. Your next race uses this vehicle.';
+ }catch(error){if(status)status.textContent='Garage transaction failed: '+String(error.message||'Retry later').slice(0,160);}
+ finally{pendingSale=false;}
 }
 function mount(){
  if(root)return;
  const inside=document.getElementById('sr-inside');if(!inside)return;
  root=document.createElement('section');root.id='scc-motor-vault';root.className='scc-vault';
- root.innerHTML='<details><summary><span class="scc-heading"><b>MOTOR VAULT · 60 VEHICLES</b><small>Classics · Modern machines · Kid-friendly builds · Final mystery rival</small></span><span class="scc-chevron">▾</span></summary><div class="scc-inner"><div class="scc-intro"><h3>Choose your era. Build your legend.</h3><p>Original, composite-designed vehicle concepts. Five existing cars can be raced today; the rest are a post-launch catalog roadmap. The mystery-themed Cipher Van X is the planned final challenger.</p><div id="scc-you" class="scc-your-driver"></div></div><div class="scc-tools"><label class="scc-search">Find a vehicle <input id="scc-search" type="search" placeholder="Model, era, body style"></label><label class="scc-sort">Sort <select id="scc-sort"><option value="family">Original order</option><option value="old">Oldest first</option><option value="power">Power high to low</option><option value="name">A to Z</option></select></label></div><nav id="scc-filters" aria-label="Vehicle categories"></nav><p id="scc-count" class="scc-count"></p><div id="scc-grid" class="scc-grid"></div><details class="scc-roster"><summary>Driver characters · Toolbox profile avatars</summary><p>Your existing Toolbox profile is your driver character. Other members appear only when their profiles are published and active.</p><div id="scc-driver-grid" class="scc-driver-grid"></div></details><p class="scc-legal">Cars, bodywork and logos are original composites. Resemblance to real-world vehicle eras does not imply manufacturer affiliation. The Cipher Van X is an independent fictional mystery-themed rival, not a recreation of a TV vehicle.</p></div></details><dialog id="scc-detail" class="scc-dialog"><button type="button" data-scc-close aria-label="Close vehicle details" class="scc-close">Close ×</button><div class="scc-dialog-content"></div></dialog>';
+ root.innerHTML='<details><summary><span class="scc-heading"><b>MOTOR VAULT · 60 VEHICLES</b><small>Classics · Modern machines · Kid-friendly builds · Final mystery rival</small></span><span class="scc-chevron">▾</span></summary><div class="scc-inner"><div class="scc-intro"><h3>Choose your era. Build your legend.</h3><p>Original composite-designed vehicle concepts. Forty-nine adult cars can be purchased, tuned and raced with fictional credits. Ten Junior vehicles are a separate creative collection; the mystery-themed Cipher Van X is an endgame rival.</p><div id="scc-you" class="scc-your-driver"></div></div><div class="scc-tools"><label class="scc-search">Find a vehicle <input id="scc-search" type="search" placeholder="Model, era, body style"></label><label class="scc-sort">Sort <select id="scc-sort"><option value="family">Original order</option><option value="old">Oldest first</option><option value="power">Power high to low</option><option value="name">A to Z</option></select></label></div><nav id="scc-filters" aria-label="Vehicle categories"></nav><p id="scc-count" class="scc-count"></p><div id="scc-grid" class="scc-grid"></div><details class="scc-roster"><summary>Driver characters · Toolbox profile avatars</summary><p>Your existing Toolbox profile is your driver character. Other members appear only when their profiles are published and active.</p><div id="scc-driver-grid" class="scc-driver-grid"></div></details><p class="scc-legal">Cars, bodywork and logos are original composites. Resemblance to real-world vehicle eras does not imply manufacturer affiliation. The Cipher Van X is an independent fictional mystery-themed rival, not a recreation of a TV vehicle.</p></div></details><dialog id="scc-detail" class="scc-dialog"><button type="button" data-scc-close aria-label="Close vehicle details" class="scc-close">Close ×</button><div class="scc-dialog-content"></div></dialog>';
  const race=inside.querySelector('.sr-race-card');if(race)race.before(root);else inside.append(root);
  modal=root.querySelector('#scc-detail');
  const nav=root.querySelector('#scc-filters');nav.innerHTML=groups.map(g=>'<button type="button" data-scc-group="'+esc(g)+'"'+(g===filter?' aria-pressed="true"':' aria-pressed="false"')+'>'+esc(g)+'</button>').join('');
@@ -157,6 +179,7 @@ function mount(){
   if(btn.hasAttribute('data-scc-group')){filter=btn.dataset.sccGroup;root.querySelectorAll('[data-scc-group]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.sccGroup===filter)));renderCatalog();}
   else if(btn.hasAttribute('data-scc-car'))inspectCar(btn.dataset.sccCar);
   else if(btn.hasAttribute('data-scc-close')){if(modal.close)modal.close();else modal.removeAttribute('open');}
+  else if(btn.hasAttribute('data-scc-action'))void market(btn.dataset.sccAction,btn.dataset.car);
  });
  root.querySelector('#scc-search').addEventListener('input',ev=>{query=ev.target.value.trim().toLowerCase();renderCatalog();});
  root.querySelector('#scc-sort').addEventListener('change',ev=>{order=ev.target.value;renderCatalog();});
@@ -190,6 +213,8 @@ async function connect(){
    if(!signed.error)for(const item of signed.data||[])if(item.signedUrl&&item.path)photoLinks.set(item.path,item.signedUrl);
   }
   renderRoster();
+  const game=await client.rpc('community_streetrod_state');
+  if(!game.error){liveState=game.data;catalog.forEach(v=>{v.live=!!liveState.catalog?.find(z=>z.key===v.key);});renderCatalog();}
  }catch(error){const el=document.getElementById('scc-you');if(el)el.textContent='Driver profile will appear when your Commons session is ready.';}
 }
 function attach(){
