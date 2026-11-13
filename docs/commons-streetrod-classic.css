@@ -1,0 +1,118 @@
+/* Street r0d · Original summer 1963 classic garage scene UI
+ * Visual research: Street Rod DOS screenshots (garage wall, newspaper, diner,
+ * first-person dashboard). No copyrighted game image or UI art reused.
+ */
+body.community-page .src-classic-hub{--src-gold:#f3ce7f;--src-plum:#322238;--src-light:#f4e6c6;isolation:isolate;max-width:100%;margin:14px 0 23px;border:2px solid #8e715e;border-radius:16px;background:#17191e;color:#f4ebd8;overflow:hidden;box-shadow:0 16px 40px #0508117a}
+body.community-page .src-classic-hub *{box-sizing:border-box}
+body.community-page .src-top{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:clamp(15px,2.5vw,24px);border-bottom:4px double #b49a75;background:repeating-linear-gradient(90deg,#3a242a 0 4px,#35262b 4px 12px)}
+body.community-page .src-top>div:first-child{flex:1 1 220px;min-width:0}
+body.community-page .src-super{color:#ffe0a3;font:800 .69rem/1.3 system-ui,sans-serif;letter-spacing:.14em}
+body.community-page .src-top h3{font-family:Georgia,Cambria,serif!important;color:#f5d888!important;font-weight:900!important;font-size:clamp(2rem,4.3vw,3.5rem)!important;line-height:1.03!important;letter-spacing:-.045em!important;margin:.26rem 0!important;text-shadow:0 3px #080709}
+body.community-page .src-top h3 em{font-weight:500;color:#fff2c4}
+body.community-page .src-top p{color:#eee1d4!important;font:500 .93rem/1.47 system-ui,sans-serif!important;margin:.4rem 0 0!important;max-width:520px}
+body.community-page .src-top-metrics{flex:0 0 auto;display:grid;gap:2px;min-width:170px;background:linear-gradient(#161c1f,#2b252c);border:2px solid #d0ad7c;border-radius:9px;padding:11px 14px;box-shadow:inset 0 2px 4px #0009}
+body.community-page .src-top-metrics>span{font:900 .63rem/1.4 system-ui,sans-serif;color:#e6d0a1;letter-spacing:.1em}
+body.community-page .src-top-metrics>strong{color:#aee4a6;font:800 1.45rem/1.2 ui-monospace,Consolas,monospace}
+body.community-page .src-top-metrics>small{color:#e3d8c5;font-size:.69rem}
+body.community-page .src-scene-menu{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#11151b;border-bottom:3px solid #887258;gap:1px}
+body.community-page .src-scene-menu button{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;min-width:0;min-height:54px;padding:10px 7px;border:0;border-right:1px solid #4a4343;background:linear-gradient(#31333b,#1e2028);color:#eee1c6;font:800 clamp(.69rem,1.55vw,.87rem)/1.22 system-ui,sans-serif;cursor:pointer}
+body.community-page .src-scene-menu button span{font-size:1rem;flex:none}
+body.community-page .src-scene-menu button[aria-pressed=true]{color:#252128;background:linear-gradient(#ffe4a1,#bf9664);box-shadow:inset 0 -5px 0 #66513c}
+body.community-page .src-scene-menu button:hover:not([aria-pressed=true]){background:#43404a}
+body.community-page .src-scene{min-height:290px;background:radial-gradient(ellipse at 50% 25%,#293039,#171820)}
+body.community-page .src-garage-stage{position:relative;min-height:clamp(235px,42vw,480px);overflow:hidden;background:linear-gradient(#555250,#56514d 70%,#25292f 70%)}
+body.community-page .src-garage-wall{position:absolute;inset:0 0 22%;background:repeating-linear-gradient(to right,transparent 0 69px,#ffffff0b 70px 71px),repeating-linear-gradient(to bottom,transparent 0 38px,#0003 38px 40px),linear-gradient(135deg,#756e64,#383d3d 75%);border-top:8px solid #252527;box-shadow:inset 0 17px 30px #111a203b}
+body.community-page .src-garage-wall:before{content:'';position:absolute;top:0;left:4%;right:4%;height:18px;background:linear-gradient(#2e2422,#886b4c,#2a292b);border-radius:2px;box-shadow:0 5px #0005}
+body.community-page .src-garage-wall:after{content:'';position:absolute;bottom:0;left:17%;width:66%;height:17%;background:linear-gradient(#1b1e21,#323538);border:10px solid #3d322d;border-bottom:0;box-shadow:inset 0 6px 20px #0007}
+body.community-page .src-sign{position:absolute;top:15%;left:7%;display:block;padding:8px 15px;border:3px solid #e4ce9e;border-radius:3px;background:#4d2928;color:#f9e1ae;box-shadow:3px 5px #0006;transform:rotate(-3deg);font:900 clamp(.85rem,2.3vw,1.55rem)/1.2 Georgia,serif;letter-spacing:.045em}
+body.community-page .src-wall-objects{position:absolute;top:36%;right:7%;display:flex;align-items:center;gap:clamp(8px,2.5vw,31px);padding:8px 10px;background:#333232;border:3px solid #917b65;box-shadow:4px 5px 0 #0005;font-size:clamp(1.3rem,2.8vw,2rem)}
+body.community-page .src-wall-calendar{position:absolute;top:16%;right:10%;font:900 clamp(.65rem,1.4vw,.94rem)/1.3 monospace;color:#ad292b;text-align:center;background:#eee2bb;border-top:9px solid #a12d30;padding:5px 14px;box-shadow:3px 5px #1b1718a8}
+body.community-page .src-garage-clock{position:absolute;left:27%;top:24%;font-size:clamp(1.3rem,3.4vw,2.5rem);color:#f3e7d0;text-shadow:2px 3px #0009}
+body.community-page .src-garage-bench{position:absolute;right:6%;bottom:1%;width:28%;height:13%;background:linear-gradient(#8e5e3e 0 12%,#4f3127 12% 100%);border:4px solid #322520;box-shadow:0 8px #08080850}
+body.community-page .src-concrete-floor{position:absolute;inset:78% 0 0;background:repeating-linear-gradient(90deg,#6d696212 0 100px,#eee7c41c 101px,#6d696212 103px),linear-gradient(#46484a,#282b30);box-shadow:inset 0 6px 25px #0005}
+body.community-page .src-ground-shadow{position:absolute;z-index:2;left:20%;right:15%;bottom:12%;height:7%;border-radius:50%;background:#06090ba8;filter:blur(14px)}
+body.community-page .src-stage-car{position:absolute;z-index:3;inset:0 7% -10% 17%;display:flex;align-items:center;justify-content:center}
+body.community-page .src-car-photo{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 9px 9px #000a)}
+body.community-page .src-hero-car{width:100%;max-width:850px;object-position:center 62%}
+body.community-page .src-vehicle-label{position:absolute;z-index:4;bottom:2%;left:3%;padding:6px 10px;border:1px solid #e9cb90;border-radius:5px;background:#111b20e3;color:#fee8b9;font:900 clamp(.75rem,1.6vw,1rem)/1.2 monospace;letter-spacing:.03em}
+body.community-page .src-scene-actions{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px 4px;background:#171a20}
+body.community-page .src-scene-actions button{flex:1 1 180px;min-height:48px;padding:11px 12px;border:2px solid #cbb17e;border-radius:7px;background:linear-gradient(#533f42,#352d33);color:#ffeac2;font:850 .9rem/1.3 system-ui,sans-serif;cursor:pointer}
+body.community-page .src-scene-actions button:hover{background:#65504b}
+body.community-page .src-scene-note{margin:0!important;padding:12px 17px 16px;color:#d8ced2!important;font-size:.83rem!important;line-height:1.65!important;background:#171a20}
+body.community-page .src-message{margin:0!important;min-height:22px;padding:0 14px 10px;background:#171a20;color:#f0c98f!important;font-size:.8rem!important}
+body.community-page .src-paper{color:#242629;background:repeating-linear-gradient(0deg,transparent 0 19px,#b39f7433 20px),linear-gradient(120deg,#ede3c6,#fef4d8 45%,#e6d2a2);padding:clamp(15px,3vw,30px);border:12px solid #e3d5b3;box-shadow:inset 0 0 15px #8a70454d}
+body.community-page .src-paper-masthead{display:grid;gap:2px;text-align:center;padding-bottom:10px;border-bottom:5px double #282421}
+body.community-page .src-paper-masthead>span{font:900 .73rem/1.3 Georgia,serif;letter-spacing:.16em}
+body.community-page .src-paper-masthead>strong{font:900 clamp(1.65rem,3.5vw,3.2rem)/1.1 Georgia,serif;letter-spacing:-.06em}
+body.community-page .src-paper-masthead>small{font:650 .68rem/1.4 ui-monospace,Consolas,monospace;letter-spacing:.14em}
+body.community-page .src-paper-columns{display:grid;grid-template-columns:minmax(0,3fr) minmax(175px,1fr);gap:19px;margin-top:15px}
+body.community-page .src-paper-main>h4,body.community-page .src-paper-side>h4{margin:0!important;border-bottom:2px solid #322d29;padding-bottom:7px;font:900 1.08rem/1.3 Georgia,serif!important;letter-spacing:.065em;color:#232223!important}
+body.community-page .src-paper-main>p,body.community-page .src-paper-side p{color:#333333!important;font:550 .84rem/1.45 Georgia,serif!important}
+body.community-page .src-listings{display:grid;gap:0}
+body.community-page .src-listing{display:grid;grid-template-columns:33px minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:10px 1px;border-bottom:1px dashed #756a5c;overflow-wrap:anywhere}
+body.community-page .src-ad-number{font:800 .76rem/1.3 monospace;color:#846f58}
+body.community-page .src-listing>div{display:grid;gap:4px;min-width:0}
+body.community-page .src-listing>div strong{font:900 .96rem/1.25 Georgia,serif;color:#242426}
+body.community-page .src-listing>div small{font:600 .68rem/1.45 system-ui,sans-serif;color:#555358}
+body.community-page .src-ad-price{font:900 .75rem/1.4 ui-monospace,monospace;white-space:nowrap;color:#252529}
+body.community-page .src-listing button{min-height:38px;padding:6px 9px;border:1px solid #3a3732;border-radius:4px;background:#292a2c;color:#f4e8ca;font:750 .78rem/1.25 system-ui,sans-serif;cursor:pointer}
+body.community-page .src-listing button:disabled{opacity:.45}
+body.community-page .src-paper-side{border-left:2px solid #64513f;padding-left:17px}
+body.community-page .src-paper-side button{min-height:44px;width:100%;border:2px solid #3d322a;border-radius:4px;padding:9px;color:#f8e1a7;background:#353130;font-weight:800;cursor:pointer}
+body.community-page .src-paper footer{margin-top:17px;border-top:3px double #504637;padding-top:9px;font:600 .75rem/1.45 Georgia,serif;text-align:center;color:#62543e}
+body.community-page .src-parts-scene{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:14px;padding:clamp(15px,3vw,28px);background:linear-gradient(#313438,#1d2229);min-height:300px}
+body.community-page .src-parts-scene header{grid-column:1/-1;background:#11171ee3;border:2px solid #bca28e;padding:14px 17px;border-radius:7px}
+body.community-page .src-parts-scene header span{color:#f2ca88;font:900 .66rem/1.4 system-ui,sans-serif;letter-spacing:.15em}
+body.community-page .src-parts-scene header h4{margin:4px 0!important;color:#f3e4c3!important;font:800 clamp(1.3rem,3vw,2.1rem)/1.25 Georgia,serif!important}
+body.community-page .src-parts-scene header p{margin:5px 0!important;font:550 .85rem/1.55 system-ui,sans-serif!important;color:#ddd5c7!important}
+body.community-page .src-parts-illustration{min-height:190px;display:grid;place-items:center;align-content:center;gap:7px;background:radial-gradient(circle,#6c727a,#0c131a 68%);border:8px ridge #a79e8c}
+body.community-page .src-parts-illustration>span:first-child{font-size:6rem;color:#bcbcbc;filter:drop-shadow(0 8px 8px #0009)}
+body.community-page .src-parts-label{color:#f4d28f;font:850 .65rem/1.4 monospace;letter-spacing:.06em}
+body.community-page .src-parts-rows{display:grid;gap:8px;align-content:start}
+body.community-page .src-parts-rows button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 9px;text-align:left;align-items:center;min-height:61px;padding:11px;border:2px solid #969ca2;background:#1c252c;color:#e8e2d7;cursor:pointer}
+body.community-page .src-parts-rows button b{font:800 .95rem/1.3 system-ui,sans-serif}
+body.community-page .src-parts-rows button small{grid-column:1;font-size:.75rem;color:#c9c6ba}
+body.community-page .src-parts-rows button span{grid-column:2;grid-row:1/3;font-size:.73rem;color:#f6d395;max-width:100px}
+body.community-page .src-parts-disclaimer{grid-column:1/-1;color:#e5d8c1!important;font-size:.77rem!important;line-height:1.5!important;margin:0!important}
+body.community-page .src-diner-scene{position:relative;min-height:clamp(220px,34vw,380px);overflow:hidden;background:linear-gradient(#090d19 0 25%,#3a2631 63%,#4b4749 63% 100%)}
+body.community-page .src-diner-scene:before{content:'';position:absolute;left:0;right:0;top:29%;height:32%;border-top:11px solid #c04545;border-bottom:8px solid #f5b7a4;background:repeating-linear-gradient(90deg,#f2e8c8 0 14%,#aecccc 14.1% 16%,#eee2ca 16.1% 31%);box-shadow:inset 0 7px #443c43}
+body.community-page .src-diner-neon{position:absolute;z-index:2;top:4%;left:7%;display:grid;gap:1px;text-align:center;padding:9px 17px;border:4px solid #e9a7b9;background:#28192ad9;border-radius:18px;box-shadow:0 0 8px #ee8ba1,0 0 27px #cb6788b3}
+body.community-page .src-diner-neon small{font-size:.67rem;font-weight:900;color:#fbe1ce;letter-spacing:.17em}
+body.community-page .src-diner-neon strong{font:900 clamp(1.4rem,3.2vw,2.4rem)/.99 Georgia,serif;color:#fff1c0;text-shadow:0 0 8px #efa8c2}
+body.community-page .src-diner-neon>span{font-size:.6rem;letter-spacing:.09em;color:#f4dec7}
+body.community-page .src-diner-window{position:absolute;right:8%;top:37%;display:flex;gap:clamp(25px,5vw,70px);font-size:2rem;color:#2d4457}
+body.community-page .src-drive-cars{position:absolute;inset:25% 5% -15%;z-index:3;display:flex;justify-content:center;align-items:end;gap:2%}
+body.community-page .src-drive-cars img{width:50%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 7px #000e)}
+body.community-page .src-drive-cars .src-drive-rival{transform:scale(.88)}
+body.community-page .src-diner-parking{position:absolute;inset:74% 0 0;background:repeating-linear-gradient(100deg,transparent 0 110px,#faf0b25e 111px 115px,transparent 116px 220px),linear-gradient(#5c5a5a,#2e3134);border-top:3px solid #b6af8e}
+body.community-page .src-road-screen{position:relative;background:#151a21;padding:10px}
+body.community-page .src-road-screen canvas{display:block;width:100%;height:auto;max-height:380px;border:2px solid #a5a6a2;aspect-ratio:960/340;object-fit:contain}
+body.community-page .src-road-caption{padding:10px;text-align:center;color:#f6d9a2;letter-spacing:.08em;font:850 clamp(.68rem,1.6vw,.8rem)/1.5 system-ui,sans-serif}
+body.community-page .src-classic-hub button:focus-visible{outline:3px solid #3dc8c6!important;outline-offset:3px!important}
+body.community-page .src-classic-hub .src-scene :is(button,a):disabled{opacity:.55;cursor:not-allowed}
+body.community-page .sr-race-view{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:7px 12px;background:#1c222d;border:1px solid #776b80;border-top:0}
+body.community-page .sr-race-view button{min-height:44px;max-width:260px}
+body.community-page .sr-race-view small{font-size:.78rem;color:#e9cc9c}
+body.community-page .sr-car-pic{display:flex;align-items:center;justify-content:center;min-height:73px;overflow:hidden}
+body.community-page .sr-car-pic img.sr-real-car{display:block;width:100%;height:auto;max-height:125px;object-fit:contain;filter:drop-shadow(0 6px 7px #0008)}
+body.community-page .scc-photostage{display:block;width:100%;aspect-ratio:460/174;position:relative;overflow:visible}
+body.community-page .scc-photocar{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 5px 7px #0009);transform:scale(1.2)}
+body.community-page .scc-picture{overflow:hidden;min-height:120px}
+body.community-page .scc-detail-art{min-height:185px}
+body.community-page .scc-detail-art .scc-photostage{aspect-ratio:460/230}
+body.community-page .srj-choice .srj-real-car{display:block;width:80px;height:48px;max-width:100%;object-fit:contain;filter:drop-shadow(0 4px 5px #0005)}
+@media(max-width:800px){body.community-page .src-paper-columns{grid-template-columns:minmax(0,1fr)}body.community-page .src-paper-side{border-left:0;border-top:2px solid #6e5c48;padding:15px 0 0}
+body.community-page .src-parts-scene{grid-template-columns:minmax(0,1fr)}body.community-page .src-parts-illustration{min-height:150px}body.community-page .src-scene-menu button{min-height:61px;gap:2px}body.community-page .src-scene-menu button span{display:block;width:100%}}
+@media(max-width:500px){body.community-page .src-top{gap:8px}body.community-page .src-top-metrics{flex-basis:100%;display:flex;justify-content:space-between;align-items:center;gap:10px}
+body.community-page .src-top-metrics>small{display:none}body.community-page .src-top-metrics>strong{font-size:1.1rem}
+body.community-page .src-scene-menu{grid-template-columns:repeat(5,minmax(0,1fr))}
+body.community-page .src-scene-menu button{font-size:.65rem;padding:5px 3px;min-height:62px;word-break:normal}
+body.community-page .src-scene-menu button span{font-size:1.04rem}
+body.community-page .src-listing{grid-template-columns:27px minmax(0,1fr) auto;gap:6px}
+body.community-page .src-listing .src-ad-price{grid-column:2;text-align:left}
+body.community-page .src-listing button{grid-column:3;grid-row:1/3;min-width:59px}
+body.community-page .src-garage-stage{min-height:250px}
+body.community-page .src-sign{top:17%}body.community-page .src-stage-car{inset:8% 0 -15% 2%}
+body.community-page .src-garage-clock{left:41%}body.community-page .src-scene-actions{padding:9px;gap:8px}
+body.community-page .src-scene-actions button{min-height:45px;flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){body.community-page .src-classic-hub *,body.community-page .src-classic-hub *:before,body.community-page .src-classic-hub *:after{scroll-behavior:auto!important;transition:none!important}}
