@@ -3,6 +3,7 @@
  * are credited to the signed-in approved Commons account only.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {drawPhotoCar,carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const CARS=[
  ['dragonwagon','Dragon Wagon','#aa6546','dragon'],['rocketpea','Rocket Pea','#7c9b6c','rocket'],
@@ -20,7 +21,7 @@ const car=()=>CARS.find(c=>c.key===chosen)||CARS[0];
 function say(t,isError=false){const node=document.getElementById('srj-status');if(node){node.textContent=t;node.dataset.error=String(isError);}}
 function renderCars(){
  const el=document.getElementById('srj-cars');if(!el)return;
- el.innerHTML=CARS.map(c=>'<button class="srj-choice'+(chosen===c.key?' selected':'')+'" data-srj-car="'+E(c.key)+'" type="button" aria-pressed="'+(chosen===c.key)+'"><span style="--car-color:'+E(c.color)+'" aria-hidden="true">🚗</span><b>'+E(c.name)+'</b></button>').join('');
+ el.innerHTML=CARS.map(c=>'<button class="srj-choice'+(chosen===c.key?' selected':'')+'" data-srj-car="'+E(c.key)+'" type="button" aria-pressed="'+(chosen===c.key)+'"><span style="--car-color:'+E(c.color)+'" aria-hidden="true"><img class="srj-real-car" alt="" loading="lazy" decoding="async" src="'+E(carPhotoUrl(({bus:'van',truck:'truck',rover:'truck',buggy:'truck',rocket:'muscle',dino:'truck',dragon:'van'})[c.shape]||'coupe',c.key))+'"></span><b>'+E(c.name)+'</b></button>').join('');
  const title=document.getElementById('srj-car-name');if(title)title.textContent=car().name;
 }
 function renderProgress(){
@@ -49,6 +50,8 @@ function round(x,y,w,h,r,fill){
  ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
 }
 function drawCar(x,y,c){
+ const body={bus:'van',truck:'truck',rover:'truck',buggy:'truck',rocket:'muscle',space:'coupe',dino:'truck',dragon:'van',turtle:'coupe',cloud:'coupe'}[c.shape]||'coupe';
+ if(drawPhotoCar(ctx,x-105,y-94,215,138,body,c.key))return;
  ctx.save();ctx.translate(x,y);const color=c.color;
  ctx.fillStyle='#11182766';ctx.beginPath();ctx.ellipse(0,18,80,12,0,0,2*Math.PI);ctx.fill();
  ctx.fillStyle=color;ctx.strokeStyle='#233240';ctx.lineWidth=3;
