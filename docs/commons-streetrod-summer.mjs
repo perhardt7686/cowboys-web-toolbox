@@ -4,7 +4,7 @@
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
-import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=practice1';
+import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=dos1';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const cap=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
