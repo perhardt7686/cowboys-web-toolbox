@@ -59,3 +59,7 @@ body.community-page .srm-empty{padding:16px;border:1px dashed #7e7387;border-rad
 body.community-page .srm-disclaimer{font-size:11px;line-height:1.55;color:#c4c4cb;margin:0!important}
 @media(max-width:600px){body.community-page .srm-player{padding:12px}body.community-page .srm-player-metrics b{font-size:13px}body.community-page .srm-inner{padding:13px}}
 @media(prefers-reduced-motion:reduce){body.community-page .srm-club *{transition:none!important}}
+
+body.community-page .srm-invite{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid #716a7c;padding-top:10px;margin-top:9px}
+body.community-page .srm-invite span{font-weight:800;color:#ffe7bf}
+body.community-page .srm-invite button{max-width:225px}
