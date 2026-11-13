@@ -1,0 +1,61 @@
+/* Street r0d Racer Club v1: member avatars, builds and accomplishments */
+body.community-page .srm-club{box-sizing:border-box;margin:16px 0;color:#f6f1e9}
+body.community-page .srm-club *{box-sizing:border-box}
+body.community-page .srm-club>details{border:1px solid #ad7f9d;border-radius:18px;background:linear-gradient(160deg,#241c32,#171c26);overflow:hidden;box-shadow:0 12px 36px #08081470}
+body.community-page .srm-club>details>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:18px 20px;cursor:pointer;background:linear-gradient(115deg,#573b61,#302841 65%,#623d58);border-bottom:1px solid #84667a}
+body.community-page .srm-club summary::-webkit-details-marker{display:none}
+body.community-page .srm-club>details>summary>span:first-child{display:grid;gap:6px}
+body.community-page .srm-club>details>summary b{font-size:clamp(19px,4vw,28px);font-weight:950;letter-spacing:.045em;color:#ffdf98}
+body.community-page .srm-club>details>summary small{font-size:11px;font-weight:800;letter-spacing:.08em;color:#f0e1ea}
+body.community-page .srm-chevron{font-size:20px;color:#ffdea0;transition:transform .2s}
+body.community-page .srm-club details[open] .srm-chevron{transform:rotate(180deg)}
+body.community-page .srm-inner{padding:clamp(14px,2.8vw,24px);display:grid;gap:16px}
+body.community-page .srm-lead{display:flex;align-items:start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+body.community-page .srm-lead>div{flex:1 1 280px}
+body.community-page .srm-lead h3{margin:0 0 8px;color:#ffe3ae!important;font-size:clamp(21px,3vw,27px)!important}
+body.community-page .srm-lead p{max-width:810px;margin:0;color:#ded8e2;font-size:13px;line-height:1.55}
+body.community-page .srm-refresh,body.community-page .srm-challenge{min-height:44px;border:1px solid #f6d69b;border-radius:9px;background:#e4bb79;color:#171c22;padding:10px 12px;font:900 12px system-ui;cursor:pointer}
+body.community-page .srm-refresh{background:#493d4e;color:#ffedce;border-color:#9b7d9d}
+body.community-page .srm-count{margin:0!important;font-size:12px;font-weight:900;letter-spacing:.06em;color:#f1d4a8}
+body.community-page .srm-incoming{margin:0!important;padding:11px 12px;color:#e3e5e6;font-size:12px;line-height:1.45;border-radius:9px;border:1px solid #706a7a;background:#2a2b36}
+body.community-page .srm-players{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:13px}
+body.community-page .srm-player{display:grid;align-content:start;gap:13px;padding:15px;border-radius:14px;border:1px solid #807384;background:linear-gradient(155deg,#35303e,#252d32);min-width:0}
+body.community-page .srm-player-top{display:flex;gap:12px;align-items:center;min-width:0}
+body.community-page .srm-person{min-width:0;flex:1}
+body.community-page .srm-person h4{margin:5px 0 4px;font-size:18px!important;color:#ffefd5!important;overflow-wrap:anywhere}
+body.community-page .srm-person p{margin:0;font-size:12px;color:#d7d3d5}
+body.community-page .srm-rank{font-size:10px;color:#edc98c;font-weight:900;letter-spacing:.07em}
+body.community-page .srm-ontrack{color:#fff8db;background:#456d62;border-radius:5px;padding:5px;font-size:9px;font-weight:900}
+body.community-page .srm-avatar{position:relative;flex:0 0 60px;width:60px;height:70px}
+body.community-page .srm-head{position:absolute;top:0;left:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;z-index:2;overflow:hidden;background:#63527a;color:#fff9e3;border:3px solid #eac687;border-radius:50%;font-size:18px;font-weight:900}
+body.community-page .srm-head img{width:100%;height:100%;object-fit:cover}
+body.community-page .srm-jacket{position:absolute;bottom:0;left:3px;width:55px;height:34px;background:linear-gradient(130deg,#576179,#1c2734);border:2px solid #b8a27b;border-radius:23px 23px 9px 9px}
+body.community-page .srm-jacket:before{content:"";position:absolute;left:24px;top:6px;width:4px;height:24px;background:#cda871}
+body.community-page .srm-player-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+body.community-page .srm-player-metrics>span{display:grid;gap:4px;padding:10px 7px;border-radius:8px;background:#1d232d;border:1px solid #565d69}
+body.community-page .srm-player-metrics small{font-size:9px;font-weight:900;color:#ccbca3}
+body.community-page .srm-player-metrics b{font-size:15px;color:#fff2db;font-variant-numeric:tabular-nums}
+body.community-page .srm-player-actions{display:flex;align-items:center;min-height:44px}
+body.community-page .srm-challenge{width:100%}
+body.community-page .srm-challenge:hover{background:#ffda97}
+body.community-page .srm-challenge:focus-visible,body.community-page .srm-refresh:focus-visible{outline:3px solid #f7e2b1;outline-offset:3px}
+body.community-page .srm-you{font-size:12px;color:#ded7e5;font-weight:800}
+body.community-page .srm-details{border-top:1px solid #6d6877;padding-top:10px}
+body.community-page .srm-details summary{cursor:pointer;color:#fce0af;font-size:12px;font-weight:900;line-height:1.45}
+body.community-page .srm-details h5{color:#f2e7d9;font-size:12px;margin:13px 0 8px;font-weight:900}
+body.community-page .srm-details>small{display:block;margin-top:12px;font-size:11px;color:#d3cbd1;line-height:1.45}
+body.community-page .srm-builds{display:grid;gap:5px}
+body.community-page .srm-build{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid #5e626a;border-radius:8px;background:#222834}
+body.community-page .srm-build.selected{border-color:#bd965d;background:#353441}
+body.community-page .srm-build-indicator{color:#e7bc83;font-size:17px}
+body.community-page .srm-build>div{display:grid;gap:3px;min-width:0;flex:1}
+body.community-page .srm-build strong{font-size:12px;color:#fff1dd}
+body.community-page .srm-build small{font-size:10px;color:#dbd7d6}
+body.community-page .srm-current{font-size:9px;font-weight:900;color:#e8c18b}
+body.community-page .srm-achievements{display:flex;flex-wrap:wrap;gap:6px}
+body.community-page .srm-achievements span{border-radius:6px;border:1px solid #a083a9;background:#4b3e57;color:#fff1d8;padding:5px 7px;font-size:10px;font-weight:800}
+body.community-page .srm-achievements p,body.community-page .srm-builds p{color:#cdcbd3;font-size:11px}
+body.community-page .srm-empty{padding:16px;border:1px dashed #7e7387;border-radius:9px;color:#e7deeb;font-size:13px}
+body.community-page .srm-disclaimer{font-size:11px;line-height:1.55;color:#c4c4cb;margin:0!important}
+@media(max-width:600px){body.community-page .srm-player{padding:12px}body.community-page .srm-player-metrics b{font-size:13px}body.community-page .srm-inner{padding:13px}}
+@media(prefers-reduced-motion:reduce){body.community-page .srm-club *{transition:none!important}}
