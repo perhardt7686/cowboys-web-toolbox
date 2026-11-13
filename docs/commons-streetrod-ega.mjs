@@ -13,6 +13,15 @@ function poly(c,pts,p,outline=0){c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo
 function txt(c,t,x,y,p=15,size=7){c.fillStyle=col(p);c.font='bold '+size+'px monospace';c.textBaseline='top';c.fillText(String(t),x|0,y|0);}
 function disk(c,x,y,r,p){c.fillStyle=col(p);c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
 function keyhash(s){let h=19;for(const a of String(s||''))h=((h*33)^a.charCodeAt(0))>>>0;return h;}
+function bodyFor(name){
+ const s=String(name||'').toLowerCase();
+ if(/van|parcel|cipher|bus/.test(s))return 'van';
+ if(/pickup|truck|mammoth|irons|gravel|rover/.test(s))return 'truck';
+ if(/wagon|nomad|mariner|estate/.test(s))return 'wagon';
+ if(/fastback|muscle|meteor|phantom|raven|scorpion/.test(s))return 'muscle';
+ if(/hardtop|comet|saturn|sedan/.test(s))return 'hardtop';
+ return 'coupe';
+}
 function chromeWheel(c,x,y,r=16){
  disk(c,x,y,r+2,0);disk(c,x,y,r,7);disk(c,x,y,r-3,15);
  disk(c,x,y,r-6,8);disk(c,x,y,4,15);
@@ -173,8 +182,8 @@ function componentCard(c,key,body){
  car(c,key,body,4,14,154);
 }
 const scenes={
- '.ss-garage-stage':['garage',n=>{let name=n.closest('#streetrod-summer')?.querySelector('.ss-garage-overlay span')?.textContent||'rattler';return [name,'coupe'];}],
- '.src-garage-stage':['garage',n=>[n.querySelector('#src-current-ride')?.textContent||'rattler','coupe']],
+ '.ss-garage-stage':['garage',n=>{let name=n.closest('#streetrod-summer')?.querySelector('.ss-garage-overlay span')?.textContent||'rattler';return [name,bodyFor(name)];}],
+ '.src-garage-stage':['garage',n=>{const name=n.querySelector('#src-current-ride')?.textContent||'rattler';return [name,bodyFor(name)];}],
  '.ss-diner-hero':['diner'],'.src-diner-scene':['diner'],
  '.ss-newspaper':['newspaper'],'.src-paper':['newspaper'],
  '.ss-parts-counter':['engine'],'.src-parts-illustration':['engine'],
@@ -196,9 +205,11 @@ function spriteImages(){
  ROOT?.querySelectorAll('.ss-car-photo,.src-car-photo,.sr-real-car,.scc-photocar,.srj-real-car').forEach(img=>{
   if(decorated.has(img))return;decorated.add(img);
   const stage=img.parentElement;if(!stage)return;
-  const label=img.closest('.sr-car-card,.scc-car-card,.srj-car-card,.ss-ad,.src-scene-stage')?.querySelector('strong')?.textContent||
+  const label=img.closest('.src-garage-stage')?.querySelector('#src-current-ride')?.textContent||
+   img.closest('.ss-garage-stage')?.querySelector('.ss-garage-overlay span')?.textContent||
+   img.closest('.sr-car-card,.scc-car-card,.srj-car-card,.ss-ad,.src-scene-stage')?.querySelector('strong')?.textContent||
    img.closest('.ss-ad')?.querySelector('strong')?.textContent||img.alt||'rattler';
-  const body=/wagon|van|truck|rover|bus|pickup/i.test(label)?'van':/hardtop|comet/i.test(label)?'hardtop':'coupe';
+  const body=bodyFor(label);
   const cv=document.createElement('canvas');cv.width=160;cv.height=70;cv.className='sr-ega-car';
   const ct=cv.getContext('2d',{alpha:false});if(!ct)return;ct.imageSmoothingEnabled=false;
   componentCard(ct,label,body);
