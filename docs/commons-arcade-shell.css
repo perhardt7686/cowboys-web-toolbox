@@ -24,10 +24,10 @@ body.community-page.arcade-ready:not(.arcade-on) :is(
 ){display:none!important}
 body.community-page.arcade-ready:not(.arcade-on) :is(
  #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
- #streetrod-root,#vdacs-study-root,#arcade-drawing-entry
+ #streetrod-root,#vdacs-study-root,#drawing-studio-game-root
 ){display:block!important}
 body.community-page.arcade-ready.arcade-on #commons-family-zone{display:contents!important}
-body.community-page.arcade-ready.arcade-on #arcade-drawing-entry{display:none!important}
+
 html.arcade-on,html.arcade-on body.community-page{
  overflow:hidden!important;overscroll-behavior:none!important;height:100%!important
 }
@@ -168,11 +168,11 @@ body.community-page #arcade-hud-pagecount{font:900 .75rem monospace;min-width:56
    original DOM locations so auth, event listeners, timers and saves survive. */
 body.community-page.arcade-on :is(
  #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
- #streetrod-root,#vdacs-study-root,#commons-art
+ #streetrod-root,#vdacs-study-root,#drawing-studio-game-root
 ):not(.arcade-game-active){display:none!important}
 body.community-page.arcade-on :is(
  #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
- #streetrod-root,#vdacs-study-root,#commons-art
+ #streetrod-root,#vdacs-study-root,#drawing-studio-game-root
 ).arcade-game-active{
  position:fixed!important;inset:var(--arcade-top) 0 var(--arcade-bottom) 0!important;
  z-index:2147481900!important;display:block!important;
@@ -514,14 +514,14 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-summer[hidd
    and event listeners so achievements and existing game accounts survive. */
 body.community-page.arcade-ready:not(.arcade-on) :is(
  #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
- #streetrod-root,#vdacs-study-root,#arcade-drawing-entry
+ #streetrod-root,#vdacs-study-root,#drawing-studio-game-root
 ){
  margin:10px 0!important;padding:0!important;max-width:100%!important;min-width:0!important;
  border-radius:17px!important;overflow:visible!important
 }
 body.community-page.arcade-ready:not(.arcade-on) :is(
  #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
- #sr-toggle,#vdacs-study-toggle,#arcade-drawing-entry > button
+ #sr-toggle,#vdacs-study-toggle,#drawing-studio-toggle
 ){
  display:flex!important;align-items:center!important;min-height:76px!important;
  width:100%!important;box-sizing:border-box!important;gap:11px!important;
@@ -529,19 +529,13 @@ body.community-page.arcade-ready:not(.arcade-on) :is(
 }
 body.community-page.arcade-ready:not(.arcade-on) :is(
  #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
- #sr-toggle,#vdacs-study-toggle,#arcade-drawing-entry > button
+ #sr-toggle,#vdacs-study-toggle,#drawing-studio-toggle
 ):focus-visible{outline:4px solid #0ca4a3!important;outline-offset:3px}
 body.community-page.arcade-ready:not(.arcade-on) .mahjong-chevron,
 body.community-page.arcade-ready:not(.arcade-on) .plate-expand{
  margin-left:auto!important;flex-shrink:0;transform:none!important
 }
-body.community-page.arcade-ready:not(.arcade-on) #arcade-drawing-entry > button{
- border:3px solid #217475;border-radius:15px;color:#fbf4ff;
- background:linear-gradient(125deg,#1b5361,#47305e);
- box-shadow:0 5px 0 #1a2238
-}
-body.community-page.arcade-ready:not(.arcade-on) #arcade-drawing-entry strong{color:#fff6c7}
-body.community-page.arcade-ready:not(.arcade-on) #arcade-drawing-entry small{color:#def1f6}
+
 /* Arcade display area is a single viewport. Only sublists and photographic
    review may scroll within their own bounded panels when content is long. */
 body.community-page.arcade-on{
@@ -555,7 +549,7 @@ body.community-page.arcade-on #arcade-hud .arcade-hud-footer{
 }
 body.community-page.arcade-on :is(
  #mahjong-root,#letter-lock-root,#word-game-root,#plate-game-root,
- #streetrod-root,#vdacs-study-root,#commons-art
+ #streetrod-root,#vdacs-study-root,#drawing-studio-game-root
 ).arcade-game-active{
  box-sizing:border-box!important;min-height:0!important;
  overflow:hidden!important;contain:layout style
@@ -731,7 +725,7 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene button{
  }
  body.community-page.arcade-ready:not(.arcade-on) :is(
   #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
-  #sr-toggle,#vdacs-study-toggle,#arcade-drawing-entry > button
+  #sr-toggle,#vdacs-study-toggle,#drawing-studio-toggle
  ){min-height:68px!important;padding:9px 11px!important}
  body.community-page.arcade-on #arcade-hud .arcade-hud-main{
   min-height:46px;gap:4px!important
@@ -786,4 +780,31 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene button{
  body.community-page.arcade-on[data-arcade-game=mahjong] :is(
   .mahjong-stats,.mahjong-view-tools
  ){display:none!important}
+}
+
+/* The original Drawing Studio button and existing canvas are retained.
+   Full-screen navigation wraps the native stage, not a duplicate launcher. */
+body.community-page.arcade-ready:not(.arcade-on) #drawing-studio-game-root{
+ display:block!important;max-width:100%!important
+}
+body.community-page.arcade-ready:not(.arcade-on) #drawing-studio-inside{display:none!important}
+body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-game-root.arcade-game-active{
+ position:fixed!important;inset:var(--arcade-top) 0 var(--arcade-bottom) 0!important;
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ width:100vw!important;overflow:hidden!important;min-height:0!important;
+ background:#080819!important;border:0!important;border-radius:0!important;
+ padding:3px 7px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-toggle{display:none!important}
+body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-inside:not([hidden]){
+ display:block!important;min-height:0!important;height:100%!important;
+ max-height:100%!important;overflow:hidden!important;padding:0!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-art{
+ display:block!important;min-height:0!important;height:100%!important;
+ max-height:100%!important;padding:4px!important;overflow:auto!important;
+ overscroll-behavior:contain
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-drawing-root{
+ max-width:100%!important;min-height:0!important
 }
