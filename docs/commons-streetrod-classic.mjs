@@ -3,7 +3,7 @@
  * Backend racing, credit balances, profiles and upgrades remain unchanged.
  */
 import {carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
-import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=practice1';
+import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=dos1';
 import {openWorkshop} from './commons-streetrod-mechanics.mjs?v=mech2';
 import {mountRoadPractice} from './commons-streetrod-road-practice.mjs?v=practice1';
 const S=id=>document.getElementById(id);
