@@ -252,8 +252,15 @@ function backOptions(){
 function onMenuClick(e){
  const target=e.target.closest('[data-arcade-game], [data-arcade-scene], [data-arcade-action]');
  if(!target||target.disabled)return;
- if(target.dataset.arcadeGame){launch(target.dataset.arcadeGame);return;}
- if(target.dataset.arcadeScene){view(target.dataset.arcadeScene);return;}
+ if(target.dataset.arcadeGame){
+  if(mode!=='menu'||$('arcade-menu-view')?.hidden)return;
+  launch(target.dataset.arcadeGame);return;
+ }
+ if(target.dataset.arcadeScene){
+  if(mode!=='game')return;
+  view(target.dataset.arcadeScene);return;
+ }
+ if(mode==='options'&&target.dataset.arcadeAction!=='options-back')return;
  switch(target.dataset.arcadeAction){
   case 'home':openMenu();break;
   case 'exit':closeArcade();break;
