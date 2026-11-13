@@ -1,0 +1,194 @@
+/* Cowboy's Commons: The Family Fridge · grocery + household note.
+ * Inside the existing approved-member Family Calendar foldout.
+ * Decorative paper only, no extra image assets or font downloads.
+ */
+body.community-page .family-fridge{
+  position:relative;
+  isolation:isolate;
+  display:grid;gap:15px;
+  padding:clamp(16px,3vw,25px);
+  margin:3px 0 8px;
+  border:2px solid #7c8690;
+  border-radius:16px;
+  color:#283443;
+  background:linear-gradient(135deg,#d4dfe5 0%,#edf1f1 22%,#d2dce1 100%);
+  box-shadow:0 11px 0 #11182542,0 15px 28px #05070c45,inset 0 1px 0 #fff;
+}
+body.community-page .family-fridge:before,
+body.community-page .family-fridge:after{
+  content:'';position:absolute;top:-9px;width:26px;height:26px;
+  z-index:1;border-radius:50%;border:3px solid #ece1c3;
+  background:radial-gradient(circle at 36% 31%,#fff6d4 0 10%,#f6c171 15%,#bd665a 55%,#7e3550 100%);
+  box-shadow:0 4px 8px #27323d80,inset 0 -2px 2px #6928318c;
+}
+body.community-page .family-fridge:before{left:15%}
+body.community-page .family-fridge:after{right:15%}
+body.community-page .family-fridge-magnet{position:absolute;top:-10px;left:calc(50% - 13px);width:26px;height:26px;border-radius:50%;border:3px solid #cbe1d6;background:radial-gradient(circle at 35% 30%,#eaffeb,#50a0a3 48%,#225a6e);box-shadow:0 4px 8px #27323d70;z-index:1}
+body.community-page .family-fridge-heading{display:flex;flex-wrap:wrap;align-items:start;justify-content:space-between;gap:12px;border-bottom:1px solid #8b9ba2;padding-bottom:13px}
+body.community-page .family-fridge-title{flex:1 1 220px;min-width:0}
+body.community-page .family-fridge-eyebrow{
+  margin:0 0 3px!important;color:#60466c!important;
+  font:900 .7rem/1.45 system-ui,-apple-system,'Segoe UI',sans-serif!important;
+  letter-spacing:.12em
+}
+body.community-page .family-fridge-title h3{
+  margin:0 0 4px!important;
+  font:700 clamp(1.8rem,4vw,2.5rem)/1.18 Georgia,Cambria,'Times New Roman',serif!important;
+  color:#3d2e51!important;letter-spacing:-.035em;text-wrap:balance;
+}
+body.community-page .family-fridge-subtitle{
+  margin:0!important;color:#42535d!important;
+  max-width:60ch;font:500 .91rem/1.55 system-ui,-apple-system,'Segoe UI',sans-serif!important
+}
+body.community-page .family-fridge-meta{display:flex;flex:0 1 200px;flex-direction:column;align-items:end;gap:8px}
+body.community-page .family-fridge-meta strong{font:850 .82rem/1.4 system-ui,-apple-system,'Segoe UI',sans-serif;color:#394556}
+body.community-page .family-fridge-refresh,
+body.community-page .family-fridge-clear{
+  min-height:44px;padding:9px 13px;
+  border:1.5px solid #5d5674!important;border-radius:10px;
+  color:#fff4e7!important;background:#59436b!important;
+  font:800 .87rem/1.3 system-ui,-apple-system,'Segoe UI',sans-serif!important;
+  cursor:pointer
+}
+body.community-page .family-fridge :is(button,input):focus-visible{
+  outline:3px solid #05899a!important;outline-offset:3px!important
+}
+body.community-page .family-fridge-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+body.community-page .family-fridge-column{
+  position:relative;isolation:isolate;
+  display:flex;flex-direction:column;
+  gap:10px;min-width:0;
+  padding:clamp(13px,2.6vw,22px);
+  border:1px solid #d3bd8b;border-radius:3px 13px 11px 11px;
+  background:
+    repeating-linear-gradient(to bottom,transparent 0,transparent 30px,#8eb9d348 31px,transparent 32px),
+    #fffae8;
+  box-shadow:4px 6px 0 #5a666a26,0 10px 18px #3a40402c;
+}
+body.community-page .family-fridge-column.is-household{
+  border-color:#a6c6c4;
+  background:
+    repeating-linear-gradient(to bottom,transparent 0,transparent 30px,#6fa9b044 31px,transparent 32px),
+    #edf9f4
+}
+body.community-page .family-fridge-column:before{
+  content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  height:21px;width:69px;
+  background:linear-gradient(120deg,#e6b87db3,#f1dca8ab);
+  border:1px solid #c89e74ad;
+  box-shadow:0 2px 2px #0002;
+}
+body.community-page .family-fridge-column.is-household:before{background:linear-gradient(120deg,#b4ddd4bc,#8ab9bdab);border-color:#8caeaf99}
+body.community-page .family-fridge-column-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px}
+body.community-page .family-fridge-column-title{display:flex;align-items:center;gap:9px;min-width:0}
+body.community-page .family-fridge-icon{
+  display:inline-grid;place-items:center;font-size:1.15rem;width:35px;height:35px;
+  border-radius:9px;background:#f0dab2;border:1px solid #caad83
+}
+body.community-page .is-household .family-fridge-icon{background:#c6e6dc;border-color:#9bbcb3}
+body.community-page .family-fridge-column h4{
+  margin:0!important;font:750 clamp(1.12rem,2.5vw,1.4rem)/1.2 Georgia,serif!important;
+  color:#352b40!important
+}
+body.community-page .family-fridge-count{
+  padding:4px 7px;border:1px solid #c6af8d;border-radius:100px;
+  background:#fff4cf;color:#51445d;font-size:.7rem;font-weight:800;white-space:nowrap
+}
+body.community-page .family-fridge-hint{
+  margin:0!important;color:#56656b!important;font-size:.78rem!important;line-height:1.5!important
+}
+body.community-page .family-fridge-items{
+  display:grid;align-content:start;gap:4px;list-style:none;
+  flex:1 1 auto;min-height:78px;
+  padding:0;margin:0;max-height:390px;overflow-y:auto;
+}
+body.community-page .family-fridge-item{
+  display:flex;align-items:center;gap:5px;flex-wrap:wrap;
+  padding:8px 3px;
+  border-bottom:1px dashed #a9adab;
+  font-size:.9rem;min-width:0;
+}
+body.community-page .family-fridge-item-label{
+  flex:1 1 115px;min-width:0;display:flex;align-items:center;gap:9px;cursor:pointer;
+  color:#2d3540!important
+}
+body.community-page .family-fridge-item-label input[type=checkbox]{
+  flex:none;appearance:auto!important;
+  accent-color:#4d627f;
+  width:21px;height:21px;margin:0;cursor:pointer
+}
+body.community-page .family-fridge-item-name{
+  font:650 .93rem/1.45 system-ui,-apple-system,'Segoe UI',sans-serif;
+  overflow-wrap:anywhere
+}
+body.community-page .family-fridge-item.is-done .family-fridge-item-name{
+  text-decoration:line-through;text-decoration-thickness:2px;color:#72808b
+}
+body.community-page .family-fridge-qty{
+  background:#f5e5c9;border:1px solid #d9be93;
+  border-radius:6px;padding:3px 6px;
+  font:750 .72rem/1.35 system-ui,sans-serif;color:#604e3d
+}
+body.community-page .is-household .family-fridge-qty{background:#d4eee7;border-color:#a7d0c2}
+body.community-page .family-fridge-item-tools{margin-left:auto;display:flex;gap:4px}
+body.community-page .family-fridge-item-tools button,
+body.community-page .family-fridge-edit-tools button{
+  cursor:pointer;min-height:36px;min-width:38px;
+  padding:7px 8px;border:1px solid #b2a8a1!important;
+  border-radius:7px;background:#fffefa!important;
+  font:800 .75rem/1.2 system-ui,sans-serif!important;color:#44344a!important
+}
+body.community-page .family-fridge-item-tools .family-fridge-remove{font-size:1.3rem!important;color:#8e3e54!important}
+body.community-page .family-fridge-empty{font-size:.83rem;line-height:1.5;color:#727771;padding:8px 3px}
+body.community-page .family-fridge-add{
+  margin-top:auto;padding-top:11px;border-top:1px dashed #c5bca2
+}
+body.community-page .family-fridge-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(86px,.5fr) auto;align-items:end;gap:7px}
+body.community-page .family-fridge-field,
+body.community-page .family-fridge-edit-field{display:grid;gap:5px;min-width:0}
+body.community-page .family-fridge-field>span,
+body.community-page .family-fridge-edit-field>span{
+  color:#5d4c56!important;font-size:.72rem!important;font-weight:850!important;line-height:1.3
+}
+body.community-page .family-fridge :is(.family-fridge-field input,.family-fridge-edit-field input){
+  display:block;min-height:44px;min-width:0;width:100%;border:1.5px solid #a5a9aa!important;
+  border-radius:8px;padding:10px 9px!important;
+  background:#fffdf6!important;color:#2c3143!important;
+  font:550 1rem/1.35 system-ui,-apple-system,'Segoe UI',sans-serif!important;
+  box-shadow:0 2px 1px #0001
+}
+body.community-page .family-fridge .family-fridge-add-button,
+body.community-page .family-fridge .family-fridge-save{
+  min-height:44px;
+  padding:10px 11px;border:1px solid #5a4670!important;border-radius:8px;
+  background:#583b69!important;color:#fff2e3!important;font:850 .85rem/1.3 system-ui,sans-serif!important;
+  cursor:pointer;white-space:nowrap
+}
+body.community-page .family-fridge-edit{
+  width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(80px,.55fr);
+  gap:7px;padding:5px 0
+}
+body.community-page .family-fridge-edit-tools{display:flex;grid-column:1/-1;gap:8px}
+body.community-page .family-fridge-footer{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  padding-top:11px;border-top:1px solid #a2b1b8
+}
+body.community-page .family-fridge-status{flex:1 1 230px;margin:0!important;color:#3b5963!important;font-size:.84rem!important;line-height:1.5!important}
+body.community-page .family-fridge-status.is-error{color:#9b283b!important;font-weight:800}
+body.community-page .family-fridge button:disabled{
+  opacity:.55!important;cursor:not-allowed!important;filter:grayscale(.18)
+}
+@media(max-width:900px){
+ body.community-page .family-fridge-columns{grid-template-columns:minmax(0,1fr)}
+ body.community-page .family-fridge-items{max-height:330px}
+}
+@media(max-width:460px){
+ body.community-page .family-fridge{padding:14px}
+ body.community-page .family-fridge-meta{flex:1 1 100%;align-items:start;flex-direction:row;justify-content:space-between;flex-wrap:wrap}
+ body.community-page .family-fridge-fields{grid-template-columns:minmax(0,1fr) minmax(0,.45fr)}
+ body.community-page .family-fridge-fields .family-fridge-add-button{grid-column:1/-1}
+ body.community-page .family-fridge-column{padding:14px 12px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .family-fridge *{transition:none!important}
+}
