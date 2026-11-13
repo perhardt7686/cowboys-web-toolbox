@@ -1,0 +1,84 @@
+/* Physical saved season workbench: chrome under-hood parts with real fasteners.
+ * Car's own server state; no crossover to multiplayer garages.
+ */
+body.community-page .ssb-workbench{
+ border:3px solid #b59c78;border-radius:17px;margin:0 0 16px;
+ padding:clamp(10px,2.4vw,21px);color:#f5e5cb;
+ background:linear-gradient(140deg,#333a40,#1c222a 74%);
+ box-shadow:0 13px 35px #000b,inset 0 1px 0 #f0ebde3b;
+ min-width:0
+}
+body.community-page .ssb-workbench[hidden]{display:none!important}
+body.community-page .ssb-workbench *,body.community-page .ssb-workbench *::before,body.community-page .ssb-workbench *::after{box-sizing:border-box}
+body.community-page .ssb-body{display:grid;gap:13px}
+body.community-page .ssb-title-row{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:11px}
+body.community-page .ssb-title-row>div{flex:1 1 250px;min-width:0}
+body.community-page .ssb-title-row p{color:#e2bd84;font-size:.7rem!important;font-weight:900;letter-spacing:.09em;margin:0 0 6px!important}
+body.community-page .ssb-title-row h4{font:900 clamp(1.6rem,3.6vw,2.3rem)/1.1 Georgia,serif!important;color:#ffecbf!important;margin:0 0 5px!important}
+body.community-page .ssb-title-row span{display:block;color:#d8d7d4;font-size:.86rem;line-height:1.55}
+body.community-page .ssb-readiness{display:inline-flex;align-items:center;min-height:38px;padding:8px 12px;border-radius:8px;border:1px solid #a09e98;font:900 .7rem/1.35 system-ui;letter-spacing:.075em}
+body.community-page .ssb-readiness.ready{border-color:#71a68b;color:#ceffe1;background:#1f4636}
+body.community-page .ssb-readiness.unsafe{border-color:#e09e7e;color:#ffe0bf;background:#5a3038}
+body.community-page .ssb-mechanical-art{position:relative;isolation:isolate;min-height:245px;border:5px solid #56646d;border-radius:40px 40px 17px 17px;background:radial-gradient(ellipse at center,#4c6268,#20292f 71%,#131b23);box-shadow:inset 0 0 26px #070e15,0 7px 25px #060a0d9a;overflow:hidden}
+body.community-page .ssb-mechanical-art:before{content:"";position:absolute;z-index:2;inset:15px 18px auto;height:9px;border-radius:9px;background:linear-gradient(90deg,#515f62,#e4dfc5,#485357);box-shadow:0 2px 3px #0009}
+body.community-page .ssb-bonnet{
+ position:absolute;z-index:6;top:-98px;left:-4%;width:108%;height:151px;
+ transform:perspective(390px) rotateX(-25deg);transform-origin:center top;
+ background:linear-gradient(96deg,#1b242b,#8799a0 28%,#506169 51%,#9daaaa 70%,#242f37);
+ border:5px solid #afb9b7;border-radius:7px 7px 40px 40px;
+ box-shadow:0 21px 22px #050a1290;
+ display:flex;align-items:end;justify-content:center;padding:12px;color:#f9e8bd
+}
+body.community-page .ssb-bonnet span{font:900 .8rem/1.3 system-ui;letter-spacing:.09em;text-shadow:0 2px 4px #111}
+body.community-page .ssb-chassis{position:absolute;z-index:2;left:17%;right:17%;top:40px;bottom:18px;border:4px solid #849497;border-radius:26px;display:flex;align-items:center;justify-content:center;background:linear-gradient(115deg,#24323a,#5e747b,#1b252c 53%,#82979b);box-shadow:inset 0 0 26px #0b1319}
+body.community-page .ssb-block{display:grid;place-content:center;grid-template-columns:repeat(3,1fr);align-items:center;justify-items:center;gap:8px;padding:20px;border:3px solid #bfc5c2;border-radius:27px;background:linear-gradient(110deg,#282e34,#9da9a4 17%,#566369 35%,#28353b 60%,#b9c1b5);box-shadow:0 9px 12px #000b;max-width:90%;width:min(320px,90%);height:125px;transform:perspective(300px) rotateX(10deg)}
+body.community-page .ssb-block span{grid-column:1/-1;color:#fbefdc;font:900 .76rem/1.3 system-ui;text-shadow:0 2px 4px #111}
+body.community-page .ssb-block i{display:block;width:24px;height:21px;border:3px solid #a8b2ad;background:linear-gradient(#7c8a8a,#1f2c34);border-radius:9px;box-shadow:inset 0 1px 4px #0009}
+body.community-page .ssb-air-cleaner{position:absolute;left:20%;top:12%;z-index:4;background:linear-gradient(90deg,#434d50,#c9cfbe,#44525a);color:#20292f;border:2px solid #dce1d6;padding:8px 11px;border-radius:30px;font:900 .59rem system-ui;box-shadow:0 4px 7px #0009}
+body.community-page .ssb-radiator{position:absolute;right:-13%;top:16%;height:73%;width:13%;background:repeating-linear-gradient(90deg,#5a6b70 0 4px,#b3bfbe 4px 7px);border:3px solid #bec5b9;color:#fff0d6;font:800 .52rem system-ui;writing-mode:vertical-rl}
+body.community-page .ssb-wrench-switch{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:10px;background:#252831;border:1px solid #7e7680;border-radius:9px}
+body.community-page .ssb-wrench-switch strong{color:#ffe0ab;font-size:.73rem;font-weight:900;letter-spacing:.1em;margin-right:10px}
+body.community-page .ssb-wrench-switch button{min-height:44px;border:1px solid #8b8185;border-radius:7px;background:#383a43;color:#efecdf;padding:9px 13px;font-size:.85rem;font-weight:850;cursor:pointer}
+body.community-page .ssb-wrench-switch button[aria-pressed=true]{background:#f4d59b;color:#28272d;border-color:#ffebba}
+body.community-page .ssb-components{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+body.community-page .ssb-component{display:grid;align-content:start;gap:10px;min-width:0;padding:13px;border:1px solid #81838a;border-radius:10px;background:linear-gradient(#333941,#252b33)}
+body.community-page .ssb-component.removed{border-color:#c38b72;background:linear-gradient(#473b3c,#302c31)}
+body.community-page .ssb-component header{display:flex;align-items:start;justify-content:space-between;gap:7px;flex-wrap:wrap}
+body.community-page .ssb-component header strong{color:#ffe4b4;font:800 clamp(.97rem,2vw,1.17rem) Georgia,serif}
+body.community-page .ssb-component header span{border-radius:4px;border:1px solid #a29a89;color:#e9d5b1;font-size:.61rem;font-weight:900;letter-spacing:.06em;padding:4px}
+body.community-page .ssb-component p{margin:0!important;color:#d3d4d1!important;font-size:.81rem!important;line-height:1.45!important}
+body.community-page .ssb-bolts{display:flex;flex-wrap:wrap;gap:7px;padding:10px 7px;border:2px solid #5d6972;border-radius:7px;background:linear-gradient(100deg,#22282f,#505f65,#222d35);min-height:60px}
+body.community-page .ssb-bolts button{display:grid;justify-items:center;gap:1px;min-width:47px;min-height:50px;padding:5px;border:2px solid #b9b8ac;background:linear-gradient(#9ca8aa,#59666d);box-shadow:inset 0 2px 4px #12191f;cursor:pointer;border-radius:8px;color:#fff0c2;font-weight:900}
+body.community-page .ssb-bolts button>span{font-size:21px;text-shadow:0 2px 4px #111}
+body.community-page .ssb-bolts button>small{font-size:.6rem;color:#f8efe0}
+body.community-page .ssb-removed-warning{color:#ffe1c8;font-size:.77rem;font-weight:850}
+body.community-page .ssb-component-controls{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+body.community-page .ssb-component-controls button{min-height:44px;flex:1 1 125px;border:1px solid #c8aa7a;border-radius:7px;background:#463b41;color:#ffecd1;padding:9px 11px;font-size:.79rem;font-weight:850;cursor:pointer}
+body.community-page .ssb-bottom{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px;border:1px solid #846f5e;border-radius:9px;background:#37323a;padding:13px}
+body.community-page .ssb-bottom>div:first-child{flex:1 1 200px}
+body.community-page .ssb-bottom strong{font:900 .85rem system-ui;color:#f4d6a0}
+body.community-page .ssb-bottom p{margin:4px 0 0;color:#e4dadd;font-size:.81rem;line-height:1.5}
+body.community-page .ssb-buttons{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+body.community-page .ssb-buttons button{min-height:44px;border:1px solid #dfb37e;border-radius:7px;background:#574449;color:#fff0d9;padding:9px 11px;font-size:.82rem;font-weight:850;cursor:pointer}
+body.community-page .ssb-buttons button:disabled{opacity:.42;cursor:not-allowed}
+body.community-page .ssb-status{margin:11px 0 0!important;min-height:36px;border:1px solid #727b83;border-radius:7px;padding:10px 12px;background:#2c323b;color:#e8e1cd!important;font-size:.83rem!important;line-height:1.5!important}
+body.community-page .ssb-status.error{color:#ffe1ce!important;border-color:#d09d8c;background:#503338}
+body.community-page .ssb-workbench button:focus-visible{outline:3px solid #19c4c2;outline-offset:3px}
+body.community-page #streetrod-summer .ss-service .ss-service-steps,
+body.community-page #streetrod-summer .ss-service .ss-service-art{display:none!important}
+body.community-page #streetrod-summer .ss-service header span{font-size:.8rem;color:#e0bc8d}
+@media(max-width:760px){
+ body.community-page .ssb-components{grid-template-columns:minmax(0,1fr)}
+ body.community-page .ssb-mechanical-art{min-height:225px}
+ body.community-page .ssb-chassis{left:9%;right:9%}
+}
+@media(max-width:410px){
+ body.community-page .ssb-workbench{padding:9px}
+ body.community-page .ssb-bolts button{min-width:45px}
+ body.community-page .ssb-component{padding:10px}
+ body.community-page .ssb-mechanical-art{min-height:200px}
+ body.community-page .ssb-block{padding:8px;width:85%}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .ssb-workbench *{animation:none!important;transition:none!important}
+}
