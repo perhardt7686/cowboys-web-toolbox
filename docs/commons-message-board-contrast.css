@@ -362,3 +362,196 @@ body.community-page :is(#content-dialog,#conversations) :is(button,a,summary,tex
   border:1px solid ButtonText!important;
  }
 }
+
+
+/* 2026-11-13, pass 2: visible filter bubbles and board-toolbar controls.
+   Button semantics already use aria-pressed in community-lab.mjs.
+   Do not change data filtering, permissions or active view state. */
+body.community-page #lab-filters.lab-filters{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:center;
+ gap:9px;
+ margin:16px 0 22px;
+ padding:0;
+ max-width:100%;
+}
+body.community-page #lab-filters.lab-filters button{
+ appearance:none;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:6px;
+ margin:0;
+ min-height:46px;
+ max-width:100%;
+ padding:11px 15px!important;
+ border:2px solid #6b487b!important;
+ border-radius:999px!important;
+ background:#fffaf2!important;
+ color:#392449!important;
+ font:800 clamp(.92rem,2.35vw,1rem)/1.24 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+ letter-spacing:0;
+ text-align:center;
+ text-shadow:none!important;
+ box-shadow:0 2px 0 #2f1d3a15;
+ opacity:1!important;
+ -webkit-text-fill-color:#392449;
+ transition:background .15s,color .15s,border-color .15s,transform .15s;
+}
+body.community-page #lab-filters.lab-filters button[aria-pressed="true"]{
+ background:#502568!important;
+ color:#fffaf2!important;
+ -webkit-text-fill-color:#fffaf2;
+ border-color:#502568!important;
+ box-shadow:inset 0 0 0 2px #f3d69c,0 2px 0 #2b1837aa;
+}
+body.community-page #lab-filters.lab-filters button[aria-pressed="true"]::before{
+ content:"✓";
+ font-size:.9rem;
+ color:#ffe0a1;
+ margin-right:2px;
+}
+body.community-page #lab-filters.lab-filters button:hover:not([aria-pressed="true"]){
+ background:#efe3f4!important;
+ border-color:#502568!important;
+ color:#2b1837!important;
+ -webkit-text-fill-color:#2b1837;
+}
+body.community-page #lab-filters.lab-filters button:active{
+ transform:translateY(1px);
+}
+body.community-page #lab-filters.lab-filters button:focus-visible{
+ outline:3px solid #096b73!important;
+ outline-offset:3px!important;
+ box-shadow:0 0 0 2px #fffaf2!important;
+}
+body.community-page #conversations .feed-status{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ flex-wrap:wrap;
+ gap:10px;
+ color:#442852!important;
+ margin:19px 0!important;
+}
+body.community-page #conversations #feed-count{
+ color:#442852!important;
+ font-size:clamp(.95rem,2.4vw,1.07rem)!important;
+ line-height:1.5!important;
+ font-weight:800!important;
+ opacity:1!important;
+}
+body.community-page #conversations #refresh-community{
+ color:#45215d!important;
+ background:#fffaf2!important;
+ border:1.5px solid #775087!important;
+ border-radius:10px;
+ padding:9px 13px!important;
+ min-height:44px!important;
+ font-size:.93rem!important;
+ font-weight:800!important;
+ text-decoration:none!important;
+}
+body.community-page #conversations #refresh-community:hover{
+ color:#fffaf2!important;background:#502568!important;
+}
+/* The toolbar is a dark navigation strip, so its action text must not
+   inherit the unreadable pale-violet-on-ivory link styling. */
+body.community-page #forum-toolbar.forum-toolbar{
+ background:#282032!important;
+ border:1.5px solid #8d729a!important;
+ border-radius:17px!important;
+ padding:clamp(12px,2.8vw,18px)!important;
+ gap:10px!important;
+ box-shadow:inset 0 1px 0 #fff2,0 7px 18px #2c19401c!important;
+}
+body.community-page #forum-toolbar.forum-toolbar :is(button,a){
+ min-height:46px!important;
+ padding:11px 13px!important;
+ background:#fff7eb!important;
+ color:#452458!important;
+ border:2px solid #e2b76d!important;
+ border-radius:11px!important;
+ font:800 clamp(.91rem,2.3vw,1.03rem)/1.35 system-ui,-apple-system,'Segoe UI',sans-serif!important;
+ text-decoration:none!important;
+ text-align:center;
+ white-space:normal;
+ overflow-wrap:anywhere;
+ opacity:1!important;
+ text-shadow:none!important;
+}
+body.community-page #forum-toolbar.forum-toolbar :is(button,a):is(:hover,:focus-visible){
+ color:#fffaf2!important;
+ background:#693783!important;
+ border-color:#dfbe85!important;
+}
+body.community-page #forum-toolbar.forum-toolbar button[aria-pressed="true"]{
+ background:#502568!important;
+ color:#fffaf2!important;
+ border-color:#e3bd7a!important;
+ box-shadow:inset 0 0 0 2px #d3a7e7;
+}
+body.community-page #forum-toolbar.forum-toolbar button:disabled{
+ background:#e7dce8!important;
+ color:#59475d!important;
+ border-color:#ac97b6!important;
+ opacity:.8!important;
+ cursor:not-allowed;
+}
+body.community-page #conversations .community-categories button{
+ min-height:46px!important;
+ color:#382449!important;
+ font-size:clamp(.91rem,2.3vw,1rem)!important;
+ font-weight:750;
+ background:#fffaf2!important;
+ border:1.5px solid #b89bc5!important;
+}
+body.community-page #conversations .community-categories button[aria-pressed="true"]{
+ background:#502568!important;
+ color:#fffaf2!important;
+ border-color:#502568!important;
+}
+body.community-page #conversations .community-categories button:hover:not([aria-pressed="true"]){
+ background:#f1e2f7!important;
+ color:#382449!important;
+}
+body.community-page #conversations .thread-card .thread-site{
+ background:#fff0d7!important;
+ color:#372041!important;
+ border:1px solid #d3ac73!important;
+}
+body.community-page #conversations .thread-card .thread-kicker .category-dot{
+ background:#e4b66a!important;
+}
+@media(max-width:650px){
+ body.community-page #lab-filters.lab-filters{
+  gap:8px;margin-top:13px;margin-bottom:17px;
+ }
+ body.community-page #lab-filters.lab-filters button{
+  min-height:46px;font-size:.91rem!important;
+  padding:10px 13px!important;
+ }
+ body.community-page #forum-toolbar.forum-toolbar{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px!important;
+ }
+ body.community-page #forum-toolbar.forum-toolbar :is(button,a){
+  width:100%;font-size:.9rem!important;
+  padding:11px 8px!important;min-width:0;
+ }
+ body.community-page #forum-toolbar.forum-toolbar :is(button,a):nth-child(3){
+  grid-column:1 / -1;
+ }
+}
+@media(max-width:380px){
+ body.community-page #forum-toolbar.forum-toolbar{grid-template-columns:1fr}
+ body.community-page #forum-toolbar.forum-toolbar :is(button,a):nth-child(3){
+  grid-column:auto;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #lab-filters.lab-filters button{
+  transition:none!important;transform:none!important;
+ }
+}
