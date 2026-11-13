@@ -1,0 +1,69 @@
+/* Commons Arcade audit polish | scoped, no scoring/backend/board geometry changes.
+ * Consistent launch surfaces, readable instructions, 44px controls, clear focus.
+ */
+body.community-page .community-main :is(
+ #mahjong-root,#word-game-root,#letter-lock-root,#plate-game-root,#drawing-studio-game-root
+){margin-block:12px;scroll-margin-top:1.5rem}
+body.community-page .community-main :is(
+ #mahjong-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,#drawing-studio-toggle
+){
+ min-height:66px;
+ border:1px solid #9f81b5!important;border-radius:14px!important;
+ box-shadow:inset 0 1px 0 #fff2,0 7px 20px #06071535;
+ transition:box-shadow .15s,border-color .15s;
+}
+body.community-page .community-main :is(
+ #mahjong-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,#drawing-studio-toggle
+):hover{border-color:#f1d09b!important;box-shadow:0 12px 28px #0708166b}
+body.community-page .community-main :is(
+ #mahjong-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,#drawing-studio-toggle
+) strong{line-height:1.24!important;letter-spacing:.005em;overflow-wrap:anywhere}
+body.community-page .community-main :is(
+ #mahjong-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,#drawing-studio-toggle
+) small{line-height:1.4!important;color:#e2d5e3}
+body.community-page .mahjong-actions button,
+body.community-page .mahjong-view-tools button,
+body.community-page .plate-game .plate-button,
+body.community-page .letter-lock-form button,
+body.community-page .family-room .family-action,
+body.community-page #commons-word-form button{
+ min-height:44px!important;font-weight:750;
+}
+body.community-page :is(.mahjong-actions,.mahjong-view-tools,.letter-lock-form,.plate-game .plate-fields){
+ gap:.6rem;
+}
+body.community-page :is(.mahjong-status,.letter-lock-message,.plate-game #plate-status,.word-panel #commons-word-message){
+ line-height:1.55;overflow-wrap:anywhere;
+}
+body.community-page .community-main :is(.mahjong-status,.letter-lock-rules,.plate-hint,.word-rules,.family-room-note){
+ font-size:clamp(.85rem,1.3vw,.98rem)!important;line-height:1.6!important;
+}
+body.community-page .community-main :is(.mahjong-game,.word-panel,.letter-lock-panel,.plate-game,.family-room)
+ :is(h2,h3,h4){text-wrap:balance;line-height:1.23;overflow-wrap:anywhere}
+body.community-page .community-main :is(.mahjong-actions button,.mahjong-view-tools button,
+ .plate-button,.letter-lock-form button,#commons-word-form button,
+ #drawing-studio-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,
+ #mahjong-toggle):focus-visible{
+ outline:3px solid #14a6b7!important;outline-offset:3px!important;
+}
+body.community-page .community-main :is(.mahjong-game,.word-panel,.letter-lock-panel,.plate-game,.family-room) p{
+ overflow-wrap:anywhere;
+}
+body.community-page .letter-lock-game .letter-lock-guess-caption,
+body.community-page .mahjong-game .mahjong-ribbon,
+body.community-page .plate-game .plate-ribbon{
+ font-variant-numeric:tabular-nums;
+}
+@media(max-width:540px){
+ body.community-page .mahjong-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.community-page .mahjong-actions button{width:100%}
+ body.community-page .letter-lock-form input{flex:1 1 100%;min-width:0}
+ body.community-page .letter-lock-form button{flex:1 1 45%}
+ body.community-page .mahjong-view-tools{flex-wrap:wrap}
+ body.community-page .mahjong-view-tools button{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .community-main :is(
+ #mahjong-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,#drawing-studio-toggle
+ ){transition:none!important}
+}
