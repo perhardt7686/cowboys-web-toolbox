@@ -159,8 +159,12 @@ async def run_device(browser,width,height):
   if height>=650:
    panel=await page.locator(".letter-lock-panel").bounding_box()
    keyboard=await page.locator("#letter-lock-keyboard").bounding_box()
+   grid=await page.locator("#letter-lock-grid").bounding_box()
+   last=await page.locator("#letter-lock-grid .letter-lock-grid-row:last-child").bounding_box()
    assert panel and keyboard and keyboard["y"]+keyboard["height"]<=panel["y"]+panel["height"]+2, (
     "Keyboard extends below game screen",width,height,panel,keyboard)
+   assert grid and last and last["y"]+last["height"]<=grid["y"]+grid["height"]+3,(
+    "Word puzzle rows are cropped",width,height,grid,last)
   (ROOT/"reports").mkdir(exist_ok=True,parents=True)
   if width==390:
    await page.screenshot(path=str(ROOT/"reports"/"arcade-one-screen-iphone-sample.png"),
