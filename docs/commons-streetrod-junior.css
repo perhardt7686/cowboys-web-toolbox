@@ -1,0 +1,39 @@
+/* Street r0d Junior Star Drives — family-safe independent arcade */
+body.community-page .srj-junior{margin:15px 0 22px;box-sizing:border-box;color:#fcfbf5}
+body.community-page .srj-junior *{box-sizing:border-box}
+body.community-page .srj-junior>details{border-radius:19px;overflow:hidden;border:2px solid #8aaf9b;background:linear-gradient(140deg,#1d3c47,#353043);box-shadow:0 12px 36px #0809126a}
+body.community-page .srj-junior>details>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:19px;background:linear-gradient(100deg,#2c737a,#435d79 55%,#6e6085)}
+body.community-page .srj-junior>details>summary::-webkit-details-marker{display:none}
+body.community-page .srj-junior>details>summary>span:first-child{display:grid;gap:5px}
+body.community-page .srj-junior>details>summary b{font-weight:950;letter-spacing:.05em;font-size:clamp(20px,4vw,29px);color:#fff2b8}
+body.community-page .srj-junior>details>summary small{font-size:12px;color:#fff5f4;font-weight:700}
+body.community-page .srj-arrow{font-size:24px;color:#fff6c5;transition:transform .25s}
+body.community-page .srj-junior>details[open] .srj-arrow{transform:rotate(180deg)}
+body.community-page .srj-inside{padding:clamp(13px,2.5vw,22px);display:grid;gap:15px}
+body.community-page .srj-welcome h3{color:#fff2b8!important;font-size:clamp(22px,3.6vw,30px)!important;margin:0 0 7px}
+body.community-page .srj-welcome p{color:#f7e9e8;font-size:14px;line-height:1.6;max-width:850px;margin:0}
+body.community-page .srj-cars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+body.community-page .srj-choice{display:grid;place-items:center;gap:4px;min-height:85px;padding:9px 5px;border:2px solid #7b96aa;border-radius:12px;background:linear-gradient(#344c61,#243744);color:#fff8df;cursor:pointer}
+body.community-page .srj-choice span{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:var(--car-color);font-size:19px;box-shadow:0 3px 12px #0007}
+body.community-page .srj-choice b{font-size:11px;line-height:1.15;font-weight:900}
+body.community-page .srj-choice.selected{border-color:#ffe08c;background:#55505e;box-shadow:0 0 0 1px #ffe08c}
+body.community-page .srj-choice:disabled{opacity:.5;cursor:default}
+body.community-page .srj-screen{position:relative;overflow:hidden;border:3px solid #d5bb95;border-radius:14px;background:#8bb7bc}
+body.community-page #srj-canvas{display:block;width:100%;height:auto;aspect-ratio:5/2}
+body.community-page .srj-caption{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;gap:9px;align-items:center;padding:11px 14px;background:#1b2a3bbd;color:#fff6db;font-weight:900;font-size:13px}
+body.community-page .srj-controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+body.community-page #srj-start{min-height:52px;border:2px solid #f9e09f;background:#efd083;color:#232738;border-radius:11px;padding:11px 19px;font-weight:950;font-size:15px;cursor:pointer}
+body.community-page #srj-start:disabled{opacity:.6;cursor:wait}
+body.community-page .srj-lane-buttons{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+body.community-page .srj-lane-buttons button{min-height:49px;flex:1 1 85px;border:1px solid #b9cdd0;border-radius:9px;background:#44667a;color:#fff;padding:9px;font-size:13px;font-weight:900;cursor:pointer}
+body.community-page .srj-lane-buttons button[aria-pressed=true]{background:#f3deaa;color:#183340;border-color:#fff}
+body.community-page .srj-status{margin:0!important;font-size:13px;font-weight:800;line-height:1.6;color:#fff3d0}
+body.community-page .srj-status[data-error=true]{color:#ffb8b3}
+body.community-page .srj-progress{border:1px solid #8bb5b5;background:#2d4250;border-radius:10px;padding:12px;font-size:12px;color:#f5eeda}
+body.community-page .srj-progress>div{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+body.community-page .srj-progress>div>span{background:#435970;border:1px solid #778e9c;border-radius:7px;padding:7px;font-weight:800}
+body.community-page .srj-legal{margin:0!important;font-size:11px;line-height:1.5;color:#ccdadd}
+body.community-page .srj-junior button:focus-visible{outline:3px solid #fff3aa;outline-offset:3px}
+@media(max-width:690px){body.community-page .srj-cars{grid-template-columns:repeat(2,minmax(0,1fr))}body.community-page .srj-choice{min-height:72px;display:flex;justify-content:start;gap:10px;padding:8px}body.community-page .srj-choice span{flex:0 0 32px}}
+@media(max-width:390px){body.community-page .srj-caption{font-size:11px;padding:8px}body.community-page .srj-choice b{font-size:10px}}
+@media(prefers-reduced-motion:reduce){body.community-page .srj-junior *{transition:none!important}}
