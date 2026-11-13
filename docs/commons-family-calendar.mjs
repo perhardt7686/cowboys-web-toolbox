@@ -45,7 +45,7 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
   host.before(panel);
  }
  const fold=panel.querySelector('#family-calendar-fold'),content=panel.querySelector('#family-calendar-content');
- const state={month:currentMonth(),view:'agenda',events:[],loading:false,client:null,connected:false,synced:null};
+ const state={month:currentMonth(),view:'agenda',events:[],loading:false,queued:false,client:null,connected:false,synced:null};
  const buildShell=()=>{
   content.replaceChildren();
   const toolbar=el('div','family-calendar-toolbar');
@@ -104,7 +104,7 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
    const cell=el('div','family-calendar-day');
    if(key===dayKey(new Date()))cell.classList.add('is-today');
    cell.append(el('strong','',day));
-   const matches=events.filter(item=>dayKey(item.start)===key);
+   const matches=events.filter(item=>{const end=new Date(item.end).getTime(),start=new Date(item.start).getTime();const last=dayKey(new Date(Math.max(start,end-1)));return dayKey(item.start)<=key&&last>=key;});
    const n=Math.min(matches.length,3);
    for(let i=0;i<n;i++)cell.append(el('span','family-calendar-day-event',matches[i].title||'Event'));
    if(matches.length>3)cell.append(el('small','','+'+(matches.length-3)+' more'));
@@ -123,9 +123,12 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
   name.textContent=longMonth(state.month.year,state.month.month)+' '+state.month.year;
   panel.querySelectorAll('button[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===state.view)));
   list.replaceChildren();
+  const monthStart=numberDate(state.month.year,state.month.month,1);
+  const lastDay=numberDate(state.month.year,state.month,new Date(Date.UTC(state.month.year,state.month.month,0)).getUTCDate());
   const all=state.events.filter(e=>{
-   const key=dayKey(e.start);
-   return key.startsWith(numberDate(state.month.year,state.month.month,1).slice(0,7));
+   const from=dayKey(e.start),end=new Date(e.end).getTime(),start=new Date(e.start).getTime();
+   const last=dayKey(new Date(Math.max(start,end-1)));
+   return from<=lastDay&&last>=monthStart;
   }).sort((a,b)=>new Date(a.start)-new Date(b.start));
   if(state.view==='month'){monthRender(list,all);}
   else if(!all.length){list.append(el('p','family-calendar-empty-message','No family events scheduled for this month.'));}
@@ -149,7 +152,8 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
   return state.client;
  }
  async function refresh(){
-  if(state.loading||panel.hidden||!fold.open)return;
+  if(state.loading){state.queued=true;return;}
+  if(panel.hidden||!fold.open)return;
   state.loading=true;
   const line=panel.querySelector('#family-calendar-feed-status');
   if(line)line.textContent='Loading family events…';
@@ -165,9 +169,12 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
   }catch(error){
    state.events=[];state.synced=null;
    if(line)line.textContent='Could not load Family events: '+String(error.message||'Try signing in again.').slice(0,150);
-   state.loading=false;return;
+   state.loading=false;
+   if(state.queued){state.queued=false;void refresh();}
+   return;
   }
   state.loading=false;render();
+  if(state.queued){state.queued=false;void refresh();}
  }
  function visibility(){
   const shown=!host.hidden&&!host.closest('[hidden]');
