@@ -172,9 +172,37 @@ function previewArt(spec){
 }
 function sitePreview(s){
   const spec=previewSpecs[s.id]||[s.previewKind||'directory',s.name,'Explore','Try a task'];
-  const domain=new URL(s.url).hostname.replace(/^www\./,'');
-  return `<div class="site-preview" data-preview="${esc(s.id)}" style="--pv-bg:${tiles[s.category]||'#e7ecda'}" role="img" aria-label="Illustrated preview of ${esc(s.name)}: ${esc(s.description)}"><div class="preview-browser" aria-hidden="true"><i></i><i></i><i></i><small>${esc(domain)}</small></div><div class="preview-drawing" aria-hidden="true">${previewArt(spec)}</div><div class="preview-caption" aria-hidden="true"><span><i></i>${esc(spec[1])}</span><span>ILLUSTRATED</span></div></div>`;
+  const domain=new URL(s.url).hostname.replace(/^www\\./,'');
+  // The manifest lists only successfully rendered public website screenshots.
+  // Never call an illustration a real screenshot, and don't request third-party
+  // thumbnail services from visitors' browsers.
+  const shot=Object.hasOwn(window.CowboySiteShots||{},s.id)?window.CowboySiteShots[s.id]:null;
+  const hasShot=!!(shot&&/^\\d{4}-\\d{2}-\\d{2}$/.test(shot.captured));
+  let hash=2166136261;
+  for(const char of s.id){hash^=char.codePointAt(0);hash=Math.imul(hash,16777619)>>>0;}
+  const hue=hash%360;
+  const brandBand=`hsl(${hue} 40% 32%)`;
+  const label=hasShot?`Captured public homepage of ${s.name} on ${shot.captured}; the website may have changed`:`Illustrated placeholder for ${s.name}; an actual website capture is not yet available`;
+  const fallback=`<div class="preview-fallback-art" ${hasShot?'hidden':''}>${previewArt(spec)}<span class="preview-identity">${esc(domain)} · ${esc(s.name)}</span></div>`;
+  const image=hasShot?`<img class="preview-capture" loading="lazy" decoding="async" src="site-shots/${encodeURIComponent(s.id)}.webp?v=${encodeURIComponent(shot.captured)}" alt="" width="640" height="350">`:'';
+  return `<div class="site-preview" data-preview="${esc(s.id)}" data-preview-source="${hasShot?'capture':'illustration'}" data-preview-name="${esc(s.name)}" style="--pv-bg:${tiles[s.category]||'#e7ecda'};--pv-brand:${brandBand}" role="img" aria-label="${esc(label)}"><div class="preview-browser" aria-hidden="true"><i></i><i></i><i></i><small>${esc(domain)}</small></div><div class="preview-drawing" aria-hidden="true">${image}${fallback}</div><div class="preview-caption" aria-hidden="true"><span><i></i>${esc(s.name)}</span><span>${hasShot?'SITE CAPTURE':'ILLUSTRATED'}</span></div></div>`;
 }
+// If a once-successful capture is removed or corrupted, recover gracefully
+// without silently passing the fallback illustration off as real imagery.
+document.addEventListener('error',event=>{
+  const img=event.target;
+  if(!(img instanceof HTMLImageElement)||!img.matches('.site-preview .preview-capture'))return;
+  const tile=img.closest('.site-preview');
+  if(!tile)return;
+  img.remove();
+  const fallback=tile.querySelector('.preview-fallback-art');
+  if(fallback)fallback.hidden=false;
+  tile.dataset.previewSource='illustration';
+  const caption=tile.querySelector('.preview-caption>span:last-child');
+  if(caption)caption.textContent='ILLUSTRATED';
+  tile.setAttribute('aria-label','Illustrated placeholder for '+(tile.dataset.previewName||'this website')+'; website screenshot unavailable');
+},true);
+
 const previewMedia=matchMedia('(prefers-reduced-motion: reduce)');
 let previewMotion=!previewMedia.matches;
 try{if(localStorage.getItem('cowboy-web-toolbox-motion')==='off')previewMotion=false}catch{}
