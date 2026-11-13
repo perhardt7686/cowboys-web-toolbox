@@ -12,7 +12,7 @@ function dial(ctx,x,y,r,value,max,title){
  ctx.fillStyle='#f7eacb';ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(title,0,14);ctx.font='800 8px system-ui';ctx.fillText(max===160?'MPH':'RPM',0,25);
  const angle=PI*.78+Math.min(1,Math.max(0,value/max))*PI*1.45;ctx.rotate(angle);ctx.fillStyle='#db735c';path(ctx,[[-2,5],[-2,-r*.72],[1,-r*.72],[2,5]],'#ed7052');ctx.restore();
 }
-export function drawClassicCockpit(ctx,{width=960,height=340,progress=0,live=false,seed=1,own={},rival={},boss=false,clock=0,speed=null,rpm=null,steer=0,damage=0}={}){
+function drawDetailedCockpit(ctx,{width=960,height=340,progress=0,live=false,seed=1,own={},rival={},boss=false,clock=0,speed=null,rpm=null,steer=0,damage=0}={}){
  const w=width,h=height, p=Math.max(0,Math.min(1,Number(progress)||0)),t=Number(clock)||0;
  ctx.save();ctx.clearRect(0,0,w,h);
  let sky=ctx.createLinearGradient(0,0,0,235);sky.addColorStop(0,'#121628');sky.addColorStop(.60,'#3e324c');sky.addColorStop(1,'#c17966');ctx.fillStyle=sky;ctx.fillRect(0,0,w,218);
@@ -60,4 +60,60 @@ export function drawClassicCockpit(ctx,{width=960,height=340,progress=0,live=fal
  rr(ctx,19,10,197,28,5,'#151c25dd','#c3a36b');ctx.fillStyle='#ffdf96';ctx.font='800 13px monospace';ctx.textAlign='left';ctx.fillText('RIVERSIDE NIGHT RUN',30,29);
  rr(ctx,758,10,173,28,5,'#151c25e0','#aa9b8e');ctx.fillStyle='#f3dfba';ctx.fillText('SUMMER OF 1963',769,29);
  ctx.restore();return true;
+}
+
+/* The original DOS game was drawn on a tiny indexed-colour adapter. Recreate
+ * that hardware constraint with a 320x200 raster and fixed 16-colour palette.
+ * No original cockpit images are copied; the rendering is from our own art.
+ * Cache the nearest-colour table once and limit graphics updates to ~10 FPS.
+ */
+const palette16=[
+ [0,0,0],[0,0,170],[0,170,0],[0,170,170],
+ [170,0,0],[170,0,170],[170,85,0],[170,170,170],
+ [85,85,85],[85,85,255],[85,255,85],[85,255,255],
+ [255,85,85],[255,85,255],[255,255,85],[255,255,255]
+];
+const paletteLookup=new Uint8Array(4096);
+for(let i=0;i<4096;i++){
+ const r=((i>>8)&15)*17,g=((i>>4)&15)*17,b=(i&15)*17;
+ let best=0,dist=1e9;
+ for(let k=0;k<16;k++){
+  const p=palette16[k],dr=r-p[0],dg=g-p[1],db=b-p[2];
+  const d=dr*dr*0.299+dg*dg*0.587+db*db*0.114;
+  if(d<dist){dist=d;best=k;}
+ }
+ paletteLookup[i]=best;
+}
+const adapterCache=new WeakMap();
+export function drawClassicCockpit(ctx,options={}){
+ const isDos=window.COWBOY_STREETROD_RETRO===true;
+ if(!isDos)return drawDetailedCockpit(ctx,options);
+ let cached=adapterCache.get(ctx.canvas);
+ if(!cached){
+  const hi=document.createElement('canvas');hi.width=960;hi.height=340;
+  const low=document.createElement('canvas');low.width=320;low.height=200;
+  const h=hi.getContext('2d',{alpha:false,willReadFrequently:true});
+  const l=low.getContext('2d',{alpha:false,willReadFrequently:true});
+  if(!h||!l)return drawDetailedCockpit(ctx,options);
+  cached={hi,low,h,l,tick:0};
+  adapterCache.set(ctx.canvas,cached);
+ }
+ const now=performance.now();
+ if(now-cached.tick>96||!cached.tick){
+  cached.tick=now;
+  drawDetailedCockpit(cached.h,{...options,width:960,height:340});
+  cached.l.imageSmoothingEnabled=true;
+  cached.l.drawImage(cached.hi,0,0,320,200);
+  const data=cached.l.getImageData(0,0,320,200);
+  const a=data.data;
+  for(let i=0;i<a.length;i+=4){
+   const idx=((a[i]>>4)<<8)|((a[i+1]>>4)<<4)|(a[i+2]>>4);
+   const p=palette16[paletteLookup[idx]];
+   a[i]=p[0];a[i+1]=p[1];a[i+2]=p[2];a[i+3]=255;
+  }
+  cached.l.putImageData(data,0,0);
+ }
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+ ctx.drawImage(cached.low,0,0,ctx.canvas.width,ctx.canvas.height);ctx.restore();
+ return true;
 }
