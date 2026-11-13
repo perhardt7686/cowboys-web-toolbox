@@ -78,7 +78,7 @@ function build(){
   document.body.append(menu);
   menu.addEventListener('click',onMenuClick);
   hud=document.createElement('header');hud.id='arcade-hud';hud.hidden=true;
-  hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" title="Arcade main menu">◀ MENU</button><strong id="arcade-hud-title">COMMONS / ARCADE</strong><div class="arcade-hud-right"><button type="button" data-arcade-action="options" title="Display settings">SETUP</button><button type="button" data-arcade-action="exit" title="Exit arcade">EXIT ✕</button></div></div><nav id="arcade-hud-scenes" aria-label="Game scenes"></nav><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous">◀ PREV</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next">NEXT ▶</button></div><div class="arcade-hud-footer" aria-live="polite" id="arcade-hud-footer">ESC: MENU · F2: SETTINGS · NO PAGE SCROLL</div>';
+  hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" title="Arcade main menu">◀ MENU</button><strong id="arcade-hud-title">COMMONS / ARCADE</strong><div class="arcade-hud-right"><button type="button" data-arcade-action="options" title="Display settings">SETUP</button><button type="button" data-arcade-action="exit" title="Exit arcade">EXIT ✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous scene">◀</button><nav id="arcade-hud-scenes" aria-label="Game scenes"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next scene">▶</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous">◀ PREV</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next">NEXT ▶</button></div><div class="arcade-hud-footer" aria-live="polite" id="arcade-hud-footer">ESC: MENU · F2: SETTINGS · NO PAGE SCROLL</div>';
   document.body.append(hud);
   hud.addEventListener('click',onMenuClick);
   settings=loadSettings();saveSettings();
@@ -170,6 +170,13 @@ function renderTabs(){
  const foot=$('arcade-hud-footer');
  if(foot)foot.textContent=active==='streetrod'?'SCENES REPLACE THIS SCREEN · YOUR GARAGE AND RACES STAY SAVED':
   'ESC: MENU · F2: SETTINGS · RESULTS SAVE WITH YOUR EXISTING GAME';
+}
+function stepScene(delta){
+ if(mode!=='game'||!active)return;
+ const scenes=pageLabels().map(([id])=>id),current=scenes.indexOf(scene);
+ if(current<0)return;
+ const next=scenes[(current+delta+scenes.length)%scenes.length];
+ view(next);
 }
 function view(next){
  if(!active||!pageLabels().some(([id])=>id===next))return;
@@ -266,6 +273,8 @@ function onMenuClick(e){
   case 'exit':closeArcade();break;
   case 'options':showOptions();break;
   case 'options-back':backOptions();break;
+  case 'scene-previous':stepScene(-1);break;
+  case 'scene-next':stepScene(1);break;
   case 'previous':paging(-1);break;
   case 'next':paging(1);break;
  }
