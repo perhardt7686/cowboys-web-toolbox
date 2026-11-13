@@ -3,6 +3,7 @@
  * race, grant credits, or create assets. Driver portraits mirror published profiles.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
 
 const raw=[
 'Classic|rattler|Rattler 48|1948|coupe|175|#a45634|A stripped, low-nose postwar coupe',
@@ -92,6 +93,9 @@ const bodies={
  rocket:['M38 120 L73 112 L154 89 L184 73 L290 73 L344 103 L415 116 L420 133 L37 133Z','M185 91 L200 78 L280 78 L315 98Z']
 };
 function carArt(car,large=false){
+ const photo=carPhotoUrl(car.body,car.key);
+ const optionalHue=(car.index*13)%47-23;
+ return '<span class="scc-photostage"><img class="scc-photocar" src="'+esc(photo)+'" alt="" loading="lazy" decoding="async" style="filter:hue-rotate('+optionalHue+'deg) saturate(1.04)"></span>';
  const bp=bodies[car.body]||bodies.coupe,grad='scc-g-'+car.key;
  const rear=car.body==='van'?112:car.body==='truck'?117:car.body==='supercar'?115:car.body==='mini'?118:108;
  const front=car.body==='van'?350:car.body==='truck'?351:car.body==='supercar'?356:car.body==='mini'?346:351;
