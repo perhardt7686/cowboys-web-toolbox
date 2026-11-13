@@ -152,3 +152,42 @@ body.community-page .src-hot-diner{top:34%;right:5%;width:25%}
  body.community-page .src-hot-paper{top:7%;left:3%;width:29%}
  body.community-page .src-hot-diner{top:34%;right:3%;width:25%}
 }
+
+
+/* Drive-in opponent board: live member garages rather than decorative diners only */
+body.community-page .src-diner-patrons{background:linear-gradient(145deg,#302137,#191a28);border:2px solid #ca8aab;border-radius:14px;padding:clamp(13px,2.5vw,22px);margin:14px 0;color:#f5e4de;box-shadow:0 15px 30px #03040877}
+body.community-page .src-diner-patrons header{display:flex;gap:13px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #9f7397;padding-bottom:14px;margin-bottom:13px}
+body.community-page .src-diner-patrons header>div{flex:1 1 220px}
+body.community-page .src-diner-patrons header span{font:900 .68rem/1.4 system-ui;color:#f6a6c9;letter-spacing:.11em}
+body.community-page .src-diner-patrons header h4{margin:4px 0!important;font:800 clamp(1.45rem,3vw,1.9rem)/1.2 Georgia,serif!important;color:#ffdbb2!important}
+body.community-page .src-diner-patrons header p{margin:0!important;color:#e6d8e1!important;font-size:.86rem!important;line-height:1.55!important}
+body.community-page .src-diner-patrons button{min-height:44px;padding:9px 13px;background:#5c3954;color:#ffecdc;border:1px solid #d4a78f;border-radius:9px;font-weight:800;font-size:.8rem;cursor:pointer}
+body.community-page .src-diner-patrons button:hover{background:#884d68}
+body.community-page .src-diner-patrons button:disabled{opacity:.4;cursor:not-allowed}
+body.community-page .src-diner-racers{display:grid;gap:10px}
+body.community-page .src-diner-racer{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:13px;align-items:center;padding:12px;border:1px solid #a17998;border-radius:10px;background:linear-gradient(110deg,#3c3244,#282734)}
+body.community-page .src-diner-driver-photo{width:60px;height:60px;border:3px solid #e2c092;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#4b4868;color:#fff6cf;font-size:1.5rem}
+body.community-page .src-diner-driver-photo img{width:100%;height:100%;object-fit:cover}
+body.community-page .src-diner-racer>div:nth-child(2){display:grid;gap:4px;min-width:0}
+body.community-page .src-diner-racer strong{color:#ffe0ad;font:900 .97rem/1.22 system-ui;overflow-wrap:anywhere}
+body.community-page .src-diner-racer small{font-size:.78rem;line-height:1.4;color:#e2d9e1;overflow-wrap:anywhere}
+body.community-page .src-diner-racer>div:nth-child(2)>span{font-size:.63rem;letter-spacing:.085em;font-weight:900;color:#eec7d1}
+body.community-page .src-diner-racer-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px}
+body.community-page .src-diner-racer-actions .src-diner-challenge{background:#c0807d;color:#231c2b;border-color:#f9c0a4}
+body.community-page .src-diner-none{color:#f4e6ec;line-height:1.6;font-size:.87rem;padding:22px;text-align:center}
+body.community-page .src-diner-pagination{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:13px 0 3px}
+body.community-page .src-diner-pagination span{font-size:.82rem;color:#fbe2ba;font-weight:800}
+body.community-page .src-rival-review{padding:14px 16px;border:1px solid #e1ac7d;border-radius:9px;background:#44343b;margin-top:13px;color:#f8e5e1}
+body.community-page .src-rival-review[hidden]{display:none!important}
+body.community-page .src-rival-review h4{font:850 1.18rem Georgia,serif!important;color:#ffe7b3!important;margin:0 0 6px!important}
+body.community-page .src-rival-review p,body.community-page .src-rival-review small{color:#efe2e7!important;line-height:1.55!important}
+body.community-page .src-rival-spec{display:grid;gap:4px;margin:9px 0;padding:12px;border-left:3px solid #dda775;background:#272935}
+body.community-page .src-rival-spec span{font-size:.75rem;color:#efc49d}
+body.community-page .src-rival-spec b{font-size:.95rem;color:#f6e8d8}
+@media(max-width:650px){
+ body.community-page .src-diner-racer{grid-template-columns:48px minmax(0,1fr)}
+ body.community-page .src-diner-driver-photo{width:48px;height:48px}
+ body.community-page .src-diner-racer-actions{grid-column:1/-1;justify-content:stretch}
+ body.community-page .src-diner-racer-actions button{flex:1}
+ body.community-page .src-diner-patrons{padding:13px}
+}
