@@ -19,6 +19,7 @@ export function createForum(ctx){
     mount();document.querySelector('[data-forum-unread]')?.setAttribute('aria-pressed',String(unreadOnly));
     for(const [i,card] of [...document.querySelectorAll('.thread-card')].entries()){
       const t=rows[i];if(!t)continue;
+      card.querySelectorAll('.forum-unread, .forum-last-reply').forEach(item=>item.remove());
       if(isUnread(t)){const flag=document.createElement('span');flag.className='forum-unread';flag.textContent='● Unread';card.querySelector('.thread-kicker').append(flag);}
       const age=card.querySelector('.thread-age');if(age)age.innerHTML='Started '+timeHTML(t.created_at);
       if(t.last_reply_at){const last=document.createElement('p');last.className='forum-last-reply';last.innerHTML='Last reply '+timeHTML(t.last_reply_at)+` <button class="text-button" data-forum-latest="${esc(t.id)}">Read latest ↗</button>`;card.append(last);}
@@ -35,8 +36,9 @@ export function createForum(ctx){
     return `<nav class="forum-pager" aria-label="Reply pages"><button class="button-quiet" data-forum-page="${page-1}" ${page===0?'disabled':''}>← Earlier</button><span>${total?'Replies '+(page*50+1)+'–'+Math.min(total,(page+1)*50)+' of '+total:'No replies yet'} · page ${page+1}/${pages}</span><button class="button-quiet" data-forum-page="${page+1}" ${page>=pages-1?'disabled':''}>Later →</button></nav>`;
   }
   function attachReply(){
-    const form=document.getElementById('reply-form');quoted=null;
-    if(!form)return;
+    const form=document.getElementById('reply-form');
+    if(!form||form.dataset.forumEnhanced==='1')return;
+    quoted=null;form.dataset.forumEnhanced='1';
     form.insertAdjacentHTML('afterbegin','<div id="forum-quote-target" class="forum-quote-target" hidden></div><input type="hidden" name="replyToId" value="">');
     const toolbar=document.createElement('div');toolbar.className='forum-editor-tools';toolbar.setAttribute('aria-label','Reply formatting');toolbar.innerHTML='<button type="button" class="button-quiet" data-forum-format="bold">Bold</button><button type="button" class="button-quiet" data-forum-format="code">Code</button><button type="button" class="button-quiet" data-forum-format="quote">Quote text</button><button type="button" class="button-quiet" data-forum-preview>Preview</button>';
     form.querySelector('textarea').closest('label').before(toolbar);
