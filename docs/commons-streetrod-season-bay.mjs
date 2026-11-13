@@ -9,9 +9,9 @@ let busy=false,tool='loosen';
 const defs=[
  ['carb','Carburetor','Twin carb mounting studs'],
  ['manifold','Intake manifold','Four inlet fasteners'],
- ['engine','Engine block','Main engine mounting bolts and ignition'],
+ ['engine','Engine block','Ignition wiring, battery ground, coolant hoses and fuel feed'], 
  ['gearbox','Transmission','Bellhousing mounts and shift linkage'],
- ['wheels','Wheels & tires','Four locking wheel bolts']
+ ['wheels','Wheels & tires','Use jack and stands, then tighten lugs in cross-pattern']
 ];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function message(text,bad=false){const x=holder?.querySelector('.ssb-status');if(x){x.textContent=String(text);x.classList.toggle('error',bad)}}
@@ -48,22 +48,27 @@ function contents(){
    '<div class="ssb-bolts">'+(mounted?bolts.map((value,i)=>
     '<button type="button" data-ssb="bolt" data-part="'+key+'" data-index="'+i+'" data-delta="'+(tool==='loosen'?-1:1)+
     '" aria-label="'+tool+' '+label+' bolt '+(i+1)+'"><span>'+(value===2?'✣':value===1?'◉':'○')+'</span>'+
-    '<small>'+(i+1)+'</small></button>').join(''):'<span class="ssb-removed-warning">Part removed. Reinstall before racing.</span>')+'</div>'+
+    '<small>'+(i+1)+'/2</small></button>').join(''):'<span class="ssb-removed-warning">Part removed. Reinstall before racing.</span>')+'</div>'+
    '<div class="ssb-component-controls">'+
    '<button type="button" data-ssb="'+(mounted?'remove':'install')+'" data-part="'+key+'">'+(mounted?'Lift part':'Refit part')+'</button>'+
-   (key==='engine'&&mounted?'<button type="button" data-ssb="wire" data-part="engine">'+(part.wires?'Disconnect ignition':'Reconnect ignition')+'</button>':'')+
+   (key==='engine'&&mounted?'<button type="button" data-ssb="wire" data-part="engine">'+(part.wires?'Disconnect ignition':'Reconnect ignition')+'</button>'+
+    '<button type="button" data-ssb="battery" data-part="engine">'+(part.battery===false?'Reconnect battery':'Disconnect battery ground')+'</button>'+
+    '<button type="button" data-ssb="coolant" data-part="engine">'+(part.coolant===false?'Reconnect coolant hose':'Disconnect coolant hose')+'</button>'+
+    '<button type="button" data-ssb="fuel" data-part="engine">'+(part.fuel_line===false?'Reconnect fuel feed':'Disconnect fuel feed')+'</button>':'')+
+   (key==='wheels'?'<button type="button" class="ssb-jack" data-ssb="jack" data-part="wheels">'+(part.jacked?'Lower jack (after torque)':'Raise jack and stands')+'</button>':'')+
    (key==='gearbox'&&mounted?'<button type="button" data-ssb="link" data-part="gearbox">'+(part.linked?'Disconnect linkage':'Reconnect linkage')+'</button>':'')+
    '</div></article>';
  }).join('');
  holder.querySelector('.ssb-body').innerHTML=
  '<div class="ssb-title-row"><div><p>THE SEASONAL WORKSHOP · '+safe(vehicle)+'</p><h4>Under the hood</h4>'+
- '<span>Remove parts in order. Tighten every bolt and reconnect wiring before starting.</span></div>'+
+ '<span>Remove carburetor before manifold. Disconnect battery, ignition, coolant and fuel before lifting engine. Jack wheels before loosening.</span></div>'+ 
  '<div class="ssb-readiness '+(ready?'ready':'unsafe')+'">'+(ready?'SAFE TO RACE':'DISASSEMBLED · DO NOT RACE')+'</div></div>'+
  '<div class="ssb-mechanical-art"><div class="ssb-bonnet"><span>OPEN HOOD · ENGINE COMPARTMENT</span></div>'+
  '<div class="ssb-chassis"><div class="ssb-air-cleaner">AIR CLEANER</div><div class="ssb-block"><span>VINTAGE V8</span>'+
  '<i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ssb-radiator">RADIATOR</div></div></div>'+
  '<nav class="ssb-wrench-switch"><strong>WRENCH POSITION</strong><button type="button" data-ssb-tool="loosen" aria-pressed="'+(tool==='loosen')+'">↶ Loosen</button>'+
  '<button type="button" data-ssb-tool="tighten" aria-pressed="'+(tool==='tighten')+'">↷ Tighten</button></nav>'+
+ '<div class="ssb-torque-guide"><strong>TORQUE ORDER: 1 - 3 - 2 - 4.</strong> For engine, gearbox and wheel bolts, snug all fasteners to stage 1 before the final cross-pattern torque pass. Loosen to 0 before removal. Reconnect all fluids and electricity, and lower the jack before racing.</div>'+
  '<div class="ssb-components">'+partView+'</div>'+
  '<div class="ssb-bottom"><div><strong>'+ (planned?'SERVICE PLAN · '+safe(service.kind).toUpperCase():'ORIGINAL ASSEMBLY')+'</strong>'+
  '<p>'+(planned?(service.prepared?'Replacement part has been removed once. Restore all parts and fasteners, then certify the job.':
