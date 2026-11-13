@@ -172,12 +172,12 @@ function previewArt(spec){
 }
 function sitePreview(s){
   const spec=previewSpecs[s.id]||[s.previewKind||'directory',s.name,'Explore','Try a task'];
-  const domain=new URL(s.url).hostname.replace(/^www\\./,'');
+  const domain=new URL(s.url).hostname.replace(/^www\./,'');
   // The manifest lists only successfully rendered public website screenshots.
   // Never call an illustration a real screenshot, and don't request third-party
   // thumbnail services from visitors' browsers.
   const shot=Object.hasOwn(window.CowboySiteShots||{},s.id)?window.CowboySiteShots[s.id]:null;
-  const hasShot=!!(shot&&/^\\d{4}-\\d{2}-\\d{2}$/.test(shot.captured));
+  const hasShot=!!(shot&&/^\d{4}-\d{2}-\d{2}$/.test(shot.captured));
   let hash=2166136261;
   for(const char of s.id){hash^=char.codePointAt(0);hash=Math.imul(hash,16777619)>>>0;}
   const hue=hash%360;
