@@ -48,7 +48,7 @@ function contents(){
    '<div class="ssb-bolts">'+(mounted?bolts.map((value,i)=>
     '<button type="button" data-ssb="bolt" data-part="'+key+'" data-index="'+i+'" data-delta="'+(tool==='loosen'?-1:1)+
     '" aria-label="'+tool+' '+label+' bolt '+(i+1)+'"><span>'+(value===2?'✣':value===1?'◉':'○')+'</span>'+
-    '<small>'+(i+1)+'/2</small></button>').join(''):'<span class="ssb-removed-warning">Part removed. Reinstall before racing.</span>')+'</div>'+
+    '<small>#'+(i+1)+' '+value+'/2</small></button>').join(''):'<span class="ssb-removed-warning">Part removed. Reinstall before racing.</span>')+'</div>'+
    '<div class="ssb-component-controls">'+
    '<button type="button" data-ssb="'+(mounted?'remove':'install')+'" data-part="'+key+'">'+(mounted?'Lift part':'Refit part')+'</button>'+
    (key==='engine'&&mounted?'<button type="button" data-ssb="wire" data-part="engine">'+(part.wires?'Disconnect ignition':'Reconnect ignition')+'</button>'+
