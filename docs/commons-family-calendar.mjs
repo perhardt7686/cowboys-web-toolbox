@@ -63,7 +63,7 @@ if(board&&location.pathname.endsWith('community.html')){
    link.target='_blank';link.rel='noopener noreferrer';
    link.textContent='Create a separate Family calendar in Google';
    const warning=document.createElement('p');warning.className='family-calendar-caution';
-   warning.textContent='Use a separate calendar for group-safe events. Do not publish a personal calendar with children’s private details, addresses or appointments.';
+   warning.textContent='Use a newly created secondary Google calendar, not your primary calendar even if it is named Family. Never publish personal appointments, children’s private details, home addresses or medical visits.';
    card.append(title,copy,link,warning);slot.replaceChildren(card);
   }
  };
