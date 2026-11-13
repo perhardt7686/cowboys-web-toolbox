@@ -1,0 +1,254 @@
+/* DOS computer edition. Original 320×200 16-colour pixel-art and square
+ * bevelled EGA windows. CSS changes are ONLY in the Street r0d game.
+ * Mouse, keyboard and 44px touch controls remain usable.
+*/
+body.community-page #streetrod-root.sr-ega-mode{
+ --sr-black:#000000;--sr-blue:#0000aa;--sr-green:#00aa00;--sr-cyan:#00aaaa;
+ --sr-red:#aa0000;--sr-magenta:#aa00aa;--sr-brown:#aa5500;
+ --sr-silver:#aaaaaa;--sr-gray:#555555;--sr-brightblue:#5555ff;
+ --sr-brightgreen:#55ff55;--sr-brightcyan:#55ffff;
+ --sr-brightred:#ff5555;--sr-pink:#ff55ff;--sr-yellow:#ffff55;--sr-white:#ffffff;
+ --sr-egafont:'Courier New',Courier,monospace;
+ background:#000!important;color:#eee!important;
+ border:4px solid #aaaaaa!important;border-radius:0!important;
+ box-shadow:inset 0 0 0 3px #555555,0 18px 28px #000a!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .src-top,.src-scene-menu,.ss-summer,.ss-scene,.ss-metrics,.sr-race-card,
+ .ssg-station,.ssb-workbench,.src-paper,.ss-newspaper,.src-parts-scene,
+ .ss-garage-stats,.ss-diner-hero,.src-diner-scene,.ss-parts-counter
+){font-family:var(--sr-egafont)!important}
+body.community-page #streetrod-root.sr-ega-mode :is(h2,h3,h4,h5,strong,b,small,p,span,label,summary,button,input,select){
+ font-family:var(--sr-egafont)!important;text-shadow:none!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-summer,.src-top,.src-garage-stage,.src-scene,.ssb-workbench,.ssg-station){
+ background:#000!important;color:#fff!important;
+ box-shadow:none!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-summer h3,.ss-summer h4,.ss-summer h5,
+ .src-top h3,.src-paper h4,.src-parts-scene h4,.ssb-workbench h4
+){font:900 clamp(1.15rem,2.5vw,1.65rem)/1.35 var(--sr-egafont)!important;
+ color:#ffff55!important;letter-spacing:-.015em!important}
+body.community-page #streetrod-root.sr-ega-mode :is(.src-super,.ss-top small,.ss-scene-head small,.ssb-title-row p){
+ color:#55ffff!important;letter-spacing:.05em!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-top p,.ss-scene-head p,.src-top p,.ss-hint,.src-scene-note){
+ color:#aaaaaa!important
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-summer button,.src-scene-menu button,.ss-tabs button,
+ .ssb-workbench button,.ssg-station button,.src-scene-actions button,
+ .src-paper button,.sr-action,.ss-ad-actions button
+){
+ border:2px solid #fff!important;
+ border-right-color:#555555!important;border-bottom-color:#555555!important;
+ border-radius:0!important;background:#0000aa!important;color:#ffffff!important;
+ box-shadow:inset 1px 1px 0 #aaaaaa!important;
+ font:900 clamp(.73rem,1.45vw,.95rem)/1.25 var(--sr-egafont)!important;
+ letter-spacing:0!important;text-transform:uppercase;
+ padding:8px 10px!important;min-height:44px;cursor:pointer;
+ text-shadow:none!important;transition:none!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-summer button,.src-scene-menu button,.ss-tabs button,.ssb-workbench button,.ssg-station button):is(:hover,[aria-pressed=true]){
+ background:#aaaaaa!important;color:#000000!important;border-color:#ffffff #555555 #555555 #ffffff!important
+}
+body.community-page #streetrod-root.sr-ega-mode button:focus-visible{
+ outline:3px solid #ffff55!important;outline-offset:3px!important
+}
+body.community-page #streetrod-root.sr-ega-mode button:disabled{
+ background:#555555!important;color:#aaaaaa!important;opacity:.7!important;cursor:not-allowed
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-metrics>div,.ss-garage-stats>div,.ss-parts-counter article,.ss-inventory-item,
+ .ss-rival,.ss-workshop-preview,.ss-inline-form,.ss-alert,.ss-empty,
+ .ss-status,.ss-challenge-form,.ss-calendar-info,.ss-service,.ss-race-result,
+ .ssb-component,.ssb-bottom,.ssb-status,.ssg-status,.ssg-station,.ss-calendar-big
+){
+ background:#000!important;border:2px solid #aaaaaa!important;border-radius:0!important;
+ box-shadow:2px 2px 0 #555555!important;color:#fff!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-metrics,.ss-tabs){
+ gap:4px!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-metrics small,.ss-garage-stats b,.ss-rival small,.ssb-component header strong,.ss-challenge-form h5
+){color:#ffff55!important}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-rival p,.ss-parts-counter p,.ss-component p,.ss-inventory-item span,.ss-garage-stats>div
+){color:#aaaaaa!important}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-scene-head,.ss-top){
+ border-bottom:2px solid #555555!important;padding-bottom:10px!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-garage-stage,.src-garage-stage,.ss-diner-hero,
+ .ssb-mechanical-art,.ss-service-art,.ssg-forecourt
+).sr-ega-active{
+ display:block!important;min-height:0!important;height:auto!important;max-height:none!important;
+ background:#000!important;padding:0!important;margin:0!important;
+ border:4px solid #aaaaaa!important;border-radius:0!important;
+ box-shadow:0 0 0 3px #555555!important;overflow:hidden!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .sr-ega-scene{
+ display:block!important;
+ width:min(100%,740px)!important;height:auto!important;max-height:none!important;
+ margin:0 auto!important;
+ aspect-ratio:4/3;
+ image-rendering:pixelated!important;
+ image-rendering:crisp-edges!important;
+ background:#000!important;
+ object-fit:fill;
+}
+body.community-page #streetrod-root.sr-ega-mode .ss-garage-stage.sr-ega-active > :not(canvas),
+body.community-page #streetrod-root.sr-ega-mode .ss-diner-hero.sr-ega-active > :not(canvas),
+body.community-page #streetrod-root.sr-ega-mode .ssb-mechanical-art.sr-ega-active > :not(canvas),
+body.community-page #streetrod-root.sr-ega-mode .ss-service-art.sr-ega-active > :not(canvas),
+body.community-page #streetrod-root.sr-ega-mode .ssg-forecourt.sr-ega-active > :not(canvas),
+body.community-page #streetrod-root.sr-ega-mode .src-parts-illustration.sr-ega-active > :not(canvas){
+ display:none!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .src-garage-stage.sr-ega-active > :is(
+ .src-garage-wall,.src-stage-car,.src-concrete-floor,.src-ground-shadow,.src-vehicle-label){
+ display:none!important
+}
+body.community-page #streetrod-root.sr-ega-mode .src-garage-stage.sr-ega-active .src-garage-hotspots{
+ position:relative!important;z-index:3!important;bottom:auto!important;left:auto!important;right:auto!important;
+ display:flex!important;flex-wrap:wrap!important;gap:4px!important;
+ padding:7px!important;background:#000!important;pointer-events:auto!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .src-garage-stage.sr-ega-active .src-garage-hotspots button{
+ position:relative!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;
+ transform:none!important;width:auto!important;max-width:100%!important;min-height:44px!important;
+ opacity:1!important;visibility:visible!important;
+ background:#0000aa!important;border:2px solid #aaaaaa!important;color:#fff!important;
+ padding:8px!important;font:800 .73rem/1.2 var(--sr-egafont)!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .src-paper.sr-ega-active .sr-ega-scene,
+body.community-page #streetrod-root.sr-ega-mode .ss-newspaper.sr-ega-active .sr-ega-scene{
+ border-bottom:4px solid #000;max-width:100%;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.src-paper,.ss-newspaper){
+ background:#aaaaaa!important;color:#000!important;
+ border:5px ridge #fff!important;border-radius:0!important;box-shadow:none!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.src-paper,.ss-newspaper) :is(
+ h4,h5,strong,span,p,label,small){color:#000!important}
+body.community-page #streetrod-root.sr-ega-mode .ss-newspaper .ss-ad{
+ border-color:#555555!important;background:#aaaaaa!important
+}
+body.community-page #streetrod-root.sr-ega-mode .ss-newspaper .ss-ad-photo{
+ background:#000!important;border:2px solid #555!important
+}
+body.community-page #streetrod-root.sr-ega-mode .ss-parts-counter.sr-ega-active > .sr-ega-scene{
+ grid-column:1/-1;max-width:100%;border:3px solid #aaaaaa;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-part-emblem,.ss-wall-rack){filter:grayscale(1)}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-ad,.ss-rival,.ss-inventory-item,.ss-bay-part){
+ border-radius:0!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-race-result>strong,.ss-diner-sign strong,.ss-calendar-big strong
+){color:#ffff55!important}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-cockpit,.sr-race-card #sr-track
+){border:4px solid #aaaaaa!important;border-radius:0!important;background:#000!important}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .ss-cockpit canvas,#sr-track
+){
+ display:block!important;image-rendering:pixelated!important;image-rendering:crisp-edges!important;
+ width:100%!important;height:auto!important;aspect-ratio:4/3!important;max-height:none!important;
+ background:#000!important;
+}
+body.community-page #streetrod-root.sr-ega-mode .ss-cockpit{max-width:740px!important;margin:0 auto!important}
+body.community-page #streetrod-root.sr-ega-mode :is(.ssb-bolts button,.ss-bay-bolts button){
+ min-width:49px!important;min-height:49px!important;background:#555555!important;border:3px ridge #ffffff!important;
+ color:#ffff55!important;border-radius:0!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ssb-wrench-switch button[aria-pressed=true],.ss-bay-wrench button[aria-pressed=true]){
+ background:#00aaaa!important;color:#000!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ssg-station input,.ss-inline-form select,.ss-inline-form input,.ss-challenge-form select,.ss-ad-actions input){
+ border:2px solid #555555!important;border-radius:0!important;color:#000!important;
+ background:#ffffff!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ss-diner-hero,.ss-rival-face){
+ border-radius:0!important;background:#000!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.sr-ega-car){
+ display:block!important;width:100%!important;max-width:260px!important;max-height:150px!important;
+ margin:auto;image-rendering:pixelated!important;image-rendering:crisp-edges!important;
+}
+body.community-page #streetrod-root.sr-ega-mode :is(
+ .sr-car-icon,.scc-car-visual,.ss-ad-photo,.src-hero-car){
+ border-radius:0!important;background:#000!important
+}
+body.community-page #streetrod-root.sr-ega-mode :is(.ssg-station,.ssb-workbench,.ss-service){
+ margin-block:8px!important
+}
+body.community-page #streetrod-root.sr-ega-mode .ss-physical-bay{
+ border:3px solid #ffffff!important;border-radius:0!important;background:#000!important
+}
+body.community-page #streetrod-root.sr-ega-mode .sr-race-card,
+body.community-page #streetrod-root.sr-ega-mode .ss-scene{
+ overflow:visible;min-width:0
+}
+body.community-page #streetrod-root.sr-ega-mode #sr-inside{
+ background:#000!important;color:#fff!important
+}
+body.community-page #streetrod-root.sr-ega-mode .ss-start-lights{
+ background:#000!important;color:#55ff55!important;border:2px solid #fff!important;border-radius:0!important
+}
+/* Simulated boot computer only shown on user entry, not a fake browser permission prompt */
+body.community-page .sr-dos-overlay{
+ position:fixed;inset:0;z-index:2147483000;overflow-y:auto;
+ display:grid;place-items:center;padding:20px;
+ background:#000;cursor:default;
+ font-family:'Courier New',Courier,monospace;
+}
+body.community-page .sr-dos-screen{
+ width:min(96vw,850px);min-height:min(70vh,610px);
+ display:flex;flex-direction:column;
+ border:8px ridge #aaaaaa;padding:clamp(17px,3vw,30px);
+ background:#000000;color:#aaaaaa;
+ box-shadow:0 0 0 5px #555555,0 0 55px #0000aa99;
+ font-family:'Courier New',Courier,monospace;
+}
+body.community-page .sr-dos-bios{
+ background:#0000aa;color:#ffffff;text-align:center;
+ padding:8px;min-height:42px;font:bold clamp(.9rem,2.4vw,1.3rem)/1.3 'Courier New',monospace;
+}
+body.community-page .sr-dos-boot-log{
+ color:#aaaaaa;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:4;
+ font:bold clamp(.75rem,2.3vw,1.12rem)/1.6 'Courier New',monospace;
+ margin:22px 0;flex:1;
+}
+body.community-page .sr-dos-boot-log::after{
+ content:'█';color:#ffff55;animation:sr-dos-cursor .9s steps(2,end) infinite
+}
+body.community-page .sr-dos-boot-actions{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+ border-top:2px solid #555555;padding-top:16px;color:#ffff55;
+ font:bold .9rem/1.5 'Courier New',monospace
+}
+body.community-page .sr-dos-skip{
+ min-height:48px;background:#aaaaaa;color:#000000;border:3px outset #ffffff;
+ border-radius:0;padding:9px 18px;cursor:pointer;
+ font:bold .9rem 'Courier New',monospace
+}
+body.community-page .sr-dos-skip:focus-visible{outline:4px solid #ffff55;outline-offset:3px}
+@keyframes sr-dos-cursor{50%{opacity:0}}
+@media(max-width:580px){
+ body.community-page #streetrod-root.sr-ega-mode :is(.ss-metrics,.ss-tabs){
+ grid-template-columns:repeat(2,minmax(0,1fr))!important
+ }
+ body.community-page #streetrod-root.sr-ega-mode .ss-garage-stats{
+ grid-template-columns:repeat(2,minmax(0,1fr))!important
+ }
+ body.community-page #streetrod-root.sr-ega-mode .ss-garage-stage.sr-ega-active .sr-ega-scene{
+ width:100%!important
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .sr-dos-boot-log::after{animation:none}
+ body.community-page .sr-dos-overlay *{animation:none!important;transition:none!important}
+}
