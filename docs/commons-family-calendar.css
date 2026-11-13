@@ -1,0 +1,69 @@
+/* Collapsible Family Calendar, separate from private Google calendars */
+body.community-page .family-calendar-panel{margin:16px auto 24px}
+body.community-page .family-calendar-panel[hidden]{display:none!important}
+body.community-page .family-calendar-panel *{box-sizing:border-box}
+body.community-page .family-calendar-panel>details{
+ overflow:hidden;border:1px solid #ad8cba;border-radius:21px;
+ color:#f5f1ee;background:linear-gradient(136deg,#292136,#171c28 67%,#39263e);
+ box-shadow:0 13px 39px #08091770,inset 0 1px 0 #fff2;
+}
+body.community-page .family-calendar-panel summary{
+ min-height:94px;display:flex;align-items:center;gap:clamp(12px,3vw,22px);
+ padding:clamp(15px,3vw,22px);list-style:none;cursor:pointer;user-select:none;
+ background:linear-gradient(108deg,#362342,#251e34 65%,#3d2a47);
+ border-bottom:1px solid transparent;
+}
+body.community-page .family-calendar-panel details[open]>summary{border-color:#a58b9e}
+body.community-page .family-calendar-panel summary::-webkit-details-marker{display:none}
+body.community-page .family-calendar-icon{
+ flex:0 0 58px;width:58px;height:58px;display:grid;place-items:center;
+ border:1px solid #d1b18f;border-radius:16px;
+ background:linear-gradient(150deg,#eecb8e,#9e6c70);
+ box-shadow:0 5px 0 #1b111e;
+ color:#281a30;font-size:29px;
+}
+body.community-page .family-calendar-copy{flex:1;min-width:0;display:grid;gap:6px}
+body.community-page .family-calendar-copy strong{
+ font-family:Georgia,Cambria,'Times New Roman',serif;
+ font-size:clamp(1.25rem,3.4vw,2rem);
+ font-weight:800;letter-spacing:-.018em;color:#ffe1a9;
+ line-height:1.1;text-wrap:balance;
+}
+body.community-page .family-calendar-copy small{font-size:clamp(.8rem,2vw,.96rem);line-height:1.4;color:#eee5eb}
+body.community-page .family-calendar-open{font-size:26px;color:#ffdfa5;transition:transform .2s;line-height:1}
+body.community-page details[open] .family-calendar-open{transform:rotate(180deg)}
+body.community-page .family-calendar-inner{display:grid;gap:18px;padding:clamp(14px,3vw,23px)}
+body.community-page .family-calendar-intro{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+ padding:15px 18px;background:#302d3d;border:1px solid #786b85;border-radius:13px;
+}
+body.community-page .family-calendar-intro>div{min-width:0;flex:1 1 250px}
+body.community-page .family-calendar-intro p{margin:0 0 5px;color:#f1d099;letter-spacing:.12em;font-size:.73rem;font-weight:900}
+body.community-page .family-calendar-intro h2{
+ margin:0 0 7px;font-family:Georgia,serif;color:#ffe5b4;font-size:clamp(1.45rem,2.8vw,1.9rem);line-height:1.18;
+}
+body.community-page .family-calendar-intro span{color:#e9e3ea;font-size:.91rem;line-height:1.55}
+body.community-page .family-calendar-chip{display:inline-flex;padding:8px 11px;border-radius:100px;border:1px solid #d2ae79;color:#ffdda7;font-size:.66rem;font-weight:900;letter-spacing:.08em;white-space:nowrap}
+body.community-page .family-calendar-content{min-width:0}
+body.community-page .family-calendar-controls{display:flex;align-items:center;justify-content:space-between;gap:11px;flex-wrap:wrap;margin-bottom:12px}
+body.community-page .family-calendar-controls a,
+body.community-page .family-calendar-setup a{
+ display:inline-flex;align-items:center;min-height:44px;padding:11px 15px;border:1px solid #efcd8e;
+ border-radius:10px;background:#f3d599;color:#221729;font-weight:850;font-size:.88rem;text-decoration:none;
+}
+body.community-page .family-calendar-controls>span{color:#e0d5e3;font-size:.86rem;line-height:1.45}
+body.community-page .family-calendar-frame{display:block;width:100%;min-width:0;height:660px;min-height:580px;background:#fffdf7;border:1px solid #e4cb9e;border-radius:13px}
+body.community-page .family-calendar-setup{
+ padding:clamp(16px,3vw,25px);border:1px dashed #bda2ac;border-radius:15px;background:#272733;
+}
+body.community-page .family-calendar-setup h3{color:#ffe2aa;font-size:clamp(1.2rem,3vw,1.55rem);margin:0 0 8px}
+body.community-page .family-calendar-setup p{color:#ece3eb;font-size:.97rem;line-height:1.65;max-width:65ch}
+body.community-page .family-calendar-setup .family-calendar-caution{color:#f4dfc3;font-size:.86rem;margin-top:15px}
+body.community-page .family-calendar-panel :is(summary,a):focus-visible{outline:3px solid #15b7b7!important;outline-offset:3px!important}
+@media(max-width:620px){
+ body.community-page .family-calendar-panel summary{min-height:82px}
+ body.community-page .family-calendar-icon{flex-basis:48px;width:48px;height:48px;font-size:25px}
+ body.community-page .family-calendar-frame{height:610px;min-height:540px}
+ body.community-page .family-calendar-intro{padding:13px}
+}
+@media(prefers-reduced-motion:reduce){body.community-page .family-calendar-panel *{transition:none!important}}
