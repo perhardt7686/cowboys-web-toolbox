@@ -9,7 +9,7 @@ const fmt=n=>Number(n||0).toLocaleString('en-US');
 const time=n=>n==null?'—':(Number(n)/1000).toFixed(2)+'s';
 const initials=n=>String(n||'Racer').trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join('').toUpperCase();
 const icons={compass:'◈',spark:'✳',leaf:'❧',hammer:'⚒',bolt:'ϟ',mountain:'△',coffee:'☕',fox:'🦊',planet:'◉',rocket:'🚀',paw:'🐾'};
-const badgeNames={first_key:'First Ignition',first_win:'Victory Lane',night_shift:'Night Shift',ten_races:'Road Warrior',fifty_races:'Long Haul',hundred_races:'Road Legend',eleven_second:'Eleven Second Club',street_champion:'Street Champion',rival_slayer:'Rival Slayer',rival_king:'Rival King',collector:'Car Collector',full_build:'Master Mechanic',credit_millionaire:'Garage Tycoon',six_figures:'Six-Figure Racer'};
+const badgeNames={first_key:'First Ignition',first_win:'Victory Lane',night_shift:'Night Shift',ten_races:'Road Warrior',fifty_races:'Long Haul',hundred_races:'Road Legend',eleven_second:'Eleven Second Club',street_champion:'Street Champion',rival_slayer:'Rival Slayer',rival_king:'Rival King',collector:'Car Collector',full_build:'Master Mechanic',credit_millionaire:'Garage Tycoon',six_figures:'Six-Figure Racer',cipher_breaker:'Cipher Breaker',junior_pilot:'Junior Pilot',junior_triple:'Perfect Star Run'};
 let client,ui,me,players=[],imageURLs=new Map(),roster=null,latest=0,connecting=false;
 const carNames={rattler:'Rattler 48',comet:'Comet 55',nomad:'Nomad 63',meteor:'Meteor 67',phantom:'Phantom X'};
 function avatar(p){
@@ -64,6 +64,7 @@ async function refresh(force=false){
   const [show,state]=await Promise.all([client.rpc('community_streetrod_showroom'),client.rpc('community_streetrod_state')]);
   if(show.error)throw show.error;
   me=uid;players=show.data?.drivers||[];roster=state.data||{};
+  for(const c of roster.catalog||[])carNames[c.key]=c.name;
   const paths=[...new Set(players.filter(p=>p.avatar_mode==='photo'&&p.avatar_path).map(p=>p.avatar_path))];
   imageURLs.clear();
   if(paths.length){const signed=await client.storage.from('community-avatars').createSignedUrls(paths,300);
