@@ -10,6 +10,8 @@ const $=id=>document.getElementById(id);
 const BADGES=[
  ['first_key','First Ignition','Complete your first race','🔑'],
  ['cipher_breaker','Cipher Breaker','Defeat the final mystery van','👑'],
+ ['junior_pilot','Junior Pilot','Complete a family-friendly star drive','🌟'],
+ ['junior_triple','Perfect Star Run','Collect three stars in a single junior drive','✨'],
  ['first_win','Victory Lane','Win your first race','🏆'],
  ['night_shift','Night Shift','Finish five races','🌙'],
  ['ten_races','Road Warrior','Complete ten races','🛣️'],
