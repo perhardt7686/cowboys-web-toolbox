@@ -54,12 +54,14 @@ jobs:
           assert all(v['captured'] for v in data.values())
           print('Verified',len(data),'site-specific screenshot assets.')
           PY
+      - name: Rebuild the homepage and downloadable preview
+        run: python3 build.py
       - name: Commit only generated screenshot images and manifest
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/site-shots/
+          git add docs/site-shots/ docs/index.html docs/Cowboys-Web-Toolbox-Preview.html
           if git diff --cached --quiet; then
             echo 'No new public screenshot captures.'
             exit 0
