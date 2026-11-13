@@ -67,28 +67,15 @@ async def main():
    assert await page.locator("body").get_attribute("data-arcade-scene")=="levels"
    dims=await page.locator("#mahjong-root").bounding_box()
    assert dims and dims["y"]>=84 and dims["height"]<=844, dims
-   page.on("console",lambda m:print("BROWSER LOG:",m.text,flush=True) if "OPTIONS" in m.text else None)
-   await page.evaluate("""()=>{
-     const v=document.getElementById('arcade-options-view');
-     const d=Object.getOwnPropertyDescriptor(HTMLElement.prototype,'hidden');
-     Object.defineProperty(v,'hidden',{
-       configurable:true,get(){return d.get.call(this)},
-       set(value){console.log('OPTIONS SET HIDDEN',value,new Error().stack);return d.set.call(this,value)}
-     });
-   }""")
+   await page.locator('#arcade-hud [data-arcade-action="scene-previous"]').click()
+   assert await page.locator("body").get_attribute("data-arcade-scene")=="play"
+   await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
+   assert await page.locator("body").get_attribute("data-arcade-scene")=="levels"
    await page.locator('#arcade-hud [data-arcade-action="options"]').click()
-   print("OPTIONS BEFORE CHECK",await page.locator("#arcade-options-view").evaluate("el=>el.hidden"),flush=True)
+   assert not await page.locator('#arcade-options-view').evaluate("el=>el.hidden")
    await page.locator('#arcade-options-form input[name="contrast"][value="bright"]').check()
-   print("OPTIONS AFTER CHECK",await page.locator("#arcade-options-view").evaluate("el=>el.hidden"),flush=True)
    assert await page.locator("body").get_attribute("data-arcade-contrast")=="bright"
-   debug=await page.locator('#arcade-options-view [data-arcade-action="options-back"]').evaluate("""el=>{
-    const chain=[];for(let n=el;n&&chain.length<7;n=n.parentElement){
-      const st=getComputedStyle(n),r=n.getBoundingClientRect();
-      chain.push({name:n.tagName+'#'+(n.id||''),hidden:n.hidden,display:st.display,visibility:st.visibility,overflow:st.overflow,
-        rect:{x:r.x,y:r.y,w:r.width,h:r.height},scroll:n.scrollHeight,client:n.clientHeight});
-    }return chain;}""")
-   print("ARCADE SETTINGS VISIBILITY DIAGNOSTIC",debug,flush=True)
-   await page.locator('#arcade-options-view [data-arcade-action="options-back"]').click(timeout=4500)
+   await page.locator('#arcade-options-view [data-arcade-action="options-back"]').click()
    assert await page.locator("body").get_attribute("data-arcade-game")=="mahjong"
    await page.locator('#arcade-hud [data-arcade-action="home"]').click()
    await page.locator('#arcade-program-grid [data-arcade-game="plates"]').click()
