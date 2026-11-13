@@ -4,7 +4,7 @@
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {drawPhotoCar,carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
-import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=classic1';
+import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=practice1';
 import {openWorkshop} from './commons-streetrod-mechanics.mjs?v=mech1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
