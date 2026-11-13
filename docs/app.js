@@ -206,7 +206,7 @@ document.addEventListener('error',event=>{
 const previewMedia=matchMedia('(prefers-reduced-motion: reduce)');
 let previewMotion=!previewMedia.matches;
 try{if(localStorage.getItem('cowboy-web-toolbox-motion')==='off')previewMotion=false}catch{}
-const previewButton=document.createElement('button');previewButton.id='preview-motion';previewButton.className='preview-motion';previewButton.type='button';previewButton.setAttribute('aria-label','Animated website previews');previewButton.title='Play or pause the illustrated website previews';
+const previewButton=document.createElement('button');previewButton.id='preview-motion';previewButton.className='preview-motion';previewButton.type='button';previewButton.setAttribute('aria-label','Animated website previews');previewButton.title='Play or pause movement on real homepage screenshots and illustrated fallbacks';
 document.querySelector('.result-options').prepend(previewButton);
 function syncPreviewMotion(){document.body.classList.toggle('previews-enabled',previewMotion&&!document.hidden);previewButton.setAttribute('aria-pressed',String(previewMotion));previewButton.innerHTML=previewMotion?'<span aria-hidden="true">Ⅱ</span> Previews on':'<span aria-hidden="true">▷</span> Previews paused'}
 previewButton.addEventListener('click',()=>{previewMotion=!previewMotion;document.body.classList.toggle('previews-user-enabled',previewMotion);try{localStorage.setItem('cowboy-web-toolbox-motion',previewMotion?'on':'off')}catch{}syncPreviewMotion()});
