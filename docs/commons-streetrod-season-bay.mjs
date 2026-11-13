@@ -5,7 +5,7 @@
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const config=window.COWBOY_COMMUNITY_CONFIG;
 let root=null,holder=null,client=null,promise=null,vehicle=null,session=null,bench=null;
-let busy=false,tool='loosen';
+let busy=false,tool='loosen',turnGesture=null,blockedBoltClick=null;
 const defs=[
  ['carb','Carburetor','Twin carb mounting studs'],
  ['manifold','Intake manifold','Four inlet fasteners'],
@@ -35,6 +35,54 @@ async function rpc(fn,args){
  if(error)throw Error(error.message||'Workbench record unavailable');
  return data;
 }
+function nextTorqueGuide(part){
+ const bolts=Array.isArray(part?.bolts)?part.bolts:[];
+ if(bolts.length!==4||tool!=='tighten'||!part?.mounted)return '';
+ const order=[0,2,1,3];
+ const stage=bolts.some(x=>Number(x)<1)?0:bolts.some(x=>Number(x)<2)?1:2;
+ if(stage===2)return '<div class="ssb-next-bolt">ALL FOUR TORQUED · STAGE 2 COMPLETE</div>';
+ const next=order.find(i=>Number(bolts[i])===stage);
+ return '<div class="ssb-next-bolt">NEXT WRENCH: BOLT #'+((next??0)+1)+' · '+(stage?'FINAL TORQUE':'SNUG PASS')+'</div>';
+}
+function cancelTurn(){
+ if(!turnGesture)return;
+ turnGesture.bolt.classList.remove('ssb-wrench-dragging');
+ turnGesture.bolt.style.removeProperty('--ssb-turn');
+ turnGesture=null;
+}
+function installWrenchGestures(){
+ holder.addEventListener('pointerdown',e=>{
+  const b=e.target.closest('button[data-ssb="bolt"]');
+  if(!b||busy||!bench)return;
+  cancelTurn();
+  turnGesture={bolt:b,id:e.pointerId,x:e.clientX,y:e.clientY};
+  b.classList.add('ssb-wrench-dragging');
+  try{b.setPointerCapture(e.pointerId)}catch{}
+ });
+ holder.addEventListener('pointermove',e=>{
+  const t=turnGesture;if(!t||e.pointerId!==t.id)return;
+  const dx=Math.max(-65,Math.min(65,e.clientX-t.x));
+  t.bolt.style.setProperty('--ssb-turn',String(dx*1.1)+'deg');
+ });
+ holder.addEventListener('pointerup',e=>{
+  const t=turnGesture;if(!t||e.pointerId!==t.id)return;
+  const dx=e.clientX-t.x,dy=e.clientY-t.y;
+  const action=t.bolt.dataset.ssb,part=t.bolt.dataset.part,slot=Number(t.bolt.dataset.index);
+  const delta=Number(t.bolt.dataset.delta);
+  cancelTurn();
+  if(Math.hypot(dx,dy)<28)return; // a normal tap still works for keyboard and touch accessibility
+  blockedBoltClick={part,slot,until:performance.now()+800};
+  e.preventDefault();
+  if((tool==='tighten'&&dx<28)||(tool==='loosen'&&dx>-28)){
+   message('Turn the wrench '+(tool==='tighten'?'right (clockwise)':'left (counterclockwise)')+'. No bolt change was saved.',true);
+   return;
+  }
+  if(action==='bolt')void act('bolt',part,slot,delta);
+ });
+ holder.addEventListener('pointercancel',cancelTurn);
+ holder.addEventListener('lostpointercapture',cancelTurn);
+}
+
 function contents(){
  if(!holder)return;
  if(!bench){holder.querySelector('.ssb-body').innerHTML='<p>Opening your saved engine bay…</p>';return;}
@@ -45,9 +93,10 @@ function contents(){
   const part=parts[key]||{},mounted=Boolean(part.mounted),bolts=part.bolts||[];
   return '<article class="ssb-component '+(mounted?'mounted':'removed')+'"><header><strong>'+safe(label)+'</strong>'+
    '<span>'+(mounted?'BOLTED TO CAR':'IN PARTS TRAY')+'</span></header><p>'+safe(desc)+'</p>'+
+   nextTorqueGuide(part)+
    '<div class="ssb-bolts">'+(mounted?bolts.map((value,i)=>
     '<button type="button" data-ssb="bolt" data-part="'+key+'" data-index="'+i+'" data-delta="'+(tool==='loosen'?-1:1)+
-    '" aria-label="'+tool+' '+label+' bolt '+(i+1)+'"><span>'+(value===2?'✣':value===1?'◉':'○')+'</span>'+
+    '" title="Drag '+(tool==='tighten'?'right to tighten':'left to loosen')+' or tap to make one saved wrench turn" aria-label="'+tool+' '+label+' bolt '+(i+1)+'"><span>'+(value===2?'✣':value===1?'◉':'○')+'</span>'+
     '<small>#'+(i+1)+' '+value+'/2</small></button>').join(''):'<span class="ssb-removed-warning">Part removed. Reinstall before racing.</span>')+'</div>'+
    '<div class="ssb-component-controls">'+
    '<button type="button" data-ssb="'+(mounted?'remove':'install')+'" data-part="'+key+'">'+(mounted?'Lift part':'Refit part')+'</button>'+
@@ -68,7 +117,7 @@ function contents(){
  '<i></i><i></i><i></i><i></i><i></i><i></i></div><div class="ssb-radiator">RADIATOR</div></div></div>'+
  '<nav class="ssb-wrench-switch"><strong>WRENCH POSITION</strong><button type="button" data-ssb-tool="loosen" aria-pressed="'+(tool==='loosen')+'">↶ Loosen</button>'+
  '<button type="button" data-ssb-tool="tighten" aria-pressed="'+(tool==='tighten')+'">↷ Tighten</button></nav>'+
- '<div class="ssb-torque-guide"><strong>TORQUE ORDER: 1 - 3 - 2 - 4.</strong> For engine, gearbox and wheel bolts, snug all fasteners to stage 1 before the final cross-pattern torque pass. Loosen to 0 before removal. Reconnect all fluids and electricity, and lower the jack before racing.</div>'+
+ '<div class="ssb-torque-guide"><strong>TORQUE ORDER: 1 - 3 - 2 - 4.</strong> For engine, gearbox and wheel bolts, snug all fasteners to stage 1 before the final cross-pattern torque pass. Drag right to tighten or left to loosen each bolt, or tap the bolt for an accessible single turn. Loosen to 0 before removal. Reconnect all fluids and electricity, and lower the jack before racing.</div>'+
  '<div class="ssb-components">'+partView+'</div>'+
  '<div class="ssb-bottom"><div><strong>'+ (planned?'SERVICE PLAN · '+safe(service.kind).toUpperCase():'ORIGINAL ASSEMBLY')+'</strong>'+
  '<p>'+(planned?(service.prepared?'Replacement part has been removed once. Restore all parts and fasteners, then certify the job.':
@@ -91,11 +140,16 @@ function mount(){
   const b=event.target.closest('button');if(!b||b.disabled||busy)return;
   if(b.dataset.ssbTool){tool=b.dataset.ssbTool;contents();return;}
   const a=b.dataset.ssb;if(!a)return;
+  if(a==='bolt'&&blockedBoltClick&&performance.now()<blockedBoltClick.until&&
+    blockedBoltClick.part===b.dataset.part&&blockedBoltClick.slot===Number(b.dataset.index)){
+    blockedBoltClick=null;return;
+  }
   if(a==='close'){holder.hidden=true;message('Hood lowered. Your saved assembly remains intact.');return;}
   if(a==='reset'&&!window.confirm('Restore all factory components? The purchased spare part remains in your inventory.'))return;
   void act(a,b.dataset.part||null,b.dataset.index===undefined?null:Number(b.dataset.index),
     b.dataset.delta===undefined?null:Number(b.dataset.delta));
  });
+ installWrenchGestures();
  root.addEventListener('click',event=>{
   const b=event.target.closest('button');if(!b)return;
   if(b.dataset.ssAction==='workshop'||b.dataset.ssAction==='service_advance'){
