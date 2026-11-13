@@ -69,10 +69,15 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <div id="vdacs-study-inside" hidden><div class="vdacs-inner"><div class="vdacs-controls">TOPICS</div>
 <div id="vdacs-study-card" class="vdacs-card">WHAT IS THE ANSWER?</div><div class="vdacs-actions"><button>PREVIOUS</button><button>REVEAL</button><button>NEXT</button></div>
 <div class="vdacs-badges">MILESTONES</div></div></div></section>
-<div id="commons-family-zone" class="community-play-zone"><section id="commons-art" class="family-stage"><div id="commons-drawing-root"><div class="art-tools"><button>PEN</button><button>ERASER</button></div><canvas width="320" height="200" style="max-width:100%"></canvas></div></section></div>
+<div id="commons-family-zone" class="community-play-zone"></div>
+<section id="drawing-studio-game-root" class="mahjong-game drawing-studio-game">
+<button id="drawing-studio-toggle" aria-expanded="false" class="mahjong-entry-button">DRAWING STUDIO</button>
+<div id="drawing-studio-inside" hidden><section id="commons-art" class="family-stage">
+<div id="commons-drawing-root"><div class="art-tools"><button>PEN</button><button>ERASER</button></div>
+<canvas width="320" height="200" style="max-width:100%"></canvas></div></section></div></section>
 </div></section>
 <script>
-for (const [btn,inside] of [['mahjong-toggle','mahjong-inside'],['plate-game-open','plate-game-content'],['letter-lock-toggle','letter-lock-content'],['word-game-toggle','word-game-inside'],['sr-toggle','sr-inside'],['vdacs-study-toggle','vdacs-study-inside']]) {
+for (const [btn,inside] of [['mahjong-toggle','mahjong-inside'],['plate-game-open','plate-game-content'],['letter-lock-toggle','letter-lock-content'],['word-game-toggle','word-game-inside'],['sr-toggle','sr-inside'],['vdacs-study-toggle','vdacs-study-inside'],['drawing-studio-toggle','drawing-studio-inside']]) {
  document.getElementById(btn).addEventListener('click',()=>{
   const el=document.getElementById(inside),b=document.getElementById(btn);
   el.hidden=!el.hidden;b.setAttribute('aria-expanded',String(!el.hidden));
@@ -103,7 +108,7 @@ async def check_one(page, id, root):
  bbox=await page.locator({
   "mahjong":"#mahjong-root","wordle":"#letter-lock-root","wordquest":"#word-game-root",
   "plates":"#plate-game-root","streetrod":"#streetrod-root","study":"#vdacs-study-root",
-  "drawing":"#commons-art"
+  "drawing":"#drawing-studio-game-root"
  }[root]).bounding_box()
  dims=page.viewport_size
  assert bbox and bbox["x"]>=-2 and bbox["y"]>=0 and bbox["y"]+bbox["height"]<=dims["height"]+2, (root,bbox,dims)
@@ -119,12 +124,14 @@ async def run_device(browser,width,height):
  await page.route(URL,lambda route:route.fulfill(status=200,content_type="text/html",body=HTML))
  try:
   await page.goto(URL,wait_until="load")
-  await page.locator("#arcade-drawing-entry").wait_for(timeout=8000)
+  await page.locator("#drawing-studio-game-root").wait_for(timeout=8000)
   assert await page.locator("#arcade-launch").count()==0, "The old shared launcher must be gone"
   assert await page.locator("#arcade-program-grid").count()==1, "The old hidden markup may remain for settings but must not appear"
   assert await page.locator("#arcade-program-grid").is_hidden()
+  assert await page.locator("#arcade-drawing-entry").count()==0,"Duplicate drawing button must not exist"
+  assert await page.locator("#drawing-studio-toggle").count()==1,"Keep only original Drawing Studio button"
   for selector in ["#mahjong-toggle","#letter-lock-toggle","#word-game-toggle",
-    "#plate-game-open","#sr-toggle","#vdacs-study-toggle","#arcade-drawing-entry > button"]:
+    "#plate-game-open","#sr-toggle","#vdacs-study-toggle","#drawing-studio-toggle"]:
    assert await page.locator(selector).is_visible(),selector
   await check_one(page,"#mahjong-toggle","mahjong")
   await page.locator("#mahjong-toggle").click()
@@ -154,7 +161,11 @@ async def run_device(browser,width,height):
   assert await page.locator("#srj-junior details").evaluate("el=>el.open")
   await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
   await check_one(page,"#vdacs-study-toggle","study")
-  await check_one(page,"#arcade-drawing-entry > button","drawing")
+  await check_one(page,"#drawing-studio-toggle","drawing")
+  await page.locator("#drawing-studio-toggle").click()
+  assert await page.locator("#drawing-studio-inside").evaluate("el=>!el.hidden")
+  assert await page.locator("#commons-drawing-root canvas").count()==1,"Original canvas must survive fullscreen navigation"
+  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
   await page.locator("#letter-lock-toggle").click()
   if height>=650:
    panel=await page.locator(".letter-lock-panel").bounding_box()
