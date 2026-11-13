@@ -472,3 +472,31 @@ body.community-page #arcade-options-view > button[data-arcade-action="options-ba
  body.community-page #arcade-options-view h2{font-size:1.06rem!important}
  body.community-page #arcade-options-view p{display:none!important}
 }
+
+/* Dedicated scene arrows make switching screens possible without horizontal
+   webpage or tab-strip scrolling on small devices. */
+body.community-page #arcade-hud .arcade-scene-switcher{
+ display:flex;align-items:center;justify-content:center;gap:3px;
+ height:42px;border-bottom:2px solid #555;padding:2px 5px
+}
+body.community-page #arcade-hud .arcade-scene-switcher > button{
+ display:none;min-height:33px;flex:0 0 36px;padding:4px!important
+}
+body.community-page #arcade-hud .arcade-scene-switcher #arcade-hud-scenes{
+ flex:1 1 auto;min-width:0;border:0!important;min-height:34px!important;
+}
+@media(max-width:680px){
+ body.community-page #arcade-hud .arcade-scene-switcher{height:40px}
+ body.community-page #arcade-hud .arcade-scene-switcher > button{display:block}
+ body.community-page #arcade-hud .arcade-scene-switcher #arcade-hud-scenes{
+  display:flex!important;justify-content:center!important;overflow:hidden!important;
+  padding:2px!important
+ }
+ body.community-page #arcade-hud #arcade-hud-scenes button:not([aria-current=page]){
+  display:none!important
+ }
+ body.community-page #arcade-hud #arcade-hud-scenes button[aria-current=page]{
+  display:block!important;width:min(100%,240px);text-align:center
+ }
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-summer[hidden]{display:none!important}
