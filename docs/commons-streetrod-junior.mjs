@@ -148,7 +148,7 @@ async function boot(){
   const attach=()=>{if(!document.getElementById('sr-inside')||document.getElementById('conversations')?.hidden){if(root&&!run){root.remove();root=null;}return;}if(approved&&!root){enter();void load();}};
   const obs=new MutationObserver(attach);obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
   document.addEventListener('keydown',ev=>{if(!run||ev.target?.closest('input,textarea,select'))return;if(ev.key==='ArrowUp'){ev.preventDefault();setLane(lane-1);}else if(ev.key==='ArrowDown'){ev.preventDefault();setLane(lane+1);}});
-  client.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){approved=false;if(!run&&root){root.remove();root=null;}}});
+  client.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){approved=false;if(!run&&root){root.remove();root=null;}}else if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'){setTimeout(async()=>{try{const auth=await client.auth.getSession();const uid=auth.data.session?.user?.id;if(!uid)return;const m=await client.from('community_members').select('status').eq('user_id',uid).maybeSingle();approved=!m.error&&m.data?.status==='approved';attach();}catch{}},0);}});
   attach();
  }catch{}
 }
