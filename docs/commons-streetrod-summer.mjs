@@ -25,7 +25,7 @@ let buttonsDown=new Set(),frameId=0,sampleTicker=0,keyboardAttached=false;
 const gamePhoto=(body,key)=>'<img class="ss-car-photo" loading="lazy" decoding="async" src="'+esc(carPhotoUrl(body||'coupe',key||'rattler'))+'" alt="Original rendered '+esc(key||'vintage')+' car">';
 const currentCar=()=>season?.garage?.find(c=>c.car_key===season?.season?.current_car)||null;
 const catalogCar=key=>season?.catalog?.find(c=>c.key===key)||null;
-const allCar=key=>catalogCar(key)||{key,name:key,body:'coupe',accent:'#667786',price:0};
+const allCar=key=>catalogCar(key)||{key,name:key==='rattler'?'Rattler 48':key,body:'coupe',accent:'#a45634',price:0};
 const banner=(title,desc)=>'<header class="ss-scene-head"><div><small>SUMMER 1963 · COWBOY MOTOR WORKS</small><h4>'+esc(title)+'</h4><p>'+esc(desc)+'</p></div></header>';
 const action=(command,label,attrs='')=>'<button type="button" data-ss-action="'+esc(command)+'" '+attrs+'>'+esc(label)+'</button>';
 function status(text,error=false){const box=root?.querySelector('#ss-status');if(box){box.textContent=String(text);box.classList.toggle('ss-error',error);}}
@@ -46,7 +46,7 @@ function makeRoot(){
  button.addEventListener('click',()=>{open();});
  hub.addEventListener('click',event=>{
   const other=event.target.closest('.src-scene-menu button[data-src-tab]');
-  if(other&&visible){close();}
+  if(other&&visible){if(live){status('Finish or abandon the current race before leaving the summer track.',true);open();}else close();}
  });
  root.addEventListener('click',onClick);
  root.addEventListener('submit',onSubmit);
@@ -289,9 +289,10 @@ function onClick(event){
  if(cmd==='navigate'){navigate(btn.dataset.target);return;}
  if(cmd==='refresh'){void load();return;}
  if(cmd==='workshop'){
-  const old=hub.querySelector('[data-src-action="hood"]');
-  if(old){const classic=hub.querySelector('.src-scene-menu [data-src-tab="garage"]');close();classic?.click();old.click();}
-  else status('Open the Garage hood to access the saved mechanical workbench.',true);
+  const classic=hub.querySelector('.src-scene-menu [data-src-tab="garage"]');
+  close();classic?.click();
+  const hood=hub.querySelector('.src-garage-stage [data-src-action="hood"]');
+  if(hood){hood.click();}else status('Could not find the garage hood. Reload Street r0d and try again.',true);
   return;
  }
  if(cmd==='inspect_rival'){const r=RV[rival];status(r.name+' drives a '+r.car+'. Tier '+r.require+'. Choose Call Out to negotiate the race.');return;}
