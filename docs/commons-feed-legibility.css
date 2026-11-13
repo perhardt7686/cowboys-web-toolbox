@@ -1,0 +1,146 @@
+/* Commons feed legibility v3 — final cascade after every theme and game.
+   Fix screenshot regression: ivory topic cards with pale lavender/gold metadata.
+   Match ACTUAL .thread-card markup, rather than dark-dialog selectors.
+   This changes neither post data nor access control. */
+body.community-page #conversations #community-feed .thread-card{
+ --feed-ink:#2b1c39;
+ --feed-muted:#51405c;
+ --feed-purple:#57246f;
+ color:var(--feed-ink)!important;
+ background:#fffaf2!important;
+ border:2px solid #ad7db9!important;
+ box-shadow:5px 7px 0 #6b467021!important;
+}
+body.community-page #conversations #community-feed .thread-card :is(.thread-kicker,.thread-kicker span,.thread-kicker strong){
+ color:#54295f!important;
+ font-weight:800!important;
+ opacity:1!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-title{
+ color:#4b205e!important;
+ background:transparent!important;
+ font-weight:850!important;
+ font-size:clamp(1.3rem,3.1vw,1.7rem)!important;
+ line-height:1.28!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-excerpt{
+ color:#30273c!important;
+ font-weight:500!important;
+ font-size:clamp(1.03rem,2.5vw,1.14rem)!important;
+ line-height:1.65!important;
+ opacity:1!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-bottom,
+body.community-page #conversations #community-feed .thread-card .thread-bottom :is(.thread-author,.member-author,.member-author>span,.thread-age,.thread-count,.lab-helpful-count,.author-title,span,time,strong,b,button),
+body.community-page #conversations #community-feed .thread-card .thread-bottom time{
+ color:var(--feed-muted)!important;
+ -webkit-text-fill-color:var(--feed-muted)!important;
+ opacity:1!important;
+ font-size:clamp(.9rem,2.1vw,1rem)!important;
+ line-height:1.5!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-bottom{
+ display:flex;flex-wrap:wrap;gap:9px 12px;align-items:center;
+ border-top:1px solid #d6c2d8;padding-top:14px;margin-top:15px;
+}
+body.community-page #conversations #community-feed .thread-card .thread-bottom .member-author,
+body.community-page #conversations #community-feed .thread-card .thread-bottom .member-author>span:not(.avatar):not(.profile-avatar),
+body.community-page #conversations #community-feed .thread-card .thread-bottom .thread-author{
+ color:#452056!important;
+ -webkit-text-fill-color:#452056!important;
+ font-weight:850!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-bottom :is(.profile-badge,.moderator-badge,.power-rank-chip,.power-honor-chip,.power-ribbon,.role-badge){
+ background:#4b205d!important;
+ color:#fff7ed!important;
+ -webkit-text-fill-color:#fff7ed!important;
+ border:1px solid #4b205d!important;
+ font-weight:800!important;
+ opacity:1!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-bottom :is(.avatar,.profile-avatar){
+ /* Keep user-specific avatar foreground; colored usernames remain readable. */
+ -webkit-text-fill-color:initial!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-age :is(time,span),
+body.community-page #conversations #community-feed .thread-card .thread-count,
+body.community-page #conversations #community-feed .thread-card .lab-helpful-count{
+ color:#51405c!important;
+ -webkit-text-fill-color:#51405c!important;
+ font-size:clamp(.91rem,2.2vw,1rem)!important;
+ font-weight:750!important;
+ opacity:1!important;
+}
+body.community-page #conversations #community-feed .thread-card .forum-last-reply{
+ display:flex;align-items:center;flex-wrap:wrap;gap:7px 12px;
+ color:#51405c!important;
+ -webkit-text-fill-color:#51405c!important;
+ background:#f2e8f3!important;
+ border-top:1px solid #bda2c7!important;
+ padding:12px 14px!important;margin:16px 0 0!important;
+ border-radius:9px!important;
+ font-size:clamp(.92rem,2.2vw,1rem)!important;
+ font-weight:750!important;
+ opacity:1!important;
+}
+body.community-page #conversations #community-feed .thread-card .forum-last-reply time,
+body.community-page #conversations #community-feed .thread-card .forum-last-reply :is(span,strong){
+ color:#4d3659!important;
+ -webkit-text-fill-color:#4d3659!important;
+ opacity:1!important;
+ font-weight:750!important;
+}
+body.community-page #conversations #community-feed .thread-card .forum-last-reply button[data-forum-latest]{
+ color:#fff9f1!important;
+ -webkit-text-fill-color:#fff9f1!important;
+ background:#53266a!important;
+ border:2px solid #53266a!important;
+ border-radius:9px!important;
+ padding:10px 14px!important;
+ min-height:44px!important;
+ font:800 .95rem/1.35 system-ui,-apple-system,'Segoe UI',sans-serif!important;
+ text-decoration:none!important;
+ box-shadow:none!important;
+ opacity:1!important;
+}
+body.community-page #conversations #community-feed .thread-card .forum-last-reply button[data-forum-latest]:is(:hover,:focus-visible){
+ background:#e8bd78!important;color:#2b1c39!important;
+ -webkit-text-fill-color:#2b1c39!important;
+ border-color:#986533!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-open-cue{
+ background:#126872!important;
+ color:#fffaf2!important;
+ -webkit-text-fill-color:#fffaf2!important;
+ border:2px solid #0c4f59!important;
+ border-radius:12px!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-open-cue :is(span,strong){
+ color:#fffaf2!important;
+ -webkit-text-fill-color:#fffaf2!important;
+}
+body.community-page #conversations #community-feed .thread-card .thread-site{
+ color:#30203b!important;
+ -webkit-text-fill-color:#30203b!important;
+ background:#f1d19d!important;
+ border:1px solid #c39a59!important;
+}
+body.community-page #conversations #community-feed .thread-card .forum-unread{
+ color:#2b1c39!important;
+ -webkit-text-fill-color:#2b1c39!important;
+ background:#f0cb85!important;
+ border:1px solid #a7772b!important;
+}
+body.community-page #conversations #community-feed .thread-card :is(button,a):focus-visible{
+ outline:3px solid #076e76!important;
+ outline-offset:4px!important;
+}
+@media(max-width:620px){
+ body.community-page #conversations #community-feed .thread-card{padding:17px!important}
+ body.community-page #conversations #community-feed .thread-card .thread-bottom{gap:8px 12px}
+ body.community-page #conversations #community-feed .thread-card .forum-last-reply{gap:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #conversations #community-feed .thread-card,
+ body.community-page #conversations #community-feed .thread-card *{transition:none!important}
+}
