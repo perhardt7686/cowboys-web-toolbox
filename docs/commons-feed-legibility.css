@@ -31,7 +31,7 @@ body.community-page #conversations #community-feed .thread-card .thread-excerpt{
  opacity:1!important;
 }
 body.community-page #conversations #community-feed .thread-card .thread-bottom,
-body.community-page #conversations #community-feed .thread-card .thread-bottom :is(.thread-author,.member-author,.member-author>span,.thread-age,.thread-count,.lab-helpful-count,.author-title,span,time,strong,b,button),
+body.community-page #conversations #community-feed .thread-card .thread-bottom :is(.thread-author,.member-author,.thread-age,.thread-count,.lab-helpful-count,.author-title),
 body.community-page #conversations #community-feed .thread-card .thread-bottom time{
  color:var(--feed-muted)!important;
  -webkit-text-fill-color:var(--feed-muted)!important;
@@ -44,7 +44,7 @@ body.community-page #conversations #community-feed .thread-card .thread-bottom{
  border-top:1px solid #d6c2d8;padding-top:14px;margin-top:15px;
 }
 body.community-page #conversations #community-feed .thread-card .thread-bottom .member-author,
-body.community-page #conversations #community-feed .thread-card .thread-bottom .member-author>span:not(.avatar):not(.profile-avatar),
+body.community-page #conversations #community-feed .thread-card .thread-bottom .member-author>span:not(.avatar):not(.profile-avatar):not(.profile-badge):not(.moderator-badge):not(.role-badge),
 body.community-page #conversations #community-feed .thread-card .thread-bottom .thread-author{
  color:#452056!important;
  -webkit-text-fill-color:#452056!important;
