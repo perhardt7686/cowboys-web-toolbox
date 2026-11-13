@@ -3,6 +3,7 @@
  * No original Street Rod game art, trademark imagery, copied source, or music.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {drawPhotoCar} from './streetrod-photo-sprites.mjs?v=photoreal1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const ROOT_ID='streetrod-root';
@@ -344,14 +345,17 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   for(let y=181;y<314;y+=14)for(let j=0;j<2;j++)if(((y/14|0)+j)%2===0){ctx.fillStyle='#161222';ctx.fillRect(finishX+j*5,y,5,14)}
   ctx.fillStyle='#e8e6e6';ctx.font='bold 15px system-ui';ctx.fillText('1/4 MILE',753,194);
   const me=CAR(race?.car||state?.cars?.find(c=>c.selected)?.key);const driveX=live?clamp(90+progress*690,70,785):120;
-  drawCar(ctx,driveX,230,me.accent||'#ebbb58',1,me.body);paintOwnBadge(ctx,driveX-20,174);
+  drawCar(ctx,driveX,230,me.accent||'#ebbb58',1,me.body,me.key);paintOwnBadge(ctx,driveX-20,174);
   const other=(live?clamp(90+progress*670+(seed%13-6)*5,70,780):135);
-  if(race?.mode==='boss')drawCipherVan(ctx,other,278,.88);else {const otherModel=state?.catalog?.find(v=>v.key===race?.opponent_car);drawCar(ctx,other,278,otherModel?.accent||'#9a80df',.88,otherModel?.body);paintDriverBadge(ctx,other-19,218);}
+  if(race?.mode==='boss')drawCipherVan(ctx,other,278,.88);else {const otherModel=state?.catalog?.find(v=>v.key===race?.opponent_car);drawCar(ctx,other,278,otherModel?.accent||'#9a80df',.88,otherModel?.body,otherModel?.key);paintDriverBadge(ctx,other-19,218);}
   ctx.font='800 18px system-ui';ctx.fillStyle='#fff';ctx.fillText('YOU',clamp(driveX-25,5,w-80),193);
   if(race?.mode==='boss'){ctx.font='bold 13px system-ui';ctx.fillStyle='#f4c487';ctx.fillText('CIPHER VAN X',Math.max(8,other-42),294);}
   if(progress>=1){ctx.fillStyle='#ffd67e';ctx.font='900 26px system-ui';ctx.fillText('FINISH!',w-145,245)}
  }
- function drawCar(ctx,x,y,color,scale,body='coupe'){
+ function drawCar(ctx,x,y,color,scale,body='coupe',key=''){
+  // Original photorealistic body art replaces the flat vector sprite when loaded.
+  // Race timing, opponent selection and physics remain server-authoritative.
+  if(drawPhotoCar(ctx,x-111*scale,y-100*scale,232*scale,139*scale,body,key))return;
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   ctx.fillStyle='#0006';ctx.beginPath();ctx.ellipse(0,9,85,13,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#14131b';for(const xx of [-55,52]){ctx.beginPath();ctx.arc(xx,8,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ddd';ctx.beginPath();ctx.arc(xx,8,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#14131b';}
@@ -361,6 +365,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   ctx.restore();
  }
  function drawCipherVan(ctx,x,y,scale){
+  if(drawPhotoCar(ctx,x-120*scale,y-113*scale,248*scale,147*scale,'van','cipherx'))return;
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   ctx.fillStyle='#090c16ad';ctx.beginPath();ctx.ellipse(0,11,97,13,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#191521';
