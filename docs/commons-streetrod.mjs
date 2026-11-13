@@ -4,6 +4,7 @@
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {drawPhotoCar} from './streetrod-photo-sprites.mjs?v=photoreal1';
+import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=classic1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const ROOT_ID='streetrod-root';
@@ -39,7 +40,7 @@ let state=null;
 const CAR=key=>state?.catalog?.find(x=>x.key===key) || {key:'rattler',name:'Rattler 48',base:14400,accent:'#ebbb58'};
 if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
  let client=null,uid=null,mounted=false,expanded=false,busy=false,timer=null,observer=null;
- let race=null,raceRaf=0,authChecked=false,dragSeed=0;
+ let race=null,raceRaf=0,authChecked=false,dragSeed=0,viewMode='cockpit';
  function setStatus(msg,type='info'){
   const n=$('sr-status');if(n){n.textContent=msg;n.dataset.type=type;}
  }
@@ -59,6 +60,7 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
     <section class="sr-race-card" aria-label="Street r0d quarter mile race">
       <div class="sr-race-heading"><div><span class="sr-eyebrow">QUARTER-MILE STRIP · NIGHT MEET</span><h3 id="sr-car-name">Preparing the garage…</h3><p id="sr-car-tune">Engine, tires, transmission</p></div><span id="sr-mode-chip" class="sr-mode-chip">PRACTICE / SOLO</span></div>
       <canvas id="sr-track" width="960" height="340" role="img" aria-label="Animated nighttime drag-racing strip with your car and opponent"></canvas>
+      <div class="sr-race-view"><button class="sr-action sr-outline" type="button" id="sr-view-toggle" data-sr-action="view" aria-pressed="true">Switch to side-view race</button><small>Classic first-person cockpit · original racing art</small></div>
       <div class="sr-race-hud"><div><small>START LIGHT</small><strong id="sr-light">READY</strong></div><div><small>GEAR</small><strong id="sr-gear">N</strong></div><div><small>REV METER</small><div class="sr-rev-wrap"><div id="sr-rev" class="sr-rev"></div><i class="sr-rev-target"></i></div></div><div><small>RUN CLOCK</small><strong id="sr-clock">0.00</strong></div></div>
       <p class="sr-control-tip">Tap <b>LAUNCH</b> on green, then <b>SHIFT</b> when the rev meter hits the gold zone. One nitro burst per race. Keyboard: <b>Space</b> to launch/shift; <b>N</b> for nitro.</p>
       <div class="sr-controls">
@@ -91,7 +93,8 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   root.addEventListener('click',evt=>{
    const btn=evt.target.closest('[data-sr-action]');if(!btn||btn.disabled)return;
    const action=btn.dataset.srAction;
-   if(action==='solo')void startRace('solo');
+   if(action==='view'){viewMode=viewMode==='cockpit'?'side':'cockpit';$('sr-view-toggle').setAttribute('aria-pressed',String(viewMode==='cockpit'));$('sr-view-toggle').textContent=viewMode==='cockpit'?'Switch to side-view race':'Switch to cockpit view';$('sr-track').setAttribute('aria-label',viewMode==='cockpit'?'First-person dashboard road racing view':'Animated side-view racing strip');drawTrack(0,Boolean(race));}
+   else if(action==='solo')void startRace('solo');
    else if(action==='challenge')void startRace('duel');
    else if(action==='boss')void startRace('boss');
    else if(action==='challenge-target')void startRace('duel',null,safeUUID(btn.dataset.memberId));
@@ -333,6 +336,12 @@ if(board&&cfg?.enabled===true&&location.pathname.endsWith('community.html')){
   const cv=$('sr-track');if(!cv)return;
   const ctx=cv.getContext('2d');if(!ctx)return;
   const w=cv.width,ht=cv.height,seed=Number(race?.seed||1);
+  if(viewMode==='cockpit'){
+   const own=CAR(race?.car||state?.cars?.find(c=>c.selected)?.key);
+   const rival=state?.catalog?.find(v=>v.key===race?.opponent_car)||{};
+   drawClassicCockpit(ctx,{width:w,height:ht,progress,live,seed,own,rival,boss:race?.mode==='boss',clock:race?Math.max(0,performance.now()-race.goAt):0});
+   return;
+  }
   const sky=ctx.createLinearGradient(0,0,0,200);sky.addColorStop(0,'#0d102d');sky.addColorStop(.62,'#402446');sky.addColorStop(1,'#d37465');ctx.fillStyle=sky;ctx.fillRect(0,0,w,ht);
   ctx.fillStyle='#f8c8aa';ctx.beginPath();ctx.arc(805,72,33,0,Math.PI*2);ctx.fill();
   for(let i=0;i<18;i++){const bx=(i*73+seed*7)%1030-40,bh=60+((i*41)%95);ctx.fillStyle=i%3===0?'#16132f':'#1d183a';ctx.fillRect(bx,169-bh,62,bh+40);
