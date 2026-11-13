@@ -63,7 +63,7 @@ async def main():
    assert await page.evaluate("getComputedStyle(document.body).overflow")=="hidden"
    await page.locator('#arcade-program-grid [data-arcade-game="mahjong"]').click()
    assert await page.locator("#mahjong-inside").evaluate("el=>!el.hidden")
-   await page.locator('#arcade-hud-scenes [data-arcade-scene="levels"]').click()
+   await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
    assert await page.locator("body").get_attribute("data-arcade-scene")=="levels"
    dims=await page.locator("#mahjong-root").bounding_box()
    assert dims and dims["y"]>=84 and dims["height"]<=844, dims
@@ -79,7 +79,7 @@ async def main():
    assert await page.locator("body").get_attribute("data-arcade-game")=="mahjong"
    await page.locator('#arcade-hud [data-arcade-action="home"]').click()
    await page.locator('#arcade-program-grid [data-arcade-game="plates"]').click()
-   await page.locator('#arcade-hud-scenes [data-arcade-scene="vote"]').click()
+   await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
    assert await page.locator(".arcade-current-card").count()==1
    await page.locator('#arcade-hud [data-arcade-action="next"]').click()
    assert await page.locator("#arcade-hud-pagecount").inner_text()=="2 / 3"
@@ -87,9 +87,11 @@ async def main():
    await page.keyboard.press("Escape")
    assert await page.locator("body").get_attribute("data-arcade-game")==""
    await page.locator('#arcade-program-grid [data-arcade-game="streetrod"]').click()
-   await page.locator('#arcade-hud-scenes [data-arcade-scene="diner"]').click()
+   for _ in range(4):
+    await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
    assert await page.locator('#ss-tabs [data-ss-tab="diner"]').get_attribute("aria-pressed")=="true"
-   await page.locator('#arcade-hud-scenes [data-arcade-scene="junior"]').click()
+   for _ in range(3):
+    await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
    assert await page.locator("#srj-junior details").evaluate("el=>el.open")
    (ROOT/"reports").mkdir(exist_ok=True,parents=True)
    await page.screenshot(path=str(ROOT/"reports"/"arcade-one-screen-iphone-sample.png"),full_page=False,animations="disabled")
