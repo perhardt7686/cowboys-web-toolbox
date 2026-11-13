@@ -121,3 +121,34 @@ body.community-page .src-paper-pages{display:flex;align-items:center;justify-con
 body.community-page .src-paper-pages button{min-height:44px;padding:9px 13px;border:1px solid #2a2928;border-radius:4px;background:#38312d;color:#ffefce;font:850 .82rem/1.3 system-ui,sans-serif;cursor:pointer}
 body.community-page .src-paper-pages span{color:#3b3029;font:900 .82rem/1.4 Georgia,serif}
 body.community-page .src-paper-pages button:disabled{opacity:.36;cursor:not-allowed}
+
+
+/* Real vintage-garage object hotspots. Visible captions replace guesswork on touchscreens. */
+body.community-page .src-garage-stage{position:relative;isolation:isolate;overflow:hidden}
+body.community-page .src-garage-hotspots{position:absolute;inset:0;z-index:11;pointer-events:none}
+body.community-page .src-garage-hotspots button{
+ pointer-events:auto;position:absolute;min-height:39px;padding:8px 11px;
+ border:1px solid #e8c18a!important;border-radius:5px;
+ background:#171d24e8!important;color:#ffe6b7!important;
+ box-shadow:0 2px 8px #0009;
+ font:900 clamp(9px,1.5vw,12px)/1.25 system-ui,sans-serif!important;
+ letter-spacing:.025em;cursor:pointer;text-align:center;white-space:normal;
+ transition:transform .16s ease,background .16s ease;
+}
+body.community-page .src-garage-hotspots button:hover{background:#63462fed!important;transform:translateY(-2px)}
+body.community-page .src-garage-hotspots button:focus-visible{outline:3px solid #14ceda!important;outline-offset:3px}
+body.community-page .src-hot-hood{top:51%;left:25%;width:26%;border-color:#eecf8d!important}
+body.community-page .src-hot-inspect{top:18%;right:11%;width:27%}
+body.community-page .src-hot-wheel{bottom:19%;left:10%;width:26%}
+body.community-page .src-hot-trans{bottom:15%;right:12%;width:29%}
+body.community-page .src-hot-paper{top:12%;left:8%;width:24%}
+body.community-page .src-hot-diner{top:34%;right:5%;width:25%}
+@media(max-width:700px){
+ body.community-page .src-garage-hotspots button{min-height:32px;padding:5px 6px;font-size:9px!important;letter-spacing:0}
+ body.community-page .src-hot-hood{top:54%;left:27%;width:30%}
+ body.community-page .src-hot-inspect{top:17%;right:4%;width:30%}
+ body.community-page .src-hot-wheel{bottom:17%;left:4%;width:29%}
+ body.community-page .src-hot-trans{bottom:15%;right:3%;width:32%}
+ body.community-page .src-hot-paper{top:7%;left:3%;width:29%}
+ body.community-page .src-hot-diner{top:34%;right:3%;width:25%}
+}
