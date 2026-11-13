@@ -196,7 +196,7 @@ function parts(){
  '<span class="ss-bolt ss-bolt-1">✣</span><span class="ss-bolt ss-bolt-2">✣</span><span class="ss-motor">ENGINE / '+esc(service.kind.toUpperCase())+'</span>'+
  '<span class="ss-bolt ss-bolt-3">✣</span><span class="ss-bolt ss-bolt-4">✣</span></div></div>'+
  '<ol class="ss-service-steps">'+steps.map((t,i)=>'<li class="'+(i<service.step?'complete':i===service.step?'current':'')+'">'+esc(t)+'</li>').join('')+'</ol>'+
- '<div class="ss-actions">'+action('service_advance','Use wrench: '+(steps[service.step]||'Secure assembly'),'data-step="'+service.step+'"')+
+ '<div class="ss-actions">'+action('workshop','Operate saved bolts and parts')+
  action('service_cancel','Cancel, return spare part')+'</div>'+
  '<p class="ss-hint">Each operation saves on the server. The car cannot start while a service order is open.</p></section>':'')+
  '<div class="ss-actions">'+action('workshop','Open detailed bolt-by-bolt workbench')+'</div>';
@@ -288,11 +288,8 @@ function onClick(event){
  const car=btn.dataset.car,rival=btn.dataset.rival;
  if(cmd==='navigate'){navigate(btn.dataset.target);return;}
  if(cmd==='refresh'){void load();return;}
- if(cmd==='workshop'){
-  const classic=hub.querySelector('.src-scene-menu [data-src-tab="garage"]');
-  close();classic?.click();
-  const hood=hub.querySelector('.src-garage-stage [data-src-action="hood"]');
-  if(hood){hood.click();}else status('Could not find the garage hood. Reload Street r0d and try again.',true);
+ if(cmd==='workshop'||cmd==='service_advance'){
+  status('Opening the saved seasonal car workbench. If the hood does not appear, refresh Street r0d.',true);
   return;
  }
  if(cmd==='inspect_rival'){const r=RV[rival];status(r.name+' drives a '+r.car+'. Tier '+r.require+'. Choose Call Out to negotiate the race.');return;}
