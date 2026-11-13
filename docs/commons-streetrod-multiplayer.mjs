@@ -33,7 +33,9 @@ function render(){
  if(!ui)return;
  const list=ui.querySelector('#srm-players');if(!list)return;
  const order=[...players].sort((a,b)=>Number(b.points||0)-Number(a.points||0)||(a.name||'').localeCompare(b.name||''));
+ const expanded=new Set([...list.querySelectorAll('article.srm-player')].filter(el=>el.querySelector('details.srm-details')?.open).map(el=>el.dataset.racer));
  list.innerHTML=order.length?order.map(racer).join(''):'<p class="srm-empty">Racer profiles will appear when approved members join the game.</p>';
+ for(const entry of list.querySelectorAll('article.srm-player'))if(expanded.has(entry.dataset.racer)){const detail=entry.querySelector('details.srm-details');if(detail)detail.open=true;}
  ui.querySelector('#srm-count').textContent=order.length+' verified racers · '+order.filter(p=>p.playing).length+' on the track';
  ui.querySelector('#srm-meta').textContent='BUILD RECORDS & ACHIEVEMENTS · ASYNCHRONOUS HEAD-TO-HEAD';
  const inbound=ui.querySelector('#srm-incoming');
