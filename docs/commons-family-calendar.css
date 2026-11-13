@@ -74,3 +74,37 @@ body.community-page .family-calendar-modes button{min-height:38px;padding:7px 13
 body.community-page .family-calendar-modes button[aria-pressed=true]{background:#f3d599;color:#271a2f}
 body.community-page .family-calendar-panel .family-calendar-content>.family-calendar-caution{color:#eed9bd;font-size:.8rem;line-height:1.55;margin:11px 3px 0}
 body.community-page .family-calendar-modes button:focus-visible{outline:3px solid #15b7b7;outline-offset:2px}
+
+
+/* Authenticated family-feed agenda and monthly grid */
+body.community-page .family-calendar-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+body.community-page .family-calendar-date-controls{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+body.community-page .family-calendar-date-controls button{min-height:44px;padding:7px 13px;border:1px solid #977fa7;background:#2b283a;color:#ffead0;border-radius:9px;font-weight:850;cursor:pointer}
+body.community-page .family-calendar-date-controls button:hover{background:#40334e}
+body.community-page .family-calendar-month{font-family:Georgia,serif;color:#ffe0a4;font-size:clamp(1.2rem,3vw,1.65rem);margin-left:8px}
+body.community-page .family-calendar-feed-status{color:#f3dfbd;font-weight:650;font-size:.87rem;margin:0;line-height:1.55}
+body.community-page .family-calendar-list{display:grid;gap:11px;min-width:0}
+body.community-page .family-calendar-event{padding:15px 17px;border:1px solid #86728e;border-left:4px solid #ecc78b;border-radius:12px;background:linear-gradient(127deg,#332d3a,#252633);color:#f3edf3;min-width:0;overflow-wrap:anywhere}
+body.community-page .family-calendar-event-header{display:flex;align-items:start;justify-content:space-between;gap:9px;flex-wrap:wrap}
+body.community-page .family-calendar-event-header>div{display:grid;gap:5px}
+body.community-page .family-calendar-event-header strong{font-size:clamp(1rem,2.6vw,1.17rem);color:#fff1d4;line-height:1.25}
+body.community-page .family-calendar-event-header small{font-size:.85rem;color:#dfd5e6}
+body.community-page .family-calendar-event p{font-size:.92rem;color:#ede5ee;line-height:1.58;margin:12px 0 0;white-space:pre-line}
+body.community-page .family-calendar-event .family-calendar-where{color:#f5dbae}
+body.community-page .family-calendar-tentative{font-size:.75rem;border:1px solid #d6bc88;border-radius:7px;color:#f6d9a1;padding:5px 8px;font-weight:850}
+body.community-page .family-calendar-empty-message{padding:24px;border:1px dashed #917d95;border-radius:12px;background:#282537;color:#eedddf;text-align:center;font-size:.96rem}
+body.community-page .family-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+body.community-page .family-calendar-weekday{text-align:center;font-size:.73rem;font-weight:850;color:#e7cda7;padding:5px 0}
+body.community-page .family-calendar-day{min-width:0;min-height:85px;padding:6px;border:1px solid #70617f;border-radius:7px;background:#272737;overflow:hidden}
+body.community-page .family-calendar-day.is-today{outline:2px solid #e9cc8d;outline-offset:-2px}
+body.community-page .family-calendar-day>strong{display:block;color:#ffe5b3;margin-bottom:5px;font-size:.85rem}
+body.community-page .family-calendar-day-event{display:block;padding:4px 5px;margin:3px 0;border-radius:4px;background:#665074;color:#fff1e8;font-size:.67rem;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.community-page .family-calendar-day small{display:block;color:#ebd5ee;font-size:.66rem}
+body.community-page .family-calendar-month-list{display:grid;gap:10px;margin-top:8px}
+body.community-page .family-calendar-month-list h3{font-size:1.15rem;color:#f5dfaf;margin:9px 0 0}
+body.community-page .family-calendar-panel :is(button,summary):focus-visible{outline:3px solid #19b8b4!important;outline-offset:2px}
+@media(max-width:700px){body.community-page .family-calendar-day{min-height:56px;padding:4px}
+body.community-page .family-calendar-day-event{font-size:.57rem;padding:3px;white-space:normal;overflow-wrap:anywhere;max-height:30px}
+body.community-page .family-calendar-month{font-size:1.16rem}
+body.community-page .family-calendar-toolbar{align-items:stretch}
+}
