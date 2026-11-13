@@ -31,13 +31,16 @@ jobs:
       - name: Install headless browser and image encoder
         run: |
           python -m pip install 'playwright>=1.50,<2' 'Pillow>=10,<13'
-          python -m playwright install --with-deps chromium
+          python -m playwright install --with-deps chromium firefox
       - name: Capture public homepages without logins
         timeout-minutes: 75
         env:
           PYTHONUNBUFFERED: '1'
         run: |
-          python scripts/capture-site-previews.py --workers 4
+          python scripts/capture-site-previews.py --workers 4 --browser chromium
+          # Sites blocked in Chromium may still offer a public Firefox view.
+          # Existing valid screenshots are automatically skipped.
+          python scripts/capture-site-previews.py --workers 4 --browser firefox
       - name: Verify images are unique successful site captures
         run: |
           python - <<'PY'
