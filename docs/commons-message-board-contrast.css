@@ -23,7 +23,7 @@ body.community-page{
 
 /* The thread reader stays a warm, near-white writing surface.
    Only the actual conversation reader gets these typography rules. */
-body.community-page #content-dialog.content-dialog{
+body.community-page #content-dialog.content-dialog:has(#thread-replies){
  background:#fbf7f0!important;
  color:var(--cb-ink)!important;
  border:2px solid #966ab0!important;
@@ -63,14 +63,14 @@ body.community-page #content-dialog :is(.thread-detail-body,.reply-body) a{
 body.community-page #content-dialog :is(.thread-detail-body,.reply-body) a:hover{
  color:#096b73!important;
 }
-body.community-page #content-dialog .dialog-close{
+body.community-page #content-dialog:has(#thread-replies) .dialog-close{
  background:#efe6f4!important;
  color:#3e234d!important;
  border:1px solid #af94b9!important;
  width:44px;height:44px;top:10px;right:10px;
  display:grid;place-items:center;
 }
-body.community-page #content-dialog .dialog-close:hover{
+body.community-page #content-dialog:has(#thread-replies) .dialog-close:hover{
  background:#dfd0e9!important;color:#261a31!important;
 }
 
@@ -328,7 +328,7 @@ body.community-page :is(#content-dialog,#conversations) :is(button,a,summary,tex
 
 /* Prevent overflow and the giant pale action tiles shown in the iPhone screenshot. */
 @media(max-width:600px){
- body.community-page #content-dialog.content-dialog{
+ body.community-page #content-dialog.content-dialog:has(#thread-replies){
   padding:62px 15px 22px;
   max-width:calc(100vw - 16px);
   border-radius:18px!important;
