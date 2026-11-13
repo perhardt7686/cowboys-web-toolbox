@@ -761,3 +761,29 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene button{
   min-height:21px!important;font-size:.6rem!important;padding:2px 5px!important
  }
 }
+
+/* Landscape phones have plenty of width but very little height. Keep the
+   scene-arrow controller there too, instead of a horizontally scrolling row. */
+@media(max-height:540px){
+ body.community-page #arcade-hud .arcade-scene-switcher > button{
+  display:block!important;min-height:30px!important
+ }
+ body.community-page #arcade-hud .arcade-scene-switcher #arcade-hud-scenes{
+  justify-content:center!important;overflow:hidden!important
+ }
+ body.community-page #arcade-hud #arcade-hud-scenes button:not([aria-current=page]){
+  display:none!important
+ }
+ body.community-page #arcade-hud #arcade-hud-scenes button[aria-current=page]{
+  display:block!important;max-width:240px;width:100%;text-align:center
+ }
+ body.community-page.arcade-on[data-arcade-game=wordle] #letter-lock-statline{
+  display:none!important
+ }
+ body.community-page.arcade-on[data-arcade-game=wordle] .letter-lock-key{
+  min-height:24px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=mahjong] :is(
+  .mahjong-stats,.mahjong-view-tools
+ ){display:none!important}
+}
