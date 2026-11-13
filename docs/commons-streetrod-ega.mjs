@@ -19,19 +19,52 @@ function chromeWheel(c,x,y,r=16){
  for(let i=0;i<8;i++){const t=i*Math.PI/4;stroke(c,x+Math.cos(t)*5,y+Math.sin(t)*5,x+Math.cos(t)*(r-7),y+Math.sin(t)*(r-7),15);}
 }
 function car(c,key='rattler',body='coupe',x=45,y=111,width=236){
- const h=keyhash(key),paint=[2,3,4,5,6,9,12][h%7],van=/van|wagon|bus/i.test(body),pickup=/truck|pickup|rover/i.test(body);
+ // Each fictional car has a deterministic body recipe, not just a new paint colour.
+ // The hand-drawn shapes stay inside the same sixteen EGA palette entries.
+ const h=keyhash(key),shape=(h>>>5)%4,trim=(h>>>12)%3;
+ const family=String(body||'coupe').toLowerCase();
+ const van=/van|bus/.test(family),wagon=/wagon|estate/.test(family);
+ const pickup=/truck|pickup|rover/.test(family);
+ const muscle=/muscle|fastback/.test(family),hardtop=/hardtop|sedan/.test(family);
+ const paint=[2,3,4,5,6,9,12][h%7],light=paint===9?11:15;
+ const roofPaint=trim===2?7:paint;
+ const rearWheel=45+(h%9),frontWheel=189+((h>>>8)%9),wheelRadius=13+((h>>>15)%3);
+ const deck=pickup?77:van?31:wagon?36:muscle?59:hardtop?53:67;
+ const crown=van?2:wagon?4:pickup?6:muscle?5:hardtop?6:7;
+ const roof=van?[[29,24],[43,crown],[174,crown],[191,24]]:
+  wagon?[[36,24],[55,crown],[167,crown],[188,24]]:
+  pickup?[[deck,24],[91,crown],[139,crown],[153,24]]:
+  muscle?[[59,24],[88,crown],[127,crown+2],[174,24]]:
+  hardtop?[[50,24],[68,crown],[149,crown],[172,24]]:
+  [[deck,24],[83,crown],[126,crown],[151,24]];
  c.save();c.translate(x,y);c.scale(width/240,width/240);
- box(c,3,43,236,7,0);
- poly(c,[[3,24],[22,19],[47,17],[64,5],[103,3],[130,16],[187,17],[213,21],[235,29],[237,43],[3,43]],paint);
- const roof=van?[[50,21],[64,4],[161,4],[186,22]]:pickup?[[81,22],[90,4],[140,4],[154,22]]:[[53,22],[69,5],[113,6],[140,22]];
- poly(c,roof,paint);
- poly(c,van?[[67,8],[158,8],[171,20],[56,20]]:pickup?[[91,9],[136,9],[147,20],[86,20]]:[[71,9],[111,9],[130,20],[58,20]],3,0);
- box(c,13,24,215,3,15);box(c,8,32,223,4,7);box(c,13,40,220,3,0);
- box(c,26,32,21,5,14);box(c,219,29,14,7,12);box(c,0,32,8,7,15);
- box(c,81,19,2,18,0);box(c,145,20,2,16,0);
- box(c,94,24,14,2,15);box(c,168,24,14,2,15);
- chromeWheel(c,51,42,16);chromeWheel(c,194,42,16);
- box(c,0,46,240,3,8);
+ box(c,1,45,238,5,0);
+ // Body panels: a real wagon tail, pickup bed, van nose and sloped fastback.
+ poly(c,[[2,30],[16,26],[29,23],[deck,22],
+   [pickup?156:188,23],[217,26],[235,32],[238,43],[4,43]],paint);
+ if(pickup){box(c,8,23,67,4,7);box(c,8,26,4,9,15);box(c,70,24,4,12,0);}
+ if(van){box(c,8,21,28,4,light);box(c,226,26,9,13,0);}
+ if(wagon){box(c,11,23,24,3,light);}
+ poly(c,roof,roofPaint);
+ const r0=roof[0],r1=roof[1],r2=roof[2],r3=roof[3];
+ poly(c,[[r1[0]+5,r1[1]+4],[r2[0]-5,r2[1]+4],[r3[0]-9,22],[r0[0]+8,22]],3,0);
+ // Split windows and door seams by body type. Small per-model geometry varies.
+ const mid=r1[0]+(r2[0]-r1[0])*((van||wagon)?0.61:0.50);
+ stroke(c,mid,8,mid+((shape&1)?2:-2),22,0,2);
+ if(van||wagon){const third=r1[0]+(r2[0]-r1[0])*.33;stroke(c,third,8,third,22,0,2);}
+ const doorX=pickup?155:hardtop?141:muscle?145:136+shape*3;
+ stroke(c,doorX,23,doorX,41,0);box(c,doorX-13,29,11,2,light);
+ // Distinct belt-line, grille and tail-lamp treatments.
+ box(c,10,31,218,2,trim===0?15:7);
+ box(c,12,37,215,3,trim===1?0:8);
+ for(let i=0;i<2+shape;i++)box(c,217+i*3,32,1,7,0);
+ box(c,6,33,5,7,trim===0?12:14);
+ box(c,229,31,5,8,trim===2?14:15);
+ box(c,20,33,17+shape*3,3,trim===2?14:7);
+ box(c,173,28,13,2,light);
+ chromeWheel(c,rearWheel,43,wheelRadius);
+ chromeWheel(c,frontWheel,43,wheelRadius);
+ box(c,0,47,240,2,8);
  c.restore();
 }
 function border(c,title='',bottom='CLICK TO CONTINUE'){
