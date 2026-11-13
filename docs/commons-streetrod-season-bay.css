@@ -82,3 +82,28 @@ body.community-page #streetrod-summer .ss-service header span{font-size:.8rem;co
 @media(prefers-reduced-motion:reduce){
  body.community-page .ssb-workbench *{animation:none!important;transition:none!important}
 }
+
+/* Added to reflect actual 1963 engine service rules: safety jack, fuel/coolant,
+   battery ground, and an enforced two-pass cross-pattern for four fasteners. */
+body.community-page #streetrod-root .ssb-torque-guide{
+ padding:13px 15px;border:2px solid #ffff55;background:#000000;
+ color:#ffffff;font:bold .8rem/1.65 'Courier New',monospace;
+ border-radius:0;margin:6px 0 11px;
+}
+body.community-page #streetrod-root .ssb-torque-guide strong{
+ display:block;color:#55ffff;margin-bottom:6px;font-weight:900;
+}
+body.community-page #streetrod-root .ssb-jack{
+ background:#00aaaa!important;color:#000!important;
+ border-color:#55ffff!important
+}
+body.community-page #streetrod-root .ssb-component-controls button{
+ min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere;
+}
+body.community-page #streetrod-root .ssb-component header,
+body.community-page #streetrod-root .ssb-component-controls{
+ gap:7px;
+}
+body.community-page #streetrod-root .ssb-bolts small{
+ color:#ffff55!important
+}
