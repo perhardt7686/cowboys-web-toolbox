@@ -197,6 +197,31 @@ const preamble=[
  'REGISTERED RACERS    ............ OK',
  'OPENING GARAGE ...'
 ];
+function monitorMode(enabled){
+ if(!ROOT)return;
+ ROOT.classList.toggle('sr-dos-fullscreen',Boolean(enabled));
+ const btn=ROOT.querySelector('#sr-dos-maximize');
+ if(btn){
+  btn.textContent=enabled?'EXIT DOS DISPLAY [ESC]':'EXPAND DOS DISPLAY';
+  btn.setAttribute('aria-pressed',String(Boolean(enabled)));
+ }
+}
+function addMonitorControls(){
+ if(!ROOT)return;
+ const inside=ROOT.querySelector('#sr-inside');
+ if(!inside||inside.querySelector('#sr-dos-maximize'))return;
+ const btn=document.createElement('button');
+ btn.id='sr-dos-maximize';btn.type='button';
+ btn.textContent='EXPAND DOS DISPLAY';btn.className='sr-dos-monitor-toggle';
+ btn.setAttribute('aria-pressed','false');
+ btn.addEventListener('click',()=>monitorMode(!ROOT.classList.contains('sr-dos-fullscreen')));
+ inside.prepend(btn);
+ window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&ROOT.classList.contains('sr-dos-fullscreen')&&!booting){
+   e.preventDefault();monitorMode(false);
+  }
+ });
+}
 async function bootAndOpen(target){
  if(booting||booted)return;
  booting=true;const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
@@ -217,6 +242,7 @@ async function bootAndOpen(target){
    if(summer&&!summer.disabled&&!summer.hidden)summer.click();
   }
   schedule();
+  addMonitorControls();monitorMode(true);
  };
  handler=e=>{if(e.key==='Escape'||e.key==='Enter'){e.preventDefault();e.stopPropagation();finish();}};
  window.addEventListener('keydown',handler,true);
@@ -240,6 +266,7 @@ function install(){
  if(!ROOT)return false;
  window.COWBOY_STREETROD_RETRO=true;
  ROOT.classList.add('sr-ega-mode');
+ addMonitorControls();
  document.addEventListener('click',capture,true);
  const observer=new MutationObserver(schedule);
  observer.observe(ROOT,{subtree:true,childList:true});
