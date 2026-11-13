@@ -131,7 +131,7 @@ function makeVisible(g){
  for(const other of games)$(other.root)?.classList.toggle('arcade-game-active',other.id===g.id);
  if(g.toggle){
   const button=$(g.toggle);
-  if(button&&button.getAttribute('aria-expanded')!=='true'){
+  if(button&&button.getAttribute('aria-expanded')!=='true'&&!document.querySelector('.sr-dos-overlay')){
    button.click(); // Use the game's own open pathway, including DOS boot.
   }
  }
@@ -159,7 +159,7 @@ function renderTabs(){
  ).join('');
  nav.hidden=!active;
  const paging=$('arcade-hud-paging');
- paging.hidden=active!=='plates'||scene!=='vote';
+ paging.hidden=!pagerSelector();
  updatePlatePaging();
  const foot=$('arcade-hud-footer');
  if(foot)foot.textContent=active==='streetrod'?'SCENES REPLACE THIS SCREEN · YOUR GARAGE AND RACES STAY SAVED':
@@ -169,7 +169,7 @@ function view(next){
  if(!active||!pageLabels().some(([id])=>id===next))return;
  scene=next;
  document.body.dataset.arcadeScene=scene;
- if(active==='plates'&&scene==='vote')plateIndex=0;
+ plateIndex=0;
  renderTabs();sync();
 }
 function sync(){
@@ -195,17 +195,27 @@ function sync(){
  }
  updatePlatePaging();
 }
+function pagerSelector(){
+ if(active==='plates'&&scene==='vote')return '#plate-list > .plate-card';
+ if(active==='streetrod'&&scene==='paper')return '#ss-scene .ss-ad';
+ if(active==='streetrod'&&scene==='diner')return '#ss-scene .ss-rival';
+ return null;
+}
 function updatePlatePaging(){
- const paging=$('arcade-hud-paging');
- if(!paging||active!=='plates'||scene!=='vote')return;
- const cards=Array.from(document.querySelectorAll('#plate-list > .plate-card'));
+ const paging=$('arcade-hud-paging'),selector=pagerSelector();
+ if(!paging||!selector)return;
+ const cards=Array.from(document.querySelectorAll(selector));
  plateIndex=Math.max(0,Math.min(plateIndex,Math.max(cards.length-1,0)));
  cards.forEach((c,i)=>c.classList.toggle('arcade-current-card',i===plateIndex));
- $('arcade-hud-pagecount').textContent=cards.length?(plateIndex+1)+' / '+cards.length:'NO PLATES YET';
+ $('arcade-hud-pagecount').textContent=cards.length?(plateIndex+1)+' / '+cards.length:'NO ENTRIES';
  paging.querySelector('[data-arcade-action="previous"]').disabled=plateIndex===0;
  paging.querySelector('[data-arcade-action="next"]').disabled=plateIndex>=cards.length-1;
 }
-function paging(delta){const max=document.querySelectorAll('#plate-list > .plate-card').length;plateIndex=Math.max(0,Math.min(plateIndex+delta,max-1));updatePlatePaging();}
+function paging(delta){
+ const selector=pagerSelector();if(!selector)return;
+ const max=document.querySelectorAll(selector).length;
+ plateIndex=Math.max(0,Math.min(plateIndex+delta,Math.max(max-1,0)));updatePlatePaging();
+}
 function showOptions(){
  if(!menu||!document.body.classList.contains('arcade-on'))return;
  returnMode=mode;mode='options';
@@ -262,10 +272,12 @@ function onKeyDown(e){
 document.addEventListener('click',e=>{
  if(active!=='streetrod'||mode!=='game')return;
  const tab=e.target.closest?.('#ss-tabs button[data-ss-tab]');
- if(tab&&scene!=='tune'){scene=tab.dataset.ssTab;document.body.dataset.arcadeScene=scene;renderTabs();}
+ const target=e.target.closest?.('#streetrod-summer [data-ss-action="navigate"]');
+ const next=tab?.dataset.ssTab||target?.dataset.target;
+ if(next&&pageLabels().some(([name])=>name===next)){scene=next;document.body.dataset.arcadeScene=scene;plateIndex=0;renderTabs();}
 },true);
 // License cards are re-rendered on server refresh, so reselect the visible card.
-const watchCards=new MutationObserver(()=>{if(active==='plates'&&scene==='vote')updatePlatePaging();});
+const watchCards=new MutationObserver(()=>{if(pagerSelector())updatePlatePaging();});
 function start(){
  if(!board||!config?.enabled)return;
  build();
