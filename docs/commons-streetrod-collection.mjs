@@ -160,7 +160,8 @@ function mount(){
  });
  root.querySelector('#scc-search').addEventListener('input',ev=>{query=ev.target.value.trim().toLowerCase();renderCatalog();});
  root.querySelector('#scc-sort').addEventListener('change',ev=>{order=ev.target.value;renderCatalog();});
- renderCatalog();renderRoster();
+ root.querySelector(':scope > details').addEventListener('toggle',ev=>{if(ev.target.open)renderCatalog();});
+ renderRoster();
 }
 async function connect(){
  if(ready||!window.COWBOY_COMMUNITY_CONFIG?.enabled||!root)return;
@@ -192,7 +193,7 @@ async function connect(){
  }catch(error){const el=document.getElementById('scc-you');if(el)el.textContent='Driver profile will appear when your Commons session is ready.';}
 }
 function attach(){
- if(!document.getElementById('sr-inside')){if(root){root.remove();root=null;ready=false;profiles=[];self=null;}return;}
+ if(!document.getElementById('sr-inside')){if(root){root.remove();root=null;ready=false;profiles=[];self=null;photoLinks.clear();authId=null;}return;}
  if(!root){mount();void connect();}
  else if(self && ((document.querySelector('#srw-garage .srw-header')&&!document.querySelector('#srw-garage .srw-header .scc-live-driver'))||(document.querySelector('#streetrod-root .sr-race-heading')&&!document.querySelector('#streetrod-root .sr-race-heading .scc-live-driver'))))renderRoster();
 }
