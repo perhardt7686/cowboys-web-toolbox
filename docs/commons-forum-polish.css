@@ -1,0 +1,152 @@
+/* The Commons Message Board | Editorial night polish 2026-11-13
+   Progressive enhancement only. No game canvases, owner dashboard, or auth mechanics changed.
+   Reading surfaces maintain contrast; system fonts avoid extra network/font licenses.
+*/
+body.community-page {
+  --commons-ink:#f6f2ee;--commons-muted:#d6cad8;--commons-edge:#856d91;
+  --commons-gold:#f5d69b;--commons-night:#161521;
+}
+body.community-page .community-heading {
+  padding:clamp(1rem,3vw,1.65rem);
+  border:1px solid #7b668a;
+  border-radius:18px;
+  background:linear-gradient(120deg,#322340 0%,#242533 68%,#382642 100%);
+  box-shadow:0 14px 30px #100c2040,inset 0 1px 0 #fff2;
+  flex-wrap:wrap;
+}
+body.community-page .community-heading h2 {
+  color:#fff1da!important;
+  font-family:Georgia,Cambria,'Times New Roman',serif;
+  font-weight:700;line-height:1.12;font-size:clamp(1.75rem,3.3vw,2.5rem);
+  letter-spacing:-.024em;text-wrap:balance;
+}
+body.community-page .community-heading .eyebrow{color:#f0cca1;font-weight:850;font-size:.72rem;letter-spacing:.12em}
+body.community-page .community-heading .button-primary,
+body.community-page .forum-toolbar [aria-pressed=true]{
+  background:#f3d4a0!important;color:#271b30!important;border-color:#f9e8bd!important;font-weight:850;
+}
+body.community-page .community-main .community-tools{gap:.75rem;align-items:end;margin:1rem 0}
+body.community-page .community-main .community-search{min-width:min(100%,230px)}
+body.community-page .community-main :is(.community-search input,.community-sort select){
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+  font-size:1rem!important;font-weight:550;
+}
+body.community-page #forum-toolbar{
+  display:flex;gap:.6rem;flex-wrap:wrap;
+  padding:1rem .75rem;
+  border:1px solid #6b5b79;border-radius:14px;
+  background:#242032;
+  box-shadow:inset 0 1px 0 #fff1;
+}
+body.community-page #forum-toolbar :is(button,a){border-radius:9px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.65rem .85rem;font-size:.9rem;font-weight:750;text-decoration:none}
+body.community-page #forum-toolbar a{color:#f8dba3!important;text-underline-offset:3px}
+body.community-page .feed-status{font-size:.85rem;line-height:1.5;color:#d9cedc;gap:.65rem}
+body.community-page .feed-status button{min-height:44px;font-weight:700}
+body.community-page .thread-card{
+  position:relative;isolation:isolate;
+  background:linear-gradient(147deg,#2b2535,#211e2b 80%)!important;
+  border:1px solid #766583!important;border-radius:16px!important;
+  padding:clamp(1rem,2.3vw,1.6rem)!important;
+  margin-bottom:13px;overflow-wrap:anywhere;
+  box-shadow:0 6px 0 #08081128,0 10px 35px #04041238;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+body.community-page .thread-card::before{
+  content:'';position:absolute;inset:0 auto 0 0;width:4px;
+  border-radius:16px 0 0 16px;background:linear-gradient(#edc78c,#8d73ad);
+}
+body.community-page .thread-card:hover,
+body.community-page .thread-card:focus-within{
+  border-color:#f2d39e!important;box-shadow:0 0 0 1px #f2d39e4c,0 17px 38px #02040b65;
+}
+body.community-page .thread-card .thread-kicker{
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:#ecd6b7!important;letter-spacing:.09em;font-size:.75rem!important;
+  line-height:1.5;flex-wrap:wrap;gap:.45rem;margin-bottom:.65rem;
+}
+body.community-page .thread-card h3,
+body.community-page .thread-card .thread-title{
+  color:#fff2da!important;
+  font-family:Georgia,Cambria,'Times New Roman',serif!important;
+  font-weight:700!important;line-height:1.23!important;
+  font-size:clamp(1.3rem,2.4vw,1.7rem)!important;
+  letter-spacing:-.02em;text-wrap:pretty;
+}
+body.community-page .thread-card .thread-title{min-height:44px;text-decoration-thickness:2px;text-underline-offset:4px;overflow-wrap:anywhere}
+body.community-page .thread-card .thread-excerpt{
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:1rem!important;line-height:1.65!important;
+  color:#e4dce6!important;max-width:68ch!important;
+  margin:.6rem 0 1.15rem;white-space:pre-line;
+}
+body.community-page .thread-card .thread-bottom,
+body.community-page .thread-card .thread-age,
+body.community-page .thread-card .thread-author{
+  color:#dccce0!important;font-size:.82rem!important;line-height:1.5;
+  flex-wrap:wrap;
+}
+body.community-page .thread-card .thread-site{
+  color:#2e1e38!important;background:#ecd4a9!important;
+  padding:6px 10px;font-size:.78rem;font-weight:750;border-radius:8px;
+}
+body.community-page .thread-card .forum-last-reply{
+  color:#dccfdf!important;font-size:.84rem!important;
+  border-top-color:#75677f!important;line-height:1.6;
+}
+body.community-page .thread-card .forum-last-reply time{color:#f9e1b1!important}
+body.community-page .thread-card .forum-last-reply button{min-height:40px;font-size:.86rem;color:#f9dfa4!important}
+body.community-page .thread-card .forum-unread{
+  display:inline-flex;align-items:center;
+  color:#251a2d!important;background:#f6d999!important;
+  padding:4px 8px;border-radius:999px;font-size:.7rem;letter-spacing:0;
+}
+body.community-page :is(.reply-body,.thread-detail-body,.forum-reply-preview){
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:1.04rem!important;line-height:1.66!important;
+  overflow-wrap:anywhere;max-width:70ch;
+}
+body.community-page .forum-post{
+  border-radius:15px;border:1px solid #79698a!important;
+  margin:13px 0;padding:clamp(1rem,2.5vw,1.45rem)!important;
+  background:linear-gradient(138deg,#282331,#211d29)!important;
+}
+body.community-page .forum-post .reply-body{color:#f3edef!important}
+body.community-page .forum-post .forum-post-context{color:#d9ccd9!important;font-size:.82rem!important}
+body.community-page .forum-post .forum-post-number{color:#f1d49a!important;font-size:.9rem}
+body.community-page .forum-post .forum-post-actions{gap:.55rem;flex-wrap:wrap}
+body.community-page .forum-post .forum-post-actions button{
+  min-height:44px;font-size:.87rem!important;
+  border:1px solid #766780;border-radius:8px;
+  padding:.55rem .8rem;color:#f1d9ac!important;
+}
+body.community-page .forum-post .forum-post-actions button:hover{background:#483451}
+body.community-page .forum-editor-tools{display:flex;flex-wrap:wrap;gap:.5rem;padding:.65rem 0}
+body.community-page .forum-editor-tools button{border-radius:8px!important}
+body.community-page .reply-form textarea{min-height:140px;line-height:1.6!important;resize:vertical}
+body.community-page .forum-pager{display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:.6rem;padding:.8rem}
+body.community-page .forum-pager button{min-height:44px}
+body.community-page #conversations :is(button,a,summary,input,select,textarea):focus-visible{
+  outline:3px solid #13a9ae!important;outline-offset:3px!important;
+}
+body.community-page .community-main .community-empty{
+  background:#2b2535!important;border-color:#927d9c!important;border-radius:16px;
+}
+body.community-page .community-main .community-empty :is(h3,p){color:#f4e7dd!important;font-size:1rem}
+body.community-page .community-main a:not(.thread-title){text-underline-offset:3px}
+body.community-page .community-main .thread-meta,
+body.community-page .community-main .forum-post-context{font-variant-numeric:tabular-nums}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+ body.community-page .thread-card:hover{transform:translateY(-2px)}
+}
+@media(max-width:720px){
+ body.community-page .community-heading{padding:1rem;gap:.7rem}
+ body.community-page .community-heading .button-primary{width:100%;min-height:48px}
+ body.community-page #forum-toolbar{padding:.65rem}
+ body.community-page #forum-toolbar :is(button,a){flex:1 1 auto}
+ body.community-page .thread-card{padding:1rem!important}
+ body.community-page .thread-card .thread-bottom{gap:.45rem}
+ body.community-page .community-tools :is(.community-search,.community-sort){flex:1 1 100%;max-width:none}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .thread-card{transform:none!important;transition:none!important}
+}
