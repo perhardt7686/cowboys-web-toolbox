@@ -1,0 +1,63 @@
+/* Street r0d Racing / Workshop Phase 1 | isolated from original Commons game styling */
+body.community-page .srw-workshop{isolation:isolate;box-sizing:border-box;color:#f3eee2;--srw-gold:#edbf78;--srw-ink:#171d21;--srw-border:#67645a;background:radial-gradient(ellipse at 60% 0%,#404441 0%,#1e2428 62%,#141c21 100%);border:2px solid #86785e;border-radius:20px;padding:clamp(10px,2.5vw,20px);margin:13px 0 20px;box-shadow:0 16px 38px #0b11214d}
+body.community-page .srw-workshop *{box-sizing:border-box}
+body.community-page .srw-workshop [hidden]{display:none!important}
+body.community-page .srw-header{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin:0 0 16px}
+body.community-page .srw-overline{font:850 10px/1.5 system-ui,sans-serif;letter-spacing:.17em;color:#dfbd82;text-transform:uppercase;margin:0 0 5px!important}
+body.community-page .srw-header h3{font:950 clamp(24px,4vw,34px)/1.12 system-ui,sans-serif;color:#fff2d9;margin:0 0 7px!important;letter-spacing:-.03em}
+body.community-page .srw-header p:not(.srw-overline){margin:0!important;color:#d4d3ce;font:600 13px/1.55 system-ui,sans-serif}
+body.community-page .srw-mode{flex:0 0 auto;max-width:180px;display:block;color:#9ed2be;border:1px solid #658d7e;background:#14292c;padding:8px 10px;border-radius:10px;font:800 10px/1.25 system-ui,sans-serif;letter-spacing:.035em}
+body.community-page .srw-scene-frame{position:relative;overflow:hidden;border:2px solid #85775d;border-radius:14px;background:#293131;box-shadow:inset 0 0 0 1px #d7ad6944,0 9px 20px #040b1199;min-width:0}
+body.community-page #srw-canvas{display:block;width:100%;aspect-ratio:1152/648;height:auto;max-height:600px}
+body.community-page .srw-scene-caption{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:calc(100% - 20px)}
+body.community-page .srw-scene-caption>span,body.community-page .srw-scene-caption>strong{border:1px solid #8d9787aa;background:#101b20dd;color:#eee4d1;padding:6px 8px;border-radius:7px;font:800 10px/1.3 system-ui,sans-serif;letter-spacing:.035em}
+body.community-page .srw-scene-caption>strong{color:#ffdfa6;border-color:#c6a97e}
+body.community-page .srw-scene-hotspots{position:absolute;inset:0;pointer-events:none}
+body.community-page .srw-hotspot{position:absolute;pointer-events:auto;transform:translate(-50%,-50%);padding:6px 10px;border:1px solid #e3be80;border-radius:18px;min-height:36px;background:#141d23e8;color:#fff0d6;font:800 11px/1.2 system-ui,sans-serif;box-shadow:0 2px 12px #000c;cursor:pointer;white-space:nowrap}
+body.community-page .srw-hotspot:hover{background:#3b3130}
+body.community-page .srw-hot-hood{top:55%;left:70%}
+body.community-page .srw-hot-wheel{top:75%;left:32%}
+body.community-page .srw-hot-trans{top:79%;left:54%}
+body.community-page .srw-control-bar{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 2px}
+body.community-page .srw-button,body.community-page .srw-part button,body.community-page .srw-job-actions button,body.community-page .srw-tune-head button{min-height:42px;border-radius:9px;border:1px solid #8d8271;background:#303a40;color:#f9ecdb!important;font:850 12px/1.25 system-ui,sans-serif;cursor:pointer;padding:10px 14px;transition:background .14s}
+body.community-page .srw-button:hover,body.community-page .srw-part button:hover,body.community-page .srw-job-actions button:hover{background:#465052}
+body.community-page .srw-button.srw-primary,body.community-page .srw-job-actions .srw-confirm{background:#ddb577;border-color:#ffdfac;color:#222124!important;font-weight:900;box-shadow:0 3px 0 #756243}
+body.community-page .srw-button.srw-primary:hover,body.community-page .srw-job-actions .srw-confirm:hover{background:#f1c78c;color:#222124!important}
+body.community-page .srw-workshop button:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+body.community-page .srw-workshop button:focus-visible,body.community-page .srw-workshop input:focus-visible{outline:3px solid #94d5cf;outline-offset:2px}
+body.community-page .srw-bay-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px;margin-top:10px}
+body.community-page .srw-panel{background:#20282c;border:1px solid #535b56;border-radius:12px;padding:14px;min-width:0}
+body.community-page .srw-panel h4,body.community-page .srw-tuning h4{font:900 clamp(16px,2vw,21px)/1.2 system-ui,sans-serif;color:#ffe6ad;margin:2px 0 9px!important}
+body.community-page .srw-panel p{font:600 12px/1.55 system-ui,sans-serif;color:#cdd2d0;margin:5px 0!important}
+body.community-page .srw-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+body.community-page .srw-stat-grid span,body.community-page .srw-slip span{display:block;padding:9px;background:#131c21;border:1px solid #4e5c5d;border-radius:7px}
+body.community-page .srw-stat-grid small,body.community-page .srw-slip small{display:block;font:800 9px/1.3 system-ui,sans-serif;letter-spacing:.06em;color:#9eafa9;text-transform:uppercase}
+body.community-page .srw-stat-grid b,body.community-page .srw-slip b{display:block;margin-top:3px;font:900 13px/1.25 system-ui,sans-serif;color:#ffdda4;overflow-wrap:anywhere}
+body.community-page .srw-helper{color:#a9c5b4!important}
+body.community-page .srw-part-list{display:grid;gap:7px;margin-top:8px}
+body.community-page .srw-part{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#2d3637;border:1px solid #53605d;border-radius:9px;padding:10px;min-width:0}
+body.community-page .srw-part>div{min-width:0}
+body.community-page .srw-part b{display:block;color:#f5e4ce;font:800 12px/1.3 system-ui,sans-serif}
+body.community-page .srw-part small{color:#acc7bd;display:block;font:700 10px/1.4 system-ui,sans-serif;margin-top:3px}
+body.community-page .srw-part button{flex-shrink:0;padding:8px 10px;min-height:36px}
+body.community-page .srw-progress{width:100%;height:8px;border-radius:7px;background:#4d504e;overflow:hidden}
+body.community-page .srw-progress>span{height:100%;display:block;background:linear-gradient(90deg,#a7d6c7,#ebc07c);border-radius:7px}
+body.community-page .srw-job-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin:13px 0 2px}
+body.community-page .srw-tuning{background:linear-gradient(140deg,#262c31,#383932);border:1px solid #98845d;border-radius:12px;padding:17px;margin:13px 0}
+body.community-page .srw-tune-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+body.community-page .srw-tune-head p:not(.srw-overline){font:600 12px/1.45 system-ui,sans-serif;color:#c8d4cb;margin:2px 0 12px}
+body.community-page .srw-sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 24px;margin:14px 0}
+body.community-page .srw-sliders label{font:850 12px/1.6 system-ui,sans-serif;color:#e6e6d9}
+body.community-page .srw-sliders output{float:right;color:#ffd89b;font-weight:900}
+body.community-page .srw-sliders input[type=range]{display:block;width:100%;margin:10px 0 2px;accent-color:#f1c277;min-height:34px}
+body.community-page .srw-tune-foot{display:flex;justify-content:space-between;align-items:center;gap:15px}
+body.community-page .srw-tune-foot p{font:600 11px/1.5 system-ui,sans-serif;color:#bdc3bd;max-width:610px}
+body.community-page .srw-tune-foot button{flex-shrink:0}
+body.community-page .srw-diagnostics{padding:13px;margin:12px 0 0;background:#18272a;border:1px solid #46847a;border-radius:12px}
+body.community-page .srw-slip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+body.community-page .srw-status{background:#242d31;padding:11px 13px;margin:12px 0 0!important;border-left:4px solid #98c5a9;border-radius:7px;color:#daebdc!important;font:700 12px/1.5 system-ui,sans-serif!important}
+body.community-page .srw-status.is-error{border-color:#ef937b;color:#ffd6c9!important}
+body.community-page .srw-fineprint{font:600 10px/1.5 system-ui,sans-serif;color:#b3bebc!important;margin:11px 2px 0!important}
+@media(max-width:760px){body.community-page .srw-bay-layout{grid-template-columns:minmax(0,1fr)}body.community-page .srw-header{display:block}body.community-page .srw-mode{max-width:max-content;margin-top:8px}body.community-page .srw-sliders{grid-template-columns:1fr}body.community-page .srw-control-bar .srw-button{flex:1 1 135px}body.community-page .srw-tune-foot{display:block}body.community-page .srw-tune-foot button{width:100%}}
+@media(max-width:430px){body.community-page .srw-workshop{padding:9px;border-radius:12px}body.community-page .srw-header h3{font-size:23px}body.community-page .srw-hotspot{padding:5px 7px;min-height:30px;font-size:8px}body.community-page .srw-hot-hood{top:52%;left:70%}body.community-page .srw-hot-wheel{top:73%;left:25%}body.community-page .srw-hot-trans{top:84%;left:61%}body.community-page .srw-scene-caption{top:5px;left:5px;gap:4px}body.community-page .srw-scene-caption>span,body.community-page .srw-scene-caption>strong{font-size:7px;padding:4px 5px}body.community-page .srw-slip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){body.community-page .srw-workshop *,body.community-page .srw-workshop *:before{transition:none!important;scroll-behavior:auto!important}}
