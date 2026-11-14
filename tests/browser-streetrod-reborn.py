@@ -69,7 +69,7 @@ function roomHtml(room){
   '<form data-ss-form="decal"><label>Decal <input name="decal" value="COCO"></label><button type="submit">Apply decal</button></form>';
  if(room==='paper')return '<div class="ss-scene-head">Newspaper</div><div class="ss-ads">'+
   ['1940 Coupe','1955 Wagon','1960 Rattler'].map((n,i)=>
-  '<article class="ss-ad"><div class="ss-ad-main"><strong>'+n+'</strong>'+
+  '<article class="ss-ad"><div class="ss-ad-photo"><img class="ss-car-photo" alt="Preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="></div><div class="ss-ad-main"><strong>'+n+'</strong>'+
   '<small>Used car · $'+(450+i*150)+'</small><div class="ss-ad-actions">'+
   '<button data-ss-action="buy_car" data-car="car'+i+'">Buy now</button>'+
   '<form data-ss-form="offer" data-car="car'+i+'"><input name="offer" value="380">'+
@@ -118,8 +118,8 @@ elem('streetrod-summer').addEventListener('submit',e=>{e.preventDefault();elem('
 applyRoom('garage');
 </script>
 <script src="/streetrod-reborn-config.js?v=reborn4"></script>
-<script type="module" src="/commons-streetrod-ega.mjs?v=dos10"></script>
-<script type="module" src="/streetrod-reborn.mjs?v=reborn4"></script>
+<script type="module" src="/commons-streetrod-ega.mjs?v=dos11"></script>
+<script type="module" src="/streetrod-reborn.mjs?v=reborn6"></script>
 </body></html>"""
 
 async def run_one(browser,width,height):
@@ -157,6 +157,8 @@ async def run_one(browser,width,height):
   await p.locator('#sr-reborn .sr-v3-gas [data-ss-action="refuel"]').click()
   assert 'Selected refuel' in await p.locator('#ss-status').inner_text(), 'The explicit pump button must still work'
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="hood"]').click()
+  assert await p.locator('#sr-reborn .sr-v3-shop-menu').is_visible()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="tune"]').click()
   assert await p.locator('#sr-reborn form[data-ss-form="tune"]').is_visible()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paint"]').click()
@@ -170,13 +172,21 @@ async def run_one(browser,width,height):
   assert bbox and bbox['y']>=0 and bbox['y']+bbox['height']<=height+3,(width,height,bbox)
   assert await p.locator('#sr-reborn .sr-v3-canvas').evaluate(
    'el=>el.getContext("2d").getImageData(100,100,1,1).data[3]===255'), 'EGA painter must fill canvas'
-  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paper"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paperfront"]').click()
+  assert await p.locator('#sr-reborn .sr-v3-classifieds-cover').is_visible()
+  await p.locator('#sr-reborn .sr-v3-classifieds-cover [data-v3-action="paper"]').click()
   await p.locator('#sr-reborn .sr-v3-record-count').wait_for()
+  assert await p.locator('#sr-reborn .sr-v3-inline-preview').count()==1, 'Classified preview must use 16-color canvas, not a photo'
   assert '1 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
   assert '2 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
   text=await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   assert '1955 Wagon' in text
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="viewcar"]').click()
+  assert await p.locator('#sr-reborn .sr-v3-view-car').is_visible()
+  assert await p.locator('#sr-reborn .sr-v3-canvas').evaluate(
+   'el=>el.getContext("2d").getImageData(30,30,1,1).data[3]===255')
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paper"]').click()
   await p.locator('#sr-reborn .sr-v3-pocket [data-ss-action="buy_car"]').click()
   assert 'Selected buy_car' in await p.locator('#ss-status').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="parts"]').click()
@@ -224,6 +234,8 @@ async def run_one(browser,width,height):
   assert 'Bought a car' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
   await p.locator('#sr-reborn .sr-v3-hotspot[data-v3-action="hood"]').click()
+  assert await p.locator('#sr-reborn .sr-v3-shop-menu').is_visible()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="wrench"]').click()
   await p.locator('#ss-season-bay:not([hidden])').wait_for()
   assert await p.locator('#sr-reborn').count()==1
   (ROOT/'reports').mkdir(exist_ok=True,parents=True)
