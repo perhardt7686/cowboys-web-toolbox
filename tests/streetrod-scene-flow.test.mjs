@@ -73,7 +73,7 @@ test('Mobile scene gestures work and station entry never buys fuel',()=>{
 test('Original newspaper-first flow and real car inspection are independently rendered',()=>{
  assert.match(reborn,/paperfront:\[\['USED CARS'/);
  assert.match(reborn,/data-v3-action="paperfront"/);
- assert.match(reborn,/data-v3-action="viewcar"/);
+ assert.match(reborn,/\['LOOK AT CAR','viewcar'\]/);
  assert.match(reborn,/sr-v3-inline-preview/);
  assert.match(ega,/function carInspection\(/);
  assert.match(ega,/carinspect:carInspection/);
