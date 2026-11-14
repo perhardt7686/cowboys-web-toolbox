@@ -1,5 +1,6 @@
 /* The Commons · family word quest and drawing studio, members only. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {letterKnowledge} from './family-word-clues.mjs?v=personal9';
 import {startDrawingStudio} from './commons-drawing.mjs?v=1';
 
 const board=document.getElementById('conversations');
@@ -20,6 +21,77 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       const pic=document.createElement('img');pic.src=img;pic.alt='';pic.loading='lazy';pic.width=size==='ranking'?31:27;return pic;
     }
     const a=document.createElement('span');a.className='word-initials';a.textContent=safeStr(name).trim().slice(0,2).toUpperCase()||'?';return a;
+  }
+  function ensureQuestKeyboard() {
+    const form=byId('commons-word-form');
+    if(!form)return null;
+    let board=byId('commons-quest-keyboard');
+    if(board)return board;
+    board=document.createElement('section');
+    board.id='commons-quest-keyboard';
+    board.className='family-quest-keyboard';
+    board.setAttribute('aria-label','Team used-letter keyboard');
+    const heading=document.createElement('strong');
+    heading.className='family-letter-heading';
+    heading.textContent='Team letter clues';
+    const fixed=document.createElement('div');
+    fixed.id='commons-quest-confirmed';
+    fixed.className='family-fixed-positions';
+    const hint=document.createElement('p');
+    hint.className='family-letter-note';
+    hint.textContent='Green letters stay in their confirmed positions.';
+    const keys=document.createElement('div');
+    keys.className='family-quest-keys';
+    for(const chars of ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM']){
+      const row=document.createElement('div');row.className='family-quest-key-row';
+      if(chars==='ZXCVBNM'){
+        const enter=document.createElement('button');enter.type='button';enter.dataset.questKey='ENTER';enter.textContent='Enter';row.append(enter);
+      }
+      for(const char of chars){
+        const btn=document.createElement('button');btn.type='button';btn.dataset.questKey=char;
+        btn.textContent=char;btn.setAttribute('aria-label','Type '+char);row.append(btn);
+      }
+      if(chars==='ZXCVBNM'){
+        const back=document.createElement('button');back.type='button';back.dataset.questKey='BACK';back.textContent='⌫';back.setAttribute('aria-label','Backspace');row.append(back);
+      }
+      keys.append(row);
+    }
+    const excluded=document.createElement('p');
+    excluded.className='family-letter-excluded';excluded.id='commons-quest-excluded';
+    excluded.textContent='Not in the word: none yet';
+    board.append(heading,fixed,hint,keys,excluded);
+    form.after(board);
+    board.addEventListener('click',event=>{
+      const key=event.target.closest('button[data-quest-key]')?.dataset.questKey;
+      const input=byId('commons-word-guess');
+      if(!key||!input||input.disabled)return;
+      if(key==='ENTER'){form.requestSubmit();return;}
+      if(key==='BACK')input.value=input.value.slice(0,-1);
+      else if(input.value.length<5)input.value+=key;
+      input.focus();
+    });
+    return board;
+  }
+  function paintQuestKeyboard(data) {
+    const board=ensureQuestKeyboard();
+    if(!board)return;
+    const {used,fixed,absent}=letterKnowledge(data.guesses);
+    const fixedRow=byId('commons-quest-confirmed');
+    fixedRow.replaceChildren(...fixed.map((ch,index)=>{
+      const item=document.createElement('span');
+      item.textContent=ch||'·';item.className=ch?'confirmed':'unknown';
+      item.setAttribute('aria-label',ch?'Position '+(index+1)+' confirmed '+ch:'Position '+(index+1)+' unknown');
+      return item;
+    }));
+    byId('commons-quest-excluded').textContent='Not in the word: '+(absent.join(' · ')||'none yet');
+    for(const btn of board.querySelectorAll('button[data-quest-key]')){
+      const k=btn.dataset.questKey,status=used[k]||'unused';
+      btn.classList.toggle('correct',status==='correct');
+      btn.classList.toggle('present',status==='present');
+      btn.classList.toggle('absent',status==='absent');
+      if(k!=='ENTER'&&k!=='BACK')btn.setAttribute('aria-label',k+', '+({correct:'correct position',present:'in word, different position',absent:'not in word',unused:'not tried'}[status]));
+      btn.disabled=Boolean(data.finished);
+    }
   }
   function renderWord(data){
     live=data;
@@ -87,6 +159,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       const points=document.createElement('b');points.textContent=Number(member.points||0).toLocaleString()+' pts';
       li.append(info,points);ranking.append(li);
     }
+    paintQuestKeyboard(data);
   }
   async function refreshTotals(){
     const {data,error}=await client.rpc('community_word_family_totals');

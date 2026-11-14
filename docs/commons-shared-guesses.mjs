@@ -101,7 +101,7 @@ function renderCurrent(mode,data) {
   const guesses=Array.isArray(data.guesses)?data.guesses:[];
   const signature=safe(data.day)+'/'+guesses.map((x,i)=>[i,x.guess,x.user_id,x.points].join(':')).join('|');
   const counter=panel.querySelector('[data-role="counter"]');
-  counter.textContent=guesses.length+' of '+Number(data.max_attempts||0)+' guesses · '+safe(data.day||todayLocal());
+  counter.textContent=mode==='w0rdle'?'Team '+guesses.length+' guesses · Yours '+Number(data.my_attempts||0)+' / '+Number(data.max_per_player||9)+' · '+safe(data.day||todayLocal()):guesses.length+' of '+Number(data.max_attempts||0)+' guesses · '+safe(data.day||todayLocal());
   if(panel.dataset.signature===signature)return;
   panel.dataset.signature=signature;
   const area=panel.querySelector('[data-role="current"]');

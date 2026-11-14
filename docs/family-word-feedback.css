@@ -1,0 +1,48 @@
+/* Team letter discoveries and honest no-pair feedback. Loaded after game skins. */
+body.community-page .family-word-clues,
+body.community-page .family-quest-keyboard{
+  width:100%;box-sizing:border-box;border:1px solid #bd9bcb;border-radius:14px;
+  padding:10px 12px;margin:10px 0 16px;background:#f9f3e9;color:#342343;
+}
+body.community-page .family-word-clues>strong,
+body.community-page .family-letter-heading{
+  display:block;color:#382448;font:800 .88rem/1.4 system-ui,sans-serif;margin:2px 0 7px;
+}
+body.community-page .family-word-clues>strong:not(:first-child){margin-top:12px}
+body.community-page .family-fixed-positions{display:flex;justify-content:center;gap:6px;flex-wrap:nowrap;margin:5px 0;}
+body.community-page .family-fixed-positions>span{
+ display:grid;place-items:center;width:clamp(34px,10vw,54px);height:clamp(34px,10vw,54px);
+ border-radius:10px;background:#e7ddeb;color:#4b3a5b;border:2px solid #b7a2c5;
+ font:900 clamp(18px,5vw,27px)/1 system-ui,sans-serif;min-width:0;
+}
+body.community-page .family-fixed-positions>span.confirmed{background:#137b59;border-color:#1b654b;color:white}
+body.community-page .family-letter-excluded{font:800 1rem/1.5 system-ui,sans-serif;color:#40314d;overflow-wrap:anywhere;margin:7px 0 2px}
+body.community-page .family-letter-note{font:600 .81rem/1.35 system-ui,sans-serif;color:#56485d;margin:4px 0 10px}
+body.community-page .family-quest-keys{display:grid;gap:5px;max-width:540px;margin:10px auto}
+body.community-page .family-quest-key-row{display:flex;justify-content:center;gap:3px;min-width:0}
+body.community-page .family-quest-key-row button{
+ flex:1 1 0;min-width:0;min-height:43px;padding:3px 1px;border-radius:6px;border:1px solid #9b8aaa;
+ background:#ded4e5;color:#382747;font:800 clamp(11px,2.7vw,16px)/1.1 system-ui,sans-serif;cursor:pointer;
+}
+body.community-page .family-quest-key-row button:is([data-quest-key="ENTER"],[data-quest-key="BACK"]){flex:1.5 1 0;font-size:.78rem}
+body.community-page .family-quest-key-row button.correct{background:#137b59;color:white;border-color:#137b59}
+body.community-page .family-quest-key-row button.present{background:#dfaa3c;color:#281e12;border-color:#ba842e}
+body.community-page .family-quest-key-row button.absent{background:#61596b;color:white;border-color:#61596b}
+body.community-page .family-quest-key-row button:focus-visible{outline:3px solid #067d84;outline-offset:2px}
+body.community-page .family-quest-key-row button:disabled{opacity:.85;cursor:default}
+body.community-page .mahjong-no-moves{
+ margin:8px 0;padding:10px 12px;background:#ffedc6;color:#3a2743;border:2px solid #bd6c23;
+ font:800 .92rem/1.4 system-ui,sans-serif;border-radius:12px;
+}
+body.community-page .mahjong-no-moves[hidden]{display:none!important}
+body.community-page.arcade-on[data-arcade-game="wordle"] #letter-lock-grid{
+ max-height:min(40dvh,395px);overflow-y:auto!important;overscroll-behavior:contain;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"] .family-quest-keyboard{padding:8px}
+body.community-page.arcade-on[data-arcade-game="wordquest"] .family-quest-key-row button{min-height:43px!important}
+@media(max-width:400px){
+ body.community-page .family-word-clues,body.community-page .family-quest-keyboard{padding:9px}
+ body.community-page .family-quest-key-row{gap:2px}
+ body.community-page .family-quest-key-row button{font-size:11px;min-height:42px}
+}
+@media(prefers-reduced-motion:reduce){body.community-page .family-word-clues *{transition:none!important}}

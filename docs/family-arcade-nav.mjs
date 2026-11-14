@@ -10,7 +10,7 @@ const labels = {
 };
 const instructions = {
   mahjong: 'Match tiles with the same picture and corner mark. A playable tile is uncovered and has an open left or right side. Zoom in, then swipe to pan. Fit board brings the full layout back into view. Campaign stages unlock as you qualify.',
-  wordle: 'Guess five-letter words as a team. Green means the correct position and earns 12 personal points. Gold means the letter belongs elsewhere and earns 5. A solve adds a bonus and awards contributing players 35 team-victory points each. The shared word resets at midnight Eastern.',
+  wordle: 'Guess five-letter words as a team. Green means the correct position and earns 12 personal points. Gold means the letter belongs elsewhere and earns 5. A solve adds a bonus and awards contributing players 35 team-victory points each. You each get nine valid guesses per day; everyone shares every guess and saved green-letter position. The shared word resets at midnight Eastern.',
   wordquest: 'Use the clue to solve today’s five-letter word together. Valid guesses score 5 points, with bonus points for solving. Everyone who contributes gets a team win when the team solves. Open Level, XP and achievements to see your progress. The puzzle resets at midnight Eastern.',
   plates: 'Post a photo, enter the plate characters and region, then explain your interpretation. The other player can agree for one point or explain a disagreement. A revised interpretation goes back for review. Each photo can earn one point.',
   drawing: 'Draw with a touch, mouse or stylus. Open Tools and layers to change tools, add a layer, zoom or select Pan, and see undo, redo and export options. Save editable project and Open project keep your layers. PNG and JPEG export a flat image.',
@@ -169,7 +169,7 @@ export function makeArcadeNav({leave, view, settings}) {
       mahjong: [text('mahjong-run-title').replace(/ · Combo .+$/, ''), text('mahjong-remaining')],
       wordle: [...(get('letter-lock-statline')?.children || [])].slice(1, 4).map(item => {
         const [label, value] = [...item.children].map(child => child.textContent);
-        const renamed = {'TEAM GUESSES LEFT': 'Guesses left', 'TEAM SCORE': 'Team score', 'YOUR POINTS TODAY': 'Your points'};
+        const renamed = {'YOUR GUESSES LEFT': 'Your guesses left', 'TEAM GUESSES': 'Team guesses', 'TEAM SCORE': 'Team score', 'YOUR POINTS TODAY': 'Your points'};
         return value === undefined ? '' : (renamed[label] || label) + ' ' + value;
       }),
       wordquest: [get('commons-word')?.dataset.difficulty, get('commons-word-progress')?.dataset.remaining !== undefined ? get('commons-word-progress').dataset.remaining + ' guesses left' : text('commons-word-progress'), text('arcade-quest-rank-chip').split(' · ').slice(0, 2).join(' · ')],
