@@ -11,12 +11,12 @@ import {cue,soundEnabled,toggleSound} from './streetrod-pc-speaker.mjs?v=audio1'
 const $=id=>document.getElementById(id);
 const BODY=document.body;
 const FULL=new Set(['garage','paper','parts','diner','drive','calendar','tune']);
-const VIEW_LABELS={garage:'THE GARAGE',paper:'CLASSIFIED ADS',parts:'AUTO PARTS',diner:'BOB’S DRIVE-IN',drive:'ON THE ROAD',calendar:'SUMMER 1963',tune:'IGNITION TIMING',gas:'FUEL STOP',crew:'COMMONS DRIVERS',underbody:'UNDER THE CAR',licence:'DRIVER LICENCE',inventory:'PARTS TRAY',service:'SERVICE ORDER',paint:'PAINT & DECALS',hall:'HALL OF FAME'};
+const VIEW_LABELS={garage:'THE GARAGE',paper:'CLASSIFIED ADS',parts:'AUTO PARTS',diner:'BOB’S DRIVE-IN',drive:'ON THE ROAD',calendar:'SUMMER 1963',tune:'IGNITION TIMING',gas:'FUEL STOP',paperfront:'THE DAILY PAPER',carshow:'LOOK AT CAR',hoodmenu:'UNDER THE HOOD',carinfo:'CAR INFORMATION',rivalview:'CHECK THE RIVAL',crew:'COMMONS DRIVERS',underbody:'UNDER THE CAR',licence:'DRIVER LICENCE',inventory:'PARTS TRAY',service:'SERVICE ORDER',paint:'PAINT & DECALS',hall:'HALL OF FAME'};
 const NAV={
- garage:[['NEWSPAPER','paper'],['POP HOOD','hood'],['GO TO DINER','diner'],['GAS STATION','gas'],['CALENDAR','calendar'],['TUNE','tune']],
- paper:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['PARTS SHOP','parts']],
+ garage:[['NEWSPAPER','paperfront'],['POP HOOD','hood'],['CAR INFO','carinfo'],['DRIVE-IN','diner'],['GAS','gas'],['CALENDAR','calendar']],
+ paper:[['COVER','paperfront'],['PREVIOUS','prev'],['NEXT','next'],['LOOK AT CAR','viewcar'],['AUTO PARTS','parts'],['GARAGE','garage']],
  parts:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['PARTS TRAY','inventory'],['SERVICE ORDER','service'],['LIFT CAR','underbody']],
- diner:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['OUR DRIVERS','crew']],
+ diner:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['INSPECT','inspectrival'],['OUR DRIVERS','crew']],
  drive:[['GARAGE','garage'],['DRIVE-IN','diner']],
  calendar:[['GARAGE','garage'],['CLASSIFIEDS','paper'],['HALL OF FAME','hall']],
  tune:[['HOOD','hood'],['GARAGE','garage'],['PAINT & DECALS','paint']],
@@ -27,18 +27,25 @@ const NAV={
  service:[['PARTS SHOP','parts'],['POP HOOD','hood'],['GARAGE','garage']],
  hall:[['CALENDAR','calendar'],['PREVIOUS','prev'],['NEXT','next'],['GARAGE','garage']],
  licence:[['ENTER GARAGE','garage'],['CREW','crew']],
- underbody:[['WRENCH','hood'],['GARAGE','garage']]
+ underbody:[['WRENCH','wrench'],['GARAGE','garage']],
+ paperfront:[['USED CARS','paper'],['AUTO PARTS','parts'],['GARAGE','garage']],
+ carshow:[['CLASSIFIEDS','paper'],['GARAGE','garage'],['AUTO PARTS','parts']],
+ hoodmenu:[['REAL BOLTS','wrench'],['TUNE','tune'],['PARTS TRAY','inventory'],['DONE','garage']],
+ carinfo:[['GARAGE','garage'],['POP HOOD','hood'],['SPARE PARTS','inventory']],
+ rivalview:[['DRIVE-IN','diner'],['GARAGE','garage']]
 };
 const HOTSPOTS={
  garage:[
   ['Check newspaper','paper',3,75,17,18],['Pop the hood','hood',28,56,47,29],
   ['Tune engine','tune',43,22,16,21],['Check calendar','calendar',89,20,10,27],
-  ['Hit the street','diner',77,78,21,14],['Radio and engine parts','parts',64,21,22,27]
+  ['Hit the street','diner',77,78,21,14],['Radio and engine parts','parts',64,21,22,27],['Read car clipboard','carinfo',61,45,13,14]
  ],
  paper:[['Previous classified','prev',1,34,12,35],['Next classified','next',87,34,12,35]],
  diner:[['Challenge this driver','challenge',33,58,51,26],['Return to garage','garage',70,86,29,12]],
  parts:[['Work under hood','hood',56,24,38,30]],
- calendar:[['Return to garage','garage',77,80,20,17]]
+ calendar:[['Return to garage','garage',77,80,20,17]],
+ paperfront:[['Browse used cars','paper',4,22,43,65],['Browse auto parts','parts',53,22,43,65]],
+ hoodmenu:[['Open real bolt workbench','wrench',23,32,50,47]]
 };
 const TEAM=['Coco','Ana','Wizardhardt','Eliot','Emma','Erica','Eloy','Evi'];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -108,7 +115,18 @@ function choose(target){
   page[r]=(page[r]+(target==='next'?1:-1)+records.length)%records.length;
   redraw(true);return;
  }
- if(target==='hood'){splash=false;showWorkbench();return;}
+ if(target==='hood'){
+  sideRoom='hoodmenu';splash=false;redraw(true);return;
+ }
+ if(target==='wrench'){splash=false;showWorkbench();return;}
+ if(target==='viewcar'){
+  if(!visibleRecord()){showStatus('Open a used-car listing first.');return;}
+  sideRoom='carshow';splash=false;redraw(true);return;
+ }
+ if(target==='inspectrival'){
+  if(!visibleRecord()){showStatus('Choose a rival at the drive-in first.');return;}
+  sideRoom='rivalview';splash=false;redraw(true);return;
+ }
  if(target==='challenge'){
   const card=visibleRecord();
   card?.querySelector('[data-ss-action="choose_rival"]:not(:disabled)')?.click();
@@ -127,7 +145,7 @@ function choose(target){
   sideRoom='gas';splash=false;redraw(true);
   return;
  }
- if(['licence','crew','underbody','inventory','service','paint','hall'].includes(target)){
+ if(['licence','crew','underbody','inventory','service','paint','hall','paperfront','carinfo'].includes(target)){
   sideRoom=target;splash=false;redraw(true);return;
  }
  if(target==='tune'){
