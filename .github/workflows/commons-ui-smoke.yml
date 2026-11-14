@@ -6,6 +6,8 @@ on:
       - 'docs/commons-feed-legibility.css'
       - 'docs/family-*'
       - 'tests/browser-family-board.py'
+      - 'tests/browser-plate-review.py'
+      - 'docs/commons-plates.css'
       - 'docs/unified-nav.css'
       - 'docs/unified-nav.js'
       - 'tests/browser-shared-navigation.py'
@@ -65,6 +67,7 @@ jobs:
           python tests/browser-commons-contrast.py
           python tests/browser-shared-navigation.py
           python tests/browser-family-board.py
+          python tests/browser-plate-review.py
           python tests/browser-streetrod-ega.py
           python tests/browser-arcade-shell.py
           python tests/browser-streetrod-scenes.py

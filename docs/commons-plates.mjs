@@ -64,6 +64,17 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  }
  function ptext(value,cls=''){return newEl('p',cls,value);}
  function labelText(text){return newEl('strong','',text);}
+ function plateDetails(entry){
+  const details=newEl('div','plate-card-info');
+  const plate=entry.plate||'Unknown plate';
+  const guess=typeof entry.guess==='string'&&entry.guess.trim()?entry.guess:'No saved guess for this plate.';
+  details.append(
+   ptext(plate+(entry.region?' · '+entry.region:''),'plate-plate'),
+   newEl('strong','plate-guess-label','Submitted guess'),
+   ptext(guess,'plate-guess')
+  );
+  return details;
+ }
  async function picture(img,path){
   if(!client||!mounted||board.hidden)return;
   const generation=sessionGeneration;
@@ -84,13 +95,13 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const src=await pending;
   if(src&&img.isConnected&&mounted&&sessionGeneration===generation)img.src=src;
  }
- function reviewPhoto(img,caption){
+ function reviewPhoto(img,entry){
   if(!img.src||!img.complete||!img.naturalWidth){setStatus('Photo is still loading. Please retry shortly.');return;}
   const dialog=newEl('dialog','plate-photo-dialog');dialog.id='plate-photo-viewer';
   dialog.setAttribute('aria-label','Full-size license plate photograph');
   const close=button('Close photo ✕',()=>dialog.close(),'secondary');close.classList.add('plate-photo-close');
   const full=newEl('img','plate-photo-full');full.alt=img.alt;full.src=img.src;
-  dialog.append(close,full,ptext(caption,'plate-photo-caption'));
+  dialog.append(close,plateDetails(entry),full,ptext('Photo by '+nameFor(entry.seat),'plate-photo-caption'));
   document.body.append(dialog);
   dialog.addEventListener('close',()=>dialog.remove(),{once:true});
   dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
@@ -111,7 +122,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    const head=newEl('div','plate-card-head');
    const by=newEl('div','plate-by');by.append(labelText(nameFor(entry.seat)),pill(dateFor(entry.created_at)));
    const status=entry.status==='approved'?'👍 Approved · +1':entry.status==='needs_revision'?'👎 Explanation needed':'Awaiting vote';
-   head.append(by,pill(status));card.append(head);
+   head.append(by,pill(status));card.append(head,plateDetails(entry));
    const img=newEl('img','plate-photo');img.alt='License plate challenge posted by '+nameFor(entry.seat);img.loading='lazy';
    const preview=newEl('div','plate-preview');
    const open=newEl('button','plate-photo-open');open.type='button';
@@ -135,15 +146,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     }catch(error){loading.textContent='Could not download the saved photo. Retry below.';retry.hidden=false;}
     finally{loadingPhoto=false;}
    };
-   open.addEventListener('click',()=>reviewPhoto(img,entry.plate+' · '+nameFor(entry.seat)));
+   open.addEventListener('click',()=>reviewPhoto(img,entry));
    card.append(preview);
-   const info=newEl('div','plate-card-info');info.append(ptext(`${entry.plate}${entry.region?' · '+entry.region:''}`,'plate-plate'));
-   const guess=ptext(entry.guess,'plate-guess');info.append(labelText('The interpretation'),guess);
-   const refs=newEl('div','plate-links');
-   for(const [title,url] of [['🔎 Research this plate',googleLink(entry.plate,entry.region)],['State plate designs',designLink(entry.region||'US')]]){
-    const a=newEl('a','plate-research',title);a.href=url;a.target='_blank';a.rel='noopener noreferrer';refs.append(a);
-   }
-   info.append(refs);card.append(info);
    if(entry.status==='approved')card.append(ptext('Point awarded to '+nameFor(entry.seat)+'. This plate is settled.','plate-done'));
    else if(entry.status==='pending'&&own)card.append(ptext('Waiting for '+otherName()+' to vote.','plate-waiting'));
    else if(entry.status==='pending'&&!own){
@@ -160,6 +164,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
      f.addEventListener('submit',async ev=>{ev.preventDefault();await revise(entry.id,f.querySelectorAll('textarea')[0].value,f.querySelectorAll('textarea')[1].value);});card.append(f);
     }else card.append(ptext('Waiting for '+nameFor(entry.seat)+' to revise the guess.','plate-waiting'));
    }
+   const refs=newEl('div','plate-links');
+   for(const [title,url] of [['🔎 Research this plate',googleLink(entry.plate,entry.region)],['State plate designs',designLink(entry.region||'US')]]){
+    const a=newEl('a','plate-research',title);a.href=url;a.target='_blank';a.rel='noopener noreferrer';refs.append(a);
+   }
+   card.append(refs);
    if((entry.history?.length||0)+(entry.discussion?.length||0)>0){
     const details=newEl('details','plate-history'),summary=newEl('summary','','The debate so far');details.append(summary);
     for(const h of entry.history||[])details.append(ptext((h.decision==='up'?'👍 Approved':'👎 Disagreed')+(h.reason?' · '+h.reason:''),'plate-history-row'));
@@ -184,7 +193,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const total=Number(game?.total||0);
   const index=Math.floor(offset/6);
   const max=Math.max(1,Math.ceil(total/6));
-  $('plate-gallery-count').textContent=total?total+' saved · Select a photo to open its debate':'No saved plate photos yet.';
+  $('plate-gallery-count').textContent=total?total+' saved · Tap a photo to read the guess':'No saved plate photos yet.';
   $('plate-gallery-position').textContent=(index+1)+' / '+max;
   $('plate-gallery-prev').disabled=index===0;
   $('plate-gallery-next').disabled=index>=max-1;
