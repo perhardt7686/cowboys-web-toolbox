@@ -516,6 +516,9 @@ function build(){
   b.className='sr-v3-hotspot';b.dataset.v3Action=target;
   b.title=name;b.setAttribute('aria-label',name);
   Object.assign(b.style,{left:left+'%',top:top+'%',width:width+'%',height:height+'%'});
+  // The 1989 bottom status bar tells players what the wrench points at.
+  b.addEventListener('pointerenter',()=>showStatus(name.toUpperCase()));
+  b.addEventListener('focus',()=>showStatus(name.toUpperCase()));
   hotspots.append(b);
  }
  const pocket=el.querySelector('.sr-v3-pocket');
@@ -604,6 +607,14 @@ let bootLoop=setInterval(()=>{
  if(install()){clearInterval(bootLoop);bootLoop=null;}
 },300);
 install();
+// Preserve actual saves. Only an authenticated success notification may return
+// an acquired/switched car to the garage, exactly as in the original flow.
+window.addEventListener('cowboy:streetrod-season-saved',event=>{
+ if(!isArcade())return;
+ const command=event.detail?.command;
+ if(command==='buy_car'||command==='switch')choose('garage');
+ else if(command==='new_season')choose('paperfront');
+});
 // The source game calculates and saves its own race. We only draw the updated
 // telemetry; this interval makes no RPC calls and never changes race state.
 tick=setInterval(()=>{
