@@ -232,7 +232,14 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
  }
  if(options.bankroll!==undefined){
   box(ctx,66,189,80,10,8);
-  txt(ctx,'
+  txt(ctx,'USD '+Math.max(0,Number(options.bankroll)||0).toLocaleString('en-US'),68,190,14,8);
+ }
+ if(options.subtitle){
+  box(ctx,133,189,180,10,8);
+  txt(ctx,String(options.subtitle).slice(0,32).toUpperCase(),137,190,14,7);
+ }
+};
+function componentCard(c,key,body){
  box(c,0,0,160,70,0);
  car(c,key,body,4,14,154);
 }
