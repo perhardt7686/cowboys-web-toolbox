@@ -74,8 +74,8 @@ function roomHtml(room){
   '<button type="submit">Haggle</button></form></div></div></article>').join('')+'</div>';
  if(room==='parts')return '<div class="ss-parts-counter">'+['Engine','Wheels','Gearbox'].map((n,i)=>
   '<article><strong>'+n+'</strong><button data-ss-action="buy_part" data-kind="'+n.toLowerCase()+'">Buy used</button></article>').join('')+'</div>';
- if(room==='diner')return '<div class="ss-rivals">'+['The Rookie','Blackjack','The King'].map((n,i)=>
-  '<article class="ss-rival"><strong>'+n+'</strong><button data-ss-action="choose_rival" data-rival="r'+i+'">Call out</button></article>').join('')+'</div>';
+ if(room==='diner')return '<div class="ss-rivals">'+['The Rookie','Blackjack','The King','Cipher Van X'].map((n,i)=>
+  '<article class="ss-rival"><strong>'+n+'</strong><button data-ss-action="choose_rival" data-rival="'+(i===3?'cipher':'r'+i)+'">Call out</button></article>').join('')+'</div>';
  if(room==='drive')return '<div class="ss-cockpit"><canvas width="960" height="340" id="ss-race-canvas"></canvas><div id="ss-start-lights">GREEN</div></div>'+
  '<div class="ss-drive-metrics"><div><strong id="ss-speed">64 mph</strong></div><div><strong id="ss-rpm">3400</strong></div><div><strong id="ss-gear">3</strong></div><div><strong id="ss-distance">25%</strong></div></div>'+
  '<div class="ss-drive-controls"><button data-ss-hold="left">STEER LEFT</button><button data-ss-hold="right">STEER RIGHT</button><button data-ss-hold="gas">GAS</button><button data-ss-hold="brake">BRAKE</button><button data-ss-action="shift">SHIFT UP</button><button data-ss-action="downshift">SHIFT DOWN</button></div>'+
@@ -135,7 +135,6 @@ async def run_one(browser,width,height):
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
   assert '2 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
   text=await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
-  print('RECORD AFTER NEXT:',repr(text[:800]),'current=',await p.locator('#sr-reborn .sr-v3-record-count').inner_text(),flush=True)
   assert '1955 Wagon' in text
   await p.locator('#sr-reborn .sr-v3-pocket [data-ss-action="buy_car"]').click()
   assert 'Selected buy_car' in await p.locator('#ss-status').inner_text()
@@ -145,6 +144,15 @@ async def run_one(browser,width,height):
   assert await p.locator('body').get_attribute('data-arcade-scene')=='diner'
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
   assert 'Blackjack' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
+  assert 'THE MYSTERY MACHINE' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  assert await p.locator('#sr-reborn .sr-v3-boss-mark').is_visible()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="prev"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="prev"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="crew"]').click()
+  assert 'Coco' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="diner"]').click()
   await p.locator('#sr-reborn .sr-v3-pocket [data-ss-action="choose_rival"]').click()
   await p.locator('#sr-reborn .ss-challenge-form').wait_for(timeout=4000)
   assert await p.locator('#sr-reborn .ss-challenge-form button').is_visible()
