@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Real mobile browser smoke test with only local preview identities.
+No real users, credentials, posts, or third-party TV streams are touched.
+"""
+import asyncio
+from pathlib import Path
+from playwright.async_api import async_playwright, expect
+
+ROOT=Path(__file__).resolve().parents[1]
+URL='http://127.0.0.1:8765/community.html?preview=1&role=member'
+
+async def main():
+    async with async_playwright() as p:
+        browser=await p.chromium.launch(headless=True)
+        try:
+            for width in [375,390]:
+                page=await browser.new_page(viewport={'width':width,'height':844},
+                  reduced_motion='reduce',has_touch=True)
+                errors=[]
+                page.on('pageerror',lambda error: errors.append(str(error)))
+                await page.goto(URL,wait_until='domcontentloaded',timeout=30000)
+                quick=page.locator('#family-avatar-quick')
+                await expect(quick).to_be_visible(timeout=25000)
+                bounds=await quick.bounding_box()
+                assert bounds and bounds['width']>=44 and bounds['height']>=44,(width,bounds)
+                assert await quick.get_attribute('aria-label')=='Open my avatar studio'
+                hamburger=await page.locator('#cowboy-site-nav .cowboy-nav-toggle').bounding_box()
+                assert hamburger and 0<=hamburger['x']-bounds['x']<=120,(
+                    width,'header avatar not next to menu',bounds,hamburger)
+                await quick.click()
+                await expect(page.locator('#content-dialog')).to_be_visible()
+                await expect(page.locator('[data-profile-pane="avatar"]')).to_be_visible()
+                canvas=page.locator('#family-avatar-canvas')
+                await expect(canvas).to_be_visible()
+                before=await canvas.evaluate('(el)=>el.toDataURL("image/png")')
+                await page.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]').click()
+                after=await canvas.evaluate('(el)=>el.toDataURL("image/png")')
+                assert before!=after,(width,'changing hair did not redraw character')
+                assert await page.locator('button[type="submit"]',has_text='Save my avatar').count()>=1
+                await page.keyboard.press('Escape')
+                # Test external TV link using the same class+DOM location that
+                # Drawing Studio injects during approved account mount.
+                await page.evaluate("""()=>{
+                    const main=document.querySelector('#conversations .community-main');
+                    const drawing=document.createElement('section');
+                    drawing.id='drawing-studio-game-root';
+                    main.append(drawing);
+                }""")
+                link=page.locator('#spelunkr-game-link')
+                await expect(link).to_be_visible(timeout=10000)
+                assert await link.get_attribute('href')=='https://spelunkr.tv/?tv'
+                assert await link.get_attribute('target')=='_blank'
+                assert await link.get_attribute('rel')=='noopener noreferrer'
+                after_draw=await link.evaluate("""el=>
+                  el.previousElementSibling?.id==='drawing-studio-game-root'""")
+                assert after_draw,(width,'Spelunkr is not after Drawing Studio')
+                overflow=await page.evaluate('document.documentElement.scrollWidth-innerWidth')
+                assert overflow<=2,(width,'horizontal overflow',overflow)
+                assert not errors,(width,errors)
+                (ROOT/'reports').mkdir(exist_ok=True)
+                await page.screenshot(path=str(ROOT/'reports'/f'family-avatar-studio-{width}.png'),
+                  full_page=False,animations='disabled')
+                await page.close()
+                print(f'Family avatar studio and Spelunkr button PASS at {width}px')
+            visitor=await browser.new_page(viewport={'width':390,'height':844})
+            await visitor.goto('http://127.0.0.1:8765/community.html?preview=1&role=visitor',
+              wait_until='domcontentloaded')
+            await expect(visitor.locator('#family-avatar-quick')).to_be_hidden(timeout=20000)
+            assert await visitor.locator('#spelunkr-game-link').count()==0
+            await visitor.close()
+            print('Signed-out visitor avatar shortcut & games HIDDEN')
+        finally:
+            await browser.close()
+
+if __name__=='__main__':
+    asyncio.run(main())

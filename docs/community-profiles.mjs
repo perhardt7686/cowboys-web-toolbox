@@ -82,8 +82,9 @@ export function createProfileStudio(ctx){
     selectedTab=requested==='avatar'?'avatar':requested==='account'?'account':'profile';
     draft=getOwn();
     avatarRecipe=normalizeAvatarRecipe(draft.details.avatar_recipe);
-    avatarMethod=draft.avatar_mode==='photo'?(draft.details.avatar_recipe?'character':'photo'):'initials';
-    avatarChanged=false;photoChanged=false;
+    avatarMethod=draft.avatar_mode==='photo'?(draft.details.avatar_recipe?'character':'photo'):(requested==='avatar'?'character':'initials');
+    avatarChanged=avatarMethod==='character'&&!draft.details.avatar_recipe;
+    photoChanged=false;
     bitmap?.close?.();bitmap=null;
     await imageURLs([draft]);
     const readonly=ctx.state.member.role==='owner'?'readonly':'';
