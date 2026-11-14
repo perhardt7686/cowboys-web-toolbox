@@ -54,7 +54,7 @@ test('Pixel-car art varies by six original body families and by model key',()=>{
 });
 
 test('Commons links the fresh EGA assets without removing the saved seasonal garage',()=>{
- for(const asset of ['commons-streetrod-ega.css?v=dos5','commons-streetrod-ega.mjs?v=dos7',
+ for(const asset of ['commons-streetrod-ega.css?v=dos5','commons-streetrod-ega.mjs?v=dos8',
   'commons-streetrod-season-bay.mjs','commons-streetrod-summer.mjs',
   'commons-streetrod-multiplayer.mjs','commons-family-calendar.mjs']){
   assert.ok(html.includes(asset),'missing release asset: '+asset);
@@ -65,4 +65,10 @@ test('Commons links the fresh EGA assets without removing the saved seasonal gar
  assert.match(ega,/bodyFor\(label\)/);
  assert.match(ega,/function bootAndOpen\(target\)/);
  assert.match(ega,/function monitorMode\(enabled\)/);
+});
+
+test('Reborn keeps the pixel-art renderer but suppresses duplicate DOS boot handlers',()=>{
+ assert.match(html,/streetrod-reborn-config\.js\?v=reborn1/);
+ assert.match(ega,/if\(!window\.COWBOY_STREETROD_REBORN\)/);
+ assert.match(ega,/function mysteryMachine\(/);
 });
