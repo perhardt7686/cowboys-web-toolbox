@@ -284,8 +284,8 @@ async def campaign_flow(page, name, *, touch):
                 await wrench.get_by_role('button',name=f'Torque bolt {bolt}',exact=True).click()
             if slot=='engine':
                 await work.get_by_role('button',name='Connect ignition',exact=True).click()
-    await work.get_by_role('combobox',name='Work area').select_option('carb')
     await work.get_by_role('button',name='Parts',exact=True).click()
+    await expect(work.get_by_role('combobox',name='Work area')).to_have_value('carb')
     await work.get_by_role('button',name='Change',exact=True).click()
     for bolt in range(1,5):
         await wrench.get_by_role('button',name=f'Tighten bolt {bolt}',exact=True).click()

@@ -209,7 +209,7 @@ export function paintWorkbench(s,view) {
     key(s,BAY_MENU.done,'DONE');
   }else{
     key(s,BAY_MENU.back,'BACK');
-    if(bayMode==='shelf')key(s,BAY_MENU.change,'CHANGE',Boolean(view.shelfParts?.length));
+    if(bayMode==='shelf')key(s,BAY_MENU.change,'CHANGE',view.canFitSpare??Boolean(view.shelfParts?.length));
     key(s,BAY_MENU.done,'DONE');
   }
   s.box(0,186,320,14,0);s.box(0,186,320,1,7);

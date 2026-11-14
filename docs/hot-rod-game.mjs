@@ -13,6 +13,7 @@ import {connectDrivingInput} from './hot-rod-input.mjs';
 const cash = amount => '$' + Number(amount).toLocaleString('en-US');
 const time = ms => ms === null || ms === undefined ? '—' : (ms / 1000).toFixed(2) + ' s';
 const memberBadge = name => el('span','hot-rod-avatar',(name || 'Family driver').slice(0,2).toUpperCase());
+const engineAssembly = ['engine','manifold','carb'];
 const garageSlots = {engine:'Cylinder block',manifold:'Intake manifold',carb:'Carburetor',gearbox:'Gearbox'};
 const endings = {champion:'King of the road',deadline:'School starts today',broke:'Out of money',jail:'The summer ends in jail'};
 const playoff = {finish:'Time recorded',win:'Victory',loss:'Second place',false_start:'False start',crash:'Wrecked',engine:'Engine failure',
@@ -224,6 +225,7 @@ export function makeHotRod({client, memberId, launcher}) {
       view.timing=timing;
       view.timingReference=PARTS[car.installed.engine?.id]?.timing;
       view.shelfParts=compatibleParts(car).map(entry=>({label:PARTS[entry.part.id].name}));
+      view.canFitSpare=!car.installed[selectedSlot]&&!view.locked&&view.shelfParts.length>0;
       view.shelfIndex=shelfSelection;
     }
     if(scene==='diner'&&negotiating)view.slot='engine';
@@ -513,7 +515,12 @@ export function makeHotRod({client, memberId, launcher}) {
     if(!car){panel('Workbench',copy('There’s no car in the bay.'),action('Newspaper',()=>openPaper()));return;}
     const slot=selectedSlot, item=car.installed[slot], bolts=car.bolts[slot], tire=isWheel(slot);
     const blocked=bayBlock(car,slot), spare=compatibleParts(car);
-    const parts=()=>{bayMode='shelf';shelfSelection=0;render();};
+    const parts=()=>{
+      if(engineAssembly.includes(slot)){
+        selectedSlot=engineAssembly.find(part=>!car.installed[part])||slot;
+      }
+      bayMode='shelf';shelfSelection=0;render();
+    };
     const back=()=>{bayMode='work';render();};
     const done=()=>show('garage');
     const tune=()=>{
