@@ -1,3 +1,5 @@
+/* Coco's Family Corner was retired. Keep an explicit safeguard against cached panels. */
+body.community-page #conversations .family-room{display:none!important}
 /* Commons compact experience, Nov 2026.
    This file intentionally loads AFTER existing styles, keeping all
    account/permission/data behavior in the original modules. */
