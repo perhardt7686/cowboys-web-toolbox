@@ -64,10 +64,11 @@ function renderBoardAccess(){
 }
 function renderCategories(){$('community-categories').innerHTML=[{id:'all',name:'All conversations',icon:'◌'},...CATEGORIES].map(c=>`<button data-category="${c.id}" aria-pressed="${state.category===c.id}"><span class="category-icon" aria-hidden="true">${c.icon}</span>${esc(c.name)}</button>`).join('');}
 function renderAccount(){
-  if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Request access</button>';return}
+  if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Request access</button>';window.dispatchEvent(new CustomEvent('family-avatar-state',{detail:{visible:false}}));return}
   const member=state.member;
-  $('account-actions').innerHTML=`<details class="account-menu"><summary>${profiles.avatar({...state.profile,display_name:member.display_name})}<span>${esc(member.display_name)}</span><span aria-hidden="true">⌄</span></summary><div class="account-dropdown"><button data-profile>Customize my profile</button>${member.role==='owner'?'<button data-owner>Owner dashboard</button>':''}<button data-signout>Log out</button></div></details>`;
+  $('account-actions').innerHTML=`<details class="account-menu"><summary>${profiles.avatar({...state.profile,display_name:member.display_name})}<span>${esc(member.display_name)}</span><span aria-hidden="true">⌄</span></summary><div class="account-dropdown"><button data-profile>Edit family profile</button>${member.role==='owner'?'<button data-owner>Owner dashboard</button>':''}<button data-signout>Log out</button></div></details>`;
   if(canReadBoard(member)){hub.decorateAccount();powers.decorateAccount();}
+  window.dispatchEvent(new CustomEvent('family-avatar-state',{detail:{visible:canReadBoard(member),html:profiles.avatar({...state.profile,display_name:member.display_name})}}));
 }
 function renderNotice(){
   let html='';
@@ -253,7 +254,8 @@ const ownerCenter=createOwnerCenter({state,isPreview,api,catalog:()=>catalog,con
 const hub=createCommunityLab({state,isPreview,client:()=>client,catalog:()=>catalog,categories:CATEGORIES,api,openAuth,showDialog,closeDialogs,toast,loadFeed,openThread,sampleID,demoThreads:()=>demoThreads});
 const powers=createPowerHouse({state,isPreview,client:()=>client,api,showDialog,toast,loadFeed,openThread,sampleID,demoThreads:()=>demoThreads,demoReplies:()=>demoReplies});
 const forum=createForum({state,isPreview,client:()=>client,profiles,api,showDialog,toast,renderFeed,loadFeed,openThread});
-function showProfile(){if(mustSignIn())return;return profiles.show();}
+function showProfile(tab='profile'){if(mustSignIn())return;return profiles.show(tab);}
+document.addEventListener('family-open-avatar-studio',()=>{if(canReadBoard(state.member))void showProfile('avatar');});
 async function showOwner(){if(state.member?.role!=='owner')return;try{await ownerCenter.show();}catch(error){toast(errorMessage(error));}}
 async function refreshAnnouncement(){
   const target=$('community-announcement');if(!target)return;

@@ -104,6 +104,36 @@
     const account = header.querySelector('#account-actions');
     if (account) utility.append(account);
   }
+  let avatarQuick=null;
+  if(page==='commons'){
+    avatarQuick=document.createElement('button');
+    avatarQuick.id='family-avatar-quick';
+    avatarQuick.type='button';
+    avatarQuick.hidden=true;
+    avatarQuick.setAttribute('aria-label','Open my avatar studio');
+    avatarQuick.title='Make your avatar';
+    avatarQuick.addEventListener('click',()=>{
+      if(avatarQuick.hidden)return;
+      close();
+      document.dispatchEvent(new Event('family-open-avatar-studio'));
+    });
+    window.addEventListener('family-avatar-state',event=>{
+      const detail=event.detail||{};
+      const show=Boolean(detail.visible);
+      avatarQuick.hidden=!show;
+      if(!show){
+        avatarQuick.replaceChildren();
+        avatarQuick.dataset.lastAvatar='';
+        return;
+      }
+      const html=String(detail.html||'');
+      if(avatarQuick.dataset.lastAvatar!==html){
+        avatarQuick.innerHTML=html;
+        avatarQuick.dataset.lastAvatar=html;
+      }
+    });
+    root.append(avatarQuick);
+  }
   root.append(toggle,panel);
   header.querySelector('.brand')?.after(shell);
   header.append(root);
