@@ -249,7 +249,7 @@ function drive(){
   return banner(r.champion?'Championship victory!':r.police_stop?'Highway patrol stop':
    r.motor_failure?'Engine breakdown':r.win?'Victory at the finish!':'Rival takes the win',
    'The race result, fines, wear and campaign time were verified by the game server.')+
-   '<div class="ss-race-result" data-incident="'+incident+'"><strong>'+
+   '<div class="ss-race-result" data-incident="'+incident+'" data-champion="'+Boolean(r.champion)+'"><strong>'+
    (r.police_stop?'PULLED OVER':r.motor_failure?'ENGINE FAILED':r.win?'YOU WIN':'YOU LOSE')+'</strong>'+
    '<div><span>Your time: '+Number(r.player_ms/1000).toFixed(3)+' s</span>'+
    '<span>Rival: '+Number(r.opponent_ms/1000).toFixed(3)+' s</span>'+
