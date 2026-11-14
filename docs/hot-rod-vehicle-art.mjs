@@ -1,0 +1,600 @@
+// Side elevations drawn on a 240 × 75 pixel grid. The nose faces right.
+// The DOS screens inform the proportions, whitewalls, and palette. These contours are new artwork.
+const WIDTH = 240;
+const HEIGHT = 76;
+const GROUND = 72;
+const EMPTY = 255;
+
+const PAINT = {
+  1:[0,1,9,7], 2:[0,2,10,15], 3:[1,3,11,15], 4:[0,4,12,7], 5:[1,5,13,15],
+  6:[4,6,14,15], 7:[0,8,7,15], 9:[1,9,11,15], 10:[2,10,14,15],
+  12:[4,12,14,15], 13:[5,13,15,11], 14:[6,14,15,7], 15:[8,7,15,11]
+};
+export const vehiclePaint = color => PAINT[color] || PAINT[1];
+
+// Each model has a body contour, window openings, and fittings in its own proportions.
+// The waist controls the transition from the top of the body to the darker lower panels.
+const PROFILES = {
+  ford32:{
+    shell:[[16,47],[23,40],[57,34],[67,17],[75,9],[86,6],[120,6],[131,11],[142,32],[198,33],
+      [209,37],[215,46],[215,56],[207,62],[19,62],[13,57]],
+    glass:[[[76,15],[87,11],[113,11],[116,29],[70,31]],[[120,11],[128,14],[137,31],[120,30]]],
+    waist:38,wheels:[47,189,14],doors:[[118,32,119,53,91]],lamps:[17,46,211,38,'separate'],
+    fenders:'running',trim:'hood',wall:'thin'
+  },
+  sedan32:{
+    shell:[[10,45],[18,37],[25,19],[32,10],[43,6],[117,6],[129,13],[142,32],[196,32],
+      [211,35],[218,44],[216,58],[207,63],[13,63],[7,57]],
+    glass:[[[34,14],[43,11],[74,11],[75,32],[28,32]],[[80,11],[112,11],[122,14],[135,31],[82,32]]],
+    waist:37,wheels:[45,192,14],doors:[[78,32,77,55,68],[136,33,135,54,91]],
+    lamps:[10,43,215,37,'separate'],fenders:'running',trim:'hood',wall:'thin'
+  },
+  master38:{
+    shell:[[8,51],[15,43],[24,37],[48,29],[63,16],[79,8],[104,7],[124,12],[137,23],[143,33],
+      [186,32],[211,34],[225,42],[228,55],[224,63],[19,63],[8,59]],
+    glass:[[[63,22],[76,14],[89,13],[88,31],[51,34]],[[94,13],[108,12],[122,17],[136,31],[94,31]]],
+    waist:37,wheels:[44,192,15],doors:[[135,34,134,57,100]],lamps:[10,48,222,43,'separate'],
+    fenders:'running',trim:'hood',wall:'wide'
+  },
+  chevy40:{
+    shell:[[7,51],[15,43],[27,38],[47,31],[62,18],[75,12],[96,9],[119,10],[132,15],[142,26],
+      [149,32],[191,32],[215,34],[226,39],[232,48],[233,58],[229,63],[18,63],[7,59]],
+    glass:[[[58,28],[69,19],[78,15],[93,14],[93,31],[55,33]],[[100,14],[117,14],[130,20],[141,32],[100,31]]],
+    waist:36,wheels:[48,194,15],doors:[[143,34,143,57,105]],lamps:[10,48,226,40,'shell'],
+    fenders:'step',trim:'hood',wall:'wide'
+  },
+  roadster40:{
+    shell:[[8,49],[16,41],[36,36],[68,35],[77,38],[119,38],[122,23],[131,22],[145,33],
+      [192,32],[218,34],[230,40],[235,49],[234,59],[227,63],[18,63],[8,58]],
+    glass:[[[125,25],[131,25],[141,33],[123,34]]],
+    waist:37,wheels:[49,196,15],doors:[[145,37,143,57,108]],lamps:[11,47,229,41,'shell'],
+    fenders:'step',trim:'hood',wall:'wide',seat:[88,34]
+  },
+  ford40:{
+    shell:[[9,48],[18,41],[37,34],[56,23],[68,13],[83,8],[109,7],[123,10],[136,17],[150,32],
+      [184,34],[208,35],[225,41],[232,49],[232,58],[225,63],[20,63],[10,59]],
+    glass:[[[56,27],[68,19],[82,14],[94,13],[97,31],[52,34]],[[101,13],[117,14],[129,19],[142,32],[102,31]]],
+    waist:38,wheels:[46,193,15],doors:[[149,35,148,56,106]],lamps:[11,46,227,43,'shell'],
+    fenders:'step',trim:'fordHood',wall:'thin'
+  },
+  style49:{
+    shell:[[7,47],[13,40],[32,34],[58,31],[72,20],[87,12],[106,9],[125,10],[144,16],[162,32],
+      [196,33],[221,36],[232,42],[236,52],[233,61],[225,65],[16,65],[8,59]],
+    glass:[[[70,29],[86,18],[100,15],[111,15],[113,32],[64,33]],[[118,15],[132,17],[145,23],[153,32],[118,32]]],
+    waist:37,wheels:[48,194,15],doors:[[163,34,161,60,123]],lamps:[10,45,230,42,'round'],
+    fenders:'blend',trim:'straight',wall:'wide'
+  },
+  olds49:{
+    shell:[[7,47],[16,39],[38,34],[53,33],[79,16],[96,10],[118,9],[137,13],[150,22],[161,33],
+      [209,34],[228,37],[237,45],[237,57],[229,64],[15,64],[7,58]],
+    glass:[[[64,30],[83,20],[99,15],[112,15],[114,32],[57,34]],[[119,15],[134,18],[148,26],[153,33],[119,33]]],
+    waist:37,wheels:[47,193,15],doors:[[162,36,161,59,117]],lamps:[10,45,232,41,'round'],
+    fenders:'blend',trim:'rocket',wall:'wide'
+  },
+  silver50:{
+    shell:[[7,49],[10,39],[49,34],[67,21],[87,12],[112,9],[137,12],[155,20],[167,33],[215,34],
+      [229,39],[236,49],[234,59],[227,64],[17,64],[8,59]],
+    glass:[[[61,29],[81,19],[99,15],[111,15],[112,33],[54,34]],[[118,15],[134,17],[149,23],[158,33],[118,33]]],
+    waist:36,wheels:[49,195,15],doors:[[165,35,164,59,117]],lamps:[11,42,230,42,'round'],
+    fenders:'blend',trim:'streak',wall:'wide'
+  },
+  olds52:{
+    shell:[[6,46],[12,38],[52,35],[66,24],[83,16],[122,14],[143,19],[162,34],[213,35],[228,40],
+      [236,45],[236,57],[232,62],[223,65],[12,64],[6,58]],
+    glass:[[[60,34],[71,26],[86,20],[107,19],[109,34]],[[113,19],[128,19],[143,24],[153,34],[113,34]]],
+    waist:38,wheels:[49,193,15],doors:[[158,35,157,59,112]],lamps:[9,43,231,43,'round'],
+    fenders:'blend',trim:'rocket',wall:'wide'
+  },
+  mercury54:{
+    shell:[[5,43],[11,37],[53,34],[66,25],[86,15],[104,13],[137,14],[155,20],[171,34],[215,34],
+      [233,38],[237,44],[236,58],[224,63],[14,64],[6,58]],
+    glass:[[[63,33],[73,26],[89,19],[106,18],[107,33]],[[113,18],[134,18],[152,25],[162,34],[113,33]]],
+    waist:38,wheels:[47,195,14],doors:[[167,35,165,61,113]],lamps:[8,40,232,40,'round'],
+    fenders:'flush',trim:'dip',wall:'wide'
+  },
+  belair55:{
+    shell:[[5,35],[16,39],[50,38],[62,31],[79,20],[95,15],[128,15],[140,17],[156,27],[166,36],
+      [218,35],[231,37],[236,42],[236,55],[229,62],[12,64],[5,57]],
+    glass:[[[68,33],[84,24],[97,20],[107,20],[107,36],[63,37]],[[111,20],[129,20],[141,23],[154,34],[156,36],[111,36]]],
+    waist:40,wheels:[46,193,14],doors:[[161,36,160,58,112]],lamps:[7,39,231,40,'brow'],
+    fenders:'flush',trim:'belAir',wall:'wide'
+  },
+  fairlane55:{
+    shell:[[6,39],[16,37],[58,37],[77,23],[94,16],[129,16],[145,20],[162,32],[169,37],
+      [220,35],[234,38],[238,46],[236,56],[229,63],[12,64],[5,58]],
+    glass:[[[64,36],[81,26],[97,21],[110,21],[110,36]],[[115,21],[129,21],[143,25],[160,36],[115,36]]],
+    waist:40,wheels:[48,195,14],doors:[[166,37,164,59,117]],lamps:[9,40,234,42,'round'],
+    fenders:'flush',trim:'fairlane',wall:'wide'
+  },
+  lancer55:{
+    shell:[[5,37],[16,39],[55,38],[65,34],[80,23],[94,16],[128,16],[144,19],[159,28],[169,37],
+      [222,35],[232,37],[237,44],[237,57],[230,63],[10,64],[4,57]],
+    glass:[[[66,35],[84,25],[99,21],[110,21],[110,36]],[[115,21],[135,22],[151,28],[160,36],[115,36]]],
+    waist:40,wheels:[48,195,14],doors:[[169,37,165,60,118]],lamps:[8,39,232,40,'brow'],
+    fenders:'flush',trim:'lancer',wall:'wide'
+  },
+  vette56:{
+    shell:[[5,49],[9,42],[22,37],[54,35],[77,36],[96,38],[114,38],[117,23],[125,22],[141,35],
+      [171,35],[195,32],[218,33],[229,38],[235,45],[234,55],[228,62],[13,63],[4,56]],
+    glass:[[[119,25],[125,25],[136,34],[116,36]]],
+    waist:39,wheels:[44,190,14],doors:[[139,36,139,59,112]],lamps:[7,46,229,39,'sport'],
+    fenders:'sport',trim:'cove',wall:'wide',seat:[96,34]
+  },
+  mercury56:{
+    shell:[[5,36],[15,39],[55,38],[70,28],[83,20],[101,15],[136,16],[151,22],[168,36],
+      [213,35],[232,38],[238,43],[237,58],[230,64],[11,64],[4,56]],
+    glass:[[[65,35],[81,25],[101,20],[113,20],[113,35]],[[118,20],[135,21],[149,26],[159,35],[118,36]]],
+    waist:40,wheels:[44,196,14],doors:[[165,37,164,59,118]],lamps:[7,40,233,41,'brow'],
+    fenders:'flush',trim:'dip',wall:'wide'
+  },
+  fairlane57:{
+    shell:[[3,30],[14,33],[34,38],[55,38],[78,22],[97,16],[124,16],[143,19],[157,27],[166,36],
+      [215,34],[233,36],[239,43],[237,57],[229,62],[12,65],[4,56]],
+    glass:[[[64,36],[81,25],[98,20],[110,20],[110,36]],[[114,20],[130,21],[144,25],[159,36],[114,36]]],
+    waist:40,wheels:[48,194,14],doors:[[163,37,162,59,116]],lamps:[7,34,234,39,'brow'],
+    fenders:'flush',trim:'fairlaneFin',wall:'wide'
+  },
+  tbird57:{
+    shell:[[6,33],[15,35],[40,39],[96,38],[117,37],[120,24],[129,23],[147,36],[198,35],
+      [221,33],[234,37],[238,43],[237,58],[222,63],[15,65],[6,57]],
+    glass:[[[123,27],[129,27],[141,36],[119,36]]],
+    waist:40,wheels:[45,191,14],doors:[[147,37,145,60,118]],lamps:[7,37,233,39,'brow'],
+    fenders:'flush',trim:'bird',wall:'wide',seat:[98,34]
+  },
+  impala58:{
+    shell:[[4,37],[17,37],[41,40],[60,37],[78,25],[95,18],[133,17],[152,23],[171,36],
+      [220,35],[233,36],[239,42],[238,57],[226,64],[12,64],[4,54]],
+    glass:[[[67,36],[81,28],[96,23],[111,22],[111,36]],[[116,22],[133,22],[148,27],[162,36],[116,37]]],
+    waist:41,wheels:[47,194,14],doors:[[168,37,166,60,122]],lamps:[7,41,233,39,'quad'],
+    fenders:'flush',trim:'impala',wall:'wide'
+  },
+  valiant61:{
+    shell:[[7,40],[18,39],[44,40],[58,36],[78,23],[92,17],[119,16],[138,20],[160,36],
+      [183,37],[215,34],[228,37],[234,44],[233,58],[224,62],[13,62],[6,55]],
+    glass:[[[65,36],[83,25],[96,21],[100,21],[101,36]],[[105,21],[120,21],[133,24],[151,36],[105,36]]],
+    waist:41,wheels:[48,187,13],doors:[[103,35,101,59,97],[157,37,152,59,112]],lamps:[9,42,230,38,'round'],
+    fenders:'flush',trim:'valiant',wall:'thin'
+  },
+  vette61:{
+    shell:[[4,40],[43,37],[70,36],[98,39],[116,38],[119,24],[126,22],[143,35],
+      [167,36],[196,33],[220,34],[230,38],[237,45],[236,55],[227,61],[10,63],[4,56]],
+    glass:[[[121,26],[126,26],[138,35],[118,36]]],
+    waist:40,wheels:[44,191,14],doors:[[140,36,139,59,112]],lamps:[6,44,232,40,'quad'],
+    fenders:'sport',trim:'coveShort',wall:'thin',seat:[98,35]
+  },
+  polara62:{
+    shell:[[5,40],[12,38],[51,39],[67,27],[82,19],[99,15],[125,15],[143,20],[160,34],
+      [210,35],[230,37],[237,41],[235,56],[227,62],[12,63],[5,58]],
+    glass:[[[62,36],[80,25],[98,20],[105,20],[105,35]],[[110,20],[127,20],[139,24],[151,35],[110,35]]],
+    waist:40,wheels:[48,193,14],doors:[[156,36,156,59,112]],lamps:[7,41,231,40,'quad'],
+    fenders:'flush',trim:'polara',wall:'thin'
+  },
+  valiant63:{
+    shell:[[8,40],[16,38],[55,38],[65,31],[79,22],[92,17],[120,17],[139,23],[154,36],
+      [207,35],[224,37],[231,43],[230,56],[222,62],[16,62],[8,57]],
+    glass:[[[62,36],[78,27],[95,22],[104,22],[106,35]],[[110,22],[122,22],[136,27],[148,36],[110,35]]],
+    waist:40,wheels:[49,185,13],doors:[[156,36,153,60,112]],lamps:[10,41,227,39,'round'],
+    fenders:'flush',trim:'crease',wall:'thin'
+  },
+  vette63:{
+    shell:[[5,42],[11,37],[41,36],[58,29],[76,21],[98,17],[118,17],[133,23],[146,35],
+      [169,36],[194,33],[220,34],[231,37],[238,41],[231,55],[220,62],[11,62],[5,56]],
+    glass:[[[53,34],[75,26],[94,22],[97,22],[94,35]],[[103,22],[117,22],[128,26],[138,35],[101,35]]],
+    waist:40,wheels:[47,191,14],doors:[[142,36,143,58,104]],lamps:[6,43,233,40,'hidden'],
+    fenders:'sport',trim:'stingRay',wall:'thin'
+  },
+  savoy64:{
+    shell:[[5,41],[13,37],[55,37],[69,27],[83,21],[97,18],[127,18],[145,22],[166,36],
+      [213,34],[230,35],[237,40],[237,55],[228,61],[11,63],[5,56]],
+    glass:[[[63,36],[83,26],[98,23],[109,23],[110,36]],[[114,23],[131,23],[147,29],[158,36],[114,36]]],
+    waist:40,wheels:[46,195,14],doors:[[164,36,162,59,115]],lamps:[8,41,233,39,'quad'],
+    fenders:'flush',trim:'crease',wall:'thin'
+  },
+  mystery66:{
+    shell:[[6,12],[10,7],[19,5],[166,5],[178,9],[197,18],[214,37],[225,40],[232,46],
+      [233,57],[226,64],[11,64],[5,56]],
+    glass:[[[171,13],[181,16],[195,24],[207,36],[177,36]],[[142,12],[164,12],[168,33],[142,33]]],
+    waist:36,wheels:[46,186,14],doors:[[172,36,169,60,180]],lamps:[7,44,226,45,'round'],
+    fenders:'flush',trim:'van',wall:'thin'
+  }
+};
+
+const along = (points, draw) => {
+  for (let i = 1; i < points.length; i++) draw(...points[i-1], ...points[i]);
+};
+
+class Sprite {
+  constructor() { this.pixels = new Uint8Array(WIDTH * HEIGHT).fill(EMPTY); }
+
+  pixel(x, y, color) {
+    if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) this.pixels[y * WIDTH + x] = color;
+  }
+
+  box(x, y, w, h, color) {
+    for (let yy = y; yy < y + h; yy++) {
+      for (let xx = x; xx < x + w; xx++) this.pixel(xx, yy, color);
+    }
+  }
+
+  line(x, y, toX, toY, color) {
+    const steps = Math.max(Math.abs(toX - x), Math.abs(toY - y), 1);
+    for (let i = 0; i <= steps; i++) {
+      this.pixel(Math.round(x + (toX - x) * i / steps), Math.round(y + (toY - y) * i / steps), color);
+    }
+  }
+
+  trace(points, color) { along(points, (...line) => this.line(...line,color)); }
+
+  polygon(points, color) {
+    const first = Math.min(...points.map(([,y]) => y));
+    const last = Math.max(...points.map(([,y]) => y));
+    for (let y = first; y < last; y++) {
+      const cuts = [];
+      for (let i = 0; i < points.length; i++) {
+        const [xa,ya] = points[i], [xb,yb] = points[(i+1) % points.length];
+        const scan = y + 0.5;
+        if ((ya <= scan && scan < yb) || (yb <= scan && scan < ya)) cuts.push(xa + (scan-ya)*(xb-xa)/(yb-ya));
+      }
+      cuts.sort((a,b) => a-b);
+      for (let i = 0; i < cuts.length; i += 2) {
+        const start = Math.ceil(cuts[i]);
+        const end = Math.ceil(cuts[i+1]);
+        if (typeof color === 'function') {
+          for (let x = start; x < end; x++) this.pixel(x,y,color(x,y));
+        } else {
+          this.box(start,y,end-start,1,color);
+        }
+      }
+    }
+  }
+
+  ellipse(x, y, rx, ry, color) {
+    for (let dy = -ry; dy <= ry; dy++) {
+      const half = Math.floor(rx * Math.sqrt(Math.max(0,1 - (dy/ry)**2)));
+      this.box(x-half,y+dy,half*2+1,1,color);
+    }
+  }
+
+  blit(screen, x, y, scale) {
+    const left = Math.round(x), top = Math.round(y);
+    const width = Math.round(WIDTH * scale), height = Math.round(HEIGHT * scale);
+    for (let yy = 0; yy < height; yy++) {
+      const offset = Math.floor((yy + 0.5) / scale) * WIDTH;
+      let start = 0, color = EMPTY;
+      for (let xx = 0; xx <= width; xx++) {
+        const next = xx === width ? EMPTY : this.pixels[offset + Math.floor((xx + 0.5) / scale)];
+        if (next === color) continue;
+        if (color !== EMPTY && color !== undefined) screen.box(left+start,top+yy,xx-start,1,color);
+        start = xx;
+        color = next;
+      }
+    }
+  }
+}
+
+function bodyPaint(y, waist, palette) {
+  const [dark,middle,light] = palette;
+  return (x,row) => {
+    const band = row - y - waist;
+    const dither = (x + row) & 1;
+    if (band <= -17) return band >= -19 && dither ? light : middle;
+    if (band <= -5) return middle;
+    if (band <= -2) return dither ? light : middle;
+    if (band <= 3) return light;
+    if (band <= 7) return band <= 5 || dither ? middle : light;
+    if (band <= 14) return middle;
+    if (band <= 20) return dither ? dark : middle;
+    return dark;
+  };
+}
+
+function drawGlass(sprite, points, index) {
+  sprite.polygon(points,(x,y) => {
+    const reflection = (x+y*2+13*index)%43;
+    if (reflection < 4) return 3;
+    if (reflection < 7) return 1;
+    return (x+y)%2 && reflection > 36 ? 8 : 0;
+  });
+  sprite.trace([...points,points[0]],8);
+  sprite.trace(points.slice(0,-1),7);
+  const [, [x,y]] = points;
+  sprite.box(x+2,y+1,4,1,15);
+}
+
+function fenderArch(cx, cy, rx, ry) {
+  return [[cx-rx,cy+4],[cx-rx,cy-3],[cx-rx+2,cy-9],[cx-rx+6,cy-ry+3],[cx-5,cy-ry],
+    [cx+5,cy-ry],[cx+rx-6,cy-ry+3],[cx+rx-2,cy-9],[cx+rx,cy-3],[cx+rx,cy+4]];
+}
+
+function drawFender(sprite, x, r, fenders, paint) {
+  const [,mid,light,shine] = paint;
+  const radius = fenders==='running' ? r+20 : r+16;
+  const archX = fenders==='flush' ? r+4 : r+6;
+  const height = fenders==='flush' ? r+2 : r+7;
+  const center = GROUND-r;
+  if (fenders === 'step' || fenders === 'running') {
+    const outer = [[x-radius,59],[x-radius+3,51],[x-radius+9,45],[x-13,40],[x-5,39],[x+6,39],
+      [x+15,42],[x+24,48],[x+radius-3,54],[x+radius,60],[x+radius-4,64],[x-radius+4,64]];
+    sprite.polygon(outer,(xx,y) => {
+      if (y <= 42) return (xx+y)%2 ? light : mid;
+      if (y <= 51) return y<=48 || (xx+y)%2 ? light : mid;
+      return paint[1];
+    });
+    sprite.trace(outer.slice(0,10),paint[0]);
+    sprite.trace([[x-radius+5,54],[x-21,47],[x-12,43],[x-4,42],[x+5,42],[x+14,45],[x+22,50]],light);
+    sprite.trace([[x-18,47],[x-14,45],[x-9,44],[x+1,44]],shine);
+  }
+  if (fenders === 'sport' || fenders === 'blend') {
+    sprite.trace([[x-r-9,54],[x-r-5,48],[x-9,43],[x,42],[x+8,43],[x+r+6,48],[x+r+10,54]],light);
+  }
+  sprite.trace(fenderArch(x,center,archX,height),fenders==='flush'?7:light);
+}
+
+const TRIM = {
+  straight:{strip:[[10,49],[223,49]]},
+  rocket:{strip:[[10,49],[53,48],[166,50],[220,45]],insert:[[16,48],[36,47],[65,47],[153,50],[65,52],[30,53],[16,52]]},
+  streak:{strip:[[10,46],[43,46],[162,47],[222,45]]},
+  dip:{strip:[[11,46],[60,46],[106,51],[163,51],[216,43],[232,43]]},
+  belAir:{strip:[[8,41],[32,43],[87,44],[117,47],[148,48],[230,44]],
+    insert:[[10,44],[87,45],[118,49],[137,50],[111,56],[86,54],[19,53],[10,52]]},
+  fairlane:{strip:[[9,43],[91,43],[111,47],[128,50],[146,50],[231,42]],
+    insert:[[9,45],[93,45],[113,50],[125,53],[107,56],[26,52],[9,54]]},
+  lancer:{strip:[[6,41],[67,41],[110,46],[152,46],[181,41],[230,41]],
+    insert:[[7,44],[65,44],[107,48],[151,48],[183,43],[229,43],[227,48],[181,48],[153,55],[58,54],[7,56]]},
+  fairlaneFin:{strip:[[5,36],[38,43],[97,42],[120,47],[231,41]],
+    insert:[[7,38],[38,45],[96,44],[119,49],[105,55],[18,50],[8,51]]},
+  bird:{strip:[[8,43],[63,47],[150,48],[225,43]]},
+  impala:{strip:[[9,47],[62,47],[96,49],[149,47],[181,43],[230,42]]},
+  valiant:{strip:[[10,43],[57,44],[156,49],[226,43]]},
+  polara:{strip:[[8,42],[64,45],[116,51],[181,47],[230,44]]},
+  crease:{strip:[[9,43],[58,42],[148,44],[214,42],[231,41]]},
+  cove:{coveshape:[[102,47],[120,44],[151,43],[174,44],[193,47],[197,50],[192,52],
+    [181,53],[167,58],[140,59],[115,57],[103,54],[99,51]]},
+  coveShort:{coveshape:[[105,47],[125,45],[156,44],[186,45],[191,49],[179,51],[168,55],
+    [146,58],[118,58],[107,54],[103,51]]},
+  stingRay:{strip:[[10,44],[48,41],[96,46],[143,46],[179,43],[227,42]]}
+};
+
+function drawTrim(sprite, profile, paint) {
+  const {trim, waist, wheels:[rear,front]} = profile;
+  const [dark,middle,light,shine] = paint;
+  if (trim==='hood' || trim==='fordHood') {
+    const hoodStart = Math.round(front - 34);
+    const hoodEnd = Math.min(WIDTH-20,front+18);
+    sprite.trace([[hoodStart-7,waist-3],[hoodStart+6,waist-3],[hoodEnd,waist-2]],light);
+    sprite.line(hoodStart,waist+1,hoodEnd,waist+1,7);
+    sprite.line(hoodStart,waist+2,hoodEnd,waist+2,dark);
+    for (let x=hoodStart+3; x<hoodEnd; x+=4) {
+      if (trim==='fordHood') sprite.line(x,waist+4,x,waist+7,dark);
+      else sprite.line(x,waist+2,x+1,waist+3,0);
+    }
+    sprite.box(rear+37,61,front-rear-72,2,0);
+    sprite.box(rear+41,61,front-rear-80,1,7);
+    return;
+  }
+  const detail = TRIM[trim];
+  if (!detail) return;
+  if (detail.insert) {
+    sprite.polygon(detail.insert,(x,y) => {
+      if ((x + y)%2 && y>=50) return 7;
+      return 15;
+    });
+  }
+  if (detail.coveshape) {
+    sprite.polygon(detail.coveshape,(x,y) => y < 51 || (x ^ y) & 1 ? 15 : 7);
+    sprite.trace([...detail.coveshape,detail.coveshape[0]],7);
+    sprite.trace(detail.coveshape.slice(1,6),15);
+    sprite.trace(detail.coveshape.slice(6),dark);
+    const start = trim==='cove' ? 145 : 154;
+    for (let i=0;i<3;i++) sprite.line(start+i*4,47,start-1+i*4,54,i%2?dark:8);
+  }
+  if (detail.strip) {
+    sprite.trace(detail.strip.map(([x,y]) => [x,y+1]),8);
+    sprite.trace(detail.strip,trim==='valiant'||trim==='crease'||trim==='stingRay'?light:15);
+  }
+  if (trim==='impala') {
+    for (let i=0;i<3;i++) sprite.line(70+i*3,52,69+i*3,58,15);
+    sprite.trace([[31,54],[57,54],[63,52]],7);
+  }
+  if (trim==='streak') {
+    sprite.trace([[162,37],[198,35],[225,38]],7);
+    sprite.line(174,41,219,41,shine);
+  }
+  if (trim==='stingRay') {
+    for (let i=0;i<3;i++) sprite.line(157+i*4,46,155+i*4,53,dark);
+    sprite.line(94,59,151,59,8);
+    sprite.line(104,58,150,58,7);
+  }
+  if (trim==='bird') {
+    sprite.trace([[65,48],[72,50],[78,50],[76,53],[65,54]],15);
+    sprite.pixel(70,52,middle);
+  }
+}
+
+function drawDoors(sprite, profile, paint) {
+  const [dark,,light] = paint;
+  const [back,front] = profile.wheels;
+  for (const [x,y,foot,floor,handle] of profile.doors) {
+    sprite.trace([[x,y],[x-1,y+8],[foot,floor-2],[foot-3,floor]],dark);
+    if (foot > back+25 && foot < front-25) sprite.line(foot-3,floor,Math.max(back+20,handle-15),floor,dark);
+    sprite.line(x+1,y+4,x+1,y+8,light);
+    sprite.box(handle,y+5,8,1,0);
+    sprite.box(handle+1,y+4,6,1,15);
+  }
+  if (profile.trim==='van') {
+    sprite.box(62,18,55,1,dark);
+    sprite.line(61,19,61,34,dark);
+    sprite.line(118,19,118,30,dark);
+    sprite.line(70,49,70,59,dark);
+  }
+}
+
+function drawVan(sprite) {
+  const side = [[9,36],[37,29],[63,29],[83,38],[109,44],[136,43],[157,34],[169,33],
+    [182,41],[209,49],[228,47],[227,55],[209,56],[182,49],[155,46],[135,52],[105,54],
+    [80,50],[55,41],[29,40],[9,46]];
+  sprite.polygon(side,(x,y) => y<44 || (x+y)%2 ? 10 : 2);
+  sprite.trace(side.slice(0,11),11);
+  for (const [x,y] of [[35,23],[144,28],[125,48]]) {
+    sprite.ellipse(x-4,y,4,2,6);
+    sprite.ellipse(x+4,y,4,2,6);
+    sprite.ellipse(x,y-3,2,4,6);
+    sprite.ellipse(x,y+3,2,4,6);
+    sprite.box(x-1,y-1,3,3,14);
+    sprite.pixel(x,y,12);
+  }
+}
+
+function drawWheel(sprite, x, r, part, whitewall, fitted) {
+  const y = GROUND - r;
+  const slick = part === 'tire-slick';
+  const sporty = slick || part === 'tire-road';
+  sprite.ellipse(x,y,r+2,r+2,EMPTY);
+  sprite.ellipse(x,y-1,r+1,r,0);
+  if (!fitted) {
+    sprite.ellipse(x,y-1,r-6,r-6,8);
+    sprite.ellipse(x,y-1,r-8,r-8,7);
+    sprite.box(x-2,y-3,5,5,8);
+    return;
+  }
+  sprite.ellipse(x,y,r,r,0);
+  sprite.ellipse(x-1,y-1,r-1,r-1,8);
+  sprite.ellipse(x,y+1,r-1,r-1,0);
+  const lip = sporty ? r-5 : r-4;
+  const hub = whitewall==='wide' && !sporty ? lip-4 : lip-2;
+  sprite.ellipse(x,y,lip+1,lip+1,8);
+  sprite.ellipse(x,y,lip,lip,slick?7:15);
+  sprite.ellipse(x,y+1,lip-1,lip-1,slick?8:7);
+  sprite.trace([[x-lip+2,y-4],[x-4,y-lip+2],[x,y-lip+1],[x+5,y-lip+3]],15);
+  sprite.ellipse(x,y,hub+1,hub+1,0);
+  sprite.ellipse(x,y,hub,hub,8);
+  if (sporty) {
+    for (const [dx,dy] of [[-hub+1,0],[hub-1,0],[0,-hub+1],[0,hub-1],[-4,-4],[4,-4],[-4,4],[4,4]]) {
+      sprite.line(x,y,x+dx,y+dy,7);
+    }
+  } else {
+    sprite.ellipse(x-1,y-1,hub-1,hub-1,7);
+    sprite.trace([[x-hub+2,y-2],[x-2,y-hub+2],[x+2,y-hub+2]],15);
+    for (const [dx,dy] of [[4,0],[-4,0],[0,4],[0,-4]]) sprite.pixel(x+dx,y+dy,0);
+  }
+  sprite.ellipse(x,y,2,2,7);
+  sprite.pixel(x-1,y-1,15);
+  sprite.pixel(x+1,y+1,8);
+}
+
+function drawBumper(sprite, x, y, width) {
+  sprite.trace([[x+3,y-1],[x+width-3,y-1],[x+width,y+1],[x+width-2,y+3],[x+2,y+3],[x,y+1],[x+3,y-1]],0);
+  sprite.box(x+1,y,width-1,1,7);
+  sprite.box(x,y+1,width+1,1,15);
+  sprite.box(x+1,y+2,width-1,1,8);
+}
+
+function drawEnds(sprite, profile, car) {
+  const [rx,ry,fx,fy,style] = profile.lamps;
+  const early = style==='shell' || style==='separate';
+  sprite.box(rx,ry,style==='sport'?4:3,5,4);
+  sprite.box(rx,ry,2,3,12);
+  if (style==='separate' || style==='shell') {
+    const x = style==='separate' ? fx-6 : fx;
+    sprite.ellipse(x,fy,4,3,0);
+    sprite.ellipse(x,fy,3,2,7);
+    sprite.box(x+1,fy-1,2,3,15);
+  } else if (style!=='hidden') {
+    const width = style==='quad' ? 7 : 5;
+    sprite.box(fx-width,fy,width+3,7,8);
+    sprite.box(fx-width+1,fy+1,width+1,3,7);
+    sprite.box(fx-width+2,fy+1,style==='quad'?2:4,3,15);
+    if (style==='quad') sprite.box(fx-1,fy+1,2,3,15);
+    if (style==='brow') sprite.line(fx-width-1,fy,fx+1,fy,15);
+  }
+  const grilleX = early ? fx+1 : fx-3;
+  for (let i=0;i<(early?6:3);i++) sprite.line(grilleX,fy+8+i*2,fx+4,fy+8+i*2,i%2?8:7);
+  if (car?.rear!==false) drawBumper(sprite,Math.max(0,rx-6),58,early?13:15);
+  if (car?.front!==false) drawBumper(sprite,Math.min(WIDTH-16,fx-6),58,early?13:15);
+}
+
+function drawDecal(sprite, decal, profile) {
+  const x = profile.doors.at(-1)[3]-6;
+  const y = profile.trim === 'cove' || profile.trim === 'coveShort' ? 48 : 49;
+  if (decal === 1) {
+    const flame = [[x-14,y+8],[x-9,y+5],[x-5,y+6],[x,y],[x-1,y+4],[x+4,y+2],
+      [x+3,y+5],[x+12,y+2],[x+9,y+7],[x+14,y+8],[x+6,y+10],[x-9,y+10]];
+    sprite.polygon(flame,12);
+    sprite.trace([[x-13,y+8],[x-7,y+7],[x-1,y+5],[x+5,y+6],[x+11,y+4]],14);
+  } else if (decal === 2) {
+    sprite.ellipse(x,y+6,9,6,15);
+    sprite.ellipse(x,y+6,7,4,0);
+    sprite.box(x-2,y+3,4,6,15);
+    sprite.box(x-4,y+5,8,2,15);
+  } else if (decal === 3) {
+    sprite.polygon([[x-13,y+8],[x-1,y+1],[x+10,y+2],[x+3,y+6],[x+14,y+7],[x-3,y+11],[x,y+7]],11);
+    sprite.line(x-8,y+7,x+4,y+3,15);
+  }
+}
+
+function vehicleSprite(profile, car, paint, frontWheel, rearWheel) {
+  const sprite = new Sprite();
+  const roof = points => car?.roof
+    ? points.map(([x,y]) => [x,y < profile.waist-2 ? Math.round(y+(profile.waist-2-y)*0.28) : y])
+    : points;
+  const shell = roof(profile.shell);
+  const [dark,,light] = paint;
+  const [rear,front,r] = profile.wheels;
+  const visibleJack = car?.jack?.endsWith('-left') ? car.jack : '';
+  const jackX = visibleJack.startsWith('rear') ? rear : front;
+  sprite.polygon([[7,69],[41,67],[194,67],[232,70],[220,74],[44,74],[13,72]],8);
+  sprite.polygon([[16,70],[209,70],[224,72],[209,73],[31,73]],0);
+  sprite.polygon(shell,bodyPaint(0,profile.waist,paint));
+  sprite.trace([...shell,shell[0]],0);
+  sprite.trace(shell.slice(2,-4).map(([x,y]) => [x,y+1]),light);
+  if (profile.seat) {
+    const [x,y] = profile.seat;
+    sprite.trace([[x-12,y+3],[x-6,y+3],[x-5,y-3],[x+1,y-4],[x+7,y+3],[x+12,y+3]],0);
+    sprite.line(x-3,y-3,x+1,y-3,8);
+    sprite.line(x+2,y-2,x+5,y+3,dark);
+  }
+  profile.glass.forEach((points,i) => drawGlass(sprite,roof(points),i));
+  if (profile.trim === 'van') drawVan(sprite);
+  for (const x of [rear,front]) drawFender(sprite,x,r,profile.fenders,paint);
+  drawTrim(sprite,profile,paint);
+  drawDoors(sprite,profile,paint);
+  if (car?.decal && profile.trim !== 'van') drawDecal(sprite,car.decal,profile);
+  for (const [x, wheel] of [[rear,rearWheel],[front,frontWheel]]) {
+    drawWheel(sprite,x,r,wheel,profile.wall,Boolean(wheel));
+  }
+  drawEnds(sprite,profile,car);
+  if (!visibleJack) return sprite;
+
+  const lifted = new Sprite();
+  for (let x = 0; x < WIDTH; x++) {
+    const raise = Math.max(0,Math.round(3*(1-Math.abs(x-jackX)/205)));
+    for (let y = 0; y < 67; y++) {
+      const color = sprite.pixels[y*WIDTH+x];
+      if (color !== EMPTY) lifted.pixel(x,y-raise,color);
+    }
+    for (let y = 67; y < HEIGHT; y++) lifted.pixel(x,y,sprite.pixels[y*WIDTH+x]);
+  }
+  lifted.box(jackX+17,70,18,2,0);
+  lifted.box(jackX+19,67,15,3,8);
+  lifted.trace([[jackX+19,68],[jackX+25,61],[jackX+31,68]],14);
+  lifted.line(jackX+25,61,jackX+35,59,7);
+  return lifted;
+}
+
+const spriteCache = new Map();
+
+export function paintVehicle(screen, model, car, x, y, scale) {
+  if (!model) return;
+  const profile = PROFILES[model.id];
+  if (!profile) return;
+  const color = car?.color ?? model.color;
+  const wheelPart = slot => car?.installed ? (car.installed[slot]?.id ?? '') : 'tire-bias';
+  const front = wheelPart('front-left'), rear = wheelPart('rear-left');
+  const key = [model.id,color,car?.roof===true,car?.front!==false,car?.rear!==false,car?.decal||0,
+    car?.jack||'',front,rear].join('/');
+  if (!spriteCache.has(key)) {
+    if (spriteCache.size >= 80) spriteCache.delete(spriteCache.keys().next().value);
+    spriteCache.set(key,vehicleSprite(profile,car,vehiclePaint(color),front,rear));
+  }
+  spriteCache.get(key).blit(screen,x,y,scale);
+}
