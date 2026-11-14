@@ -30,9 +30,9 @@ max-width:100%!important;overflow:hidden!important;background:#000!important}
 <body class="community-page arcade-on" data-arcade-game="streetrod" data-arcade-scene="garage">
 <section id="streetrod-root" class="sr-ega-mode sr-dos-fullscreen arcade-game-active">
 <div id="sr-inside"><div id="src-classic-hub"><section id="streetrod-summer">
-<div id="ss-metrics"><div><small>WALLET</small><strong>$2,250</strong></div>
+<div id="ss-metrics" class="ss-metrics"><div><small>WALLET</small><strong>$2,250</strong></div>
 <div><small>CAR</small><strong>Rattler Coupe</strong></div></div>
-<nav id="ss-tabs">
+<nav id="ss-tabs" class="ss-tabs">
 <button data-ss-tab="garage" aria-pressed="true">Garage</button>
 <button data-ss-tab="paper" aria-pressed="false">Newspaper</button>
 <button data-ss-tab="parts" aria-pressed="false">Parts</button>
