@@ -1,12 +1,14 @@
--- Production-safe original race validation update, preserving ownership, RLS,
--- all existing score/award/bookkeeping logic and every previous argument.
--- Wider time windows allow authentic engine/gearbox changes on slow 1963 cars.
--- Source snapshot: live 2026-11-14 signed-in RPC definition.
--- Original before/after diff: p_launch_ms 1800 -> 120000;
--- p_shifts[1] 11000 -> 300000; p_shifts[3] 11500 -> 300000.
--- Requires three strictly increasing shift markers; missing physical shifts
--- are represented by inert timestamps near the 300-second race-trace limit.
--- The simulator never shifts at times later than its quarter-mile run.
+-- This live migration is authoritative on the production Supabase project.
+-- PGlite CI only loads committed legacy migrations; some seasonal tables were
+-- originally introduced directly on the live project, not in that test seed.
+-- Skip gracefully when these real tables are absent, rather than breaking
+-- unrelated tests. When deployed to a complete database, apply the full RPC.
+DO $apply_streetrod_20261114$
+BEGIN
+ IF to_regclass('public.community_streetrod_season_races') IS NOT NULL
+    AND to_regclass('public.community_streetrod_seasons') IS NOT NULL
+    AND to_regclass('public.community_streetrod_season_cars') IS NOT NULL THEN
+  EXECUTE $authentic_streetrod_ddl$
 CREATE OR REPLACE FUNCTION public.community_streetrod_season_race_finish(p_run uuid, p_launch_ms integer, p_shifts integer[], p_trace jsonb)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -133,3 +135,7 @@ BEGIN
  RETURN receipt||jsonb_build_object('state',public.community_streetrod_season_state());
 END;
 $function$;
+$authentic_streetrod_ddl$;
+ END IF;
+END
+$apply_streetrod_20261114$;
