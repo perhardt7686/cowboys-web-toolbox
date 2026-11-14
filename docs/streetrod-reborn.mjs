@@ -12,7 +12,7 @@ const BODY=document.body;
 const FULL=new Set(['garage','paper','parts','diner','drive','calendar','tune']);
 const VIEW_LABELS={garage:'THE GARAGE',paper:'CLASSIFIED ADS',parts:'AUTO PARTS',diner:'BOB’S DRIVE-IN',drive:'ON THE ROAD',calendar:'SUMMER 1963',tune:'IGNITION TIMING',gas:'FUEL STOP',crew:'COMMONS DRIVERS',underbody:'UNDER THE CAR',licence:'DRIVER LICENCE'};
 const NAV={
- garage:[['NEWSPAPER','paper'],['POP HOOD','hood'],['GO TO DINER','diner'],['GAS STATION','gas'],['CALENDAR','calendar'],['YOUR CARS','paper']],
+ garage:[['NEWSPAPER','paper'],['POP HOOD','hood'],['GO TO DINER','diner'],['GAS STATION','gas'],['CALENDAR','calendar'],['TUNE','tune']],
  paper:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['PARTS SHOP','parts']],
  parts:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['LIFT CAR','underbody'],['POP HOOD','hood']],
  diner:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['OUR DRIVERS','crew']],
