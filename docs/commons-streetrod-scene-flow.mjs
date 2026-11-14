@@ -12,7 +12,7 @@ const rooms={
  tune:[['Garage','garage'],['Timing','timing'],['Hood bolts','hood'],['Parts','parts']],
  paper:[['Garage','garage'],['Prev ad','prev'],['Next ad','next'],['Auto parts','parts']],
  parts:[['Garage','garage'],['Prev part','prev'],['Next part','next'],['Under hood','hood']],
- diner:[['Garage','garage'],['Prev driver','prev'],['Next driver','next'],['Cruise home','garage']],
+ diner:[['Prev driver','prev'],['Next driver','next'],['Cruise home','garage']],
  drive:[['Garage','garage'],['Drive-in','diner']],
  calendar:[['Garage','garage'],['Newspaper','paper'],['Drive-in','diner']]
 };
