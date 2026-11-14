@@ -261,24 +261,25 @@ async def campaign_flow(page, name, *, touch):
     await game.get_by_role('button',name='Challenge Earl').click()
     await scene(game,'race')
     await game.get_by_role('button',name='Stage at the line').click()
-    await expect(game.locator('.hot-rod-meters')).not_to_contain_text('WAIT FOR GREEN',timeout=10000)
     await fit(page,game,driving=True)
-    await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
+    if not touch:
+        # Select first at the red light with the throttle released. Catch the
+        # first green frame without pausing or taking a screenshot at launch.
+        await page.keyboard.press('e')
+        await expect(game.locator('.hot-rod-meters')).to_contain_text('GEAR 1')
+    await page.wait_for_function("""() =>
+      !document.querySelector('.hot-rod-meters').textContent.includes('WAIT FOR GREEN')
+    """, timeout=10000)
     if touch:
+        await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
         await finger(game.locator('[data-drive="up"]'),'pointerdown',1)
         await finger(game.locator('[data-drive="gas"]'),'pointerdown',2)
         await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
         await finger(game.locator('[data-drive="gas"]'),'pointerup',2)
         await finger(game.locator('[data-drive="up"]'),'pointerup',1)
-    else:
-        await page.keyboard.press('e')
-        await page.keyboard.down('ArrowUp')
-        await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
-        await page.keyboard.up('ArrowUp')
-    await game.get_by_role('button',name='Pause',exact=True).click()
-    await expect(game.get_by_text('Paused. Resume when you’re ready.')).to_be_visible()
-    await game.get_by_role('button',name='Resume',exact=True).click()
-    if touch:
+        await game.get_by_role('button',name='Pause',exact=True).click()
+        await expect(game.get_by_text('Paused. Resume when you’re ready.')).to_be_visible()
+        await game.get_by_role('button',name='Resume',exact=True).click()
         await game.get_by_role('button',name='Forfeit race',exact=True).click()
         await game.get_by_role('button',name='Confirm forfeit').click()
         await expect(game.get_by_role('heading',name='Forfeited')).to_be_visible()
@@ -288,7 +289,7 @@ async def campaign_flow(page, name, *, touch):
             await page.wait_for_function(r"""gear => {
               const text=document.querySelector('.hot-rod-meters').textContent;
               const rpm=text.match(/(\d+) RPM/);
-              return rpm && Number(rpm[1]) >= 4080 && text.includes('GEAR ' + gear);
+              return rpm && Number(rpm[1]) >= 4250 && text.includes('GEAR ' + gear);
             }""", arg=gear, timeout=12000)
             await page.keyboard.up('ArrowUp')
             await page.keyboard.press('e')
@@ -299,6 +300,7 @@ async def campaign_flow(page, name, *, touch):
         await expect(game.get_by_role('heading',name='Victory')).to_be_visible(timeout=23000)
         await page.keyboard.up('ArrowUp')
         assert await page.evaluate("fixture.result()?.outcome") == 'win'
+        await game.locator('.hot-rod-canvas').screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
     await game.get_by_role('button',name='Continue',exact=True).click()
     await scene(game,'garage')
     await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Hall of Fame').click()
