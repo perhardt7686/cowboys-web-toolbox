@@ -59,7 +59,7 @@ const portrait=()=>{
  return el?el:null;
 };
 let panel=null,sourceObserver=null,rootObserver=null,bodyObserver=null;
-let splash=true,sideRoom='',page={paper:0,parts:0,diner:0,crew:0,inventory:0,hall:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null,travelSkip=null;
+let splash=true,bootPhase='post',bootTimer=null,sideRoom='',page={paper:0,parts:0,diner:0,crew:0,inventory:0,hall:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null,travelSkip=null;
 let tick=0,renderQueued=false,stageKey='',liveBridge=false;
 let lastRoadWarning='';
 const stage=()=>$('sr-reborn');
@@ -386,6 +386,13 @@ function installChallenge(){
  }
 }
 function intro(){
+ if(bootPhase==='post')return '<div class="sr-v3-post" role="status">'+
+  '<strong>COWBOY XT / DOS-ERA COMPUTER</strong>'+
+  '<p>640 KB BASE MEMORY .......... OK</p><p>EGA 320 x 200 ............... OK</p>'+
+  '<p>FLOPPY DRIVE A: ............ READY</p><p>LOADING CLASSIC SUMMER 1963</p>'+
+  '<p>C:> STREETR0D.EXE</p>'+
+  '<button type="button" data-v3-action="boot">SKIP STARTUP / ENTER</button>'+
+  '<small>SIMULATED 1989 COMPUTER STARTUP</small></div>';
  return '<div class="sr-v3-intro"><small>1989 COMPUTER PRESENTATION · COWBOY EDITION</small>'+
   '<h2>STREET R0D</h2><p>THE SUMMER OF 1963</p>'+
   '<p>Find an old car in the newspaper, rebuild it, and beat the Mystery Machine before school starts.</p>'+
@@ -487,6 +494,9 @@ function build(){
     return;
    }
    cue(next==='hood'?'wrench':next==='diner'?'race':next==='continue'?'start':'menu');
+   if(next==='boot'){
+    clearTimeout(bootTimer);bootTimer=null;bootPhase='title';redraw(true);return;
+   }
    if(next==='continue'){splash=false;choose(gameCar().name==='NO CAR'?'paperfront':'garage');return;}
    choose(next);
   }
@@ -549,6 +559,12 @@ function build(){
  pocket.addEventListener('touchcancel',()=>{swipeStart=null;});
  if(splash&&!source()?.querySelector('.ss-drive-controls')){
   pocket.innerHTML=intro();el.classList.add('sr-v3-boot');
+  if(bootPhase==='post'&&bootTimer===null){
+   bootTimer=setTimeout(()=>{
+    bootTimer=null;bootPhase='title';
+    if(splash&&isArcade())redraw(true);
+   },1800);
+  }
  }else{
   pocket.innerHTML=sourcePanel(currentRoom());
   if(currentRoom()==='diner'&&visibleRecord()?.querySelector('[data-rival="cipher"]')){
