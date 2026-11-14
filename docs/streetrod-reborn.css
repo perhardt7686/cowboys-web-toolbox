@@ -1,0 +1,380 @@
+/*
+ * Cowboy's Street r0d Reborn · 1989 state-room reconstruction.
+ * Reference: MIT Street Rod SDL3 by Krzysztof Kania.
+ * Independently drawn artwork only. No original LIB1/LIB2 game assets.
+ */
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-summer{
+ overflow:hidden!important;min-height:0!important;box-shadow:none!important;
+ padding:0!important;margin:0!important;border:0!important;background:#090909!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #streetrod-summer>.ss-top,
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-metrics,
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-tabs{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene{
+ display:block!important;box-sizing:border-box!important;
+ position:relative!important;width:100%!important;height:100%!important;
+ max-height:100%!important;min-height:0!important;
+ overflow:hidden!important;overscroll-behavior:none!important;
+ padding:0!important;margin:0!important;background:#050505!important;
+ border:0!important;border-radius:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene>:not(#sr-reborn){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-status{
+ position:absolute!important;z-index:12!important;bottom:0!important;
+ left:0!important;right:0!important;height:23px!important;min-height:23px!important;
+ max-height:23px!important;margin:0!important;padding:4px 7px!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+ border-top:1px solid #979797!important;
+ background:#000!important;color:#ffff55!important;
+ font:700 10px/1.1 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene>#sr-reborn{
+ position:absolute!important;inset:0 0 23px 0!important;
+ display:grid!important;grid-template-rows:23px auto 22px minmax(0,1fr) auto!important;
+ align-content:stretch!important;justify-items:stretch!important;
+ width:100%!important;height:calc(100% - 23px)!important;
+ max-height:calc(100% - 23px)!important;
+ min-width:0!important;min-height:0!important;box-sizing:border-box!important;
+ margin:0!important;padding:2px 3px 0!important;gap:3px!important;
+ border:0!important;border-radius:0!important;overflow:hidden!important;
+ background:#090909!important;color:#f8f8ef!important;
+ font-family:'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-head{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:5px!important;margin:0!important;padding:2px 6px!important;
+ min-height:22px!important;overflow:hidden!important;background:#050529!important;
+ border:1px solid #777!important;color:#ffff55!important;
+ font:bold clamp(9px,2.7vw,12px)/1.15 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-head strong{
+ min-width:0!important;overflow:hidden!important;white-space:nowrap!important;
+ text-overflow:ellipsis!important;font:inherit!important;color:#ffff55!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-bank{
+ flex:0 0 auto!important;color:#55ffff!important;white-space:nowrap!important;
+ font-size:.9em!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-art{
+ position:relative!important;display:block!important;justify-self:center!important;
+ width:min(100%,calc((100dvh - var(--arcade-top,73px) - 220px)*1.6),840px)!important;
+ max-width:100%!important;aspect-ratio:8/5!important;height:auto!important;
+ min-height:0!important;max-height:min(44dvh,430px)!important;
+ overflow:hidden!important;background:#000!important;
+ border:3px ridge #aaa!important;border-radius:0!important;box-shadow:0 2px 0 #000!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-canvas{
+ width:100%!important;height:100%!important;display:block!important;
+ max-width:100%!important;object-fit:fill!important;image-rendering:pixelated!important;
+ image-rendering:crisp-edges!important;aspect-ratio:8/5!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-hotspots{
+ position:absolute!important;inset:0!important;pointer-events:none!important;
+ display:block!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn button.sr-v3-hotspot{
+ position:absolute!important;pointer-events:auto!important;
+ min-width:0!important;min-height:0!important;padding:0!important;
+ border:1px solid transparent!important;outline:0!important;
+ border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;touch-action:manipulation!important;cursor:pointer!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-hotspot:hover,
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-hotspot:focus-visible{
+ background:#ffff5525!important;border:2px dashed #ffff55!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-context{
+ display:block!important;flex:0 0 auto!important;min-height:22px!important;
+ margin:0!important;padding:4px 5px!important;
+ overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;
+ color:#55ffff!important;background:#03032b!important;
+ border:1px solid #444!important;text-align:center!important;
+ font:bold clamp(9px,2.4vw,11px)/1.1 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-pocket{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-height:0!important;max-height:100%!important;min-width:0!important;
+ gap:4px!important;padding:5px!important;margin:0!important;
+ overflow:hidden!important;overscroll-behavior:none!important;
+ border:2px ridge #888!important;border-radius:0!important;
+ background:#171720!important;color:#f8f8ec!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-toolbar{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ grid-auto-rows:minmax(30px,auto)!important;gap:3px!important;
+ min-width:0!important;min-height:0!important;max-height:78px!important;
+ margin:0!important;padding:2px 0!important;overflow:hidden!important;
+ background:#070707!important;border-top:1px solid #666!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn button{
+ min-height:30px!important;max-width:100%!important;box-sizing:border-box!important;
+ border:2px outset #999!important;border-radius:0!important;
+ padding:4px 6px!important;margin:0!important;
+ background:#0000aa!important;color:#fff!important;
+ font:bold clamp(9px,2.45vw,12px)/1.1 'Courier New',monospace!important;
+ box-shadow:none!important;white-space:normal!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn button:disabled{
+ background:#333!important;color:#aaa!important;opacity:.55!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn button:focus-visible{
+ outline:3px solid #ffff55!important;outline-offset:1px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record-count{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ flex:0 0 auto!important;gap:4px!important;min-height:22px!important;
+ padding:2px 5px!important;margin:0!important;background:#000!important;
+ color:#ffff55!important;font:bold 10px/1.2 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-width:0!important;min-height:0!important;max-height:100%!important;
+ gap:3px!important;margin:0!important;padding:7px!important;
+ overflow:hidden!important;border:2px solid #aaa!important;border-radius:0!important;
+ background:#e3dfcd!important;color:#111!important;box-shadow:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record :is(
+ .ss-ad-main,.ss-rival-buttons,.ss-ad-actions
+){display:flex!important;flex-direction:column!important;gap:4px!important;
+ margin:0!important;padding:0!important;min-height:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record :is(
+ .ss-ad-photo,.ss-rival-face,.ss-car-photo
+){display:none!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record :is(
+ strong,b
+){font:bold clamp(12px,3.4vw,16px)/1.15 monospace!important;color:#111!important;margin:0!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record :is(
+ small,p,span,label
+){color:#151515!important;font:500 clamp(10px,2.9vw,13px)/1.2 monospace!important;margin:0!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record :is(
+ p,small
+){display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record form{
+ display:flex!important;flex-wrap:wrap!important;gap:3px!important;margin:0!important;align-items:center!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record :is(button,input){
+ flex:0 0 auto!important;min-width:0!important;width:auto!important;
+ min-height:32px!important;padding:3px 9px!important;background:#f5edbc!important;
+ color:#151515!important;border:2px outset #999!important;border-radius:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn input{
+ font-size:16px!important;min-width:0!important;max-width:130px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-boss-card{
+ background:#9cdee2!important;border-color:#36b0ad!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-boss-mark{
+ color:#55ffff!important;font:bold 12px/1.15 monospace!important;
+ text-align:center!important;padding:2px!important;border:1px solid #55ffff!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-tip,
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-empty{
+ margin:0!important;padding:3px!important;overflow:hidden!important;
+ font:600 11px/1.28 monospace!important;color:#eee!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn :is(
+ .sr-v3-garage-meta,.sr-v3-gas,.sr-v3-cal,.sr-v3-under
+){
+ display:flex!important;flex-direction:column!important;gap:6px!important;
+ min-height:0!important;overflow:hidden!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-garage-meta strong{
+ color:#ffff55!important;font:bold clamp(13px,3.5vw,18px)/1.15 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-garage-meta small{
+ color:#eee!important;font:500 11px/1.2 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-quick{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:5px!important;min-height:0!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-readout{
+ display:flex!important;gap:8px!important;justify-content:space-between!important;
+ color:#55ffff!important;font:bold 11px/1.2 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-intro{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ gap:8px!important;justify-content:center!important;
+ flex:1 1 auto!important;min-height:0!important;max-height:100%!important;
+ overflow:hidden!important;padding:6px!important;text-align:center!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-intro h2{
+ margin:0!important;padding:0!important;color:#ffff55!important;
+ font:bold clamp(23px,7vw,42px)/1.1 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-intro :is(p,small){
+ font:bold 11px/1.2 'Courier New',monospace!important;color:#fff!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-crew{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ gap:5px!important;min-height:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-crew .srm-avatar{
+ transform:scale(.8)!important;flex:0 0 60px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-crew-fallback{
+ display:flex!important;flex-wrap:wrap!important;justify-content:center!important;gap:3px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-crew-fallback span{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ padding:3px!important;border:1px solid #aaa!important;color:#fff!important;font:900 12px/1 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-crew-fallback small{
+ font:600 8px/1.2 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-cal strong{
+ font-size:clamp(17px,4.5vw,27px)!important;color:#ffff55!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-cal span{
+ color:#fff!important;font-size:11px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-challenge{
+ display:flex!important;flex-direction:column!important;gap:5px!important;
+ min-height:0!important;padding:5px!important;margin:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-challenge :is(
+ select,label,button
+){min-height:30px!important;padding:3px!important;margin:0!important;font-size:11px!important}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-drive-controls,
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-drive-controls{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ grid-auto-rows:minmax(34px,1fr)!important;gap:3px!important;
+ min-width:0!important;max-height:100%!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-drive-controls button{
+ width:100%!important;min-width:0!important;min-height:34px!important;
+ padding:4px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-telemetry{
+ text-align:center!important;font:bold 11px/1.25 monospace!important;color:#55ffff!important;
+ background:#000!important;padding:3px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-race-result{
+ display:flex!important;flex-direction:column!important;gap:4px!important;
+ padding:5px!important;margin:0!important;min-height:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-timing-bench{
+ flex:0 0 auto!important;max-height:135px!important;
+ min-height:0!important;padding:2px!important;margin:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-timing-bench header,
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-timing-bench p{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-timing-controls{
+ display:flex!important;gap:6px!important;align-items:center!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-distributor{
+ width:60px!important;height:60px!important;flex:0 0 60px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-timing-steps{
+ gap:3px!important;display:flex!important;flex-direction:column!important;min-width:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-timing-steps button{
+ min-height:30px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn form[data-ss-form=tune]{
+ display:flex!important;gap:4px!important;align-items:center!important;
+ flex-wrap:wrap!important;min-height:0!important;max-height:60px!important;margin:0!important
+}
+/* The saved physical mechanic is a room-sized overlay, not a second webpage. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay:not([hidden]){
+ position:fixed!important;inset:var(--arcade-top,73px) 0 0 0!important;
+ z-index:2147481000!important;display:flex!important;flex-direction:column!important;
+ width:100vw!important;height:calc(100dvh - var(--arcade-top,73px))!important;
+ max-height:calc(100dvh - var(--arcade-top,73px))!important;overflow:hidden!important;
+ min-height:0!important;box-sizing:border-box!important;padding:3px!important;
+ background:#0b0b0f!important;border:0!important;border-radius:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-body{
+ display:flex!important;flex-direction:column!important;min-height:0!important;
+ flex:1 1 auto!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-mechanical-art{
+ flex:0 1 auto!important;max-height:17dvh!important;overflow:hidden!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-components{
+ flex:1 1 auto!important;min-height:0!important;max-height:100%!important;
+ display:flex!important;flex-direction:column!important;gap:3px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-component{
+ flex:1 1 auto!important;min-height:0!important;max-height:100%!important;
+ overflow:hidden!important;padding:4px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-title-row{
+ flex:0 0 auto!important;max-height:52px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-torque-guide{
+ flex:0 0 auto!important;max-height:57px!important;overflow:hidden!important;
+ font-size:10px!important;line-height:1.13!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-bottom{
+ flex:0 0 auto!important;max-height:85px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-component[hidden]{
+ display:none!important
+}
+@media(max-width:590px){
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene>#sr-reborn{
+  grid-template-rows:23px auto 20px minmax(0,1fr) auto!important;
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-art{
+  width:min(100%,calc((100dvh - var(--arcade-top,73px) - 275px)*1.6))!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-toolbar button{
+  min-height:32px!important
+ }
+}
+@media(orientation:landscape) and (max-height:550px){
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-scene>#sr-reborn{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)!important;
+  grid-template-rows:23px minmax(0,1fr) 24px!important;
+  grid-template-areas:"head head" "art pocket" "hint nav"!important;
+  gap:3px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-head{grid-area:head}
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-art{
+  grid-area:art;width:min(100%,calc((100dvh - var(--arcade-top,73px) - 50px)*1.6))!important;
+  align-self:center!important;justify-self:center!important;
+  max-height:100%!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-context{
+  grid-area:hint;font-size:9px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-pocket{
+  grid-area:pocket;padding:2px!important;overflow:hidden!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-toolbar{
+  grid-area:nav;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-auto-flow:column!important;grid-template-rows:23px!important;
+  min-height:23px!important;max-height:23px!important;padding:0!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-toolbar button{
+  min-height:22px!important;height:22px!important;padding:1px 3px!important;
+  font-size:8px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-record{
+  padding:4px!important;gap:2px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-intro{
+  gap:3px!important;padding:2px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-intro h2{
+  font-size:21px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-intro p{
+  font-size:9px!important
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn *,
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay *{
+  transition:none!important;animation:none!important
+ }
+}
