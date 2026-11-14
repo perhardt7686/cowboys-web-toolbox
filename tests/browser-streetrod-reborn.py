@@ -152,7 +152,10 @@ async def run_one(browser,width,height):
   await p.locator('#sr-reborn [data-v3-action="continue"]').click()
   assert await p.locator('#sr-reborn .sr-v3-garage-meta').is_visible()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="gas"]').click()
-  assert 'Selected refuel' in await p.locator('#ss-status').inner_text()
+  assert await p.locator('#sr-reborn .sr-v3-gas').is_visible()
+  assert 'Selected refuel' not in await p.locator('#ss-status').inner_text(), 'Simply visiting the pump must never buy gasoline'
+  await p.locator('#sr-reborn .sr-v3-gas [data-ss-action="refuel"]').click()
+  assert 'Selected refuel' in await p.locator('#ss-status').inner_text(), 'The explicit pump button must still work'
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="tune"]').click()
   assert await p.locator('#sr-reborn form[data-ss-form="tune"]').is_visible()
