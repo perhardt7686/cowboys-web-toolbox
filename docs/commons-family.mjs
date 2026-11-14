@@ -1,3 +1,4 @@
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=reward1';
 /* The Commons · family word quest and drawing studio, members only. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {getAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
@@ -252,6 +253,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   }
   async function loadAvatars(){
     if(!client)return;
+    const member=activeUser;
     try{
       const [art,profiles]=await Promise.all([
         client.from('community_board_avatar_assets').select('user_id,data_uri'),
@@ -267,10 +269,18 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
         const results=await Promise.all(photos.map(async p=>
           [String(p.user_id),await getAvatarPhoto(client,p.avatar_path)]));
         for(const [id,url] of results)if(url)next.set(id,url);
+        const projections=await avatarProjections(client,(profiles.data||[]).map(p=>p.user_id));
+        const portraits=await Promise.all([...projections].map(async ([id,recipe])=>[id,await cacheAvatarCharacter(id,recipe)]));
+        for(const profile of profiles.data||[]){
+          const id=String(profile.user_id);
+          const url=portraits.find(([member])=>member===id)?.[1];
+          if(url)next.set(id,url);
+          else if(profile.avatar_mode==='initials')next.delete(id);
+        }
       }
       // Photo preference wins over generated portrait; a transient failure
       // leaves the previous image in place instead of flipping to initials.
-      avatarMap=next;
+      if(activeUser===member)avatarMap=next;
     }catch{/* Existing avatar pictures remain visible on a transient error. */}
   }
   async function mount(){

@@ -14,14 +14,14 @@ test('every approved family member sees a direct avatar studio shortcut by menu'
 test('simple profile settings preserve advanced saved fields and send editable avatar recipe',()=>{
  const s=read('docs/community-profiles.mjs'),client=read('docs/forum-core.mjs'),
    server=read('supabase/functions/community-api/forum-core.mjs');
- for(const label of ['My Profile','Make an Avatar','Privacy & Account','family-avatar-canvas',
-   "avatarMethod==='character'?avatarRecipe:null","getOwn()","Save my avatar","getAvatarPhoto"]){
+ for(const label of ['My Profile','Avatar Studio','Privacy & Account','family-avatar-canvas',
+   "community_avatar_equip","getOwn()","Save my avatar","getAvatarPhoto"]){
      assert.ok(s.includes(label),label);
  }
- assert.match(s,/avatarMethod==='character'&&avatarChanged/);
+ assert.match(s,/character=replaceAvatar&&avatarMethod==='character'/);
  assert.match(s,/\.upload\(path,blob/);
  assert.match(client,/avatar_recipe/);assert.match(server,/avatar_recipe/);
- assert.match(read('docs/community.html'),/family-avatar-studio\.css\?v=studio1/);
+ assert.match(read('docs/community.html'),/family-avatar-studio\.css\?v=reward1/);
 });
 test('photo and icon preferences stay private and Hot Rod is untouched',()=>{
  const nav=read('docs/unified-nav.js'),studio=read('docs/community-profiles.mjs');
