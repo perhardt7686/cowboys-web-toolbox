@@ -117,9 +117,9 @@ elem('streetrod-summer').addEventListener('click',e=>{
 elem('streetrod-summer').addEventListener('submit',e=>{e.preventDefault();elem('ss-status').textContent='Submitted '+e.target.dataset.ssForm;});
 applyRoom('garage');
 </script>
-<script src="/streetrod-reborn-config.js?v=reborn3"></script>
-<script type="module" src="/commons-streetrod-ega.mjs?v=dos9"></script>
-<script type="module" src="/streetrod-reborn.mjs?v=reborn3"></script>
+<script src="/streetrod-reborn-config.js?v=reborn4"></script>
+<script type="module" src="/commons-streetrod-ega.mjs?v=dos10"></script>
+<script type="module" src="/streetrod-reborn.mjs?v=reborn4"></script>
 </body></html>"""
 
 async def run_one(browser,width,height):
