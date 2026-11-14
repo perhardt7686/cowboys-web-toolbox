@@ -32,6 +32,9 @@
       let link=document.getElementById('spelunkr-game-link');
       if(!link)link=createLink('spelunkr-game-link');
       if(drawing.nextElementSibling!==link)drawing.after(link);
+    } else {
+      // Avoid a floating shortcut after an authorized game session unmounts.
+      document.getElementById('spelunkr-game-link')?.remove();
     }
     const grid=document.getElementById('arcade-program-grid');
     if(grid!==watchedGrid){

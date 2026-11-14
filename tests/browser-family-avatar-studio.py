@@ -43,13 +43,18 @@ async def main():
                 await page.keyboard.press('Escape')
                 # Test external TV link using the same class+DOM location that
                 # Drawing Studio injects during approved account mount.
+                # A realistic synthetic drawing session: the existing
+                # drawing manager mounts its game button from the real stage.
                 await page.evaluate("""()=>{
-                    if(document.getElementById('drawing-studio-game-root'))return;
+                    if(document.getElementById('commons-family-zone'))return;
                     const main=document.querySelector('#conversations .community-main');
-                    const drawing=document.createElement('section');
-                    drawing.id='drawing-studio-game-root';
-                    main.append(drawing);
+                    const zone=document.createElement('section');zone.id='commons-family-zone';
+                    const drawingRoot=document.createElement('section');
+                    drawingRoot.id='commons-drawing-root';drawingRoot.dataset.ready='true';
+                    const stage=document.createElement('div');stage.id='commons-art';
+                    drawingRoot.append(stage);zone.append(drawingRoot);main.append(zone);
                 }""")
+                await expect(page.locator('#drawing-studio-game-root')).to_be_visible(timeout=12000)
                 link=page.locator('#spelunkr-game-link')
                 await expect(link).to_be_visible(timeout=10000)
                 assert await link.get_attribute('href')=='https://spelunkr.tv/?tv'
