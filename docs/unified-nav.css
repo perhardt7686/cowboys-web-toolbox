@@ -49,3 +49,30 @@ body.cowboy-nav-ready .cowboy-nav-note{display:block;font-size:12px;line-height:
 }
 @media(prefers-reduced-motion:reduce){body.cowboy-nav-ready .cowboy-nav-toggle > span{transition:none}}
 /* Games, including Street Rod, retain their own full-screen HUD; this is site navigation only. */
+
+.cowboy-nav-item.cowboy-nav-family,
+.toolbox-page .hero-actions .family-board-entry {
+  display: inline-flex;
+  gap: .6rem;
+  align-items: center;
+  min-height: 44px;
+  color: #fff2be;
+  background: #352047;
+  border: 1px solid #e6bd70;
+  box-shadow: 0 0 14px #d9a75433;
+}
+.cowboy-nav-item.cowboy-nav-family { display: flex; }
+.toolbox-page .hero-actions .family-board-entry {
+  padding: .55rem .9rem;
+  border-radius: .65rem;
+  text-transform: none;
+  letter-spacing: .01em;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .toolbox-page .family-board-entry { animation: family-entry-glow 5s ease-in-out infinite; }
+}
+@keyframes family-entry-glow {
+  50% { box-shadow: 0 0 20px #d9a75470; }
+}
+
+@media(min-width: 761px) { body.toolbox-page .toolbox-map-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }

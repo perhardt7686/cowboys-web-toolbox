@@ -10,6 +10,9 @@ import {validateLabPost} from './lab-core.mjs';
 import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
+import {createFamilyBoard} from './family-board.mjs?v=family3';
+
+const familyBoard = createFamilyBoard();
 const $=id=>document.getElementById(id);
 const config=window.COWBOY_COMMUNITY_CONFIG||{enabled:false};
 const query=new URLSearchParams(location.search),isPreview=query.get('preview')==='1'&&['localhost','127.0.0.1'].includes(location.hostname);
@@ -54,12 +57,14 @@ function clearBoardState(){
 }
 function renderBoardAccess(){
   const allowed=canReadBoard(state.member);$('board-access').hidden=allowed;document.querySelector('.community-layout').hidden=!allowed;const intro=$('lab-intro');if(intro)intro.hidden=!allowed;
+  $('family-welcome-description').hidden=allowed;
+  if(!isPreview)familyBoard.setAccess(client,state.member);
   if(allowed)return true;const copy=accessCopy(state.member);
-  $('board-access-content').innerHTML=`<span class="board-access-mark" aria-hidden="true">⌑</span><p class="eyebrow">THE COMMONS / MEMBERSHIP</p><h2>${esc(copy.title)}</h2><p>${esc(copy.text)}</p><div class="board-access-actions">${!state.member?'<button class="button-primary" data-auth="login">Log in</button><button class="button-quiet" data-auth="signup">Request membership</button>':copy.pending?'<button class="button-primary" data-check-membership>Check approval status</button>':''}<a class="button-quiet" href="./">Explore the website collection</a></div><p class="board-access-foot">The website collection is open to everyone. Reading or posting on the boards requires approved membership.</p>`;return false;
+  $('board-access-content').innerHTML=`<span class="board-access-mark" aria-hidden="true">⌑</span><p class="eyebrow">FAMILY MESSAGE BOARD</p><h2>${esc(copy.title)}</h2><p>${esc(copy.text)}</p><div class="board-access-actions">${!state.member?'<button class="button-primary" data-auth="login">Log in</button><button class="button-quiet" data-auth="signup">Request membership</button>':copy.pending?'<button class="button-primary" data-check-membership>Check approval status</button>':''}<a class="button-quiet" href="./">Explore the website collection</a></div><p class="board-access-foot">The website collection is open to everyone. Reading or posting on the boards requires approved membership.</p>`;return false;
 }
 function renderCategories(){$('community-categories').innerHTML=[{id:'all',name:'All conversations',icon:'◌'},...CATEGORIES].map(c=>`<button data-category="${c.id}" aria-pressed="${state.category===c.id}"><span class="category-icon" aria-hidden="true">${c.icon}</span>${esc(c.name)}</button>`).join('');}
 function renderAccount(){
-  if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Join the conversation <span aria-hidden="true">↗</span></button>';return}
+  if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Request access</button>';return}
   const member=state.member;
   $('account-actions').innerHTML=`<details class="account-menu"><summary>${profiles.avatar({...state.profile,display_name:member.display_name})}<span>${esc(member.display_name)}</span><span aria-hidden="true">⌄</span></summary><div class="account-dropdown"><button data-profile>Customize my profile</button>${member.role==='owner'?'<button data-owner>Owner dashboard</button>':''}<button data-signout>Log out</button></div></details>`;
   if(canReadBoard(member)){hub.decorateAccount();powers.decorateAccount();}
@@ -337,7 +342,10 @@ async function initialize(){
       authStorage=sessionStore;authStorageKey=`sb-${new URL(config.supabaseUrl).hostname.split('.')[0]}-auth-token`;
       recoveryStep=createRecoveryStep(session,`cowboy-recovery-step:${new URL(config.supabaseUrl).hostname}`);
       client=createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:authStorageKey,flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:sessionStore}});
-      client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||(session?.user?.id&&state.user?.id&&session.user.id!==state.user.id))ownerCenter.hide();if(event==='SIGNED_OUT'){state.bootstrapGeneration=(state.bootstrapGeneration||0)+1;state.recovery=false;recoveryStep.clear();state.member=null;state.user=null;state.profile=null;renderFeed();}if(event==='PASSWORD_RECOVERY'&&session?.user?.id){state.recovery=true;recoveryStep.mark(session.user.id);setTimeout(()=>{if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset')},0);}else setTimeout(()=>bootstrap().then(()=>loadFeed()).catch(error=>toast(errorMessage(error))),0);});
+      client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||(session?.user?.id&&state.user?.id&&session.user.id!==state.user.id)){
+        ownerCenter.hide();familyBoard.setAccess(null,null);
+        state.member=null;state.profile=null;renderBoardAccess();
+      }if(event==='SIGNED_OUT'){state.bootstrapGeneration=(state.bootstrapGeneration||0)+1;state.recovery=false;recoveryStep.clear();state.member=null;state.user=null;state.profile=null;renderFeed();}if(event==='PASSWORD_RECOVERY'&&session?.user?.id){state.recovery=true;recoveryStep.mark(session.user.id);setTimeout(()=>{if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset')},0);}else setTimeout(()=>bootstrap().then(()=>loadFeed()).catch(error=>toast(errorMessage(error))),0);});
       const {error:initError}=await client.auth.initialize();
       if(initError||new URLSearchParams(location.search).has('code')){authProblem=authErrorMessage(initError,'callback');clearAuthCallback();}
       await bootstrap();await loadFeed();
@@ -361,4 +369,9 @@ async function initialize(){
   if(reviewToken&&!state.member)openAuth('login','Sign in with the verified owner email to review this request.');
 }
 document.addEventListener('visibilitychange',()=>{if(!isPreview&&client&&document.visibilityState==='visible')bootstrap().then(()=>loadFeed()).catch(()=>{state.member=null;state.profile=null;renderFeed();});});
+document.addEventListener('family-membership-changed',()=>{
+  if(isPreview||!client)return;
+  state.member=null;state.profile=null;renderFeed();
+  void bootstrap().then(()=>loadFeed()).catch(()=>{});
+});
 await initialize();

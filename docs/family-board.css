@@ -1,0 +1,157 @@
+body.community-page {
+  --family-ink: #2d1b3c;
+  --family-muted: #5b4768;
+  --family-surface: #fff7e9;
+  --family-paper: #fffdf7;
+  --family-border: #ae8abb;
+  --family-accent: #59296d;
+  --family-gold: #e6be73;
+  --family-focus: #00737a;
+}
+
+body.community-page [hidden]:is(#conversations, #family-tools, #family-overview, #family-welcome-description) { display: none !important; }
+body.community-page.cowboy-nav-ready .masthead .header-inner { min-height: 60px; padding-block: 6px; }
+body.community-page.cowboy-nav-ready .masthead .cowboy-nav-toggle { width: 46px; height: 46px; border-radius: 12px; gap: 5px; }
+body.community-page.cowboy-nav-ready .cowboy-nav-heading strong { font-size: clamp(15px, 3.2vw, 24px); }
+body.community-page.cowboy-nav-ready .cowboy-nav-toggle[aria-expanded="true"] > span:first-child { transform: translateY(8px) rotate(45deg); }
+body.community-page.cowboy-nav-ready .cowboy-nav-toggle[aria-expanded="true"] > span:last-child { transform: translateY(-8px) rotate(-45deg); }
+body.community-page.cowboy-nav-ready .cowboy-menu-utility #account-actions button { min-height: 44px; }
+body.community-page #family-welcome { display: flex!important; margin-block: 0!important; align-items: center; }
+body.community-page #family-welcome > div { display: flex; width: 100%; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .45rem .75rem; }
+body.community-page #family-welcome h1 { font-size: clamp(1.28rem, 4.2vw, 2rem)!important; }
+body.community-page #family-welcome-description { color: #f1dff7!important; }
+body.community-page #family-overview { min-width: 0; }
+body.community-page #family-overview h2 { color: var(--family-ink); line-height: 1.2; margin: 0; font-family: system-ui, sans-serif; font-weight: 780; }
+body.community-page #family-overview h2.family-games-title { color: #fff5e8; font-size: 1.18rem; margin-block: .75rem .15rem; }
+body.community-page #family-updates:has(#community-announcement[hidden]) { display: none; }
+body.community-page #family-updates :is(.community-announcement, .community-announcement h2, .community-announcement p) { margin-block: .25rem; }
+body.community-page .family-quick-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-block: 0 .5rem; }
+body.community-page .family-quick-links a {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 44px; padding-inline: 2px; border: 1px solid #9d79ac; border-radius: 8px;
+  background: #342244; color: #fff6e7; font-weight: 690; text-decoration: none;
+  font-size: clamp(.72rem, 3.15vw, .95rem);
+}
+body.community-page .family-panel, body.community-page .family-standings-dialog {
+  padding: .65rem .75rem; color: var(--family-ink); background: var(--family-surface);
+  border: 1px solid var(--family-border); border-radius: 12px; min-width: 0;
+}
+body.community-page .family-panel :is(h2,h3,h4,p), body.community-page .family-standings-dialog :is(h2,h3,h4,p) { color: inherit; }
+body.community-page .family-panel button, body.community-page .family-panel select, body.community-page .family-panel input:not([type=checkbox]),
+body.community-page .family-panel textarea, body.community-page .family-standings-dialog button, body.community-page .family-controls > a {
+  min-height: 44px; box-sizing: border-box; font: inherit;
+  border: 1px solid #936e9e; border-radius: 7px; color: var(--family-ink);
+  background: var(--family-paper); padding: .35rem .55rem;
+}
+body.community-page .family-panel :is(button, select), body.community-page .family-standings-dialog button { cursor: pointer; }
+body.community-page .family-panel button { font-size: .83rem; font-weight: 670; line-height: 1.2; }
+body.community-page .family-panel button[disabled], body.community-page .family-standings-dialog button[disabled] { opacity: .65; cursor: default; }
+body.community-page .family-panel button[aria-pressed="true"], body.community-page .family-panel .family-primary {
+  background: var(--family-accent); color: #fff9eb; border-color: var(--family-accent);
+}
+body.community-page :is(.family-quick-links, .family-panel, .family-standings-dialog) :is(button,select,a,input,textarea,summary):focus-visible {
+  outline: 3px solid var(--family-focus); outline-offset: 2px;
+}
+body.community-page .family-quick-links a:focus-visible { outline-color: var(--family-gold); }
+body.community-page .family-score-heading, body.community-page .family-score-controls { display: flex; align-items: center; justify-content: space-between; gap: .4rem; }
+body.community-page .family-score-heading h2 { font-size: clamp(1.07rem, 4.2vw, 1.42rem); }
+body.community-page .family-score-controls { margin-bottom: .25rem; }
+body.community-page .family-score-controls select { flex: 1 1 auto; min-width: 0; font-size: max(16px, .9rem); }
+body.community-page .family-score-content { min-width: 0; }
+body.community-page .family-status { color: var(--family-muted); font-size: .8rem; line-height: 1.35; margin: .35rem 0 0; }
+body.community-page .family-status:empty { display: none; }
+body.community-page :is(.family-score-list,.family-game-leaders,.family-item-list) { padding: 0; list-style: none; margin: 0; }
+body.community-page .family-score-list li {
+  display: grid; grid-template-columns: 2rem 28px minmax(0, 1fr) auto; align-items: center; gap: .38rem;
+  padding: .2rem .3rem; border-top: 1px solid #e1d1e4; font-size: .83rem; min-height: 33px;
+}
+body.community-page .family-score-list li.is-mine { background: #eadcf1; border-radius: 5px; }
+body.community-page .family-score-list :is(.family-score-name,strong) { overflow-wrap: anywhere; }
+body.community-page .family-score-rank { font-weight: 800; color: var(--family-accent); }
+body.community-page .family-score-avatar {
+  display: grid; place-items: center; width: 28px; height: 28px; overflow: hidden; border-radius: 50%;
+  color: #fff7e9; background: #68447b; font-size: .74rem; font-weight: 800;
+}
+body.community-page .family-score-avatar img { object-fit: cover; width: 100%; height: 100%; }
+body.community-page .family-game-leaders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+body.community-page .family-game-leaders li {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-content: start; align-items: center;
+  gap: 2px 5px; min-width: 0; padding: 0 5px 4px; border-radius: 7px; background: #f2e5f4;
+}
+body.community-page .family-game-leaders li > button {
+  grid-column: 1 / -1; padding: 0; text-align: left; border-color: transparent; background: none; color: var(--family-accent);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+body.community-page .family-game-leaders li > small { grid-column: 1 / -1; font-size: .73rem; color: var(--family-muted); }
+body.community-page .family-overall-leader { overflow-wrap: anywhere; font-size: .8rem; }
+body.community-page .family-standings-dialog { width: min(42rem, calc(100% - 20px)); max-height: 85dvh; overflow: auto; }
+body.community-page .family-standings-dialog::backdrop { background: #150b20b0; }
+body.community-page .family-standings-dialog h3 { margin: .65rem 0 .25rem; font-size: 1rem; }
+body.community-page #family-tools { display: grid; gap: .65rem; margin-block: .85rem; min-width: 0; }
+body.community-page #family-tools details.family-panel { padding: 0; }
+body.community-page #family-tools details.family-panel > summary {
+  padding: .5rem .75rem; min-height: 44px; font-weight: 760; cursor: pointer;
+  color: var(--family-ink); list-style-position: inside; border-radius: 12px;
+}
+body.community-page .family-fold-meta { margin-inline-start: .5rem; color: var(--family-muted); font-size: .82rem; font-weight: 550; }
+body.community-page .family-panel-body { padding: .25rem .75rem .75rem; }
+body.community-page .family-panel-body :is(h3,h4) { margin: .6rem 0 .3rem; font-size: 1rem; }
+body.community-page .family-controls { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+body.community-page .family-controls > a { display: inline-flex; align-items: center; }
+body.community-page .family-fridge-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+body.community-page .family-item { display: flex; flex-wrap: wrap; gap: .15rem .75rem; align-items: center; border-top: 1px solid #d9c5df; padding: .25rem 0; }
+body.community-page .family-item-copy { min-width: min(7rem,100%); flex: 1; overflow-wrap: anywhere; }
+body.community-page .family-item-copy .family-field { display: flex; align-items: center; min-height: 44px; gap: .45rem; flex-direction: row-reverse; justify-content: flex-end; }
+body.community-page .family-item-copy .family-field input { flex: 0 0 23px; width: 23px; height: 23px; }
+body.community-page .family-item-copy :is(small,.family-item-note) { display: block; font-size: .78rem; color: var(--family-muted); margin: 0 0 .25rem; }
+body.community-page .family-item.is-done .family-field span { text-decoration: line-through; }
+body.community-page .family-form {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .45rem;
+  background: #f3e8f2; border: 1px solid var(--family-border); border-radius: 8px; padding: .5rem; margin-top: .55rem;
+}
+body.community-page .family-field { display: grid; gap: .2rem; min-width: 0; font-size: .85rem; font-weight: 670; }
+body.community-page .family-form .family-field :is(input:not([type=checkbox]),select,textarea) { font-size: 16px; width: 100%; min-width: 0; }
+body.community-page .family-form .family-field input[type=checkbox] { height: 25px; width: 25px; margin-block: .15rem .45rem; }
+body.community-page .family-form > .family-status { grid-column: 1 / -1; }
+body.community-page .family-calendar-modes { margin-top: .4rem; }
+body.community-page .family-date-grid {
+  display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 3px; margin-top: .4rem;
+}
+body.community-page .family-date-grid[hidden] { display: none; }
+body.community-page .family-date-grid button { min-width: 0; padding-inline: 0; display: grid; align-content: center; justify-content: center; }
+body.community-page .family-date-grid button[aria-current=date] { border-width: 2px; }
+body.community-page .family-weekday { text-align: center; font-size: .75rem; }
+body.community-page .family-date-count { font-size: .68rem; }
+body.community-page .family-event { border: 1px solid #d6bddc; border-radius: 7px; background: var(--family-paper); margin-block: .35rem; }
+body.community-page .family-event > summary { min-height: 44px; cursor: pointer; padding: .4rem .6rem; }
+body.community-page .family-event > summary small { display: block; padding-inline-start: 1rem; color: var(--family-muted); }
+body.community-page .family-event-title { font-weight: 720; overflow-wrap: anywhere; }
+body.community-page .family-event-body { padding: .2rem .65rem .65rem; overflow-wrap: anywhere; }
+body.community-page .family-event-body p { margin: .25rem 0; white-space: pre-wrap; }
+body.community-page .family-event-tag { color: var(--family-muted); font-weight: 700; font-size: .8rem; }
+body.community-page #family-tools, body.community-page #family-games,
+body.community-page #family-conversations, body.community-page #family-fridge,
+body.community-page #family-calendar { scroll-margin-top: 72px; }
+body.community-page .family-entry-stat { display: block; }
+body.community-page #conversations #community-categories button,
+body.community-page #conversations .community-tools :is(input,select),
+body.community-page #new-thread { min-height: 44px!important; }
+body.community-page #conversations #new-thread { white-space: normal; }
+body.community-page #compact-feed-count { color: #f2dffb!important; }
+body.community-page #conversations .community-sidebar { margin-top: .75rem!important; }
+
+@media(max-width: 520px) {
+  body.community-page .family-fridge-list { grid-template-columns: minmax(0,1fr); }
+  body.community-page .family-panel { padding-inline: .57rem; }
+  body.community-page .family-panel-body { padding-inline: .6rem; }
+  body.community-page .family-date-grid { gap: 1px; }
+  body.community-page .family-period { overflow-wrap: anywhere; }
+}
+@media(max-width: 360px) {
+  body.community-page #family-calendar .family-date-grid { grid-template-columns: repeat(7,minmax(32px,1fr)); }
+  body.community-page #family-calendar .family-date-grid-week { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  body.community-page .family-event-form { grid-template-columns: minmax(0,1fr); }
+}
+
+body.community-page #conversations :is(#mahjong-toggle,#plate-game-open,#letter-lock-toggle,#word-game-toggle):has(.family-entry-stat:not(:empty)) :is(#mahjong-button-score,#plate-top-score,#letter-lock-summary,#word-game-summary) { display: none!important; }
+body.community-page #conversations .family-entry-stat { color: inherit!important; }

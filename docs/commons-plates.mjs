@@ -3,13 +3,15 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
- let client=null,userId=null,seat=null,game=null,working=false,expanded=false,timer=null,mounted=false,historyPageIndex=0;
+ let client=null,userId=null,seat=null,game=null,working=false,expanded=false,timer=null,mounted=false;
+ let scope='all',offset=0,requested=0,sessionGeneration=0,mounting=false;
+ const pageSize=()=>scope==='gallery'?6:25;
  const urls=new Map();
  const $=id=>document.getElementById(id);
  const newEl=(tag,cls='',txt)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(txt!==undefined)el.textContent=String(txt);return el;};
  const pill=(txt)=>newEl('span','plate-pill',txt);
- const setStatus=(txt)=>{if($('plate-status'))$('plate-status').textContent=txt;};
- const clean=()=>{for(const url of urls.values())URL.revokeObjectURL(url);urls.clear();};
+ const setStatus=(txt)=>{if($('plate-status'))$('plate-status').textContent=txt;if($('plate-post-status'))$('plate-post-status').textContent=txt;};
+ const clean=()=>{for(const photo of urls.values())void photo.then(url=>URL.revokeObjectURL(url)).catch(()=>{});urls.clear();};
  const nameFor=who=>who==='ana'?'Ana':'Cowboy';
  const dateFor=stamp=>{try{return new Date(stamp).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});}catch{return '';}};
  const googleLink=(plate,region)=>'https://www.google.com/search?q='+encodeURIComponent('"'+plate+'" personalized vanity license plate meaning '+region);
@@ -18,7 +20,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   if($('plate-game-root'))return;
   const main=board.querySelector('.community-main');if(!main)return;
   const root=newEl('section','plate-game');root.id='plate-game-root';
-  root.innerHTML=`<button type="button" class="plate-entry-button" id="plate-game-open" aria-expanded="false" aria-controls="plate-game-content"><span class="plate-entry-icon" aria-hidden="true">📸</span><span><strong>Our License Plate Game</strong><small id="plate-top-score">Ana 33 · Cowboy 19</small></span><span class="plate-expand" aria-hidden="true">▾</span></button>
+  root.innerHTML=`<button type="button" class="plate-entry-button" id="plate-game-open" aria-expanded="false" aria-controls="plate-game-content"><span class="plate-entry-icon" aria-hidden="true">📸</span><span class="plate-entry-copy"><strong>License Plates</strong><small id="plate-top-score">Loading scores…</small></span><span class="plate-expand" aria-hidden="true">▾</span></button>
     <div id="plate-game-content" hidden><section class="commons-score-ribbon" aria-label="Live license plate scores" aria-live="polite">
       <div class="commons-score-tile is-record"><span class="commons-score-label">LEADING TOTAL</span><strong id="plate-ribbon-lead">…</strong><small id="plate-ribbon-holder">Top player · cumulative points</small></div>
       <div class="commons-score-tile is-personal"><span class="commons-score-label">YOUR TOTAL</span><strong id="plate-ribbon-mine">…</strong><small>Approved plates and starting points</small></div>
@@ -29,11 +31,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     <div class="plate-list-header"><h3>Our plate debates</h3><button type="button" class="plate-button secondary" id="plate-refresh">Refresh</button></div><div id="plate-status" role="status" aria-live="polite"></div><div id="plate-list"></div><section id="plate-gallery" aria-label="Saved license plate photo history"><header class="plate-gallery-head"><strong>Saved plate photos</strong><span id="plate-gallery-count" role="status"></span></header><div id="plate-gallery-grid" class="plate-gallery-grid"></div><nav id="plate-gallery-pages" class="plate-gallery-pages" aria-label="Photo history pages"><button type="button" id="plate-gallery-prev">‹ Earlier</button><span id="plate-gallery-position">1 / 1</span><button type="button" id="plate-gallery-next">Later ›</button></nav></section>
     <p class="plate-hint">Research links search public plate designs and possible meanings, not the registered owner's identity. Only Ana and Cowboy can view these photos in the game.</p></div>`;
   main.prepend(root);
-  $('plate-game-open').addEventListener('click',()=>{expanded=!expanded;$('plate-game-content').hidden=!expanded;$('plate-game-open').setAttribute('aria-expanded',String(expanded));if(expanded){refresh();$('plate-game-content').scrollIntoView({block:'nearest',behavior:'smooth'});}});
-  $('plate-new').addEventListener('submit',post);$('plate-submit').before($('plate-status'));$('plate-photo').addEventListener('change',()=>{const f=$('plate-photo').files?.[0];if(f)setStatus(`Photo selected (${(f.size/1048576).toFixed(1)} MB). Add the guess and tap Post challenge.`);});
+  $('plate-game-open').addEventListener('click',()=>{expanded=!expanded;$('plate-game-content').hidden=!expanded;$('plate-game-open').setAttribute('aria-expanded',String(expanded));if(expanded){scope='all';offset=0;refresh();$('plate-game-content').scrollIntoView({block:'nearest',behavior:'smooth'});}});
+  $('plate-new').addEventListener('submit',post);const postStatus=newEl('div');postStatus.id='plate-post-status';postStatus.setAttribute('role','status');$('plate-submit').before(postStatus);$('plate-photo').addEventListener('change',()=>{const f=$('plate-photo').files?.[0];if(f)setStatus(`Photo selected (${(f.size/1048576).toFixed(1)} MB). Add the guess and tap Post challenge.`);});
   $('plate-refresh').addEventListener('click',()=>refresh());
-  $('plate-gallery-prev').addEventListener('click',()=>{historyPageIndex=Math.max(0,historyPageIndex-1);renderGallery();});
-  $('plate-gallery-next').addEventListener('click',()=>{historyPageIndex++;renderGallery();});
+  $('plate-gallery-prev').addEventListener('click',()=>loadPage(-1));
+  $('plate-gallery-next').addEventListener('click',()=>loadPage(1));
 
  }
  function scores(){
@@ -62,10 +64,24 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  function ptext(value,cls=''){return newEl('p',cls,value);}
  function labelText(text){return newEl('strong','',text);}
  async function picture(img,path){
-  if(!client)return;
-  let src=urls.get(path);
-  if(!src){const {data,error}=await client.storage.from('community-plate-game').download(path);if(error)throw error;src=URL.createObjectURL(data);urls.set(path,src);}
-  if(img.isConnected)img.src=src;
+  if(!client||!mounted||board.hidden)return;
+  const generation=sessionGeneration;
+  let pending=urls.get(path);
+  if(!pending){
+   pending=client.storage.from('community-plate-game').download(path, {}, {cache:'no-store'}).then(({data,error})=>{
+    if(error)throw error;
+    if(!mounted||board.hidden||sessionGeneration!==generation)return '';
+    if(urls.size>80){
+     const [old,previous]=urls.entries().next().value;
+     urls.delete(old);void previous.then(url=>URL.revokeObjectURL(url)).catch(()=>{});
+    }
+    return URL.createObjectURL(data);
+   });
+   urls.set(path,pending);
+   void pending.catch(()=>{if(urls.get(path)===pending)urls.delete(path);});
+  }
+  const src=await pending;
+  if(src&&img.isConnected&&mounted&&sessionGeneration===generation)img.src=src;
  }
  function reviewPhoto(img,caption){
   if(!img.src||!img.complete||!img.naturalWidth){setStatus('Photo is still loading. Please retry shortly.');return;}
@@ -81,10 +97,12 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  }
  function display(){
   scores();const list=$('plate-list');list.replaceChildren();
+  list.dataset.plateTotal=String(game?.total||0);
+  list.dataset.plateOffset=String(game?.offset||0);
   // Keep the full photo history in its own screen. The review area remains
   // one card at a time and all old image data stays on the server.
   renderGallery();
-  const entries=game?.entries||[];
+  const entries=scope==='gallery'?[]:game?.entries||[];
   if(!entries.length){list.append(ptext('No photos yet. First plate gets the first debate!','plate-empty'));return;}
   for(const entry of entries){
    const own=entry.seat===seat;
@@ -102,15 +120,19 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    const loading=ptext('Loading saved photo…','plate-photo-loading');preview.append(loading);
    const retry=button('Retry photo',()=>{void loadPhoto();},'secondary');
    retry.classList.add('plate-photo-retry');retry.hidden=true;preview.append(retry);
+   let loadingPhoto=false;
    const loadPhoto=async()=>{
+    if(loadingPhoto||img.getAttribute('src'))return;
+    loadingPhoto=true;
     loading.hidden=false;loading.textContent='Loading saved photo…';retry.hidden=true;inspectHint.hidden=true;
     try{
      // Photo must be attached before storage returns; the old code skipped detached images.
      await picture(img,entry.photo_path);
      if(img.complete&&img.naturalWidth){loading.hidden=true;inspectHint.hidden=false;return;}
      img.addEventListener('load',()=>{loading.hidden=true;retry.hidden=true;inspectHint.hidden=false;},{once:true});
-     img.addEventListener('error',()=>{loading.textContent='Photo could not be displayed.';retry.hidden=false;},{once:true});
+     img.addEventListener('error',()=>{img.removeAttribute('src');loading.textContent='Photo could not be displayed.';retry.hidden=false;},{once:true});
     }catch(error){loading.textContent='Could not download the saved photo. Retry below.';retry.hidden=false;}
+    finally{loadingPhoto=false;}
    };
    open.addEventListener('click',()=>reviewPhoto(img,entry.plate+' · '+nameFor(entry.seat)));
    card.append(preview);
@@ -145,8 +167,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    }
    list.append(card);
    card.addEventListener('arcade:reveal',()=>void loadPhoto());
-   if(entries.indexOf(entry)<4)void loadPhoto();
-   else if(photoObserver)photoObserver.observe(card);
+   if(photoObserver)photoObserver.observe(card);
    else void loadPhoto();
   }
  }
@@ -157,14 +178,17 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  },{rootMargin:'240px'}):null;
  function renderGallery(){
   const gallery=$('plate-gallery-grid');if(!gallery)return;
-  const entries=game?.entries||[];const max=Math.max(1,Math.ceil(entries.length/6));
-  historyPageIndex=Math.max(0,Math.min(max-1,historyPageIndex));
-  $('plate-gallery-count').textContent=entries.length+' saved · Select a photo to open its debate';
-  $('plate-gallery-position').textContent=(historyPageIndex+1)+' / '+max;
-  $('plate-gallery-prev').disabled=historyPageIndex===0;
-  $('plate-gallery-next').disabled=historyPageIndex>=max-1;
+  const entries=scope==='gallery'?game?.entries||[]:[];
+  if(scope!=='gallery'){gallery.replaceChildren();return;}
+  const total=Number(game?.total||0);
+  const index=Math.floor(offset/6);
+  const max=Math.max(1,Math.ceil(total/6));
+  $('plate-gallery-count').textContent=total?total+' saved · Select a photo to open its debate':'No saved plate photos yet.';
+  $('plate-gallery-position').textContent=(index+1)+' / '+max;
+  $('plate-gallery-prev').disabled=index===0;
+  $('plate-gallery-next').disabled=index>=max-1;
   gallery.replaceChildren();
-  for(const e of entries.slice(historyPageIndex*6,historyPageIndex*6+6)){
+  for(const e of entries){
    const b=newEl('button','plate-gallery-tile');b.type='button';
    b.dataset.plateId=String(e.id);
    b.setAttribute('aria-label','Open plate '+e.plate+' by '+nameFor(e.seat));
@@ -175,27 +199,65 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    // Reuses the existing private signed-in storage download and cached blob.
    void picture(img,e.photo_path).catch(()=>{img.alt='Photo unavailable; open debate to retry';});
    b.addEventListener('click',()=>{
+    scope='all';offset=0;
+    void refresh(false,e.id);
     document.dispatchEvent(new CustomEvent('arcade:plate-select',{detail:{id:String(e.id)}}));
    });
   }
  }
 
- async function requestPlateState(){
-  // Higher photo-history limit; older server versions can still cap at 20.
-  const primary=await client.rpc('community_plate_state',{p_limit:100});
-  if(!primary.error)return primary;
-  return client.rpc('community_plate_state',{p_limit:20});
+ function requestPlateState(anchor){
+  return client.rpc('community_plate_browse',{p_scope:scope,p_offset:offset,p_limit:pageSize(),p_anchor:anchor||null});
  }
- async function refresh(quiet=false){
-  if(!client||!mounted)return;
-  try{const {data,error}=await requestPlateState();if(error)throw error;game=data;display();if(!quiet)setStatus('Scores and photos updated.');}
-  catch(err){if(!quiet)setStatus('Could not refresh: '+(err.message||'Please retry.'));}
+ function loadPage(delta){
+  offset=Math.max(0,offset+delta*pageSize());
+  void refresh(true);
  }
+ async function refresh(quiet=false,anchor=null){
+  if(!client||!mounted||board.hidden)return;
+  const ticket=++requested;
+  const list=$('plate-list');
+  if(!quiet||!game||offset!==game.offset)list.dataset.loading='true';
+  delete list.dataset.error;
+  try{
+   const {data,error}=await requestPlateState(anchor);
+   if(ticket!==requested||!mounted||board.hidden)return;
+   if(error)throw error;
+   game=data;offset=Number(data.offset||0);display();
+   if(!quiet&&!working)setStatus('Scores and photos updated.');
+  }catch(err){
+   if(ticket!==requested||!mounted)return;
+   list.dataset.error='The challenges could not refresh. Use Refresh scores and photos to retry.';
+   if(scope==='gallery')$('plate-gallery-count').textContent=list.dataset.error;
+   if(!quiet)setStatus('Could not refresh: '+(err.message||'Please retry.'));
+  }finally{if(ticket===requested)list.dataset.loading='false';}
+ }
+ document.addEventListener('arcade:plate-scope',e=>{
+  if(!mounted||board.hidden)return;
+  scope=e.detail;offset=0;
+  void refresh();
+ });
+ document.addEventListener('arcade:plate-page',e=>{if(mounted)loadPage(e.detail);});
+ document.addEventListener('family-plate-scores-changed',()=>{
+  if(!mounted||!expanded||working||$('plate-list')?.dataset.loading==='true')return;
+  const list=$('plate-list');
+  if(list?.querySelector('form:focus-within'))return;
+  void refresh(true, list?.querySelector('.arcade-current-card')?.dataset.plateId);
+ });
  async function action(fn){
-  if(working)return;working=true;setStatus('Saving…');
-  try{const {data,error}=await fn();if(error)throw error;game=data;display();await refresh(true);setStatus('Saved! Both players can now see the update.');}
-  catch(err){setStatus('Not saved: '+(err.message||'Please retry.'));}
-  finally{working=false;}
+  if(working||!mounted||board.hidden)return;
+  const generation=sessionGeneration;
+  working=true;setStatus('Saving…');
+  const buttons=[...($('plate-list')?.querySelectorAll('.plate-actions button,button[type=submit]')||[])];
+  buttons.forEach(button=>button.disabled=true);
+  try{
+   const {error}=await fn();
+   if(error)throw error;
+   if(!mounted||sessionGeneration!==generation)return;
+   await refresh(true);
+   if(mounted&&sessionGeneration===generation)setStatus('Saved.');
+  }catch(err){if(mounted&&sessionGeneration===generation)setStatus('Could not save: '+(err.message||'Please retry.'));}
+  finally{if(sessionGeneration===generation){working=false;buttons.forEach(button=>button.disabled=false);}}
  }
  async function vote(id,up,reason){await action(()=>client.rpc('community_plate_vote',{p_id:id,p_up:up,p_reason:reason}));}
  async function revise(id,guess,response){await action(()=>client.rpc('community_plate_revise',{p_id:id,p_guess:guess,p_response:response}));}
@@ -229,32 +291,64 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  async function post(ev){
   ev.preventDefault();if(!client||working)return;
   const file=$('plate-photo').files?.[0];if(!file){setStatus('Choose a photo first.');return;}
-  working=true;let path=null;$('plate-submit').disabled=true;setStatus('Resizing and uploading the photo…');
+  working=true;let path=null;const generation=sessionGeneration;const author=userId;
+  $('plate-submit').disabled=true;setStatus('Resizing and uploading the photo…');
   try{
-   const blob=await compress(file);path=`${userId}/${crypto.randomUUID()}.jpg`;setStatus(`Uploading resized JPEG (${Math.round(blob.size/1024)} KB)…`);
+   const blob=await compress(file);
+   if(!mounted||sessionGeneration!==generation||board.hidden)return;
+   path=`${author}/${crypto.randomUUID()}.jpg`;setStatus(`Uploading resized JPEG (${Math.round(blob.size/1024)} KB)…`);
    const up=await client.storage.from('community-plate-game').upload(path,blob,{contentType:'image/jpeg',upsert:false});
    if(up.error)throw up.error;
-   const {data,error}=await client.rpc('community_plate_post',{p_plate:$('plate-characters').value,p_region:$('plate-region').value,p_guess:$('plate-guess').value,p_photo_path:path});
+   if(!mounted||sessionGeneration!==generation||board.hidden)return;
+   const {error}=await client.rpc('community_plate_post',{p_plate:$('plate-characters').value,p_region:$('plate-region').value,p_guess:$('plate-guess').value,p_photo_path:path});
    if(error)throw error;
-   $('plate-new').reset();game=data;historyPageIndex=0;display();await refresh(true);setStatus('Challenge posted! '+nameFor(seat==='ana'?'cowboy':'ana')+' can vote.');path=null;
-  }catch(err){setStatus('Could not post: '+(err.message||'Please retry.'));if(path)try{await client.storage.from('community-plate-game').remove([path]);}catch{}}
-  finally{working=false;$('plate-submit').disabled=false;}
+   path=null;
+   if(mounted&&sessionGeneration===generation){
+    $('plate-new').reset();
+    await refresh(true);
+    if(mounted&&sessionGeneration===generation)setStatus('Challenge posted. '+nameFor(seat==='ana'?'cowboy':'ana')+' can vote.');
+   }
+  }catch(err){
+   if(mounted&&sessionGeneration===generation)setStatus('Could not post: '+(err.message||'Please retry.'));
+   if(path&&sessionGeneration===generation)try{await client.storage.from('community-plate-game').remove([path]);}catch{}
+  }finally{if(sessionGeneration===generation){working=false;if($('plate-submit'))$('plate-submit').disabled=false;}}
  }
  async function mount(){
-  if(mounted||board.hidden||!client)return;
-  const {data:{session}}=await client.auth.getSession();const id=session?.user?.id;if(!id)return;
-  const {data,error}=await requestPlateState();if(error){return;}
-  userId=id;seat=data.seat;game=data;mounted=true;frame();if(!$('plate-game-root'))return;display();
-  if(timer)clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&mounted)refresh(true);},25000);
+  if(mounted||mounting||board.hidden||!client)return;
+  mounting=true;
+  const generation=sessionGeneration;
+  try{
+   const {data:{session}}=await client.auth.getSession();
+   const id=session?.user?.id;
+   if(!id||board.hidden||sessionGeneration!==generation)return;
+   const {data,error}=await requestPlateState();
+   if(error||board.hidden||sessionGeneration!==generation)return;
+   userId=id;seat=data.seat;game=data;mounted=true;frame();
+   if(!$('plate-game-root'))return;
+   display();
+   if(timer)clearInterval(timer);
+   timer=setInterval(()=>{
+    if(document.hidden||!mounted||!expanded||working||board.hidden)return;
+    const view=document.body.dataset.arcadeScene;
+    if(view==='vote'||$('plate-list')?.dataset.loading==='true')return;
+    void refresh(true);
+   },45000);
+  }finally{mounting=false;}
  }
- function unmount(){$('plate-photo-viewer')?.close();mounted=false;seat=null;userId=null;game=null;expanded=false;if(timer){clearInterval(timer);timer=null;}clean();$('plate-game-root')?.remove();}
+ function unmount(){
+  ++sessionGeneration;++requested;
+  $('plate-photo-viewer')?.close();
+  mounted=false;seat=null;userId=null;game=null;expanded=false;working=false;scope='all';offset=0;
+  if(timer){clearInterval(timer);timer=null;}
+  clean();$('plate-game-root')?.remove();
+ }
  try{
   const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
   const local=window.localStorage,session=window.sessionStorage;
   const store=createAuthStorage({local,session,remember:()=>local.getItem('cowboy-community-remember')==='yes'});
   const storageKey='sb-'+new URL(config.supabaseUrl).hostname.split('.')[0]+'-auth-token';
   client=createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey,flowType:'pkce',persistSession:true,autoRefreshToken:false,detectSessionInUrl:false,storage:store}});
-  let wait=null;const schedule=()=>{clearTimeout(wait);wait=setTimeout(()=>{if(board.hidden){if(mounted)unmount();}else mount().catch(()=>{});},180);};
+  let wait=null;const schedule=()=>{clearTimeout(wait);wait=setTimeout(()=>{if(board.hidden){if(mounted||mounting)unmount();}else mount().catch(()=>{});},180);};
   new MutationObserver(schedule).observe(board,{attributes:true,attributeFilter:['hidden']});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});
   client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT')unmount();schedule();});

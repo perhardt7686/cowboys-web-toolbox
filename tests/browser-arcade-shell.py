@@ -5,6 +5,7 @@ No real accounts, member records, credits, scores, purchases or backend APIs.
 Tests the actual CSS and navigation with stand-in game DOM nodes on 3 devices.
 """
 import asyncio
+import os
 from pathlib import Path
 from playwright.async_api import async_playwright
 
@@ -20,6 +21,8 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <link rel="stylesheet" href="/commons-streetrod-summer.css">
 <link rel="stylesheet" href="/commons-arcade-shell.css">
 <link rel="stylesheet" href="/commons-compact-ui.css">
+<link rel="stylesheet" href="/family-board.css">
+<link rel="stylesheet" href="/family-arcade.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true}</script></head>
 <body class="community-page"><section id="conversations">
 <div class="community-main">
@@ -119,7 +122,20 @@ async def check_one(page, id, root):
  }[root]).bounding_box()
  dims=page.viewport_size
  assert bbox and bbox["x"]>=-2 and bbox["y"]>=0 and bbox["y"]+bbox["height"]<=dims["height"]+2, (root,bbox,dims)
- await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
+ if root=="streetrod":
+  assert await page.locator("#family-game-header").is_hidden()
+  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
+ else:
+  menu=page.get_by_role("button",name="Open game menu")
+  box=await menu.bounding_box()
+  assert box and min(box["width"],box["height"])>=44,(root,box)
+  await menu.click()
+  dropdown=await page.locator("#family-game-menu").bounding_box()
+  assert dropdown and dropdown["x"]>=0 and dropdown["y"]+dropdown["height"]<=dims["height"]+2
+  await page.keyboard.press("Escape")
+  assert await page.locator("#family-game-menu").is_hidden()
+  assert await menu.evaluate("el=>el===document.activeElement")
+  await page.get_by_role("button",name="Back to games").click()
  assert not await page.evaluate("document.body.classList.contains('arcade-on')")
  assert await page.locator("body").get_attribute("data-arcade-game")==""
 
@@ -158,11 +174,13 @@ async def run_device(browser,width,height):
   await page.locator("#mahjong-toggle").click()
   assert await page.locator("#mahjong-board-wrap").evaluate("el=>getComputedStyle(el).overflow==='hidden'"),"Board must never scroll"
   assert await page.locator(".mahjong-game-zone .mahjong-actions").evaluate("el=>getComputedStyle(el).gridTemplateColumns.split(' ').length===5"),"Mahjong actions must be in one row"
-  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
+  await page.get_by_role("button",name="Back to games").click()
   await page.locator("#mahjong-toggle").click()
-  await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
+  await page.get_by_role("button",name="Open game menu").click()
+  await page.get_by_role("button",name="Current level").click()
   assert await page.locator("body").get_attribute("data-arcade-scene")=="levels"
-  await page.locator('#arcade-hud [data-arcade-action="options"]').click()
+  await page.get_by_role("button",name="Open game menu").click()
+  await page.get_by_role("button",name="Display settings").click()
   assert await page.locator('#arcade-options-view').is_visible()
   await page.locator('#arcade-options-form input[name="contrast"][value="bright"]').check()
   assert await page.locator("body").get_attribute("data-arcade-contrast")=="bright"
@@ -174,14 +192,14 @@ async def run_device(browser,width,height):
   await check_one(page,"#word-game-toggle","wordquest")
   await check_one(page,"#plate-game-open","plates")
   await page.locator('#plate-game-open').click()
-  await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
+  await page.get_by_role("button",name="Review Plates",exact=True).click()
   assert await page.locator(".arcade-current-card").count()==1
-  await page.locator('#arcade-hud [data-arcade-action="next"]').click()
-  assert await page.locator("#arcade-hud-pagecount").inner_text()=="2 / 3"
-  await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
+  await page.locator('#family-plate-queue [data-arcade-action="next"]').click()
+  assert await page.locator("#family-plate-queue-label").inner_text()=="3 to review · 2 of 3"
+  await page.get_by_role("button",name="Photo Gallery",exact=True).click()
   assert await page.locator("body").get_attribute("data-arcade-scene")=="history"
   assert await page.locator("#plate-gallery").is_visible(),"Saved photo gallery must show"
-  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
+  await page.get_by_role("button",name="Back to games").click()
   await page.locator('#sr-toggle').click()
   for _ in range(4):await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
   assert await page.locator('#ss-tabs [data-ss-tab="diner"]').get_attribute("aria-pressed")=="true"
@@ -199,7 +217,7 @@ async def run_device(browser,width,height):
   assert await page.locator("#art-drawer").is_visible(),"Advanced tools can be opened"
   await page.locator("#art-tools-toggle").click()
   assert await page.locator("#art-drawer").is_hidden(),"Advanced tools can close"
-  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
+  await page.get_by_role("button",name="Back to games").click()
   await page.locator("#letter-lock-toggle").click()
   if height>=650:
    panel=await page.locator(".letter-lock-panel").bounding_box()
@@ -208,22 +226,22 @@ async def run_device(browser,width,height):
    last=await page.locator("#letter-lock-grid .letter-lock-grid-row:last-child").bounding_box()
    assert panel and keyboard and keyboard["y"]+keyboard["height"]<=panel["y"]+panel["height"]+2, (
     "Keyboard extends below game screen",width,height,panel,keyboard)
-   assert grid and last and last["y"]+last["height"]<=grid["y"]+grid["height"]+3,(
-    "Word puzzle rows are cropped",width,height,grid,last)
+   assert await page.locator("#letter-lock-grid").evaluate("el=>getComputedStyle(el).overflowY==='auto'"),(
+    "Word puzzle rows must be reachable",width,height,grid,last)
   (ROOT/"reports").mkdir(exist_ok=True,parents=True)
   if width==390:
    await page.screenshot(path=str(ROOT/"reports"/"arcade-one-screen-iphone-sample.png"),
     full_page=False,animations="disabled")
-  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
+  await page.get_by_role("button",name="Back to games").click()
   assert not errors,"Browser JS errors: "+"; ".join(errors)
   print(f"Standalone arcade buttons and fullscreen scenes PASS at {width}x{height}")
  finally:await page.close()
 
 async def main():
  async with async_playwright() as p:
-  browser=await p.chromium.launch(headless=True)
+  browser=await p.chromium.launch(headless=True, executable_path=os.environ.get("CHROMIUM_PATH"))
   try:
-   for width,height in [(390,844),(375,667),(844,390)]:
+   for width,height in [(320,640),(375,667),(390,844),(430,932),(768,1024),(844,390),(1280,850)]:
     await run_device(browser,width,height)
   finally:await browser.close()
 

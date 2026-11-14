@@ -4,9 +4,8 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
   const safeImage=s=>typeof s==='string'&&/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(s)&&s.length<60000;
-  const cast=[['coco','Coco'],['ana','Ana'],['tyler','Tyler · Wizard'],['elliot','Elliot'],['emma','Emma'],['erica','Erica'],['eloy','Eloy'],['evi','Evi']];
-  let client=null,fetching=false,loaded=false,lastChecked=0,currentUserId=null,timer=0;
-  const pictures=new Map(),identities=new Map();
+  let client=null,fetching=false,loaded=false,lastChecked=0,currentUserId=null,timer=0,generation=0;
+  const pictures=new Map();
   const byUser=new Map();
   function replaceAvatar(span,src){
     if(!span||!safeImage(src))return;
@@ -20,9 +19,9 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
   function update(){
     const board=document.getElementById('conversations');
     if(!board||board.hidden||!loaded)return;
-    for(const button of document.querySelectorAll('[data-member-profile]')){
-      const src=byUser.get(button.getAttribute('data-member-profile'));
-      replaceAvatar(button.querySelector('.profile-avatar'),src);
+    for(const button of document.querySelectorAll('[data-member-profile], [data-family-avatar]')){
+      const id=button.getAttribute('data-member-profile')||button.dataset.familyAvatar;
+      replaceAvatar(button.matches('[data-family-avatar]')?button:button.querySelector('.profile-avatar'),byUser.get(id));
     }
     replaceAvatar(document.querySelector('#account-actions .profile-avatar'),byUser.get(currentUserId));
     replaceAvatar(document.querySelector('#profile-live-preview .profile-avatar'),byUser.get(currentUserId));
@@ -32,7 +31,7 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
     document.getElementById('coco-cast-strip')?.remove(); // deprecated family portrait block
   }
   function clear(){
-    loaded=false;currentUserId=null;pictures.clear();identities.clear();byUser.clear();
+    ++generation;loaded=false;lastChecked=0;currentUserId=null;pictures.clear();byUser.clear();
     document.getElementById('coco-cast-strip')?.remove();
     document.body.style.removeProperty('--coco-van-image');
   }
@@ -43,11 +42,12 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
     if(loaded){update();return;}
     if(Date.now()-lastChecked<3000)return;
     fetching=true;lastChecked=Date.now();
+    const access=generation;
     try{
       const {data:{session}}=await client.auth.getSession();
       if(!session?.user?.id)return;
       const {data,error}=await client.from('community_board_avatar_assets').select('asset_key,user_id,data_uri');
-      if(error||!Array.isArray(data))return;
+      if(error||!Array.isArray(data)||board.hidden||generation!==access)return;
       currentUserId=session.user.id;
       for(const item of data){if(!safeImage(item.data_uri))continue;
         pictures.set(item.asset_key,item.data_uri);
@@ -64,6 +64,7 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
     const store=createAuthStorage({local,session,remember:()=>local.getItem('cowboy-community-remember')==='yes'});
     const storageKey='sb-'+new URL(cfg.supabaseUrl).hostname.split('.')[0]+'-auth-token';
     client=createClient(cfg.supabaseUrl,cfg.publishableKey,{auth:{storageKey,flowType:'pkce',persistSession:true,autoRefreshToken:false,detectSessionInUrl:false,storage:store}});
+    client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||(currentUserId&&session?.user?.id!==currentUserId))clear();schedule();});
     new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')schedule();});
     schedule();

@@ -23,6 +23,10 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   }
   function renderWord(data){
     live=data;
+    const stage=byId('commons-word');
+    if(stage)stage.dataset.difficulty=typeof data.difficulty==='string'?data.difficulty[0].toUpperCase()+data.difficulty.slice(1):'';
+    const remaining=Number(data.remaining ?? Math.max(0, Number(data.max_attempts||12)-Number(data.attempts||0)));
+    byId('commons-word-progress')?.setAttribute('data-remaining', String(remaining));
     const summary=byId('word-game-summary');
     if(summary){
       const count=`${Number(data.attempts||0)} / ${Number(data.max_attempts||12)} team guesses`;

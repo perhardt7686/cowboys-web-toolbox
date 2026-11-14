@@ -57,7 +57,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     <div class="commons-score-tile is-live"><span class="commons-score-label">CURRENT RUN</span><strong id="mahjong-ribbon-current">…</strong><small id="mahjong-ribbon-current-note">No game in progress</small></div>
    </section>
    <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match two open tiles with identical corner marks. Clear the layered mystery garden to earn points and collect achievements.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
-   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p></section>
+   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p><details id="mahjong-level-browser"><summary id="mahjong-browse-level">Browse campaign levels</summary><form id="mahjong-level-form"><label>Level <input name="level" type="number" required min="1" max="1000" value="1"></label><button type="submit">See level rules</button></form><p id="mahjong-lookup-result" role="status">Campaign stages unlock in order.</p></details></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
    <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span><strong id="mahjong-remaining" class="mahjong-remaining" aria-live="polite"></strong></div><div class="mahjong-view-tools" role="group" aria-label="Mahjong board view controls"><button type="button" id="mahjong-fit-button" aria-label="Fit entire board on screen">Fit board</button><button type="button" id="mahjong-zoom-out" aria-label="Zoom out">−</button><strong id="mahjong-zoom-label" aria-live="polite">100%</strong><button type="button" id="mahjong-zoom-in" aria-label="Zoom in">+</button></div><p class="mahjong-pan-help" id="mahjong-view-hint">Every tile visible. Zoom in for a closer look.</p><div id="mahjong-board-wrap" class="mahjong-board-wrap"><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div><div id="mahjong-pause-screen" class="mahjong-pause-screen" hidden><div class="mahjong-pause-card"><span class="mahjong-pause-symbol" aria-hidden="true">⏸</span><strong>Game paused</strong><p>Your tiles, matches, and score are saved to your Commons account.</p><button type="button" id="mahjong-overlay-resume">▶ Resume game</button></div></div></div>
    <div class="mahjong-actions"><button type="button" id="mahjong-new">New game</button><button type="button" id="mahjong-pause">⏸ Pause</button><button type="button" id="mahjong-hint">💡 Hint</button><button type="button" id="mahjong-shuffle">⤨ Shuffle</button><button type="button" id="mahjong-undo">↶ Undo</button></div><p class="mahjong-status" id="mahjong-status" role="status" aria-live="polite">Tap New game to begin.</p></div>
@@ -67,6 +67,25 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   </div>`;
   main.prepend(root);locate();
   $('mahjong-toggle').addEventListener('click',()=>{expanded=!expanded;$('mahjong-inside').hidden=!expanded;$('mahjong-toggle').setAttribute('aria-expanded',String(expanded));if(expanded){display();$('mahjong-inside').scrollIntoView({behavior:'smooth',block:'nearest'});}});
+  const browse=$('mahjong-level-form');
+  browse.addEventListener('submit',async event=>{
+   event.preventDefault();
+   const level=Number(new FormData(browse).get('level'));
+   const output=$('mahjong-lookup-result');
+   const submit=browse.querySelector('button');
+   submit.disabled=true;
+   try{
+    const {data,error}=await client.rpc('community_mahjong_level_rules',{p_level:level});
+    if(error)throw error;
+    if(!output.isConnected)return;
+    const current=Number(state?.campaign?.level||state?.profile?.campaign?.level||1);
+    const lock=data.level===current?'Current stage':data.level>current?'Locked until earlier stages are cleared':'Previously unlocked stage';
+    const time=data.max_seconds?' · '+Math.floor(data.max_seconds/60)+':'+String(data.max_seconds%60).padStart(2,'0')+' time limit':'';
+    const help=data.level>=51&&data.level<=100?'No hints or shuffles; one undo allowed':data.max_assists>=99?'Assistance allowed':data.max_assists+' assists';
+    output.textContent='Level '+data.level+' · '+data.name+' · '+lock+' · '+help+time+' · ×'+data.multiplier+' points';
+   }catch{output.textContent='Could not load these rules. Try again.';}
+   finally{submit.disabled=false;}
+  });
   $('mahjong-new').addEventListener('click',async()=>{
    if(state?.run?.pairs>0&&!confirm('Start a fresh game? Your current board will be retired, but earned achievements and high scores stay saved.'))return;
    await run('community_mahjong_start',{p_restart:Boolean(state?.run)},'A new mystery garden is ready.');
