@@ -2,7 +2,7 @@ begin;
 -- Applied through Supabase migration 20261114184207.
 -- The limit is per player, not a shared team cap. Preserve all recorded words,
 -- green/gold/absent feedback, scores and Eastern-day histories.
-alter table public.community_wordle_guesses drop constraint community_wordle_guesses_attempt_check;
+alter table public.community_wordle_guesses drop constraint if exists community_wordle_guesses_attempt_check;
 alter table public.community_wordle_guesses add constraint community_wordle_guesses_attempt_check check (attempt between 1 and 32767);
 
 CREATE OR REPLACE FUNCTION public.community_mahjong_shuffle()
