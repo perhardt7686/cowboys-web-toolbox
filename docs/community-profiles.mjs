@@ -179,7 +179,6 @@ export function createProfileStudio(ctx){
           : id+(prior?.avatar_path?.endsWith('/avatar.png')?'/avatar.webp':'/avatar.png');
       }else if(avatarMethod==='photo'&&photoChanged){
         const canvas=document.getElementById('profile-crop');
-        blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.85));
         // Keep the current custom character asset separate from uploaded
         // portraits. Both private storage slots are already allowed by RLS.
         const current=ctx.state.profile;
@@ -187,6 +186,7 @@ export function createProfileStudio(ctx){
           ? id+(current.avatar_path?.endsWith('/avatar.png')?'/avatar.webp':'/avatar.png')
           : current?.avatar_mode==='photo'&&current.avatar_path
             ? current.avatar_path : id+'/avatar.webp';
+        blob=await new Promise(resolve=>canvas.toBlob(resolve,path.endsWith('.png')?'image/png':'image/webp',.85));
       }else if(avatarMethod==='initials'){
         draft.avatar_mode='initials';path=null;
       }else if(avatarMethod==='photo'&&ctx.state.profile?.details?.avatar_recipe){
