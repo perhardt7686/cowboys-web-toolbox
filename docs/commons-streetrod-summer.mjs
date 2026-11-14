@@ -18,7 +18,7 @@ const STEPS={
 const RV={rookie:{name:'Juniper Jack',car:'Rattler 48',require:0,symbol:'J'},
  cruiser:{name:'Neon Nora',car:'Comet 55',require:1,symbol:'N'},
  hotshot:{name:'Redline Ray',car:'Meteor Special',require:3,symbol:'R'},
- cipher:{name:'Cipher Van X',car:'The Mystery Prototype',require:6,symbol:'X'}};
+ cipher:{name:'The Mystery Machine',car:'Turquoise flower-power mystery van',require:6,symbol:'M'}};
 const yearDay=n=>new Date(Date.UTC(1963,5,24+(Number(n)||1)-1)).toLocaleDateString('en-US',{timeZone:'UTC',month:'short',day:'numeric',year:'numeric'});
 let hub=null,root=null,button=null,visible=false,screen='garage',season=null,loading=false,busy=false,client=null,connection=null,live=null,lastResult=null;
 let buttonsDown=new Set(),frameId=0,sampleTicker=0,keyboardAttached=false;
@@ -28,7 +28,7 @@ const catalogCar=key=>season?.catalog?.find(c=>c.key===key)||null;
 const allCar=key=>catalogCar(key)||{key,name:key==='rattler'?'Rattler 48':key,body:'coupe',accent:'#a45634',price:0};
 const banner=(title,desc)=>'<header class="ss-scene-head"><div><small>SUMMER 1963 · COWBOY MOTOR WORKS</small><h4>'+esc(title)+'</h4><p>'+esc(desc)+'</p></div></header>';
 const action=(command,label,attrs='')=>'<button type="button" data-ss-action="'+esc(command)+'" '+attrs+'>'+esc(label)+'</button>';
-function status(text,error=false){const box=root?.querySelector('#ss-status');if(box){box.textContent=String(text);box.classList.toggle('ss-error',error);}}
+function status(text,error=false){const box=root?.querySelector('#ss-status');if(box){box.textContent=String(text).replace(/Cipher Van X/gi,'The Mystery Machine');box.classList.toggle('ss-error',error);}}
 function makeRoot(){
  if(!document.getElementById('src-classic-hub'))return false;
  hub=document.getElementById('src-classic-hub');
@@ -226,7 +226,7 @@ function calendar(){
  '<div class="ss-calendar-info"><b>Season #'+s.season_no+'</b><p>Victories '+s.victories+' · Losses '+s.defeats+' · Reputation '+s.rep+'</p>'+
  '<p>Status: '+esc(s.status)+'</p><p>'+(
  s.status==='champion'?'You dethroned the Mystery Van and won the Summer Championship.':
- s.status==='time_up'?'School is back. This campaign has ended.':'Beat Cipher Van X before the 84-day deadline.')+'</p>'+
+ s.status==='time_up'?'School is back. This campaign has ended.':'Beat the Mystery Machine before the 84-day deadline.')+'</p>'+
  action('rest','Rest one day',s.status!=='active'?'disabled':'')+
  action('new_season','Begin a new summer campaign','class="ss-danger"')+'</div></div>'+
  '<h5 class="ss-heading">Garage journal</h5><ol class="ss-journal">'+
@@ -278,7 +278,7 @@ function render(){
  root.querySelector('#ss-tabs').innerHTML=nav();
  root.querySelector('#ss-scene').innerHTML=({garage,paper,parts,diner,drive,calendar})[screen]();
  const state=season.season;
- if(state.status==='champion'||state.status==='time_up')status(state.status==='champion'?'SUMMER CHAMPION · Cipher Van X defeated.':'Summer ended. Your campaign history is saved.');
+ if(state.status==='champion'||state.status==='time_up')status(state.status==='champion'?'SUMMER CHAMPION · The Mystery Machine defeated.':'Summer ended. Your campaign history is saved.');
  if(live&&screen==='drive')beginFrames();
 }
 function navigate(next){
