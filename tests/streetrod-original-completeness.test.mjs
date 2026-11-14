@@ -32,7 +32,7 @@ test('A unique 22-rival summer includes all original four IDs and one final Myst
  assert.match(summer,/availableRivals\(\)/);
  assert.match(summer,/rivalInfo\(rival\)/);
 });
-test('County police and engine breakdown results come only from validated server trace',()=>{
+test('County police and engine breakdown results come only from validated server trace',async()=>{
  assert.match(incidents,/r\.seed%5=0/);
  assert.match(incidents,/r\.seed%11=0/);
  assert.match(incidents,/jsonb_array_elements\(p_trace\)/);
