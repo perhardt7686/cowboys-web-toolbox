@@ -74,3 +74,11 @@ test('Public page serves new cache revisions and documented fidelity limits',()=
  assert.ok(html.includes(script),script+' is not versioned into published Commons');
  assert.match(tracker,/Historical fidelity still outstanding/);
 });
+
+test('Classic wagering offers road pink slips and drag practice only',()=>{
+ assert.match(summer,/option\.value==='title'/);
+ assert.match(summer,/option\.value==='practice'/);
+ assert.match(summer,/course\.value!=='road'/);
+ assert.match(summer,/course\.value!=='drag'/);
+ assert.match(summer,/syncWager\(\)/);
+});
