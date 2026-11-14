@@ -399,6 +399,7 @@ function beginFrames(){
   if(moving){
    if(r.launchMs===null&&gas>0)r.launchMs=Math.round(elapsed);
    automaticShift(m,elapsed);
+   if(m.shiftedAt.length>r.shifts.length)r.shifts=m.shiftedAt.slice();
    stepPowertrain(m,{gas,brake,steer},dt,elapsed);
    r.speed=m.speed;r.gear=m.gear;r.distance=m.distance;
    // The automatic has real in-game upshifts; the authoritative server still
