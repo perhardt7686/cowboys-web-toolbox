@@ -105,7 +105,14 @@ function choose(target){
   originalControl('refuel')?.click();showStatus('Tank refill is saved through the original game.');
   return;
  }
- if(target==='licence'||target==='crew'||target==='gas'||target==='underbody'){
+ if(target==='gas'){
+  sideRoom='gas';splash=false;redraw(true);
+  // Use the already authenticated, server-backed exact-amount fuel pump.
+  const nozzle=originalControl('refuel');
+  if(nozzle&&!nozzle.disabled)nozzle.click();
+  return;
+ }
+ if(target==='licence'||target==='crew'||target==='underbody'){
   sideRoom=target;splash=false;redraw(true);return;
  }
  if(target==='tune'){
