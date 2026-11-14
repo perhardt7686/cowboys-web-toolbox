@@ -14,6 +14,20 @@ export function validateDetails(value={}){
   for(const [key,choices] of [['frame',['plain','ring','stamp']],['layout',['classic','showcase','minimal']],['density',['comfortable','compact']],['text_size',['standard','large']]]){
     out[key]=value[key]??DETAIL_DEFAULTS[key];if(!choices.includes(out[key]))throw new Error('Choose a valid forum appearance.');
   }
+  // The character recipe belongs only in private profile preferences. It
+  // must be a small set of whitelisted options, never arbitrary markup or URLs.
+  if(value.avatar_recipe!==undefined&&value.avatar_recipe!==null){
+    const allowed={skin:['porcelain','sand','amber','copper','deep','espresso'],hair:['brown','black','blonde','auburn','silver','purple'],
+      style:['short','wavy','curly','long','spiky','bald'],eyes:['brown','blue','green','hazel'],
+      shirt:['violet','teal','rose','gold','navy','forest'],background:['lavender','sunset','ocean','mint','night'],
+      accessory:['none','glasses','freckles','headphones','crown']};
+    const recipe=value.avatar_recipe;
+    if(!recipe||typeof recipe!=='object'||Array.isArray(recipe)||
+      Object.keys(recipe).length!==Object.keys(allowed).length||
+      Object.entries(allowed).some(([key,options])=>typeof recipe[key]!=='string'||!options.includes(recipe[key])))
+      throw new Error('Choose a valid family character design.');
+    out.avatar_recipe=Object.fromEntries(Object.keys(allowed).map(key=>[key,recipe[key]]));
+  }
   return out;
 }
 export function publicDetails(value={}){
