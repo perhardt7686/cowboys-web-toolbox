@@ -54,7 +54,7 @@ test('Pixel-car art varies by six original body families and by model key',()=>{
 });
 
 test('Commons links the fresh EGA assets without removing the saved seasonal garage',()=>{
- for(const asset of ['commons-streetrod-ega.css?v=dos5','commons-streetrod-ega.mjs?v=dos6',
+ for(const asset of ['commons-streetrod-ega.css?v=dos5','commons-streetrod-ega.mjs?v=dos7',
   'commons-streetrod-season-bay.mjs','commons-streetrod-summer.mjs',
   'commons-streetrod-multiplayer.mjs','commons-family-calendar.mjs']){
   assert.ok(html.includes(asset),'missing release asset: '+asset);
