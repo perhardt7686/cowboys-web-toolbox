@@ -1,3 +1,4 @@
+import {cue,soundEnabled,toggleSound} from './streetrod-pc-speaker.mjs?v=audio1';
 /*
  * COWBOY'S STREET R0D: REBORN (1989 gameplay architecture)
  * New presentation/controller built around the documented 1989 state machine,
@@ -53,6 +54,7 @@ const portrait=()=>{
 let panel=null,sourceObserver=null,rootObserver=null,bodyObserver=null;
 let splash=true,sideRoom='',page={paper:0,parts:0,diner:0,crew:0,inventory:0,hall:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null;
 let tick=0,renderQueued=false,stageKey='',liveBridge=false;
+let lastRoadWarning='';
 const stage=()=>$('sr-reborn');
 const currentRoom=()=>sideRoom||roomNow();
 function metrics(){
@@ -353,7 +355,14 @@ function paint(){
   const el=stage()?.querySelector('.sr-v3-telemetry');
   if(el)el.textContent=Math.round(options.speed)+' MPH · '+Math.round(options.rpm)+' RPM · GEAR '+options.gear;
   const warn=source()?.querySelector('#ss-warning')?.textContent;
-  if(warn)showStatus(warn);
+  if(warn){
+   showStatus(warn);
+   if(warn!==lastRoadWarning){
+    if(warn.includes('PATROL'))cue('warning');
+    else if(warn.includes('MISFIRE'))cue('engine');
+    lastRoadWarning=warn;
+   }
+  }
  }
 }
 function build(){
@@ -361,6 +370,7 @@ function build(){
  const el=document.createElement('section');el.id='sr-reborn';el.className='sr-v3';
  el.setAttribute('aria-label','Classic Street r0d single-screen game');
  el.innerHTML='<header class="sr-v3-head"><strong>STREET R0D · '+safe(label(currentRoom()))+'</strong>'+
+  '<button type="button" class="sr-v3-sound" data-v3-action="sound" aria-label="Toggle original PC-speaker style effects">'+(soundEnabled()?'SOUND ON':'SOUND OFF')+'</button>'+
   '<span class="sr-v3-bank">'+safe(metrics().wallet||'SUMMER 1963')+'</span></header>'+
   '<div class="sr-v3-art"><canvas class="sr-v3-canvas" width="320" height="200" aria-label="'+safe(label(currentRoom()))+' retro game view"></canvas>'+
   '<div class="sr-v3-hotspots"></div></div>'+
@@ -371,9 +381,25 @@ function build(){
   const target=event.target.closest('[data-v3-action]');
   if(target){event.preventDefault();event.stopPropagation();
    const next=target.dataset.v3Action;
+   if(next==='sound'){
+    const on=toggleSound();target.textContent=on?'SOUND ON':'SOUND OFF';
+    target.setAttribute('aria-pressed',String(on));
+    return;
+   }
+   cue(next==='hood'?'wrench':next==='diner'?'race':next==='continue'?'start':'menu');
    if(next==='continue'){splash=false;choose(gameCar().name==='NO CAR'?'paper':'garage');return;}
    choose(next);
   }
+ },true);
+ el.addEventListener('click',event=>{
+  const b=event.target.closest('[data-ss-action]');
+  if(!b)return;
+  const name=b.dataset.ssAction||'';
+  cue(['shift','downshift'].includes(name)?'gear':
+   name==='choose_rival'?'race':
+   ['buy_car','buy_part'].includes(name)?'buy':
+   ['service_begin','service_advance','workshop'].includes(name)?'wrench':
+   name==='transmission'?'click':'menu');
  },true);
  el.addEventListener('click',event=>{
   const btn=event.target.closest('[data-ss-timing-step]');
