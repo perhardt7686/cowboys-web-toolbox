@@ -245,8 +245,9 @@ function sync(){
 }
 function pagerSelector(){
  if(active==='plates'&&scene==='vote')return '#plate-list > .plate-card';
- if(active==='streetrod'&&scene==='paper')return '#ss-scene .ss-ad';
- if(active==='streetrod'&&scene==='diner')return '#ss-scene .ss-rival';
+ // The EGA newspaper and diner now page their own server-backed cards
+ // *inside* the room; the generic pager would count cloned cards twice.
+ if(active==='streetrod')return null;
  return null;
 }
 function updatePlatePaging(){
