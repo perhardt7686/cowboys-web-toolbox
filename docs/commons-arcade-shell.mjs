@@ -198,7 +198,9 @@ function updateScorePills(){
  const labels=active==='mahjong'?[['BEST',safe('mahjong-ribbon-mine')],['TOP',safe('mahjong-ribbon-record')]]:
    active==='plates'?[['LEAD',safe('plate-ribbon-lead')],['MINE',safe('plate-ribbon-mine')]]:
    active==='streetrod'?[['CREDITS',safe('ss-credits')||safe('sr-credits')],['WINS',safe('sr-wins')]]:
-   active==='wordle'?[['POINTS',safe('letter-lock-score')||safe('letter-lock-team-score')]]:[];
+   active==='wordle'?[['LEVEL',safe('arcade-passport-level')],['GUESS',safe('letter-lock-summary')]]]:
+   active==='wordquest'?[['MINE',safe('commons-word-my-points')],['TOP',safe('word-ribbon-record')]]:
+   active==='study'?[['STUDY',safe('vdacs-study-summary')]]:[];
  const pills=labels.filter(x=>x[1]).slice(0,2);
  const result=pills.length?pills.map(([label,v])=>'<span class="arcade-score-pill"><small>'+escapeHTML(label)+'</small><b>'+escapeHTML(v)+'</b></span>').join(''):
   '<span class="arcade-score-pill arcade-game-name">'+escapeHTML(game(active)?.name||'GAME')+'</span>';
