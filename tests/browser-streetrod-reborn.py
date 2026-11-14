@@ -64,7 +64,9 @@ function roomHtml(room){
   '<div class="ss-distributor">TUNE</div><div class="ss-timing-steps">'+
   '<button data-ss-timing-step="-1">Retard</button><button data-ss-timing-step="1">Advance</button>'+
   '</div></div></div><form data-ss-form="tune"><select name="setting"><option>0</option></select>'+
-  '<button>Save timing</button></form>';
+  '<button>Save timing</button></form>'+
+  '<form data-ss-form="paint"><label>Paint <input type="color" value="#c04040" name="color"></label><button type="submit">Spray paint</button></form>'+
+  '<form data-ss-form="decal"><label>Decal <input name="decal" value="COCO"></label><button type="submit">Apply decal</button></form>';
  if(room==='paper')return '<div class="ss-scene-head">Newspaper</div><div class="ss-ads">'+
   ['1940 Coupe','1955 Wagon','1960 Rattler'].map((n,i)=>
   '<article class="ss-ad"><div class="ss-ad-main"><strong>'+n+'</strong>'+
@@ -73,13 +75,23 @@ function roomHtml(room){
   '<form data-ss-form="offer" data-car="car'+i+'"><input name="offer" value="380">'+
   '<button type="submit">Haggle</button></form></div></div></article>').join('')+'</div>';
  if(room==='parts')return '<div class="ss-parts-counter">'+['Engine','Wheels','Gearbox'].map((n,i)=>
-  '<article><strong>'+n+'</strong><button data-ss-action="buy_part" data-kind="'+n.toLowerCase()+'">Buy used</button></article>').join('')+'</div>';
+  '<article><strong>'+n+'</strong><button data-ss-action="buy_part" data-kind="'+n.toLowerCase()+'">Buy used</button></article>').join('')+'</div>'+
+  '<div class="ss-inventory"><div class="ss-inventory-item"><b>Used carburetor · 80%</b>'+
+  '<button data-ss-action="service_begin" data-part-id="4">Fit this part</button></div></div>'+
+  '<section class="ss-service"><strong>OPEN SERVICE ORDER</strong>'+
+  '<button data-ss-action="workshop">Open workbench</button>'+
+  '<button data-ss-action="service_cancel">Cancel job</button></section>';
  if(room==='diner')return '<div class="ss-rivals">'+['The Rookie','Blackjack','The King','Cipher Van X'].map((n,i)=>
   '<article class="ss-rival"><strong>'+n+'</strong><button data-ss-action="choose_rival" data-rival="'+(i===3?'cipher':'r'+i)+'">Call out</button></article>').join('')+'</div>';
  if(room==='drive')return '<div class="ss-cockpit"><canvas width="960" height="340" id="ss-race-canvas"></canvas><div id="ss-start-lights">GREEN</div></div>'+
  '<div class="ss-drive-metrics"><div><strong id="ss-speed">64 mph</strong></div><div><strong id="ss-rpm">3400</strong></div><div><strong id="ss-gear">3</strong></div><div><strong id="ss-distance">25%</strong></div></div>'+
  '<div class="ss-drive-controls"><button data-ss-hold="left">STEER LEFT</button><button data-ss-hold="right">STEER RIGHT</button><button data-ss-hold="gas">GAS</button><button data-ss-hold="brake">BRAKE</button><button data-ss-action="shift">SHIFT UP</button><button data-ss-action="downshift">SHIFT DOWN</button></div>'+
- '<div class="ss-actions"><button data-ss-action="abandon">Abandon</button></div>';
+ '<div class="ss-actions"><button data-ss-action="transmission">TRANSMISSION: AUTO</button>'+
+ '<button data-ss-action="abandon">Abandon</button></div>';
+ if(room==='calendar')return '<div class="ss-calendar-scene"><strong>SUMMER 1963</strong>'+
+  '<button data-ss-action="rest">Rest a day</button><button data-ss-action="new_season">Start new summer</button></div>'+
+  '<ol class="ss-journal"><li><span>DAY 2</span><strong>Beat a rookie rival</strong></li>'+
+  '<li><span>DAY 1</span><strong>Bought a car</strong></li></ol>';
  return '<div class="ss-scene-head">'+room.toUpperCase()+'</div>';
 }
 function applyRoom(room){
@@ -121,8 +133,21 @@ async def run_one(browser,width,height):
   await p.locator('#sr-reborn').wait_for(timeout=10000)
   assert await p.locator('#sr-reborn .sr-v3-canvas').evaluate('el=>el.width===320 && el.height===200')
   assert await p.locator('#sr-reborn .sr-v3-intro').is_visible(), 'Actual DOS-style boot/licence screen must appear'
+  await p.locator('#sr-reborn [data-v3-action="licence"]').click()
+  assert await p.locator('#sr-reborn .sr-v3-licence').is_visible()
+  assert 'DRIVER LICENCE' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   await p.locator('#sr-reborn [data-v3-action="continue"]').click()
   assert await p.locator('#sr-reborn .sr-v3-garage-meta').is_visible()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="gas"]').click()
+  assert 'Selected refuel' in await p.locator('#ss-status').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="tune"]').click()
+  assert await p.locator('#sr-reborn form[data-ss-form="tune"]').is_visible()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paint"]').click()
+  assert await p.locator('#sr-reborn form[data-ss-form="paint"]').is_visible()
+  await p.locator('#sr-reborn form[data-ss-form="paint"] button').click()
+  assert 'Submitted paint' in await p.locator('#ss-status').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
   assert await p.locator('#sr-reborn .sr-v3-hotspot[data-v3-action="paper"]').count()==1
   assert await p.locator('#sr-reborn').evaluate('el=>getComputedStyle(el).overflow==="hidden"')
   bbox=await p.locator('#sr-reborn').bounding_box()
@@ -138,6 +163,14 @@ async def run_one(browser,width,height):
   assert '1955 Wagon' in text
   await p.locator('#sr-reborn .sr-v3-pocket [data-ss-action="buy_car"]').click()
   assert 'Selected buy_car' in await p.locator('#ss-status').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="parts"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="inventory"]').click()
+  assert 'Used carburetor' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  await p.locator('#sr-reborn [data-ss-action="service_begin"]').click()
+  assert 'Selected service_begin' in await p.locator('#ss-status').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="parts"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="service"]').click()
+  assert 'OPEN SERVICE ORDER' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="diner"]').click()
   await p.locator('#sr-reborn .sr-v3-record-count').wait_for()
@@ -161,8 +194,18 @@ async def run_one(browser,width,height):
   await p.wait_for_function("document.querySelector('.sr-v3-telemetry')?.textContent?.includes('64 MPH')",timeout=4000)
   assert '3400 RPM' in await p.locator('.sr-v3-telemetry').inner_text()
   assert await p.locator('#sr-reborn .sr-v3-drive-controls button').count()==6
+  assert await p.locator('#sr-reborn [data-ss-action="transmission"]').is_visible()
+  await p.locator('#sr-reborn [data-ss-action="transmission"]').click()
+  assert 'Selected transmission' in await p.locator('#ss-status').inner_text()
   await p.locator('#sr-reborn [data-ss-action="shift"]').click()
   assert 'Selected shift' in await p.locator('#ss-status').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="calendar"]').click()
+  assert await p.locator('#sr-reborn [data-ss-action="new_season"]').is_visible()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="hall"]').click()
+  assert 'Beat a rookie rival' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
+  assert 'Bought a car' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
   await p.locator('#sr-reborn .sr-v3-hotspot[data-v3-action="hood"]').click()
   await p.locator('#ss-season-bay:not([hidden])').wait_for()
