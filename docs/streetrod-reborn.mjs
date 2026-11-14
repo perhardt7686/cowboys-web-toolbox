@@ -10,17 +10,22 @@
 const $=id=>document.getElementById(id);
 const BODY=document.body;
 const FULL=new Set(['garage','paper','parts','diner','drive','calendar','tune']);
-const VIEW_LABELS={garage:'THE GARAGE',paper:'CLASSIFIED ADS',parts:'AUTO PARTS',diner:'BOB’S DRIVE-IN',drive:'ON THE ROAD',calendar:'SUMMER 1963',tune:'IGNITION TIMING',gas:'FUEL STOP',crew:'COMMONS DRIVERS',underbody:'UNDER THE CAR',licence:'DRIVER LICENCE'};
+const VIEW_LABELS={garage:'THE GARAGE',paper:'CLASSIFIED ADS',parts:'AUTO PARTS',diner:'BOB’S DRIVE-IN',drive:'ON THE ROAD',calendar:'SUMMER 1963',tune:'IGNITION TIMING',gas:'FUEL STOP',crew:'COMMONS DRIVERS',underbody:'UNDER THE CAR',licence:'DRIVER LICENCE',inventory:'PARTS TRAY',service:'SERVICE ORDER',paint:'PAINT & DECALS',hall:'HALL OF FAME'};
 const NAV={
  garage:[['NEWSPAPER','paper'],['POP HOOD','hood'],['GO TO DINER','diner'],['GAS STATION','gas'],['CALENDAR','calendar'],['TUNE','tune']],
  paper:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['PARTS SHOP','parts']],
- parts:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['LIFT CAR','underbody'],['POP HOOD','hood']],
+ parts:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['PARTS TRAY','inventory'],['SERVICE ORDER','service'],['LIFT CAR','underbody']],
  diner:[['GARAGE','garage'],['PREVIOUS','prev'],['NEXT','next'],['OUR DRIVERS','crew']],
  drive:[['GARAGE','garage'],['DRIVE-IN','diner']],
- calendar:[['GARAGE','garage'],['CLASSIFIEDS','paper']],
- tune:[['HOOD','hood'],['GARAGE','garage']],
+ calendar:[['GARAGE','garage'],['CLASSIFIEDS','paper'],['HALL OF FAME','hall']],
+ tune:[['HOOD','hood'],['GARAGE','garage'],['PAINT & DECALS','paint']],
+ paint:[['GARAGE','garage'],['IGNITION TUNE','tune'],['POP HOOD','hood']],
  gas:[['FILL TANK','fill'],['GARAGE','garage'],['DINER','diner']],
- crew:[['DINER','diner'],['GARAGE','garage']],
+ crew:[['DINER','diner'],['PREVIOUS','prev'],['NEXT','next'],['GARAGE','garage']],
+ inventory:[['PARTS SHOP','parts'],['PREVIOUS','prev'],['NEXT','next'],['POP HOOD','hood'],['GARAGE','garage']],
+ service:[['PARTS SHOP','parts'],['POP HOOD','hood'],['GARAGE','garage']],
+ hall:[['CALENDAR','calendar'],['PREVIOUS','prev'],['NEXT','next'],['GARAGE','garage']],
+ licence:[['ENTER GARAGE','garage'],['CREW','crew']],
  underbody:[['WRENCH','hood'],['GARAGE','garage']]
 };
 const HOTSPOTS={
@@ -46,7 +51,7 @@ const portrait=()=>{
  return el?el:null;
 };
 let panel=null,sourceObserver=null,rootObserver=null,bodyObserver=null;
-let splash=true,sideRoom='',page={paper:0,parts:0,diner:0,crew:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null;
+let splash=true,sideRoom='',page={paper:0,parts:0,diner:0,crew:0,inventory:0,hall:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null;
 let tick=0,renderQueued=false,stageKey='',liveBridge=false;
 const stage=()=>$('sr-reborn');
 const currentRoom=()=>sideRoom||roomNow();
@@ -70,7 +75,9 @@ function nativeRecords(kind){
  const host=source();if(!host)return [];
  const sel=kind==='paper'?'.ss-ads > .ss-ad':
   kind==='diner'?'.ss-rivals > .ss-rival':
-  kind==='parts'?'.ss-parts-counter > article':null;
+  kind==='parts'?'.ss-parts-counter > article':
+  kind==='inventory'?'.ss-inventory > .ss-inventory-item':
+  kind==='hall'?'.ss-journal > li':null;
  return sel?[...host.querySelectorAll(sel)]:[];
 }
 function visibleRecord(){
@@ -90,7 +97,11 @@ function showStatus(text){
 function choose(target){
  if(target==='prev'||target==='next'){
   const r=currentRoom(),records=nativeRecords(r);
-  if(r==='crew'){page.crew=Math.max(0,page.crew+(target==='next'?1:-1));redraw(true);return;}
+  if(r==='crew'){
+   const count=$('srm-players')?.querySelectorAll('.srm-player').length||1;
+   page.crew=(page.crew+(target==='next'?1:-1)+count)%count;
+   redraw(true);return;
+  }
   if(!records.length)return;
   page[r]=(page[r]+(target==='next'?1:-1)+records.length)%records.length;
   redraw(true);return;
@@ -112,7 +123,7 @@ function choose(target){
   if(nozzle&&!nozzle.disabled)nozzle.click();
   return;
  }
- if(target==='licence'||target==='crew'||target==='underbody'){
+ if(['licence','crew','underbody','inventory','service','paint','hall'].includes(target)){
   sideRoom=target;splash=false;redraw(true);return;
  }
  if(target==='tune'){
@@ -178,6 +189,45 @@ function sourcePanel(room){
    cardHTML(visibleRecord())+
    (room==='parts'?'<p class="sr-v3-tip">Buy a part, then return to your real workbench to install it.</p>':'');
  }
+ if(room==='inventory'||room==='hall'){
+  const list=nativeRecords(room),i=page[room]||0;
+  if(!list.length)return '<div class="sr-v3-empty">'+(room==='inventory'?
+    'Parts tray empty. Buy an engine, tyre, or gearbox part at the shop.':
+    'No saved race journal entries yet.')+'</div>';
+  return '<div class="sr-v3-record-count">'+safe(room.toUpperCase())+' '+(i+1)+' / '+list.length+'</div>'+
+   cardHTML(visibleRecord());
+ }
+ if(room==='service'){
+  const el=src.querySelector('.ss-service');
+  if(!el)return '<div class="sr-v3-empty">No open service job. Buy and select a spare part first.</div>';
+  const copy=el.cloneNode(true);copy.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+  copy.classList.add('sr-v3-record','arcade-current-card');
+  return copy.outerHTML;
+ }
+ if(room==='paint'){
+  const paint=src.querySelector('form[data-ss-form="paint"]');
+  const decal=src.querySelector('form[data-ss-form="decal"]');
+  const box=document.createElement('div');box.className='sr-v3-paint';
+  const heading=document.createElement('strong');heading.textContent='BODY SHOP · SAVED TO YOUR CAR';box.append(heading);
+  if(paint)box.append(paint.cloneNode(true));
+  if(decal)box.append(decal.cloneNode(true));
+  if(!paint&&!decal)box.append('Return to the garage before customizing this car.');
+  return box.outerHTML;
+ }
+ if(room==='licence'){
+  // Prefer the current signed-in member. Never show another player's
+  // profile as if it belonged to the current driver.
+  const racer=$('srm-players')?.querySelector('.srm-player:has(.srm-you)');
+  const name=racer?.querySelector('.srm-person h4')?.textContent?.trim()||'CURRENT DRIVER';
+  const avatar=racer?.querySelector('.srm-avatar')?.outerHTML||'<span class="sr-v3-default-avatar">★</span>';
+  const m=metrics();
+  return '<div class="sr-v3-licence"><small>CALIFORNIA · SUMMER 1963</small>'+
+   '<strong>STREET R0D DRIVER LICENCE</strong>'+
+   '<div class="sr-v3-driver">'+avatar+'<span>'+safe(name)+'</span></div>'+
+   '<p>CAR: '+safe(m.car||'NO CAR YET')+'</p><p>WINS: '+safe(m['race wins']||0)+
+   ' · REPUTATION: '+safe(m.reputation||0)+'</p>'+
+   '<button type="button" data-v3-action="continue">ENTER THE GARAGE ▶</button></div>';
+ }
  if(room==='garage'){
   const m=metrics(),car=gameCar();
   const status=src.querySelector('.ss-garage-stats')?.textContent?.trim()||'';
@@ -207,6 +257,7 @@ function sourcePanel(room){
    '<span>'+safe(m['summer days left']||'')+' DAYS LEFT</span>'+
    '<span>'+safe(m['race wins']||'0')+' WINS</span>'+
    (calendar?.querySelector('[data-ss-action="rest"]')?.outerHTML||'')+
+   (calendar?.querySelector('[data-ss-action="new_season"]')?.outerHTML||'')+
    '</div>';
  }
  if(room==='underbody'){
@@ -275,8 +326,9 @@ function svgBoss(){
 function paint(){
  const c=stage()?.querySelector('canvas.sr-v3-canvas');if(!c)return;
  const car=gameCar(),m=metrics(),room=currentRoom();
- const target=room==='licence'||room==='crew'?'garage':
+ const target=room==='licence'||room==='crew'||room==='paint'?'garage':
   room==='underbody'?'gearbox':room==='gas'?'gas':room==='tune'?'tune':
+  room==='inventory'||room==='service'?'parts':room==='hall'?'calendar':
   room==='paper'?'paper':room;
  const options={carKey:car.name,body:car.body,
   bankroll:Number(String(m.wallet||'').replace(/[^\d]/g,''))||0,
