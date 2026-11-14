@@ -72,11 +72,24 @@ This rebuild is **not** a byte-for-byte copy or a native/WASM execution of the o
 
 The 1989 release remains a different game binary and experience. The independent browser campaign still differs in several substantial ways:
 
-1. The original's approximately 22 distinct opponent drivers, diner arrival/leave logic and King's two-stage challenge are not yet fully reimplemented; Commons currently has three progress rivals plus the Mystery Machine boss.
-2. The original's police pursuits, pullovers and jail, mechanical breakdown hazards, weather/time interactions and some road-track details are not yet reproduced in the authoritative season server.
+1. Commons now has 22 distinct originally named, database-backed street racers with unique unlock thresholds, road/drag target times and rewards. Original DOS diner arrival/leave behavior and the King's exact two-stage challenge still differ.
+2. The authoritative race-finish RPC now simulates deterministic highway patrol pullovers, a one-day county jail delay, fictional traffic tickets and high-load breakdowns for worn engines, with matching visual warnings. Full animated police pursuit AI, original roadside geometry, weather and mechanical event breadth still differ.
 3. The original parts hierarchy includes precise part grades, carburettors, manifolds, transmissions and wear data beyond the Commons simplified seasonal upgrade model, even though the saved mechanical assemblies have individual bolts.
-4. The original DOS sprites, intro/credits, PC speaker audio, sound effects and proprietary car/road imagery are not included or redistributed. All browser art is independently drawn.
+4. The browser uses independently drawn EGA-style 16-color garage, jail, breakdown and trophy art plus new opt-in square-wave PC-speaker effects. Original DOS sprite libraries, game music, exact sound recordings and proprietary car/road imagery are not redistributed.
 5. The original save-file slots/Hall of Fame and complete historic vehicle data disks are not the same as Commons' account-bound single summer, saved seasonal journal and authenticated multiplayer garages.
 6. Browser test accounts are synthetic. A full authenticated iPhone Safari championship with real purchase/repair, physical parts, gas, races and final-boss award has not been end-to-end certified in the owner's session.
 
 **Policy for future claims:** A passing CI build and deployment do not prove historical equivalence or live signed-in gameplay. Record the unfinished features openly, protect production records and require a targeted acceptance test before marking the 1:1 original-source rebuild complete.
+
+## November 14, 2026 · City rivals, highway patrol and sound pass
+
+- Adopted Edward's 33 Core rules throughout this release, including version-safe original records, proof-before-completion, reversible corrections, and the bounded Rule 33 creative-discretion policy.
+- **22 original fictional rivals** are declared in `community_streetrod_season_rivals()`. The final `cipher` key remains the Mystery Machine. The old four database keys survive and their original time/reward thresholds remain unchanged.
+- **Server authority:** production migrations `20261114132909_streetrod_twenty_two_story_rivals` and `20261114133250_streetrod_road_patrol_and_breakdown_events` were applied after rollback-only dry runs; the roster count, distinct IDs, final boss count, membership permissions, and owner-private RPC grants were checked.
+- **Road incidents:** policing requires a deterministic seeded patrol and validated excessive throttle during a 10-second window; braking helps avoid a ticket. Mechanical failure depends on actual vehicle condition and high throttle under load. Incidents affect fictional race results, damage, one-day jail and ticket charges. Title races and the final boss are exempt from random encounters.
+- **Artwork and sound:** new independent VGA/EGA-style jail, roadside smoking engine and Mystery Machine trophy screens; original short PC-speaker-style synthesizer cues for navigating, using tools, shifting gears, racing, alarms and victories. Sound defaults off, and requires an explicit tap.
+- **No proprietary DOS assets:** The free original can be obtained separately from the rights holder; no copyrighted original music, sprites, `LIB1`, `LIB2` or `HOT_DATA` are redistributed.
+- **Known remaining differences:** the original's precise city event sequences, cars/data-disk specification, 2-stage King confrontation, police chase animations, original save-slot format, and authentic art/audio remain different. This is an expanding independent reinterpretation, not a provably byte-accurate 1989 emulator.
+- **Verification boundary:** automated source and synthetic-browser checks do not substitute for a signed-in owner account purchasing, building, racing and winning a complete live campaign.
+
+The game does not use a second account database, and the current player data tables have not been emptied, replaced, or reset.
