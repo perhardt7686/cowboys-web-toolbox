@@ -17,7 +17,9 @@ as $$
 begin
   -- Only the invalidation category leaves the write transaction. Clients
   -- obtain fresh records by calling the independently authorized RPCs.
-  perform realtime.send(jsonb_build_object('topic', tg_argv[0]), 'changed', 'family-board-updates', true);
+  if exists (select 1 from changed_rows) then
+    perform realtime.send(jsonb_build_object('topic', tg_argv[0]), 'changed', 'family-board-updates', true);
+  end if;
   return null;
 end;
 $$;
@@ -28,15 +30,14 @@ declare source record;
 begin
   for source in select * from (values
     ('community_mahjong_stats','scores'), ('community_mahjong_campaign','scores'),
-    ('community_mahjong_badges','scores'), ('community_wordle_scores','scores'),
-    ('community_word_scores','scores'), ('community_word_days','scores'),
-    ('community_wordle_days','scores'), ('community_wordle_guesses','scores'),
-    ('community_plate_entries','scores'),
-    ('community_plate_players','scores'), ('community_members','scores'),
-    ('community_profiles','scores'), ('community_family_fridge_items','fridge'),
-    ('community_family_calendar_events','calendar'), ('community_family_calendar_sync','calendar')
+    ('community_wordle_scores','scores'), ('community_word_scores','scores'),
+    ('community_wordle_guesses','scores'), ('community_plate_entries','scores'),
+    ('community_plate_players','scores'), ('community_family_fridge_items','fridge'),
+    ('community_family_calendar_events','calendar')
   ) as sources(relation, topic) loop
-    execute format('create trigger signal_family_update after insert or update or delete on public.%I for each statement execute function community_private.signal_family_update(%L)', source.relation, source.topic);
+    execute format('create trigger signal_family_insert after insert on public.%I referencing new table as changed_rows for each statement execute function community_private.signal_family_update(%L)', source.relation, source.topic);
+    execute format('create trigger signal_family_change after update on public.%I referencing new table as changed_rows for each statement execute function community_private.signal_family_update(%L)', source.relation, source.topic);
+    execute format('create trigger signal_family_delete after delete on public.%I referencing old table as changed_rows for each statement execute function community_private.signal_family_update(%L)', source.relation, source.topic);
   end loop;
 end;
 $$;
@@ -113,8 +114,6 @@ begin
     'wordle_attempts', (select count(*) from public.community_wordle_guesses where game_date = eastern_date),
     'wordle_solved', exists (select 1 from public.community_wordle_days
       where game_date = eastern_date and solved_at is not null),
-    'quest_team_points', coalesce((select team_score from public.community_word_days
-      where game_date = eastern_date), 0),
     'as_of', statement_timestamp()
   );
 end;

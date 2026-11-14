@@ -23,7 +23,7 @@ export function makeFridge({rpc}) {
   panel.append(shell);
 
   let items = [], newest = null, loaded = false, busy = false, generation = 0, active = true;
-  let loading = false, queued = false, needsRefresh = true;
+  let loading = false, queued = false, needsRefresh = true, savedMessage = '';
   const read = data => {
     items = data.items || [];
     newest = items.reduce((date, item) => date > item.updated_at ? date : item.updated_at, '');
@@ -134,7 +134,7 @@ export function makeFridge({rpc}) {
       if (error) throw error;
       if (!active || generation !== ticket) return;
       read(data);
-      status.textContent = manual ? 'Fridge refreshed.' : '';
+      status.textContent = manual ? 'Fridge refreshed.' : savedMessage;
     } catch (error) {
       if (active && generation === ticket) {
         status.textContent = reportError(error, loaded ? 'Showing the last loaded list. Refresh to reconnect.' : 'The fridge list could not load. Try Refresh.');
@@ -149,6 +149,7 @@ export function makeFridge({rpc}) {
     if (!active || busy) return false;
     busy = true;
     generation += 1;
+    savedMessage = '';
     const previous = items;
     if (preview) items = preview;
     render();
@@ -159,12 +160,12 @@ export function makeFridge({rpc}) {
       if (error) throw error;
       if (!active) return false;
       read(data);
-      status.textContent = 'Saved.';
+      status.textContent = savedMessage = 'Saved.';
       saved = true;
     } catch (error) {
       if (!active) return false;
       items = previous;
-      status.textContent = reportError(error, 'Could not save this change. Your previous list was restored.');
+      status.textContent = savedMessage = reportError(error, 'Could not save this change. Your previous list was restored.');
       if (error?.code === '40001') queued = true;
     } finally {
       busy = false;

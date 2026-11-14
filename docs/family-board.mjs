@@ -269,7 +269,8 @@ export function createFamilyBoard() {
         scoreTime = result.as_of;
         offline = false;
         failed = false;
-        const {as_of, ...displayed} = result;
+        const displayed = {...result};
+        delete displayed.as_of;
         const signature = JSON.stringify(displayed);
         if (lastScore !== signature) {
           lastScore = signature;
@@ -305,8 +306,7 @@ export function createFamilyBoard() {
         if (topic === 'scores') {
           void refreshScores();
           if (data?.plate_access) document.dispatchEvent(new Event('family-plate-scores-changed'));
-        }
-        else if (topic === 'fridge') void fridge.refresh();
+        } else if (topic === 'fridge') void fridge.refresh();
         else void calendar.refresh();
       }, 180));
     }

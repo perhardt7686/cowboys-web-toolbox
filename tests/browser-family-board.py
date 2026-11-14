@@ -99,7 +99,7 @@ async def shared_flow(first, second):
     await second.get_by_role('checkbox', name='Fixture milk · 2').check()
     await expect(first.get_by_role('checkbox', name='Fixture milk · 2')).to_be_checked()
     await first.evaluate('fixtureReject()')
-    await first.get_by_role('checkbox', name='Fixture milk · 2').uncheck()
+    await first.get_by_role('checkbox', name='Fixture milk · 2').click()
     await expect(first.get_by_text('Your previous list was restored', exact=False)).to_be_visible()
     await expect(first.get_by_role('checkbox', name='Fixture milk · 2')).to_be_checked()
     await first.get_by_role('button', name='Add event', exact=True).click()

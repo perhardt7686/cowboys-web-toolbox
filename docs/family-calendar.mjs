@@ -27,6 +27,7 @@ export function makeCalendar({rpc}) {
   if (!['month', 'week', 'agenda'].includes(view)) view = 'month';
   let events = [], loadedRange = '', request = 0, active = true, needsRefresh = true;
   let editing = false, saving = false;
+  const expanded = new Set();
   const go = delta => openDate(view === 'week' ? addDays(selected, delta * 7) : shiftMonth(selected, delta));
   const previous = button('‹', () => go(-1), {'aria-label': 'Previous period'});
   const next = button('›', () => go(1), {'aria-label': 'Next period'});
@@ -94,6 +95,8 @@ export function makeCalendar({rpc}) {
     if (!items.length) list.append(el('p', 'family-status', 'No events scheduled.'));
     for (const event of items) {
       const row = el('details', 'family-event');
+      row.open = expanded.has(event.id);
+      row.addEventListener('toggle', () => row.open ? expanded.add(event.id) : expanded.delete(event.id));
       const header = el('summary');
       const time = event.all_day ? 'All day' : clockTime(event.start) + '–' + clockTime(event.end);
       const span = el('span', 'family-event-title', event.title);
@@ -232,7 +235,7 @@ export function makeCalendar({rpc}) {
       if (!active) return '';
       if (data) selected = data.start.slice(0, 10);
       await refresh();
-      if (active) status.textContent = action === 'remove' ? 'Event deleted.' : 'Event saved.';
+      if (active && !needsRefresh) status.textContent = action === 'remove' ? 'Event deleted.' : 'Event saved.';
     } catch (error) {
       failure = reportError(error, 'Unable to save the event. Check your connection and try again.');
       if (active && action === 'remove') status.textContent = failure;
