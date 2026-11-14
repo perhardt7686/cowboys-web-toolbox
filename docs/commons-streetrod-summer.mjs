@@ -120,6 +120,9 @@ async function mutate(command,args,success){
  try{
   const out=await call('community_streetrod_season_action',{p_action:command,p_args:args||{},p_nonce:crypto.randomUUID()});
   season=out.state;lastResult=null;render();status(out.message||success||'Saved.');
+   // The presentation may navigate only after the authenticated mutation
+   // succeeds. Failed buys/repairs cannot pretend to have changed the garage.
+   window.dispatchEvent(new CustomEvent('cowboy:streetrod-season-saved',{detail:{command}}));
  }catch(error){status(error.message||'Save failed.',true);}
  finally{busy=false;}
 }
