@@ -36,7 +36,10 @@ async def main():
                 await page.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]').click()
                 after=await canvas.evaluate('(el)=>el.toDataURL("image/png")')
                 assert before!=after,(width,'changing hair did not redraw character')
-                assert await page.locator('button[type="submit"]',has_text='Save my avatar').count()>=1
+                save=page.locator('#profile-studio-form button[type="submit"]')
+                await expect(save).to_be_visible()
+                assert await save.is_enabled(),(width,'avatar save is disabled')
+                assert 'Save' in (await save.inner_text()),(width,'missing save label')
                 await page.keyboard.press('Escape')
                 # Test external TV link using the same class+DOM location that
                 # Drawing Studio injects during approved account mount.
