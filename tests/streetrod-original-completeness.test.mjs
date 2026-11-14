@@ -69,8 +69,8 @@ test('Opt-in PC-speaker audio is synthesized, muteable, and does not reproduce m
 });
 test('Public page serves new cache revisions and documented fidelity limits',()=>{
  for(const script of ['commons-streetrod-summer.mjs?v=ega7',
-  'commons-streetrod-ega.mjs?v=dos12','streetrod-reborn.mjs?v=reborn7',
-  'streetrod-reborn.css?v=reborn6'])
+  'commons-streetrod-ega.mjs?v=dos12','streetrod-reborn.mjs?v=reborn8',
+  'streetrod-reborn.css?v=reborn8'])
  assert.ok(html.includes(script),script+' is not versioned into published Commons');
  assert.match(tracker,/Historical fidelity still outstanding/);
 });
