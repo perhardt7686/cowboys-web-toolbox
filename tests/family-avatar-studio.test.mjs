@@ -15,7 +15,7 @@ test('simple profile settings preserve advanced saved fields and send editable a
  const s=read('docs/community-profiles.mjs'),client=read('docs/forum-core.mjs'),
    server=read('supabase/functions/community-api/forum-core.mjs');
  for(const label of ['My Profile','Make an Avatar','Privacy & Account','family-avatar-canvas',
-   "avatar_recipe:avatarRecipe","getOwn()","Save my avatar","getAvatarPhoto"]){
+   "avatarMethod==='character'?avatarRecipe:null","getOwn()","Save my avatar","getAvatarPhoto"]){
      assert.ok(s.includes(label),label);
  }
  assert.match(s,/avatarMethod==='character'&&avatarChanged/);
