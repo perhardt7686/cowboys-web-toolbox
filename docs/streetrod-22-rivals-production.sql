@@ -32,6 +32,7 @@ SELECT jsonb_build_array(
 );
 $rivals$;
 REVOKE ALL ON FUNCTION public.community_streetrod_season_rivals() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.community_streetrod_season_rivals() FROM anon;
 GRANT EXECUTE ON FUNCTION public.community_streetrod_season_rivals() TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.community_streetrod_season_state()
