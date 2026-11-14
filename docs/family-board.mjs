@@ -317,9 +317,11 @@ export function createFamilyBoard() {
     }
     function connect() {
       if (channel || !active() || !navigator.onLine) return;
-      const realtime = client.channel('family-board-updates', {config: {private: true}});
+      const realtime = client.channel('family-board-revisions');
       channel = realtime;
-      realtime.on('broadcast', {event: 'changed'}, ({payload}) => schedule(payload?.topic));
+      realtime.on('postgres_changes', {
+        schema: 'public', table: 'community_family_revisions', event: 'UPDATE'
+      }, change => schedule(change.new?.topic));
       realtime.subscribe(state => {
         if (!active() || channel !== realtime) return;
         connected = state === 'SUBSCRIBED';
