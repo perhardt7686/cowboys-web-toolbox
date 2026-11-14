@@ -62,7 +62,7 @@ async def visit(browser, width, full=False):
         await page.locator('#content-dialog').evaluate('n=>n.close()')
         await expect(page.locator('#family-avatar-quick img')).to_be_visible()
         await page.locator('#family-avatar-quick').click()
-        await expect(editor.get_by_text('Giant Taco Hat', exact=True)).to_be_visible()
+        await expect(editor.locator('#avatar-equipped').get_by_text('Giant Taco Hat', exact=True)).to_be_visible()
         await editor.get_by_role('textbox', name='Outfit name').fill('Taco night')
         await editor.get_by_role('button', name='Save outfit', exact=True).click()
         await expect(editor.get_by_role('button', name='Taco night', exact=True)).to_be_visible()
