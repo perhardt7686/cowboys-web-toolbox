@@ -1,5 +1,8 @@
 // Independently drawn EGA scenes. All strokes and textures resolve to whole pixels.
-import {CARS, PARTS, SLOT_NAMES, isWheel} from './hot-rod-catalog.mjs';
+import {CARS} from './hot-rod-catalog.mjs';
+import {paintVehicle,vehiclePaint as tone} from './hot-rod-vehicle-art.mjs';
+import {paintWorkbench} from './hot-rod-engine-bay.mjs';
+import {paintCalendar,paintDriveIn,paintNewspaper,paintTrafficTicket} from './hot-rod-period-scenes.mjs';
 import {courseCurve, displaySpeed, raceClock} from './hot-rod-racing.mjs';
 
 export const EGA = Object.freeze([
@@ -7,11 +10,6 @@ export const EGA = Object.freeze([
   '#555555','#5555ff','#55ff55','#55ffff','#ff5555','#ff55ff','#ffff55','#ffffff'
 ]);
 const CHROME = [0,8,7,15,7,8];
-const PAINT = {
-  1:[0,1,9,7], 2:[0,2,10,15], 3:[1,3,11,15], 4:[0,4,12,7], 5:[1,5,13,15],
-  6:[4,6,14,15], 7:[0,8,7,15], 9:[1,9,11,15], 10:[2,10,14,15],
-  12:[4,12,14,15], 13:[5,13,15,11], 14:[6,14,15,7], 15:[8,7,15,11]
-};
 const FONT = {
   A:'0e11111f111111',B:'1e11111e11111e',C:'0e11101010110e',D:'1e11111111111e',
   E:'1f10101e10101f',F:'1f10101e101010',G:'0e11101711110e',H:'1111111f111111',
@@ -31,7 +29,6 @@ const FONT = {
 const GLYPHS = Object.fromEntries(Object.entries(FONT).map(([c, bits]) =>
   [c, Array.from({length:7}, (_,i) => parseInt(bits.slice(i * 2, i * 2 + 2), 16))]));
 const trunc = (value, low, high) => Math.max(low, Math.min(high, value));
-const tone = color => PAINT[color] || PAINT[1];
 
 class Screen {
   constructor(context) { this.ctx = context; }
@@ -105,95 +102,7 @@ class Screen {
   }
 }
 
-const shapes = {
-  deuce:{roof:[[13,42],[28,14],[43,7],[91,7],[111,20],[124,42]], glass:[[31,36],[42,13],[89,13],[105,23],[116,39]], deck:110, nose:206, wheel:[50,183], fenders:true},
-  round:{roof:[[14,44],[33,20],[57,8],[103,8],[128,22],[146,42]], glass:[[35,36],[58,14],[102,14],[123,24],[136,39]], deck:143, nose:218, wheel:[50,185], fenders:true},
-  open:{roof:[[32,44],[55,24],[97,23],[123,34],[141,41]], glass:[[60,35],[97,27],[118,36],[126,39]], deck:136,nose:224,wheel:[47,189],fenders:false},
-  hard:{roof:[[16,43],[43,19],[65,10],[125,10],[146,25],[155,40]], glass:[[47,34],[66,15],[122,15],[137,26],[146,37]],deck:154,nose:225,wheel:[51,192],fenders:false},
-  fin:{roof:[[24,43],[49,21],[68,11],[119,11],[144,24],[159,42]],glass:[[48,37],[70,16],[118,16],[136,26],[150,40]],deck:155,nose:226,wheel:[50,189],fenders:false},
-  sting:{roof:[[20,45],[41,37],[72,19],[118,14],[139,27],[151,42]],glass:[[59,36],[74,23],[117,19],[136,31],[144,40]],deck:152,nose:228,wheel:[50,190],fenders:false},
-  van:{roof:[[10,49],[12,5],[156,5],[178,22],[188,48]],glass:[[145,17],[157,17],[174,28],[177,39],[145,39]],deck:184,nose:220,wheel:[47,187],fenders:false}
-};
-
-function wheel(s,x,y,r,raised=false) {
-  if (!r) return;
-  s.ellipse(x,y,r+1,r+1,0);
-  s.ellipse(x,y,r-2,r-2,8);
-  s.ellipse(x,y,r-3,r-3,7);
-  s.ellipse(x,y,Math.max(1,r-5),Math.max(1,r-5),15);
-  s.ellipse(x,y,Math.max(1,r-7),Math.max(1,r-7),8);
-  for (const [dx,dy] of [[-4,0],[4,0],[0,-4],[0,4],[-3,-3],[3,3],[-3,3],[3,-3]]) {
-    if (r>=8) s.box(x+dx,y+dy,1,1,raised?15:0);
-  }
-  s.box(x-1,y-1,3,3,7);
-  s.box(x-1,y-1,1,1,15);
-}
-
-function profile(s,model,car,x=56,y=93,scale=1) {
-  if (!model) return;
-  const shape = shapes[model.body] || shapes.round, [shadow,base,light,shine] = tone(car?.color ?? model.color);
-  const sc = (vx,vy) => [x+vx*scale,y+vy*scale];
-  const rect=(vx,vy,w,h,c)=>s.box(...sc(vx,vy),w*scale,Math.max(1,h*scale),c);
-  const trace=(points,c)=>s.poly(points.map(([vx,vy])=>sc(vx,vy)),c);
-  const line=(a,b,c,d,color)=>s.line(...sc(a,b),...sc(c,d),color);
-  const kind=model.body;
-  const roof=shape.roof.map(([px,py])=>[px,car?.roof?Math.round(py+(42-py)*0.28):py]);
-  const glass=shape.glass.map(([px,py])=>[px,car?.roof?Math.round(py+(42-py)*0.28):py]);
-  const ends=kind==='fin'?[[0,27],[14,36]]:kind==='van'?[[1,41],[4,42]]:[[4,43],[17,38]];
-  trace([[0,61],[23,62],[208,62],[237,68],[226,73],[55,73],[2,69]],8);
-  trace([...ends,...roof,[shape.deck,40],[shape.nose,42],[234,47],[239,59],[230,65],[8,65],[1,58]],0);
-  trace([...roof,[shape.deck,42],[14,43]],base);
-  trace(glass,1);
-  trace(glass.map(([px,py])=>[px+(px>100?-2:2),py+1]),0);
-  for (let j=1;j<glass.length;j++) line(...glass[j-1],...glass[j],7);
-  if (kind!=='open' && kind!=='van') line(92,glass[2][1],91,41,7);
-  const belt=kind==='van'?49:43;
-  trace([[4,44],[shape.nose-8,belt],[230,48],[235,53],[232,60],[8,61],[4,55]],base);
-  if (kind==='van') {
-    trace([[8,13],[143,13],[143,48],[7,48]],base);
-    trace([[9,33],[146,28],[169,39],[161,55],[103,51],[75,42],[8,49]],11);
-    trace([[8,26],[41,21],[75,25],[86,38],[63,42],[48,34],[8,42]],10);
-    if (scale >= 0.75) s.text('MYSTERY',x+29*scale,y+24*scale,14);
-    for (const dx of [115,132]) {
-      rect(dx,44,3,11,12); rect(dx-4,48,11,3,12); rect(dx,48,3,3,14);
-    }
-  }
-  if (shape.fenders) {
-    for (const nx of shape.wheel) {
-      trace([[nx-28,56],[nx-17,45],[nx-7,42],[nx+9,43],[nx+18,47],[nx+29,57],[nx+25,62],[nx-27,62]],light);
-      trace([[nx-17,50],[nx-9,45],[nx+7,45],[nx+18,51],[nx+19,60],[nx-18,62]],base);
-    }
-  }
-  line(13,51,224,51,light);
-  if (kind==='sting') {
-    trace([[134,45],[156,47],[180,43],[223,44],[204,50],[171,51],[154,57]],light);
-    trace([[135,48],[151,48],[171,53],[154,56],[139,55]],shadow);
-    for (let i=0;i<3;i++) line(158+i*3,48,161+i*3,53,7);
-  }
-  line(10,56,228,56,shadow);
-  line(20,57,222,57,base);
-  line(72,59,166,59,7);
-  line(72,60,166,60,shine);
-  if (kind!=='van') {
-    line(83,42,81,57,shadow);
-    line(131,41,132,57,shadow);
-    rect(111,47,9,2,shine);
-    rect(181,39,32,1,light);
-  }
-  for (const nx of shape.wheel) {
-    if (car?.installed && !car.installed[nx<100?'rear-left':'front-left']) continue;
-    wheel(s,...sc(nx,61-(car?.jack?.startsWith(nx<100?'rear':'front')?3:0)),Math.max(1,Math.round(13*scale)),Boolean(car?.jack));
-  }
-  rect(222,46,9,3,14); rect(224,49,12,4,shine);
-  rect(5,45,6,4,12); rect(5,52,4,4,4);
-  for (let i=0;i<5;i++) rect(222,53+i,11,1,i%2?8:7);
-  if (car?.front!==false) { rect(225,60,14,3,15); rect(220,63,18,2,8); }
-  if (car?.rear!==false) { rect(0,59,19,3,15); rect(2,62,13,2,8); }
-  if (car?.decal && kind !== 'van') {
-    trace([[96,49],[106,46],[119,48],[107,53],[117,54],[98,57],[102,53],[91,53]],car.decal === 3 ? 11 : 14);
-    if (car.decal === 2) rect(105,50,5,3,12);
-  }
-}
+const profile = (screen, model, car, x=56, y=93, scale=1) => paintVehicle(screen, model, car, x, y, scale);
 
 function footer(s,left,right='') {
   s.box(0,186,320,14,0);
@@ -251,14 +160,19 @@ function garage(s,{car,model,title='',radio=false}) {
   s.box(61,18,259,128,8);
   s.box(63,28,248,110,7);
   s.box(63,30,248,101,8);
+  s.noise(64,31,246,100,310,[8,8,7,0],862);
   for (let y=33;y<125;y+=9) {
     s.box(65,y,245,1,7);
+    s.box(65,y+1,245,1,0);
     for (let x=65+(y%2)*13;x<305;x+=23) s.box(x,y,1,8,0);
   }
-  s.box(65,29,249,7,8);
+  s.box(65,28,249,5,8);
   s.poly([[60,0],[320,0],[320,15],[302,27],[63,27]],8);
   s.poly([[0,0],[177,0],[74,33],[0,36]],6);
-  for (let i=0;i<15;i++) s.line(i*11,0,5+i*4,31,0);
+  for (let i=0;i<15;i++) {
+    s.line(i*11,0,5+i*4,31,0);
+    s.line(i*11+1,0,6+i*4,31,4);
+  }
   s.line(0,35,73,32,7);
   s.line(73,32,175,0,7);
   s.poly([[0,39],[53,39],[53,133],[0,147]],0);
@@ -309,222 +223,19 @@ function garage(s,{car,model,title='',radio=false}) {
   s.frame(179,85,22,17,8,7,0);s.box(181,87,18,7,0);s.box(188,90,4,2,15);
   s.box(77,104,6,18,14);s.box(78,102,4,3,7);s.box(78,113,4,2,0);
   s.box(85,84,2,31,0);
-  profile(s,model,car,52,94,1);
+  profile(s,model,car,40,86,1.085);
   newspaper(s,24,157);
-  s.box(110,175,28,4,0);s.box(115,159,4,16,2);s.box(113,156,7,4,10);s.box(119,163,17,2,2);
-  s.box(120,160,5,2,15);s.box(112,174,18,2,8);
+  s.ellipse(134,178,22,3,8);
+  s.frame(121,175,26,4,0,7,0);
+  s.frame(129,157,6,19,2,10,0);
+  s.frame(127,155,9,5,2,10,0);
+  s.frame(133,161,16,4,2,10,0);
+  s.box(147,161,5,4,8);s.box(130,161,1,14,7);
   s.frame(215,166,12,10,5,13,0);s.box(218,162,6,4,7);s.box(220,160,5,2,15);
   s.line(224,161,234,159,8);s.line(234,159,244,169,8);
   s.frame(230,166,9,10,8,7,0);s.box(232,164,4,2,14);
   fuelCan(s,284,157);
   footer(s,'GARAGE','SUMMER 1963');
-}
-
-function classifieds(s,{scene,mode,model}) {
-  const parts=scene==='parts'||mode==='parts';
-  s.box(0,0,320,200,8);
-  s.poly([[13,9],[157,4],[309,9],[314,182],[158,179],[9,185]],0);
-  s.poly([[10,7],[157,3],[306,7],[312,177],[159,174],[7,179]],15);
-  s.line(156,7,158,175,8);
-  s.center('THE EVENING REGISTER',160,15,0,2);
-  s.box(24,34,272,2,0);s.box(16,36,285,1,8);
-  s.center(parts?'AUTO PARTS':'USED CARS',160,43,0);
-  for (const col of [21,82,180,240]) {
-    for(let row=0;row<17;row++) {
-      const y=57+row*6;
-      const val=Math.sin(col*10+row*7)*8;
-      s.box(col,y,44+val,1,row%4===0?0:8);
-      s.box(col,y+2,34-val,1,7);
-    }
-  }
-  s.box(18,84,284,69,0);
-  s.box(20,86,280,64,7);
-  if(parts) {
-    s.box(76,135,169,1,8);
-    s.center('PARTS AND ACCESSORIES',160,115,0);
-    s.center('ENGINES / TIRES / GEARBOXES',160,128,8);
-  } else if(model) profile(s,model,null,53,86,0.91);
-  else s.center('SUNDAY CLASSIFIEDS',160,112,8);
-  footer(s,'CLASSIFIEDS','EVENING EDITION');
-}
-
-const fasteners = {
-  engine:[[67,101],[100,90],[135,93],[169,99],[201,105],[235,114]],
-  manifold:[[62,96],[115,85],[170,96],[89,135],[145,145],[212,135]],
-  carb:[[99,78],[210,78],[100,136],[211,136]],
-  gearbox:[[73,102],[101,83],[136,86],[85,138],[119,144],[158,125]],
-  wheel:[[160,78],[185,96],[176,124],[145,124],[135,96]]
-};
-export function workbenchFasteners(slot) {
-  return (fasteners[isWheel(slot)?'wheel':slot] || []).map(([x,y])=>({x,y}));
-}
-
-function metal(s,face,highlight,shade) {
-  s.poly(face,8);
-  s.poly(highlight,7);
-  s.poly(shade,0);
-  for (let i=1;i<highlight.length;i++) s.line(...highlight[i-1],...highlight[i],15);
-}
-
-function engineArt(s, car) {
-  metal(s,[[44,90],[97,72],[196,82],[259,108],[253,137],[216,156],[73,139],[47,121]],
-    [[45,92],[102,77],[193,87],[250,110],[226,125],[72,116]],
-    [[75,120],[225,131],[251,115],[244,138],[218,149],[76,135]]);
-  metal(s,[[61,87],[99,78],[193,89],[222,105],[219,118],[86,109],[60,99]],
-    [[62,88],[101,81],[191,92],[213,105],[93,100]],
-    [[91,101],[215,107],[214,115],[89,107],[65,96]]);
-  metal(s,[[74,105],[102,98],[204,114],[231,123],[229,136],[201,145],[86,133]],
-    [[75,108],[103,103],[203,117],[225,125],[205,131],[91,122]],
-    [[88,124],[204,134],[227,127],[224,135],[201,142],[87,131]]);
-  for (let x=96;x<201;x+=12) {
-    const y=115+(x-90)*0.12;
-    s.line(x,y,x+25,y+2,8);s.line(x,y+2,x+24,y+4,15);
-  }
-  for (let i=0;i<4;i++) {
-    const x=95+i*26,y=122+i*4;
-    s.ellipse(x,y,5,4,0);s.ellipse(x,y,3,2,7);s.box(x-1,y,3,1,15);
-    s.line(x,y+2,x+5,y+9,4);
-  }
-  s.ellipse(63,120,16,17,0); s.ellipse(63,120,13,14,7);s.ellipse(63,120,10,11,8);
-  s.ellipse(63,120,4,5,15);s.box(63,115,2,4,0);
-  s.line(53,104,53,125,0); s.line(68,106,77,119,7);
-  s.poly([[101,140],[119,142],[119,151],[86,148],[82,139]],8);
-  s.box(89,143,11,3,7);
-  s.ellipse(240,125,6,7,0);s.ellipse(240,125,3,4,14);
-  if(car?.ignition) {
-    s.line(186,138,204,151,12);s.line(204,151,231,141,12);s.line(231,141,240,125,4);
-    s.box(238,124,6,3,14);
-  } else { s.line(193,145,210,157,12);s.line(210,157,231,151,12);s.box(228,150,6,2,14); }
-}
-
-function manifoldArt(s) {
-  metal(s,[[41,87],[105,70],[191,82],[260,119],[226,147],[110,150],[55,128]],
-    [[46,88],[108,76],[191,88],[252,118],[218,139],[113,141],[62,123]],
-    [[58,125],[111,143],[218,142],[245,126],[224,145],[110,148],[55,128]]);
-  for(let t=0;t<4;t++) {
-    const x=72+t*39,y=99+t*3;
-    s.poly([[x,y-13],[x+16,y-12],[x+38,y+16],[x+24,y+26],[x+12,y+8]],8);
-    s.line(x+1,y-13,x+21,y+14,15);
-    s.ellipse(x+22,y+20,6,5,0);s.box(x+18,y+20,8,1,8);
-  }
-  metal(s,[[105,91],[151,83],[195,99],[187,116],[142,121],[107,109]],
-    [[107,91],[150,86],[191,100],[179,111],[142,113],[108,105]],
-    [[109,107],[141,115],[182,113],[189,106],[188,116],[142,120]]);
-  for(const [x,y] of [[131,101],[162,103],[146,111],[176,108]]) s.ellipse(x,y,6,4,0);
-}
-function carbArt(s) {
-  metal(s,[[73,98],[88,75],[207,70],[244,98],[229,141],[92,146],[70,128]],
-    [[77,98],[92,77],[206,74],[237,97],[220,119],[97,124]],
-    [[76,117],[98,126],[221,121],[235,106],[225,139],[96,143],[76,129]]);
-  s.frame(102,89,111,26,7,15,8);
-  for(const x of [124,154,184]) {
-    s.ellipse(x,99,13,8,0);s.ellipse(x,99,11,6,8);
-    s.line(x-6,96,x+7,101,15);
-  }
-  s.frame(91,119,26,20,8,7,0);s.frame(189,120,35,17,8,7,0);
-  s.line(96,131,119,124,14);s.line(119,124,160,128,6);
-  s.box(149,136,18,5,15);
-  s.ellipse(218,121,8,8,0);s.ellipse(218,121,6,6,6);
-}
-function gearboxArt(s) {
-  metal(s,[[51,94],[91,70],[139,72],[168,100],[212,106],[228,118],[260,125],[258,135],[221,139],[192,132],[103,150],[65,137]],
-    [[54,96],[95,74],[138,78],[163,104],[207,108],[226,120],[253,127],[222,130],[189,122],[103,142],[71,132]],
-    [[66,125],[102,145],[189,125],[226,134],[258,129],[254,137],[221,138],[195,132],[102,149],[65,137]]);
-  for(let i=0;i<5;i++) {
-    s.line(84+i*11,81+i*2,111+i*13,139-i*3,7);
-    s.line(85+i*11,83+i*2,112+i*13,139-i*3,15);
-  }
-  s.ellipse(66,111,16,29,0);s.ellipse(66,111,12,24,8);s.ellipse(66,111,8,17,7);
-  s.ellipse(68,111,6,13,0);
-  s.box(194,109,15,3,15);s.box(236,128,16,4,8);
-}
-function tireArt(s) {
-  s.ellipse(160,103,54,53,8);s.ellipse(160,104,51,51,0);s.ellipse(160,103,47,47,8);
-  s.ellipse(160,103,42,43,0);s.ellipse(160,103,37,38,15);
-  s.ellipse(160,103,33,34,8);s.ellipse(160,103,30,30,7);
-  s.ellipse(160,103,22,21,8);s.ellipse(160,103,10,10,0);
-  s.ellipse(160,103,6,6,15);s.ellipse(160,103,3,3,8);
-  for(let i=0;i<24;i++) {
-    const radians=i*Math.PI/12;
-    const x=Math.round(160+48*Math.cos(radians)),y=Math.round(103+48*Math.sin(radians));
-    s.line(x,y,x+Math.round(4*Math.sin(radians)),y-Math.round(4*Math.cos(radians)),7);
-  }
-}
-
-function workbench(s,{car,slot='engine',title=''}) {
-  s.box(0,0,320,200,0);
-  s.frame(9,10,302,169,8,15,0);
-  s.frame(15,16,290,156,0,7,0);
-  s.box(16,17,288,16,1);s.line(16,33,303,33,9);
-  const label=String((title && title!=='Hot Rod' ? title : SLOT_NAMES[slot])||'WORKBENCH').slice(0,37);
-  s.center(label,160,22,15);
-  const component=car?.installed?.[slot];
-  if (!car?.installed || component) {
-    if(slot==='carb') carbArt(s);
-    else if(slot==='manifold') manifoldArt(s);
-    else if(slot==='gearbox') gearboxArt(s);
-    else if(isWheel(slot)) tireArt(s);
-    else engineArt(s,car);
-    const fill=car?.bolts?.[slot]??0;
-    workbenchFasteners(slot).forEach(({x,y},i)=>{
-      const tight=Boolean(fill&(1<<i));
-      s.ellipse(x,y,6,6,0);
-      s.ellipse(x,y,5,5,tight?15:14);
-      s.ellipse(x,y,3,3,tight?8:6);
-      s.line(x-2,y+1,x+2,y-1,tight?0:4);
-    });
-  } else {
-    s.line(39,156,276,156,8);
-    s.center('PART REMOVED',160,96,7);
-  }
-  if(component && PARTS[component.id]) s.center(PARTS[component.id].name.slice(0,45),160,160,7);
-  footer(s,'SERVICE BAY','TIGHTEN / LOOSEN');
-}
-
-function rivalModel(view) {
-  return view.model || CARS[view.rival?.model] || CARS.chevy40;
-}
-function diner(s,view) {
-  sky(s,143);
-  s.poly([[0,133],[320,128],[320,185],[0,185]],8);
-  s.box(25,73,273,57,0);
-  s.frame(34,77,249,54,6,7,0);
-  s.box(36,102,245,28,8);
-  for(let y=103;y<129;y+=4) {
-    s.box(37,y,242,1,7);
-    for(let x=41+(y%3)*3;x<282;x+=13)s.box(x,y,1,3,0);
-  }
-  s.poly([[18,72],[52,57],[262,57],[304,76],[290,81],[21,80]],4);
-  for(let x=24;x<275;x+=13)s.line(x+28,58,x,74,x%3?12:6);
-  s.box(22,76,279,3,7);s.box(20,79,281,3,15);s.box(26,82,265,2,8);
-  s.frame(91,22,135,30,0,11,1);
-  s.center("BOB'S",159,26,11,2); s.center('DRIVE-IN',159,42,14);
-  s.line(106,53,106,62,7);s.line(216,53,216,62,7);
-  s.box(230,35,23,14,6);s.box(232,37,18,2,14);s.box(232,39,19,5,2);s.box(231,44,21,3,12);
-  for(let j=0;j<8;j++){
-    const x=40+j*29;
-    s.frame(x,89,24,25,1,11,0);
-    s.box(x+2,92,20,4,14);
-    s.box(x+4,98,6,9,7);s.box(x+15,99,5,8,6);
-    s.box(x+11,90,2,22,8);s.box(x+2,103,21,1,7);
-  }
-  s.frame(272,91,15,39,8,15,0);s.box(274,94,11,22,1);s.box(281,116,3,1,14);
-  s.box(31,130,257,5,7);s.box(24,135,277,4,0);
-  s.box(8,107,4,36,7);s.box(19,111,2,26,8);
-  s.frame(2,105,19,7,4,12,0);
-  s.ellipse(279,118,5,5,6);s.box(277,115,6,2,14);s.box(275,122,8,12,3);
-  s.line(275,126,270,132,6);s.line(282,132,282,143,1);s.line(277,131,274,143,1);
-  s.box(270,143,8,2,0);s.box(280,143,7,2,0);
-  s.box(296,105,3,42,8);s.ellipse(297,106,5,4,14);
-  s.box(0,151,320,2,7);
-  s.noise(0,156,320,27,240,[0,8,7],319);
-  for(let x=6;x<286;x+=45)s.box(x,178,21,2,14);
-  const model=rivalModel(view);
-  const foreground=view.rival?.id==='mystery'||model.body==='van';
-  profile(s,CARS[foreground?'fairlane55':'mercury56'],null,31,100,0.51);
-  const rivalCar=view.car?.model===model.id && !view.rival ? view.car : null;
-  profile(s,model,rivalCar,foreground?54:77,foreground?115:114,foreground?0.91:0.81);
-  footer(s,'DRIVE-IN',view.rival?.name?.toUpperCase().slice(0,26)||'PICK A RIVAL');
 }
 
 function fuel(s,{model,car}) {
@@ -615,7 +326,7 @@ function roadScene(s,race) {
   const projection=y=>{
     const ratio=(y-horizon+1)/80;
     const depth=11+48/Math.max(0.02,ratio);
-    const edge=5+(ratio**1.24)*146;
+    const edge=5+(ratio**1.13)*174;
     const center=center0+ratio*ratio*(-player.offset*80-player.heading*28-ahead*39);
     return {depth,edge,center,ratio};
   };
@@ -723,6 +434,8 @@ function dash(s,race,car) {
     s.line(x,118,x+9,115,light);s.line(x+2,120,x+13,116,light);
   }
   s.box(0,0,320,4,8);s.box(0,4,320,2,7);s.box(0,6,320,2,0);
+  s.frame(67,5,193,11,8,15,0);
+  s.line(74,9,254,9,7);s.line(74,11,251,11,7);
   band(s,[[24,2],[32,21],[43,56],[52,91],[68,128],[79,132]],CHROME);
   band(s,[[13,17],[19,41],[28,76],[38,103],[47,124],[64,139]],CHROME);
   s.poly([[0,77],[13,83],[34,119],[58,137],[49,166],[0,163]],8);
@@ -742,17 +455,22 @@ function dash(s,race,car) {
 
   const wheelX=155+Math.round(player.heading*4);
   const rpmMax=Math.ceil(Math.max(6000,contract.player.redline+800)/1000)*1000;
-  s.ellipse(wheelX,168,68,44,0);s.ellipse(wheelX,167,65,42,15);
-  s.ellipse(wheelX,167,63,40,7);s.ellipse(wheelX,167,60,37,8);
+  s.frame(87,136,136,39,0,8,0);
+  s.ellipse(wheelX,172,71,49,0);s.ellipse(wheelX,171,69,46,15);
+  s.ellipse(wheelX,172,66,45,8);s.ellipse(wheelX,172,64,42,15);
+  s.ellipse(wheelX,172,61,40,7);
+  s.box(106,168,23,1,8);s.box(181,168,23,1,8);
   // The opening is black behind both gauges.
-  s.ellipse(wheelX,165,57,33,0);
+  s.ellipse(wheelX,168,58,34,0);
+  for(const [x,y] of [[105,171],[117,174],[189,174],[201,171]])s.frame(x,y,13,5,0,7,8);
+  s.ellipse(154,134,8,5,8);s.ellipse(154,134,5,3,7);s.box(153,133,2,2,4);
   dial(s,129,154,'RPM',player.engine,rpmMax,contract.player.redline,1000);
   dial(s,180,154,'MPH',displaySpeed(player),140,Infinity,10);
   s.poly([[99,176],[114,172],[153,178],[192,172],[211,176],[165,185],[148,185]],7);
   s.line(104,176,152,181,15);s.line(161,181,205,176,15);
   s.ellipse(wheelX,185,12,6,0);s.ellipse(wheelX,184,10,6,7);
   s.ellipse(wheelX,184,6,4,8);s.ellipse(wheelX,184,3,3,12);
-  s.box(wheelX-4,125,8,3,12);
+  s.box(wheelX-3,123,7,3,12);
 
   s.frame(238,139,71,42,8,15,0);
   s.frame(242,142,63,34,0,7,8);
@@ -820,7 +538,7 @@ function opening(s,view) {
 function ending(s,view) {
   const won=view.status==='champion'||view.status==='bossChampion';
   const showCar=won ? 'vette63' : 'ford32';
-  diner(s,{...view,model:CARS[showCar],rival:{model:showCar,name:won?'Champion':'Summer’s over'}});
+  paintDriveIn(s,{...view,model:CARS[showCar],rival:{model:showCar,name:won?'Champion':'Summer’s over'}},profile);
   s.frame(35,40,250,54,0,won?14:7,8);
   s.center(won?'SUMMER CHAMPION':'SUMMER OVER',160,49,won?14:7,2);
   s.center(won?'HALL OF FAME':'CLASSIC 1963',160,78,11);
@@ -836,11 +554,13 @@ export function paintScene(canvas, view) {
   const scene={...view,model};
   switch(view.scene) {
     case 'garage': case 'garage-view': garage(screen,scene); break;
-    case 'paper': case 'parts': classifieds(screen,scene); break;
-    case 'workbench': workbench(screen,scene); break;
-    case 'diner': case 'family': diner(screen,scene); break;
+    case 'paper': case 'parts': paintNewspaper(screen,scene,profile); break;
+    case 'calendar': garage(screen,scene); paintCalendar(screen,scene,profile); break;
+    case 'workbench': garage(screen,scene); paintWorkbench(screen,scene); break;
+    case 'diner': case 'family': paintDriveIn(screen,scene,profile); break;
+    case 'diner-inspect': paintDriveIn(screen,scene,profile); paintWorkbench(screen,{...scene,readOnly:true}); break;
     case 'fuel': fuel(screen,scene); break;
-    case 'race': cockpit(screen,scene); break;
+    case 'race': cockpit(screen,scene);paintTrafficTicket(screen,scene); break;
     case 'ending': ending(screen,scene); break;
     case 'boot': case 'title': default: opening(screen,scene);
   }

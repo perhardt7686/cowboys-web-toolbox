@@ -1,21 +1,25 @@
 import {button as makeButton, el, preference} from './family-board-core.mjs?v=family3';
 import {getAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
-import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, matches, repairCost, roadProblem, saleValue} from './hot-rod-campaign.mjs';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=reward1';
+import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, makeCar, matches, repairCost, roadProblem, saleValue} from './hot-rod-campaign.mjs';
 import {BOLTS, CAR_LIST, CARS, COLORS, DOLLARS, FUEL_TANK, MAKES, PART_LIST, PARTS, RIVALS,
   SLOT_NAMES, SLOTS, WAGERS, WHEELS, fullBolts, isWheel} from './hot-rod-catalog.mjs';
-import {paintScene, workbenchFasteners} from './hot-rod-art.mjs?v=classic1';
+import {paintScene} from './hot-rod-art.mjs?v=period2';
+import {BAY_MENU,IGNITION,SHELF_LIST,workbenchFasteners} from './hot-rod-engine-bay.mjs';
+import {DRIVE_IN_HOTSPOTS,NEWSPAPER_HOTSPOTS} from './hot-rod-period-scenes.mjs';
 import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP} from './hot-rod-racing.mjs';
 import {connectDrivingInput} from './hot-rod-input.mjs';
 
 const cash = amount => '$' + Number(amount).toLocaleString('en-US');
 const time = ms => ms === null || ms === undefined ? '—' : (ms / 1000).toFixed(2) + ' s';
 const memberBadge = name => el('span','hot-rod-avatar',(name || 'Family driver').slice(0,2).toUpperCase());
+const engineAssembly = ['engine','manifold','carb'];
 const garageSlots = {engine:'Cylinder block',manifold:'Intake manifold',carb:'Carburetor',gearbox:'Gearbox'};
 const endings = {champion:'King of the road',deadline:'School starts today',broke:'Out of money',jail:'The summer ends in jail'};
 const playoff = {finish:'Time recorded',win:'Victory',loss:'Second place',false_start:'False start',crash:'Wrecked',engine:'Engine failure',
   gearbox:'Transmission failed',fuel:'Out of fuel',police20:'Stopped by patrol',police75:'Caught by patrol',abandoned:'Forfeited'};
 const canvasLabels = {boot:'DOS startup',title:'Hot Rod title, a coupe at dusk',garage:'Garage with interactive tools and car',
-  paper:'Newspaper classifieds',workbench:'Close-up on a mechanical part',diner:'Bob’s Drive-In',fuel:'Gus’s Gas',
+  paper:'Newspaper classifieds',workbench:'Assembled engine and mechanical controls',diner:'Bob’s Drive-In',fuel:'Gus’s Gas',
   race:'First-person view with instruments and the road ahead',ending:'End of summer',crew:'Garage club',
   standings:'Hot Rod Hall of Fame'};
 
@@ -140,9 +144,11 @@ export function makeHotRod({client, memberId, launcher}) {
   let problem = '', message = '', retry = null, race = null, duel = null, inputLog = [], frame = 0, tickTime = 0, lag = 0;
   let paused = false, staged = false, showForfeit = false, finishing = false, radio = false, submitted = false;
   let soundEnabled = preference('hot-rod-sound') === 'on';
-  let paperMode = 'cars', paperPage = 0, listing = null, selectedSlot = 'carb', bayMode = 'work';
+  let paperMode = 'cover', paperPage = 0, listing = null, selectedSlot = 'carb', bayMode = 'work';
   let workmanship = false, selectedRival = RIVALS[0], raceType = 'drag', wager = 'kicks';
-  let negotiating = false, crew = null, focusedMember = null, standings = null, fetchingScores = false, fetchingCrew = false;
+  let negotiating = false, dinerMenu = '', callerPage=0, crew = null, focusedMember = null, standings = null, fetchingScores = false, fetchingCrew = false;
+  const fastenerTurns=new Map(), portraits=new Map();
+  let focusBolt=null, shelfSelection=0, timing=0;
   let confirmNew = false, bootTimer = 0, panelName = '', crewError = '', scoreError = '';
   const input = connectDrivingInput(racePanel, () => dialog.open && !!race && !paused && !staged && !finishing && !race.result);
   const speaker = audio(soundButton);
@@ -185,20 +191,45 @@ export function makeHotRod({client, memberId, launcher}) {
     return node;
   }
 
+  const pixelButton=(label,coords,handler,focus='')=>hotspot(label,...coords,handler,focus);
+
   function artView() {
     const car = activeCar(state);
     const currentMemberCar = memberCar();
-    return {
+    const rivalModel=CARS[selectedRival.model];
+    const view = {
       scene:scene === 'crew' && currentMemberCar ? 'garage' : scene === 'clip' ? 'garage' :
-        scene === 'clock' || scene === 'calendar' || scene === 'body' ? 'garage' :
-        scene === 'standings' || scene === 'crew' ? 'title' : scene,
+        scene === 'clock' || scene === 'body' ? 'garage' :
+        scene === 'standings' || scene === 'crew' ? 'title' :
+        scene === 'diner' && negotiating ? 'diner-inspect' : scene,
       car:scene === 'crew' && focusedMember ? currentMemberCar :
-        scene === 'paper' || scene === 'diner' ? null : car,
-      model:scene === 'paper' ? CARS[listing] : scene === 'diner' ? CARS[selectedRival.model] :
+        scene === 'paper' ? null : scene === 'diner' ? (negotiating?makeCar(rivalModel,0):null) : car,
+      model:scene === 'paper' ? CARS[listing] : scene === 'diner' ? rivalModel :
         scene === 'crew' && currentMemberCar ? CARS[currentMemberCar.model] : CARS[car?.model],
       slot:selectedSlot, race, status:state?.status, rival:selectedRival, title:'Hot Rod',
-      page:paperPage, mode:paperMode, radio
+      page:paperPage, mode:paperMode, radio, cash:state?.cash, hours:state?.hours
     };
+    if(scene==='paper'){
+      const listings=paperListings(car);
+      view.listings=listings.slice(paperPage*5,paperPage*5+5);
+      view.pageCount=Math.ceil(listings.length/5);
+    }
+    if(scene==='diner'&&!negotiating)
+      view.menuItems=challengeChoices().map(({label,selected,disabled})=>({label,active:selected,disabled}));
+    if(scene==='workbench'&&car){
+      view.bayMode=bayMode;
+      view.turns=Object.fromEntries(workbenchFasteners(selectedSlot).map((_,index)=>[index,fastenerStage(car,selectedSlot,index)]));
+      view.focusBolt=focusBolt;
+      view.locked=Boolean(bayBlock(car,selectedSlot));
+      view.tuneAvailable=canTune(car);
+      view.timing=timing;
+      view.timingReference=PARTS[car.installed.engine?.id]?.timing;
+      view.shelfParts=compatibleParts(car).map(entry=>({label:PARTS[entry.part.id].name}));
+      view.canFitSpare=!car.installed[selectedSlot]&&!view.locked&&view.shelfParts.length>0;
+      view.shelfIndex=shelfSelection;
+    }
+    if(scene==='diner'&&negotiating)view.slot='engine';
+    return view;
   }
 
   function show(next) {
@@ -206,6 +237,7 @@ export function makeHotRod({client, memberId, launcher}) {
     if (scene === 'race' && race && !race.result && !staged) return;
     scene = next;
     if (next !== 'clip') workmanship = false;
+    if (next !== 'diner') {negotiating=false;dinerMenu='';}
     problem = '';
     if (next !== 'garage') speaker.silence();
     else if (radio && soundEnabled) speaker.radio();
@@ -239,6 +271,7 @@ export function makeHotRod({client, memberId, launcher}) {
       const reply = await request({type:'load'});
       if (!alive || !dialog.open) return;
       state = reply.state;
+      fastenerTurns.clear();
       revision = reply.revision;
       loaded = true;
       retry = null;
@@ -296,6 +329,7 @@ export function makeHotRod({client, memberId, launcher}) {
   function work(slot) {
     selectedSlot = slot;
     bayMode = 'work';
+    shelfSelection=0;focusBolt=null;
     show('workbench');
   }
 
@@ -307,7 +341,7 @@ export function makeHotRod({client, memberId, launcher}) {
     }
     const start = action(state ? 'Continue Classic 1963' : 'Start Classic 1963', () => {
       if (state) { show(state.status === 'summer' ? 'garage' : 'ending'); return; }
-      void mutate('new',{},() => show('paper'));
+      void mutate('new',{},() => openPaper('cover'));
     }, {accent:true, disabled:busy});
     const secondary = row(action('Family garages & challenges', () => show('crew')),
       action('Hall of Fame', () => show('standings')), action('Cowboy Remix', remix));
@@ -323,12 +357,12 @@ export function makeHotRod({client, memberId, launcher}) {
     hotspot('Wall calendar',276,38,43,39,() => show('calendar'));
     hotspot(radio ? 'Turn radio off' : 'Turn radio on',224,49,48,40,toggleRadio);
     hotspot('Vehicle clipboard',82,52,43,41,() => show('clip'));
-    hotspot('Open newspaper',5,151,66,41,() => show('paper'));
-    hotspot('Jack and wheels',95,154,54,39,() => work(WHEELS[0]));
+    hotspot('Open newspaper',5,151,66,41,() => openPaper('cover'));
+    hotspot('Jack and wheels',111,153,49,35,() => work(WHEELS[0]));
     hotspot('Paint and bodywork',192,154,58,39,() => show('body'));
     hotspot('Fuel can',266,151,54,43,() => show('fuel'));
     if (car) {
-      hotspot('Open the hood',223,98,75,41,() => work('carb'));
+      hotspot('Open the hood',213,110,84,40,openHood);
       hotspot('Transmission tunnel',144,110,68,43,() => work('gearbox'));
     }
     if (state?.race) {
@@ -341,27 +375,42 @@ export function makeHotRod({client, memberId, launcher}) {
     panel(car ? CARS[car.model].name : 'Your garage',
       copy(car ? [spec.hp + ' hp',Math.floor(car.fuel) / 10 + ' gal',issue || 'Ready for the road.'].join(' · ') :
         'The garage is empty. Pick up the newspaper to find your first car.'),
-      row(action('Newspaper', () => show('paper'), {accent:!car}), action('Hit the street', cruise, {accent:!!car}),
-        action('Under the hood', () => work('carb'), {disabled:!car}), action('Car info', () => show('clip'), {disabled:!car})),
+      row(action('Newspaper', () => openPaper('cover'), {accent:!car}), action('Hit the street', cruise, {accent:!!car}),
+        action('Under the hood', openHood, {disabled:!car}), action('Car info', () => show('clip'), {disabled:!car})),
       counts.length > 1 ? select('Garage bay',counts.map(item=>[item.number,CARS[item.model].name]),car.number,
         number => void mutate('select-car',{number:Number(number)})) : el('span'));
   }
 
-  function openPaper(mode = paperMode) {
+  function openPaper(mode = 'cover') {
     paperMode = mode;
     listing = null;
     paperPage = 0;
     show('paper');
   }
 
-  function renderPaper() {
-    const car = activeCar(state);
-    const listings = paperMode === 'cars' ? CAR_LIST :
+  function paperListings(car) {
+    return paperMode === 'cars' ? CAR_LIST :
       PART_LIST.filter(item => !item.stock && (!car || !item.make || item.make === CARS[car.model].make));
+  }
+
+  function renderPaper() {
+    const garage=()=>show('garage');
+    const cars=()=>openPaper('cars'), parts=()=>openPaper('parts'), cover=()=>openPaper('cover');
+    const controls=paperMode==='cover'?NEWSPAPER_HOTSPOTS.cover:NEWSPAPER_HOTSPOTS.listings;
+    pixelButton('Open used cars',controls.cars,cars);
+    pixelButton('Open auto parts',controls.parts,parts);
+    pixelButton('Drop newspaper and return to garage',controls.garage,garage);
+    if(paperMode==='cover'){
+      panel('Los Angeles News',row(action('Used cars',cars,{accent:true}),
+        action('Auto parts',parts),action('Garage',garage)));
+      return;
+    }
+    const listings = paperListings(activeCar(state));
     const totalPages = Math.ceil(listings.length / 5);
-    const back = action('Used cars', () => openPaper('cars'), {accent:paperMode === 'cars'});
-    const parts = action('Auto parts', () => openPaper('parts'), {accent:paperMode === 'parts'});
-    const navigation = row(back,parts,action('Garage',() => show('garage')));
+    pixelButton('Show newspaper front page',controls.cover,cover);
+    const navigation = row(action('Front page',cover),
+      action('Used cars',cars,{accent:paperMode==='cars'}),
+      action('Auto parts',parts,{accent:paperMode==='parts'}),action('Garage',garage));
     if (listing) {
       const model = CARS[listing];
       const detail = el('div','hot-rod-newspaper');
@@ -381,81 +430,178 @@ export function makeHotRod({client, memberId, launcher}) {
       return;
     }
     const classified = el('ul','hot-rod-classifieds');
-    for (const item of listings.slice(paperPage * 5,paperPage * 5 + 5)) {
+    const pageItems=listings.slice(paperPage*5,paperPage*5+5);
+    for (const [index,item] of pageItems.entries()) {
       const itemRow = el('li');
-      itemRow.append(action(item.name + ' · ' + cash(item.price), () => {
+      const open=()=>{
         if (paperMode === 'cars') { listing = item.id; render(); return; }
         void mutate('buy-part',{id:item.id});
-      }, {disabled:paperMode === 'parts' && (busy || item.price > state?.cash),
-        focus:'paper-' + item.id}));
+      };
+      const disabled=paperMode==='parts'&&(busy||item.price>state?.cash);
+      if(!disabled)pixelButton((paperMode==='cars'?'Inspect ':'Buy spare ')+item.name,NEWSPAPER_HOTSPOTS.listing[index],open,'art-paper-'+item.id);
+      itemRow.append(action(item.name+' · '+cash(item.price),open,{disabled,focus:'paper-'+item.id}));
       if (paperMode === 'parts') itemRow.append(el('small','',item.slot === 'tire' ? 'Each tire' : garageSlots[item.slot]));
-      else itemRow.append(el('small','',item.wear + '% · ' + (item.auto ? 'Automatic' : 'Manual') + ' · ' +
-        (carOffer(item) <= state?.cash ? 'Within your budget' : 'Above your budget')));
+      else itemRow.append(el('small','',item.wear+'% · '+(item.auto?'Automatic':'Manual')+' · '+
+        (carOffer(item)<=state?.cash?'Within your budget':'Above your budget')));
       classified.append(itemRow);
     }
-    const paging = row(action('‹ Previous',() => {paperPage--;render();},{disabled:paperPage===0,focus:'paper-prev'}),
-      el('span','',(paperPage + 1) + ' / ' + totalPages),
-      action('Next ›',() => {paperPage++;render();},{disabled:paperPage>=totalPages-1,focus:'paper-next'}));
-    panel(paperMode === 'cars' ? 'Used car classifieds' : 'Auto parts classifieds',navigation,classified,paging);
+    const previous=()=>{paperPage--;render();}, next=()=>{paperPage++;render();};
+    if(paperPage>0)pixelButton('Previous classifieds page',controls.previous,previous,'art-paper-prev');
+    if(paperPage<totalPages-1)pixelButton('Next classifieds page',controls.next,next,'art-paper-next');
+    const paging = row(action('‹ Previous',previous,{disabled:paperPage===0,focus:'paper-prev'}),
+      el('span','',(paperPage+1)+' / '+totalPages),
+      action('Next ›',next,{disabled:paperPage>=totalPages-1,focus:'paper-next'}));
+    panel(paperMode==='cars'?'Used car classifieds':'Auto parts classifieds',navigation,classified,paging);
+  }
+
+  function openHood(){
+    const fitted=activeCar(state)?.installed;
+    work(fitted?.carb?'carb':fitted?.manifold?'manifold':'engine');
+  }
+  const fastenerKey=(car,slot,index)=>car.number+'|'+slot+'|'+index;
+  const fastenerStage=(car,slot,index)=>fastenerTurns.get(fastenerKey(car,slot,index))||0;
+  const canTune=car=>!roadProblem({...car,damage:0,fuel:20});
+
+  function bayBlock(car,slot) {
+    if(isWheel(slot)&&car.jack!==slot)return 'Raise this corner before touching the lugs.';
+    if(slot==='engine'&&(car.installed.carb||car.installed.manifold))
+      return 'Remove the carburetor and intake to reach the engine mounts.';
+    if(slot==='manifold'&&car.installed.carb)return 'Remove the carburetor to reach the intake.';
+    return '';
+  }
+  function compatibleParts(car) {
+    return state.inventory.map((part,index)=>({part,index})).filter(({part})=>matches(car,selectedSlot,part.id));
+  }
+
+  function removeIfReady(slot) {
+    const car=activeCar(state);
+    if(!car?.installed[slot]||car.bolts[slot]!==0||bayBlock(car,slot)||slot==='engine'&&car.ignition)return;
+    queueMicrotask(()=>{
+      if(!alive||!dialog.open||activeCar(state)?.number!==car.number||activeCar(state)?.bolts[slot]!==0)return;
+      void mutate('remove',{slot},()=>{
+        for(let index=0;index<BOLTS[slot];index++)fastenerTurns.delete(fastenerKey(car,slot,index));
+        if(slot==='carb')selectedSlot='manifold';
+        else if(slot==='manifold')selectedSlot='engine';
+        focusBolt=null;
+      });
+    });
+  }
+  function turnFastener(car,slot,index){
+    if(busy||bayBlock(car,slot)||!car.installed[slot])return;
+    const key=fastenerKey(car,slot,index),stage=fastenerStage(car,slot,index);
+    const tight=Boolean(car.bolts[slot]&(1<<index));
+    focusBolt=index;
+    if(stage<(tight?1:2)){
+      fastenerTurns.set(key,stage+1);
+      message=!tight&&!stage?'Bolt seated. Turn it twice to tighten.':'One turn. Turn again to '+(tight?'remove':'tighten')+' the fastener.';
+      problem='';retry=null;render();return;
+    }
+    void mutate('bolt',{slot,index},()=>{
+      fastenerTurns.delete(key);
+      if(tight)removeIfReady(slot);
+    });
+  }
+  function selectSpare(car,index){
+    if(car.installed[selectedSlot]||busy||bayBlock(car,selectedSlot))return;
+    const slot=selectedSlot;
+    void mutate('install',{slot,index},()=>{
+      for(let n=0;n<BOLTS[slot];n++)fastenerTurns.set(fastenerKey(car,slot,n),1);
+      bayMode='work';focusBolt=null;shelfSelection=0;
+    });
   }
 
   function renderWorkbench() {
-    const car = activeCar(state);
-    if (!car) { panel('Workbench',copy('There’s no car in the bay.'),action('Newspaper',() => openPaper('cars')));return; }
-    const slot = selectedSlot, item = car.installed[slot], bolts = car.bolts[slot], tire = isWheel(slot);
-    const availableParts = state.inventory.map((part,index) => [part,index]).filter(([part]) => matches(car,slot,part.id));
-    const mount = select('Work area',SLOTS.map(name=>[name,SLOT_NAMES[name]]),slot,value=>work(value));
-    const choose = row(mount,action('Parts classifieds',() => openPaper('parts')),action('Garage',() => show('garage')));
-    const toolRow = row(action('Wrench',() => {bayMode='work';render();},{accent:bayMode==='work'}),
-      action('Spare parts',() => {bayMode='shelf';render();},{accent:bayMode==='shelf'}),
-      action('Ignition timing',() => {bayMode='tune';render();},{accent:bayMode==='tune'}));
-    if (bayMode === 'shelf') {
-      const shelf = state.inventory.map((part,index) => row(
-        el('span','',PARTS[part.id].name + ' · ' + part.wear + '%'),
-        action('Sell',doWork('sell-part',{index}),{disabled:busy || PARTS[part.id].slot === 'tire'})
-      ));
-      panel('Parts shelf',choose,toolRow,...(shelf.length ? shelf : [copy('No spare parts. Try the classifieds.')]));
+    const car=activeCar(state);
+    if(!car){panel('Workbench',copy('There’s no car in the bay.'),action('Newspaper',()=>openPaper()));return;}
+    const slot=selectedSlot, item=car.installed[slot], bolts=car.bolts[slot], tire=isWheel(slot);
+    const blocked=bayBlock(car,slot), spare=compatibleParts(car);
+    const parts=()=>{
+      if(engineAssembly.includes(slot)){
+        selectedSlot=engineAssembly.find(part=>!car.installed[part])||slot;
+      }
+      bayMode='shelf';shelfSelection=0;render();
+    };
+    const back=()=>{bayMode='work';render();};
+    const done=()=>show('garage');
+    const tune=()=>{
+      if(!canTune(car))return;
+      timing=car.timing;bayMode='tune';render();
+    };
+    const mount=select('Work area',SLOTS.map(name=>[name,SLOT_NAMES[name]]),slot,work);
+    if(bayMode==='tune'){
+      const adjust=delta=>{
+        timing=Math.max(0,Math.min(16,timing+delta));render();
+      };
+      const save=()=>{
+        if(timing===car.timing){back();return;}
+        void mutate('tune',{value:timing},back);
+      };
+      pixelButton('Back to engine',BAY_MENU.back,back,'art-bay-back');
+      pixelButton('Save timing and return to engine',BAY_MENU.done,save,'art-timing-done');
+      if(timing>0)pixelButton('Timing belt up',BAY_MENU.up,()=>adjust(-1),'art-retard');
+      if(timing<16)pixelButton('Timing belt down',BAY_MENU.down,()=>adjust(1),'art-advance');
+      panel('Timing belt',copy('Up retards timing. Down advances it. The red mark is this engine’s reference.'),
+        row(action('↑ Retard timing',()=>adjust(-1),{disabled:busy||timing<=0,focus:'retard'}),
+        el('output','',timing+'°'),
+        action('↓ Advance timing',()=>adjust(1),{disabled:busy||timing>=16,focus:'advance'})),
+        row(action('Back',back),action('Done',save,{accent:true,disabled:busy,focus:'timing-done'})));
       return;
     }
-    if (bayMode === 'tune') {
-      const value = el('input');
-      value.type = 'range';
-      value.min = '0';
-      value.max = '16';
-      value.value = String(car.timing);
-      const label = el('label','hot-rod-field','Distributor advance');
-      const number = el('output','',value.value + '°');
-      value.addEventListener('input',() => number.textContent = value.value + '°');
-      label.append(value,number);
-      const timing = PARTS[car.installed.engine?.id]?.timing;
-      panel('Ignition timing',choose,toolRow,copy('Listen for a smooth idle. This block’s reference is ' + (timing ?? '—') + '°.'),
-        row(label,action('Set timing',() => void mutate('tune',{value:Number(value.value)}),{disabled:busy,accent:true})));
+    if(bayMode==='shelf'){
+      const pick=index=>{shelfSelection=index;render();};
+      const change=()=>{if(spare[shelfSelection])selectSpare(car,spare[shelfSelection].index);};
+      if(!busy){
+        pixelButton('Back to engine',BAY_MENU.back,back,'art-bay-back');
+        pixelButton('Close parts and return to garage',BAY_MENU.done,done);
+        if(!item&&!blocked&&spare.length)pixelButton('Fit the selected part',BAY_MENU.change,change,'art-fit');
+        spare.slice(0,4).forEach(({part},index)=>pixelButton('Select '+PARTS[part.id].name,SHELF_LIST[index],()=>pick(index),'art-spare-'+index));
+      }
+      const selectors=spare.map(({part},index)=>action(PARTS[part.id].name+' · '+part.wear+'%',()=>pick(index),
+        {accent:shelfSelection===index,focus:'shelf-'+index}));
+      const sell=spare[shelfSelection];
+      panel('Parts shelf',mount,copy(item?'Finish removing the installed part before fitting a spare.':
+        blocked||(!spare.length?'No matching spare in the garage. Try the newspaper.':'Select a part and choose Change.')),
+      row(...selectors),row(action('Change',change,{accent:true,disabled:busy||!!item||!!blocked||!spare.length}),
+        action('Parts classifieds',()=>openPaper('parts')),
+        ...(sell&&PARTS[sell.part.id].slot!=='tire'?[action('Sell this spare',doWork('sell-part',{index:sell.index},()=>{shelfSelection=0;}),{disabled:busy})]:[]),
+        action('Back',back),action('Done',done)));
       return;
     }
-    const loose = item ? BOLTS[slot] - [...Array(BOLTS[slot]).keys()].filter(i=>bolts & (1 << i)).length : 0;
-    const help = tire && car.jack !== slot ? 'Raise this corner before working on the lugs.' :
-      !item ? 'Fit a compatible part from the shelf.' :
-      slot === 'engine' && car.installed.manifold || slot === 'manifold' && car.installed.carb ?
-        'Remove the part sitting above this one to reach its bolts.' :
-        'Turn the ' + (tire ? 'lugs' : 'fasteners') + ' on the drawing or use the numbered wrench controls.';
-    const mechanics = el('div','hot-rod-wrench');
-    if (item) workbenchFasteners(slot).forEach(({x,y},index) => {
-      const tight = !!(bolts & (1 << index));
-      const label = (tight ? 'Loosen' : 'Tighten') + ' ' + (tire ? 'lug ' : 'bolt ') + (index + 1);
-      const wrench = doWork('bolt',{slot,index});
-      const isDisabled = busy || (tire && car.jack !== slot);
-      if (!isDisabled) hotspot(label,x-13,y-13,26,26,wrench,'art-bolt'+index).classList.add('hot-rod-fastener',tight ? 'tight' : 'loose');
-      mechanics.append(action(label,wrench,{disabled:isDisabled,focus:'bolt'+index}));
+    if(!busy) {
+      if(canTune(car))pixelButton('Tune engine',BAY_MENU.tune,tune,'art-tune');
+      pixelButton('Open parts shelf',BAY_MENU.parts,parts,'art-parts');
+      pixelButton('Close the hood',BAY_MENU.done,done,'art-done');
+    }
+    const loose=item?BOLTS[slot]-workbenchFasteners(slot).filter((_,i)=>bolts&(1<<i)).length:0;
+    const mechanics=el('div','hot-rod-wrench');
+    if(item&&!blocked)workbenchFasteners(slot).forEach(({x,y},index)=>{
+      const tight=Boolean(bolts&(1<<index)),turn=fastenerStage(car,slot,index);
+      const type=tire?'lug ':'bolt ';
+      const label=(tight?(turn?'Remove ':'Loosen '):(turn===0?'Seat ':turn===1?'Tighten ':'Torque '))+type+(index+1);
+      const wrench=()=>turnFastener(car,slot,index);
+      if(!busy)hotspot(label,x-11,y-9,22,18,wrench,'art-bolt'+index).classList.add('hot-rod-fastener');
+      mechanics.append(action(label,wrench,{disabled:busy,focus:'bolt'+index}));
     });
-    const controls = row(tire ? action(car.jack ? 'Lower jack' : 'Raise corner',doWork('jack',{slot}),{disabled:busy}) :
-      action(car.ignition ? 'Disconnect ignition' : 'Connect ignition',doWork('ignition'),{disabled:busy}));
-    if (item) controls.append(action('Remove ' + SLOT_NAMES[slot],doWork('remove',{slot}),
-      {disabled:busy || bolts !== 0,accent:bolts === 0}));
-    else for (const [part,index] of availableParts) controls.append(action('Fit ' + PARTS[part.id].name + ' · ' + part.wear + '%',
-      doWork('install',{slot,index}),{disabled:busy,accent:true}));
-    panel(item ? PARTS[item.id].name : SLOT_NAMES[slot],choose,toolRow,copy(help),
-      item ? copy(item.wear + '% condition · ' + loose + ' loose') : copy(availableParts.length ? 'Choose a replacement below.' : 'No compatible spare on the shelf.'),
-      mechanics,controls);
+    const ignition=()=>{
+      void mutate('ignition',{},()=>{if(car.ignition)removeIfReady(slot);});
+    };
+    const canConnect=!!car.installed.engine&&car.bolts.engine===fullBolts('engine');
+    const ignitionLabel=car.ignition?'Disconnect ignition':'Connect ignition';
+    if(!tire&&slot!=='gearbox'&&!busy&&(car.ignition||canConnect))
+      pixelButton(ignitionLabel+' lead',IGNITION,ignition,'art-ignition');
+    const controls=row();
+    if(tire)controls.append(action(car.jack?'Lower jack':'Raise corner',doWork('jack',{slot}),
+      {disabled:busy||Boolean(car.jack&&car.jack!==slot)}));
+    else if(slot!=='gearbox')controls.append(action(ignitionLabel,ignition,{disabled:busy||!car.ignition&&!canConnect}));
+    if(item&&bolts===0&&!blocked)controls.append(action('Lift off '+SLOT_NAMES[slot],()=>removeIfReady(slot),
+      {accent:true,disabled:busy||slot==='engine'&&car.ignition}));
+    if(!item&&!blocked)controls.append(action('Choose a spare',parts,{accent:true,disabled:busy}));
+    const note=blocked||(!item?'Open Parts to fit a compatible spare.':
+      slot==='engine'&&bolts===0&&car.ignition?'Unclip the ignition lead to lift the block.':
+      'Turn each '+(tire?'lug':'bolt')+' twice to remove it. Tap an empty hole to seat it again.');
+    panel(item?PARTS[item.id].name:SLOT_NAMES[slot],mount,
+      row(action('Tune',tune,{disabled:busy||!canTune(car)}),action('Parts',parts,{disabled:busy}),action('Done',done,{disabled:busy})),
+      copy(note),item?copy(item.wear+'% condition · '+loose+' loose'):el('span'),mechanics,controls);
   }
 
   function renderClip() {
@@ -522,30 +668,64 @@ export function makeHotRod({client, memberId, launcher}) {
     selectedRival = RIVALS.find(rival=>rival.id===id) || RIVALS[0];
     raceType = selectedRival.id === 'king' ? 'road' : 'drag';
     wager = selectedRival.id === 'king' ? 'pink' : 'kicks';
-    negotiating = false;
+    negotiating=false;dinerMenu='';
     render();
   }
 
+  const wagerLabel=key=>key==='kicks'?'For kicks':key==='pink'?'Pink slips':cash(DOLLARS[key]);
+  const courseLabels=[['drag','¼-mile drag'],['road','2½-mile road']];
+  function chooseCourse(kind){
+    raceType=kind;wager=WAGERS[kind][0];
+  }
+  function startChallenge(stake=wager){
+    const rival=selectedRival;
+    void mutate('challenge',{rival:rival.id,kind:raceType,stake},()=>prepareRace(state.race));
+  }
+  function challengeChoices(){
+    const cancel={label:'Forget it',activate:()=>{dinerMenu='';render();}};
+    if(dinerMenu==='call'){
+      const names=RIVALS.slice(callerPage*3,callerPage*3+3).map(person=>({
+        label:'Call '+person.name,selected:person.id===selectedRival.id,activate:()=>chooseRival(person.id)
+      }));
+      return [...names,{label:'More drivers',activate:()=>{callerPage=(callerPage+1)%Math.ceil(RIVALS.length/3);render();}}];
+    }
+    if(dinerMenu==='course')return [...courseLabels.map(([kind])=>({
+      label:kind==='drag'?'Drag race':'Road race',activate:()=>{chooseCourse(kind);dinerMenu='stake';render();}
+    })),cancel];
+    if(dinerMenu==='stake')return [...WAGERS[raceType].map(stake=>({
+      label:wagerLabel(stake),selected:stake===wager,disabled:!!challengeProblem(state,selectedRival,raceType,stake),
+      activate:()=>startChallenge(stake)
+    })),cancel];
+    return [];
+  }
+
   function renderDiner() {
-    const rival = selectedRival, model = CARS[rival.model];
-    const requirements = state.dragWins < rival.drag || state.roadWins < rival.road;
-    const wagerOptions = WAGERS[raceType].map(key => [key,key === 'kicks' ? 'For kicks' : key === 'pink' ? 'Pink slips' : cash(DOLLARS[key])]);
-    const inspect = () => { negotiating = !negotiating; render(); };
-    hotspot('Inspect rival engine',214,103,92,48,inspect);
-    hotspot('Call another driver',13,35,64,65,() => consolePanel.querySelector('select')?.focus());
-    const info = negotiating ? copy(model.name + ' · ' + model.hp + ' hp · ' + model.weight + ' lb · ' +
-      (model.auto ? 'Automatic' : 'Manual transmission')) : copy(model.name + ' · “' + rival.line + '”');
-    const blocked = challengeProblem(state,rival,raceType,wager);
-    panel('Bob’s Drive-In',row(select('Call a driver',RIVALS.map(person=>[person.id,person.name +
-      (state.beaten.includes(person.id) ? ' ✓' : '')]),rival.id,chooseRival),
-      action('Inspect car',inspect,{focus:'inspect-rival'}),action('Garage',() => show('garage'))),info,
-      requirements ? copy('Required wins: ' + rival.drag + ' drag · ' + rival.road + ' road.') : el('span'),
-      row(select('Race',[['drag','¼-mile drag'],['road','2½-mile road']],raceType,value=>{
-        raceType=value;wager=WAGERS[value][0];render();
-      }),select('Wager',wagerOptions,wager,value=>{wager=value;render();}),
-      action('Challenge ' + rival.name,() => void mutate('challenge',{rival:rival.id,kind:raceType,stake:wager},
-        () => prepareRace(state.race)), {disabled:busy,accent:true})),
-      blocked ? copy(blocked) : el('span'));
+    const rival=selectedRival, model=CARS[rival.model], zones=DRIVE_IN_HOTSPOTS;
+    const requirements=state.dragWins<rival.drag||state.roadWins<rival.road;
+    const inspect=()=>{negotiating=!negotiating;dinerMenu='';render();};
+    if(negotiating)pixelButton('Done inspecting rival',BAY_MENU.done,inspect,'art-rival-done');
+    else {
+      pixelButton('Inspect rival engine',zones.inspect,inspect,'art-inspect-rival');
+      pixelButton('Call another driver',zones.caller,()=>{
+        dinerMenu=dinerMenu==='call'?'':'call';
+        callerPage=Math.floor(RIVALS.indexOf(rival)/3);render();
+      },'art-call-rival');
+      pixelButton('Discuss a race with '+rival.name,zones.challenge,()=>{dinerMenu='course';render();},'art-diner-course');
+      challengeChoices().forEach(({label,activate,disabled},index)=>{
+        if(!busy&&!disabled)pixelButton(label,zones.menu[index],activate,'art-diner-'+index);
+      });
+    }
+    const info=negotiating?copy(model.name+' · '+model.hp+' hp · '+model.weight+' lb · '+
+      (model.auto?'Automatic':'Manual transmission')):copy(model.name+' · “'+rival.line+'”');
+    const blocked=challengeProblem(state,rival,raceType,wager);
+    panel('Bob’s Drive-In',row(select('Call a driver',RIVALS.map(person=>[person.id,person.name+
+      (state.beaten.includes(person.id)?' ✓':'')]),rival.id,chooseRival),
+      action(negotiating?'Close rival’s hood':'Inspect car',inspect,{focus:'inspect-rival'}),action('Garage',()=>show('garage'))),info,
+      requirements?copy('Required wins: '+rival.drag+' drag · '+rival.road+' road.'):el('span'),
+      row(select('Race',courseLabels,raceType,kind=>{chooseCourse(kind);render();}),
+        select('Wager',WAGERS[raceType].map(key=>[key,wagerLabel(key)]),wager,value=>{wager=value;render();}),
+        action('Challenge '+rival.name,()=>startChallenge(),{disabled:busy,accent:true})),
+      blocked?copy(blocked):el('span'));
   }
 
   function renderCalendar() {
@@ -587,7 +767,7 @@ export function makeHotRod({client, memberId, launcher}) {
       row(action('Hall of Fame',() => show('standings')),
         action(confirmNew ? 'Confirm new summer' : 'Start another summer',() => {
           if (!confirmNew) { confirmNew=true;render();return; }
-          void mutate('new',{},() => { confirmNew=false;openPaper('cars'); });
+          void mutate('new',{},() => { confirmNew=false;openPaper('cover'); });
         },{disabled:busy}),action('Cowboy Remix',remix)));
   }
 
@@ -603,10 +783,20 @@ export function makeHotRod({client, memberId, launcher}) {
     return list;
   }
 
+  async function loadPortraits(people) {
+    const ids=people.map(person=>person.avatar_member||person.id).filter(Boolean);
+    const recipes=await avatarProjections(client,ids);
+    const urls=await Promise.all([...recipes].map(async ([id,recipe])=>[id,await cacheAvatarCharacter(id,recipe)]));
+    if(!alive||!dialog.open)return;
+    ids.forEach(id=>portraits.delete(id));
+    for(const [id,url] of urls)if(url)portraits.set(id,url);
+  }
+
   function avatar(person) {
     const icon = memberBadge(person.name);
-    const path = person.avatar_path;
-    if (path) void getAvatarPhoto(client,path).then(url => {
+    const id=person.avatar_member||person.id, path=person.avatar_path;
+    const source=portraits.get(id);
+    if (source||path) void (source?Promise.resolve(source):getAvatarPhoto(client,path)).then(url => {
       if (!url || !alive || !dialog.open || !icon.isConnected) return;
       const image = el('img');
       image.alt = '';
@@ -615,7 +805,7 @@ export function makeHotRod({client, memberId, launcher}) {
       image.addEventListener('load',() => icon.replaceChildren(image),{once:true});
       image.src = url;
     }).catch(() => {});
-    if (person.avatar_member || person.id) icon.dataset.familyAvatar = person.avatar_member || person.id;
+    if(id)icon.dataset.familyAvatar=id;
     icon.setAttribute('aria-hidden','true');
     return icon;
   }
@@ -627,6 +817,7 @@ export function makeHotRod({client, memberId, launcher}) {
     try {
       const {data,error} = await client.rpc('community_hot_rod_standings');
       if (error) throw new Error('Couldn’t refresh the Hall of Fame.');
+      await loadPortraits(data?.entries||[]);
       if (alive && dialog.open) standings = data;
     } catch (error) { scoreError = error.message; }
     finally {
@@ -660,6 +851,7 @@ export function makeHotRod({client, memberId, launcher}) {
     crewError = '';
     try {
       const data = await request({type:'crew'});
+      await loadPortraits(data?.members||[]);
       if (alive && dialog.open) {
         crew = data;
         focusedMember = crew.members?.find(person => person.id === focusedMember?.id) || null;
@@ -752,6 +944,7 @@ export function makeHotRod({client, memberId, launcher}) {
     dialog.dataset.scene = scene;
     housing.setAttribute('aria-busy',String(busy));
     screen.setAttribute('data-cursor',scene === 'workbench' ? 'wrench' : '');
+    dialog.dataset.bayMode=scene==='workbench'?bayMode:'';
     stat.textContent = state ? 'BANKROLL ' + cash(state.cash) + '   ' + dateLabel(state.hours).toUpperCase() : '';
     stat.hidden = !state || ['boot','title','race'].includes(scene);
     quit.disabled = busy;
@@ -942,9 +1135,11 @@ export function makeHotRod({client, memberId, launcher}) {
     input.clear();
     race = duel = null;
     inputLog = [];
+    fastenerTurns.clear();
     state = null;
     loaded = false;
     crew = standings = focusedMember = null;
+    portraits.clear();
     dialog.close();
     document.documentElement.classList.remove('hot-rod-open');
     if (launcher.isConnected) launcher.focus({preventScroll:true});
@@ -961,7 +1156,7 @@ export function makeHotRod({client, memberId, launcher}) {
   },{signal:abort.signal});
   dialog.addEventListener('keydown',event=>{
     if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input,select,textarea,button')) return;
-    if (scene==='garage' && event.code==='KeyN') openPaper('cars');
+    if (scene==='garage' && event.code==='KeyN') openPaper('cover');
     if (scene==='garage' && event.code==='KeyM') toggleRadio();
     if (scene==='race' && event.code==='KeyP') togglePaused();
   },{signal:abort.signal});
