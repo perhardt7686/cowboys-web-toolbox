@@ -838,7 +838,8 @@ export function makeHotRod({client, memberId, launcher}) {
         copy('Wait for green. Arrow keys steer, accelerate and brake. E / Q shift. Ease off the gas or use Shift for the clutch.'),
         row(action('Stage at the line',goRace,{accent:true,disabled:busy}),action('Forfeit race',()=>{showForfeit=true;renderRace();})));
     } else if (showForfeit) {
-      raceDetails.append(copy('Forfeit this run? Any Classic wager will be lost.'),row(
+      const hasStake = !duel && !['kicks',undefined].includes(race.contract.stake);
+      raceDetails.append(copy(hasStake ? 'Forfeit this run and lose the wager?' : 'Forfeit this run?'),row(
         action('Confirm forfeit',() => void submitRace(true),{disabled:busy,accent:true}),
         action('Keep racing',()=>{showForfeit=false;renderRace();})));
     } else if (finishing || race.result) {

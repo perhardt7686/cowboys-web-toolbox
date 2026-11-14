@@ -180,7 +180,8 @@ export function createFamilyBoard() {
         row.append(el('span', 'family-score-rank', '#' + entry.rank), avatar(entry), label,
           el('strong', '', number(entry.score) + ' ' + games[key].unit));
         if (key === 'hotrod') label.append(el('small', 'family-hot-rod-record',
-          number(entry.crowns) + ' crowns · ' + number(entry.wins) + ' wins · ' + number(entry.duel_wins) + ' challenge wins'));
+          number(entry.crowns) + ' crowns · ' + number(entry.wins) + ' wins · ' + number(entry.losses) +
+          ' losses · ' + number(entry.duel_wins) + ' challenge wins'));
         rows.append(row);
       }
       target.append(rows);
