@@ -82,38 +82,122 @@ function border(c,title='',bottom='CLICK TO CONTINUE'){
  txt(c,'BANKROLL',4,190,12,8);txt(c,bottom,156,190,12,7);
 }
 function garage(c,key,body){
- border(c,'COWBOY MOTOR WORKS','HIT THE STREET');
- box(c,0,17,320,119,8);
- for(let x=0;x<320;x+=10)stroke(c,x,23,x+23,4,6);
- box(c,0,18,320,12,6);for(let x=0;x<320;x+=12)stroke(c,x,18,x+10,30,0);
- box(c,0,31,320,101,7);
- box(c,13,48,115,4,6);box(c,145,45,138,4,6);
- for(let i=0;i<7;i++)box(c,150+i*18,34,10,11,i%2?12:3);
- for(let i=0;i<7;i++){box(c,15+i*14,57,4,24,i%2?8:0);box(c,15+i*14,58,4,4,15);}
- disk(c,128,54,15,0);disk(c,128,54,12,15);
- stroke(c,128,54,128,45,0,2);stroke(c,128,54,135,60,0,2);
- box(c,290,41,24,38,15);box(c,293,48,18,25,11);txt(c,'JUL',295,53,0,7);txt(c,'63',297,63,0,7);
- box(c,0,131,320,56,7);poly(c,[[0,136],[320,122],[320,146],[0,156]],8,null);
- box(c,270,112,23,29,2);box(c,274,107,15,7,0);
- box(c,29,164,250,4,8);
- car(c,key,body,36,104,241);
- box(c,4,148,10,25,2);box(c,13,150,13,4,10);
+ border(c,'COWBOY MOTOR WORKS / 1963','HIT THE STREET');
+ // Brick garage with rafters, storage shelves, clock and real shop objects.
+ box(c,0,17,320,169,8);
+ box(c,0,17,320,24,6);
+ poly(c,[[0,17],[120,17],[151,40],[133,40]],6,0);
+ for(let x=0;x<320;x+=17)stroke(c,x,18,x+25,41,0,2);
+ box(c,0,42,320,87,7);
+ for(let y=43;y<128;y+=12){
+  stroke(c,0,y,319,y,8,1);
+  for(let x=((y/12)|0)%2?0:12;x<320;x+=25)stroke(c,x,y,x,y+11,8);
+ }
+ // Garage window and nighttime garden with small illuminated sign.
+ box(c,5,55,86,48,0);box(c,9,58,78,42,3);
+ for(let j=0;j<14;j++){
+  const x=12+(j*23)%71,y=61+(j*17)%29;
+  box(c,x,y,1+(j%3===0?1:0),1,15);
+ }
+ box(c,9,88,78,12,2);for(let x=10;x<86;x+=8)box(c,x,85+(x%4),4,6,10);
+ box(c,8,58,2,42,0);box(c,85,58,2,42,0);
+ box(c,47,58,2,42,7);box(c,10,77,77,2,0);
+ // Top left painted banner.
+ box(c,100,48,77,22,0);
+ box(c,102,50,73,18,1);
+ txt(c,'MOTOR',110,53,14,9);txt(c,'WORKS',109,61,15,7);
+ // A rotary clock, pegboard and wall calendar.
+ disk(c,186,56,14,0);disk(c,186,56,12,15);
+ for(let i=0;i<12;i++){const a=i*Math.PI/6;box(c,185+Math.cos(a)*10,55+Math.sin(a)*10,2,2,0);}
+ stroke(c,186,56,186,48,0,2);stroke(c,186,56,193,59,0,2);
+ box(c,224,47,53,40,0);box(c,227,49,47,36,7);
+ for(let y=53;y<83;y+=7)for(let x=233;x<271;x+=8)box(c,x,y,2,2,8);
+ // Wrenches and hammers are visible as physical, selectable shop equipment.
+ for(let i=0;i<3;i++){
+  const x=233+i*12;
+  box(c,x,56,2,19,0);box(c,x-3,53,8,4,i===1?12:15);
+  box(c,x-2,74,6,2,8);
+ }
+ box(c,285,47,31,45,15);box(c,287,50,27,39,11);
+ box(c,289,53,23,9,0);txt(c,'JUL',290,54,15,7);
+ txt(c,'19',292,68,0,10);txt(c,'63',292,80,0,6);
+ // Two wooden storage shelves, cans, a radio, and cardboard cartons.
+ box(c,196,92,118,5,6);box(c,196,115,118,5,6);
+ for(let x=202;x<310;x+=14){
+  const p=(x/14|0)%4;
+  box(c,x,97,10,17,[3,4,2,5][p]);
+  box(c,x,96,10,3,15);
+  box(c,x+3,104,4,4,14);
+ }
+ box(c,198,122,31,20,6);box(c,201,125,25,15,8);box(c,235,122,34,20,6);
+ box(c,239,126,25,11,7);box(c,271,123,34,19,0);
+ box(c,275,126,26,12,8);txt(c,'RADIO',275,127,15,5);
+ // Open work area and service pit below the car.
+ box(c,0,132,320,55,7);
+ poly(c,[[0,135],[320,126],[320,146],[0,156]],8,null);
+ for(let i=0;i<31;i++){const x=(i*53)%320,y=140+(i*17)%42;box(c,x,y,1+(i%3),1,0);}
+ box(c,23,173,265,4,0);
+ box(c,32,177,230,2,8);
+ // The selected vehicle dominates the foreground, but is not a flat CSS car.
+ box(c,25,152,265,5,8);
+ car(c,key,body,27,103,262);
+ // Floor tools: newspaper, axle jack, oil bottle, lug wrench, shop rag.
+ poly(c,[[9,166],[37,163],[46,177],[18,181]],15);
+ for(let i=0;i<4;i++)stroke(c,14,168+i*3,35,166+i*3,8);
+ box(c,151,165,29,5,6);box(c,162,152,5,19,8);box(c,164,147,10,7,12);
+ disk(c,157,173,4,0);disk(c,177,173,4,0);
+ box(c,206,168,40,3,0);stroke(c,207,168,220,156,0,2);
+ disk(c,231,157,6,8);disk(c,231,157,3,15);
+ box(c,254,165,9,16,5);box(c,255,162,7,4,15);
+ box(c,282,151,30,28,2);box(c,285,148,24,5,10);
+ stroke(c,288,161,303,174,0,2);stroke(c,303,161,288,174,0,2);
 }
 function diner(c){
- border(c,'MOONLIGHT DRIVE-IN','CLICK TO CHALLENGE');
- box(c,0,17,320,102,0);
- for(let i=0;i<31;i++)box(c,(i*67+9)%320,19+(i*13)%80,1,1,15);
- poly(c,[[0,43],[28,28],[267,28],[319,45],[319,113],[0,113]],7);
- box(c,0,31,320,8,4);box(c,0,37,320,4,14);
- for(let i=0;i<3;i++){let x=10+i*104;
-  box(c,x,46,98,52,0);box(c,x+4,49,90,44,7);box(c,x+6,52,86,39,3);
-  disk(c,x+31,68,8,6);box(c,x+23,76,16,17,4);
-  disk(c,x+64,67,7,12);box(c,x+57,74,16,19,5);
+ border(c,'MOONLIGHT DRIVE-IN','CLICK A DRIVER TO CHALLENGE');
+ box(c,0,17,320,170,0);
+ // Deep purple night with twinkling white stars behind a bustling neon cafe.
+ for(let i=0;i<38;i++){
+  const x=(i*73+11)%319,y=18+(i*19)%73;
+  box(c,x,y,1+(i%5===0?1:0),1,i%4===0?13:15);
  }
- box(c,119,24,100,27,5);box(c,123,27,93,21,4);
- txt(c,'MOONLIGHT',130,29,15,11);txt(c,'DRIVE-IN',139,41,14,7);
- box(c,0,111,320,76,8);stroke(c,0,164,319,164,0,3);
- car(c,'comet','hardtop',6,131,174);car(c,'cipherx','van',170,133,142);
+ box(c,0,76,320,95,7);
+ for(let x=0;x<320;x+=13){box(c,x,69+(x%4),11,7,8);}
+ // Angular roof, neon trim, tall glass windows and booths.
+ poly(c,[[0,63],[31,42],[280,42],[320,64],[320,84],[0,84]],8,0);
+ box(c,0,59,320,6,5);box(c,0,65,320,3,13);
+ box(c,0,72,320,4,2);
+ for(let i=0;i<4;i++){
+  const x=10+i*78;
+  box(c,x,83,72,51,0);
+  box(c,x+3,86,66,44,3);
+  box(c,x+4,86,63,5,11);
+  for(let b=0;b<3;b++){
+   disk(c,x+13+b*18,103+(b%2)*3,5,b===1?12:6);
+   box(c,x+7+b*18,108,13,13,b===1?13:5);
+  }
+  box(c,x+8,125,50,5,6);
+ }
+ for(let x=5;x<=319;x+=78)box(c,x,79,4,57,0);
+ // Neon original sign is drawn from glyphs, not borrowed game art.
+ box(c,74,20,176,39,5);box(c,78,23,168,33,0);
+ box(c,83,25,159,27,4);
+ txt(c,'MOONLIGHT',95,28,13,15);
+ txt(c,'DRIVE-IN',113,45,14,9);
+ disk(c,43,44,21,6);disk(c,43,44,17,14);
+ box(c,27,41,32,5,12);box(c,30,47,26,3,15);
+ box(c,33,53,20,4,6);
+ box(c,258,38,38,19,0);txt(c,'OPEN',262,42,10,10);
+ // Road, parking lines, two differently-bodied customers, street lamp.
+ box(c,0,136,320,51,8);box(c,0,162,320,5,0);
+ stroke(c,0,168,319,168,7,3);
+ for(let x=11;x<319;x+=58)box(c,x,179,35,2,15);
+ box(c,296,20,3,131,7);disk(c,297,23,8,15);
+ box(c,286,30,20,7,14);
+ car(c,'comet','hardtop',4,128,163);
+ car(c,'cipherx','muscle',158,128,154);
+ // Drivers and a take-out bag near the sidewalk.
+ disk(c,275,120,5,6);box(c,271,125,10,11,3);
+ box(c,277,138,11,11,6);box(c,281,135,4,3,0);
 }
 function engine(c){
  border(c,'UNDER THE HOOD','TURN BOLTS TWICE');
