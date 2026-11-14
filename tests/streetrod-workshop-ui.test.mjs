@@ -34,7 +34,7 @@ test('Distributor adjustment saves through the existing seven-setting campaign A
 
 test('Single monitor restores existing games rather than replacing game state',()=>{
  for(const name of ['commons-arcade-shell.mjs?v=compact6',
-   'commons-streetrod-season-bay.mjs?v=mechanic6','commons-streetrod-summer.mjs?v=ega7']){
+   'commons-streetrod-season-bay.mjs?v=mechanic6','commons-streetrod-summer.mjs?v=ega8']){
    assert.ok(html.includes(name),'Missing versioned game module: '+name);
  }
  assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(url('docs/commons-arcade-shell.mjs'))]));
