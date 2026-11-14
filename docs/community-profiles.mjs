@@ -34,7 +34,7 @@ export function createProfileStudio(ctx){
       bio:text('bio',draft.bio),
       interests:text('interests',(draft.interests||[]).join(',')).split(',').map(v=>v.trim()).filter(Boolean).slice(0,8),
       published:formData.has('published'),
-      details:{...draft.details,avatar_recipe:avatarRecipe,
+      details:{...draft.details,avatar_recipe:avatarMethod==='character'?avatarRecipe:null,
         text_size:text('textSize',draft.details?.text_size||'standard'),
         reduce_motion:formData.has('reduceMotion')}
     };
