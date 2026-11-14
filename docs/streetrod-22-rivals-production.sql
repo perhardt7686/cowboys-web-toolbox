@@ -68,7 +68,7 @@ begin
    'active_run',(select to_jsonb(r)-'user_id' from public.community_streetrod_season_races r
       where r.user_id=u and r.status='active' order by started_at desc limit 1)
  );
-end $function$
+end $function$;
 
 CREATE OR REPLACE FUNCTION public.community_streetrod_season_race_start(p_rival text, p_type text, p_stake text)
  RETURNS jsonb
@@ -105,7 +105,7 @@ BEGIN
  RETURN jsonb_build_object('id',r.id,'started_at',r.started_at,'seed',r.seed,
   'rival',r.rival,'type',r.race_type,'stake',r.stake,'car',r.car_key);
 END;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION public.community_streetrod_season_race_finish(p_run uuid, p_launch_ms integer, p_shifts integer[], p_trace jsonb)
  RETURNS jsonb
@@ -231,5 +231,4 @@ BEGIN
   (CASE WHEN won THEN 'Won against ' ELSE 'Lost to ' END)||(rival_data->>'name'),earned);
  RETURN receipt||jsonb_build_object('state',public.community_streetrod_season_state());
 END;
-$function$
-
+$function$;
