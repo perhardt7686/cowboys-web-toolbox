@@ -23,15 +23,75 @@ body.community-page #family-welcome h1 { font-size: clamp(1.28rem, 4.2vw, 2rem)!
 body.community-page #family-welcome-description { color: #f1dff7!important; }
 body.community-page #family-overview { min-width: 0; }
 body.community-page #family-overview h2 { color: var(--family-ink); line-height: 1.2; margin: 0; font-family: system-ui, sans-serif; font-weight: 780; }
-body.community-page #family-overview h2.family-games-title { color: #fff5e8; font-size: 1.18rem; margin-block: .75rem .15rem; }
+body.community-page #family-overview h2.family-games-title { color: var(--family-ink); font-size: 1.18rem; margin-block: .75rem .15rem; }
 body.community-page #family-updates:has(#community-announcement[hidden]) { display: none; }
 body.community-page #family-updates :is(.community-announcement, .community-announcement h2, .community-announcement p) { margin-block: .25rem; }
-body.community-page .family-quick-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-block: 0 .5rem; }
-body.community-page .family-quick-links a {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 44px; padding-inline: 2px; border: 1px solid #9d79ac; border-radius: 8px;
-  background: #342244; color: #fff6e7; font-weight: 690; text-decoration: none;
-  font-size: clamp(.72rem, 3.15vw, .95rem);
+body.community-page .family-quick-links {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
+  gap: .4rem;
+  margin-block: 0 .65rem;
+}
+body.community-page .family-quick-link {
+  --route-color: #c99df3;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: .12rem;
+  min-width: 0;
+  min-height: 82px;
+  padding: .2rem .1rem .38rem;
+  border: 1px solid var(--route-color);
+  border-radius: 12px;
+  background: radial-gradient(ellipse at 50% 10%, #46245c, #281536 80%);
+  box-shadow: 0 3px 0 #21102e, 0 5px 10px #24113930;
+  color: #fff6e8;
+  text-decoration: none;
+  text-align: center;
+}
+body.community-page .family-quick-link[data-route="conversations"] { --route-color: #ffb1d2; }
+body.community-page .family-quick-link[data-route="fridge"] { --route-color: #9de4c5; }
+body.community-page .family-quick-link[data-route="calendar"] {
+  --route-color: #ffde87;
+  background: radial-gradient(ellipse at 50% 10%, #553366, #2c1738 78%);
+  box-shadow: 0 3px 0 #21102e, 0 0 0 1px #ffe3a091, 0 5px 12px #9e5c323e;
+}
+body.community-page .family-quick-link:is(:hover,:focus-visible,[aria-current="location"]) {
+  border-color: var(--route-color);
+  background: radial-gradient(ellipse at 50% 10%, #664984, #382049 78%);
+  box-shadow: 0 3px 0 #21102e, inset 0 -3px var(--route-color);
+  color: #fff6e8;
+  text-decoration: none;
+}
+body.community-page .family-quick-art {
+  display: block;
+  object-fit: contain;
+  width: clamp(39px, 12vw, 58px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 10px;
+}
+body.community-page .family-quick-label {
+  font: 750 clamp(.71rem, 3vw, .96rem)/1.15 system-ui,sans-serif;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 360px) {
+  body.community-page .family-quick-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.community-page .family-quick-label { font-size: .85rem; }
+}
+@media (min-width: 600px) {
+  body.community-page .family-quick-links { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  body.community-page .family-quick-link {
+    grid-template-columns: auto minmax(0, auto);
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    gap: .35rem;
+    min-height: 66px;
+    padding: .25rem;
+  }
 }
 body.community-page .family-panel, body.community-page .family-standings-dialog {
   padding: .65rem .75rem; color: var(--family-ink); background: var(--family-surface);
@@ -53,7 +113,7 @@ body.community-page .family-panel button[aria-pressed="true"], body.community-pa
 body.community-page :is(.family-quick-links, .family-panel, .family-standings-dialog) :is(button,select,a,input,textarea,summary):focus-visible {
   outline: 3px solid var(--family-focus); outline-offset: 2px;
 }
-body.community-page .family-quick-links a:focus-visible { outline-color: var(--family-gold); }
+body.community-page .family-quick-links a:focus-visible { outline-color: #59296d; outline-offset: 3px; }
 body.community-page .family-score-heading, body.community-page .family-score-controls { display: flex; align-items: center; justify-content: space-between; gap: .4rem; }
 body.community-page .family-score-heading h2 { font-size: clamp(1.07rem, 4.2vw, 1.42rem); }
 body.community-page .family-score-controls { margin-bottom: .25rem; }
@@ -137,7 +197,39 @@ body.community-page .family-entry-stat { display: block; }
 body.community-page #conversations #community-categories button,
 body.community-page #conversations .community-tools :is(input,select),
 body.community-page #new-thread { min-height: 44px!important; }
-body.community-page #conversations #new-thread { white-space: normal; }
+body.community-page .family-conversation-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem .9rem;
+  margin-block: .2rem .45rem;
+}
+body.community-page .family-conversation-bar h2 {
+  color: var(--family-ink);
+  font: 780 clamp(1.15rem, 4.3vw, 1.45rem)/1.25 system-ui,sans-serif;
+  margin: 0;
+}
+body.community-page #conversations .family-conversation-bar #new-thread {
+  width: auto;
+  min-height: 44px;
+  padding: .4rem .85rem;
+  border: 1px solid #5b3470;
+  border-radius: 8px;
+  background: #56306d;
+  color: #fff9ed;
+  box-shadow: none;
+  font: 720 .9rem/1.25 system-ui,sans-serif;
+  white-space: normal;
+}
+body.community-page #conversations .family-conversation-bar #new-thread:is(:hover,:focus-visible) {
+  background: #3d204e;
+  color: #fff9ed;
+}
+body.community-page #conversations .family-conversation-bar #new-thread:focus-visible {
+  outline: 3px solid var(--family-focus);
+  outline-offset: 2px;
+}
 body.community-page #compact-feed-count { color: #f2dffb!important; }
 body.community-page #conversations .community-sidebar { margin-top: .75rem!important; }
 

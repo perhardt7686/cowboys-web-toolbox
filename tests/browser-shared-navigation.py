@@ -32,6 +32,30 @@ async def main():
                     await nav.wait_for(timeout=20000)
                     heading=page.locator('.cowboy-nav-heading strong')
                     assert await heading.inner_text()==title,(name,'title',await heading.inner_text())
+                    if name == 'Toolbox':
+                        entry=page.locator('header a.family-board-entry')
+                        assert await entry.get_attribute('href') == 'community.html'
+                        for width in [320, 375, 390, 768, 1280]:
+                            await page.set_viewport_size({'width':width,'height':844})
+                            box=await entry.bounding_box()
+                            assert box and box['height']>=44 and box['width']>=44, (width, box)
+                            assert box['x']>=0 and box['x']+box['width']<=width+1, (width, box)
+                        await page.set_viewport_size({'width':390,'height':844})
+                        assert await entry.inner_text() == 'Family Message Board'
+                        assert await entry.locator('.family-board-stars i').count() == 3
+                        assert await entry.evaluate("el=>getComputedStyle(el,'::after').animationName") == 'none'
+                        await page.emulate_media(reduced_motion='no-preference')
+                        motion=await entry.evaluate('''el=>{
+                           const star=el.querySelector('.family-board-stars i');
+                           const animation=star.getAnimations()[0];
+                           animation.pause();
+                           animation.currentTime=0;
+                           const before=getComputedStyle(star).transform;
+                           animation.currentTime=1568;
+                           return [before,getComputedStyle(star).transform,getComputedStyle(el,'::after').animationName];
+                        }''')
+                        assert motion[0]!=motion[1] and motion[2]=='family-board-shimmer', motion
+                        await page.emulate_media(reduced_motion='reduce')
                     toggle=nav.locator('button.cowboy-nav-toggle')
                     box=await toggle.bounding_box()
                     assert box and box['width']>=44 and box['height']>=44,(name,'toggle size',box)
@@ -56,6 +80,12 @@ async def main():
                     assert 'Family Message Board' in labels and not any(label in labels for label in ['Mahjong','w0rdle','Plate Challenge','Family games']),labels
                     if game_link:
                         assert await panel.locator(f'a[href="{game_link}"]').count()==1
+                        language=panel.get_by_label('Navigation language')
+                        await language.select_option('es')
+                        assert await entry.inner_text()=='Tablón familiar'
+                        assert await entry.locator('.family-board-stars i').count()==3
+                        await language.select_option('en')
+                        assert await entry.inner_text()=='Family Message Board'
                     (ROOT/'reports').mkdir(parents=True,exist_ok=True)
                     await page.screenshot(path=str(ROOT/'reports'/('shared-nav-'+name.lower()+'-mobile.png')),
                       full_page=False,animations='disabled')

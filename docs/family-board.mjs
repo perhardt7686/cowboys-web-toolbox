@@ -10,6 +10,12 @@ const games = {
   plates: {label: 'License Plates', unit: 'points', achievement: 'approved plates', entry: 'plate-game-open'}
 };
 const topics = ['scores', 'fridge', 'calendar'];
+const routes = [
+  ['games', 'Games'],
+  ['conversations', 'Conversations'],
+  ['fridge', 'Fridge'],
+  ['calendar', 'Calendar']
+];
 const number = value => Number(value || 0).toLocaleString('en-US');
 
 export function createFamilyBoard() {
@@ -51,10 +57,16 @@ export function createFamilyBoard() {
 
     const nav = el('nav', 'family-quick-links');
     nav.setAttribute('aria-label', 'Family board sections');
-    for (const [id, label] of [['family-games', 'Games'], ['family-conversations', 'Conversations'],
-      ['family-fridge', 'Fridge'], ['family-calendar', 'Calendar']]) {
-      const link = el('a', '', label);
-      link.href = '#' + id;
+    for (const [route, label] of routes) {
+      const link = el('a', 'family-quick-link');
+      const artwork = el('img', 'family-quick-art');
+      artwork.src = new URL('./family-route-' + route + '.webp', import.meta.url).href;
+      artwork.alt = '';
+      artwork.width = artwork.height = 160;
+      artwork.decoding = 'async';
+      link.href = '#family-' + route;
+      link.dataset.route = route;
+      link.append(artwork, el('span', 'family-quick-label', label));
       nav.append(link);
     }
     const scoreboard = el('section', 'family-panel family-scoreboard');
@@ -75,11 +87,12 @@ export function createFamilyBoard() {
     scoreboard.append(top, control, list, status);
     const gamesTitle = el('h2', 'family-games-title', 'Family Games');
     gamesTitle.id = 'family-games';
+    gamesTitle.tabIndex = -1;
     host.append(nav, scoreboard, gamesTitle);
     const updates = document.getElementById('family-updates');
     if (updates) scoreboard.before(updates);
     const sidebar = board.querySelector('.community-sidebar');
-    document.getElementById('family-conversations')?.before(sidebar);
+    document.getElementById('family-conversations')?.after(sidebar);
 
     const dialog = el('dialog', 'family-standings-dialog');
     dialog.setAttribute('aria-labelledby', 'family-standings-title');
@@ -98,12 +111,22 @@ export function createFamilyBoard() {
 
     function launchHash() {
       if (!active()) return;
-      const panel = [fridge.panel, calendar.panel].find(item => location.hash === '#' + item.id);
-      if (panel) {
-        panel.open = true;
-        panel.scrollIntoView({block: 'start'});
+      let current;
+      for (const link of nav.children) {
+        if (link.hash === location.hash) {
+          link.setAttribute('aria-current', 'location');
+          current = link;
+        } else link.removeAttribute('aria-current');
       }
+      if (!current) return;
+      const target = document.getElementById(current.hash.slice(1));
+      if (target?.tagName === 'DETAILS') target.open = true;
+      target?.scrollIntoView({block: 'start'});
     }
+    nav.addEventListener('click', event => {
+      const link = event.target.closest('.family-quick-link');
+      if (link?.hash === location.hash && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) launchHash();
+    });
     window.addEventListener('hashchange', launchHash);
     function showStandings() {
       if (!dialog.open) dialog.showModal();

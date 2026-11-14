@@ -12,7 +12,7 @@ HTML = """<!doctype html><html lang="en"><head><meta name="viewport" content="wi
 <section id="conversations" class="community-layout container" hidden>
 <div id="family-overview" hidden></div><div id="family-updates"><div id="community-announcement" hidden></div></div>
 <aside class="community-sidebar"></aside><div class="community-main"><div id="mahjong-root"><button id="mahjong-toggle">Mahjong</button></div>
-<div class="community-heading" id="family-conversations"><h2>Conversations</h2></div>
+<div class="family-conversation-bar" id="family-conversations"><h2>Conversations</h2></div>
 <div id="family-tools" hidden></div></div></section>
 </main><script type="module">
 import {createFamilyBoard} from '/family-board.mjs';
@@ -68,12 +68,36 @@ async def layout(page, width):
     assert await page.locator('#family-games').evaluate(
         "el=>Boolean(el.compareDocumentPosition(document.getElementById('mahjong-toggle')) & Node.DOCUMENT_POSITION_FOLLOWING)"
     )
+    shortcuts = page.get_by_role('navigation', name='Family board sections')
+    artwork = await shortcuts.locator('a').evaluate_all('''links=>Promise.all(links.map(async link=>{
+        const art=link.querySelector('img');
+        await art.decode();
+        const bounds=link.getBoundingClientRect();
+        return [link.hash, art.getAttribute('src').split('/').pop(), bounds.width, bounds.height,
+          link.querySelector('span').scrollWidth <= link.clientWidth];
+    }))''')
+    for (hash_name, source, link_width, link_height, label_fits), route in zip(
+        artwork, ['games', 'conversations', 'fridge', 'calendar'], strict=True
+    ):
+        assert hash_name == '#family-' + route, (width, hash_name)
+        assert source == 'family-route-' + route + '.webp', (width, source)
+        assert min(link_width, link_height) >= 44 and label_fits, (width, route, artwork)
+    await shortcuts.get_by_role('link', name='Games', exact=True).click()
+    await expect(shortcuts.get_by_role('link', name='Games', exact=True)).to_have_attribute('aria-current', 'location')
+    await shortcuts.get_by_role('link', name='Conversations', exact=True).click()
+    await expect(shortcuts.get_by_role('link', name='Conversations', exact=True)).to_have_attribute('aria-current', 'location')
+    await shortcuts.get_by_role('link', name='Fridge', exact=True).click()
+    await expect(page.locator('#family-fridge')).to_have_attribute('open', '')
     await page.get_by_role('combobox', name='Standings by game').select_option('mahjong')
     await expect(page.get_by_text('First member (you)')).to_be_visible()
     await page.get_by_role('button', name='View All Standings').click()
     await expect(page.get_by_text('Second member', exact=True)).to_be_visible()
     await page.get_by_role('button', name='Close', exact=True).click()
-    await page.get_by_role('link', name='Calendar', exact=True).click()
+    calendar = shortcuts.get_by_role('link', name='Calendar', exact=True)
+    await calendar.click()
+    await expect(calendar).to_have_attribute('aria-current', 'location')
+    await page.locator('#family-calendar > summary').click()
+    await calendar.click()
     await expect(page.get_by_text('Eastern time · 24-hour clock')).to_be_visible()
     await page.get_by_role('button', name='Week', exact=True).click()
     await expect(page.locator('.family-date-grid button')).to_have_count(7)

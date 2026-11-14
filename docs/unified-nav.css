@@ -50,29 +50,95 @@ body.cowboy-nav-ready .cowboy-nav-note{display:block;font-size:12px;line-height:
 @media(prefers-reduced-motion:reduce){body.cowboy-nav-ready .cowboy-nav-toggle > span{transition:none}}
 /* Games, including Street Rod, retain their own full-screen HUD; this is site navigation only. */
 
-.cowboy-nav-item.cowboy-nav-family,
-.toolbox-page .hero-actions .family-board-entry {
-  display: inline-flex;
-  gap: .6rem;
-  align-items: center;
-  min-height: 44px;
+body.toolbox-page .cowboy-nav-item.cowboy-nav-family {
   color: #fff2be;
   background: #352047;
   border: 1px solid #e6bd70;
-  box-shadow: 0 0 14px #d9a75433;
 }
-.cowboy-nav-item.cowboy-nav-family { display: flex; }
-.toolbox-page .hero-actions .family-board-entry {
-  padding: .55rem .9rem;
-  border-radius: .65rem;
-  text-transform: none;
-  letter-spacing: .01em;
+body.toolbox-page .masthead .family-board-entry {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  flex: 0 1 auto;
+  justify-content: center;
+  align-items: center;
+  gap: .46rem;
+  min-width: 0;
+  min-height: 48px;
+  padding: .4rem .64rem;
+  margin-inline-start: auto;
+  border: 1px solid #f6d286;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at 80% 0, #6b3991, transparent 70%), #391b51;
+  box-shadow: inset 0 0 0 1px #ffffff23, 0 0 12px #e3bb613f;
+  color: #fff3d2;
+  text-decoration: none;
+  text-align: center;
+  font: 780 clamp(.8rem, 2.65vw, 1rem)/1.1 system-ui,sans-serif;
+}
+body.toolbox-page.cowboy-nav-ready .masthead .family-board-entry { margin-inline-start: 0; }
+body.toolbox-page .masthead .family-board-entry:is(:hover,:focus-visible) {
+  background-color: #552c6e;
+  box-shadow: inset 0 0 0 1px #ffde9b6b, 0 0 17px #e3bb618c;
+  color: #fff6df;
+}
+body.toolbox-page .masthead .family-board-entry:focus-visible {
+  outline: 3px solid #fff1c4;
+  outline-offset: 3px;
+}
+body.toolbox-page .family-board-entry svg { flex: 0 0 21px; width: 21px; height: 21px; color: #ffdc8c; }
+body.toolbox-page .family-board-entry-label { max-width: 20ch; }
+body.toolbox-page .family-board-stars {
+  position: relative;
+  flex: 0 0 22px;
+  height: 27px;
+  color: #fff0b6;
+  pointer-events: none;
+}
+body.toolbox-page .family-board-stars i {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  inset: 5px auto auto 8px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0 50%, 37% 37%);
+}
+body.toolbox-page .family-board-stars i:nth-child(2) { width: 7px; height: 7px; inset: 0 auto auto 1px; color: #ddc1ff; }
+body.toolbox-page .family-board-stars i:nth-child(3) { width: 7px; height: 7px; inset: auto auto 1px 3px; color: #ffd177; }
+body.toolbox-page .family-board-entry::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 38%, #ffe8a828 50%, transparent 62%);
+  content: '';
+  opacity: 0;
+  pointer-events: none;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .toolbox-page .family-board-entry { animation: family-entry-glow 5s ease-in-out infinite; }
+  body.toolbox-page .family-board-stars i { animation: family-board-twinkle 5.6s ease-in-out infinite; }
+  body.toolbox-page .family-board-stars i:nth-child(2) { animation-delay: -.6s; }
+  body.toolbox-page .family-board-stars i:nth-child(3) { animation-delay: -1.25s; }
+  body.toolbox-page .family-board-entry::after { animation: family-board-shimmer 5.6s ease-in-out infinite; }
 }
-@keyframes family-entry-glow {
-  50% { box-shadow: 0 0 20px #d9a75470; }
+@keyframes family-board-twinkle {
+  0%, 18%, 41%, 100% { opacity: .78; transform: scale(.85); }
+  28% { opacity: 1; transform: scale(1.27) rotate(14deg); }
+}
+@keyframes family-board-shimmer {
+  0%, 14% { opacity: 0; transform: translateX(-75%); }
+  23% { opacity: 1; }
+  39%, 100% { opacity: 0; transform: translateX(75%); }
+}
+@media (max-width: 550px) {
+  body.toolbox-page.cowboy-nav-ready .masthead .header-inner { gap: 8px; }
+  body.toolbox-page.cowboy-nav-ready .cowboy-nav-heading small { display: none; }
+  body.toolbox-page .masthead .family-board-entry { gap: .3rem; }
+  body.toolbox-page .family-board-entry-label { max-width: 11ch; }
+}
+@media (max-width: 360px) {
+  body.toolbox-page.cowboy-nav-ready .cowboy-nav-heading { display: none; }
+  body.toolbox-page.cowboy-nav-ready .masthead .family-board-entry { margin-inline-start: auto; }
 }
 
 @media(min-width: 761px) { body.toolbox-page .toolbox-map-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }

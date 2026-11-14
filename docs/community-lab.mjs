@@ -49,7 +49,7 @@ export function createCommunityLab(ctx){
       card.prepend(tag);const footer=card.querySelector('.thread-bottom');if(footer){const count=document.createElement('span');count.className='lab-helpful-count';count.textContent=(t.helpful_count||0)+' helpful';footer.append(count);}
     });
     const challenge=ctx.state.threads.find(t=>t.post_kind==='challenge'&&(!t.challenge_ends_at||Date.parse(t.challenge_ends_at)>Date.now()));
-    let spotlight=$('lab-challenge');if(!spotlight){spotlight=document.createElement('div');spotlight.id='lab-challenge';document.querySelector('.community-heading').before(spotlight);}
+    let spotlight=$('lab-challenge');if(!spotlight){spotlight=document.createElement('div');spotlight.id='lab-challenge';$('family-conversations').before(spotlight);}
     spotlight.hidden=!challenge;if(challenge)spotlight.innerHTML=`<div><p class="eyebrow">COWBOY’S WEEKLY CHALLENGE</p><h3>${esc(challenge.title)}</h3><p>${challenge.challenge_ends_at?'Open until '+time(challenge.challenge_ends_at)+' · New York time':'Try a small project and share what you learn.'}</p></div><button class="button-lime" data-thread="${esc(challenge.id)}">Give it a go ↗</button>`;
   }
   function composerFields(kind){

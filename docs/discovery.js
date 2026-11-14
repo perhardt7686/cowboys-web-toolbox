@@ -40,7 +40,26 @@ let searchTimer;el('search').addEventListener('input',()=>{limit=24;window.Cowbo
 for(const k of ['topic','origin','sort'])el(k==='topic'?'topic-filter':k==='origin'?'origin-filter':'sort').addEventListener('change',()=>{limit=24;pushURL();render();});for(const k of Object.keys(DC.options))el('filter-'+k).addEventListener('change',e=>change({[k]:e.target.value}));el('folder-filter').addEventListener('change',e=>change({folder:e.target.value,saved:e.target.value!=='all'||state.saved}));el('categories').addEventListener('click',e=>{if(e.target.closest('[data-category]')){limit=24;state.topic='All';controls();pushURL();render();}});document.querySelector('.view-tabs').addEventListener('click',()=>{limit=24;pushURL();render();});el('saved').addEventListener('click',()=>{state.folder='all';pushURL();render();});
 for(const [selector,filename,type,content]of [['a[href="websites.csv"]','websites.csv','text/csv;charset=utf-8',()=>DC.csv(DATA.sites,DATA.videos)],['a[href="catalog.json"]','catalog.json','application/json',()=>JSON.stringify(DATA,null,2)]])document.querySelector(selector).addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();downloadText(filename,content(),type);},true);
 window.addEventListener('popstate',e=>{state={...DC.defaults,...DC.readState(location.search)};if(state.saved&&personal.folders.includes(e.state?.folder))state.folder=e.state.folder;limit=24;controls();renderCategories();render();});
-el('navigation-language').addEventListener('change',e=>{const es=e.target.value==='es';document.querySelectorAll('.masthead nav a').forEach((n,i)=>{n.textContent=(es?['Explorar','¡FOROS! ↗','Entrar ↗']:['Explore','MESSAGE BOARDS! ↗','Log in ↗'])[i]||n.textContent;n.lang=es?'es':'en';});el('search').placeholder=es?'Prueba combinar PDF, quitar fondo o currículum…':'Try join PDF, background remover, or résumé…';notify(es?'Navegación principal traducida; fichas y páginas externas conservan su idioma.':'Main navigation set to English.');});
+el('navigation-language').addEventListener('change', event => {
+  const es = event.target.value === 'es';
+  const translations = {
+    './': ['Home', 'Inicio'],
+    '#explore': ['Explore tools', 'Explorar herramientas'],
+    '#starter-packs': ['Starter guides', 'Guías para empezar'],
+    'community.html': ['Family Message Board', 'Tablón familiar'],
+    'community.html?auth=login': ['Log in ↗', 'Entrar ↗'],
+    'help.html': ['Help & accessibility', 'Ayuda y accesibilidad']
+  };
+  for (const link of document.querySelectorAll('.masthead nav a, .masthead a.family-board-entry')) {
+    const labels = translations[link.getAttribute('href')];
+    if (!labels) continue;
+    const label = link.querySelector('.family-board-entry-label, .cowboy-nav-item > span') || link;
+    label.textContent = labels[es ? 1 : 0];
+    label.lang = es ? 'es' : 'en';
+  }
+  el('search').placeholder = es ? 'Prueba combinar PDF, quitar fondo o currículum…' : 'Try join PDF, background remover, or résumé…';
+  notify(es ? 'Navegación principal traducida; fichas y páginas externas conservan su idioma.' : 'Main navigation set to English.');
+});
 el('discovery-dialog').addEventListener('cancel',()=>{setTimeout(()=>{if(dialogFocus?.isConnected)dialogFocus.focus();},0);});
 el('close-collection-controls').addEventListener('click',()=>{const panel=el('collection-controls');panel.open=false;panel.querySelector('summary').focus();panel.scrollIntoView({block:'start'});});
 el('clear-search').addEventListener('click',()=>pushURL());

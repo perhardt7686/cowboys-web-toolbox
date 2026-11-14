@@ -9,6 +9,8 @@
   if (!header) return;
   const iconPaths = {
     home:'<path d="m3 10 9-7 9 7v10h-6v-6H9v6H3z"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v5m10-5v5M3 11h18m-13 4h2m4 0h2"/>',
+    fridge:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 9h14M9 5v2m0 5v4"/>',
     tools:'<path d="M5 3h14v18H5zM9 8h6M9 12h6M9 16h4"/>',
     message:'<path d="M4 4h16v13H9l-5 4zM8 9h8M8 13h5"/>',
     search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>',
@@ -158,10 +160,10 @@
       approved = visible;
       memberActions.replaceChildren();
       if (!approved) return;
-      item('Family games','game','#family-games',null,false,memberActions);
+      item('Games','game','#family-games',null,false,memberActions);
       item('Conversations','message','#family-conversations',null,false,memberActions);
-      item('Fridge','tools','#family-fridge',null,false,memberActions);
-      item('Calendar','word','#family-calendar',null,false,memberActions);
+      item('Fridge','fridge','#family-fridge',null,false,memberActions);
+      item('Calendar','calendar','#family-calendar',null,false,memberActions);
       item('New post','plus',null,'new-post',false,memberActions);
     };
     const tryOpen = () => {

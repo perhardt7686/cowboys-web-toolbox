@@ -33,6 +33,11 @@ async def main():
         try:
             await page.goto(URL,wait_until='domcontentloaded',timeout=25000)
             await page.locator('#community-feed .thread-card').first.wait_for(timeout=20000)
+            assert not await page.get_by_text('What’s on your mind?', exact=True).count()
+            await page.get_by_role('button', name='New post', exact=True).click()
+            await page.locator('#lab-composer').wait_for()
+            await page.keyboard.press('Escape')
+            assert not await page.locator('#lab-composer').is_visible()
             findings=[]
             for label,selector in [
                 ('thread title','.thread-card .thread-title'),
