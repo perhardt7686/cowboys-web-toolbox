@@ -180,6 +180,10 @@ async def run_one(browser,width,height):
   assert '1 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
   assert '2 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
+  await p.keyboard.press('ArrowRight')
+  assert '3 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text(), 'DOS keyboard should page forwards'
+  await p.keyboard.press('ArrowLeft')
+  assert '2 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text(), 'DOS keyboard should page backwards'
   text=await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   assert '1955 Wagon' in text
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="viewcar"]').click()
@@ -201,7 +205,10 @@ async def run_one(browser,width,height):
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="diner"]').click()
   await p.locator('#sr-reborn .sr-v3-record-count').wait_for()
   assert await p.locator('body').get_attribute('data-arcade-scene')=='diner'
+  diner_before=await p.locator('#sr-reborn .sr-v3-canvas').evaluate('el=>el.toDataURL()')
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
+  diner_after=await p.locator('#sr-reborn .sr-v3-canvas').evaluate('el=>el.toDataURL()')
+  assert diner_before!=diner_after, 'The drive-in must show the selected rival car, not a static prop'
   assert 'Blackjack' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
