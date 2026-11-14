@@ -16,17 +16,7 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
     picture.src=src;picture.alt='';picture.width=96;picture.height=96;
     picture.decoding='async';span.append(picture);
   }
-  function castStrip(){
-    const host=document.querySelector('#conversations .community-main');
-    if(!host||document.getElementById('coco-cast-strip'))return;
-    const wrap=document.createElement('div');wrap.id='coco-cast-strip';wrap.className='coco-cast-strip';wrap.setAttribute('aria-label','Coco family illustrated avatars');
-    for(const [key,label] of cast){const uri=pictures.get(key);if(!safeImage(uri))continue;
-      const fig=document.createElement('figure'),img=document.createElement('img'),cap=document.createElement('figcaption');
-      img.src=uri;img.alt=label;img.width=58;img.height=58;img.loading='lazy';cap.textContent=label;
-      fig.append(img,cap);wrap.append(fig);
-    }
-    host.prepend(wrap);
-  }
+
   function update(){
     const board=document.getElementById('conversations');
     if(!board||board.hidden||!loaded)return;
@@ -39,7 +29,7 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
     const openMember=document.querySelector('#dialog-content [data-member-posts]')?.getAttribute('data-member-posts');
     if(openMember)replaceAvatar(document.querySelector('#dialog-content .member-card .profile-avatar'),byUser.get(openMember));
     const van=pictures.get('van');if(safeImage(van))document.body.style.setProperty('--coco-van-image','url("'+van+'")');
-    castStrip();
+    document.getElementById('coco-cast-strip')?.remove(); // deprecated family portrait block
   }
   function clear(){
     loaded=false;currentUserId=null;pictures.clear();identities.clear();byUser.clear();
