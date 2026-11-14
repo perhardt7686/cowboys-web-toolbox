@@ -41,7 +41,9 @@ test('County police and engine breakdown results come only from validated server
  assert.match(incidents,/r\.stake<>'title'/);
  assert.match(incidents,/police_stop boolean:=false/);
  assert.match(incidents,/earned:=earned-ticket/);
- assert.match(incidents,/won=won/);
+ assert.match(incidents,/won=\(seconds<enemy AND damage<52 AND NOT police_stop AND NOT motor_failure\)/);
+ const correction=await read('supabase/migrations/20261114134301_streetrod_unambiguous_incident_wins.sql');
+ assert.match(correction,/won=\(seconds<enemy AND damage<52 AND NOT police_stop AND NOT motor_failure\)/);
  assert.match(incidents,/community_streetrod_member\(\)/);
  assert.match(summer,/data-incident/);
  assert.match(summer,/data-champion/);
