@@ -155,6 +155,7 @@ function move(dir){
 function displayRecord(){
  const host=$('ss-dos-pocket');if(!host)return;
  const now=room(),cards=activeCards();
+ const openChallenge=host.querySelector('.ss-challenge-form');
  host.replaceChildren();
  const stage=$('ss-dos-stage');if(!stage)return;
  if(cards.length){
@@ -184,6 +185,7 @@ function displayRecord(){
  // Keep the original signed-in race challenge element and its listeners.
  const form=source()?.querySelector(':scope > .ss-challenge-form');
  if(form)host.append(form);
+ else if(openChallenge)host.append(openChallenge);
 }
 function sceneData(){
  const c=counter(),key=c.car||'rattler',lower=key.toLowerCase();
@@ -209,10 +211,48 @@ function render(force=false){
  }
  paint();displayRecord();
 }
+// Genuine two-turn mechanical bolts remain server-backed. The viewport only
+// paginates the part diagrams so a mechanic never has to scroll the full page.
+let partPage=0,bayObserver=null;
+function syncWorkbench(){
+ const bench=$('ss-season-bay'),list=bench?.querySelector('.ssb-components');
+ if(!bench||!list)return;
+ const cards=[...list.children].filter(el=>el.classList.contains('ssb-component'));
+ if(!cards.length)return;
+ partPage=Math.max(0,Math.min(cards.length-1,partPage));
+ let nav=bench.querySelector('.ssb-pager');
+ if(!nav){
+  nav=document.createElement('nav');nav.className='ssb-pager';
+  nav.setAttribute('aria-label','Physical engine and transmission parts');
+  nav.innerHTML='<button type="button" data-ssb-page="-1" aria-label="Previous engine part">‹</button><strong class="ssb-pager-label"></strong><button type="button" data-ssb-page="1" aria-label="Next engine part">›</button>';
+  list.before(nav);
+ }
+ cards.forEach((card,i)=>{card.hidden=i!==partPage;});
+ const label=cards[partPage].querySelector('header strong')?.textContent?.trim()||'Component';
+ const desc=label+' '+(partPage+1)+' / '+cards.length;
+ if(nav.querySelector('.ssb-pager-label').textContent!==desc)nav.querySelector('.ssb-pager-label').textContent=desc;
+ const older=nav.querySelector('[data-ssb-page="-1"]'),newer=nav.querySelector('[data-ssb-page="1"]');
+ older.disabled=partPage===0;newer.disabled=partPage===cards.length-1;
+}
+function installBay(){
+ const bench=$('ss-season-bay');
+ if(!bench||bayObserver)return;
+ bench.addEventListener('click',e=>{
+  const b=e.target.closest('[data-ssb-page]');if(!b)return;
+  e.preventDefault();partPage+=Number(b.dataset.ssbPage);syncWorkbench();
+ });
+ let pending=false;
+ bayObserver=new MutationObserver(mutations=>{
+  if(!mutations.some(m=>m.target.closest?.('.ssb-body')||m.target.classList?.contains('ssb-body')))return;
+  if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;syncWorkbench();});
+ });
+ bayObserver.observe(bench,{subtree:true,childList:true});
+ syncWorkbench();
+}
 let queued=false;
 function schedule(){
  if(queued)return;queued=true;
- requestAnimationFrame(()=>{queued=false;render();});
+ requestAnimationFrame(()=>{queued=false;render();installBay();});
 }
 function install(){
  const scene=source();if(!scene||installed)return false;
