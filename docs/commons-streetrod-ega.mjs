@@ -310,6 +310,8 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
  const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,calendar:vintageCalendar,gearbox};
  if(kind==='dash')dash(ctx,options);
  else (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
+ if(kind==='diner'&&options.boss)mysteryMachine(ctx,133,125,179);
+ if(kind==='garage'&&/mystery machine/i.test(String(options.carKey||'')))mysteryMachine(ctx,50,116,234);
  // Original palette and proportions, but never copied asset pixels.
  if(options.label&&['garage','diner'].includes(kind)){
   box(ctx,12,172,Math.min(270,String(options.label).length*6+10),11,0);
@@ -324,6 +326,35 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
   txt(ctx,String(options.subtitle).slice(0,32).toUpperCase(),137,190,14,7);
  }
 };
+/* Custom final boss: original turquoise floral van, never an imported
+   copyrighted TV/game sprite. It uses exactly the EGA 16-colour palette. */
+function mysteryMachine(c,x=138,y=127,width=175){
+ c.save();c.translate(x,y);c.scale(width/240,width/240);
+ box(c,0,0,240,86,0);
+ // Long forward-control van with squared roof and deep turquoise metal.
+ poly(c,[[4,29],[10,21],[25,13],[32,6],[195,6],[216,15],[234,25],[238,31],[239,61],[2,61]],3,0);
+ box(c,17,12,185,9,11);box(c,3,33,232,4,11);
+ poly(c,[[29,17],[37,8],[112,8],[112,28],[27,28]],0,15);
+ poly(c,[[119,8],[194,8],[213,25],[119,28]],0,15);
+ box(c,27,31,2,26,15);box(c,116,28,2,32,15);
+ box(c,208,27,2,31,0);box(c,12,49,218,5,14);
+ // An original sweeping botanical strip, not a copied decal.
+ poly(c,[[15,46],[40,37],[74,43],[110,37],[154,46],[197,39],[227,45],
+  [224,54],[188,48],[145,54],[109,45],[70,52],[35,46],[17,52]],10,null);
+ for(let j=0;j<5;j++){
+  const xx=48+j*34, yy=j%2?43:37;
+  for(let a=0;a<6;a++){
+   const rad=a*Math.PI/3;disk(c,xx+Math.cos(rad)*7,yy+Math.sin(rad)*7,4,j%2?14:15);
+  }
+  disk(c,xx,yy,4,6);
+ }
+ box(c,162,26,40,5,15);txt(c,'MYSTERY',163,28,0,7);
+ box(c,216,37,12,12,15);box(c,218,40,7,6,14);
+ disk(c,54,59,17,0);disk(c,54,59,12,7);disk(c,54,59,6,15);
+ disk(c,190,59,17,0);disk(c,190,59,12,7);disk(c,190,59,6,15);
+ box(c,0,63,240,2,8);
+ c.restore();
+}
 function componentCard(c,key,body){
  box(c,0,0,160,70,0);
  car(c,key,body,4,14,154);
@@ -463,7 +494,9 @@ function install(){
  observer.observe(ROOT,{subtree:true,childList:true});
  schedule();return true;
 }
-if(!install()){
- const wait=new MutationObserver(()=>{if(install())wait.disconnect();});
- wait.observe(document.body,{subtree:true,childList:true});
+if(!window.COWBOY_STREETROD_REBORN){
+ if(!install()){
+  const wait=new MutationObserver(()=>{if(install())wait.disconnect();});
+  wait.observe(document.body,{subtree:true,childList:true});
+ }
 }
