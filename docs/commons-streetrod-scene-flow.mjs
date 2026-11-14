@@ -240,10 +240,10 @@ function sceneData(){
   /sedan|hardtop/.test(lower)?'hardtop':'coupe';
  const creditNumber=Number(c.credits.replace(/[^\d]/g,''))||undefined;
  const real=source();
- const speed=Math.max(0,Number(String(real?.querySelector('#ss-speed')?.textContent||'0').replaceAll(',',''))||0);
- const rpm=Math.max(0,Number(String(real?.querySelector('#ss-rpm')?.textContent||'0').replaceAll(',',''))||0);
+ const speed=Math.max(0,parseFloat(String(real?.querySelector('#ss-speed')?.textContent||'0').replaceAll(',',''))||0);
+ const rpm=Math.max(0,parseFloat(String(real?.querySelector('#ss-rpm')?.textContent||'0').replaceAll(',',''))||0);
  const gear=real?.querySelector('#ss-gear')?.textContent?.trim()||'1';
- const percent=Math.max(0,Number(String(real?.querySelector('#ss-distance')?.textContent||'0').replaceAll(',',''))||0);
+ const percent=Math.max(0,parseFloat(String(real?.querySelector('#ss-distance')?.textContent||'0').replaceAll(',',''))||0);
  return {carKey:key,body:bodyType,bankroll:creditNumber,label:c.car||'THE GARAGE',
   speed,rpm,progress:Math.min(1,percent/100),gear};
 }
