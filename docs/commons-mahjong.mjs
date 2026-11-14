@@ -103,15 +103,21 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  function renderBoard(){const el=$('mahjong-board');if(!el||!el.isConnected||!state)return;const runState=state.run;if(!runState){el.replaceChildren(node('div','mahjong-board-empty','A mystery is waiting. Tap New game to begin.'));el.style.width='100%';el.style.minWidth='0';el.style.height='260px';return;}
   // Eight tile columns: fit the entire layout before any optional magnification.
   const wrap=$('mahjong-board-wrap');
-  const available=Math.max(180,(wrap?.clientWidth||el.clientWidth||360)-6);
-  const fitted=Math.max(21,Math.floor((available-26)/8.55));
-  const size=Math.min(102,Math.max(21,Math.round(fitted*boardZoomLevels[boardZoomIndex])));
+  const arcade=document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='mahjong';
+  const available=Math.max(160,(wrap?.clientWidth||el.clientWidth||360)-6);
+  const availableHeight=arcade?Math.max(135,(wrap?.clientHeight||window.innerHeight-160)-6):Infinity;
+  // Arcade mode is a genuine FIT view: fit all layers along both axes, not
+  // just 8 columns. Zoom/panning remain available outside full-screen mode.
+  const fitted=Math.max(15,Math.floor(Math.min((available-26)/8.55,(availableHeight-34)/(1.14*6.4))));
+  const zoom=arcade?1:boardZoomLevels[boardZoomIndex];
+  const size=Math.min(102,Math.max(15,Math.round(fitted*zoom)));
   const naturalWidth=Math.ceil(22+8.4*size);
-  el.style.width=boardZoomIndex===0?'100%':Math.max(available,naturalWidth)+'px';
+  el.style.width=arcade?naturalWidth+'px':boardZoomIndex===0?'100%':Math.max(available,naturalWidth)+'px';
   el.style.minWidth='0';
   el.style.setProperty('--mahjong-size',size+'px');
   el.style.height=Math.ceil(34+size*1.14*6.4)+'px';
-  const zLabel=$('mahjong-zoom-label');if(zLabel)zLabel.textContent=`${Math.round(boardZoomLevels[boardZoomIndex]*100)}%`;
+  el.style.maxHeight=arcade?availableHeight+'px':'';
+  const zLabel=$('mahjong-zoom-label');if(zLabel)zLabel.textContent=arcade?'FIT':`${Math.round(boardZoomLevels[boardZoomIndex]*100)}%`;
   const zIn=$('mahjong-zoom-in');if(zIn)zIn.disabled=boardZoomIndex===boardZoomLevels.length-1;
   const zOut=$('mahjong-zoom-out');if(zOut)zOut.disabled=boardZoomIndex===0;
   const hint=$('mahjong-view-hint');if(hint)hint.textContent=boardZoomIndex===0?'Entire board visible. Use + for a closer look.':'Zoomed in. Swipe the board to explore, or tap Fit board.';
