@@ -152,7 +152,7 @@ function garage(c,key,body){
  box(c,282,151,30,28,2);box(c,285,148,24,5,10);
  stroke(c,288,161,303,174,0,2);stroke(c,303,161,288,174,0,2);
 }
-function diner(c){
+function diner(c,rivalKey='meteor',rivalBody='muscle'){
  border(c,'MOONLIGHT DRIVE-IN','CLICK A DRIVER TO CHALLENGE');
  box(c,0,17,320,170,0);
  // Deep purple night with twinkling white stars behind a bustling neon cafe.
@@ -194,7 +194,7 @@ function diner(c){
  box(c,296,20,3,131,7);disk(c,297,23,8,15);
  box(c,286,30,20,7,14);
  car(c,'comet','hardtop',4,128,163);
- car(c,'cipherx','muscle',158,128,154);
+ car(c,rivalKey,rivalBody,158,128,154);
  // Drivers and a take-out bag near the sidewalk.
  disk(c,275,120,5,6);box(c,271,125,10,11,3);
  box(c,277,138,11,11,6);box(c,281,135,4,3,0);
@@ -377,6 +377,7 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
   scene==='calendar'?'calendar':scene==='gearbox'?'gearbox':scene;
  const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,carinspect:carInspection,calendar:vintageCalendar,gearbox,jail,breakdown,championship};
  if(kind==='dash')dash(ctx,options);
+ else if(kind==='diner')diner(ctx,options.rivalCarKey||'meteor',options.rivalBody||'muscle');
  else (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
  if(kind==='diner'&&options.boss)mysteryMachine(ctx,133,125,179);
  if(kind==='garage'&&/mystery machine/i.test(String(options.carKey||'')))mysteryMachine(ctx,50,116,234);
