@@ -241,7 +241,6 @@ function installChallenge(){
  const form=outer.querySelector(':scope > .ss-challenge-form');
  if(form){
   pocket.replaceChildren(form);form.classList.add('sr-v3-challenge');
-  stageKey+=':challenge';
  }
 }
 function intro(){
@@ -371,7 +370,15 @@ function install(){
  if(!source()||!root())return false;
  if(sourceObserver)return true;
  sourceObserver=new MutationObserver(records=>{
-  if(records.some(x=>x.target===source())){stageKey='';update();}
+  const external=records.some(m=>m.target===source()&&
+   [...m.addedNodes,...m.removedNodes].some(n=>{
+    if(n.nodeType!==1)return true;
+    return n.id!=='sr-reborn'&&!n.classList?.contains('ss-challenge-form');
+   }));
+  if(external){stageKey='';update();}
+  else if(records.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&n.classList?.contains('ss-challenge-form')))){
+   requestAnimationFrame(installChallenge);
+  }
  });
  sourceObserver.observe(source(),{childList:true});
  rootObserver=new MutationObserver(update);
