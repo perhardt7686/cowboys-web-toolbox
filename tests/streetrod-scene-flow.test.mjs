@@ -22,8 +22,8 @@ test('State-room flow is a fresh single 320x200 EGA surface without page scrolli
  assert.match(style,/image-rendering:pixelated/);
  assert.match(style,/#ss-scene>:not\(#sr-reborn\)/);
  assert.match(style,/overflow:hidden!important/);
- assert.match(html,/streetrod-reborn\.mjs\?v=reborn2/);
- assert.match(html,/streetrod-reborn\.css\?v=reborn2/);
+ assert.match(html,/streetrod-reborn\.mjs\?v=reborn3/);
+ assert.match(html,/streetrod-reborn\.css\?v=reborn3/);
  assert.doesNotMatch(html,/src="commons-streetrod-scene-flow\.mjs/);
  assert.doesNotMatch(html,/href="commons-streetrod-scene-flow\.css/);
 });
