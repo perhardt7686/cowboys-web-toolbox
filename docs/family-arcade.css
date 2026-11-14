@@ -99,7 +99,9 @@ body.community-page.arcade-on[data-arcade-game="plates"][data-arcade-scene="vote
 #family-plate-empty[hidden] { display: none!important; }
 body.community-page.arcade-on[data-arcade-game="plates"] #plate-game-content button { min-height: 44px!important; }
 body.community-page.arcade-on[data-arcade-game="plates"][data-arcade-scene="scores"] #plate-game-content { overflow: auto!important; }
-body.community-page.arcade-on[data-arcade-game="plates"] .plate-card .plate-guess { overflow-wrap: anywhere; }
+body.community-page.arcade-on[data-arcade-game="plates"] #plate-list .plate-preview .plate-photo {
+  max-height: min(35dvh, 300px);
+}
 body.community-page.arcade-on[data-arcade-game="plates"] #plate-game-content :is(#plate-status,#plate-post-status) { font: .85rem/1.35 system-ui,sans-serif; }
 
 body.community-page.arcade-on[data-arcade-game="drawing"] :is(#art-tools-toggle,#art-drawer button,#art-drawer select) { min-height: 44px!important; }
