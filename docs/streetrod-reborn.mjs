@@ -157,7 +157,7 @@ function cardHTML(el){
    cp.setAttribute('aria-label','Mystery Machine, final boss, original story rival identifier preserved');
   }
  }
- cp.classList.add('sr-v3-record');
+ cp.classList.add('sr-v3-record','arcade-current-card');
  return cp.outerHTML;
 }
 function sourcePanel(room){
