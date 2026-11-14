@@ -217,53 +217,30 @@ $$;
 revoke all on function public.community_family_fridge_update(text,bigint,text,text,text,text,boolean,timestamptz) from public, anon, authenticated;
 grant execute on function public.community_family_fridge_update(text,bigint,text,text,text,text,boolean,timestamptz) to authenticated;
 
-alter table public.community_family_calendar_events
-  add column created_by uuid references auth.users(id) on delete set null,
-  add column category text not null default 'plans'
-    check (category in ('plans','appointment','work','celebration','other'));
-
-CREATE OR REPLACE FUNCTION public.community_family_calendar_sync_snapshot(p_events jsonb, p_window_start timestamp with time zone, p_window_end timestamp with time zone)
- RETURNS jsonb
- LANGUAGE plpgsql
- SET search_path TO 'pg_catalog', 'public'
-AS $function$
-declare v_count integer;
-begin
- if p_events is null or jsonb_typeof(p_events)<>'array' or
-    jsonb_array_length(p_events)>5000 or
-    p_window_start is null or p_window_end is null or
-    p_window_end<=p_window_start or
-    p_window_end-p_window_start>interval '15 years' then
-    raise exception 'Invalid family calendar sync snapshot' using errcode='22023';
- end if;
- insert into public.community_family_calendar_events
-    (event_id,summary,description,location,starts_at,ends_at,all_day,status,updated_at)
- select src.id,coalesce(src.title,'Untitled event'),
-    coalesce(src.description,''),coalesce(src.location,''),
-    src.starts_at,src.ends_at,coalesce(src.all_day,false),
-    coalesce(src.status,'confirmed'),now()
- from jsonb_to_recordset(p_events) as src (
-   id text,title text,description text,location text,
-   starts_at timestamptz,ends_at timestamptz,all_day boolean,status text
- )
- where src.id not like 'board:%'
- on conflict(event_id) do update set
-    summary=excluded.summary,description=excluded.description,
-    location=excluded.location,starts_at=excluded.starts_at,
-    ends_at=excluded.ends_at,all_day=excluded.all_day,
-    status=excluded.status,updated_at=now()
- where community_family_calendar_events.event_id not like 'board:%';
- delete from public.community_family_calendar_events e
- where e.event_id not like 'board:%' and e.starts_at>=p_window_start and e.starts_at<p_window_end
-   and not exists(select 1 from jsonb_array_elements(p_events) j where j->>'id'=e.event_id);
- insert into public.community_family_calendar_sync(source,synced_at,status)
- values('family_google_primary',now(),'ok')
- on conflict(source) do update set synced_at=excluded.synced_at,status='ok';
- select count(*) into v_count from public.community_family_calendar_events where event_id not like 'board:%';
- return jsonb_build_object('events',v_count,'synced_at',now(),'source','family_google_primary');
-end $function$
-;
-
+-- Board events and the existing Google mirror share a feed. Keeping their
+-- storage separate preserves the existing import and calendar-email scope.
+create table public.community_family_board_events (
+  event_id text primary key check (event_id ~ '^board:[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'),
+  summary text not null,
+  description text not null default '',
+  location text not null default '',
+  starts_at timestamptz not null,
+  ends_at timestamptz not null check (ends_at > starts_at),
+  all_day boolean not null default false,
+  updated_at timestamptz not null default now(),
+  created_by uuid references auth.users(id) on delete set null,
+  category text not null default 'plans' check (category in ('plans','appointment','work','celebration','other'))
+);
+create index community_family_board_events_starts_at on public.community_family_board_events(starts_at);
+alter table public.community_family_board_events enable row level security;
+revoke all on public.community_family_board_events from public, anon, authenticated;
+grant all on public.community_family_board_events to service_role;
+create trigger signal_family_insert after insert on public.community_family_board_events
+  referencing new table as changed_rows for each statement execute function community_private.signal_family_update('calendar');
+create trigger signal_family_change after update on public.community_family_board_events
+  referencing new table as changed_rows for each statement execute function community_private.signal_family_update('calendar');
+create trigger signal_family_delete after delete on public.community_family_board_events
+  referencing old table as changed_rows for each statement execute function community_private.signal_family_update('calendar');
 
 create or replace function public.community_family_calendar_feed(p_from timestamptz, p_until timestamptz)
 returns jsonb language plpgsql stable security definer set search_path = ''
@@ -282,13 +259,22 @@ begin
     select coalesce(jsonb_agg(jsonb_build_object(
       'id', e.event_id, 'title', e.summary, 'description', e.description, 'location', e.location,
       'start', e.starts_at, 'end', e.ends_at, 'all_day', e.all_day, 'status', e.status,
-      'source', case when e.event_id like 'board:%' then 'board' else 'google' end,
+      'source', e.source,
       'category', e.category, 'updated_at', e.updated_at,
-      'editable', e.event_id like 'board:%' and (owner_access or e.created_by is not distinct from viewer)
+      'editable', e.source = 'board' and (owner_access or e.created_by is not distinct from viewer)
     ) order by e.starts_at, e.summary, e.event_id), '[]'::jsonb)
     from (
-      select * from public.community_family_calendar_events
-      where starts_at < p_until and ends_at >= p_from and status <> 'cancelled'
+      select * from (
+        select event_id, summary, description, location, starts_at, ends_at, all_day,
+          status, updated_at, 'google'::text as source, 'plans'::text as category, null::uuid as created_by
+        from public.community_family_calendar_events
+        where starts_at < p_until and ends_at >= p_from and status <> 'cancelled'
+        union all
+        select event_id, summary, description, location, starts_at, ends_at, all_day,
+          'confirmed', updated_at, 'board', category, created_by
+        from public.community_family_board_events
+        where starts_at < p_until and ends_at >= p_from
+      ) as combined
       order by starts_at, summary, event_id limit 400
     ) e
   ), 'last_synced', (select synced_at from public.community_family_calendar_sync where source = 'family_google_primary'),
@@ -303,7 +289,7 @@ as $$
 declare
   viewer uuid := auth.uid();
   owner_access boolean;
-  existing public.community_family_calendar_events%rowtype;
+  existing public.community_family_board_events%rowtype;
   event_title text := btrim(coalesce(p_event->>'title',''));
   event_location text := btrim(coalesce(p_event->>'location',''));
   event_notes text := btrim(coalesce(p_event->>'description',''));
@@ -322,7 +308,7 @@ begin
     raise exception 'Manage Google events in your Google Family calendar.' using errcode = '22023';
   end if;
   if p_action <> 'add' then
-    select * into existing from public.community_family_calendar_events where event_id = p_id for update;
+    select * into existing from public.community_family_board_events where event_id = p_id for update;
     if not found then raise exception 'This event was already removed.' using errcode = '22023'; end if;
     if not owner_access and existing.created_by is distinct from viewer then
       raise exception 'Only the organizer or board owner can change this event.' using errcode = '42501';
@@ -332,7 +318,7 @@ begin
     end if;
   end if;
   if p_action = 'remove' then
-    delete from public.community_family_calendar_events where event_id = p_id;
+    delete from public.community_family_board_events where event_id = p_id;
     return jsonb_build_object('id', p_id);
   end if;
 
@@ -363,12 +349,12 @@ begin
   then raise exception 'Choose a valid end after the start and avoid skipped daylight-saving times.' using errcode = '22023'; end if;
 
   if p_action = 'add' then
-    insert into public.community_family_calendar_events(
-      event_id, summary, description, location, starts_at, ends_at, all_day, status, updated_at, created_by, category
-    ) values (p_id,event_title,event_notes,event_location,event_start,event_end,all_day_event,'confirmed',clock_timestamp(),viewer,event_category)
+    insert into public.community_family_board_events(
+      event_id, summary, description, location, starts_at, ends_at, all_day, updated_at, created_by, category
+    ) values (p_id,event_title,event_notes,event_location,event_start,event_end,all_day_event,clock_timestamp(),viewer,event_category)
     on conflict (event_id) do nothing;
     if not found then
-      if not exists (select 1 from public.community_family_calendar_events
+      if not exists (select 1 from public.community_family_board_events
         where event_id = p_id and created_by = viewer and summary = event_title and starts_at = event_start
           and ends_at = event_end and category = event_category and description = event_notes
           and location = event_location and all_day = all_day_event) then
@@ -376,7 +362,7 @@ begin
       end if;
     end if;
   else
-    update public.community_family_calendar_events set summary = event_title, description = event_notes,
+    update public.community_family_board_events set summary = event_title, description = event_notes,
       location = event_location, starts_at = event_start, ends_at = event_end, all_day = all_day_event,
       category = event_category, updated_at = clock_timestamp()
     where event_id = p_id;

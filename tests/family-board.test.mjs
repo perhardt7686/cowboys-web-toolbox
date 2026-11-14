@@ -81,6 +81,7 @@ test('family tools enforce role isolation, persisted changes, and minimal live u
         await refused(call('community_family_fridge_state'));
         await refused(fridge('add',null,'groceries','fixture'));
         await refused(feed);
+        await refused(query('select * from public.community_family_board_events'));
         await refused(calendar('add','board:00000000-0000-4000-8000-000000000101'));
         assert.equal((await query('select count(*)::int as n from realtime.messages')).rows[0].n, 0);
       }
@@ -142,8 +143,9 @@ test('family tools enforce role isolation, persisted changes, and minimal live u
       assert.equal(before.length, 1);
       assert.equal(new Date(before[0].start).toISOString(), '2026-11-03T18:30:00.000Z');
       await as('system');
-      await call('community_family_calendar_sync_snapshot', JSON.stringify([{id:'google-fixture',title:'Fixture mirror',
-        starts_at:'2026-11-05T18:00:00Z',ends_at:'2026-11-05T19:00:00Z'}]), '2026-11-01','2026-12-01');
+      const googleInsert = "insert into public.community_family_calendar_events(event_id,summary,starts_at,ends_at) values('google-fixture','Fixture mirror','2026-11-05T18:00:00Z','2026-11-05T19:00:00Z')";
+      await query(googleInsert);
+      assert.equal((await query("select count(*)::int n from public.community_family_calendar_events where event_id like 'board:%'")).rows[0].n, 0);
       await as('other');
       const otherView = (await feed()).events;
       assert.equal(otherView.length, 2);
