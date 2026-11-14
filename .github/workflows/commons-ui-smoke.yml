@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'docs/commons-feed-legibility.css'
+      - 'docs/unified-nav.css'
+      - 'docs/unified-nav.js'
+      - 'tests/browser-shared-navigation.py'
       - 'tests/browser-commons-contrast.py'
       - 'tests/browser-streetrod-ega.py'
       - 'tests/browser-arcade-shell.py'
@@ -51,6 +54,7 @@ jobs:
         run: |
           python -m http.server 8765 --directory docs >/tmp/commons-smoke-http.log 2>&1 &
           python tests/browser-commons-contrast.py
+          python tests/browser-shared-navigation.py
           python tests/browser-streetrod-ega.py
           python tests/browser-arcade-shell.py
           python tests/browser-streetrod-scenes.py
@@ -62,6 +66,8 @@ jobs:
           name: commons-contrast-mobile-demo
           path: |
             reports/commons-mobile-legibility.png
+            reports/shared-nav-toolbox-mobile.png
+            reports/shared-nav-commons-mobile.png
             reports/streetrod-ega-iphone-sample.png
             reports/arcade-one-screen-iphone-sample.png
             reports/streetrod-room-garage-mobile.png
