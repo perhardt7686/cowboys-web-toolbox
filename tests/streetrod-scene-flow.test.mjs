@@ -69,3 +69,32 @@ test('Mobile scene gestures work and station entry never buys fuel',()=>{
  assert.match(fill,/pump\.click\(\)/,'Fuel only on an explicit player request');
  assert.doesNotMatch(fill,/is saved through/,'No premature save success message');
 });
+
+test('Original newspaper-first flow and real car inspection are independently rendered',()=>{
+ assert.match(reborn,/paperfront:\[\['USED CARS'/);
+ assert.match(reborn,/data-v3-action="paperfront"/);
+ assert.match(reborn,/data-v3-action="viewcar"/);
+ assert.match(reborn,/sr-v3-inline-preview/);
+ assert.match(ega,/function carInspection\(/);
+ assert.match(ega,/carinspect:carInspection/);
+ assert.match(style,/canvas\.sr-v3-inline-preview/);
+ assert.doesNotMatch(reborn,/fetch\([^\n]+street_rod_manual|LIB1|LIB2|HOT_DATA/);
+});
+
+test('Saved car purchase leads to garage only after authenticated backend success',()=>{
+ assert.match(summer,/cowboy:streetrod-season-saved/);
+ assert.match(reborn,/window\.addEventListener\('cowboy:streetrod-season-saved'/);
+ assert.match(reborn,/command==='buy_car'\|\|command==='switch'/);
+ assert.match(reborn,/command==='new_season'/);
+ assert.match(reborn,/if\(target==='hood'\)/);
+ assert.match(reborn,/if\(target==='wrench'\)/);
+});
+
+test('Original DOS input and drive-in rival artwork change with the selected driver',()=>{
+ assert.match(ega,/function diner\(c,rivalKey=/);
+ assert.match(ega,/car\(c,rivalKey,rivalBody,158,128,154\)/);
+ assert.match(reborn,/options\.rivalCarKey=rival\.dataset\.rivalKey/);
+ assert.match(reborn,/event\.code==='ArrowRight'/);
+ assert.match(reborn,/event\.code==='ArrowLeft'/);
+ assert.match(reborn,/pointerenter/);
+});
