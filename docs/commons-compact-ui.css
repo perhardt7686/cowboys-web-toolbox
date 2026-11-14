@@ -427,3 +427,12 @@ body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-inside .mahjong
  width:100%!important;min-width:0!important;min-height:39px!important;
  height:39px!important;padding:2px!important;box-shadow:none!important
 }
+
+/* The frame starts below the miniature HUD. A legacy 100% height on
+   drawing-studio-game-root otherwise adds the header height twice. */
+body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-game-root.arcade-game-active{
+ top:var(--arcade-top)!important;bottom:var(--arcade-bottom)!important;
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ max-height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ min-height:0!important;box-sizing:border-box!important
+}
