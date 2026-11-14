@@ -180,11 +180,18 @@ export function createProfileStudio(ctx){
       }else if(avatarMethod==='photo'&&photoChanged){
         const canvas=document.getElementById('profile-crop');
         blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.85));
-        path=id+'/avatar.webp';
+        // Keep the current custom character asset separate from uploaded
+        // portraits. Both private storage slots are already allowed by RLS.
+        const current=ctx.state.profile;
+        path=current?.details?.avatar_recipe
+          ? id+(current.avatar_path?.endsWith('/avatar.png')?'/avatar.webp':'/avatar.png')
+          : current?.avatar_mode==='photo'&&current.avatar_path
+            ? current.avatar_path : id+'/avatar.webp';
       }else if(avatarMethod==='initials'){
         draft.avatar_mode='initials';path=null;
       }else if(avatarMethod==='photo'&&ctx.state.profile?.details?.avatar_recipe){
-        const stored=id+'/avatar.webp';
+        const generated=ctx.state.profile.avatar_path;
+        const stored=id+(generated?.endsWith('/avatar.png')?'/avatar.webp':'/avatar.png');
         const original=await getAvatarPhoto(ctx.client(),stored);
         if(!original)throw new Error('Choose a photo to switch from your custom character.');
         path=stored;draft.avatar_mode='photo';
