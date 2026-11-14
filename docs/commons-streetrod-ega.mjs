@@ -223,6 +223,21 @@ function gas(c){
  box(c,280,109,23,10,0);stroke(c,301,113,309,142,0,4);
  car(c,'rattler','coupe',9,139,210);
 }
+/* Interactive classified inspection: original geometry, independently drawn
+ * paintwork. This scene is generated locally; no DOS LIB assets or photos. */
+function carInspection(c,key,body){
+ border(c,'USED MOTOR CARS / INSPECTION','BUY / HAGGLE / RETURN');
+ box(c,0,18,320,169,8);
+ box(c,10,26,300,122,0);box(c,13,29,294,116,7);
+ // Studio worklights, platform and mechanic's measuring marks.
+ box(c,18,34,284,8,8);txt(c,'USED CAR INSPECTION',80,35,14,10);
+ for(let x=25;x<300;x+=23)box(c,x,45,1,67,8);
+ box(c,20,128,280,9,0);box(c,23,136,274,3,15);
+ car(c,key,body,21,69,279);
+ box(c,13,153,294,24,15);
+ txt(c,String(key||'MOTOR CAR').toUpperCase().slice(0,30),20,157,0,10);
+ txt(c,'INSPECT BODY / COMPARE PRICE BEFORE BUYING',19,170,0,7);
+}
 function newspaper(c){
  border(c,'USED CARS & PARTS','PAGE 1 OF THE CLASSIFIEDS');
  box(c,10,21,300,159,15);box(c,15,25,290,149,7);
@@ -360,7 +375,7 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
  const kind=scene==='paper'?'newspaper':scene==='parts'?'parts':
   scene==='tune'||scene==='hood'?'engine':scene==='drive'?'dash':
   scene==='calendar'?'calendar':scene==='gearbox'?'gearbox':scene;
- const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,calendar:vintageCalendar,gearbox,jail,breakdown,championship};
+ const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,carinspect:carInspection,calendar:vintageCalendar,gearbox,jail,breakdown,championship};
  if(kind==='dash')dash(ctx,options);
  else (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
  if(kind==='diner'&&options.boss)mysteryMachine(ctx,133,125,179);
