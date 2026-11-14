@@ -134,7 +134,9 @@ async def run_one(browser,width,height):
   assert '1 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="next"]').click()
   assert '2 / 3' in await p.locator('#sr-reborn .sr-v3-record-count').inner_text()
-  assert '1955 Wagon' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  text=await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
+  print('RECORD AFTER NEXT:',repr(text[:800]),'current=',await p.locator('#sr-reborn .sr-v3-record-count').inner_text(),flush=True)
+  assert '1955 Wagon' in text
   await p.locator('#sr-reborn .sr-v3-pocket [data-ss-action="buy_car"]').click()
   assert 'Selected buy_car' in await p.locator('#ss-status').inner_text()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="garage"]').click()
