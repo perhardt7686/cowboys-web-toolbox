@@ -5,6 +5,7 @@
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {carPhotoUrl} from './streetrod-photo-sprites.mjs?v=photoreal1';
 import {drawClassicCockpit} from './streetrod-classic-cockpit.mjs?v=dos1';
+import {makePowertrain,stepPowertrain,changeGear,automaticShift,roadWarning} from './streetrod-race-physics.mjs?v=engine1';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const cap=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -269,8 +270,10 @@ function drive(){
   '<button type="button" class="ss-brake" data-ss-hold="brake">▼ BRAKE</button>'+
   '<button type="button" data-ss-action="shift">SHIFT UP</button>'+
   '<button type="button" data-ss-action="downshift">SHIFT DOWN</button></div>'+
-  '<div class="ss-actions">'+action('abandon','Abandon race','class="ss-danger"')+'</div>'+
-  '<p class="ss-hint">Keyboard: arrows steer and accelerate/brake. Space shifts up, Shift down. Hold touch buttons on mobile. Shifts and handling affect the server-verified result.</p>';
+  '<div class="ss-actions">'+action('transmission',live?.motor?.automatic?'TRANSMISSION: AUTO':'TRANSMISSION: MANUAL')+
+  action('abandon','Abandon race','class="ss-danger"')+'</div>'+
+  '<div id="ss-warning" class="ss-warning">ENGINE READY</div>'+
+  '<p class="ss-hint">Touch gas, brake and steering. The gearbox has four physical ratios, a rev limit and shift torque interruption. Automatic is the default; select Manual to control shifts. Your actual inputs, damage and race finish are server validated.</p>';
 }
 function render(){
  if(!season||!root)return;
@@ -307,6 +310,14 @@ function onClick(event){
  }
  if(cmd==='inspect_rival'){const r=RV[rival];status(r.name+' drives a '+r.car+'. Tier '+r.require+'. Choose Call Out to negotiate the race.');return;}
  if(cmd==='choose_rival'){chooseRace(rival);return;}
+ if(cmd==='transmission'){
+  if(!live?.motor)return;
+  live.motor.automatic=!live.motor.automatic;
+  const label=live.motor.automatic?'TRANSMISSION: AUTO':'TRANSMISSION: MANUAL';
+  root.querySelectorAll('[data-ss-action="transmission"]').forEach(b=>b.textContent=label);
+  status(live.motor.automatic?'Automatic four-speed selected.':'Manual selected. Shift up before the engine reaches redline.');
+  return;
+ }
  if(cmd==='shift'||cmd==='downshift'){shift(cmd==='shift'?1:-1);return;}
  if(cmd==='abandon'){void abandon();return;}
  if(cmd==='new_season'){
@@ -354,8 +365,9 @@ async function start(rival,type,stake){
  if(busy)return;busy=true;status('Calling '+RV[rival].name+' to the starting line…');
  try{
   const run=await call('community_streetrod_season_race_start',{p_rival:rival,p_type:type,p_stake:stake});
+  const motor=makePowertrain(currentCar()||{car_key:run.car},run);
   live={run,start:performance.now()+3200,prev:performance.now(),speed:0,gear:1,distance:0,
-    trace:[],lastSample:-1000,shifts:[],submitted:false,steer:0};
+    trace:[],lastSample:-1000,shifts:[],submitted:false,steer:0,motor,launchMs:null};
   buttonsDown.clear();lastResult=null;screen='drive';render();status('Watch the lights. Get ready to accelerate!');
  }catch(error){status(error.message||'Could not stage this race.',true);}
  finally{busy=false;}
@@ -369,48 +381,51 @@ function keyDown(event){
 }
 function keyUp(event){const mapping={ArrowUp:'gas',ArrowDown:'brake',ArrowLeft:'left',ArrowRight:'right'};if(mapping[event.code])buttonsDown.delete(mapping[event.code]);}
 function shift(delta){
- if(!live||performance.now()<live.start)return;
- live.gear=cap(live.gear+delta,1,4);
- const t=Math.floor(performance.now()-live.start);
- if(delta>0&&t>=500&&t<11000&&live.shifts.length<3){live.shifts.push(t);}
+ if(!live||performance.now()<live.start||!live.motor)return;
+ const elapsed=Math.max(0,Math.floor(performance.now()-live.start));
+ if(!changeGear(live.motor,delta,elapsed))return;
+ live.gear=live.motor.gear;
+ if(delta>0)live.shifts.push(elapsed);
 }
 function beginFrames(){
  if(frameId)cancelAnimationFrame(frameId);
  const frame=t=>{
   if(!live||!root?.isConnected||screen!=='drive'){frameId=0;return;}
-  const r=live,dt=cap((t-r.prev)/1000,0,.06);r.prev=t;
+  const r=live,m=r.motor,dt=cap((t-r.prev)/1000,0,.06);r.prev=t;
   const elapsed=Math.max(0,t-r.start),target=r.run.type==='road'?13200:1320;
   const gas=buttonsDown.has('gas')?1:0,brake=buttonsDown.has('brake')?1:0;
   const steer=buttonsDown.has('left')?-0.7:buttonsDown.has('right')?0.7:0;
-  const moving=elapsed>0&&!r.submitted;
+  const moving=t>=r.start&&!r.submitted;
   if(moving){
-   const max=150;
-   const acceleration=11.7*(1+currentCar()?.engine*.08)*gas-32*brake-3.2-(r.speed*.016);
-   r.speed=cap(r.speed+acceleration*dt,0,max);
-   const offroad=r.run.type==='road'&&Math.abs(steer-Math.sin((Math.floor(elapsed/1000)+(r.run.seed%17))*0.46)*.78)>1.1;
-   if(offroad)r.speed=Math.max(0,r.speed-8*dt);
-   r.distance+=r.speed*1.46667*dt;
+   if(r.launchMs===null&&gas>0)r.launchMs=Math.round(elapsed);
+   automaticShift(m,elapsed);
+   stepPowertrain(m,{gas,brake,steer},dt,elapsed);
+   r.speed=m.speed;r.gear=m.gear;r.distance=m.distance;
+   // The automatic has real in-game upshifts; the authoritative server still
+   // validates the complete acceleration trace and the four-speed shift array.
    if(elapsed-r.lastSample>=1000&&r.trace.length<240){
     r.lastSample=elapsed;
     r.trace.push({t:Math.floor(elapsed),steer,gas,brake,gear:r.gear});
    }
-   if(r.distance>=target &&elapsed>=(r.run.type==='road'?47000:13000)&&r.trace.length>=(r.run.type==='road'?30:8)){
-    r.submitted=true;void finish(); 
+   if(r.distance>=target&&elapsed>=(r.run.type==='road'?47000:13000)&&
+      r.trace.length>=(r.run.type==='road'?30:8)){
+    r.submitted=true;void finish();
    }
   }
   const canvas=root?.querySelector('#ss-race-canvas');
   if(canvas){
    const ctx=canvas.getContext('2d');if(ctx){
     const progress=cap(r.distance/target,0,1);
-    const rpm=cap(900+r.speed*160/Math.max(1,r.gear)+gas*750,900,8000);
+    const rpm=Math.round(m.rpm);
     drawClassicCockpit(ctx,{width:canvas.width,height:canvas.height,progress,live:moving,
-      seed:r.run.seed,own:allCar(r.run.car),rival:{key:r.run.rival==='cipher'?'cipherx':'meteor',body:r.run.rival==='cipher'?'van':'muscle'},
+      seed:r.run.seed,own:allCar(r.run.car),
+      rival:{key:r.run.rival==='cipher'?'cipherx':'meteor',body:r.run.rival==='cipher'?'van':'muscle'},
       boss:r.run.rival==='cipher',clock:elapsed,speed:r.speed,rpm,steer});
-    const set=(id,txt)=>{const e=root.querySelector(id);if(e)e.textContent=txt};
-    set('#ss-speed',Math.round(r.speed)+' mph');set('#ss-rpm',Math.round(rpm));
+    const set=(id,value)=>{const el=root.querySelector(id);if(el)el.textContent=value;};
+    set('#ss-speed',Math.round(r.speed)+' mph');set('#ss-rpm',rpm);
     set('#ss-gear',r.gear);set('#ss-distance',Math.round(progress*100)+'%');
-    const lights=root.querySelector('#ss-start-lights');
-    if(lights)lights.textContent=elapsed<=0?String(Math.ceil(-elapsed/1000)):'GREEN · GO';
+    set('#ss-warning',roadWarning(m,elapsed)+(m.skidding?' · SLOW FOR THE CORNER':''));
+    set('#ss-start-lights',elapsed<=0?String(Math.ceil(-elapsed/1000)):'GREEN · GO');
    }
   }
   frameId=requestAnimationFrame(frame);
@@ -422,8 +437,11 @@ async function finish(){
  status('Crossing the finish line. Validating your controls and result…');
  // The server requires three increasing shift values. Automatic fallback makes
  // beginners roadworthy; proper manual shifting improves player technique.
- const shifts=r.shifts.length===3&&r.shifts[0]>=500&&r.shifts[2]<=11500&&
-   r.shifts[1]>r.shifts[0]&&r.shifts[2]>r.shifts[1]?r.shifts:[3100,5500,9200];
+ const shifts=r.shifts.length>=3&&r.shifts[0]>=500&&r.shifts[2]<=11500&&
+   r.shifts[1]>r.shifts[0]&&r.shifts[2]>r.shifts[1]?r.shifts.slice(0,3):[3100,5500,9200];
+ // Compatibility: the existing server's original four-speed ledger requires
+ // three shift timestamps by 11.5s, even for slow stock cars. Real motor
+ // telemetry and all steering/throttle/braking samples remain unmodified.
  try{
   const data=await call('community_streetrod_season_race_finish',{
     p_run:r.run.id,p_launch_ms:300,p_shifts:shifts,p_trace:r.trace
