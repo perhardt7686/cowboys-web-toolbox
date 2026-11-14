@@ -19,9 +19,13 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <link rel="stylesheet" href="/commons-vdacs-study.css">
 <link rel="stylesheet" href="/commons-streetrod-summer.css">
 <link rel="stylesheet" href="/commons-arcade-shell.css">
+<link rel="stylesheet" href="/commons-compact-ui.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true}</script></head>
 <body class="community-page"><section id="conversations">
 <div class="community-main">
+<div id="coco-cast-strip">Old avatar portrait strip</div>
+<div id="community-feed"><article class="thread-card"><h3><button class="thread-title">Discussion 1</button></h3><p class="thread-excerpt">Short preview 1</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 2</button></h3><p class="thread-excerpt">Short preview 2</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 3</button></h3><p class="thread-excerpt">Short preview 3</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 4</button></h3><p class="thread-excerpt">Short preview 4</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 5</button></h3><p class="thread-excerpt">Short preview 5</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 6</button></h3><p class="thread-excerpt">Short preview 6</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 7</button></h3><p class="thread-excerpt">Short preview 7</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 8</button></h3><p class="thread-excerpt">Short preview 8</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 9</button></h3><p class="thread-excerpt">Short preview 9</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 10</button></h3><p class="thread-excerpt">Short preview 10</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 11</button></h3><p class="thread-excerpt">Short preview 11</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 12</button></h3><p class="thread-excerpt">Short preview 12</p></article></div>
+<button id="load-more" hidden>More</button>
 <section id="mahjong-root" class="mahjong-game">
 <button class="mahjong-entry-button" id="mahjong-toggle" aria-expanded="false">MAHJONG</button>
 <div id="mahjong-inside" hidden><div class="mahjong-stats">RUN STATS</div>
@@ -35,7 +39,8 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <section class="mahjong-history">HISTORY</section></div></section>
 <section id="plate-game-root" class="plate-game"><button class="plate-entry-button" id="plate-game-open" aria-expanded="false">PLATES</button>
 <div id="plate-game-content" hidden><form id="plate-new">POST PHOTO<input type="file"><input placeholder="PLATE"><textarea placeholder="GUESS"></textarea></form>
-<div id="plate-list"><article class="plate-card">ONE</article><article class="plate-card">TWO</article><article class="plate-card">THREE</article></div>
+<div id="plate-list"><article class="plate-card" data-plate-id="a">ONE</article><article class="plate-card" data-plate-id="b">TWO</article><article class="plate-card" data-plate-id="c">THREE</article></div>
+<section id="plate-gallery"><header class="plate-gallery-head">Saved photos</header><div id="plate-gallery-grid" class="plate-gallery-grid"><button class="plate-gallery-tile" data-plate-id="a">ONE</button><button class="plate-gallery-tile" data-plate-id="b">TWO</button></div><nav class="plate-gallery-pages"><button>Earlier</button><span>1 / 1</span><button>Later</button></nav></section>
 <section class="commons-score-ribbon">SCORE</section><section class="plate-heading">LEADERS</section></div></section>
 <section id="letter-lock-root" class="mahjong-game"><button class="mahjong-entry-button" id="letter-lock-toggle" aria-expanded="false">W0RDLE</button>
 <div id="letter-lock-content" hidden><div class="letter-lock-inner"><div class="letter-lock-layout">
@@ -73,8 +78,7 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <section id="drawing-studio-game-root" class="mahjong-game drawing-studio-game">
 <button id="drawing-studio-toggle" aria-expanded="false" class="mahjong-entry-button">DRAWING STUDIO</button>
 <div id="drawing-studio-inside" hidden><section id="commons-art" class="family-stage">
-<div id="commons-drawing-root"><div class="art-tools"><button>PEN</button><button>ERASER</button></div>
-<canvas width="320" height="200" style="max-width:100%"></canvas></div></section></div></section>
+<div id="commons-drawing-root"><div class="art-tools" id="art-toolbox"><button>PEN</button><button>ERASER</button></div><div class="art-actions"><button>Save PNG</button></div><div id="art-viewport"><canvas id="commons-art-canvas" width="1000" height="640"></canvas></div><select id="art-zoom"><option value="1" selected>Fit</option></select></div></section></div></section>
 </div></section>
 <script>
 for (const [btn,inside] of [['mahjong-toggle','mahjong-inside'],['plate-game-open','plate-game-content'],['letter-lock-toggle','letter-lock-content'],['word-game-toggle','word-game-inside'],['sr-toggle','sr-inside'],['vdacs-study-toggle','vdacs-study-inside'],['drawing-studio-toggle','drawing-studio-inside']]) {
@@ -98,6 +102,7 @@ for(const word of ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM']){
  document.getElementById('letter-lock-keyboard').append(row);
 }
 </script><script type="module" src="/commons-arcade-shell.mjs"></script>
+<script type="module" src="/commons-board-compact.mjs"></script>
 </body></html>"""
 
 async def check_one(page, id, root):
@@ -128,12 +133,20 @@ async def run_device(browser,width,height):
   assert await page.locator("#arcade-launch").count()==0, "The old shared launcher must be gone"
   assert await page.locator("#arcade-program-grid").count()==1, "The old hidden markup may remain for settings but must not appear"
   assert await page.locator("#arcade-program-grid").is_hidden()
+  assert await page.locator("#coco-cast-strip").is_hidden(),"Portrait strip should not appear"
+  assert await page.locator("#community-feed .thread-card:visible").count()==6,"Initially show six conversations"
+  await page.locator("#compact-feed-more").click()
+  assert await page.locator("#community-feed .thread-card:visible").count()==12,"Reveal another six"
   assert await page.locator("#arcade-drawing-entry").count()==0,"Duplicate drawing button must not exist"
   assert await page.locator("#drawing-studio-toggle").count()==1,"Keep only original Drawing Studio button"
   for selector in ["#mahjong-toggle","#letter-lock-toggle","#word-game-toggle",
     "#plate-game-open","#sr-toggle","#vdacs-study-toggle","#drawing-studio-toggle"]:
    assert await page.locator(selector).is_visible(),selector
   await check_one(page,"#mahjong-toggle","mahjong")
+  await page.locator("#mahjong-toggle").click()
+  assert await page.locator("#mahjong-board-wrap").evaluate("el=>getComputedStyle(el).overflow==='hidden'"),"Board must never scroll"
+  assert await page.locator(".mahjong-game-zone .mahjong-actions").evaluate("el=>getComputedStyle(el).gridTemplateColumns.split(' ').length===5"),"Mahjong actions must be in one row"
+  await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
   await page.locator("#mahjong-toggle").click()
   await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
   assert await page.locator("body").get_attribute("data-arcade-scene")=="levels"
@@ -153,6 +166,9 @@ async def run_device(browser,width,height):
   assert await page.locator(".arcade-current-card").count()==1
   await page.locator('#arcade-hud [data-arcade-action="next"]').click()
   assert await page.locator("#arcade-hud-pagecount").inner_text()=="2 / 3"
+  await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
+  assert await page.locator("body").get_attribute("data-arcade-scene")=="history"
+  assert await page.locator("#plate-gallery").is_visible(),"Saved photo gallery must show"
   await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
   await page.locator('#sr-toggle').click()
   for _ in range(4):await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
@@ -165,6 +181,12 @@ async def run_device(browser,width,height):
   await page.locator("#drawing-studio-toggle").click()
   assert await page.locator("#drawing-studio-inside").evaluate("el=>!el.hidden")
   assert await page.locator("#commons-drawing-root canvas").count()==1,"Original canvas must survive fullscreen navigation"
+  assert await page.locator("#art-viewport").is_visible(),"Actual canvas viewport is visible"
+  assert await page.locator("#art-tools-toggle").is_visible(),"Tools drawer control is visible"
+  await page.locator("#art-tools-toggle").click()
+  assert await page.locator("#art-drawer").is_visible(),"Advanced tools can be opened"
+  await page.locator("#art-tools-toggle").click()
+  assert await page.locator("#art-drawer").is_hidden(),"Advanced tools can close"
   await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
   await page.locator("#letter-lock-toggle").click()
   if height>=650:
