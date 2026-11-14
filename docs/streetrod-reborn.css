@@ -686,3 +686,34 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn :is(.sr-v3-
   max-height:53px!important
  }
 }
+
+/* Independent 1989-style startup; a presentation effect, not a real BIOS. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ justify-content:center!important;align-items:flex-start!important;
+ min-width:0!important;min-height:0!important;max-height:100%!important;
+ overflow:hidden!important;gap:5px!important;padding:7px!important;
+ background:#000!important;color:#55ff55!important;
+ font:bold clamp(9px,2.45vw,13px)/1.24 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post strong{
+ color:#ffff55!important;font:900 clamp(12px,3vw,16px)/1.14 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post p{
+ color:#55ff55!important;margin:0!important;padding:0!important;
+ font:700 clamp(9px,2.4vw,12px)/1.23 monospace!important;white-space:normal!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post small{
+ color:#aaa!important;font:500 9px/1.1 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post button{
+ align-self:flex-start!important;min-height:29px!important;background:#0000aa!important
+}
+@media(orientation:landscape) and (max-height:550px){
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post{
+  gap:2px!important;padding:3px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-post p{
+  font-size:9px!important;line-height:1.05!important
+ }
+}
