@@ -6,6 +6,7 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const config=window.COWBOY_COMMUNITY_CONFIG;
 let root=null,holder=null,client=null,promise=null,vehicle=null,session=null,bench=null;
 let busy=false,tool='loosen',turnGesture=null,blockedBoltClick=null;
+let activeAssembly='engine'; // One physical assembly per non-scrolling DOS room.
 const defs=[
  ['carb','Carburetor','Twin carb mounting studs'],
  ['manifold','Intake manifold','Four inlet fasteners'],
@@ -83,6 +84,46 @@ function installWrenchGestures(){
  holder.addEventListener('lostpointercapture',cancelTurn);
 }
 
+function renderAssemblyPager(){
+ if(!holder)return;
+ const area=holder.querySelector('.ssb-components');
+ if(!area)return;
+ const panels=[...area.querySelectorAll('.ssb-component')];
+ if(!panels.length)return;
+ const names=defs.map(x=>x[0]);
+ if(!names.includes(activeAssembly))activeAssembly='engine';
+ const i=names.indexOf(activeAssembly);
+ panels.forEach((card,n)=>{
+  const show=card.dataset.assembly===activeAssembly;
+  card.hidden=!show;
+  card.classList.toggle('ssb-current-assembly',show);
+  card.setAttribute('aria-hidden',String(!show));
+ });
+ const pager=document.createElement('nav');
+ pager.className='ssb-assembly-pager';pager.setAttribute('aria-label','Under-hood part selection');
+ pager.innerHTML='<button type="button" data-ssb-page="prev" aria-label="Previous assembly">◀</button>'+
+  '<output aria-live="polite">'+(i+1)+' / '+names.length+' · '+defs[i][1].toUpperCase()+'</output>'+
+  '<button type="button" data-ssb-page="next" aria-label="Next assembly">▶</button>';
+ area.before(pager);
+}
+function moveAssembly(direction){
+ const names=defs.map(x=>x[0]);
+ const i=names.indexOf(activeAssembly);
+ activeAssembly=names[(i+direction+names.length)%names.length];
+ renderAssemblyPagerOnly();
+}
+function renderAssemblyPagerOnly(){
+ if(!holder)return;
+ const cards=[...holder.querySelectorAll('.ssb-components>.ssb-component')];
+ const names=defs.map(x=>x[0]),i=names.indexOf(activeAssembly);
+ cards.forEach(el=>{
+  el.hidden=el.dataset.assembly!==activeAssembly;
+  el.setAttribute('aria-hidden',String(el.hidden));
+  el.classList.toggle('ssb-current-assembly',!el.hidden);
+ });
+ const output=holder.querySelector('.ssb-assembly-pager output');
+ if(output)output.textContent=(i+1)+' / '+names.length+' · '+defs[i][1].toUpperCase();
+}
 function contents(){
  if(!holder)return;
  if(!bench){holder.querySelector('.ssb-body').innerHTML='<p>Opening your saved engine bay…</p>';return;}
@@ -91,7 +132,7 @@ function contents(){
  const ready=Boolean(bench.ready);
  const partView=defs.map(([key,label,desc])=>{
   const part=parts[key]||{},mounted=Boolean(part.mounted),bolts=part.bolts||[];
-  return '<article class="ssb-component '+(mounted?'mounted':'removed')+'"><header><strong>'+safe(label)+'</strong>'+
+  return '<article data-assembly="'+key+'" class="ssb-component '+(mounted?'mounted':'removed')+'"><header><strong>'+safe(label)+'</strong>'+
    '<span>'+(mounted?'BOLTED TO CAR':'IN PARTS TRAY')+'</span></header><p>'+safe(desc)+'</p>'+
    nextTorqueGuide(part)+
    '<div class="ssb-bolts">'+(mounted?bolts.map((value,i)=>
@@ -127,6 +168,7 @@ function contents(){
  (planned?'<button type="button" data-ssb="complete" '+(!service.prepared||!ready?'disabled':'')+'>Certify new part installation</button>':'')+
  '<button type="button" data-ssb="reset">Restore original assembly</button>'+
  '<button type="button" data-ssb="close">Lower hood</button></div></div>';
+ renderAssemblyPager();
 }
 function mount(){
  root=document.getElementById('streetrod-summer');
@@ -138,6 +180,9 @@ function mount(){
  const scene=root.querySelector('#ss-scene');if(scene)scene.after(holder);else root.append(holder);
  holder.addEventListener('click',event=>{
   const b=event.target.closest('button');if(!b||b.disabled||busy)return;
+  if(b.dataset.ssbPage){
+   moveAssembly(b.dataset.ssbPage==='next'?1:-1);return;
+  }
   if(b.dataset.ssbTool){tool=b.dataset.ssbTool;contents();return;}
   const a=b.dataset.ssb;if(!a)return;
   if(a==='bolt'&&blockedBoltClick&&performance.now()<blockedBoltClick.until&&
@@ -174,6 +219,8 @@ async function open(){
  try{
   const data=await rpc('community_streetrod_season_state');
   session=data;vehicle=data?.season?.current_car;
+  const job=data?.season?.service?.kind;
+  activeAssembly=job==='gearbox'?'gearbox':job==='tires'?'wheels':'engine';
   if(!vehicle)throw Error('Buy or select a seasonal car in the newspaper first.');
   bench=await rpc('community_streetrod_season_workbench_state',{p_car:vehicle});
   contents();message('Hood up. Each bolt turn is saved to this seasonal vehicle.');
