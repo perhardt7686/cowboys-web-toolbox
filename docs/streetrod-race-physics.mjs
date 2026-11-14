@@ -45,7 +45,8 @@ export function makePowertrain(car={},run={}){
   speed:0,distance:0,rpm:900,temperature:87,offroad:0,
   steer:0,skidding:false,redlineHits:0,shiftUntil:0,shiftedAt:[],
   lastDelta:0,automatic:true,finished:false,elapsed:0,
-  launchReactionMs:null,seed:Number(run.seed)||0,mode:run.type==='road'?'road':'drag'
+  launchReactionMs:null,seed:Number(run.seed)||0,mode:run.type==='road'?'road':'drag',
+  rival:run.rival||'',stake:run.stake||'practice'
  };
 }
 export function rpmFor(s,gear=s.gear){
@@ -120,6 +121,11 @@ export function automaticShift(s,elapsed){
  return false;
 }
 export function roadWarning(s,elapsed){
+ const exempt=s.rival==='cipher'||s.stake==='title';
+ if(s.mode==='road'&&!exempt&&s.seed%5===0&&elapsed>=18000&&elapsed<=28000)
+  return 'HIGHWAY PATROL · BRAKE OR FACE A TICKET';
+ if(s.mode==='road'&&!exempt&&s.condition<43&&s.seed%11===0&&elapsed>=30000&&elapsed<=41000)
+  return 'ENGINE MISFIRE · EASE OFF THE THROTTLE';
  const curve=roadCurve(s.seed,elapsed,s.mode==='road');
  if(Math.abs(curve)>.4)return curve>0?'CURVE RIGHT':'CURVE LEFT';
  if(s.rpm>s.spec.redline*.93)return 'SHIFT UP / REV LIMIT';
