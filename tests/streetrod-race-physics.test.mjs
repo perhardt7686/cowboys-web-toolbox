@@ -95,3 +95,28 @@ test('Physics engine is isolated from authenticated RPCs and game records',async
  assert.match(bay,/data-assembly/);
  assert.match(bay,/data-ssb-page="next"/);
 });
+
+test('Full stock-car 1/4-mile run reaches the finish with real gearbox physics',()=>{
+ const m=makePowertrain({car_key:'rattler',engine:0,tires:0,gearbox:0,condition:100},{type:'drag',seed:1903});
+ let elapsed=0;
+ for(let i=0;i<6000&&m.distance<1320;i++){
+  elapsed=i*40;
+  automaticShift(m,elapsed);
+  stepPowertrain(m,{gas:1},.04,elapsed);
+ }
+ assert.ok(m.distance>=1320,'Stock car must reach 1/4 mile without impossible throttle requirement');
+ assert.ok(elapsed>=9500&&elapsed<240000,'Elapsed '+elapsed+'ms outside server range');
+ assert.ok(m.gear>=2,'Automatic transmission never upshifted');
+ assert.ok(m.speed>20&&m.speed<190,'Finish speed impossible: '+m.speed);
+});
+test('Full road course reaches the 2.5-mile finish within race-trace storage limit',()=>{
+ const m=makePowertrain({car_key:'comet',engine:1,tires:1,gearbox:1,condition:100},{type:'road',seed:12092});
+ let elapsed=0;
+ for(let i=0;i<6000&&m.distance<13200;i++){
+  elapsed=i*40;
+  automaticShift(m,elapsed);
+  stepPowertrain(m,{gas:1,steer:roadCurve(m.seed,elapsed)},.04,elapsed);
+ }
+ assert.ok(m.distance>=13200,'Road race did not finish: '+Math.round(m.distance)+'ft');
+ assert.ok(elapsed>=42000&&elapsed<240000,'Road trace would be rejected: '+elapsed+'ms');
+});
