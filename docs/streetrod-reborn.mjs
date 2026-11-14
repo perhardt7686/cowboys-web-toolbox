@@ -431,7 +431,14 @@ function paint(){
   bankroll:Number(String(m.wallet||'').replace(/[^\d]/g,''))||0,
   label:shownCar,subtitle:label(room).slice(0,31)};
  const rival=visibleRecord();
- if(room==='diner'&&rival?.querySelector('[data-rival="cipher"]'))options.boss=true;
+ if(room==='diner'&&rival){
+  const rivalName=rival.querySelector('p')?.textContent||'';
+  options.rivalCarKey=rival.dataset.rivalKey||rivalName||'meteor';
+  options.rivalBody=/van|bus/i.test(rivalName)?'van':/wagon|estate/i.test(rivalName)?'wagon':
+   /truck|pickup/i.test(rivalName)?'truck':/fastback|muscle/i.test(rivalName)?'muscle':
+   /hardtop|sedan/i.test(rivalName)?'hardtop':'coupe';
+  if(rival.querySelector('[data-rival="cipher"]'))options.boss=true;
+ }
  if(room==='drive'){
   const native=source();
   options.speed=parseFloat(native?.querySelector('#ss-speed')?.textContent||'0')||0;
