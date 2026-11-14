@@ -7,7 +7,7 @@
   const targetURL='https://spelunkr.tv/?tv';
   const board=document.getElementById('conversations');
   if(!board||!document.body.classList.contains('community-page'))return;
-  let queued=false;
+  let queued=false,watchedGrid=null,gridObserver=null;
   function createLink(id,arcade=false){
     const a=document.createElement('a');
     a.id=id;a.href=targetURL;a.target='_blank';a.rel='noopener noreferrer';
@@ -34,6 +34,13 @@
       if(drawing.nextElementSibling!==link)drawing.after(link);
     }
     const grid=document.getElementById('arcade-program-grid');
+    if(grid!==watchedGrid){
+      gridObserver?.disconnect();watchedGrid=grid;
+      if(grid){
+        gridObserver=new MutationObserver(schedule);
+        gridObserver.observe(grid,{childList:true});
+      }
+    }
     const button=grid?.querySelector('[data-arcade-game="drawing"]');
     if(grid&&button){
       let link=document.getElementById('spelunkr-arcade-link');
