@@ -24,6 +24,7 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <body class="community-page"><section id="conversations">
 <div class="community-main">
 <div id="coco-cast-strip">Old avatar portrait strip</div>
+<section class="family-room" id="legacy-family-room"><h2 id="family-room-title">More moments together.</h2><button>Question of the week</button></section>
 <div id="community-feed"><article class="thread-card"><h3><button class="thread-title">Discussion 1</button></h3><p class="thread-excerpt">Short preview 1</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 2</button></h3><p class="thread-excerpt">Short preview 2</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 3</button></h3><p class="thread-excerpt">Short preview 3</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 4</button></h3><p class="thread-excerpt">Short preview 4</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 5</button></h3><p class="thread-excerpt">Short preview 5</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 6</button></h3><p class="thread-excerpt">Short preview 6</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 7</button></h3><p class="thread-excerpt">Short preview 7</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 8</button></h3><p class="thread-excerpt">Short preview 8</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 9</button></h3><p class="thread-excerpt">Short preview 9</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 10</button></h3><p class="thread-excerpt">Short preview 10</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 11</button></h3><p class="thread-excerpt">Short preview 11</p></article><article class="thread-card"><h3><button class="thread-title">Discussion 12</button></h3><p class="thread-excerpt">Short preview 12</p></article></div>
 <button id="load-more" hidden>More</button>
 <section id="mahjong-root" class="mahjong-game">
@@ -103,6 +104,7 @@ for(const word of ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM']){
 }
 </script><script type="module" src="/commons-arcade-shell.mjs"></script>
 <script type="module" src="/commons-board-compact.mjs"></script>
+<script type="module" src="/community-board-accessibility.mjs"></script>
 </body></html>"""
 
 async def check_one(page, id, root):
@@ -134,6 +136,16 @@ async def run_device(browser,width,height):
   assert await page.locator("#arcade-program-grid").count()==1, "The old hidden markup may remain for settings but must not appear"
   assert await page.locator("#arcade-program-grid").is_hidden()
   assert await page.locator("#coco-cast-strip").is_hidden(),"Portrait strip should not appear"
+  assert await page.locator("#legacy-family-room").count()==0,"Legacy family panel must be removed"
+  assert await page.locator(".family-reading-bar #family-read-toggle").is_visible(),"Reading comfort should survive"
+  await page.evaluate("""() => {
+    const obsolete=document.createElement('section');
+    obsolete.className='family-room';obsolete.id='reinserted-family-room';
+    obsolete.textContent="Coco's Family Corner";
+    document.querySelector('#conversations .community-main').append(obsolete);
+  }""")
+  await page.wait_for_function("!document.getElementById('reinserted-family-room')",timeout=3000)
+
   assert await page.locator("#community-feed .thread-card:visible").count()==6,"Initially show six conversations"
   await page.locator("#compact-feed-more").click()
   assert await page.locator("#community-feed .thread-card:visible").count()==12,"Reveal another six"
