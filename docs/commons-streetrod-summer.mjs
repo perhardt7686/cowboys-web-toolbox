@@ -245,12 +245,19 @@ function calendar(){
 }
 function drive(){
  if(lastResult){
-  const r=lastResult;
-  return banner(r.win?'Victory at the finish!':'Rival takes the win','Your race result is saved on the game server.')+
-   '<div class="ss-race-result"><strong>'+(r.win?'YOU WIN':'YOU LOSE')+'</strong>'+
-   '<div><span>Your time: '+Number(r.player_ms/1000).toFixed(3)+' s</span><span>Rival: '+Number(r.opponent_ms/1000).toFixed(3)+' s</span>'+
-   '<span>Damage: '+r.damage+'%</span><span>Cash change: '+(r.cash_change>=0?'+':'')+r.cash_change+'</span></div>'+
-   (r.champion?'<p>THE SUMMER CHAMPIONSHIP IS YOURS!</p>':'')+'</div>'+
+  const r=lastResult,incident=r.police_stop?'police':r.motor_failure?'breakdown':'none';
+  return banner(r.champion?'Championship victory!':r.police_stop?'Highway patrol stop':
+   r.motor_failure?'Engine breakdown':r.win?'Victory at the finish!':'Rival takes the win',
+   'The race result, fines, wear and campaign time were verified by the game server.')+
+   '<div class="ss-race-result" data-incident="'+incident+'"><strong>'+
+   (r.police_stop?'PULLED OVER':r.motor_failure?'ENGINE FAILED':r.win?'YOU WIN':'YOU LOSE')+'</strong>'+
+   '<div><span>Your time: '+Number(r.player_ms/1000).toFixed(3)+' s</span>'+
+   '<span>Rival: '+Number(r.opponent_ms/1000).toFixed(3)+' s</span>'+
+   '<span>Damage: '+r.damage+'%</span>'+
+   '<span>Cash change: '+(r.cash_change>=0?'+':'')+r.cash_change+'</span></div>'+
+   (r.police_stop?'<p>Highway patrol issued a $'+Number(r.ticket||0)+' fine. One extra day passes in the county jail.</p>':'')+
+   (r.motor_failure?'<p>The engine failed under load. Return to the garage and repair it before the next race.</p>':'')+
+   (r.champion?'<p>THE SUMMER CHAMPIONSHIP IS YOURS! THE MYSTERY MACHINE HAS BEEN DEFEATED.</p>':'')+'</div>'+
    '<div class="ss-actions">'+action('navigate','Back to the Drive-In','data-target="diner"')+
    action('navigate','Return to Garage','data-target="garage"')+'</div>';
  }
@@ -463,7 +470,7 @@ async function finish(){
     p_run:r.run.id,p_launch_ms:launch,p_shifts:shifts,p_trace:r.trace
   });
   season=data.state;lastResult=data;live=null;buttonsDown.clear();render();
-  status(data.message+'. The bank, wear and championship record were updated once.');
+  status(data.message+(data.incident?' '+data.incident:'')+'. The bank, wear and championship record were updated once.');
  }catch(error){
   r.submitted=false;status('Finish not saved: '+String(error.message||'Try again.').slice(0,200),true);
  }
