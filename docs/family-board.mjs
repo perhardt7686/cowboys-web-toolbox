@@ -8,7 +8,8 @@ const games = {
   mahjong: {label: 'Mahjong', unit: 'best score', achievement: 'wins', entry: 'mahjong-toggle'},
   wordle: {label: 'w0rdle', unit: 'points', achievement: 'solves', entry: 'letter-lock-toggle'},
   wordquest: {label: 'Word Quest', unit: 'points', achievement: 'solves', entry: 'word-game-toggle'},
-  plates: {label: 'License Plates', unit: 'points', achievement: 'approved plates', entry: 'plate-game-open'}
+  plates: {label: 'License Plates', unit: 'points', achievement: 'approved plates', entry: 'plate-game-open'},
+  hotrod: {label: 'Hot Rod', unit: 'points', achievement: 'achievements', entry: 'hot-rod-entry'}
 };
 const topics = ['scores', 'fridge', 'calendar'];
 const routes = [
@@ -178,13 +179,16 @@ export function createFamilyBoard() {
         const label = el('span', 'family-score-name', entry.name + (entry.mine ? ' (you)' : ''));
         row.append(el('span', 'family-score-rank', '#' + entry.rank), avatar(entry), label,
           el('strong', '', number(entry.score) + ' ' + games[key].unit));
+        if (key === 'hotrod') label.append(el('small', 'family-hot-rod-record',
+          number(entry.crowns) + ' crowns · ' + number(entry.wins) + ' wins · ' + number(entry.losses) +
+          ' losses · ' + number(entry.duel_wins) + ' challenge wins'));
         rows.append(row);
       }
       target.append(rows);
     }
     function paintOverview(target) {
       const rows = el('ul', 'family-game-leaders');
-      for (const key of Object.keys(games).filter(key => key !== 'plates' || data?.plate_access)) {
+      for (const key of Object.keys(games).filter(key => key !== 'plates' ? key !== 'hotrod' || data?.games?.hotrod : data?.plate_access)) {
         const meta = games[key];
         const info = data?.games?.[key];
         const row = el('li');
@@ -217,7 +221,7 @@ export function createFamilyBoard() {
       if (!active()) return;
       all.disabled = !data;
       if (!data) { paintStatus(); return; }
-      const choices = ['all', ...Object.keys(games).filter(key => key !== 'plates' || data.plate_access)];
+      const choices = ['all', ...Object.keys(games).filter(key => key !== 'plates' ? key !== 'hotrod' || data.games?.hotrod : data.plate_access)];
       const optionKey = choices.join(',');
       if (optionKey !== lastInput) {
         picker.replaceChildren(...choices.map(key => scoreOption(key, games[key]?.label || 'All Games')));
@@ -253,6 +257,7 @@ export function createFamilyBoard() {
         const info = data.games?.[key];
         const mine = info?.entries?.find(row => row.mine);
         const text = {
+          hotrod: mine ? number(mine.score) + ' career points · ' + number(mine.wins) + ' wins' : '',
           mahjong: 'Level ' + number(data.mahjong_level) + (mine ? ' · Best ' + number(mine.score) : ''),
           wordle: number(data.wordle_today) + ' pts today · ' + (data.wordle_solved ? 'Team solved' : number(data.wordle_attempts) + ' team guesses'),
           wordquest: 'Level ' + number(data.quest_level) + ' · ' + number(data.quest_xp) + ' XP',
@@ -286,8 +291,16 @@ export function createFamilyBoard() {
       refreshButton.disabled = true;
       if (manual || !data) status.textContent = 'Refreshing standings…';
       try {
-        const {data: result, error} = await rpc('community_family_scoreboard');
-        if (error) throw error;
+        const [shared, racing] = await Promise.all([
+          rpc('community_family_scoreboard'),
+          Promise.resolve().then(() => client.rpc('community_hot_rod_standings')).catch(() => ({}))
+        ]);
+        if (shared.error) throw shared.error;
+        const result = {...shared.data, games:{...shared.data.games}};
+        if (racing.data && !racing.error) result.games.hotrod = racing.data;
+        else if (data?.games?.hotrod && !['42501','PGRST301'].includes(racing.error?.code)) {
+          result.games.hotrod = data.games.hotrod;
+        }
         if (!active()) return;
         data = result;
         scoreTime = result.as_of;
@@ -331,7 +344,9 @@ export function createFamilyBoard() {
         paintScores();
       }
     }
+    const onHotRodSaved = () => schedule('scores');
     window.addEventListener('family-avatar-updated',onAvatarUpdated);
+    document.addEventListener('family-hot-rod-race-saved',onHotRodSaved);
     function schedule(topic) {
       if (!active() || !topics.includes(topic)) return;
       clearTimeout(retryTimers.get(topic));
@@ -341,6 +356,7 @@ export function createFamilyBoard() {
         if (topic === 'scores') {
           void refreshScores();
           if (data?.plate_access) document.dispatchEvent(new Event('family-plate-scores-changed'));
+          document.dispatchEvent(new Event('family-hot-rod-scores-changed'));
         } else if (topic === 'fridge') void fridge.refresh();
         else void calendar.refresh();
       }, 180));
@@ -396,6 +412,7 @@ export function createFamilyBoard() {
       retryTimers.clear();
       window.removeEventListener('hashchange', launchHash);
       window.removeEventListener('family-avatar-updated',onAvatarUpdated);
+      document.removeEventListener('family-hot-rod-race-saved',onHotRodSaved);
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
       document.removeEventListener('visibilitychange', onVisible);

@@ -10,9 +10,11 @@ import {validateLabPost} from './lab-core.mjs';
 import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
-import {createFamilyBoard} from './family-board.mjs?v=family4';
+import {createFamilyBoard} from './family-board.mjs?v=hotrod1';
+import {createHotRodBoard} from './hot-rod-board.mjs?v=classic1';
 
 const familyBoard = createFamilyBoard();
+const hotRodBoard = createHotRodBoard();
 const $=id=>document.getElementById(id);
 const config=window.COWBOY_COMMUNITY_CONFIG||{enabled:false};
 const query=new URLSearchParams(location.search),isPreview=query.get('preview')==='1'&&['localhost','127.0.0.1'].includes(location.hostname);
@@ -58,7 +60,7 @@ function clearBoardState(){
 function renderBoardAccess(){
   const allowed=canReadBoard(state.member);$('board-access').hidden=allowed;document.querySelector('.community-layout').hidden=!allowed;const intro=$('lab-intro');if(intro)intro.hidden=!allowed;
   $('family-welcome-description').hidden=allowed;
-  if(!isPreview)familyBoard.setAccess(client,state.member);
+  if(!isPreview){familyBoard.setAccess(client,state.member);hotRodBoard.setAccess(client,state.member);}
   if(allowed)return true;const copy=accessCopy(state.member);
   $('board-access-content').innerHTML=`<span class="board-access-mark" aria-hidden="true">⌑</span><p class="eyebrow">FAMILY MESSAGE BOARD</p><h2>${esc(copy.title)}</h2><p>${esc(copy.text)}</p><div class="board-access-actions">${!state.member?'<button class="button-primary" data-auth="login">Log in</button><button class="button-quiet" data-auth="signup">Request membership</button>':copy.pending?'<button class="button-primary" data-check-membership>Check approval status</button>':''}<a class="button-quiet" href="./">Explore the website collection</a></div><p class="board-access-foot">The website collection is open to everyone. Reading or posting on the boards requires approved membership.</p>`;return false;
 }
@@ -343,7 +345,7 @@ async function initialize(){
       recoveryStep=createRecoveryStep(session,`cowboy-recovery-step:${new URL(config.supabaseUrl).hostname}`);
       client=createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:authStorageKey,flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:sessionStore}});
       client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||event==='PASSWORD_RECOVERY'||(session?.user?.id&&state.user?.id&&session.user.id!==state.user.id)){
-        ownerCenter.hide();familyBoard.setAccess(null,null);
+        ownerCenter.hide();familyBoard.setAccess(null,null);hotRodBoard.setAccess(null,null);
         state.member=null;state.profile=null;renderBoardAccess();
       }if(event==='SIGNED_OUT'){state.bootstrapGeneration=(state.bootstrapGeneration||0)+1;state.recovery=false;recoveryStep.clear();state.member=null;state.user=null;state.profile=null;renderFeed();}if(event==='PASSWORD_RECOVERY'&&session?.user?.id){state.recovery=true;recoveryStep.mark(session.user.id);setTimeout(()=>{if(authView!=='reset'||!$('auth-dialog').open)openAuth('reset')},0);}else setTimeout(()=>bootstrap().then(()=>loadFeed()).catch(error=>toast(errorMessage(error))),0);});
       const {error:initError}=await client.auth.initialize();

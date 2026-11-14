@@ -434,6 +434,10 @@ function boardGameClick(e){
  launch(g.id);
 }
 
+document.addEventListener('hot-rod-remix', () => {
+ if(!board?.hidden && $('hot-rod-entry') && $('streetrod-root')) launch('streetrod');
+});
+
 function start(){
  if(!board||!config?.enabled)return;
  build();
