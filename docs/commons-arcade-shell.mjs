@@ -9,7 +9,7 @@ const games=[
  {id:'mahjong',root:'mahjong-root',toggle:'mahjong-toggle',name:'Mahjong',tag:'MYSTERY ROAD',symbol:'◇',scenes:[['play','PLAY'],['levels','LEVELS'],['scores','SCORES'],['badges','AWARDS'],['history','HISTORY']]},
  {id:'wordle',root:'letter-lock-root',toggle:'letter-lock-toggle',name:'w0rdle',tag:'CO-OP WORD CIPHER',symbol:'▤',scenes:[['play','PLAY'],['scores','SCORES'],['awards','AWARDS']]},
  {id:'wordquest',root:'word-game-root',toggle:'word-game-toggle',name:'Word Quest',tag:'DAILY TEAM PUZZLE',symbol:'▥',scenes:[['play','PLAY'],['scores','LEADERBOARD']]},
- {id:'plates',root:'plate-game-root',toggle:'plate-game-open',name:'License Plates',tag:'ANA VS. COWBOY',symbol:'▧',scenes:[['post','POST'],['vote','REVIEW'],['scores','SCORES']]},
+ {id:'plates',root:'plate-game-root',toggle:'plate-game-open',name:'License Plates',tag:'ANA VS. COWBOY',symbol:'▧',scenes:[['post','POST'],['vote','REVIEW'],['history','PHOTOS'],['scores','SCORES']]},
  {id:'drawing',root:'drawing-studio-game-root',toggle:'drawing-studio-toggle',name:'Drawing Studio',tag:'ORIGINAL ART DESK',symbol:'▦',scenes:[['draw','CANVAS']]},
  {id:'study',root:'vdacs-study-root',toggle:'vdacs-study-toggle',name:'7A Study Cards',tag:'PEST CONTROL PREP',symbol:'▨',scenes:[['cards','CARDS'],['awards','MILESTONES']]}
 ];
@@ -72,7 +72,7 @@ function build(){
   document.body.append(menu);
   menu.addEventListener('click',onMenuClick);
   hud=document.createElement('header');hud.id='arcade-hud';hud.hidden=true;
-  hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" title="Return to individual game buttons">◀ GAMES</button><strong id="arcade-hud-title">COMMONS / ARCADE</strong><div class="arcade-hud-right"><button type="button" data-arcade-action="options" title="Display settings">SETUP</button><button type="button" data-arcade-action="exit" title="Exit arcade">EXIT ✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous scene">◀</button><nav id="arcade-hud-scenes" aria-label="Game scenes"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next scene">▶</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous">◀ PREV</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next">NEXT ▶</button></div><div class="arcade-hud-footer" aria-live="polite" id="arcade-hud-footer">ESC: GAMES · F2: SETTINGS · ONE SCREEN</div>';
+  hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" aria-label="Back to game buttons" title="Back to games">‹</button><strong id="arcade-hud-title" class="arcade-screen-reader">GAME</strong><div id="arcade-score-pills" role="status" aria-live="off"></div><div class="arcade-hud-right"><button type="button" data-arcade-action="options" aria-label="Display settings" title="Display settings">⚙</button><button type="button" data-arcade-action="exit" aria-label="Exit game" title="Exit">✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous location">‹</button><nav id="arcade-hud-scenes" aria-label="Current location"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next location">›</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous" aria-label="Previous item">‹</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next" aria-label="Next item">›</button></div>';
   document.body.append(hud);
   hud.addEventListener('click',onMenuClick);
   settings=loadSettings();saveSettings();
@@ -153,9 +153,19 @@ function renderTabs(){
  const paging=$('arcade-hud-paging');
  paging.hidden=!pagerSelector();
  updatePlatePaging();
- const foot=$('arcade-hud-footer');
- if(foot)foot.textContent=active==='streetrod'?'SCENES REPLACE THIS SCREEN · GARAGE AND RACES REMAIN SAVED':
-  'ESC: GAMES · F2: SETTINGS · YOUR SCORES STAY SAVED';
+ updateScorePills();
+}
+function updateScorePills(){
+ const host=$('arcade-score-pills');if(!host||!active)return;
+ const safe=id=>{const v=$(id)?.textContent?.trim();return v&&!/^[…—-]$/.test(v)?v.slice(0,18):'';};
+ const labels=active==='mahjong'?[['BEST',safe('mahjong-ribbon-mine')],['TOP',safe('mahjong-ribbon-record')]]:
+   active==='plates'?[['LEAD',safe('plate-ribbon-lead')],['MINE',safe('plate-ribbon-mine')]]:
+   active==='streetrod'?[['CREDITS',safe('ss-credits')||safe('sr-credits')],['WINS',safe('sr-wins')]]:
+   active==='wordle'?[['POINTS',safe('letter-lock-score')||safe('letter-lock-team-score')]]:[];
+ const pills=labels.filter(x=>x[1]).slice(0,2);
+ const result=pills.length?pills.map(([label,v])=>'<span class="arcade-score-pill"><small>'+escapeHTML(label)+'</small><b>'+escapeHTML(v)+'</b></span>').join(''):
+  '<span class="arcade-score-pill arcade-game-name">'+escapeHTML(game(active)?.name||'GAME')+'</span>';
+ if(host.innerHTML!==result)host.innerHTML=result;
 }
 function stepScene(delta){
  if(mode!=='game'||!active)return;
@@ -192,7 +202,7 @@ function sync(){
    }
   }
  }
- updatePlatePaging();
+ updatePlatePaging();updateScorePills();
 }
 function pagerSelector(){
  if(active==='plates'&&scene==='vote')return '#plate-list > .plate-card';
