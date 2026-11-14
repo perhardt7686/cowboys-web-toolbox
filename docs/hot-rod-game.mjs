@@ -593,13 +593,13 @@ export function makeHotRod({client, memberId, launcher}) {
 
   function achievements() {
     const list = [];
-    if (state?.dragWins) list.push('First drag win');
-    if (state?.roadWins) list.push('First road win');
-    if (state?.wins >= 10) list.push('Ten race wins');
-    if (state?.status === 'champion') list.push('Classic champion');
     const career = standings?.entries?.find(entry => entry.mine);
+    if (state?.dragWins || career?.drag_wins) list.push('First drag win');
+    if (state?.roadWins || career?.road_wins) list.push('First road win');
+    if ((state?.wins ?? 0) >= 10 || (career?.wins ?? 0) >= 10) list.push('Ten race wins');
+    if (state?.status === 'champion' || career?.crowns) list.push('Classic champion');
     if (career?.duel_wins) list.push('First family challenge win');
-    if (state?.bonus?.won) list.push('Mystery Machine defeated');
+    if (state?.bonus?.won || career?.mystery_wins) list.push('Mystery Machine defeated');
     return list;
   }
 
