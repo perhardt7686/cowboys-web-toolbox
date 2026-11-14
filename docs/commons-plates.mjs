@@ -3,7 +3,7 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
- let client=null,userId=null,seat=null,game=null,working=false,expanded=false,timer=null,mounted=false;
+ let client=null,userId=null,seat=null,game=null,working=false,expanded=false,timer=null,mounted=false,historyPageIndex=0;
  const urls=new Map();
  const $=id=>document.getElementById(id);
  const newEl=(tag,cls='',txt)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(txt!==undefined)el.textContent=String(txt);return el;};
@@ -26,12 +26,15 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
      </section><div class="plate-heading"><div><span class="plate-eyebrow">Private match · Ana vs. Cowboy</span><h2>What Does That Plate Mean?</h2><p>Find a custom plate. Snap a picture. Make your case. The other player decides.</p></div><div class="plate-score" id="plate-score" aria-live="polite"></div></div>
     <div class="plate-rules">👍 Agree = one point for the person who guessed. 👎 Disagree = explain why; the guesser can revise and you vote again. One point maximum per photo.</div>
     <form id="plate-new" class="plate-new"><h3>📷 Post a plate</h3><div class="plate-fields"><label>Photo <input id="plate-photo" type="file" accept="image/*" required></label><label>Characters on the plate <input id="plate-characters" type="text" maxlength="18" placeholder="e.g. ODIN1" autocomplete="off" required></label><label>State / region <input id="plate-region" type="text" maxlength="60" placeholder="e.g. Virginia"></label></div><label>What do you think it means? <textarea id="plate-guess" rows="2" maxlength="600" placeholder="My best argument is…" required></textarea></label><p class="plate-hint">Crop out people, house numbers and other unnecessary details. Photos are resized and their original metadata is removed before upload.</p><button class="plate-button" type="submit" id="plate-submit">Post challenge</button></form>
-    <div class="plate-list-header"><h3>Our plate debates</h3><button type="button" class="plate-button secondary" id="plate-refresh">Refresh</button></div><div id="plate-status" role="status" aria-live="polite"></div><div id="plate-list"></div>
+    <div class="plate-list-header"><h3>Our plate debates</h3><button type="button" class="plate-button secondary" id="plate-refresh">Refresh</button></div><div id="plate-status" role="status" aria-live="polite"></div><div id="plate-list"></div><section id="plate-gallery" aria-label="Saved license plate photo history"><header class="plate-gallery-head"><strong>Saved plate photos</strong><span id="plate-gallery-count" role="status"></span></header><div id="plate-gallery-grid" class="plate-gallery-grid"></div><nav id="plate-gallery-pages" class="plate-gallery-pages" aria-label="Photo history pages"><button type="button" id="plate-gallery-prev">‹ Earlier</button><span id="plate-gallery-position">1 / 1</span><button type="button" id="plate-gallery-next">Later ›</button></nav></section>
     <p class="plate-hint">Research links search public plate designs and possible meanings, not the registered owner's identity. Only Ana and Cowboy can view these photos in the game.</p></div>`;
   main.prepend(root);
   $('plate-game-open').addEventListener('click',()=>{expanded=!expanded;$('plate-game-content').hidden=!expanded;$('plate-game-open').setAttribute('aria-expanded',String(expanded));if(expanded){refresh();$('plate-game-content').scrollIntoView({block:'nearest',behavior:'smooth'});}});
   $('plate-new').addEventListener('submit',post);$('plate-submit').before($('plate-status'));$('plate-photo').addEventListener('change',()=>{const f=$('plate-photo').files?.[0];if(f)setStatus(`Photo selected (${(f.size/1048576).toFixed(1)} MB). Add the guess and tap Post challenge.`);});
   $('plate-refresh').addEventListener('click',()=>refresh());
+  $('plate-gallery-prev').addEventListener('click',()=>{historyPageIndex=Math.max(0,historyPageIndex-1);renderGallery();});
+  $('plate-gallery-next').addEventListener('click',()=>{historyPageIndex++;renderGallery();});
+
  }
  function scores(){
   const players=game?.players||[];const ana=players.find(p=>p.seat==='ana');const cowboy=players.find(p=>p.seat==='cowboy');
@@ -78,11 +81,14 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  }
  function display(){
   scores();const list=$('plate-list');list.replaceChildren();
+  // Keep the full photo history in its own screen. The review area remains
+  // one card at a time and all old image data stays on the server.
+  renderGallery();
   const entries=game?.entries||[];
   if(!entries.length){list.append(ptext('No photos yet. First plate gets the first debate!','plate-empty'));return;}
   for(const entry of entries){
    const own=entry.seat===seat;
-   const card=newEl('article','plate-card');
+   const card=newEl('article','plate-card');card.dataset.plateId=String(entry.id);
    const head=newEl('div','plate-card-head');
    const by=newEl('div','plate-by');by.append(labelText(nameFor(entry.seat)),pill(dateFor(entry.created_at)));
    const status=entry.status==='approved'?'👍 Approved · +1':entry.status==='needs_revision'?'👎 Explanation needed':'Awaiting vote';
@@ -138,17 +144,56 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     card.append(details);
    }
    list.append(card);
-   void loadPhoto();
+   card.addEventListener('arcade:reveal',()=>void loadPhoto());
+   if(entries.indexOf(entry)<4)void loadPhoto();
+   else if(photoObserver)photoObserver.observe(card);
+   else void loadPhoto();
   }
+ }
+ const photoObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(records=>{
+  for(const r of records){if(!r.isIntersecting)continue;
+    photoObserver.unobserve(r.target);r.target.dispatchEvent(new Event('arcade:reveal'));
+  }
+ },{rootMargin:'240px'}):null;
+ function renderGallery(){
+  const gallery=$('plate-gallery-grid');if(!gallery)return;
+  const entries=game?.entries||[];const max=Math.max(1,Math.ceil(entries.length/6));
+  historyPageIndex=Math.max(0,Math.min(max-1,historyPageIndex));
+  $('plate-gallery-count').textContent=entries.length+' saved · Select a photo to open its debate';
+  $('plate-gallery-position').textContent=(historyPageIndex+1)+' / '+max;
+  $('plate-gallery-prev').disabled=historyPageIndex===0;
+  $('plate-gallery-next').disabled=historyPageIndex>=max-1;
+  gallery.replaceChildren();
+  for(const e of entries.slice(historyPageIndex*6,historyPageIndex*6+6)){
+   const b=newEl('button','plate-gallery-tile');b.type='button';
+   b.dataset.plateId=String(e.id);
+   b.setAttribute('aria-label','Open plate '+e.plate+' by '+nameFor(e.seat));
+   const img=newEl('img','plate-gallery-thumb');img.alt='Saved photo: '+e.plate;img.loading='lazy';
+   const caption=newEl('span','plate-gallery-caption');
+   caption.append(newEl('strong','',e.plate||'Unknown plate'),newEl('small','',nameFor(e.seat)+' · '+dateFor(e.created_at)));
+   b.append(img,caption);gallery.append(b);
+   // Reuses the existing private signed-in storage download and cached blob.
+   void picture(img,e.photo_path).catch(()=>{img.alt='Photo unavailable; open debate to retry';});
+   b.addEventListener('click',()=>{
+    document.dispatchEvent(new CustomEvent('arcade:plate-select',{detail:{id:String(e.id)}}));
+   });
+  }
+ }
+
+ async function requestPlateState(){
+  // Higher photo-history limit; older server versions can still cap at 20.
+  const primary=await client.rpc('community_plate_state',{p_limit:100});
+  if(!primary.error)return primary;
+  return client.rpc('community_plate_state',{p_limit:20});
  }
  async function refresh(quiet=false){
   if(!client||!mounted)return;
-  try{const {data,error}=await client.rpc('community_plate_state',{p_limit:20});if(error)throw error;game=data;display();if(!quiet)setStatus('Scores and photos updated.');}
+  try{const {data,error}=await requestPlateState();if(error)throw error;game=data;display();if(!quiet)setStatus('Scores and photos updated.');}
   catch(err){if(!quiet)setStatus('Could not refresh: '+(err.message||'Please retry.'));}
  }
  async function action(fn){
   if(working)return;working=true;setStatus('Saving…');
-  try{const {data,error}=await fn();if(error)throw error;game=data;display();setStatus('Saved! Both players can now see the update.');}
+  try{const {data,error}=await fn();if(error)throw error;game=data;display();await refresh(true);setStatus('Saved! Both players can now see the update.');}
   catch(err){setStatus('Not saved: '+(err.message||'Please retry.'));}
   finally{working=false;}
  }
@@ -191,14 +236,14 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    if(up.error)throw up.error;
    const {data,error}=await client.rpc('community_plate_post',{p_plate:$('plate-characters').value,p_region:$('plate-region').value,p_guess:$('plate-guess').value,p_photo_path:path});
    if(error)throw error;
-   $('plate-new').reset();game=data;display();setStatus('Challenge posted! '+nameFor(seat==='ana'?'cowboy':'ana')+' can vote.');path=null;
+   $('plate-new').reset();game=data;historyPageIndex=0;display();await refresh(true);setStatus('Challenge posted! '+nameFor(seat==='ana'?'cowboy':'ana')+' can vote.');path=null;
   }catch(err){setStatus('Could not post: '+(err.message||'Please retry.'));if(path)try{await client.storage.from('community-plate-game').remove([path]);}catch{}}
   finally{working=false;$('plate-submit').disabled=false;}
  }
  async function mount(){
   if(mounted||board.hidden||!client)return;
   const {data:{session}}=await client.auth.getSession();const id=session?.user?.id;if(!id)return;
-  const {data,error}=await client.rpc('community_plate_state',{p_limit:20});if(error){return;}
+  const {data,error}=await requestPlateState();if(error){return;}
   userId=id;seat=data.seat;game=data;mounted=true;frame();if(!$('plate-game-root'))return;display();
   if(timer)clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&mounted)refresh(true);},25000);
  }
