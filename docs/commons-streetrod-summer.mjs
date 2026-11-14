@@ -373,8 +373,21 @@ function chooseRace(rival){
  '<label>Stake <select name="stake"><option value="practice">Just for kicks</option><option value="25">$25</option><option value="100">$100</option>'+
  '<option value="title">Pink slips / fictional car title</option></select></label>'+
  '<div class="ss-actions"><button type="submit">Stage at the starting line</button><button type="button" data-ss-action="cancel_challenge">Cancel</button></div>';
+ // Manual-aligned bet menu: drag offers practice/cash; road offers cash/title.
+ // The server already rejects title wagers on drag. Disable before submit too.
+ const course=form.querySelector('select[name="type"]');
+ const wager=form.querySelector('select[name="stake"]');
+ const syncWager=()=>{
+  for(const option of wager.options){
+   if(option.value==='title')option.disabled=course.value!=='road';
+   if(option.value==='practice')option.disabled=course.value!=='drag';
+  }
+  if(wager.selectedOptions[0]?.disabled)wager.value='25';
+ };
+ course.addEventListener('change',syncWager);syncWager();
  form.addEventListener('submit',event=>{
-  event.preventDefault();const fd=new FormData(form);void start(rival,String(fd.get('type')),String(fd.get('stake')));
+  event.preventDefault();syncWager();
+  const fd=new FormData(form);void start(rival,String(fd.get('type')),String(fd.get('stake')));
  });
  const existing=root.querySelector('.ss-challenge-form');existing?.remove();
  panel.append(form);form.scrollIntoView?.({block:'nearest'});
