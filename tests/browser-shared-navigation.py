@@ -32,6 +32,7 @@ async def main():
                     await nav.wait_for(timeout=20000)
                     heading=page.locator('.cowboy-nav-heading strong')
                     assert await heading.inner_text()==title,(name,'title',await heading.inner_text())
+                    toggle=nav.locator('button.cowboy-nav-toggle')
                     if name == 'Toolbox':
                         entry=page.locator('header a.family-board-entry')
                         assert await entry.get_attribute('href') == 'community.html'
@@ -39,7 +40,10 @@ async def main():
                             await page.set_viewport_size({'width':width,'height':844})
                             box=await entry.bounding_box()
                             assert box and box['height']>=44 and box['width']>=44, (width, box)
+                            toggle_box=await toggle.bounding_box()
                             assert box['x']>=0 and box['x']+box['width']<=width+1, (width, box)
+                            assert toggle_box and box['x']+box['width']<=toggle_box['x']+1, (width, box, toggle_box)
+                            assert abs(box['y']-toggle_box['y'])<=10, (width, box, toggle_box)
                         await page.set_viewport_size({'width':390,'height':844})
                         assert await entry.inner_text() == 'Family Message Board'
                         assert await entry.locator('.family-board-stars i').count() == 3
@@ -56,7 +60,6 @@ async def main():
                         }''')
                         assert motion[0]!=motion[1] and motion[2]=='family-board-shimmer', motion
                         await page.emulate_media(reduced_motion='reduce')
-                    toggle=nav.locator('button.cowboy-nav-toggle')
                     box=await toggle.bounding_box()
                     assert box and box['width']>=44 and box['height']>=44,(name,'toggle size',box)
                     assert await toggle.get_attribute('aria-expanded')=='false'

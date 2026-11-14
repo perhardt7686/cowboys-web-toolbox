@@ -73,7 +73,7 @@ async def layout(page, width):
         const art=link.querySelector('img');
         await art.decode();
         const bounds=link.getBoundingClientRect();
-        return [link.hash, art.getAttribute('src').split('/').pop(), bounds.width, bounds.height,
+        return [link.hash, art.src.split('/').pop(), bounds.width, bounds.height,
           link.querySelector('span').scrollWidth <= link.clientWidth];
     }))''')
     for (hash_name, source, link_width, link_height, label_fits), route in zip(

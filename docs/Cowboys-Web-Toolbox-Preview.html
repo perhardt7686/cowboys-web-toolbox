@@ -948,7 +948,11 @@ body.toolbox-page .masthead .family-board-entry {
   text-align: center;
   font: 780 clamp(.8rem, 2.65vw, 1rem)/1.1 system-ui,sans-serif;
 }
-body.toolbox-page.cowboy-nav-ready .masthead .family-board-entry { margin-inline-start: 0; }
+body.toolbox-page.cowboy-nav-ready .masthead .header-inner { flex-wrap: nowrap; }
+body.toolbox-page.cowboy-nav-ready .masthead .family-board-entry {
+  flex-shrink: 0;
+  margin-inline-start: 0;
+}
 body.toolbox-page .masthead .family-board-entry:is(:hover,:focus-visible) {
   background-color: #552c6e;
   box-shadow: inset 0 0 0 1px #ffde9b6b, 0 0 17px #e3bb618c;
@@ -1005,7 +1009,8 @@ body.toolbox-page .family-board-entry::after {
   body.toolbox-page.cowboy-nav-ready .masthead .header-inner { gap: 8px; }
   body.toolbox-page.cowboy-nav-ready .cowboy-nav-heading small { display: none; }
   body.toolbox-page .masthead .family-board-entry { gap: .3rem; }
-  body.toolbox-page .family-board-entry-label { max-width: 11ch; }
+  body.toolbox-page .masthead .family-board-entry-label { max-width: 11ch; }
+  body.toolbox-page:not(.cowboy-nav-ready) .masthead .family-board-entry { margin-inline-start: 0; }
 }
 @media (max-width: 360px) {
   body.toolbox-page.cowboy-nav-ready .cowboy-nav-heading { display: none; }
