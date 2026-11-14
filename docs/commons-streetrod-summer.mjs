@@ -20,6 +20,9 @@ const RV={rookie:{name:'Juniper Jack',car:'Rattler 48',require:0,symbol:'J'},
  cruiser:{name:'Neon Nora',car:'Comet 55',require:1,symbol:'N'},
  hotshot:{name:'Redline Ray',car:'Meteor Special',require:3,symbol:'R'},
  cipher:{name:'The Mystery Machine',car:'Turquoise flower-power mystery van',require:6,symbol:'M'}};
+const rivalInfo=key=>season?.rivals?.find(x=>x.key===key)||RV[key]||null;
+const availableRivals=()=>season?.rivals?.length?season.rivals:
+ Object.entries(RV).map(([key,r])=>({key,name:r.name,car:r.car,require:r.require,rep:key==='cipher'?7:0,symbol:r.symbol,tier:r.require}));
 const yearDay=n=>new Date(Date.UTC(1963,5,24+(Number(n)||1)-1)).toLocaleDateString('en-US',{timeZone:'UTC',month:'short',day:'numeric',year:'numeric'});
 let hub=null,root=null,button=null,visible=false,screen='garage',season=null,loading=false,busy=false,client=null,connection=null,live=null,lastResult=null;
 let buttonsDown=new Set(),frameId=0,sampleTicker=0,keyboardAttached=false;
@@ -208,16 +211,22 @@ function parts(){
 }
 function diner(){
  const s=season.season;
+ const rivals=availableRivals();
  return banner('The Moonlight Drive-In','Inspect a rival, name your stakes, and race for fictional cash or car titles.')+
  '<div class="ss-diner-hero"><div class="ss-diner-sign"><small>BURGERS · SHAKES · STREET RODS</small><strong>MOONLIGHT<br>DRIVE-IN</strong></div><div class="ss-diner-cars">'+
  gamePhoto('hardtop','comet')+gamePhoto('van','cipherx')+'</div></div>'+
- '<div class="ss-rivals">'+Object.entries(RV).map(([key,r])=>'<article class="ss-rival'+(s.victories<r.require?' locked':'')+'"><div class="ss-rival-face">'+esc(r.symbol)+'</div>'+
- '<div><strong>'+esc(r.name)+'</strong><p>'+esc(r.car)+'</p><small>'+(
- s.victories<r.require?'Unlock at '+r.require+' wins':key==='cipher'&&s.rep<7?'Needs reputation 7':'Available to challenge')+
- '</small></div><div class="ss-rival-buttons">'+action('inspect_rival','Inspect build','data-rival="'+key+'"')+
- action('choose_rival','Call out','data-rival="'+key+'" '+(s.victories<r.require||key==='cipher'&&s.rep<7?'disabled':''))+
- '</div></article>').join('')+'</div>'+
- '<p class="ss-hint">Road races can use fictional pink slips after three victories. This season does not transfer your real-world property or multiplayer garage.</p>';
+ '<p class="ss-hint">22 street-racing challengers, including the final Mystery Machine. Beat drivers, improve your garage, and climb the tiers.</p>'+
+ '<div class="ss-rivals">'+rivals.map(r=>{
+ const key=r.key,require=Number(r.require)||0,requiredRep=Number(r.rep)||0;
+ const locked=s.victories<require||s.rep<requiredRep;
+ return '<article class="ss-rival'+(locked?' locked':'')+'" data-rival-key="'+esc(key)+'"><div class="ss-rival-face">'+esc(r.symbol||r.name.slice(0,1))+'</div>'+
+ '<div><strong>'+esc(r.name)+'</strong><p>'+esc(r.car)+'</p><small>'+
+ (locked?'Unlock at '+require+' wins'+(requiredRep?' / reputation '+requiredRep:''):'Available to challenge')+
+ '</small></div><div class="ss-rival-buttons">'+action('inspect_rival','Inspect build','data-rival="'+esc(key)+'"')+
+ action('choose_rival','Call out','data-rival="'+esc(key)+'" '+(locked?'disabled':''))+
+ '</div></article>';
+ }).join('')+'</div>'+
+ '<p class="ss-hint">The Mystery Machine is the final championship opponent, requiring six wins and reputation seven. All wagers use fictional campaign dollars.</p>';
 }
 function calendar(){
  const s=season.season,log=season.history||[];
@@ -308,7 +317,7 @@ function onClick(event){
   status('Opening the saved seasonal car workbench. If the hood does not appear, refresh Street r0d.',true);
   return;
  }
- if(cmd==='inspect_rival'){const r=RV[rival];status(r.name+' drives a '+r.car+'. Tier '+r.require+'. Choose Call Out to negotiate the race.');return;}
+ if(cmd==='inspect_rival'){const r=rivalInfo(rival);if(r)status(r.name+' drives a '+r.car+'. Tier '+r.tier+'. Choose Call Out to negotiate the race.');return;}
  if(cmd==='choose_rival'){chooseRace(rival);return;}
  if(cmd==='transmission'){
   if(!live?.motor)return;
@@ -345,7 +354,7 @@ function onSubmit(event){
 }
 function chooseRace(rival){
  if(live){navigate('drive');return;}
- const r=RV[rival];if(!r)return;
+ const r=rivalInfo(rival);if(!r)return;
  const panel=root.querySelector('#ss-scene');
  const form=document.createElement('form');form.className='ss-challenge-form';
  form.innerHTML='<h5>Call out '+esc(r.name)+'</h5>'+
@@ -362,7 +371,7 @@ function chooseRace(rival){
  const cancel=form.querySelector('[data-ss-action="cancel_challenge"]');cancel.addEventListener('click',()=>form.remove());
 }
 async function start(rival,type,stake){
- if(busy)return;busy=true;status('Calling '+RV[rival].name+' to the starting line…');
+ if(busy)return;busy=true;status('Calling '+(rivalInfo(rival)?.name||rival)+' to the starting line…');
  try{
   const run=await call('community_streetrod_season_race_start',{p_rival:rival,p_type:type,p_stake:stake});
   const motor=makePowertrain(currentCar()||{car_key:run.car},run);
