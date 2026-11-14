@@ -132,6 +132,19 @@ async def run_one(browser,width,height):
   await p.goto(URL,wait_until='load')
   await p.locator('#sr-reborn').wait_for(timeout=10000)
   assert await p.locator('#sr-reborn .sr-v3-canvas').evaluate('el=>el.width===320 && el.height===200')
+  await p.locator('#sr-reborn .sr-v3-sound').click()
+  assert 'SOUND ON' in await p.locator('#sr-reborn .sr-v3-sound').inner_text()
+  await p.locator('#sr-reborn .sr-v3-sound').click()
+  assert 'SOUND OFF' in await p.locator('#sr-reborn .sr-v3-sound').inner_text()
+  assert await p.evaluate("""() => {
+   const c=document.createElement('canvas');c.width=320;c.height=200;
+   for(const room of ['jail','breakdown','championship']){
+    window.COWBOY_STREETROD_PAINT(c,room,{});
+    const pixels=c.getContext('2d').getImageData(30,30,1,1).data;
+    if(pixels[3]!==255)return false;
+   }
+   return true;
+  }"""),'Original police, engine failure and championship EGA scenes should render'
   assert await p.locator('#sr-reborn .sr-v3-intro').is_visible(), 'Actual DOS-style boot/licence screen must appear'
   await p.locator('#sr-reborn [data-v3-action="licence"]').click()
   assert await p.locator('#sr-reborn .sr-v3-licence').is_visible()
