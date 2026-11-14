@@ -200,8 +200,29 @@ function displayRecord(){
   const inv=source()?.querySelector('.ss-inventory-item');
   if(inv)host.append(cloneRecord(inv));
  }else if(now==='drive'){
-  const actual=source()?.querySelector('.ss-drive-controls,.ss-drive-panel,.ss-race-controls');
-  if(actual)host.append(actual.cloneNode(true));
+  const original=source();
+  const controls=original?.querySelector('.ss-drive-controls');
+  const finish=original?.querySelector('.ss-race-result');
+  if(controls){
+   const metrics=document.createElement('div');metrics.id='ss-dos-telemetry';
+   metrics.className='ss-dos-telemetry';metrics.setAttribute('role','status');
+   metrics.textContent='STAGING · 0 MPH · GEAR 1';host.append(metrics);
+   // Existing delegated pointer/keyboard/shift game handlers continue to
+   // receive the player's real inputs; nothing invents a race result.
+   const copy=controls.cloneNode(true);copy.classList.add('ss-dos-drive-controls');
+   host.append(copy);
+   const cancel=original.querySelector('[data-ss-action="abandon"]');
+   if(cancel){const b=cancel.cloneNode(true);b.classList.add('ss-dos-abandon');host.append(b);}
+  }else if(finish){
+   host.append(finish.cloneNode(true));
+   const actions=original.querySelector('.ss-actions');
+   if(actions)host.append(actions.cloneNode(true));
+  }else{
+   const info=original?.querySelector('.ss-alert,.ss-empty');
+   if(info)host.append(info.cloneNode(true));
+   const returnBtn=original?.querySelector('[data-ss-action="abandon"],[data-ss-action="navigate"]');
+   if(returnBtn)host.append(returnBtn.cloneNode(true));
+  }
  }
  // Keep the original signed-in race challenge element and its listeners.
  const form=source()?.querySelector(':scope > .ss-challenge-form');
@@ -214,12 +235,25 @@ function sceneData(){
   /wagon|nomad/.test(lower)?'wagon':/muscle|fastback/.test(lower)?'muscle':
   /sedan|hardtop/.test(lower)?'hardtop':'coupe';
  const creditNumber=Number(c.credits.replace(/[^\d]/g,''))||undefined;
- return {carKey:key,body:bodyType,bankroll:creditNumber,label:c.car||'THE GARAGE'};
+ const real=source();
+ const speed=Math.max(0,parseFloat(real?.querySelector('#ss-speed')?.textContent)||0);
+ const rpm=Math.max(0,parseFloat(real?.querySelector('#ss-rpm')?.textContent)||0);
+ const gear=real?.querySelector('#ss-gear')?.textContent?.trim()||'1';
+ const percent=Math.max(0,parseFloat(real?.querySelector('#ss-distance')?.textContent)||0);
+ return {carKey:key,body:bodyType,bankroll:creditNumber,label:c.car||'THE GARAGE',
+  speed,rpm,progress:Math.min(1,percent/100),gear};
 }
 function paint(){
  const canvas=$('ss-dos-canvas');
  if(!canvas)return;
- window.COWBOY_STREETROD_PAINT?.(canvas,room(),sceneData());
+ const data=sceneData();
+ window.COWBOY_STREETROD_PAINT?.(canvas,room(),data);
+ if(room()==='drive'){
+  const telemetry=$('ss-dos-telemetry');
+  const phase=source()?.querySelector('#ss-start-lights')?.textContent?.trim()||'';
+  const text=(phase||'ROAD')+' · '+Math.round(data.speed)+' MPH · '+Math.round(data.rpm)+' RPM · GEAR '+data.gear;
+  if(telemetry&&telemetry.textContent!==text)telemetry.textContent=text;
+ }
 }
 function render(force=false){
  const scene=source();if(!arcade()||!scene||!root()||root().hidden||!ROOM_IDS.has(room())){
@@ -287,6 +321,11 @@ function install(){
  const rootObs=new MutationObserver(schedule);rootObs.observe(root(),{attributes:true,attributeFilter:['hidden']});
  schedule();return true;
 }
+// The server-controlled race animation already updates its own speed/RPM
+// counters. Refresh the displayed original EGA dashboard while racing.
+window.setInterval(()=>{
+ if(arcade()&&room()==='drive'&&$('ss-dos-canvas')&&root()&&!root().hidden)paint();
+},120);
 if(!install()){
  installTimer=setInterval(()=>{if(install())clearInterval(installTimer);},500);
 }
