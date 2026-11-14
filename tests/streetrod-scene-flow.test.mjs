@@ -22,7 +22,7 @@ test('State-room flow is a fresh single 320x200 EGA surface without page scrolli
  assert.match(style,/image-rendering:pixelated/);
  assert.match(style,/#ss-scene>:not\(#sr-reborn\)/);
  assert.match(style,/overflow:hidden!important/);
- assert.match(html,/streetrod-reborn\.mjs\?v=reborn4/);
+ assert.match(html,/streetrod-reborn\.mjs\?v=reborn5/);
  assert.match(html,/streetrod-reborn\.css\?v=reborn4/);
  assert.doesNotMatch(html,/src="commons-streetrod-scene-flow\.mjs/);
  assert.doesNotMatch(html,/href="commons-streetrod-scene-flow\.css/);
@@ -54,4 +54,18 @@ test('Original-code legal boundary: attribution and no copied game data',()=>{
  assert.match(ega,/window\.COWBOY_STREETROD_PAINT/);
  assert.match(html,/streetrod-reborn-config\.js/);
  assert.match(ega,/if\(!window\.COWBOY_STREETROD_REBORN\)/);
+});
+
+test('Mobile scene gestures work and station entry never buys fuel',()=>{
+ assert.match(reborn,/pocket\.addEventListener\('touchstart'/);
+ assert.match(reborn,/pocket\.addEventListener\('touchend'/);
+ assert.match(reborn,/choose\(dx<0\?'next':'prev'\)/);
+ assert.match(reborn,/travelSkip=finishTravel/);
+ assert.match(reborn,/travelSkip\(\)/);
+ const gas=reborn.split("if(target==='gas'){")[1]?.split("\n }")[0];
+ assert.ok(gas,'Missing gas station navigation');
+ assert.doesNotMatch(gas,/\.click\(\)/,'Entering the station must not charge a player');
+ const fill=reborn.split("if(target==='fill'){")[1]?.split("\n }")[0];
+ assert.match(fill,/pump\.click\(\)/,'Fuel only on an explicit player request');
+ assert.doesNotMatch(fill,/is saved through/,'No premature save success message');
 });
