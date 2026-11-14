@@ -216,6 +216,9 @@ function updatePlatePaging(){
  const cards=Array.from(document.querySelectorAll(selector));
  plateIndex=Math.max(0,Math.min(plateIndex,Math.max(cards.length-1,0)));
  cards.forEach((c,i)=>c.classList.toggle('arcade-current-card',i===plateIndex));
+ if(cards[plateIndex]?.dataset.plateId&&!cards[plateIndex].querySelector('img[src]')){
+  cards[plateIndex].dispatchEvent(new Event('arcade:reveal'));
+ }
  $('arcade-hud-pagecount').textContent=cards.length?(plateIndex+1)+' / '+cards.length:'NO ENTRIES';
  paging.querySelector('[data-arcade-action="previous"]').disabled=plateIndex===0;
  paging.querySelector('[data-arcade-action="next"]').disabled=plateIndex>=cards.length-1;
@@ -286,6 +289,17 @@ function onKeyDown(e){
   if(mode==='options')backOptions();else closeArcade();
  }
 }
+// A saved photo selected from the history gallery opens its original debate
+// card without copying or mutating the server's records.
+document.addEventListener('arcade:plate-select',e=>{
+ if(active!=='plates'||mode!=='game')return;
+ const cards=Array.from(document.querySelectorAll('#plate-list > .plate-card'));
+ const index=cards.findIndex(c=>c.dataset.plateId===String(e.detail?.id||''));
+ if(index<0)return;
+ scene='vote';plateIndex=index;
+ document.body.dataset.arcadeScene=scene;
+ renderTabs();sync();
+});
 // Existing game menus update the arcade scene indicator without replacing their events.
 document.addEventListener('click',e=>{
  if(active!=='streetrod'||mode!=='game')return;
