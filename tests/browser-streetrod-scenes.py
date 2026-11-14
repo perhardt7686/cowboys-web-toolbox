@@ -145,7 +145,8 @@ async def run_one(browser,width,height):
   assert await p.locator('#ss-dos-pocket .ss-challenge-form button').is_visible()
   await p.evaluate("applyRoom('drive')")
   await p.locator('#ss-dos-telemetry').wait_for()
-  assert '64 MPH' in await p.locator('#ss-dos-telemetry').inner_text()
+  await p.wait_for_function("document.querySelector('#ss-dos-telemetry')?.textContent?.includes('64 MPH')",timeout=4000)
+  assert '3400 RPM' in await p.locator('#ss-dos-telemetry').inner_text()
   assert await p.locator('#ss-dos-pocket .ss-dos-drive-controls button').count()==6
   await p.locator('#ss-dos-pocket [data-ss-action="shift"]').click()
   assert 'Selected shift' in await p.locator('#ss-status').inner_text()
