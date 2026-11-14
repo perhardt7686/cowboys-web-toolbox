@@ -1,0 +1,348 @@
+#!/usr/bin/env python3
+"""Browser smoke for the actual Hot Rod launch, canvas, and controls.
+
+An isolated family fixture supplies synthetic identities, records and an RPC
+client. The client runs the shipped reducers, stores campaign state across
+page loads, and replays browser driving inputs. No live account or API is used.
+"""
+import asyncio
+import re
+from pathlib import Path
+
+from playwright.async_api import async_playwright, expect
+
+ROOT = Path(__file__).resolve().parents[1]
+URL = 'http://127.0.0.1:8765/__hot_rod_smoke__/community.html'
+HTML = """<!doctype html><html lang="en"><head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/community.css">
+<link rel="stylesheet" href="/purple-night.css">
+<link rel="stylesheet" href="/family-board.css">
+<link rel="stylesheet" href="/hot-rod.css">
+</head><body class="community-page"><main>
+<section id="conversations" class="community-layout container" hidden>
+<div id="family-overview" hidden></div>
+<div id="family-updates"><div id="community-announcement" hidden></div></div>
+<aside class="community-sidebar"></aside>
+<div class="community-main">
+<div id="family-conversations"><h2>Conversations</h2></div>
+<div id="family-tools" hidden></div>
+</div></section></main>
+<script type="module">
+import {createFamilyBoard} from '/family-board.mjs';
+import {createHotRodBoard} from '/hot-rod-board.mjs';
+import {CARS} from '/hot-rod-catalog.mjs';
+import {applyWorkshop, garageShowcase, makeCar, newCampaign, settleRace, startRace} from '/hot-rod-campaign.mjs';
+import {replayRace} from '/hot-rod-racing.mjs';
+
+const section = document.getElementById('conversations');
+const game = createHotRodBoard();
+const board = createFamilyBoard();
+const viewer = '00000000-0000-4000-8000-000000000001';
+const rival = '00000000-0000-4000-8000-000000000002';
+const rivalState = newCampaign();
+rivalState.cars = [makeCar(CARS.fairlane55, 1), makeCar(CARS.vette56, 2)];
+rivalState.selected = 2;
+const key = 'hot-rod-browser-fixture';
+let saved = JSON.parse(sessionStorage.getItem(key)) || {state:null, revision:0};
+let role = new URL(location).searchParams.get('role') || 'approved';
+let failNext = '';
+const operations = [];
+const challenges = [];
+let result = null;
+
+function save(next) {
+  saved = {state:next.state, revision:saved.revision + 1};
+  sessionStorage.setItem(key, JSON.stringify(saved));
+  return {...saved, message:next.message};
+}
+function answer(data) { return {data:structuredClone(data),error:null}; }
+function error(message, status) {
+  return {data:null,error:{context:{status,json:async()=>({error:message})}}};
+}
+const standings = () => ({
+  players:saved.state?.races ? 2 : 1, achievements:0,
+  entries:[
+    {name:'Test driver',score:115,crowns:0,wins:8,losses:1,rank:1,progress:2},
+    ...(saved.state?.races ? [{
+      name:'Fixture member',mine:true,score:saved.state.points,crowns:0,
+      wins:saved.state.wins,losses:saved.state.losses,rank:2,progress:saved.state.wins ? 1 : 0
+    }] : [])
+  ]
+});
+async function invoke(name, {body}) {
+  if (name !== 'hot-rod') throw Error('Unexpected fixture function');
+  if (role !== 'approved') return error('Approved family membership required.',403);
+  operations.push(body);
+  try {
+    if (body.type===failNext) { failNext=''; return error('Synthetic save service interruption.',503); }
+    if (body.type==='load') return answer(saved);
+    if (body.type==='crew') return answer({
+      members:[{id:rival,name:'Test driver',garage:garageShowcase(rivalState)}],
+      challenges
+    });
+    if (body.type==='invite') {
+      if (body.memberId!==rival || body.kind!=='road') throw Error('Wrong synthetic challenge.');
+      challenges.push({
+        id:body.operation,opponent:rival,kind:body.kind,you:viewer,challenged:rival,status:'pending'
+      });
+      return answer({challenge:challenges.at(-1),message:'Challenge sent.'});
+    }
+    if (body.revision!==saved.revision) return error('Fixture revision mismatch.',409);
+    let next;
+    if (body.type==='new') next = {state:newCampaign(),message:'You have $750 and a whole summer.'};
+    else if (body.type==='challenge') next = startRace(saved.state,body, {
+      id:'00000000-0000-4000-8000-000000000003',seed:17,now:Date.now()
+    });
+    else if (body.type==='finish') {
+      if (body.raceId!==saved.state.race.id) throw Error('Wrong fixture race.');
+      result = replayRace(saved.state.race,body.inputs).result;
+      next = settleRace(saved.state,result);
+    } else if (body.type==='forfeit') next = settleRace(saved.state,{
+      outcome:'abandoned',ms:0,fuel:2,wear:0,reaction:0
+    });
+    else next = applyWorkshop(saved.state,body);
+    return answer(save(next));
+  } catch (e) { return error(e.message,422); }
+}
+async function rpc(name) {
+  if (role !== 'approved') return {data:null,error:{code:'42501'}};
+  if (name==='community_hot_rod_standings') return answer(standings());
+  if (name==='community_family_fridge_state') return answer({items:[]});
+  if (name==='community_family_calendar_feed') return answer({events:[]});
+  if (name==='community_family_scoreboard') return answer({
+    as_of:new Date().toISOString(),plate_access:false,quest_level:2,quest_xp:115,
+    mahjong_level:4,wordle_today:0,wordle_attempts:0,
+    games:{mahjong:{players:1,achievements:1,entries:[{rank:1,name:'Example teammate',score:117}]}}
+  });
+  throw Error('Unexpected fixture RPC: '+name);
+}
+const client = {
+  functions:{invoke},rpc,
+  channel:()=>({on:()=>{},subscribe:fn=>fn('SUBSCRIBED')}),
+  removeChannel:async()=>{}
+};
+window.fixture = {
+  ready:true,
+  received:()=>operations,
+  result:()=>result,
+  interrupt:()=>{failNext='bolt';},
+  access(status) {
+    role=status;
+    section.hidden=status!=='approved';
+    const member = status==='visitor' ? null : {user_id:viewer,status};
+    board.setAccess(client,member);
+    game.setAccess(client,member);
+  }
+};
+window.fixture.access(role);
+</script></body></html>"""
+
+
+async def open_game(page):
+    await page.locator('#hot-rod-entry').click(timeout=15000)
+    game = page.get_by_role('dialog', name='Hot Rod')
+    await expect(game).to_be_visible()
+    await expect(game.locator('.hot-rod-canvas')).to_have_attribute('width', '320')
+    await expect(game.locator('.hot-rod-canvas')).to_have_attribute('height', '200')
+    return game
+
+
+async def scene(game, name):
+    await expect(game).to_have_attribute('data-scene', name)
+
+
+async def fit(page, game, *, driving=False):
+    size = await game.evaluate("""(dialog, driving) => {
+      const canvas = dialog.querySelector('canvas');
+      const grid = canvas.getBoundingClientRect();
+      const dlg = dialog.getBoundingClientRect();
+      const pads = [...dialog.querySelectorAll('[data-drive]')].map(el => {
+        const r = el.getBoundingClientRect();
+        return {label:el.textContent,min:r.width,height:r.height,left:r.left,
+          right:r.right,top:r.top,bottom:r.bottom};
+      });
+      return {overflow: dialog.scrollWidth - dialog.clientWidth, width:grid.width, height:grid.height,
+        layout:document.documentElement.scrollWidth-innerWidth, dlg:dlg.toJSON(), pads, driving};
+    }""", driving)
+    assert size['overflow'] <= 2 and size['layout'] <= 2, size
+    assert size['width'] >= 180 and size['height'] >= 112, size
+    assert abs(size['width'] / size['height'] - 1.6) <= 0.035, size
+    if driving:
+        for pad in size['pads']:
+            assert pad['min'] >= 43 and pad['height'] >= 44, size
+            assert pad['left'] >= size['dlg']['left'] - 2 and pad['right'] <= size['dlg']['right'] + 2, size
+            assert pad['top'] >= size['dlg']['top'] - 2 and pad['bottom'] <= size['dlg']['bottom'] + 2, size
+    assert await page.evaluate("getComputedStyle(document.documentElement).overflowY") == 'hidden', size
+
+
+async def finger(locator, name, pointer):
+    # Playwright has no cross-browser hold/release API for touch. Dispatch real
+    # PointerEvents through the production input handlers and listen at the DOM.
+    await locator.evaluate("""(pad, data) => {
+      const [name, pointer] = data;
+      pad.dispatchEvent(new PointerEvent(name,{bubbles:true,cancelable:true,
+        pointerId:pointer,pointerType:'touch',isPrimary:pointer===1,button:0,buttons:name==='pointerdown'?1:0}));
+    }""", [name,pointer])
+
+
+async def access_flow(page):
+    await page.goto(URL + '?role=visitor', wait_until='domcontentloaded')
+    await page.wait_for_function('window.fixture?.ready')
+    await expect(page.locator('#hot-rod-entry')).to_have_count(0)
+    await page.evaluate("fixture.access('pending')")
+    await expect(page.locator('#hot-rod-entry')).to_have_count(0)
+    assert await page.evaluate('fixture.received()') == []
+    await page.evaluate("fixture.access('approved')")
+    await page.evaluate("history.replaceState(null, '', location.pathname)")
+    await expect(page.locator('#hot-rod-entry')).to_be_visible()
+    await expect(page.get_by_role('heading',name='Family Scoreboard')).to_be_visible()
+    assert await page.locator('#family-score-title').evaluate("""node =>
+      !!(node.compareDocumentPosition(document.querySelector('#hot-rod-entry')) & Node.DOCUMENT_POSITION_FOLLOWING)
+    """)
+
+
+async def campaign_flow(page, name, *, touch):
+    await access_flow(page)
+    game = await open_game(page)
+    await game.get_by_role('button',name='Start Classic 1963').click()
+    await scene(game,'paper')
+    await expect(game.locator('.hot-rod-bank')).to_contain_text('$750')
+    await game.get_by_role('button',name=re.compile('1940 Chevrolet Coupe')).click()
+    await expect(game.get_by_role('heading',name='1940 Chevrolet Coupe')).to_be_visible()
+    await game.get_by_role('spinbutton',name='Your offer').fill('380')
+    await game.get_by_role('button',name='Make offer').click()
+    await scene(game,'garage')
+    await expect(game.locator('.hot-rod-bank')).to_contain_text('$370')
+    await fit(page,game)
+    await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-garage.png')
+
+    await game.get_by_role('button',name='Open the hood').click()
+    await scene(game,'workbench')
+    await expect(game.get_by_role('heading',name=re.compile('Carburetor|Carter',re.I))).to_be_visible()
+    await page.evaluate('fixture.interrupt()')
+    await game.locator('.hot-rod-fastener').first.click()
+    await expect(game.get_by_role('status')).to_contain_text('Synthetic save service interruption.')
+    await game.get_by_role('button',name='Retry save').click()
+    await expect(game.get_by_text('1 loose',exact=False)).to_be_visible()
+    assert await page.evaluate("""() => {
+      const bolts=fixture.received().filter(item=>item.type==='bolt');
+      return bolts.length===2 && bolts[0].operation===bolts[1].operation &&
+        bolts[1].slot==='carb' && bolts[1].index===0;
+    }""")
+    await game.get_by_role('button',name='Back to games').click()
+    await expect(game).to_be_hidden()
+    await expect(page.locator('#hot-rod-entry')).to_be_focused()
+
+    await page.reload(wait_until='domcontentloaded')
+    game = await open_game(page)
+    await game.get_by_role('button',name='Continue Classic 1963').click()
+    await scene(game,'garage')
+    await expect(game.locator('.hot-rod-bank')).to_contain_text('$370')
+    await game.get_by_role('button',name='Open the hood').click()
+    await expect(game.get_by_text('1 loose',exact=False)).to_be_visible()
+    await game.locator('.hot-rod-wrench').get_by_role('button',name='Tighten bolt 1').click()
+    await expect(game.get_by_text('0 loose',exact=False)).to_be_visible()
+
+    await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Family garages').click()
+    await game.get_by_role('button',name='Test driver',exact=True).click()
+    await expect(game.get_by_role('heading',name='Test driver’s garage')).to_be_visible()
+    await expect(game.get_by_text(re.compile('1956 Corvette · .* hp'))).to_be_visible()
+    await game.get_by_role('combobox',name='Garage bay').select_option('1')
+    await expect(game.get_by_text(re.compile('1955 Ford Fairlane Victoria · .* hp'))).to_be_visible()
+    await game.get_by_role('combobox',name='Challenge course').select_option('road')
+    await game.get_by_role('button',name='Send challenge').click()
+    await expect(game.get_by_text('Status: pending')).to_be_visible()
+
+    await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Garage',exact=True).click()
+    await game.locator('.hot-rod-panel').get_by_role('button',name='Hit the street').click()
+    await scene(game,'diner')
+    await game.get_by_role('button',name='Challenge Earl').click()
+    await scene(game,'race')
+    await game.get_by_role('button',name='Stage at the line').click()
+    await expect(game.locator('.hot-rod-meters')).not_to_contain_text('WAIT FOR GREEN',timeout=10000)
+    await fit(page,game,driving=True)
+    await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
+    if touch:
+        await finger(game.locator('[data-drive="up"]'),'pointerdown',1)
+        await finger(game.locator('[data-drive="gas"]'),'pointerdown',2)
+        await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
+        await finger(game.locator('[data-drive="gas"]'),'pointerup',2)
+        await finger(game.locator('[data-drive="up"]'),'pointerup',1)
+    else:
+        await page.keyboard.press('e')
+        await page.keyboard.down('ArrowUp')
+        await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
+        await page.keyboard.up('ArrowUp')
+    await game.get_by_role('button',name='Pause',exact=True).click()
+    await expect(game.get_by_text('Paused. Resume when you’re ready.')).to_be_visible()
+    await game.get_by_role('button',name='Resume',exact=True).click()
+    if touch:
+        await game.get_by_role('button',name='Forfeit race',exact=True).click()
+        await game.get_by_role('button',name='Confirm forfeit').click()
+        await expect(game.get_by_role('heading',name='Forfeited')).to_be_visible()
+    else:
+        await page.keyboard.down('ArrowUp')
+        for gear in [1,2]:
+            await page.wait_for_function(r"""gear => {
+              const text=document.querySelector('.hot-rod-meters').textContent;
+              const rpm=text.match(/(\d+) RPM/);
+              return rpm && Number(rpm[1]) >= 4080 && text.includes('GEAR ' + gear);
+            }""", arg=gear, timeout=12000)
+            await page.keyboard.up('ArrowUp')
+            await page.keyboard.press('e')
+            await page.wait_for_function("""gear =>
+              document.querySelector('.hot-rod-meters').textContent.includes('GEAR ' + gear)
+            """, arg=gear+1, timeout=4500)
+            await page.keyboard.down('ArrowUp')
+        await expect(game.get_by_role('heading',name='Victory')).to_be_visible(timeout=23000)
+        await page.keyboard.up('ArrowUp')
+        assert await page.evaluate("fixture.result()?.outcome") == 'win'
+    await game.get_by_role('button',name='Continue',exact=True).click()
+    await scene(game,'garage')
+    await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Hall of Fame').click()
+    await expect(game.get_by_text('Test driver',exact=True)).to_be_visible()
+    if not touch:
+        await expect(game.get_by_text('First drag win',exact=True)).to_be_visible()
+
+    await game.get_by_role('button',name='Back to games').click()
+    await page.get_by_role('combobox',name='Standings by game').select_option('hotrod')
+    family = page.locator('.family-scoreboard')
+    mine = family.locator('li.is-mine')
+    await expect(mine).to_contain_text('Fixture member (you)')
+    await expect(mine).to_contain_text('0 wins · 1 losses' if touch else '1 wins · 0 losses')
+    if not touch:
+        await expect(mine).to_contain_text('13 points')
+    game = await open_game(page)
+    await page.evaluate("fixture.access('suspended')")
+    await expect(game).to_have_count(0)
+    await expect(page.locator('#hot-rod-entry')).to_have_count(0)
+    await expect(page.get_by_text('Test driver',exact=True)).to_have_count(0)
+
+
+async def main():
+    (ROOT / 'reports').mkdir(exist_ok=True)
+    async with async_playwright() as p:
+        for engine in ['chromium','webkit']:
+            browser = await getattr(p,engine).launch(headless=True)
+            try:
+                for label, viewport, touch in [
+                    ('portrait',{'width':390,'height':844},True),
+                    ('landscape',{'width':844,'height':390},False)
+                ]:
+                    page = await browser.new_page(viewport=viewport,has_touch=touch,reduced_motion='reduce')
+                    failures = []
+                    page.on('pageerror',lambda error:failures.append(str(error)))
+                    await page.route('**/__hot_rod_smoke__/community.html*',
+                                     lambda route:route.fulfill(status=200,content_type='text/html',body=HTML))
+                    await campaign_flow(page,engine+'-'+label,touch=touch)
+                    assert not failures, (engine,label,failures)
+                    await page.close()
+                    print(f'Hot Rod {engine} {label} passed',flush=True)
+            finally:
+                await browser.close()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

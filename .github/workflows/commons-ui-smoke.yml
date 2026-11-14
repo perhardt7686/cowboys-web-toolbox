@@ -5,6 +5,8 @@ on:
     paths:
       - 'docs/commons-feed-legibility.css'
       - 'docs/family-*'
+      - 'docs/hot-rod*'
+      - 'tests/browser-hot-rod.py'
       - 'tests/browser-family-board.py'
       - 'tests/browser-plate-review.py'
       - 'docs/commons-plates.css'
@@ -45,6 +47,8 @@ on:
   pull_request:
     paths:
       - 'docs/family-*'
+      - 'docs/hot-rod*'
+      - 'tests/browser-hot-rod.py'
       - 'docs/commons-arcade-shell.mjs'
       - 'docs/unified-nav.*'
       - 'tests/browser-*.py'
@@ -77,6 +81,7 @@ jobs:
           python tests/browser-arcade-shell.py
           python tests/browser-streetrod-scenes.py
           python tests/browser-streetrod-reborn.py
+          python tests/browser-hot-rod.py
       - name: Retain test-only iPhone-sized screenshot
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -92,5 +97,6 @@ jobs:
             reports/arcade-one-screen-iphone-sample.png
             reports/streetrod-room-garage-mobile.png
             reports/streetrod-reborn-iphone.png
+            reports/hot-rod-*.png
           if-no-files-found: ignore
           retention-days: 7

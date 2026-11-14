@@ -4,3 +4,7 @@ project_id = "cowboys-web-toolbox-community"
 # The handler verifies every user JWT against Supabase Auth. New publishable keys
 # are not legacy JWTs; an anonymous API key alone never authorizes a mutation.
 verify_jwt = false
+
+[functions.hot-rod]
+# The function verifies each bearer with Supabase Auth before any DB operation.
+verify_jwt = false
