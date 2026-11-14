@@ -413,3 +413,17 @@ body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=vote] #
   min-height:35px!important;height:35px!important
  }
 }
+
+/* Beat the older #mahjong-inside mobile flex override: five controls must
+   never stack vertically and steal the board's playing area. */
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-inside .mahjong-game-zone .mahjong-actions{
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ grid-template-rows:minmax(39px,auto)!important;
+ flex:0 0 auto!important;align-items:stretch!important;
+ width:100%!important;max-width:100%!important;min-height:39px!important;
+ margin:0!important;padding:0!important;gap:4px!important;
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-inside .mahjong-game-zone .mahjong-actions button{
+ width:100%!important;min-width:0!important;min-height:39px!important;
+ height:39px!important;padding:2px!important;box-shadow:none!important
+}
