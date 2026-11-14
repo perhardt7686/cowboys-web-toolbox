@@ -1,4 +1,4 @@
-/* Ana + Cowboy's private license-plate interpretation game, Commons only. */
+/* Private license-plate interpretation game for approved match players. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
@@ -12,7 +12,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  const pill=(txt)=>newEl('span','plate-pill',txt);
  const setStatus=(txt)=>{if($('plate-status'))$('plate-status').textContent=txt;if($('plate-post-status'))$('plate-post-status').textContent=txt;};
  const clean=()=>{for(const photo of urls.values())void photo.then(url=>URL.revokeObjectURL(url)).catch(()=>{});urls.clear();};
- const nameFor=who=>who==='ana'?'Ana':'Cowboy';
+ const nameFor=who=>game?.players?.find(player=>player.seat===who)?.name||'Player';
+ const otherName=()=>game?.players?.find(player=>player.seat!==seat)?.name||'The other player';
  const dateFor=stamp=>{try{return new Date(stamp).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});}catch{return '';}};
  const googleLink=(plate,region)=>'https://www.google.com/search?q='+encodeURIComponent('"'+plate+'" personalized vanity license plate meaning '+region);
  const designLink=region=>'https://www.google.com/search?q='+encodeURIComponent(region+' official DMV license plate designs personalized plate');
@@ -25,11 +26,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       <div class="commons-score-tile is-record"><span class="commons-score-label">LEADING TOTAL</span><strong id="plate-ribbon-lead">…</strong><small id="plate-ribbon-holder">Top player · cumulative points</small></div>
       <div class="commons-score-tile is-personal"><span class="commons-score-label">YOUR TOTAL</span><strong id="plate-ribbon-mine">…</strong><small>Approved plates and starting points</small></div>
       <div class="commons-score-tile is-live"><span class="commons-score-label">POINTS BEHIND</span><strong id="plate-ribbon-gap">…</strong><small id="plate-ribbon-gap-caption">Distance from first place</small></div>
-     </section><div class="plate-heading"><div><span class="plate-eyebrow">Private match · Ana vs. Cowboy</span><h2>What Does That Plate Mean?</h2><p>Find a custom plate. Snap a picture. Make your case. The other player decides.</p></div><div class="plate-score" id="plate-score" aria-live="polite"></div></div>
+     </section><div class="plate-heading"><div><span class="plate-eyebrow">Private match</span><h2>What Does That Plate Mean?</h2><p>Find a custom plate. Snap a picture. Make your case. The other player decides.</p></div><div class="plate-score" id="plate-score" aria-live="polite"></div></div>
     <div class="plate-rules">👍 Agree = one point for the person who guessed. 👎 Disagree = explain why; the guesser can revise and you vote again. One point maximum per photo.</div>
     <form id="plate-new" class="plate-new"><h3>📷 Post a plate</h3><div class="plate-fields"><label>Photo <input id="plate-photo" type="file" accept="image/*" required></label><label>Characters on the plate <input id="plate-characters" type="text" maxlength="18" placeholder="e.g. ODIN1" autocomplete="off" required></label><label>State / region <input id="plate-region" type="text" maxlength="60" placeholder="e.g. Virginia"></label></div><label>What do you think it means? <textarea id="plate-guess" rows="2" maxlength="600" placeholder="My best argument is…" required></textarea></label><p class="plate-hint">Crop out people, house numbers and other unnecessary details. Photos are resized and their original metadata is removed before upload.</p><button class="plate-button" type="submit" id="plate-submit">Post challenge</button></form>
     <div class="plate-list-header"><h3>Our plate debates</h3><button type="button" class="plate-button secondary" id="plate-refresh">Refresh</button></div><div id="plate-status" role="status" aria-live="polite"></div><div id="plate-list"></div><section id="plate-gallery" aria-label="Saved license plate photo history"><header class="plate-gallery-head"><strong>Saved plate photos</strong><span id="plate-gallery-count" role="status"></span></header><div id="plate-gallery-grid" class="plate-gallery-grid"></div><nav id="plate-gallery-pages" class="plate-gallery-pages" aria-label="Photo history pages"><button type="button" id="plate-gallery-prev">‹ Earlier</button><span id="plate-gallery-position">1 / 1</span><button type="button" id="plate-gallery-next">Later ›</button></nav></section>
-    <p class="plate-hint">Research links search public plate designs and possible meanings, not the registered owner's identity. Only Ana and Cowboy can view these photos in the game.</p></div>`;
+    <p class="plate-hint">Research links search public plate designs and possible meanings, not the registered owner's identity. Only approved match players can view these photos.</p></div>`;
   main.prepend(root);
   $('plate-game-open').addEventListener('click',()=>{expanded=!expanded;$('plate-game-content').hidden=!expanded;$('plate-game-open').setAttribute('aria-expanded',String(expanded));if(expanded){scope='all';offset=0;refresh();$('plate-game-content').scrollIntoView({block:'nearest',behavior:'smooth'});}});
   $('plate-new').addEventListener('submit',post);const postStatus=newEl('div');postStatus.id='plate-post-status';postStatus.setAttribute('role','status');$('plate-submit').before(postStatus);$('plate-photo').addEventListener('change',()=>{const f=$('plate-photo').files?.[0];if(f)setStatus(`Photo selected (${(f.size/1048576).toFixed(1)} MB). Add the guess and tap Post challenge.`);});
@@ -39,8 +40,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
 
  }
  function scores(){
-  const players=game?.players||[];const ana=players.find(p=>p.seat==='ana');const cowboy=players.find(p=>p.seat==='cowboy');
-  $('plate-top-score').textContent=`Ana ${ana?.total??'—'} · Cowboy ${cowboy?.total??'—'}`;
+  const players=game?.players||[];
+  $('plate-top-score').textContent=players.length?'Player standings':'No scores available';
   const valid=players.filter(p=>Number.isFinite(Number(p.total)));
   const highest=valid.length?Math.max(...valid.map(p=>Number(p.total))):0;
   const leaders=valid.filter(p=>Number(p.total)===highest);
@@ -54,8 +55,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   $('plate-ribbon-gap').textContent=mine?gap.toLocaleString('en-US'):'—';
   $('plate-ribbon-gap-caption').textContent=mine?(gap===0?'You are tied for first or leading':'Points to catch the leader'):'Your account is not a plate player';
   const div=$('plate-score');div.replaceChildren();
-  for(const [who,score] of [['ana',ana?.total??'—'],['cowboy',cowboy?.total??'—']]){
-   const n=newEl('div','plate-scorecard');n.append(newEl('span','',nameFor(who)),newEl('strong','',score));div.append(n);
+  for(const player of players){
+   const n=newEl('div','plate-scorecard');n.append(newEl('span','',player.name||'Player'),newEl('strong','',player.total??'—'));div.append(n);
   }
  }
  function button(label,fn,style=''){
@@ -144,7 +145,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    }
    info.append(refs);card.append(info);
    if(entry.status==='approved')card.append(ptext('Point awarded to '+nameFor(entry.seat)+'. This plate is settled.','plate-done'));
-   else if(entry.status==='pending'&&own)card.append(ptext('Waiting for '+nameFor(seat==='ana'?'cowboy':'ana')+' to vote.','plate-waiting'));
+   else if(entry.status==='pending'&&own)card.append(ptext('Waiting for '+otherName()+' to vote.','plate-waiting'));
    else if(entry.status==='pending'&&!own){
     const actions=newEl('div','plate-actions');actions.append(button('👍 Agree · +1',()=>vote(entry.id,true,''),'yes'),button('👎 Disagree',()=>{
      if(card.querySelector('.plate-disagree'))return;
@@ -306,7 +307,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    if(mounted&&sessionGeneration===generation){
     $('plate-new').reset();
     await refresh(true);
-    if(mounted&&sessionGeneration===generation)setStatus('Challenge posted. '+nameFor(seat==='ana'?'cowboy':'ana')+' can vote.');
+    if(mounted&&sessionGeneration===generation)setStatus('Challenge posted. '+otherName()+' can vote.');
    }
   }catch(err){
    if(mounted&&sessionGeneration===generation)setStatus('Could not post: '+(err.message||'Please retry.'));

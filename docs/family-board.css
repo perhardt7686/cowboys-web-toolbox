@@ -9,7 +9,8 @@ body.community-page {
   --family-focus: #00737a;
 }
 
-body.community-page [hidden]:is(#conversations, #family-tools, #family-overview, #family-welcome-description) { display: none !important; }
+body.community-page [hidden]:is(#conversations, #family-tools, #family-overview, #family-welcome-description),
+body.community-page #lab-intro.lab-intro { display: none !important; }
 body.community-page.cowboy-nav-ready .masthead .header-inner { min-height: 60px; padding-block: 6px; }
 body.community-page.cowboy-nav-ready .masthead .cowboy-nav-toggle { width: 46px; height: 46px; border-radius: 12px; gap: 5px; }
 body.community-page.cowboy-nav-ready .cowboy-nav-heading strong { font-size: clamp(15px, 3.2vw, 24px); }

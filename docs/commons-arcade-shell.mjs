@@ -11,7 +11,7 @@ const games=[
  {id:'mahjong',root:'mahjong-root',toggle:'mahjong-toggle',name:'Mahjong',tag:'MYSTERY ROAD',symbol:'◇',scenes:[['play','PLAY'],['levels','LEVELS'],['scores','SCORES'],['personal','MY SCORES'],['badges','AWARDS'],['history','HISTORY']]},
  {id:'wordle',root:'letter-lock-root',toggle:'letter-lock-toggle',name:'w0rdle',tag:'CO-OP WORD CIPHER',symbol:'▤',scenes:[['play','PLAY'],['scores','SCORES'],['awards','AWARDS'],['history','HISTORY']]},
  {id:'wordquest',root:'word-game-root',toggle:'word-game-toggle',name:'Word Quest',tag:'DAILY TEAM PUZZLE',symbol:'▥',scenes:[['play','PLAY'],['scores','LEADERBOARD'],['progress','PROGRESS'],['history','HISTORY']]},
- {id:'plates',root:'plate-game-root',toggle:'plate-game-open',name:'License Plates',tag:'ANA VS. COWBOY',symbol:'▧',scenes:[['post','POST'],['vote','REVIEW'],['history','PHOTOS'],['scores','SCORES']]},
+ {id:'plates',root:'plate-game-root',toggle:'plate-game-open',name:'License Plates',tag:'PRIVATE MATCH',symbol:'▧',scenes:[['post','POST'],['vote','REVIEW'],['history','PHOTOS'],['scores','SCORES']]},
  {id:'drawing',root:'drawing-studio-game-root',toggle:'drawing-studio-toggle',name:'Drawing Studio',tag:'ORIGINAL ART DESK',symbol:'▦',scenes:[['draw','CANVAS']]},
  {id:'study',root:'vdacs-study-root',toggle:'vdacs-study-toggle',name:'7A Study Cards',tag:'PEST CONTROL PREP',symbol:'▨',scenes:[['cards','CARDS'],['awards','MILESTONES'],['sources','RESOURCES']]}
 ];

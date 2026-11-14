@@ -24,6 +24,10 @@ async def main():
                   reduced_motion='reduce')
                 try:
                     await page.goto(BASE+path,wait_until='domcontentloaded',timeout=30000)
+                    if name == 'Commons':
+                        await page.get_by_role('heading', name='Good company. Members only.').wait_for()
+                        assert not await page.locator('#lab-intro').is_visible()
+                        assert not await page.locator('#conversations').is_visible()
                     nav=page.locator('#cowboy-site-nav')
                     await nav.wait_for(timeout=20000)
                     heading=page.locator('.cowboy-nav-heading strong')
