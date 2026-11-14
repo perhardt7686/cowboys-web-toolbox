@@ -71,7 +71,11 @@ function navigate(next){
  const go=()=>{
   if(!arcade())return;
   if(selected&&!selected.disabled)selected.click();
-  if(next==='tune'){body.dataset.arcadeScene='tune';render(true);}
+  if(next==='tune'){
+   const hudTune=$('arcade-hud-scenes')?.querySelector('[data-arcade-scene="tune"]');
+   if(hudTune)hudTune.click();
+   else{body.dataset.arcadeScene='tune';render(true);}
+  }
  };
  const previous=room();
  if((previous==='garage'&&next==='diner')||(previous==='diner'&&next==='garage')){
