@@ -54,19 +54,36 @@ function actionButton(label,roomName,disabled=false){
  b.textContent=label;b.disabled=disabled;return b;
 }
 function counter(){
- const info=$('ss-metrics')?.textContent||'';
- const garage=$('ss-scene')?.querySelector('.ss-garage-overlay span')?.textContent||'';
- const credits=info.match(/(?:bankroll|credits|cash)\s*:?\s*\$?[\d,]+/i)?.[0]||'';
- const car=garage||$('ss-scene')?.querySelector('.ss-scene-head h4')?.textContent||'';
- return {credits,car};
+ const metrics=Object.fromEntries(
+  [...($('ss-metrics')?.querySelectorAll(':scope > div')||[])].map(n=>[
+   n.querySelector('small')?.textContent?.trim()?.toLowerCase(),
+   n.querySelector('strong')?.textContent?.trim()
+  ]).filter(([k])=>k)
+ );
+ const garage=source()?.querySelector('.ss-garage-overlay span')?.textContent?.trim();
+ return {credits:metrics.wallet||'',car:garage||metrics.car||'YOUR RIDE'};
 }
+let cruising=false;
 function navigate(next){
- if(!ROOM_IDS.has(next))return;
- // Use the actual saved season navigation, rather than synthesizing the
- // next screen. The existing arcade controller syncs to this pressed tab.
+ if(!ROOM_IDS.has(next)||cruising)return;
+ // Use the real season navigation to preserve the purchased cars and races.
  const selected=$('ss-tabs')?.querySelector('[data-ss-tab="'+(next==='tune'?'garage':next)+'"]');
- if(selected&&!selected.disabled){selected.click();}
- if(next==='tune'){body.dataset.arcadeScene='tune';render(true);}
+ const go=()=>{
+  if(!arcade())return;
+  if(selected&&!selected.disabled)selected.click();
+  if(next==='tune'){body.dataset.arcadeScene='tune';render(true);}
+ };
+ const previous=room();
+ if((previous==='garage'&&next==='diner')||(previous==='diner'&&next==='garage')){
+  cruising=true;
+  const canvas=$('ss-dos-canvas');
+  if(canvas)window.COWBOY_STREETROD_PAINT?.(canvas,'drive',{subtitle:'CRUISING TO '+next.toUpperCase()});
+  const hint=$('ss-dos-hint');if(hint)hint.textContent='CRUISING THROUGH TOWN...';
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  window.setTimeout(()=>{cruising=false;go();},reduced?60:440);
+  return;
+ }
+ go();
 }
 function activeCards(){
  const scene=source();if(!scene)return [];
