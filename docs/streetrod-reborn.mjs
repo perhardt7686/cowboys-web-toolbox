@@ -622,6 +622,24 @@ window.addEventListener('cowboy:streetrod-season-saved',event=>{
  if(command==='buy_car'||command==='switch')choose('garage');
  else if(command==='new_season')choose('paperfront');
 });
+// The original accepts keyboard as well as a mouse. Page navigation is
+// deliberately disabled in the road cockpit and in editable form controls.
+window.addEventListener('keydown',event=>{
+ if(!isArcade()||event.defaultPrevented||event.altKey||event.ctrlKey||event.metaKey)return;
+ if(event.target?.closest?.('input,textarea,select,[contenteditable],form'))return;
+ const room=currentRoom();
+ if(event.code==='Escape'&&stage()?.classList.contains('sr-v3-travel')){
+  event.preventDefault();travelSkip?.();return;
+ }
+ if(['paper','parts','diner','crew','inventory','hall'].includes(room)){
+  if(event.code==='ArrowRight'){event.preventDefault();choose('next');return;}
+  if(event.code==='ArrowLeft'){event.preventDefault();choose('prev');return;}
+ }
+ if(room==='garage'){
+  const shortcuts={KeyN:'paperfront',KeyH:'hood',KeyC:'carinfo',KeyD:'diner'};
+  const target=shortcuts[event.code];if(target){event.preventDefault();choose(target);}
+ }
+});
 // The source game calculates and saves its own race. We only draw the updated
 // telemetry; this interval makes no RPC calls and never changes race state.
 tick=setInterval(()=>{
