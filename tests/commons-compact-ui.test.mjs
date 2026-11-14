@@ -6,20 +6,22 @@ import {fileURLToPath} from 'node:url';
 
 const file=path=>new URL('../'+path,import.meta.url);
 const source=async path=>readFile(file(path),'utf8');
-const [html,arcade,plates,mahjong,coco,forum,css]=await Promise.all([
+const [html,arcade,plates,mahjong,coco,forum,css,family]=await Promise.all([
  'docs/community.html','docs/commons-arcade-shell.mjs','docs/commons-plates.mjs',
  'docs/commons-mahjong.mjs','docs/community-coco.mjs',
- 'docs/commons-board-compact.mjs','docs/commons-compact-ui.css'].map(source)
+ 'docs/commons-board-compact.mjs','docs/commons-compact-ui.css',
+ 'docs/community-family.mjs'].map(source)
 );
 
 test('All revised modules parse and are versioned for Safari',()=>{
  for(const path of ['docs/commons-arcade-shell.mjs','docs/commons-plates.mjs',
-   'docs/commons-mahjong.mjs','docs/community-coco.mjs','docs/commons-board-compact.mjs']){
+   'docs/commons-mahjong.mjs','docs/community-coco.mjs','docs/commons-board-compact.mjs',
+   'docs/community-family.mjs']){
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))],{stdio:'pipe'}),'Syntax error in '+path);
  }
- for(const asset of ['commons-compact-ui.css?v=compact2','commons-board-compact.mjs?v=compact1',
+ for(const asset of ['commons-compact-ui.css?v=compact3','commons-board-compact.mjs?v=compact1',
   'commons-arcade-shell.mjs?v=compact6','commons-plates.mjs?v=history2',
-  'commons-mahjong.mjs?v=fit7','community-coco.mjs?v=autumn3'])
+  'commons-mahjong.mjs?v=fit7','community-coco.mjs?v=autumn3','community-family.mjs?v=family2'])
   assert.ok(html.includes(asset),'Live page missing '+asset);
 });
 
@@ -59,4 +61,13 @@ test('Feed uses a deliberate six-item load-more control and not infinite scrolli
  assert.match(css,/\.thread-card\[hidden\]/);
  assert.match(arcade,/arcade-score-pills/);
  assert.doesNotMatch(arcade,/arcade-hud-footer/);
+});
+
+test('Coco family corner panel is removed, reading aids and standard board remain',()=>{
+ assert.doesNotMatch(family,/family-room-grid|data-family-action|Question of the week|Vote on a family plan/);
+ assert.match(family,/querySelectorAll\('\.family-room'\)/);
+ assert.match(family,/family-reading-bar/);
+ assert.match(family,/community-sort-label/);
+ assert.match(css,/#conversations \.family-room\{display:none!important\}/);
+ assert.match(html,/community-family\.mjs\?v=family2/);
 });
