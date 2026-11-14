@@ -1,27 +1,197 @@
-/* Spelunkr shortcut is a link, not an embedded third-party player. */
+/* Mobile-first family guide. Official channels open on Spelunkr, never in an iframe. */
 body.community-page #spelunkr-game-link{
- display:flex;align-items:center;box-sizing:border-box;width:100%;max-width:100%;
- margin:10px 0 20px;text-decoration:none!important;border:2px solid #d6a260;
- border-radius:16px;background:linear-gradient(115deg,#39254e,#663d7c);
- color:#fff6e5!important;box-shadow:0 5px 18px #0003;min-height:76px;
+ display:flex;align-items:center;width:100%;max-width:100%;box-sizing:border-box;min-height:76px;
+ margin:10px 0 20px;text-decoration:none!important;border:2px solid #d6a260;border-radius:16px;
+ background:linear-gradient(115deg,#39254e,#663d7c);color:#fff6e5!important;box-shadow:0 5px 18px #0003;
 }
 body.community-page #spelunkr-game-link .mahjong-entry-copy{min-width:0}
 body.community-page #spelunkr-game-link .mahjong-entry-copy strong{color:#fff5d0}
 body.community-page #spelunkr-game-link .mahjong-entry-copy small{color:#f7e7fb;line-height:1.45}
 body.community-page #spelunkr-game-link .mahjong-chevron{color:#fff0c7}
-body.community-page #spelunkr-game-link:hover,body.community-page #spelunkr-game-link:focus-visible{background:linear-gradient(115deg,#573a71,#806095);border-color:#fff0b5}
+body.community-page #spelunkr-game-link:hover,body.community-page #spelunkr-game-link:focus-visible{background:#604477;border-color:#ffe4ae}
 body.community-page #spelunkr-arcade-link{
- display:flex;align-items:center;gap:12px;box-sizing:border-box;color:#fef4d8;
+ display:flex;align-items:center;gap:12px;box-sizing:border-box;color:#fef4d8!important;
  background:#281e36;border:2px solid #ddb773;border-radius:8px;padding:12px;
- text-decoration:none;min-width:0;min-height:75px;
+ text-decoration:none!important;min-width:0;min-height:75px;
 }
 body.community-page #spelunkr-arcade-link:hover,body.community-page #spelunkr-arcade-link:focus-visible{background:#463159;border-color:#ffe4ae}
 body.community-page #spelunkr-arcade-link .arcade-program-name{min-width:0;flex:1}
 body.community-page #spelunkr-arcade-link .arcade-program-name strong{display:block;color:#fff0d0}
 body.community-page #spelunkr-arcade-link .arcade-program-name small{display:block;color:#f5dbf5}
-body.community-page #spelunkr-arcade-link .arcade-program-number,
-body.community-page #spelunkr-arcade-link .arcade-program-mark,
-body.community-page #spelunkr-arcade-link .arcade-program-state{flex:0 0 auto}
+body.community-page #spelunkr-arcade-link :is(.arcade-program-number,.arcade-program-mark,.arcade-program-state){flex:0 0 auto}
+
+body.community-page.family-retro-open{overflow:hidden!important}
+body.community-page #family-retro-guide,body.community-page #family-retro-guide *{box-sizing:border-box}
+body.community-page #family-retro-guide{
+ position:fixed!important;inset:0!important;z-index:2147483000!important;display:grid!important;
+ place-items:center;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));
+ background:#0b0715e8;backdrop-filter:blur(7px);color:#fff5dc;
+ font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+body.community-page #family-retro-guide[hidden]{display:none!important}
+body.community-page #family-retro-guide .family-retro-panel{
+ display:flex;flex-direction:column;overflow:hidden;min-width:0;width:min(960px,100%);
+ height:min(870px,calc(100dvh - 24px));border:2px solid #d6a260;border-radius:22px;
+ background:linear-gradient(160deg,#322244 0%,#160d2c 70%);box-shadow:0 12px 58px #000d;color:#fff4e3;
+}
+body.community-page #family-retro-guide .family-retro-head{
+ display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:10px;
+ padding:15px 17px;border-bottom:2px solid #cc9f67;background:linear-gradient(120deg,#39204f,#211139);
+}
+body.community-page #family-retro-guide .family-retro-brand{display:flex;align-items:center;gap:12px;min-width:0}
+body.community-page #family-retro-guide .family-retro-stamp{
+ display:grid;place-items:center;font-size:26px;background:#4d2b6a;border:2px solid #b88ed1;
+ width:50px;height:50px;border-radius:14px;flex:0 0 50px
+}
+body.community-page #family-retro-guide .family-retro-brand small{
+ display:block;color:#e5bd80;letter-spacing:.07em;font-weight:850;font-size:10px;margin-bottom:3px
+}
+body.community-page #family-retro-guide h2{
+ font:850 clamp(18px,3.6vw,26px)/1.12 system-ui,-apple-system,sans-serif;color:#fff6d5;margin:0;
+}
+body.community-page #family-retro-guide .family-retro-brand p{
+ font-size:12px;line-height:1.35;color:#e7d5eb;margin:4px 0 0
+}
+body.community-page #family-retro-guide .family-retro-close{
+ display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border-radius:14px;
+ border:2px solid #b68ecc;background:#5e3680;color:white;font:850 25px/1 system-ui;cursor:pointer;
+}
+body.community-page #family-retro-guide .family-retro-toolbar{
+ flex:0 0 auto;padding:11px 16px 9px;background:#26173d;border-bottom:1px solid #ffffff30;
+}
+body.community-page #family-retro-guide .family-retro-search-label{
+ display:grid;gap:5px;color:#f8deb5;font-size:13px;font-weight:850
+}
+body.community-page #family-retro-guide #family-retro-search{
+ display:block;width:100%;height:49px;min-width:0;background:#fffaf2;border:2px solid #c6a2d2;
+ border-radius:12px;padding:10px 13px;color:#38254d;font:700 16px system-ui,sans-serif;
+}
+body.community-page #family-retro-guide .family-retro-filter-row{
+ display:flex;gap:7px;overflow-x:auto;scrollbar-width:thin;white-space:nowrap;padding:10px 0 5px
+}
+body.community-page #family-retro-guide .family-retro-filter{
+ flex:0 0 auto;padding:9px 12px;min-height:44px;border:1px solid #ad81bd;border-radius:99px;
+ background:#3d2854;color:#f6e7f9;font:750 13px/1.2 system-ui,sans-serif;cursor:pointer;
+}
+body.community-page #family-retro-guide .family-retro-filter[aria-pressed="true"]{
+ background:#ffe2a5;color:#331a3c;border-color:#ffe2a5
+}
+body.community-page #family-retro-guide .family-retro-main{
+ flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ -webkit-overflow-scrolling:touch;padding:12px 16px 16px
+}
+body.community-page #family-retro-guide .family-retro-count{
+ font-weight:800;font-size:13px;color:#ffe5b7;margin-bottom:11px
+}
+body.community-page #family-retro-guide .family-retro-list{
+ display:grid;grid-template-columns:1fr 1fr;gap:9px
+}
+body.community-page #family-retro-guide .family-retro-channel{
+ min-width:0;display:grid;grid-template-columns:54px minmax(0,1fr);gap:10px;align-items:center;
+ padding:12px;border:1px solid #9a6eaa;border-radius:14px;
+ background:linear-gradient(145deg,#493063,#342249);box-shadow:inset 0 1px 0 #fff2
+}
+body.community-page #family-retro-guide .family-retro-channel-num{
+ display:grid;place-items:center;min-height:50px;padding:3px;background:#25183a;color:#ffda77;
+ border:2px solid #aa80bf;border-radius:11px;font:900 clamp(19px,3.5vw,26px)/1 monospace
+}
+body.community-page #family-retro-guide .family-retro-channel-copy{min-width:0}
+body.community-page #family-retro-guide .family-retro-channel-title{
+ display:block;color:#fff6e3;font:850 clamp(13px,2.5vw,17px)/1.25 system-ui,sans-serif;overflow-wrap:anywhere
+}
+body.community-page #family-retro-guide .family-retro-channel-desc{
+ display:block;color:#e1ccea;font:650 12px/1.4 system-ui,sans-serif;margin-top:4px
+}
+body.community-page #family-retro-guide .family-retro-channel-actions{
+ grid-column:1/-1;display:grid;grid-template-columns:47px minmax(0,1fr);gap:9px
+}
+body.community-page #family-retro-guide .family-retro-fav{
+ min-width:47px;min-height:46px;border-radius:11px;border:2px solid #b48cbe;
+ background:#332045;color:#f9d68c;font-size:24px;cursor:pointer
+}
+body.community-page #family-retro-guide .family-retro-fav[aria-pressed="true"]{
+ color:#ffdb70;background:#684675
+}
+body.community-page #family-retro-guide .family-retro-watch{
+ display:grid;place-items:center;min-height:46px;border-radius:11px;border:2px solid #f4c57b;
+ background:#f6d194;color:#321e40!important;text-decoration:none!important;
+ font:900 16px/1.1 system-ui,sans-serif;text-align:center
+}
+body.community-page #family-retro-guide .family-retro-watch:hover,
+body.community-page #family-retro-guide .family-retro-watch:focus-visible{background:#ffe8b9}
+body.community-page #family-retro-guide :is(button,a,input):focus-visible{
+ outline:3px solid #64f3ff;outline-offset:3px
+}
+body.community-page #family-retro-guide .family-retro-empty{
+ font-weight:700;font-size:15px;color:#fae6c1
+}
+body.community-page #family-retro-guide .family-retro-empty[hidden]{display:none!important}
+body.community-page #family-retro-guide .family-retro-foot{
+ flex:0 0 auto;border-top:1px solid #a984ba;background:#241531;padding:10px 17px 12px
+}
+body.community-page #family-retro-guide .family-retro-foot p{
+ margin:0 0 7px;font-size:12px;line-height:1.4;color:#ecd8ec
+}
+body.community-page #family-retro-guide .family-retro-foot-links{
+ display:flex;flex-wrap:wrap;gap:9px 20px
+}
+body.community-page #family-retro-guide .family-retro-foot-links a{
+ font-weight:800;font-size:13px;color:#ffe1a5!important
+}
+body.community-page #family-retro-guide .family-retro-foot>small{
+ display:block;color:#d9c3e0;font-size:10px;line-height:1.35;margin-top:8px
+}
+@media(max-width:630px){
+ body.community-page #family-retro-guide{padding:0;place-items:stretch}
+ body.community-page #family-retro-guide .family-retro-panel{
+  width:100vw;height:100dvh;border:0;border-radius:0
+ }
+ body.community-page #family-retro-guide .family-retro-head{
+  padding:calc(9px + env(safe-area-inset-top)) 12px 11px
+ }
+ body.community-page #family-retro-guide .family-retro-brand{gap:9px}
+ body.community-page #family-retro-guide .family-retro-stamp{
+  width:43px;height:43px;flex-basis:43px;font-size:23px
+ }
+ body.community-page #family-retro-guide .family-retro-brand small{font-size:9px}
+ body.community-page #family-retro-guide h2{font-size:clamp(18px,5vw,23px)}
+ body.community-page #family-retro-guide .family-retro-close{
+  width:46px;height:46px;flex-basis:46px
+ }
+ body.community-page #family-retro-guide .family-retro-toolbar{padding:10px 12px 8px}
+ body.community-page #family-retro-guide .family-retro-main{padding:10px 12px 14px}
+ body.community-page #family-retro-guide .family-retro-list{grid-template-columns:1fr}
+ body.community-page #family-retro-guide .family-retro-channel{
+  grid-template-columns:50px minmax(0,1fr) auto;gap:10px
+ }
+ body.community-page #family-retro-guide .family-retro-channel-num{min-height:48px}
+ body.community-page #family-retro-guide .family-retro-channel-actions{
+  grid-column:auto;display:flex;gap:6px;align-items:center
+ }
+ body.community-page #family-retro-guide .family-retro-fav{
+  min-width:44px;min-height:44px;font-size:21px
+ }
+ body.community-page #family-retro-guide .family-retro-watch{
+  min-width:78px;min-height:44px;padding:5px 8px;font-size:13px
+ }
+ body.community-page #family-retro-guide .family-retro-channel-desc{font-size:11px}
+ body.community-page #family-retro-guide .family-retro-foot{
+  padding:9px 13px calc(8px + env(safe-area-inset-bottom))
+ }
+ body.community-page #family-retro-guide .family-retro-foot p{font-size:11px}
+}
+@media(max-width:370px){
+ body.community-page #family-retro-guide .family-retro-channel{
+  grid-template-columns:45px minmax(0,1fr);gap:8px
+ }
+ body.community-page #family-retro-guide .family-retro-channel-actions{
+  grid-column:1/-1;display:grid;grid-template-columns:44px minmax(0,1fr)
+ }
+ body.community-page #family-retro-guide .family-retro-brand p{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #family-retro-guide *{transition:none!important;animation:none!important}
+}
 @media(max-width:400px){
  body.community-page #spelunkr-game-link .mahjong-entry-copy small{font-size:12px}
  body.community-page #spelunkr-arcade-link{gap:7px;padding:9px}
