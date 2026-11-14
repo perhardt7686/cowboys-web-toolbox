@@ -76,6 +76,10 @@ function roomHtml(room){
   '<article><strong>'+n+'</strong><button data-ss-action="buy_part" data-kind="'+n.toLowerCase()+'">Buy used</button></article>').join('')+'</div>';
  if(room==='diner')return '<div class="ss-rivals">'+['The Rookie','Blackjack','The King'].map((n,i)=>
   '<article class="ss-rival"><strong>'+n+'</strong><button data-ss-action="choose_rival" data-rival="r'+i+'">Call out</button></article>').join('')+'</div>';
+ if(room==='drive')return '<div class="ss-cockpit"><canvas width="960" height="340" id="ss-race-canvas"></canvas><div id="ss-start-lights">GREEN</div></div>'+
+ '<div class="ss-drive-metrics"><div><strong id="ss-speed">64 mph</strong></div><div><strong id="ss-rpm">3400</strong></div><div><strong id="ss-gear">3</strong></div><div><strong id="ss-distance">25%</strong></div></div>'+
+ '<div class="ss-drive-controls"><button data-ss-hold="left">STEER LEFT</button><button data-ss-hold="right">STEER RIGHT</button><button data-ss-hold="gas">GAS</button><button data-ss-hold="brake">BRAKE</button><button data-ss-action="shift">SHIFT UP</button><button data-ss-action="downshift">SHIFT DOWN</button></div>'+
+ '<div class="ss-actions"><button data-ss-action="abandon">Abandon</button></div>';
  return '<div class="ss-scene-head">'+room.toUpperCase()+'</div>';
 }
 function applyRoom(room){
@@ -139,6 +143,12 @@ async def run_one(browser,width,height):
   await p.locator('#ss-dos-pocket [data-ss-action="choose_rival"]').click()
   await p.locator('#ss-dos-pocket .ss-challenge-form').wait_for()
   assert await p.locator('#ss-dos-pocket .ss-challenge-form button').is_visible()
+  await p.evaluate("applyRoom('drive')")
+  await p.locator('#ss-dos-telemetry').wait_for()
+  assert '64 MPH' in await p.locator('#ss-dos-telemetry').inner_text()
+  assert await p.locator('#ss-dos-pocket .ss-dos-drive-controls button').count()==6
+  await p.locator('#ss-dos-pocket [data-ss-action="shift"]').click()
+  assert 'Selected shift' in await p.locator('#ss-status').inner_text()
   await p.locator('.ss-dos-room-nav [data-sr-room="garage"]').click()
   await p.locator('.ss-dos-hotspots [data-sr-room="hood"]').click()
   await p.locator('#ss-season-bay:not([hidden])').wait_for()
