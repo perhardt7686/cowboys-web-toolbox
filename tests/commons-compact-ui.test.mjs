@@ -10,18 +10,18 @@ const [html,arcade,plates,mahjong,coco,forum,css,family]=await Promise.all([
  'docs/community.html','docs/commons-arcade-shell.mjs','docs/commons-plates.mjs',
  'docs/commons-mahjong.mjs','docs/community-coco.mjs',
  'docs/commons-board-compact.mjs','docs/commons-compact-ui.css',
- 'docs/community-family.mjs'].map(source)
+ 'docs/community-board-accessibility.mjs'].map(source)
 );
 
 test('All revised modules parse and are versioned for Safari',()=>{
  for(const path of ['docs/commons-arcade-shell.mjs','docs/commons-plates.mjs',
    'docs/commons-mahjong.mjs','docs/community-coco.mjs','docs/commons-board-compact.mjs',
-   'docs/community-family.mjs']){
+   'docs/community-board-accessibility.mjs']){
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))],{stdio:'pipe'}),'Syntax error in '+path);
  }
- for(const asset of ['commons-compact-ui.css?v=compact3','commons-board-compact.mjs?v=compact1',
+ for(const asset of ['commons-compact-ui.css?v=compact4','commons-board-compact.mjs?v=compact1',
   'commons-arcade-shell.mjs?v=compact6','commons-plates.mjs?v=history2',
-  'commons-mahjong.mjs?v=fit7','community-coco.mjs?v=autumn3','community-family.mjs?v=family2'])
+  'commons-mahjong.mjs?v=fit7','community-coco.mjs?v=autumn3','community-board-accessibility.mjs?v=board-access4'])
   assert.ok(html.includes(asset),'Live page missing '+asset);
 });
 
@@ -63,11 +63,14 @@ test('Feed uses a deliberate six-item load-more control and not infinite scrolli
  assert.doesNotMatch(arcade,/arcade-hud-footer/);
 });
 
-test('Coco family corner panel is removed, reading aids and standard board remain',()=>{
+test('Retired Coco family corner is not loaded and is aggressively removed if cached',()=>{
+ assert.doesNotMatch(html,/<script[^>]+src="community-family\.mjs/);
  assert.doesNotMatch(family,/family-room-grid|data-family-action|Question of the week|Vote on a family plan/);
- assert.match(family,/querySelectorAll\('\.family-room'\)/);
+ assert.match(family,/removeLegacyCorner/);
+ assert.match(family,/MutationObserver/);
  assert.match(family,/family-reading-bar/);
  assert.match(family,/community-sort-label/);
+ assert.match(html,/community-board-accessibility\.mjs\?v=board-access4/);
+ assert.match(html,/retired-family-corner-guard/);
  assert.match(css,/#conversations \.family-room\{display:none!important\}/);
- assert.match(html,/community-family\.mjs\?v=family2/);
 });
