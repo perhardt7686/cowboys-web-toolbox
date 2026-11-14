@@ -117,7 +117,7 @@ async def run_one(browser,width,height):
   assert await p.locator('#ss-dos-canvas').evaluate('el=>el.width===320&&el.height===200')
   assert await p.locator('#ss-dos-cover').count()==0
   assert await p.locator('#ss-dos-canvas').is_visible()
-  assert await p.locator('.ss-dos-hotspot [data-sr-room="hood"]').count()==1
+  assert await p.locator('.ss-dos-hotspot[data-sr-room="hood"]').count()==1
   assert await p.locator('#ss-dos-stage').evaluate('el=>getComputedStyle(el).overflow==="hidden"')
   bounds=await p.locator('#ss-dos-stage').bounding_box()
   assert bounds and bounds['y']>=0 and bounds['y']+bounds['height']<=height+3,(width,height,bounds)
