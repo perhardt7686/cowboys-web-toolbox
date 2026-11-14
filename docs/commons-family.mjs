@@ -1,5 +1,6 @@
 /* The Commons · family word quest and drawing studio, members only. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {getAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
 import {letterKnowledge} from './family-word-clues.mjs?v=personal9';
 import {startDrawingStudio} from './commons-drawing.mjs?v=1';
 
@@ -17,7 +18,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   function status(message){const n=byId('commons-word-message');if(n)n.textContent=message;}
   function avatarOf(userId,name,size='word-player'){
     const img=avatarMap.get(safeStr(userId));
-    if(img&&isDataImage(img)){
+    if(img&&(isDataImage(img)||img.startsWith('blob:'))){
       const pic=document.createElement('img');pic.src=img;pic.alt='';pic.loading='lazy';pic.width=size==='ranking'?31:27;return pic;
     }
     const a=document.createElement('span');a.className='word-initials';a.textContent=safeStr(name).trim().slice(0,2).toUpperCase()||'?';return a;
@@ -250,10 +251,27 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     byId('commons-word-refresh').addEventListener('click',()=>refreshWord());
   }
   async function loadAvatars(){
-    avatarMap.clear();if(!client)return;
-    try{const {data,error}=await client.from('community_board_avatar_assets').select('user_id,data_uri');
-      if(!error)for(const row of data||[])if(row.user_id&&isDataImage(row.data_uri))avatarMap.set(row.user_id,row.data_uri);
-    }catch{/* Avatars are decorative. Do not block the game. */}
+    if(!client)return;
+    try{
+      const [art,profiles]=await Promise.all([
+        client.from('community_board_avatar_assets').select('user_id,data_uri'),
+        client.from('community_profiles')
+          .select('user_id,avatar_mode,avatar_path,published,account_active')
+          .eq('published',true).eq('account_active',true)
+      ]);
+      const next=new Map(avatarMap);
+      if(!art.error)for(const row of art.data||[])
+        if(row.user_id&&isDataImage(row.data_uri))next.set(String(row.user_id),row.data_uri);
+      if(!profiles.error){
+        const photos=(profiles.data||[]).filter(p=>p.avatar_mode==='photo'&&p.avatar_path);
+        const results=await Promise.all(photos.map(async p=>
+          [String(p.user_id),await getAvatarPhoto(client,p.avatar_path)]));
+        for(const [id,url] of results)if(url)next.set(id,url);
+      }
+      // Photo preference wins over generated portrait; a transient failure
+      // leaves the previous image in place instead of flipping to initials.
+      avatarMap=next;
+    }catch{/* Existing avatar pictures remain visible on a transient error. */}
   }
   async function mount(){
     if(mounting||board.hidden||!client)return;
@@ -271,6 +289,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       wordTimer=setInterval(()=>refreshWord(true),20000);
     }finally{mounting=false;}
   }
+  function onAvatarUpdated(){if(activeUser)void loadAvatars().then(()=>refreshWord(true));}
+  window.addEventListener('family-avatar-updated',onAvatarUpdated);
   function unmount(){
     activeUser=null;live=null;avatarMap.clear();if(wordTimer){clearInterval(wordTimer);wordTimer=null;}
     wordObserver?.disconnect();wordObserver=null;

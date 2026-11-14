@@ -1,4 +1,5 @@
-import {AVATAR_BUCKET, PROFILE_ICONS} from './profile-core.mjs?v=powers1';
+import {PROFILE_ICONS} from './profile-core.mjs?v=powers1';
+import {getAvatarPhoto,cachedAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
 import {boardTime, button, el, preference, statusLine} from './family-board-core.mjs?v=family3';
 import {makeFridge} from './family-fridge.mjs?v=family3';
 import {makeCalendar} from './family-calendar.mjs?v=family3';
@@ -267,16 +268,16 @@ export function createFamilyBoard() {
       }
     }
     async function updatePhotos(result) {
-      const expiry = Date.now() + 120000;
-      const paths = [...new Set(Object.values(result.games || {}).flatMap(game => game.entries.map(entry => entry.avatar_path)))];
-      const requested = paths.filter(path => path && !(images.get(path)?.expiry > Date.now()));
-      if (!requested.length) return;
-      const {data: signed, error} = await client.storage.from(AVATAR_BUCKET).createSignedUrls(requested, 120);
-      if (error || !active()) return;
-      for (const image of signed || []) {
-        if (image.signedUrl) images.set(image.path, {url: image.signedUrl, expiry});
-      }
-      paintScores();
+      const paths = [...new Set(Object.values(result.games || {}).flatMap(game =>
+        (game.entries||[]).map(entry => entry.avatar_path)).filter(Boolean))];
+      const missing = paths.filter(path => !images.has(path));
+      if (!missing.length) return;
+      const results = await Promise.all(missing.map(async path =>
+        [path, await getAvatarPhoto(client,path)]));
+      if (!active()) return;
+      for (const [path,url] of results) if (url) images.set(path, {url});
+      // Do not repaint mid-load. The caller paints exactly once after images
+      // finish loading and avoids swapping between icon and photo on updates.
     }
     async function refreshScores(manual = false) {
       if (!active()) return;
@@ -295,11 +296,12 @@ export function createFamilyBoard() {
         const displayed = {...result};
         delete displayed.as_of;
         const signature = JSON.stringify(displayed);
+        await updatePhotos(result);
+        if (!active()) return;
         if (lastScore !== signature) {
           lastScore = signature;
           paintScores();
         } else paintStatus();
-        void updatePhotos(result).catch(() => {});
       } catch (error) {
         if (!active()) return;
         failed = true;
@@ -320,6 +322,16 @@ export function createFamilyBoard() {
         if (dirty && active()) { dirty = false; schedule('scores'); }
       }
     }
+    function onAvatarUpdated(event){
+      const path=event?.detail?.path;
+      const url=cachedAvatarPhoto(path);
+      if(path&&url){
+        images.set(path,{url});
+        lastScore='';
+        paintScores();
+      }
+    }
+    window.addEventListener('family-avatar-updated',onAvatarUpdated);
     function schedule(topic) {
       if (!active() || !topics.includes(topic)) return;
       clearTimeout(retryTimers.get(topic));
@@ -383,6 +395,7 @@ export function createFamilyBoard() {
       retryTimers.forEach(clearTimeout);
       retryTimers.clear();
       window.removeEventListener('hashchange', launchHash);
+      window.removeEventListener('family-avatar-updated',onAvatarUpdated);
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
       document.removeEventListener('visibilitychange', onVisible);
