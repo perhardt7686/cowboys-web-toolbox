@@ -455,3 +455,143 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-me
   width:clamp(44px,9vw,63px)!important;height:clamp(44px,13dvh,62px)!important
  }
 }
+
+/* Previously inaccessible 1989 rooms: driver licence, paint, spare parts,
+   service order and saved hall-of-fame journal. All stay on one monitor. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn :is(.sr-v3-licence,.sr-v3-paint){
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ align-items:stretch!important;justify-content:center!important;min-height:0!important;
+ gap:6px!important;padding:7px!important;margin:0!important;overflow:hidden!important;
+ background:#f2e6c1!important;color:#1f1b2c!important;
+ border:3px ridge #a99b77!important;font:700 clamp(11px,3vw,14px)/1.25 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-licence>strong{
+ font:bold clamp(13px,3.5vw,19px)/1.15 monospace!important;
+ color:#211433!important;text-align:center!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-licence small{
+ color:#4c3950!important;font:700 10px/1.1 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-licence p{
+ color:#211433!important;margin:0!important;font:700 11px/1.2 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-driver{
+ display:flex!important;gap:8px!important;align-items:center!important;
+ justify-content:center!important;min-height:46px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-driver span{
+ color:#151228!important;font:bold 15px/1.2 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-driver .srm-avatar{
+ flex:0 0 46px!important;width:46px!important;height:46px!important;
+ max-height:46px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-paint>strong{
+ color:#1b1531!important;font:bold 12px/1.15 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-paint form{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+ gap:5px!important;min-height:0!important;align-items:center!important;
+ padding:4px!important;margin:0!important;border:1px solid #b9a175!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-paint label{
+ color:#261b32!important;font:bold 11px/1.25 monospace!important;
+ overflow:hidden!important;display:flex!important;gap:5px!important;align-items:center!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-paint input{
+ max-width:100%!important;min-width:0!important;min-height:32px!important;
+ padding:2px!important;background:#fff!important;border:2px inset #a49b80!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-inventory-item{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ align-items:stretch!important;justify-content:center!important;
+ min-height:0!important;gap:6px!important;padding:7px!important;margin:0!important;
+ background:#f0e6c8!important;color:#171722!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-inventory-item b{
+ font:bold 15px/1.2 monospace!important;color:#151525!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-inventory-item span{
+ font:700 11px/1.2 monospace!important;color:#433544!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-journal li{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;
+ gap:7px!important;min-height:0!important;padding:10px!important;
+ background:#ebe4c4!important;color:#171524!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-journal li :is(span,strong,small){
+ color:#211832!important;font:bold 13px/1.25 monospace!important;text-align:center!important
+}
+/* Manually pumped fuel is a separate stop-scene in the same fixed viewport.
+   It keeps the existing server-backed nozzle, target slider and receipt. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station:not([hidden]){
+ position:fixed!important;inset:var(--arcade-top,73px) 0 0 0!important;
+ z-index:2147481000!important;width:100vw!important;
+ height:calc(100dvh - var(--arcade-top,73px))!important;
+ max-height:calc(100dvh - var(--arcade-top,73px))!important;
+ overflow:hidden!important;box-sizing:border-box!important;
+ display:grid!important;grid-template-rows:auto minmax(0,1fr) auto auto!important;
+ gap:3px!important;margin:0!important;padding:4px!important;
+ background:#08111a!important;border:2px ridge #999!important;border-radius:0!important;
+ box-shadow:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station>header{
+ gap:2px!important;padding:1px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station>header h4{
+ font:bold 15px/1.15 'Courier New',monospace!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station>header p{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-forecourt{
+ min-height:0!important;max-height:100%!important;
+ gap:7px!important;padding:4px!important;border-radius:0!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-pump{
+ transform:scale(.82)!important;transform-origin:center!important;
+ margin:0 auto!important;height:min(27dvh,210px)!important;min-height:105px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-car-side{
+ min-height:0!important;max-height:100%!important;gap:3px!important;
+ padding:5px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-fuel-door{
+ width:clamp(35px,10dvh,75px)!important;height:clamp(35px,10dvh,75px)!important;
+ padding:2px!important;font-size:9px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station #ssg-form{
+ margin:0!important;padding:3px!important;gap:3px!important;border-radius:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station #ssg-target{
+ min-height:26px!important;height:26px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-buttons{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-buttons button{
+ min-width:0!important;min-height:38px!important;max-height:48px!important;
+ border-radius:0!important;padding:3px!important;font:bold clamp(9px,2.8vw,12px)/1.15 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-status{
+ min-height:26px!important;max-height:42px!important;overflow:hidden!important;
+ padding:4px!important;margin:0!important;border-radius:0!important;
+ font:700 10px/1.2 monospace!important
+}
+@media(orientation:landscape) and (max-height:550px){
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-forecourt:before,
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-car-side>span,
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station #ssg-current-label{
+  display:none!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-pump{
+  height:min(30dvh,110px)!important;transform:scale(.55)!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station #ssg-form label{
+  gap:2px!important;font-size:10px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-forecourt{
+  grid-template-columns:1fr 1fr!important
+ }
+}
