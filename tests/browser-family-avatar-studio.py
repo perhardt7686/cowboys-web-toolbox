@@ -54,9 +54,9 @@ async def main():
                 assert await link.get_attribute('href')=='https://spelunkr.tv/?tv'
                 assert await link.get_attribute('target')=='_blank'
                 assert await link.get_attribute('rel')=='noopener noreferrer'
-                after_draw=await link.evaluate("""el=>
-                  el.previousElementSibling?.id==='drawing-studio-game-root'""")
-                assert after_draw,(width,'Spelunkr is not after Drawing Studio')
+                await page.wait_for_function("""()=>
+                    document.getElementById('spelunkr-game-link')?.previousElementSibling?.id
+                     ==='drawing-studio-game-root'""",timeout=10000)
                 overflow=await page.evaluate('document.documentElement.scrollWidth-innerWidth')
                 assert overflow<=2,(width,'horizontal overflow',overflow)
                 assert not errors,(width,errors)
