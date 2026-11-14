@@ -71,7 +71,7 @@ test('family tools enforce role isolation, persisted changes, and minimal live u
       ($2,'REVIEWED','path3','Third challenge','needs_revision')`, [ids.owner, ids.member]);
     await query(`insert into public.community_plate_votes(entry_id,voter_id,approved)
       select id,$1,false from public.community_plate_entries where plate_text='REVIEWED'`, [ids.owner]);
-    await query(`select set_config('realtime.topic','family-board-updates',false)`);
+
 
     await t.test('signed-out, pending, suspended and nonmember accounts cannot read or write', async () => {
       for (const role of ['anon','pending','suspended','outsider']) {
@@ -83,7 +83,8 @@ test('family tools enforce role isolation, persisted changes, and minimal live u
         await refused(feed);
         await refused(query('select * from public.community_family_board_events'));
         await refused(calendar('add','board:00000000-0000-4000-8000-000000000101'));
-        assert.equal((await query('select count(*)::int as n from realtime.messages')).rows[0].n, 0);
+        if (role === 'anon') await refused(query('select * from public.community_family_revisions'));
+        else assert.equal((await query('select * from public.community_family_revisions')).rows.length, 0);
       }
     });
 
@@ -108,13 +109,17 @@ test('family tools enforce role isolation, persisted changes, and minimal live u
       assert.equal(family.plate_access, false);
       assert.equal(family.games.plates, undefined);
       await refused(plate('all'));
-      const receipts = (await query('select distinct payload, private from realtime.messages')).rows;
-      assert.ok(receipts.length >= 1 && receipts.every(row => row.private && Object.keys(row.payload).length === 1));
+      const receipts = (await query('select topic,revision from public.community_family_revisions order by topic')).rows;
+      assert.deepEqual(receipts.map(row => row.topic), ['calendar','fridge','scores']);
+      assert.ok(receipts.find(row => row.topic === 'scores').revision > 0);
+      await refused(query("update public.community_family_revisions set revision=0 where topic='scores'"));
     });
 
     await t.test('two approved members can update a fridge item without duplicating it or overwriting newer changes', async () => {
       await as('member');
+      const before = (await query("select revision from public.community_family_revisions where topic='fridge'")).rows[0].revision;
       const initial = await fridge('add',null,'groceries','  Fixture   milk ','2','Oat');
+      assert.equal(Number((await query("select revision from public.community_family_revisions where topic='fridge'")).rows[0].revision), Number(before) + 1);
       const item = initial.items[0];
       assert.equal(item.name, 'Fixture milk');
       assert.equal(item.notes, 'Oat');

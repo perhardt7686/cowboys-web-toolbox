@@ -1,6 +1,7 @@
 -- Embedded Postgres stand-ins for Supabase managed services and game tables.
 -- Production definitions predate this migration. These fixtures model only
 -- the columns and constraints the Family Message Board reads or writes.
+create publication supabase_realtime;
 create schema realtime;
 create table realtime.messages (
   topic text, event text, payload jsonb, private boolean, extension text

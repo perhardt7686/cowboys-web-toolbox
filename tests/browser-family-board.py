@@ -54,7 +54,7 @@ const client={
   channel:()=>({on:(type,event,callback)=>{handler=callback;},subscribe:callback=>callback('SUBSCRIBED')}),
   removeChannel:async()=>{}
 };
-sync.onmessage=event=>{rows=event.data;handler?.({payload:{topic:'fridge'}});};
+sync.onmessage=event=>{rows=event.data;handler?.({new:{topic:'fridge'}});};
 window.fixtureReject=()=>{pendingError=true;};
 window.fixtureLogout=()=>{document.querySelector('#conversations').hidden=true;app.setAccess(null,null);};
 if(me!=='Visitor'){document.querySelector('#conversations').hidden=false;app.setAccess(client,{user_id:me,status:'approved'});}

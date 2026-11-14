@@ -10,7 +10,7 @@ import {validateLabPost} from './lab-core.mjs';
 import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
-import {createFamilyBoard} from './family-board.mjs?v=family3';
+import {createFamilyBoard} from './family-board.mjs?v=family3-1';
 
 const familyBoard = createFamilyBoard();
 const $=id=>document.getElementById(id);
