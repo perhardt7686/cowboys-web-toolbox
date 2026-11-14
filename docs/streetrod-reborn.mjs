@@ -52,7 +52,7 @@ const portrait=()=>{
  return el?el:null;
 };
 let panel=null,sourceObserver=null,rootObserver=null,bodyObserver=null;
-let splash=true,sideRoom='',page={paper:0,parts:0,diner:0,crew:0,inventory:0,hall:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null;
+let splash=true,sideRoom='',page={paper:0,parts:0,diner:0,crew:0,inventory:0,hall:0},lastNative='',lastRoom='',travelToken=0,travelTimer=null,travelSkip=null;
 let tick=0,renderQueued=false,stageKey='',liveBridge=false;
 let lastRoadWarning='';
 const stage=()=>$('sr-reborn');
@@ -115,14 +115,16 @@ function choose(target){
   return;
  }
  if(target==='fill'){
-  originalControl('refuel')?.click();showStatus('Tank refill is saved through the original game.');
+  const pump=originalControl('refuel');
+  if(!pump||pump.disabled){showStatus('Select an eligible car before requesting fuel.');return;}
+  // An explicit FILL TANK tap is the only way to request a fuel purchase.
+  // The authenticated game handler owns confirmation of the saved result.
+  pump.click();showStatus('Fuel requested. Check your saved tank and bank balance for confirmation.');
   return;
  }
  if(target==='gas'){
+  // Looking at the filling station must never spend campaign cash.
   sideRoom='gas';splash=false;redraw(true);
-  // Use the already authenticated, server-backed exact-amount fuel pump.
-  const nozzle=originalControl('refuel');
-  if(nozzle&&!nozzle.disabled)nozzle.click();
   return;
  }
  if(['licence','crew','underbody','inventory','service','paint','hall'].includes(target)){
@@ -152,7 +154,12 @@ function choose(target){
   showStatus('CRUISING THROUGH TOWN · TAP TO SKIP');
   stage()?.classList.add('sr-v3-travel');
   clearTimeout(travelTimer);
-  travelTimer=setTimeout(()=>{if(current===travelToken){stage()?.classList.remove('sr-v3-travel');go();}},matchMedia?.('(prefers-reduced-motion:reduce)')?.matches?50:420);
+  const finishTravel=()=>{if(current!==travelToken)return;
+   clearTimeout(travelTimer);travelTimer=null;travelSkip=null;
+   stage()?.classList.remove('sr-v3-travel');go();
+  };
+  travelSkip=finishTravel;
+  travelTimer=setTimeout(finishTravel,matchMedia?.('(prefers-reduced-motion:reduce)')?.matches?50:420);
  }else go();
 }
 function showWorkbench(){
@@ -412,6 +419,11 @@ function build(){
   const out=el.querySelector('#ss-timing-number');if(out)out.textContent=value===0?'0 · BASELINE':value>0?'+'+value+' ADVANCED':value+' RETARDED';
   el.querySelector('.ss-distributor-rotor')?.style.setProperty('--distributor-angle',(value*17)+'deg');
  },true);
+ // A tap on the scene skips town travel without double navigation.
+ el.querySelector('.sr-v3-art')?.addEventListener('click',event=>{
+  if(!el.classList.contains('sr-v3-travel')||!travelSkip)return;
+  event.preventDefault();event.stopImmediatePropagation();travelSkip();
+ },true);
  const hotspots=el.querySelector('.sr-v3-hotspots');
  for(const [name,target,left,top,width,height] of HOTSPOTS[currentRoom()]||[]){
   const b=document.createElement('button');b.type='button';
@@ -421,6 +433,24 @@ function build(){
   hotspots.append(b);
  }
  const pocket=el.querySelector('.sr-v3-pocket');
+ // Swipe only on noninteractive portions of paginated game records.
+ // Forms, buttons and vertical scrolling must keep their normal behavior.
+ let swipeStart=null;
+ pocket.addEventListener('touchstart',event=>{
+  if(!['paper','parts','diner','crew','inventory','hall'].includes(currentRoom())||
+     event.touches.length!==1||event.target.closest?.('button,a,input,select,textarea,form'))return;
+  swipeStart={x:event.touches[0].clientX,y:event.touches[0].clientY};
+ },{passive:true});
+ pocket.addEventListener('touchend',event=>{
+  if(!swipeStart)return;
+  const from=swipeStart;swipeStart=null;
+  const touch=event.changedTouches?.[0];if(!touch)return;
+  const dx=touch.clientX-from.x,dy=touch.clientY-from.y;
+  if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
+  if(event.cancelable)event.preventDefault();
+  choose(dx<0?'next':'prev');
+ },{passive:false});
+ pocket.addEventListener('touchcancel',()=>{swipeStart=null;});
  if(splash&&!source()?.querySelector('.ss-drive-controls')){
   pocket.innerHTML=intro();el.classList.add('sr-v3-boot');
  }else{
