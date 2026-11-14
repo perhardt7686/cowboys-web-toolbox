@@ -326,10 +326,16 @@ function svgBoss(){
 function paint(){
  const c=stage()?.querySelector('canvas.sr-v3-canvas');if(!c)return;
  const car=gameCar(),m=metrics(),room=currentRoom();
- const target=room==='licence'||room==='crew'||room==='paint'?'garage':
+ let target=room==='licence'||room==='crew'||room==='paint'?'garage':
   room==='underbody'?'gearbox':room==='gas'?'gas':room==='tune'?'tune':
   room==='inventory'||room==='service'?'parts':room==='hall'?'calendar':
   room==='paper'?'paper':room;
+ if(room==='drive'){
+  const result=source()?.querySelector('.ss-race-result');
+  if(result?.dataset.champion==='true')target='championship';
+  else if(result?.dataset.incident==='police')target='jail';
+  else if(result?.dataset.incident==='breakdown')target='breakdown';
+ }
  const options={carKey:car.name,body:car.body,
   bankroll:Number(String(m.wallet||'').replace(/[^\d]/g,''))||0,
   label:car.name,subtitle:label(room).slice(0,31)};
