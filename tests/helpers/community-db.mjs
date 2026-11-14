@@ -49,6 +49,9 @@ export async function installUpgradeSchema(pg){
     grant usage on schema storage to anon,authenticated,service_role;grant select on storage.objects to anon;grant select,insert,update,delete on storage.objects to authenticated;grant all on storage.objects,storage.buckets to service_role;`);
   const files=await readdir(new URL('../../supabase/migrations/',import.meta.url));
   for(const file of files.filter(f=>f.endsWith('.sql')&&!f.endsWith('_community.sql')).sort()){ 
+    if(file.endsWith('_family_board_experience.sql')){
+      await pg.exec(await readFile(new URL('../fixtures/family-board-dependencies.sql',import.meta.url),'utf8'));
+    }
     await pg.exec((await readFile(new URL('../../supabase/migrations/'+file,import.meta.url),'utf8')).replace('create extension if not exists pg_net with schema extensions;','-- pg_net is exercised on the hosted project, not inside the embedded test database.')); 
   }
 }

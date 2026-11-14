@@ -20,8 +20,8 @@ test('All revised modules parse and are versioned for Safari',()=>{
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))],{stdio:'pipe'}),'Syntax error in '+path);
  }
  for(const asset of ['commons-compact-ui.css?v=compact4','commons-board-compact.mjs?v=compact1',
-  'commons-arcade-shell.mjs?v=compact6','commons-plates.mjs?v=history2',
-  'commons-mahjong.mjs?v=fit7','community-coco.mjs?v=autumn3','community-board-accessibility.mjs?v=board-access4'])
+  'commons-arcade-shell.mjs?v=family3','commons-plates.mjs?v=family3',
+  'commons-mahjong.mjs?v=family3','community-coco.mjs?v=family3','community-board-accessibility.mjs?v=board-access4'])
   assert.ok(html.includes(asset),'Live page missing '+asset);
 });
 
@@ -47,7 +47,7 @@ test('License photo history preserves authorizations and existing records',()=>{
  assert.match(plates,/plate-gallery-grid/);
  assert.match(plates,/plate-gallery-prev/);
  assert.match(plates,/arcade:plate-select/);
- assert.match(plates,/community_plate_state/);
+ assert.match(plates,/community_plate_browse/);
  assert.match(arcade,/\['history','PHOTOS'\]/);
  assert.match(css,/data-arcade-scene=history/);
  assert.ok(!plates.includes(".delete().eq("));

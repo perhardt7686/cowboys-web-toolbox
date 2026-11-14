@@ -3,19 +3,20 @@
 Uses local GitHub Pages files and no credentials, accounts, or real posts.
 """
 import asyncio
+import os
 from pathlib import Path
 from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
 BASE='http://127.0.0.1:8765/'
 CASES=[
-    ('Toolbox','index.html','Toolbox','community.html#open-mahjong'),
-    ('Commons','community.html?preview=1&role=visitor','Message Board',None)
+    ('Toolbox','index.html','Toolbox','community.html'),
+    ('Commons','community.html?preview=1&role=visitor','Family Message Board',None)
 ]
 
 async def main():
     async with async_playwright() as p:
-        browser=await p.chromium.launch(headless=True)
+        browser=await p.chromium.launch(headless=True, executable_path=os.environ.get("CHROMIUM_PATH"))
         try:
             for name,path,title,game_link in CASES:
                 page=await browser.new_page(viewport={'width':390,'height':844},
@@ -48,7 +49,7 @@ async def main():
                     assert size['scrollWidth']<=size['clientWidth']+3,(name,'horizontal scrolling',size)
                     assert all(b>a+25 for a,b in zip(size['positions'],size['positions'][1:])),(name,'menu not vertically stacked',size)
                     labels=await panel.locator('.cowboy-nav-item').all_text_contents()
-                    assert 'Mahjong' in labels and 'w0rdle' in labels and 'Plate Challenge' in labels,labels
+                    assert 'Family Message Board' in labels and not any(label in labels for label in ['Mahjong','w0rdle','Plate Challenge','Family games']),labels
                     if game_link:
                         assert await panel.locator(f'a[href="{game_link}"]').count()==1
                     (ROOT/'reports').mkdir(parents=True,exist_ok=True)

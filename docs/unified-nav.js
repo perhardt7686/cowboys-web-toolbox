@@ -1,4 +1,4 @@
-/* One accessible navigation system for Cowboy's Toolbox and the Commons.
+/* One accessible navigation system for Cowboy's Toolbox and Family Message Board.
    Preserve existing menus as no-JavaScript fallback and preserve all game logic. */
 (() => {
   'use strict';
@@ -35,7 +35,7 @@
   shell.className = 'cowboy-nav-heading';
   shell.innerHTML = page === 'toolbox' ?
     '<strong>Toolbox</strong><small>Tools, guides &amp; useful discoveries</small>' :
-    '<strong>Message Board</strong><small>The Commons · Posts &amp; games</small>';
+    '<strong>Family Message Board</strong>';
   const root = document.createElement('div');
   root.id = 'cowboy-site-nav';
   root.className = 'cowboy-site-nav';
@@ -49,7 +49,7 @@
   const panel = document.createElement('nav');
   panel.id = 'cowboy-nav-panel';
   panel.className = 'cowboy-nav-panel';
-  panel.setAttribute('aria-label','Toolbox and Commons navigation');
+  panel.setAttribute('aria-label','Toolbox and Family Message Board navigation');
   panel.hidden = true;
   const title = document.createElement('strong');
   title.className = 'cowboy-nav-panel-title';
@@ -61,7 +61,7 @@
     el.textContent = label;
     panel.append(el);
   }
-  function item(label, iconName, href, action, current = false) {
+  function item(label, iconName, href, action, current = false, target = null) {
     const el = href ? document.createElement('a') : document.createElement('button');
     if (!href) el.type = 'button';
     el.className = 'cowboy-nav-item';
@@ -72,28 +72,23 @@
     const text = document.createElement('span');
     text.textContent = label;
     el.append(text);
-    panel.append(el);
+    (target || panel).append(el);
     return el;
   }
   section('Explore');
   item('Home','home','./',null,page==='toolbox');
+  let memberActions;
   if (page === 'toolbox') {
     item('Explore tools','search','#explore');
     item('Starter guides','tools','#starter-packs');
-    item('Message Board','message','community.html#conversations');
+    item('Family Message Board','message','community.html').classList.add('cowboy-nav-family');
   } else {
-    item('Message Board','message','#conversations',null,true);
-    item('New post','plus',null,'new-post');
-    item('Toolbox','tools','./');
-  }
-  section('Games · Members');
-  if (page === 'commons') {
-    games.forEach(g => item(g.label,g.icon,null,'game:'+g.id));
-  } else {
-    games.forEach(g => item(g.label,g.icon,'community.html#open-'+g.id));
+    item('Family Message Board','message','#family-welcome',null,true);
+    memberActions = document.createElement('div');
+    memberActions.className = 'cowboy-member-actions';
+    panel.append(memberActions);
   }
   section('More');
-  if (page === 'toolbox') item('Sign in / Account','account','community.html?auth=login');
   item('Help & accessibility','help','help.html');
   const utility = document.createElement('div');
   utility.className = 'cowboy-menu-utility';
@@ -107,12 +102,6 @@
     const account = header.querySelector('#account-actions');
     if (account) utility.append(account);
   }
-  const note = document.createElement('small');
-  note.className = 'cowboy-nav-note';
-  note.textContent = page === 'commons' ?
-    'Community posts and games require approved membership.' :
-    'Browse public tools freely. Games and community posts require membership.';
-  panel.append(note);
   root.append(toggle,panel);
   header.querySelector('.brand')?.after(shell);
   header.append(root);
@@ -147,18 +136,6 @@
     const button = document.querySelector('#account-actions [data-auth="login"], #account-actions button[data-auth]');
     if (button) button.click();
   }
-  function launchGame(id) {
-    const game = games.find(entry => entry.id === id);
-    if (!game) return;
-    const board = document.getElementById('conversations');
-    const button = document.getElementById(game.button);
-    if (!board || board.hidden || !button || button.disabled || button.closest('[hidden]')) {
-      if (!board || board.hidden) signIn();
-      else board.scrollIntoView({behavior:'smooth',block:'start'});
-      return;
-    }
-    button.click();
-  }
   panel.addEventListener('click', event => {
     const target = event.target.closest('.cowboy-nav-item');
     if (!target) return;
@@ -168,29 +145,38 @@
       const button = document.getElementById('new-thread') || document.getElementById('hero-new');
       if (button && !document.getElementById('conversations')?.hidden) button.click();
       else signIn();
-    } else if (action?.startsWith('game:')) {
-      launchGame(action.slice(5));
     }
   });
-  /* A Toolbox game link opens that exact game only once the existing
-     membership-gated button is available. Never bypass authentication. */
-  if (page === 'commons') {
-    const match = /^#open-(mahjong|wordle|wordquest|plates|drawing)$/.exec(location.hash);
-    if (match) {
-      let attempts = 0;
-      const tryOpen = () => {
-        if (++attempts > 32) {clearInterval(timer);return;}
-        const game = games.find(g => g.id === match[1]);
-        const board = document.getElementById('conversations');
-        const button = document.getElementById(game?.button);
-        if (board && !board.hidden && button && !button.disabled && !button.closest('[hidden]')) {
-          clearInterval(timer);
-          history.replaceState(null,'',location.pathname + location.search + '#conversations');
-          button.click();
-        }
-      };
-      const timer = setInterval(tryOpen,250);
-      tryOpen();
-    }
+  // Restore bookmarked game links after the approved board mounts.
+  if (memberActions) {
+    const board = document.getElementById('conversations');
+    const main = board?.querySelector('.community-main');
+    let approved;
+    const syncMemberNav = () => {
+      const visible = Boolean(board && !board.hidden);
+      if (visible === approved) return;
+      approved = visible;
+      memberActions.replaceChildren();
+      if (!approved) return;
+      item('Family games','game','#family-games',null,false,memberActions);
+      item('Conversations','message','#family-conversations',null,false,memberActions);
+      item('Fridge','tools','#family-fridge',null,false,memberActions);
+      item('Calendar','word','#family-calendar',null,false,memberActions);
+      item('New post','plus',null,'new-post',false,memberActions);
+    };
+    const tryOpen = () => {
+      if (!approved) return;
+      const match = /^#open-([a-z]+)$/.exec(location.hash);
+      const game = match && games.find(g => g.id === match[1]);
+      const button = game && document.getElementById(game.button);
+      if (!button || button.disabled || button.closest('[hidden]')) return;
+      history.replaceState(null,'',location.pathname + location.search + '#family-games');
+      button.click();
+    };
+    const refresh = () => { syncMemberNav(); tryOpen(); };
+    if (board) new MutationObserver(refresh).observe(board,{attributes:true,attributeFilter:['hidden']});
+    if (main) new MutationObserver(tryOpen).observe(main,{childList:true,subtree:true});
+    window.addEventListener('hashchange',tryOpen);
+    refresh();
   }
 })();

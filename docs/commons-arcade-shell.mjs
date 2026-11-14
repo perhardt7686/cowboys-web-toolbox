@@ -1,20 +1,24 @@
 /* Cowboy's Commons Arcade: one-screen DOS-inspired scene host.
    Presentation only. Existing member-only games retain their events, state,
    RPCs, authentication, scores, and original DOM nodes. */
+import {makeArcadeNav} from './family-arcade-nav.mjs?v=family3';
+
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
 const $=id=>document.getElementById(id);
 const games=[
  {id:'streetrod',root:'streetrod-root',toggle:'sr-toggle',name:'Street r0d',tag:'1963 MOTOR SHOP',symbol:'▣',scenes:[['garage','GARAGE'],['tune','TUNE'],['paper','CLASSIFIEDS'],['parts','PARTS'],['diner','DRIVE-IN'],['drive','ROAD'],['calendar','CALENDAR'],['junior','JUNIOR']]},
- {id:'mahjong',root:'mahjong-root',toggle:'mahjong-toggle',name:'Mahjong',tag:'MYSTERY ROAD',symbol:'◇',scenes:[['play','PLAY'],['levels','LEVELS'],['scores','SCORES'],['badges','AWARDS'],['history','HISTORY']]},
- {id:'wordle',root:'letter-lock-root',toggle:'letter-lock-toggle',name:'w0rdle',tag:'CO-OP WORD CIPHER',symbol:'▤',scenes:[['play','PLAY'],['scores','SCORES'],['awards','AWARDS']]},
- {id:'wordquest',root:'word-game-root',toggle:'word-game-toggle',name:'Word Quest',tag:'DAILY TEAM PUZZLE',symbol:'▥',scenes:[['play','PLAY'],['scores','LEADERBOARD']]},
+ {id:'mahjong',root:'mahjong-root',toggle:'mahjong-toggle',name:'Mahjong',tag:'MYSTERY ROAD',symbol:'◇',scenes:[['play','PLAY'],['levels','LEVELS'],['scores','SCORES'],['personal','MY SCORES'],['badges','AWARDS'],['history','HISTORY']]},
+ {id:'wordle',root:'letter-lock-root',toggle:'letter-lock-toggle',name:'w0rdle',tag:'CO-OP WORD CIPHER',symbol:'▤',scenes:[['play','PLAY'],['scores','SCORES'],['awards','AWARDS'],['history','HISTORY']]},
+ {id:'wordquest',root:'word-game-root',toggle:'word-game-toggle',name:'Word Quest',tag:'DAILY TEAM PUZZLE',symbol:'▥',scenes:[['play','PLAY'],['scores','LEADERBOARD'],['progress','PROGRESS'],['history','HISTORY']]},
  {id:'plates',root:'plate-game-root',toggle:'plate-game-open',name:'License Plates',tag:'ANA VS. COWBOY',symbol:'▧',scenes:[['post','POST'],['vote','REVIEW'],['history','PHOTOS'],['scores','SCORES']]},
  {id:'drawing',root:'drawing-studio-game-root',toggle:'drawing-studio-toggle',name:'Drawing Studio',tag:'ORIGINAL ART DESK',symbol:'▦',scenes:[['draw','CANVAS']]},
- {id:'study',root:'vdacs-study-root',toggle:'vdacs-study-toggle',name:'7A Study Cards',tag:'PEST CONTROL PREP',symbol:'▨',scenes:[['cards','CARDS'],['awards','MILESTONES']]}
+ {id:'study',root:'vdacs-study-root',toggle:'vdacs-study-toggle',name:'7A Study Cards',tag:'PEST CONTROL PREP',symbol:'▨',scenes:[['cards','CARDS'],['awards','MILESTONES'],['sources','RESOURCES']]}
 ];
 let active=null,scene='',mode='menu',settings=null,menu=null,hud=null,station=null,plateIndex=0;
 let lastFocus=null,waiting=false,frameTimer=null,lastRoot=null,returnMode='menu',savedScroll=0;
+let familyNav=null,plateScope='pending',plateKey=null;
+const backgroundControls=new Set();
 const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&amp;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key='cowboy-arcade-display-v1';
 function loadSettings(){
@@ -75,6 +79,7 @@ function build(){
   hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" aria-label="Back to game buttons" title="Back to games">‹</button><strong id="arcade-hud-title" class="arcade-screen-reader">GAME</strong><div id="arcade-score-pills" role="status" aria-live="off"></div><div class="arcade-hud-right"><button type="button" data-arcade-action="options" aria-label="Display settings" title="Display settings">⚙</button><button type="button" data-arcade-action="exit" aria-label="Exit game" title="Exit">✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous location">‹</button><nav id="arcade-hud-scenes" aria-label="Current location"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next location">›</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous" aria-label="Previous item">‹</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next" aria-label="Next item">›</button></div>';
   document.body.append(hud);
   hud.addEventListener('click',onMenuClick);
+  familyNav=makeArcadeNav({leave:closeArcade,view,settings:showOptions});
   settings=loadSettings();saveSettings();
   document.addEventListener('keydown',onKeyDown,true);
   const observer=new MutationObserver(()=>{
@@ -94,6 +99,22 @@ function renderMenu(){
 }
 function openMenu(){closeArcade();}
 
+function setGameFocus(gameId){
+ for(const node of backgroundControls)node.inert=false;
+ backgroundControls.clear();
+ if(!gameId||gameId==='streetrod')return;
+ const root=$(game(gameId)?.root);
+ const main=board.querySelector('.community-main');
+ const targets=[
+  ...document.querySelectorAll('body > .masthead,body > .skip,body > .footer,main > :not(#conversations)'),
+  ...board.children,...(main?.children||[])
+ ];
+ for(const node of targets){
+  if(node.inert||node===root||node.contains(root))continue;
+  node.inert=true;backgroundControls.add(node);
+ }
+}
+
 function closeArcade(){
  if(!menu)return;
  const openToggle=$(game(active)?.toggle);
@@ -107,13 +128,13 @@ function closeArcade(){
  for(const g of games)$(g.root)?.classList.remove('arcade-game-active');
  document.body.dataset.arcadeGame='';
  document.body.dataset.arcadeScene='';
- menu.hidden=true;hud.hidden=true;
+ menu.hidden=true;hud.hidden=true;familyNav?.hide();setGameFocus(null);
  const drawer=$('art-drawer');if(drawer)drawer.hidden=true;
- const controls=$('art-tools-toggle');if(controls){controls.setAttribute('aria-expanded','false');controls.textContent='TOOLS / LAYERS ⚙';}
+ const controls=$('art-tools-toggle');if(controls){controls.setAttribute('aria-expanded','false');controls.textContent='Tools and layers';}
  document.body.classList.remove('arcade-on');
  document.documentElement.classList.remove('arcade-on');
  window.scrollTo(0,savedScroll);
- if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});
+ if(lastFocus?.isConnected&&!board.hidden)lastFocus.focus({preventScroll:true});
 }
 function makeVisible(g){
  const root=$(g.root);if(!root)return false;
@@ -136,7 +157,7 @@ function prepareDrawing(){
  if(!host||!$('commons-art-canvas')||$('art-tools-toggle'))return;
  const control=document.createElement('button');
  control.type='button';control.id='art-tools-toggle';
- control.textContent='TOOLS / LAYERS ⚙';control.setAttribute('aria-expanded','false');
+ control.textContent='Tools and layers';control.setAttribute('aria-expanded','false');
  control.setAttribute('aria-controls','art-drawer');
  control.setAttribute('aria-label','Open drawing tools, layers and save options');
  const drawer=document.createElement('aside');drawer.id='art-drawer';drawer.hidden=true;
@@ -145,7 +166,7 @@ function prepareDrawing(){
  if(!viewport)return;
  // Move the existing controls, preserving every listener and saved drawing.
  for(const el of Array.from(host.children)){
-  if(el===viewport||el.id==='art-toolbox'||el.matches('input[type=file]'))continue;
+  if(el===viewport||el.matches('input[type=file]'))continue;
   drawer.append(el);
  }
  host.insertBefore(control,viewport);
@@ -153,7 +174,7 @@ function prepareDrawing(){
  control.addEventListener('click',()=>{
   const open=drawer.hidden;drawer.hidden=!open;
   control.setAttribute('aria-expanded',String(open));
-  control.textContent=open?'CLOSE OPTIONS ✕':'TOOLS / LAYERS ⚙';
+  control.textContent=open?'Close tools':'Tools and layers';
  });
  const canvas=$('commons-art-canvas');
  const fit=()=>{
@@ -171,17 +192,22 @@ function launch(id){
  lastFocus=document.activeElement;savedScroll=window.scrollY;
  document.body.classList.add('arcade-on');
  document.documentElement.classList.add('arcade-on');
- active=g.id;scene=g.scenes[0][0];mode='game';plateIndex=0;
+ active=g.id;scene=g.scenes[0][0];mode='game';plateIndex=0;plateKey=null;plateScope='pending';
  document.body.dataset.arcadeGame=active;
  document.body.dataset.arcadeScene=scene;
  menu.hidden=true;
  $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=true;
- hud.hidden=false;
+ hud.hidden=active!=='streetrod';
  hud.querySelector('#arcade-hud-title').textContent=g.name.toUpperCase()+' / '+g.tag;
- waiting=true;makeVisible(g);renderTabs();sync();
+ waiting=true;makeVisible(g);setGameFocus(active);renderTabs();sync();
  requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
 }
 function renderTabs(){
+ if(active!=='streetrod'){
+  familyNav?.show(game(active),scene);
+  updatePlatePaging();
+  return;
+ }
  const nav=$('arcade-hud-scenes');if(!nav)return;
  nav.innerHTML=pageLabels().map(([id,label])=>
   '<button type="button" data-arcade-scene="'+id+'" aria-current="'+(scene===id?'page':'false')+'">'+escapeHTML(label)+'</button>'
@@ -213,11 +239,15 @@ function stepScene(delta){
  const next=scenes[(current+delta+scenes.length)%scenes.length];
  view(next);
 }
-function view(next){
+function view(next,scope){
  if(!active||!pageLabels().some(([id])=>id===next))return;
  scene=next;
  document.body.dataset.arcadeScene=scene;
- plateIndex=0;
+ if(active==='plates' && (next==='vote'||next==='history')){
+  plateScope=scope||(next==='history'?'gallery':'pending');
+  plateKey=null;plateIndex=0;
+  document.dispatchEvent(new CustomEvent('arcade:plate-scope',{detail:plateScope}));
+ }else plateIndex=0;
  renderTabs();sync();
 }
 function sync(){
@@ -241,7 +271,8 @@ function sync(){
    }
   }
  }
- updatePlatePaging();updateScorePills();
+ updatePlatePaging();
+ if(active==='streetrod')updateScorePills();else familyNav?.updateStats();
 }
 function pagerSelector(){
  if(active==='plates'&&scene==='vote')return '#plate-list > .plate-card';
@@ -250,28 +281,69 @@ function pagerSelector(){
  if(active==='streetrod')return null;
  return null;
 }
+function reviewControls(){
+ const list=$('plate-list');
+ if(!list)return null;
+ let queue=$('family-plate-queue');
+ if(queue)return queue;
+ queue=document.createElement('section');
+ queue.id='family-plate-queue';
+ queue.innerHTML='<strong id="family-plate-queue-label" role="status">Loading reviews…</strong><div class="family-plate-paging"><button type="button" data-arcade-action="previous">Previous</button><button type="button" data-arcade-action="next">Next</button></div><p id="family-plate-empty" role="status" hidden></p>';
+ queue.addEventListener('click',onMenuClick);
+ list.before(queue);
+ return queue;
+}
 function updatePlatePaging(){
- const paging=$('arcade-hud-paging'),selector=pagerSelector();
- if(!paging||!selector)return;
+ const selector=pagerSelector();
+ if(!selector)return;
+ const queue=reviewControls();
+ if(!queue)return;
+ const list=$('plate-list');
  const cards=Array.from(document.querySelectorAll(selector));
- plateIndex=Math.max(0,Math.min(plateIndex,Math.max(cards.length-1,0)));
- cards.forEach((c,i)=>c.classList.toggle('arcade-current-card',i===plateIndex));
- if(cards[plateIndex]?.dataset.plateId&&!cards[plateIndex].querySelector('img[src]')){
-  cards[plateIndex].dispatchEvent(new Event('arcade:reveal'));
+ const loading=list.dataset.loading==='true';
+ const found=cards.findIndex(card=>card.dataset.plateId===plateKey);
+ if(found>=0)plateIndex=found;
+ if(!loading)plateIndex=Math.max(0,Math.min(plateIndex,Math.max(cards.length-1,0)));
+ const current=cards[plateIndex];
+ if(!loading)plateKey=current?.dataset.plateId||null;
+ cards.forEach(card=>card.classList.toggle('arcade-current-card',card===current));
+ if(current && !loading && !current.querySelector('img[src]'))current.dispatchEvent(new Event('arcade:reveal'));
+ const label=$('family-plate-queue-label');
+ const empty=$('family-plate-empty');
+ const pending=plateScope==='pending';
+ const total=Number(list.dataset.plateTotal||cards.length);
+ const offset=Number(list.dataset.plateOffset||0);
+ if(loading){
+  label.textContent='Loading challenges…';empty.hidden=true;
+ }else if(list.dataset.error){
+  label.textContent='Review queue';empty.textContent=list.dataset.error;empty.hidden=false;
+ }else if(current){
+  label.textContent=(pending?total+' to review · ':'')+(offset+plateIndex+1)+' of '+total;
+  empty.hidden=true;
+ }else{
+  label.textContent=pending?'Review queue':({past:'Previous challenges',mine:'My submissions',reviews:'My reviews'}[plateScope]||'All submissions');
+  empty.hidden=false;
+  empty.textContent=pending?'You’re caught up. No plates are waiting for your review.':'No challenges in this view yet.';
  }
- $('arcade-hud-pagecount').textContent=cards.length?(plateIndex+1)+' / '+cards.length:'NO ENTRIES';
- paging.querySelector('[data-arcade-action="previous"]').disabled=plateIndex===0;
- paging.querySelector('[data-arcade-action="next"]').disabled=plateIndex>=cards.length-1;
+ queue.querySelector('[data-arcade-action="previous"]').disabled=list.dataset.loading==='true'||(plateIndex===0&&offset===0);
+ queue.querySelector('[data-arcade-action="next"]').disabled=list.dataset.loading==='true'||(offset+plateIndex+1>=total);
 }
 function paging(delta){
  const selector=pagerSelector();if(!selector)return;
- const max=document.querySelectorAll(selector).length;
- plateIndex=Math.max(0,Math.min(plateIndex+delta,Math.max(max-1,0)));updatePlatePaging();
+ const count=document.querySelectorAll(selector).length;
+ const index=plateIndex+delta;
+ if(index<0||index>=count){
+  plateIndex=delta<0?24:0;
+  plateKey=null;
+  document.dispatchEvent(new CustomEvent('arcade:plate-page',{detail:delta}));
+  return;
+ }
+ plateIndex=index;plateKey=null;updatePlatePaging();
 }
 function showOptions(){
  if(!menu||!document.body.classList.contains('arcade-on'))return;
  returnMode=mode;mode='options';menu.hidden=false;
- $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=false;hud.hidden=true;
+ $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=false;hud.hidden=true;familyNav?.hide();
  for(const g of games)$(g.root)?.classList.remove('arcade-game-active');
  const options=$('arcade-options-form');
  const choices=[
@@ -292,7 +364,7 @@ function showOptions(){
 function backOptions(){
  $('arcade-options-view').hidden=true;
  if(returnMode==='game'&&active){
-  mode='game';menu.hidden=true;hud.hidden=false;makeVisible(game(active));renderTabs();sync();
+  mode='game';menu.hidden=true;hud.hidden=active!=='streetrod';makeVisible(game(active));renderTabs();sync();
  }else{closeArcade();}
 }
 function onMenuClick(e){
@@ -323,6 +395,7 @@ function onKeyDown(e){
  if(e.key==='F2'){e.preventDefault();mode==='options'?backOptions():showOptions();return;}
  if(e.key==='Escape'){
   if(document.querySelector('dialog[open]'))return;
+  if(active!=='streetrod'&&familyNav?.closeMenu(true)){e.preventDefault();return;}
   // Let the active racing display handle ESC first; MENU remains available.
   if(e.target?.closest('input,textarea,select')){e.target.blur();return;}
   e.preventDefault();
@@ -333,10 +406,9 @@ function onKeyDown(e){
 // card without copying or mutating the server's records.
 document.addEventListener('arcade:plate-select',e=>{
  if(active!=='plates'||mode!=='game')return;
- const cards=Array.from(document.querySelectorAll('#plate-list > .plate-card'));
- const index=cards.findIndex(c=>c.dataset.plateId===String(e.detail?.id||''));
- if(index<0)return;
- scene='vote';plateIndex=index;
+ scene='vote';plateIndex=0;
+ plateKey=String(e.detail?.id||'');
+ plateScope='all';
  document.body.dataset.arcadeScene=scene;
  renderTabs();sync();
 });
@@ -370,7 +442,7 @@ function start(){
   if(!board.isConnected){clearInterval(timer);return;}
   if(!menu)build();
   const list=$('plate-list');
-  if(list&&!list.dataset.arcadeObserved){list.dataset.arcadeObserved='1';watchCards.observe(list,{childList:true});}
+  if(list&&!list.dataset.arcadeObserved){list.dataset.arcadeObserved='1';watchCards.observe(list,{childList:true,attributes:true,attributeFilter:['data-loading','data-plate-total','data-plate-offset','data-error']});}
   if(active&&mode==='game')sync();
  },900);
 }

@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'docs/commons-feed-legibility.css'
+      - 'docs/family-*'
+      - 'tests/browser-family-board.py'
       - 'docs/unified-nav.css'
       - 'docs/unified-nav.js'
       - 'tests/browser-shared-navigation.py'
@@ -34,6 +36,13 @@ on:
       - 'docs/commons-streetrod-ega.mjs'
       - 'docs/commons-streetrod-ega.css'
       - '.github/workflows/commons-ui-smoke.yml'
+  pull_request:
+    paths:
+      - 'docs/family-*'
+      - 'docs/commons-arcade-shell.mjs'
+      - 'docs/unified-nav.*'
+      - 'tests/browser-*.py'
+      - '.github/workflows/commons-ui-smoke.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -49,12 +58,13 @@ jobs:
       - name: Install headless browser
         run: |
           python -m pip install 'playwright>=1.50,<2'
-          python -m playwright install --with-deps chromium
+          python -m playwright install --with-deps chromium webkit
       - name: Inspect real computed CSS on a local sample member feed
         run: |
           python -m http.server 8765 --directory docs >/tmp/commons-smoke-http.log 2>&1 &
           python tests/browser-commons-contrast.py
           python tests/browser-shared-navigation.py
+          python tests/browser-family-board.py
           python tests/browser-streetrod-ega.py
           python tests/browser-arcade-shell.py
           python tests/browser-streetrod-scenes.py
