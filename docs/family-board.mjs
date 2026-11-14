@@ -1,6 +1,7 @@
 import {PROFILE_ICONS} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cachedAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
 import {boardTime, button, el, preference, statusLine} from './family-board-core.mjs?v=family3';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=reward1';
 import {makeFridge} from './family-fridge.mjs?v=family3';
 import {makeCalendar} from './family-calendar.mjs?v=family3';
 
@@ -90,7 +91,16 @@ export function createFamilyBoard() {
     const gamesTitle = el('h2', 'family-games-title', 'Family Games');
     gamesTitle.id = 'family-games';
     gamesTitle.tabIndex = -1;
-    host.append(nav, scoreboard, gamesTitle);
+    const celebration = el('div');
+    celebration.id = 'avatar-lobby-celebration';
+    host.append(nav, scoreboard, celebration, gamesTitle);
+    void import('./avatar-reward-studio.mjs?v=reward1').then(({makeAvatarShowcase})=>{
+      if(!active())return;
+      const showcase=makeAvatarShowcase(item=>document.dispatchEvent(new CustomEvent('family-open-avatar-studio',{
+        detail:{section:'collection',item}
+      })));
+      gamesTitle.after(showcase);
+    }).catch(()=>{});
     const updates = document.getElementById('family-updates');
     if (updates) scoreboard.before(updates);
     const sidebar = board.querySelector('.community-sidebar');
@@ -109,6 +119,7 @@ export function createFamilyBoard() {
     let scoreTime = '', reconnectAt = 0, lastBackgroundRefresh = 0, lastScore = '';
     const retryTimers = new Map();
     const images = new Map();
+    let portraits = new Map();
     let lastInput = '';
 
     function launchHash() {
@@ -149,7 +160,7 @@ export function createFamilyBoard() {
       const node = el('span', 'family-score-avatar');
       node.setAttribute('aria-hidden', 'true');
       if (entry.avatar_member) node.dataset.familyAvatar = entry.avatar_member;
-      const signed = images.get(entry.avatar_path);
+      const signed = portraits.get(entry.avatar_member)||images.get(entry.avatar_path);
       if (signed?.url) {
         const image = el('img');
         image.src = signed.url;
@@ -273,16 +284,19 @@ export function createFamilyBoard() {
       }
     }
     async function updatePhotos(result) {
-      const paths = [...new Set(Object.values(result.games || {}).flatMap(game =>
-        (game.entries||[]).map(entry => entry.avatar_path)).filter(Boolean))];
-      const missing = paths.filter(path => !images.has(path));
-      if (!missing.length) return;
-      const results = await Promise.all(missing.map(async path =>
-        [path, await getAvatarPhoto(client,path)]));
-      if (!active()) return;
-      for (const [path,url] of results) if (url) images.set(path, {url});
-      // Do not repaint mid-load. The caller paints exactly once after images
-      // finish loading and avoids swapping between icon and photo on updates.
+      const entries = Object.values(result.games || {}).flatMap(game => game.entries||[]);
+      const paths = [...new Set(entries.map(entry => entry.avatar_path).filter(Boolean))];
+      const ids = entries.map(entry=>entry.avatar_member).filter(Boolean);
+      const [photos,projections]=await Promise.all([
+        Promise.all(paths.filter(path=>!images.has(path)).map(async path=>[path,await getAvatarPhoto(client,path)])),
+        avatarProjections(client,ids)
+      ]);
+      const painted=await Promise.all([...projections].map(async ([id,recipe])=>[id,await cacheAvatarCharacter(id,recipe)]));
+      if (!active()) return '';
+      const next=new Map(painted.filter(([,url])=>url).map(([id,url])=>[id,{url}]));
+      portraits=next;
+      for (const [path,url] of photos) if (url) images.set(path, {url});
+      return JSON.stringify([...projections]);
     }
     async function refreshScores(manual = false) {
       if (!active()) return;
@@ -308,8 +322,8 @@ export function createFamilyBoard() {
         failed = false;
         const displayed = {...result};
         delete displayed.as_of;
-        const signature = JSON.stringify(displayed);
-        await updatePhotos(result);
+        const portraitSignature = await updatePhotos(result);
+        const signature = JSON.stringify(displayed)+portraitSignature;
         if (!active()) return;
         if (lastScore !== signature) {
           lastScore = signature;
@@ -320,7 +334,7 @@ export function createFamilyBoard() {
         failed = true;
         if (error?.code === '42501' || error?.code === 'PGRST301') {
           data = null;
-          images.clear();
+          images.clear();portraits.clear();
           scoreTime = '';
           lastScore = '';
           list.replaceChildren();
@@ -343,6 +357,7 @@ export function createFamilyBoard() {
         lastScore='';
         paintScores();
       }
+      schedule('scores');
     }
     const onHotRodSaved = () => schedule('scores');
     window.addEventListener('family-avatar-updated',onAvatarUpdated);
@@ -357,6 +372,7 @@ export function createFamilyBoard() {
           void refreshScores();
           if (data?.plate_access) document.dispatchEvent(new Event('family-plate-scores-changed'));
           document.dispatchEvent(new Event('family-hot-rod-scores-changed'));
+          document.dispatchEvent(new Event('family-game-progress'));
         } else if (topic === 'fridge') void fridge.refresh();
         else void calendar.refresh();
       }, 180));
