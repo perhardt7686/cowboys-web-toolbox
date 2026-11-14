@@ -55,6 +55,16 @@ async def main():
                 assert await link.get_attribute('href')=='https://spelunkr.tv/?tv'
                 assert await link.get_attribute('target')=='_blank'
                 assert await link.get_attribute('rel')=='noopener noreferrer'
+                print('RETRO TV ORDER',await page.evaluate("""()=>{
+                    const a=document.getElementById('spelunkr-game-link');
+                    const board=document.getElementById('conversations');
+                    return {link:{parent:a?.parentElement?.id,prev:a?.previousElementSibling?.id,next:a?.nextElementSibling?.id,
+                      visible:!!a?.getClientRects().length},
+                      drawings:[...document.querySelectorAll('#drawing-studio-game-root')].map(n=>({
+                        parent:n.parentElement?.id,prev:n.previousElementSibling?.id,
+                        next:n.nextElementSibling?.id,inBoard:board?.contains(n)})),
+                      main:[...document.querySelector('#conversations .community-main').children].map(n=>n.id)};
+                }"""))
                 await page.wait_for_function("""()=>{
                     const link=document.getElementById('spelunkr-game-link');
                     const drawing=document.getElementById('drawing-studio-game-root');
