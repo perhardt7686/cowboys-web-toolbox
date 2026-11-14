@@ -37,7 +37,11 @@ function ellipse(ctx,x,y,rx,ry,fill){
 }
 function curve(ctx,points,fill){
  ctx.beginPath();ctx.moveTo(points[0],points[1]);
- for(let i=2;i<points.length;i+=6)ctx.bezierCurveTo(...points.slice(i,i+6));
+ for(let i=2;i<points.length;){
+   if(i+5<points.length){ctx.bezierCurveTo(...points.slice(i,i+6));i+=6;}
+   else if(i+1<points.length){ctx.lineTo(points[i],points[i+1]);i+=2;}
+   else break;
+ }
  ctx.closePath();ctx.fillStyle=fill;ctx.fill();
 }
 export function drawFamilyAvatar(canvas,value){
