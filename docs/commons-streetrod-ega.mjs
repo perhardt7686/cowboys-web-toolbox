@@ -153,7 +153,7 @@ function garage(c,key,body){
  stroke(c,288,161,303,174,0,2);stroke(c,303,161,288,174,0,2);
 }
 function diner(c,rivalKey='meteor',rivalBody='muscle'){
- border(c,'MOONLIGHT DRIVE-IN','CLICK A DRIVER TO CHALLENGE');
+ border(c,"BOB'S DRIVE-IN",'CLICK A DRIVER TO CHALLENGE');
  box(c,0,17,320,170,0);
  // Deep purple night with twinkling white stars behind a bustling neon cafe.
  for(let i=0;i<38;i++){
@@ -181,7 +181,7 @@ function diner(c,rivalKey='meteor',rivalBody='muscle'){
  // Neon original sign is drawn from glyphs, not borrowed game art.
  box(c,74,20,176,39,5);box(c,78,23,168,33,0);
  box(c,83,25,159,27,4);
- txt(c,'MOONLIGHT',95,28,13,15);
+ txt(c,"BOB'S",120,28,13,15);
  txt(c,'DRIVE-IN',113,45,14,9);
  disk(c,43,44,21,6);disk(c,43,44,17,14);
  box(c,27,41,32,5,12);box(c,30,47,26,3,15);
@@ -217,7 +217,7 @@ function gas(c){
  box(c,0,18,320,102,0);for(let i=0;i<24;i++)box(c,(i*53)%320,20+(i*17)%85,1,1,15);
  box(c,0,88,320,99,7);box(c,4,51,202,64,4);box(c,8,55,194,58,12);
  for(let i=0;i<3;i++){box(c,19+i*53,69,38,38,3);box(c,21+i*53,73,34,29,11);}
- box(c,58,37,101,21,0);box(c,63,40,91,15,5);txt(c,'HILLSIDE GAS',70,43,14,10);
+ box(c,58,37,101,21,0);box(c,63,40,91,15,5);txt(c,"GUS' GAS",83,43,14,10);
  box(c,240,63,49,102,4);box(c,246,68,37,91,12);box(c,253,79,24,26,15);
  txt(c,'FUEL',255,83,0,7);txt(c,'63',258,94,0,7);
  box(c,280,109,23,10,0);stroke(c,301,113,309,142,0,4);
