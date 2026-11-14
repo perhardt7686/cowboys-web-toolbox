@@ -27,7 +27,8 @@ test('All revised modules parse and are versioned for Safari',()=>{
 
 test('Coco portraits are removed but protected member avatars remain',()=>{
  assert.ok(!coco.includes('function castStrip('));
- assert.match(coco,/replaceAvatar/);
+ assert.doesNotMatch(coco,/replaceAvatar/); // Saved profile avatars are authoritative.
+ assert.match(coco,/pictures\.get\('van'\)/);
  assert.match(css,/#coco-cast-strip/);
  assert.match(css,/#arcade-drawing-entry/);
  assert.equal((arcade.match(/arcade-drawing-entry/g)||[]).length,0);
