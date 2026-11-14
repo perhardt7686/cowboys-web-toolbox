@@ -119,7 +119,7 @@ applyRoom('garage');
 </script>
 <script src="/streetrod-reborn-config.js?v=reborn4"></script>
 <script type="module" src="/commons-streetrod-ega.mjs?v=dos12"></script>
-<script type="module" src="/streetrod-reborn.mjs?v=reborn7"></script>
+<script type="module" src="/streetrod-reborn.mjs?v=reborn8"></script>
 </body></html>"""
 
 async def run_one(browser,width,height):
