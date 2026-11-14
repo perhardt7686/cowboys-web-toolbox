@@ -5,12 +5,12 @@ import {PROFILE_DEFAULTS} from './profile-core.mjs?v=powers1';
 import {createPowerHouse} from './community-powers.mjs?v=private1';
 import {createForum} from './forum-ui.mjs?v=forumaudit1';
 import {timeHTML,forumBody} from './forum-core.mjs?v=powers1';
-import {createCommunityLab} from './community-lab.mjs?v=hero4';
+import {createCommunityLab} from './community-lab.mjs?v=family4';
 import {validateLabPost} from './lab-core.mjs';
 import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
-import {createFamilyBoard} from './family-board.mjs?v=family3-1';
+import {createFamilyBoard} from './family-board.mjs?v=family4';
 
 const familyBoard = createFamilyBoard();
 const $=id=>document.getElementById(id);
@@ -81,8 +81,6 @@ function renderSiteFilter(){const site=catalog.find(s=>s.id===state.site);$('sit
 function renderFeed(){
   if(!canReadBoard(state.member)){clearBoardState();renderAccount();renderNotice();renderBoardAccess();return;}
   renderBoardAccess();renderCategories();renderAccount();renderNotice();renderSiteFilter();
-  const title=state.category==='all'?'What’s on your mind?':categories.get(state.category)?.name;
-  $('feed-title').textContent=title;
   const terms=state.search.trim().toLowerCase().split(/\s+/u).filter(Boolean);
   const rows=state.threads.filter(t=>hub.filterRow(t)&&forum.filterRow(t)).filter(t=>configured&&!isPreview||((state.category==='all'||t.category===state.category)&&(!state.site||t.site_id===state.site)&&terms.every(w=>`${t.title} ${t.body} ${t.author_name}`.toLowerCase().includes(w)))).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(state.sort==='replies'?Number(b.visible_reply_count||b.reply_count||0)-Number(a.visible_reply_count||a.reply_count||0):state.sort==='helpful'?Number(b.helpful_count||0)-Number(a.helpful_count||0):(state.sort==='oldest'?1:-1)*(Date.parse(state.sort==='active'?(a.activity_at||a.created_at):a.created_at)-Date.parse(state.sort==='active'?(b.activity_at||b.created_at):b.created_at)))||a.id.localeCompare(b.id));
   $('feed-count').textContent=`${rows.length} conversation${rows.length===1?'':'s'}${isPreview?' · sample content':''}`;

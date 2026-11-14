@@ -6,8 +6,8 @@ test('shared menu assets are loaded on Toolbox, Commons, and build template',()=
  const pages=['docs/index.html','docs/community.html','index.template.html'];
  for(const p of pages){
   const src=read(p);
-  assert.match(src,/unified-nav\.css\?v=family3/,p+' CSS');
-  assert.match(src,/unified-nav\.js\?v=family3/,p+' JS');
+  assert.match(src,/unified-nav\.css\?v=family4/,p+' CSS');
+  assert.match(src,/unified-nav\.js\?v=family4/,p+' JS');
  }
 });
 test('menu controls are keyboard accessible and share real routes',()=>{
