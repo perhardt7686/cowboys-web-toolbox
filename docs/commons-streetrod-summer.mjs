@@ -215,8 +215,8 @@ function parts(){
 function diner(){
  const s=season.season;
  const rivals=availableRivals();
- return banner('The Moonlight Drive-In','Inspect a rival, name your stakes, and race for fictional cash or car titles.')+
- '<div class="ss-diner-hero"><div class="ss-diner-sign"><small>BURGERS · SHAKES · STREET RODS</small><strong>MOONLIGHT<br>DRIVE-IN</strong></div><div class="ss-diner-cars">'+
+ return banner('Bob\'s Drive-In','Inspect a rival, name your stakes, and race for fictional cash or car titles.')+
+ '<div class="ss-diner-hero"><div class="ss-diner-sign"><small>BURGERS · SHAKES · STREET RODS</small><strong>BOB&#39;S<br>DRIVE-IN</strong></div><div class="ss-diner-cars">'+
  gamePhoto('hardtop','comet')+gamePhoto('van','cipherx')+'</div></div>'+
  '<p class="ss-hint">22 street-racing challengers, including the final Mystery Machine. Beat drivers, improve your garage, and climb the tiers.</p>'+
  '<div class="ss-rivals">'+rivals.map(r=>{
