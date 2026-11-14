@@ -436,16 +436,22 @@ function beginFrames(){
 async function finish(){
  const r=live;if(!r)return;
  status('Crossing the finish line. Validating your controls and result…');
- // The server requires three increasing shift values. Automatic fallback makes
- // beginners roadworthy; proper manual shifting improves player technique.
- const shifts=r.shifts.length>=3&&r.shifts[0]>=500&&r.shifts[2]<=11500&&
-   r.shifts[1]>r.shifts[0]&&r.shifts[2]>r.shifts[1]?r.shifts.slice(0,3):[3100,5500,9200];
- // Compatibility: the existing server's original four-speed ledger requires
- // three shift timestamps by 11.5s, even for slow stock cars. Real motor
- // telemetry and all steering/throttle/braking samples remain unmodified.
+ // The upgraded server accepts actual shift times throughout a full race.
+ // Missing shifts are encoded as inert markers beyond the 240-second maximum
+ // trace; a driver who stays in a low gear never receives phantom upshifts.
+ const physical=(r.motor?.shiftedAt||r.shifts).map(Number)
+   .filter(t=>Number.isFinite(t)&&t>=500&&t<=240000).map(Math.floor);
+ const shifts=[];
+ for(const time of physical){
+  if(!shifts.length||time>shifts[shifts.length-1])shifts.push(time);
+  if(shifts.length===3)break;
+ }
+ while(shifts.length<3)shifts.push(250000+shifts.length*12000);
+ // Measure first throttle after green. Waiting at the line now costs time.
+ const launch=cap(Math.floor(r.launchMs??120000),0,120000);
  try{
   const data=await call('community_streetrod_season_race_finish',{
-    p_run:r.run.id,p_launch_ms:300,p_shifts:shifts,p_trace:r.trace
+    p_run:r.run.id,p_launch_ms:launch,p_shifts:shifts,p_trace:r.trace
   });
   season=data.state;lastResult=data;live=null;buttonsDown.clear();render();
   status(data.message+'. The bank, wear and championship record were updated once.');
