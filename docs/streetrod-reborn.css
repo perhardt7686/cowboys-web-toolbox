@@ -595,3 +595,19 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #ssg-gas-station .ssg-
   grid-template-columns:1fr 1fr!important
  }
 }
+
+/* The optional independent PC-speaker cues have one explicit accessible switch,
+   never blocking gameplay or requiring a download of the 1989 soundtrack. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-head button.sr-v3-sound{
+ flex:0 0 auto!important;width:auto!important;min-width:66px!important;
+ min-height:20px!important;height:20px!important;max-height:20px!important;
+ padding:2px 4px!important;border:1px outset #888!important;
+ border-radius:0!important;background:#000066!important;color:#ffff55!important;
+ font:800 clamp(8px,2.1vw,10px)/1.1 'Courier New',monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-race-result[data-incident=police]{
+ background:#e2d6b2!important;color:#1a1a30!important;border:2px ridge #333366!important;
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .ss-race-result[data-incident=breakdown]{
+ background:#eee2cd!important;color:#39231a!important;border:2px ridge #b47746!important;
+}
