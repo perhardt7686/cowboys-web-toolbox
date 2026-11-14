@@ -146,7 +146,7 @@ BEGIN
                      WHEN motor_failure THEN 'Engine breakdown: inspect and repair your car.'
                      ELSE '' END));
  UPDATE public.community_streetrod_season_races SET status='finished',finished_at=now(),
-  total_ms=seconds,enemy_ms=enemy,won=won,detail=receipt WHERE id=r.id;
+  total_ms=seconds,enemy_ms=enemy,won=(seconds<enemy AND damage<52 AND NOT police_stop AND NOT motor_failure),detail=receipt WHERE id=r.id;
  INSERT INTO public.community_streetrod_season_history
  (user_id,season_no,day_no,event_type,caption,cash_change)
  VALUES(u,s.season_no,s.day_no,r.race_type||'_race',
