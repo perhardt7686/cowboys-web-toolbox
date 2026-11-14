@@ -17,8 +17,8 @@ test('All revised modules parse and are versioned for Safari',()=>{
    'docs/commons-mahjong.mjs','docs/community-coco.mjs','docs/commons-board-compact.mjs']){
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))],{stdio:'pipe'}),'Syntax error in '+path);
  }
- for(const asset of ['commons-compact-ui.css?v=compact1','commons-board-compact.mjs?v=compact1',
-  'commons-arcade-shell.mjs?v=compact5','commons-plates.mjs?v=history2',
+ for(const asset of ['commons-compact-ui.css?v=compact2','commons-board-compact.mjs?v=compact1',
+  'commons-arcade-shell.mjs?v=compact6','commons-plates.mjs?v=history2',
   'commons-mahjong.mjs?v=fit7','community-coco.mjs?v=autumn3'])
   assert.ok(html.includes(asset),'Live page missing '+asset);
 });
