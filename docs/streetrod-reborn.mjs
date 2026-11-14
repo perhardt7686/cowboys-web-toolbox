@@ -388,8 +388,9 @@ function installChallenge(){
 function intro(){
  return '<div class="sr-v3-intro"><small>1989 COMPUTER PRESENTATION · COWBOY EDITION</small>'+
   '<h2>STREET R0D</h2><p>THE SUMMER OF 1963</p>'+
-  '<p>Buy it. Build it. Race it. Beat the Mystery Machine before school starts.</p>'+
+  '<p>Find an old car in the newspaper, rebuild it, and beat the Mystery Machine before school starts.</p>'+
   '<button type="button" data-v3-action="continue">CONTINUE SAVED SUMMER ▶</button>'+
+  '<button type="button" data-v3-action="paperfront">READ THE NEWSPAPER</button>'+
   '<button type="button" data-v3-action="licence">DRIVER LICENCE / CREW</button></div>';
 }
 function footer(room){
@@ -408,19 +409,27 @@ function svgBoss(){
 function paint(){
  const c=stage()?.querySelector('canvas.sr-v3-canvas');if(!c)return;
  const car=gameCar(),m=metrics(),room=currentRoom();
- let target=room==='licence'||room==='crew'||room==='paint'?'garage':
-  room==='underbody'?'gearbox':room==='gas'?'gas':room==='tune'?'tune':
+ let target=room==='licence'||room==='crew'||room==='paint'||room==='carinfo'?'garage':
+  room==='underbody'?'gearbox':room==='gas'?'gas':
+  room==='tune'||room==='hoodmenu'||room==='rivalview'?'engine':
   room==='inventory'||room==='service'?'parts':room==='hall'?'calendar':
-  room==='paper'?'paper':room;
+  room==='paperfront'?'paper':room==='carshow'?'carinspect':room;
  if(room==='drive'){
   const result=source()?.querySelector('.ss-race-result');
   if(result?.dataset.champion==='true')target='championship';
   else if(result?.dataset.incident==='police')target='jail';
   else if(result?.dataset.incident==='breakdown')target='breakdown';
  }
- const options={carKey:car.name,body:car.body,
+ const listing=room==='carshow'?nativeRecords('paper')[page.paper||0]:null;
+ const shownCar=listing?.querySelector('[data-car]')?.dataset.car||car.name;
+ const type=listing?.querySelector('.ss-ad-main small')?.textContent||'';
+ const shownBody=room==='carshow'?
+  /wagon|estate/i.test(type)?'wagon':/truck|pickup/i.test(type)?'truck':
+  /van|bus/i.test(type)?'van':/muscle|fastback/i.test(type)?'muscle':
+  /hardtop|sedan/i.test(type)?'hardtop':'coupe':car.body;
+ const options={carKey:shownCar,body:shownBody,
   bankroll:Number(String(m.wallet||'').replace(/[^\d]/g,''))||0,
-  label:car.name,subtitle:label(room).slice(0,31)};
+  label:shownCar,subtitle:label(room).slice(0,31)};
  const rival=visibleRecord();
  if(room==='diner'&&rival?.querySelector('[data-rival="cipher"]'))options.boss=true;
  if(room==='drive'){
@@ -431,6 +440,10 @@ function paint(){
   options.progress=(parseFloat(native?.querySelector('#ss-distance')?.textContent||'0')||0)/100;
  }
  window.COWBOY_STREETROD_PAINT?.(c,target,options);
+ for(const preview of stage()?.querySelectorAll('canvas.sr-v3-inline-preview')||[]){
+  window.COWBOY_STREETROD_PAINT?.(preview,'carinspect',{carKey:preview.dataset.carKey||'rattler',
+   body:preview.dataset.body||'coupe'});
+ }
  if(room==='drive'){
   const el=stage()?.querySelector('.sr-v3-telemetry');
   if(el)el.textContent=Math.round(options.speed)+' MPH · '+Math.round(options.rpm)+' RPM · GEAR '+options.gear;
@@ -467,7 +480,7 @@ function build(){
     return;
    }
    cue(next==='hood'?'wrench':next==='diner'?'race':next==='continue'?'start':'menu');
-   if(next==='continue'){splash=false;choose(gameCar().name==='NO CAR'?'paper':'garage');return;}
+   if(next==='continue'){splash=false;choose(gameCar().name==='NO CAR'?'paperfront':'garage');return;}
    choose(next);
   }
  },true);
