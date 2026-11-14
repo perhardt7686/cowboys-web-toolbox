@@ -15,8 +15,7 @@ const [html,arcade,plates,mahjong,coco,forum,css]=await Promise.all([
 test('All revised modules parse and are versioned for Safari',()=>{
  for(const path of ['docs/commons-arcade-shell.mjs','docs/commons-plates.mjs',
    'docs/commons-mahjong.mjs','docs/community-coco.mjs','docs/commons-board-compact.mjs']){
-  assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))]),
-   {stdio:'pipe'}),'Syntax error in '+path);
+  assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))],{stdio:'pipe'}),'Syntax error in '+path);
  }
  for(const asset of ['commons-compact-ui.css?v=compact1','commons-board-compact.mjs?v=compact1',
   'commons-arcade-shell.mjs?v=compact5','commons-plates.mjs?v=history2',
