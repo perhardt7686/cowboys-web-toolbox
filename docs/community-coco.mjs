@@ -6,32 +6,19 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
   const safeImage=s=>typeof s==='string'&&/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(s)&&s.length<60000;
   let client=null,fetching=false,loaded=false,lastChecked=0,currentUserId=null,timer=0,generation=0;
   const pictures=new Map();
-  const byUser=new Map();
-  function replaceAvatar(span,src){
-    if(!span||!safeImage(src))return;
-    const img=span.querySelector('img');
-    if(img?.getAttribute('src')===src)return;
-    span.replaceChildren();const picture=document.createElement('img');
-    picture.src=src;picture.alt='';picture.width=96;picture.height=96;
-    picture.decoding='async';span.append(picture);
-  }
-
+  // This module now owns decorative artwork only, never member portraits.
+  // Profile avatars are rendered from the member's saved profile choice by
+  // community-profiles, commons-family and family-board. Writing over those
+  // elements caused photos to alternate with old portrait art on each refresh.
   function update(){
     const board=document.getElementById('conversations');
     if(!board||board.hidden||!loaded)return;
-    for(const button of document.querySelectorAll('[data-member-profile], [data-family-avatar]')){
-      const id=button.getAttribute('data-member-profile')||button.dataset.familyAvatar;
-      replaceAvatar(button.matches('[data-family-avatar]')?button:button.querySelector('.profile-avatar'),byUser.get(id));
-    }
-    replaceAvatar(document.querySelector('#account-actions .profile-avatar'),byUser.get(currentUserId));
-    replaceAvatar(document.querySelector('#profile-live-preview .profile-avatar'),byUser.get(currentUserId));
-    const openMember=document.querySelector('#dialog-content [data-member-posts]')?.getAttribute('data-member-posts');
-    if(openMember)replaceAvatar(document.querySelector('#dialog-content .member-card .profile-avatar'),byUser.get(openMember));
-    const van=pictures.get('van');if(safeImage(van))document.body.style.setProperty('--coco-van-image','url("'+van+'")');
-    document.getElementById('coco-cast-strip')?.remove(); // deprecated family portrait block
+    const van=pictures.get('van');
+    if(safeImage(van))document.body.style.setProperty('--coco-van-image','url("'+van+'")');
+    document.getElementById('coco-cast-strip')?.remove();
   }
   function clear(){
-    ++generation;loaded=false;lastChecked=0;currentUserId=null;pictures.clear();byUser.clear();
+    ++generation;loaded=false;lastChecked=0;currentUserId=null;pictures.clear();
     document.getElementById('coco-cast-strip')?.remove();
     document.body.style.removeProperty('--coco-van-image');
   }
@@ -51,7 +38,6 @@ if(document.body.classList.contains('community-page')&&cfg?.enabled===true){
       currentUserId=session.user.id;
       for(const item of data){if(!safeImage(item.data_uri))continue;
         pictures.set(item.asset_key,item.data_uri);
-        if(item.user_id)byUser.set(item.user_id,item.data_uri);
       }
       loaded=true;update();
     }catch{/* Preserve the existing board if artwork cannot be fetched. */}
