@@ -436,3 +436,12 @@ body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-game-roo
  max-height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
  min-height:0!important;box-sizing:border-box!important
 }
+
+/* Keep the close-control above the drawing options overlay. The drawer must
+   never intercept taps on the button needed to dismiss it. */
+body.community-page.arcade-on[data-arcade-game=drawing] #art-tools-toggle{
+ position:relative!important;z-index:99!important;pointer-events:auto!important;
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-drawer:not([hidden]){
+ top:43px!important;
+}
