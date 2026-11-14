@@ -177,6 +177,210 @@ function dash(c,opts={}){
  }
  disk(c,161,191,35,0);disk(c,161,191,29,7);disk(c,161,191,21,0);disk(c,161,191,7,12);
 }
+// The public, purely decorative EGA painter is shared with the new
+// in-scene adventure controller. It never accesses private game state.
+function partsSheet(c){
+ border(c,'THE MOTOR YARD PARTS COUNTER','BUY / FIT / RETURN');
+ box(c,5,18,310,160,7);
+ box(c,10,22,300,13,8);txt(c,'NEW AND USED MOTOR PARTS',52,25,14,10);
+ for(let row=0;row<3;row++){
+  const y=42+row*43;
+  box(c,16,y,288,37,15);box(c,19,y+3,282,31,row===1?7:8);
+  txt(c,['ENGINE / INTAKE','WHEELS AND RUBBER','GEARBOX / GEARS'][row],27,y+6,0,9);
+  // Individually shaped shop-floor components, kept in 16 colours.
+  if(row===0){for(let j=0;j<5;j++){box(c,197+j*13,y+11,9,13,0);box(c,199+j*13,y+9,5,4,7);}}
+  if(row===1){for(let j=0;j<3;j++){disk(c,214+j*25,y+18,12,0);disk(c,214+j*25,y+18,8,7);}}
+  if(row===2){poly(c,[[197,y+12],[215,y+7],[242,y+7],[263,y+14],[261,y+24],[197,y+24]],8);for(let j=0;j<5;j++)box(c,201+j*12,y+15,5,6,0);}
+ }
+}
+function vintageCalendar(c){
+ border(c,'SUMMER 1963','EVERY JOB TAKES TIME');
+ box(c,39,18,242,166,15);box(c,43,22,234,24,4);
+ txt(c,'SUMMER 1963',109,29,15,13);
+ const days=['S','M','T','W','T','F','S'];
+ for(let i=0;i<7;i++)txt(c,days[i],62+i*30,52,0,9);
+ for(let r=0;r<5;r++)for(let col=0;col<7;col++){
+  const x=50+col*30,y=68+r*21;
+  box(c,x,y,26,18,(r+col)%2?7:15);
+  const n=r*7+col+1;if(n<=31)txt(c,String(n),x+7,y+5,0,9);
+ }
+ box(c,48,171,224,8,6);
+}
+function gearbox(c){
+ border(c,'UNDER THE CAR','BOLTS FIRST / LINKAGE SECOND');
+ box(c,8,20,304,162,8);box(c,16,27,287,134,7);
+ box(c,26,45,267,28,0);box(c,30,51,258,17,8);
+ poly(c,[[64,101],[95,85],[208,85],[246,103],[240,126],[72,127]],8,0);
+ for(let i=0;i<8;i++)box(c,94+i*15,93,8,27,i%2?0:7);
+ for(let i=0;i<4;i++){const x=82+i*49;disk(c,x,131,7,0);disk(c,x,131,4,15);}
+ box(c,180,70,31,15,7);txt(c,'SHIFT LINKAGE',101,148,0,8);
+}
+function smoothRoad(c,opts={}){dash(c,opts);}
+window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
+ if(!(canvas instanceof HTMLCanvasElement))return;
+ const ctx=canvas.getContext('2d',{alpha:false});if(!ctx)return;
+ ctx.imageSmoothingEnabled=false;
+ const kind=scene==='paper'?'newspaper':scene==='parts'?'parts':
+  scene==='tune'||scene==='hood'?'engine':scene==='drive'?'dash':
+  scene==='calendar'?'calendar':scene==='gearbox'?'gearbox':scene;
+ const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,calendar:vintageCalendar,gearbox};
+ (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
+ // Original palette and proportions, but never copied asset pixels.
+ if(options.label&&['garage','diner'].includes(kind)){
+  box(ctx,12,172,Math.min(270,String(options.label).length*6+10),11,0);
+  txt(ctx,String(options.label).slice(0,38).toUpperCase(),16,174,15,7);
+ }
+ if(options.bankroll!==undefined){
+  box(ctx,66,189,80,10,8);
+  txt(ctx,'
+ box(c,0,0,160,70,0);
+ car(c,key,body,4,14,154);
+}
+const scenes={
+ '.ss-garage-stage':['garage',n=>{let name=n.closest('#streetrod-summer')?.querySelector('.ss-garage-overlay span')?.textContent||'rattler';return [name,bodyFor(name)];}],
+ '.src-garage-stage':['garage',n=>{const name=n.querySelector('#src-current-ride')?.textContent||'rattler';return [name,bodyFor(name)];}],
+ '.ss-diner-hero':['diner'],'.src-diner-scene':['diner'],
+ '.ss-newspaper':['newspaper'],'.src-paper':['newspaper'],
+ '.ss-parts-counter':['engine'],'.src-parts-illustration':['engine'],
+ '.ssb-mechanical-art':['engine'],'.ss-service-art':['engine'],
+ '.ssg-forecourt':['gas']
+};
+function sceneCanvas(node,type,key='rattler',body='coupe'){
+ if(node.querySelector(':scope > canvas.sr-ega-scene'))return;
+ const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+ canvas.className='sr-ega-scene';canvas.setAttribute('aria-hidden','true');
+ canvas.setAttribute('role','presentation');
+ const ctx=canvas.getContext('2d',{alpha:false});
+ if(!ctx)return;
+ ctx.imageSmoothingEnabled=false;
+ ({garage,diner,engine,gas,newspaper,dash})[type]?.(ctx,key,body);
+ node.prepend(canvas);node.classList.add('sr-ega-active');
+}
+function spriteImages(){
+ ROOT?.querySelectorAll('.ss-car-photo,.src-car-photo,.sr-real-car,.scc-photocar,.srj-real-car').forEach(img=>{
+  if(decorated.has(img))return;decorated.add(img);
+  const stage=img.parentElement;if(!stage)return;
+  const label=img.closest('.src-garage-stage')?.querySelector('#src-current-ride')?.textContent||
+   img.closest('.ss-garage-stage')?.querySelector('.ss-garage-overlay span')?.textContent||
+   img.closest('.sr-car-card,.scc-car-card,.srj-car-card,.ss-ad,.src-scene-stage')?.querySelector('strong')?.textContent||
+   img.closest('.ss-ad')?.querySelector('strong')?.textContent||img.alt||'rattler';
+  const body=bodyFor(label);
+  const cv=document.createElement('canvas');cv.width=160;cv.height=70;cv.className='sr-ega-car';
+  const ct=cv.getContext('2d',{alpha:false});if(!ct)return;ct.imageSmoothingEnabled=false;
+  componentCard(ct,label,body);
+  img.style.display='none';img.after(cv);
+ });
+}
+function decorate(){
+ if(!ROOT||!ROOT.isConnected)return;
+ for(const [selector,[name,reader]] of Object.entries(scenes)){
+  ROOT.querySelectorAll(selector).forEach(node=>{
+   if(node.closest('.ss-summer[hidden]'))return;
+   const [key,body]=reader?reader(node):['rattler','coupe'];
+   sceneCanvas(node,name,key,body);
+  });
+ }
+ spriteImages();
+}
+function schedule(){if(scheduled)return;scheduled=true;window.setTimeout(()=>{scheduled=false;decorate()},120);}
+const preamble=[
+ 'COWBOY COMPUTER SYSTEMS 286 BIOS             (C) 1989',
+ 'CPU: 80286 @ 12 MHZ  /  MEMORY TEST: 640K OK',
+ 'VIDEO ADAPTER: EGA 320 x 200 / 16 COLORS ... OK',
+ 'FIXED DISK C: ... READY',
+ '',
+ 'C:\\>CD GAMES\\STREETR0D',
+ 'C:\\GAMES\\STREETR0D>DIR',
+ 'STREET.EXE    1989   LOADING SUMMER OF 1963 ...',
+ 'MOTOR SHOP ASSEMBLY  ............ OK',
+ 'REGISTERED RACERS    ............ OK',
+ 'OPENING GARAGE ...'
+];
+function monitorMode(enabled){
+ if(!ROOT)return;
+ ROOT.classList.toggle('sr-dos-fullscreen',Boolean(enabled));
+ const btn=ROOT.querySelector('#sr-dos-maximize');
+ if(btn){
+  btn.textContent=enabled?'EXIT DOS DISPLAY [ESC]':'EXPAND DOS DISPLAY';
+  btn.setAttribute('aria-pressed',String(Boolean(enabled)));
+ }
+}
+function addMonitorControls(){
+ if(!ROOT)return;
+ const inside=ROOT.querySelector('#sr-inside');
+ if(!inside||inside.querySelector('#sr-dos-maximize'))return;
+ const btn=document.createElement('button');
+ btn.id='sr-dos-maximize';btn.type='button';
+ btn.textContent='EXPAND DOS DISPLAY';btn.className='sr-dos-monitor-toggle';
+ btn.setAttribute('aria-pressed','false');
+ btn.addEventListener('click',()=>monitorMode(!ROOT.classList.contains('sr-dos-fullscreen')));
+ inside.prepend(btn);
+ window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&ROOT.classList.contains('sr-dos-fullscreen')&&!booting){
+   e.preventDefault();monitorMode(false);
+  }
+ });
+}
+async function bootAndOpen(target){
+ if(booting||booted)return;
+ booting=true;const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+ const overlay=document.createElement('div');overlay.className='sr-dos-overlay';overlay.setAttribute('role','dialog');
+ overlay.setAttribute('aria-label','Original DOS-style Street r0d computer startup');
+ const boxnode=document.createElement('div');boxnode.className='sr-dos-screen';
+ boxnode.innerHTML='<div class="sr-dos-bios">COWBOY / PC · EGA VIDEO SYSTEM</div><pre aria-live="off" class="sr-dos-boot-log"></pre><div class="sr-dos-boot-actions"><span>PRESS ENTER TO START</span><button type="button" class="sr-dos-skip">SKIP BOOT [ESC]</button></div>';
+ overlay.append(boxnode);ROOT.append(overlay);
+ const log=boxnode.querySelector('.sr-dos-boot-log'),btn=boxnode.querySelector('.sr-dos-skip');
+ let ended=false;let handler=null;
+ const finish=()=>{
+  if(ended)return;ended=true;booted=true;booting=false;
+  overlay.remove();window.removeEventListener('keydown',handler,true);
+  ROOT.classList.add('sr-dos-ready');window.COWBOY_STREETROD_RETRO=true;
+  target.click();
+  if(target.id==='sr-toggle'){
+   const summer=ROOT.querySelector('#ss-nav-open');
+   if(summer&&!summer.disabled&&!summer.hidden)summer.click();
+  }
+  schedule();
+  addMonitorControls();monitorMode(true);
+ };
+ handler=e=>{if(e.key==='Escape'||e.key==='Enter'){e.preventDefault();e.stopPropagation();finish();}};
+ window.addEventListener('keydown',handler,true);
+ btn.addEventListener('click',finish);btn.focus();
+ if(reduced){log.textContent=preamble.join('\n');return;}
+ for(const item of preamble){
+  if(ended)break;
+  log.textContent+=item+'\n';
+  await new Promise(res=>setTimeout(res,110));
+ }
+ if(!ended){log.textContent+='\nREADY. PRESS ENTER OR SKIP.\n';}
+}
+function capture(event){
+ const btn=event.target.closest?.('#sr-toggle,#ss-nav-open');
+ if(!btn||booted||booting||!ROOT?.contains(btn))return;
+ event.preventDefault();event.stopImmediatePropagation();void bootAndOpen(btn);
+}
+function install(){
+ if(ROOT?.isConnected)return true;
+ ROOT=document.getElementById('streetrod-root');
+ if(!ROOT)return false;
+ window.COWBOY_STREETROD_RETRO=true;
+ ROOT.classList.add('sr-ega-mode');
+ addMonitorControls();
+ document.addEventListener('click',capture,true);
+ const observer=new MutationObserver(schedule);
+ observer.observe(ROOT,{subtree:true,childList:true});
+ schedule();return true;
+}
+if(!install()){
+ const wait=new MutationObserver(()=>{if(install())wait.disconnect();});
+ wait.observe(document.body,{subtree:true,childList:true});
+}
++Math.max(0,Number(options.bankroll)||0).toLocaleString('en-US'),68,190,14,8);
+ }
+ if(options.subtitle){
+  box(ctx,133,189,180,10,8);txt(ctx,String(options.subtitle).slice(0,32).toUpperCase(),137,190,14,7);
+ }
+};
 function componentCard(c,key,body){
  box(c,0,0,160,70,0);
  car(c,key,body,4,14,154);
