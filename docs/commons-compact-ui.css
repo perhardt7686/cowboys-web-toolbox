@@ -1,0 +1,415 @@
+/* Commons compact experience, Nov 2026.
+   This file intentionally loads AFTER existing styles, keeping all
+   account/permission/data behavior in the original modules. */
+body.community-page #coco-cast-strip,
+body.community-page #arcade-drawing-entry{display:none!important}
+
+/* Short, clear reading path: only a few discussions at once, then MORE. */
+body.community-page .community-hero{padding-block:10px 12px!important;min-height:0!important;gap:8px!important}
+body.community-page .community-hero h1{font-size:clamp(27px,5vw,42px)!important;letter-spacing:-.04em!important;line-height:1.1!important;margin:0 0 3px!important}
+body.community-page .community-hero .welcome-art,
+body.community-page .community-hero .hero-secondary{display:none!important}
+body.community-page .community-hero .community-intro{font-size:.85rem!important;line-height:1.35!important;margin:0!important;max-width:none!important}
+body.community-page .community-layout{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ gap:9px!important;align-items:start!important
+}
+body.community-page .community-sidebar{
+ display:block!important;width:100%!important;max-width:none!important;
+ min-width:0!important;padding:0!important;margin:0!important
+}
+body.community-page .community-sidebar>.eyebrow,
+body.community-page .community-sidebar>.edward-card{display:none!important}
+body.community-page #community-categories{
+ display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+ width:100%;min-width:0;gap:5px!important;overflow-x:auto!important;
+ overscroll-behavior-inline:contain;scrollbar-width:thin;padding:4px 2px!important
+}
+body.community-page #community-categories button{
+ display:inline-flex!important;flex:0 0 auto!important;
+ min-height:36px!important;padding:6px 10px!important;margin:0!important;
+ width:auto!important;max-width:none!important;border-radius:999px!important;
+ font:750 .76rem/1.2 system-ui,-apple-system,sans-serif!important
+}
+body.community-page .community-heading{padding:4px 0!important;gap:6px!important;margin:0!important}
+body.community-page .community-heading h2{font-size:clamp(19px,4.3vw,28px)!important;line-height:1.2!important;margin:0!important}
+body.community-page .community-tools{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(115px,155px)!important;
+ gap:6px!important;margin:6px 0!important
+}
+body.community-page .community-search,
+body.community-page .community-sort{min-width:0!important}
+body.community-page .community-tools input,
+body.community-page .community-tools select{min-height:40px!important;font-size:14px!important}
+body.community-page .feed-status{margin:2px 0 4px!important;min-height:0!important}
+body.community-page #feed-count{font-size:.76rem!important;margin:0!important}
+body.community-page #community-feed{display:grid!important;gap:7px!important}
+body.community-page #community-feed .thread-card{
+ padding:10px 11px!important;margin:0!important;min-height:0!important;
+ border-radius:11px!important;display:grid!important;
+ gap:3px!important;box-shadow:0 2px 0 #331d4233!important
+}
+body.community-page #community-feed .thread-card[hidden]{display:none!important}
+body.community-page #community-feed .thread-card::before{display:none!important}
+body.community-page #community-feed .thread-card .thread-kicker{
+ font-size:.65rem!important;line-height:1.25!important;margin:0!important;
+ letter-spacing:.01em!important
+}
+body.community-page #community-feed .thread-card h3{margin:0!important;padding:0!important;line-height:1.25!important}
+body.community-page #community-feed .thread-card .thread-title{
+ display:block!important;width:100%!important;text-align:left!important;
+ margin:0!important;padding:3px 0!important;min-height:35px!important;
+ font:800 clamp(16px,4.1vw,20px)/1.25 system-ui,-apple-system,sans-serif!important;
+ text-decoration:none!important;line-height:1.25!important
+}
+body.community-page #community-feed .thread-card .thread-excerpt{
+ display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ overflow:hidden!important;max-height:2.6em!important;
+ margin:0!important;padding:0!important;
+ font:500 .82rem/1.3 system-ui,-apple-system,sans-serif!important
+}
+body.community-page #community-feed .thread-card .thread-bottom{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;
+ gap:5px!important;margin:1px 0 0!important;padding:0!important;
+ font:700 .71rem/1.2 system-ui,-apple-system,sans-serif!important
+}
+body.community-page #community-feed .thread-card :is(.thread-open-cue,.thread-site,.forum-last-reply){
+ display:none!important
+}
+body.community-page #community-feed .thread-card .member-author :is(.avatar,.profile-avatar){
+ width:24px!important;height:24px!important;min-width:24px!important;border-width:1px!important
+}
+body.community-page #community-feed .thread-card .thread-age,
+body.community-page #community-feed .thread-card .thread-count{
+ font-size:.71rem!important;line-height:1.2!important
+}
+body.community-page #compact-feed-count{
+ font:700 .75rem/1.3 system-ui,-apple-system,sans-serif!important;
+ color:#624d69!important;text-align:center!important;margin:8px 0 4px!important
+}
+body.community-page #compact-feed-more{
+ display:block;width:min(100%,500px);min-height:43px;margin:7px auto 14px!important;
+ padding:9px 14px;border:2px solid #804891;border-radius:12px;
+ color:#452953;background:#fff8e7;
+ font:800 .84rem/1.3 system-ui,-apple-system,sans-serif!important
+}
+body.community-page #compact-feed-more[hidden]{display:none!important}
+body.community-page #load-more{display:none!important}
+/* The dialog shows the whole selected discussion and responses in a bounded
+   panel, not a tall series of open cards on the underlying page. */
+body.community-page #content-dialog{
+ width:min(97vw,900px)!important;max-width:97vw!important;
+ max-height:calc(100dvh - 22px)!important;overflow:auto!important;
+ overscroll-behavior:contain!important;border-radius:16px!important
+}
+body.community-page #content-dialog #dialog-content{padding:7px 4px 14px!important}
+body.community-page #content-dialog :is(.forum-post,.thread-detail-body){
+ margin-block:7px!important;padding:10px!important;line-height:1.43!important
+}
+body.community-page #content-dialog #thread-replies{
+ display:grid;gap:7px!important
+}
+body.community-page #content-dialog :is(.forum-signature,.forum-reply-preview){
+ margin:3px 0!important
+}
+body.community-page #content-dialog :is(button,a,summary):focus-visible,
+body.community-page #compact-feed-more:focus-visible{
+ outline:3px solid #147c83!important;outline-offset:2px
+}
+/* No app-like full-screen DOS masthead. Scores are tiny, legible bubbles
+   with an accessible scene selector and settings/exit icons. */
+body.community-page.arcade-on{
+ --arcade-top:calc(73px + env(safe-area-inset-top,0px))!important;
+ --arcade-bottom:0px!important
+}
+body.community-page.arcade-on #arcade-hud{
+ z-index:2147482500!important;background:#111422e8!important;
+ color:#f5edff!important;box-shadow:0 2px 10px #08091077!important;
+ border-bottom:1px solid #8f6fbd88!important;
+ padding-top:env(safe-area-inset-top,0px)!important;
+ font-family:system-ui,-apple-system,sans-serif!important
+}
+body.community-page.arcade-on #arcade-hud .arcade-hud-main{
+ display:flex!important;align-items:center!important;gap:5px!important;
+ min-height:38px!important;max-height:39px!important;
+ padding:2px 7px!important;border:0!important
+}
+body.community-page.arcade-on #arcade-hud #arcade-hud-title{
+ position:absolute!important;width:1px!important;height:1px!important;
+ overflow:hidden!important;clip-path:inset(50%)!important
+}
+body.community-page.arcade-on #arcade-score-pills{
+ display:flex;justify-content:center;gap:4px;flex:1 1 auto;min-width:0;
+ max-width:100%;overflow:hidden
+}
+body.community-page.arcade-on .arcade-score-pill{
+ min-width:0;max-width:52%;display:flex;align-items:center;gap:4px;
+ padding:3px 7px;border:1px solid #dbb966;border-radius:999px;
+ background:#f9f2df;color:#3d2752;
+ font:800 .72rem/1.1 system-ui,-apple-system,sans-serif;white-space:nowrap
+}
+body.community-page.arcade-on .arcade-score-pill small{
+ font:850 .58rem/1.1 system-ui,-apple-system,sans-serif;color:#625174
+}
+body.community-page.arcade-on .arcade-score-pill b{
+ font-size:.73rem;overflow:hidden;text-overflow:ellipsis
+}
+body.community-page.arcade-on .arcade-score-pill.arcade-game-name{
+ font-size:.73rem;justify-content:center;max-width:100%;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis
+}
+body.community-page.arcade-on #arcade-hud .arcade-hud-right{
+ display:flex!important;gap:4px!important;flex:0 0 auto
+}
+body.community-page.arcade-on #arcade-hud .arcade-hud-main button{
+ display:grid!important;place-items:center!important;flex:0 0 34px!important;
+ width:34px!important;min-width:34px!important;height:34px!important;
+ min-height:34px!important;padding:0!important;border-radius:999px!important;
+ border:1px solid #b8a9cf!important;background:#382a50!important;color:#fff9e8!important;
+ box-shadow:none!important;font:800 1.2rem/1 system-ui,sans-serif!important
+}
+body.community-page.arcade-on #arcade-hud .arcade-scene-switcher{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:5px!important;height:34px!important;min-height:34px!important;
+ padding:1px 7px!important;border:0!important
+}
+body.community-page.arcade-on #arcade-hud .arcade-scene-switcher >button{
+ display:grid!important;place-items:center!important;
+ flex:0 0 34px!important;width:34px!important;height:31px!important;
+ min-height:31px!important;border-radius:999px!important;
+ padding:0!important;border:1px solid #bbb1d4!important;
+ background:#2d2847!important;color:#fff!important;font-size:1.15rem!important
+}
+body.community-page.arcade-on #arcade-hud .arcade-scene-switcher #arcade-hud-scenes{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ min-height:29px!important;max-height:29px!important;flex:1 1 auto!important;
+ overflow:hidden!important;min-width:0!important;border:0!important;
+ padding:0!important
+}
+body.community-page.arcade-on #arcade-hud #arcade-hud-scenes button{
+ display:none!important
+}
+body.community-page.arcade-on #arcade-hud #arcade-hud-scenes button[aria-current=page]{
+ display:grid!important;place-items:center!important;max-width:240px;width:100%!important;
+ min-height:29px!important;max-height:29px!important;padding:2px 6px!important;
+ border-radius:999px!important;border:1px solid #d7bb65!important;
+ background:#fff3ce!important;color:#33204b!important;
+ font:900 .75rem/1.12 system-ui,-apple-system,sans-serif!important
+}
+body.community-page.arcade-on #arcade-hud .arcade-hud-footer{display:none!important}
+body.community-page.arcade-on #arcade-hud #arcade-hud-paging{
+ position:fixed!important;right:8px!important;bottom:8px!important;
+ display:flex;align-items:center;gap:7px!important;
+ background:#17162fef;border:1px solid #e0c68a!important;
+ padding:3px 6px!important;border-radius:999px!important
+}
+body.community-page.arcade-on #arcade-hud #arcade-hud-paging[hidden]{display:none!important}
+body.community-page.arcade-on #arcade-hud #arcade-hud-paging button{
+ min-width:35px!important;min-height:35px!important;padding:3px 8px!important;
+ border-radius:999px!important;background:#f8f0dc!important;
+ color:#3c2953!important;border:0!important
+}
+body.community-page.arcade-on #arcade-hud-pagecount{color:#fff9df!important}
+body.community-page.arcade-on #arcade-hud :is(button,[role=button]):focus-visible{
+ outline:3px solid #f8d777!important;outline-offset:2px
+}
+/* Mahjong: no page scroll and no board scroll. Main surface = whole tile
+   layout at maximal fit scale. Five actions stay in one compact toolbar. */
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-inside{
+ display:flex!important;flex-direction:column!important;
+ height:100%!important;max-height:100%!important;min-height:0!important;
+ padding:0!important;gap:0!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-inside > :is(
+ .mahjong-stats,.commons-score-ribbon
+){display:none!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-inside >.mahjong-game-zone{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ height:100%!important;max-height:100%!important;min-height:0!important;
+ padding:4px!important;gap:3px!important;margin:0!important;
+ border-width:2px!important;border-radius:9px!important;box-shadow:none!important;
+ overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-hud{
+ display:flex!important;flex:0 0 auto!important;min-height:25px!important;max-height:36px!important;
+ gap:5px!important;padding:0 4px!important;margin:0!important;
+ font:800 clamp(.65rem,2.5vw,.8rem)/1.2 system-ui,-apple-system,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-view-tools{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-board-wrap{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:1 1 auto!important;height:100%!important;min-height:0!important;
+ overflow:hidden!important;touch-action:manipulation!important;
+ padding:0!important;margin:0 auto!important;border:0!important;
+ border-radius:8px!important;box-shadow:none!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] #mahjong-board{
+ flex:0 0 auto!important;max-height:100%!important;
+ min-width:0!important;margin:0 auto!important;border-radius:8px!important;
+ box-shadow:none!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-actions{
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ align-items:stretch!important;gap:4px!important;
+ width:100%!important;max-width:100%!important;
+ margin:0!important;padding:0!important;flex:0 0 auto!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-actions button{
+ display:grid!important;place-items:center!important;min-width:0!important;
+ width:100%!important;min-height:40px!important;height:40px!important;
+ margin:0!important;padding:3px!important;border-radius:7px!important;
+ box-shadow:none!important;font:800 clamp(.57rem,2.4vw,.78rem)/1.05 system-ui,-apple-system,sans-serif!important;
+ white-space:normal!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-status{
+ flex:0 0 auto!important;max-height:17px!important;min-height:0!important;
+ margin:0!important;padding:0 2px!important;
+ overflow:hidden!important;font:.68rem/1.1 system-ui,sans-serif!important
+}
+/* Drawing canvas is the main screen, not a long settings page. */
+body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-game-root.arcade-game-active,
+body.community-page.arcade-on[data-arcade-game=drawing] #drawing-studio-inside:not([hidden]),
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-art{
+ display:flex!important;flex-direction:column!important;min-height:0!important;
+ overflow:hidden!important;height:100%!important;max-height:100%!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-drawing-root{
+ position:relative!important;display:flex!important;flex-direction:column!important;
+ flex:1 1 auto!important;height:100%!important;max-height:100%!important;
+ min-height:0!important;overflow:hidden!important;gap:4px!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-toolbox{
+ flex:0 0 auto!important;min-height:39px!important;max-height:40px!important;
+ display:flex!important;flex-wrap:nowrap!important;gap:4px!important;
+ margin:0!important;overflow-x:auto!important;overflow-y:hidden!important;
+ scrollbar-width:thin!important;overscroll-behavior-inline:contain
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-toolbox button{
+ flex:0 0 auto!important;min-height:34px!important;height:35px!important;
+ padding:3px 8px!important;margin:0!important;font-size:.74rem!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-tools-toggle{
+ flex:0 0 auto!important;align-self:end!important;min-height:34px!important;
+ padding:4px 10px!important;border-radius:999px!important;
+ background:#eee0bc!important;color:#312149!important;border:1px solid #9e70aa!important;
+ font:850 .72rem/1.2 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-viewport{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:1 1 auto!important;min-height:0!important;height:auto!important;
+ max-height:none!important;width:100%!important;overflow:auto!important;
+ border:2px solid #9270ad!important;border-radius:7px!important;
+ padding:0!important;margin:0!important;background:#e4d9e9!important;
+ overscroll-behavior:contain
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #commons-art-canvas{
+ display:block!important;flex:0 0 auto!important;
+ height:auto!important;max-width:none!important;max-height:none!important;
+ touch-action:none!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-drawer[hidden]{display:none!important}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-drawer:not([hidden]){
+ position:absolute!important;z-index:80!important;inset:38px 2px 2px 2px!important;
+ display:flex!important;flex-direction:column!important;gap:7px!important;
+ overflow-y:auto!important;overflow-x:hidden!important;
+ padding:10px!important;border:2px solid #d8bf85!important;
+ border-radius:12px!important;background:#fff9ed!important;color:#3d2a4f!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-drawer :is(
+ .art-actions,.art-style,.art-swatches,.art-layer-row
+){display:flex!important;flex-wrap:wrap!important;gap:5px!important;margin:0!important}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-drawer :is(button,input,select){
+ min-height:34px!important
+}
+body.community-page.arcade-on[data-arcade-game=drawing] #art-drawer .art-hint{
+ font-size:.75rem!important
+}
+/* Saved plate gallery is a real third scene with six thumbnails and bounded
+   pages, not an endless document or a static history label. */
+body.community-page.arcade-on[data-arcade-game=plates] #plate-game-content > #plate-gallery{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=history] #plate-game-content > #plate-gallery{
+ display:flex!important;flex-direction:column!important;gap:7px!important;
+ height:100%!important;min-height:0!important;max-height:100%!important;
+ max-width:860px!important;padding:7px!important;margin:0 auto!important;
+ overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-head{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px;
+ font:800 .83rem/1.3 system-ui,sans-serif;color:#fff0cb
+}
+body.community-page.arcade-on[data-arcade-game=plates] #plate-gallery-count{
+ color:#e3d8ec;font-size:.73rem
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-grid{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-template-rows:repeat(3,minmax(0,1fr))!important;
+ gap:6px!important;min-height:0!important;flex:1 1 auto!important;
+ overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-tile{
+ display:flex!important;flex-direction:column!important;gap:3px!important;
+ min-height:0!important;max-height:100%!important;min-width:0!important;
+ overflow:hidden!important;padding:4px!important;margin:0!important;
+ border:2px solid #ab8cc1!important;border-radius:11px!important;
+ background:#fffaf1!important;color:#30203f!important;
+ text-align:left!important;font:750 .77rem/1.2 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-thumb{
+ display:block!important;width:100%!important;min-height:0!important;
+ flex:1 1 auto!important;object-fit:contain!important;border-radius:5px!important;
+ background:#e6deec!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-caption{
+ display:flex;gap:3px;align-items:center;justify-content:space-between;
+ flex-wrap:wrap!important;min-height:20px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-caption small{
+ font-size:.62rem;color:#57436b
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-pages{
+ display:flex;justify-content:center;align-items:center;gap:8px;
+ flex:0 0 auto!important;min-height:36px!important;color:#fff!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-pages button{
+ min-height:35px!important;padding:5px 11px!important;border-radius:999px!important;
+ border:1px solid #ecdaac!important;background:#fff5d7!important;
+ color:#3a2750!important;font-weight:900!important
+}
+body.community-page.arcade-on[data-arcade-game=plates] .plate-gallery-pages button:disabled{
+ opacity:.44!important
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=vote] #plate-list{
+ height:100%!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=plates][data-arcade-scene=vote] #plate-list >.arcade-current-card{
+ box-sizing:border-box!important;max-height:100%!important;overflow:auto!important;
+ margin:0!important;overscroll-behavior:contain
+}
+/* Scores, source documents and game histories remain available on demand. */
+@media(max-width:620px){
+ body.community-page .community-tools{grid-template-columns:minmax(0,1fr) minmax(105px,125px)!important}
+ body.community-page .community-hero .community-intro{display:none!important}
+ body.community-page.arcade-on{--arcade-top:calc(73px + env(safe-area-inset-top,0px))!important}
+ body.community-page.arcade-on #arcade-score-pills{max-width:100%;gap:3px!important}
+ body.community-page.arcade-on .arcade-score-pill{padding:2px 5px!important}
+ body.community-page.arcade-on .arcade-score-pill small{font-size:.54rem!important}
+ body.community-page.arcade-on .arcade-score-pill b{font-size:.67rem!important}
+ body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-actions button{
+  min-height:40px!important
+ }
+}
+@media(max-height:520px){
+ body.community-page.arcade-on{--arcade-top:calc(69px + env(safe-area-inset-top,0px))!important}
+ body.community-page.arcade-on #arcade-hud .arcade-hud-main{min-height:35px!important;max-height:35px!important}
+ body.community-page.arcade-on #arcade-hud .arcade-scene-switcher{height:32px!important;min-height:32px!important}
+ body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-hud{
+  min-height:18px!important;font-size:.62rem!important
+ }
+ body.community-page.arcade-on[data-arcade-game=mahjong] .mahjong-game-zone .mahjong-actions button{
+  min-height:35px!important;height:35px!important
+ }
+}
