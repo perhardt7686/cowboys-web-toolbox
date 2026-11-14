@@ -300,6 +300,59 @@ function gearbox(c){
  box(c,180,70,31,15,7);txt(c,'SHIFT LINKAGE',101,148,0,8);
 }
 function smoothRoad(c,opts={}){dash(c,opts);}
+/* Original sixteen-colour roadside incident screens.
+ * None of these pixels, dialogues, designs or audio are sourced from DOS assets. */
+function jail(c){
+ border(c,'COUNTY HIGHWAY PATROL','SLOW DOWN AND DRIVE SMART');
+ box(c,0,18,320,161,7);
+ for(let y=20;y<161;y+=14){
+  stroke(c,0,y,319,y,8);
+  for(let x=(y/14)%2?0:20;x<320;x+=40)stroke(c,x,y,x,y+14,8);
+ }
+ box(c,37,32,247,109,15);box(c,43,38,235,97,8);
+ box(c,47,43,227,87,7);
+ for(let x=56;x<266;x+=24){box(c,x,42,7,96,0);box(c,x+1,42,2,96,15);}
+ box(c,43,39,235,7,0);box(c,43,127,235,8,0);
+ box(c,65,113,99,11,6);box(c,70,124,5,28,0);box(c,153,124,5,28,0);
+ box(c,178,111,66,10,6);box(c,184,119,5,26,0);box(c,233,119,5,26,0);
+ // A pixelated fictional officer with a ticket book.
+ disk(c,259,77,13,6);box(c,247,87,25,30,1);
+ box(c,243,92,33,7,1);box(c,246,114,11,34,0);box(c,264,114,11,34,0);
+ box(c,245,62,28,7,1);box(c,252,55,14,9,1);box(c,250,69,17,4,0);
+ box(c,246,99,20,12,15);txt(c,'FINE',246,101,0,7);
+ box(c,15,166,290,14,1);txt(c,'ONE SUMMER DAY LOST · RESPECT THE PATROL',25,169,14,9);
+}
+function breakdown(c){
+ border(c,'ROADSIDE TROUBLE','RETURN TO YOUR GARAGE');
+ box(c,0,18,320,166,3);box(c,0,96,320,83,2);
+ poly(c,[[0,130],[320,123],[320,178],[0,178]],8,0);
+ for(let x=4;x<320;x+=52)box(c,x,170,31,2,15);
+ // Stranded coupe, open hood and smoke.
+ car(c,'wren49','coupe',27,100,220);
+ poly(c,[[170,112],[208,78],[221,80],[195,111]],8,0);
+ for(let i=0;i<6;i++){
+  const x=194+i*10,y=65-(i%3)*10;
+  disk(c,x,y,9+(i%2)*4,i%2?7:15);
+  disk(c,x+4,y-9,7,8);
+ }
+ box(c,5,19,116,19,4);txt(c,'ENGINE OVERHEAT',13,25,15,9);
+ box(c,7,149,119,13,0);txt(c,'TOOLS NEEDED',14,151,14,9);
+}
+function championship(c){
+ border(c,'SUMMER CHAMPION 1963','KING OF THE STRIP');
+ box(c,0,18,320,166,1);
+ for(let i=0;i<36;i++){
+  const x=(i*59)%315,y=22+(i*43)%128;
+  box(c,x,y,2,2,[14,15,11,10][i%4]);
+ }
+ box(c,82,28,155,27,6);box(c,85,31,149,21,14);
+ txt(c,'CHAMPION',108,36,0,17);
+ disk(c,160,93,35,14);disk(c,160,93,28,6);disk(c,160,93,23,14);
+ txt(c,'1963',139,85,0,18);
+ box(c,124,119,73,12,6);box(c,112,131,97,10,14);box(c,100,141,121,15,6);
+ txt(c,'YOU BEAT THE',103,161,15,8);
+ txt(c,'MYSTERY MACHINE',86,174,14,11);
+}
 window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
  if(!(canvas instanceof HTMLCanvasElement))return;
  const ctx=canvas.getContext('2d',{alpha:false});if(!ctx)return;
@@ -307,7 +360,7 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
  const kind=scene==='paper'?'newspaper':scene==='parts'?'parts':
   scene==='tune'||scene==='hood'?'engine':scene==='drive'?'dash':
   scene==='calendar'?'calendar':scene==='gearbox'?'gearbox':scene;
- const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,calendar:vintageCalendar,gearbox};
+ const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,calendar:vintageCalendar,gearbox,jail,breakdown,championship};
  if(kind==='dash')dash(ctx,options);
  else (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
  if(kind==='diner'&&options.boss)mysteryMachine(ctx,133,125,179);
