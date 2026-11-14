@@ -131,6 +131,9 @@ async def run_one(browser,width,height):
  try:
   await p.goto(URL,wait_until='load')
   await p.locator('#sr-reborn').wait_for(timeout=10000)
+  if await p.locator('#sr-reborn .sr-v3-post').is_visible():
+   assert '640 KB' in await p.locator('#sr-reborn .sr-v3-post').inner_text(), 'Boot should show a simulated classic PC memory check'
+   await p.locator('#sr-reborn [data-v3-action="boot"]').click()
   assert await p.locator('#sr-reborn .sr-v3-canvas').evaluate('el=>el.width===320 && el.height===200')
   await p.locator('#sr-reborn .sr-v3-sound').click()
   assert 'SOUND ON' in await p.locator('#sr-reborn .sr-v3-sound').inner_text()
