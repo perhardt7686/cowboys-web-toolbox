@@ -211,7 +211,9 @@ function sourcePanel(room){
   if(src.querySelector('.ss-drive-controls')){
    const c=src.querySelector('.ss-drive-controls').cloneNode(true);
    c.classList.add('sr-v3-drive-controls');
+   const mode=src.querySelector('[data-ss-action="transmission"]')?.outerHTML||'';
    return '<div class="sr-v3-telemetry" aria-live="off">GEAR / SPEED / RPM</div>'+c.outerHTML+
+    '<div class="sr-v3-drive-mode">'+mode+'</div>'+
     (src.querySelector('[data-ss-action="abandon"]')?.outerHTML||'');
   }
   const results=src.querySelector('.ss-race-result');
@@ -285,6 +287,8 @@ function paint(){
  if(room==='drive'){
   const el=stage()?.querySelector('.sr-v3-telemetry');
   if(el)el.textContent=Math.round(options.speed)+' MPH · '+Math.round(options.rpm)+' RPM · GEAR '+options.gear;
+  const warn=source()?.querySelector('#ss-warning')?.textContent;
+  if(warn)showStatus(warn);
  }
 }
 function build(){
