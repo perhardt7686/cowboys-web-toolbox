@@ -48,3 +48,35 @@ This rebuild is **not** a byte-for-byte copy or a native/WASM execution of the o
 4. The Mystery Machine is offered only by the existing end-boss gate, including win and reputation checks, with the correct final championship save.
 5. Avatars and prior achievements remain accessible without creating parallel profile records or exposing private data.
 6. Browser checks pass at 390×844, 375×667 and 844×390; a signed-in Safari session still requires hands-on verification.
+
+
+## Release 2026-11-14: mechanical fidelity and playable scene coverage
+
+### Verified improvements
+
+- Real four-gear powertrain model from production engineering specs, with per-car mass, engine torque/power, reduction ratios, physical wheel radius, driveline efficiency, tyre-road coefficient and drag area.
+- Real rpm and clutch-shift torque interruption, redline cutoff, overheating load, road curvature, and steering consequences.
+- Automatic and manual gear selection, with controls on the same single-screen DOS cockpit.
+- Production race-finish function updated using a migration verified in the live project's Supabase migration history:
+  - Launch is measured from the first actual throttle command after green, allowed up to 120,000 milliseconds.
+  - Shift timestamps can occur throughout the race, up to 300,000 milliseconds instead of being forced by 11.5 seconds.
+  - Unperformed upshifts are marked inert beyond the 240-second input-recording limit, rather than invented as fast shifts.
+  - The existing authenticated membership check, SECURITY DEFINER search path, execute roles, payouts, saves, result idempotence, damage/wear and championship awards are unchanged.
+- New single-screen routes for the actual saved parts tray, open service orders, driver licence, body paint and decals, exact-amount gas station and race journal/Hall of Fame.
+- Real saved mechanical assemblies are paged one at a time with reachable bolts and no vertical page scrolling; the workbench's existing revision check and fastener sequence remain authoritative.
+- Existing member avatars are read only from the Commons roster, not copied into a parallel profile store.
+- Tested at 390×844, 375×667 and 844×390 browser viewports without javascript errors; native code tests also cover torque, shifts, curve grip, and full drag/road race finish distances.
+- No existing profile, calendar, message-board, or racing table was deleted, recreated, or reset.
+
+### Historical fidelity still outstanding: do not claim 100% original equivalence
+
+The 1989 release remains a different game binary and experience. The independent browser campaign still differs in several substantial ways:
+
+1. The original's approximately 22 distinct opponent drivers, diner arrival/leave logic and King's two-stage challenge are not yet fully reimplemented; Commons currently has three progress rivals plus the Mystery Machine boss.
+2. The original's police pursuits, pullovers and jail, mechanical breakdown hazards, weather/time interactions and some road-track details are not yet reproduced in the authoritative season server.
+3. The original parts hierarchy includes precise part grades, carburettors, manifolds, transmissions and wear data beyond the Commons simplified seasonal upgrade model, even though the saved mechanical assemblies have individual bolts.
+4. The original DOS sprites, intro/credits, PC speaker audio, sound effects and proprietary car/road imagery are not included or redistributed. All browser art is independently drawn.
+5. The original save-file slots/Hall of Fame and complete historic vehicle data disks are not the same as Commons' account-bound single summer, saved seasonal journal and authenticated multiplayer garages.
+6. Browser test accounts are synthetic. A full authenticated iPhone Safari championship with real purchase/repair, physical parts, gas, races and final-boss award has not been end-to-end certified in the owner's session.
+
+**Policy for future claims:** A passing CI build and deployment do not prove historical equivalence or live signed-in gameplay. Record the unfinished features openly, protect production records and require a targeted acceptance test before marking the 1:1 original-source rebuild complete.
