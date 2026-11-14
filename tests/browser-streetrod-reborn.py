@@ -193,7 +193,13 @@ async def run_one(browser,width,height):
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paper"]').click()
   await p.locator('#sr-reborn .sr-v3-pocket [data-ss-action="buy_car"]').click()
   assert 'Selected buy_car' in await p.locator('#ss-status').inner_text()
-  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="parts"]').click()
+  # The fixture only records button clicks. Simulate the real authenticated
+  # success event separately and verify the transition cannot happen early.
+  await p.evaluate("""() => window.dispatchEvent(
+   new CustomEvent('cowboy:streetrod-season-saved',{detail:{command:'buy_car'}}))""")
+  assert await p.locator('#sr-reborn .sr-v3-garage-meta').is_visible(), 'Server-confirmed buy must return to the garage'
+  await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="paperfront"]').click()
+  await p.locator('#sr-reborn .sr-v3-classifieds-cover [data-v3-action="parts"]').click()
   await p.locator('#sr-reborn .sr-v3-toolbar [data-v3-action="inventory"]').click()
   assert 'Used carburetor' in await p.locator('#sr-reborn .sr-v3-pocket').inner_text()
   await p.locator('#sr-reborn [data-ss-action="service_begin"]').click()
