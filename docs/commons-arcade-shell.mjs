@@ -108,6 +108,8 @@ function closeArcade(){
  document.body.dataset.arcadeGame='';
  document.body.dataset.arcadeScene='';
  menu.hidden=true;hud.hidden=true;
+ const drawer=$('art-drawer');if(drawer)drawer.hidden=true;
+ const controls=$('art-tools-toggle');if(controls){controls.setAttribute('aria-expanded','false');controls.textContent='TOOLS / LAYERS ⚙';}
  document.body.classList.remove('arcade-on');
  document.documentElement.classList.remove('arcade-on');
  window.scrollTo(0,savedScroll);
@@ -122,11 +124,37 @@ function makeVisible(g){
    button.click(); // Use the game's own open pathway, including DOS boot.
   }
  }
+ if(g.id==='drawing')prepareDrawing();
  if(g.id==='streetrod'){
   const junior=$('srj-junior')?.querySelector('details');
   if(junior&&scene==='junior')junior.open=true;
  }
  return true;
+}
+function prepareDrawing(){
+ const host=$('commons-drawing-root');
+ if(!host||!$('commons-art-canvas')||$('art-tools-toggle'))return;
+ const control=document.createElement('button');
+ control.type='button';control.id='art-tools-toggle';
+ control.textContent='TOOLS / LAYERS ⚙';control.setAttribute('aria-expanded','false');
+ control.setAttribute('aria-controls','art-drawer');
+ control.setAttribute('aria-label','Open drawing tools, layers and save options');
+ const drawer=document.createElement('aside');drawer.id='art-drawer';drawer.hidden=true;
+ drawer.setAttribute('aria-label','Drawing tools and save controls');
+ const viewport=$('art-viewport');
+ if(!viewport)return;
+ // Move the existing controls, preserving every listener and saved drawing.
+ for(const el of Array.from(host.children)){
+  if(el===viewport||el.id==='art-toolbox'||el.matches('input[type=file]'))continue;
+  drawer.append(el);
+ }
+ host.insertBefore(control,viewport);
+ host.append(drawer);
+ control.addEventListener('click',()=>{
+  const open=drawer.hidden;drawer.hidden=!open;
+  control.setAttribute('aria-expanded',String(open));
+  control.textContent=open?'CLOSE OPTIONS ✕':'TOOLS / LAYERS ⚙';
+ });
 }
 function launch(id){
  const g=game(id);if(!g||!menu||!available(g))return;
