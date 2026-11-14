@@ -8,6 +8,10 @@ on:
       - 'tests/browser-streetrod-ega.py'
       - 'tests/browser-arcade-shell.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-streetrod-scene-flow.mjs'
+      - 'docs/commons-streetrod-scene-flow.css'
+      - 'docs/commons-streetrod-ega.mjs'
+      - 'tests/browser-streetrod-scenes.py'
       - 'docs/commons-arcade-shell.css'
       - 'docs/commons-compact-ui.css'
       - 'docs/commons-board-compact.mjs'
@@ -39,6 +43,7 @@ jobs:
           python tests/browser-commons-contrast.py
           python tests/browser-streetrod-ega.py
           python tests/browser-arcade-shell.py
+          python tests/browser-streetrod-scenes.py
       - name: Retain test-only iPhone-sized screenshot
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -48,5 +53,6 @@ jobs:
             reports/commons-mobile-legibility.png
             reports/streetrod-ega-iphone-sample.png
             reports/arcade-one-screen-iphone-sample.png
+            reports/streetrod-room-garage-mobile.png
           if-no-files-found: ignore
           retention-days: 7
