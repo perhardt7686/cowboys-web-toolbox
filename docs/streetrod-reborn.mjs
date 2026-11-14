@@ -202,12 +202,67 @@ function cardHTML(el){
    cp.setAttribute('aria-label','Mystery Machine, final boss, original story rival identifier preserved');
   }
  }
+ // The DOS room uses original 16-colour pixels, not modern photos.
+ if(['paper','carshow'].includes(currentRoom())){
+  const photo=cp.querySelector('img.ss-car-photo');
+  if(photo){
+   const model=cp.querySelector('[data-car]')?.dataset.car||'rattler';
+   const type=cp.querySelector('.ss-ad-main small')?.textContent||'coupe';
+   const canvas=document.createElement('canvas');
+   canvas.width=320;canvas.height=200;canvas.className='sr-v3-inline-preview';
+   canvas.dataset.carKey=model;
+   canvas.dataset.body=/wagon|estate/i.test(type)?'wagon':/truck|pickup/i.test(type)?'truck':
+    /van|bus/i.test(type)?'van':/muscle|fastback/i.test(type)?'muscle':
+    /hardtop|sedan/i.test(type)?'hardtop':'coupe';
+   canvas.setAttribute('aria-label','Independent pixel-art inspection of '+model);
+   photo.replaceWith(canvas);
+  }
+ }
  cp.classList.add('sr-v3-record','arcade-current-card');
  return cp.outerHTML;
 }
 function sourcePanel(room){
  const src=source();
  if(!src)return '<p class="sr-v3-empty">Loading your original seasonal garage…</p>';
+ if(room==='paperfront'){
+  return '<div class="sr-v3-classifieds-cover"><small>LOS ANGELES · SUMMER 1963</small>'+
+   '<strong>THE MOTOR YARD GAZETTE</strong><p>CLASSIFIEDS · ALL THE HOT DEALS</p>'+
+   '<div><button type="button" data-v3-action="paper">USED MOTOR CARS</button>'+
+   '<button type="button" data-v3-action="parts">AUTO PARTS</button></div>'+
+   '<small>LOOK IT OVER · MAKE AN OFFER · DRIVE IT HOME</small></div>';
+ }
+ if(room==='carshow'){
+  const advert=nativeRecords('paper')[page.paper||0];
+  if(!advert)return '<p class="sr-v3-empty">Return to the paper and select a car.</p>';
+  return '<div class="sr-v3-view-car"><strong>LOOK AT THE CAR BEFORE BUYING</strong>'+
+   cardHTML(advert)+'</div>';
+ }
+ if(room==='hoodmenu'){
+  return '<div class="sr-v3-shop-menu"><strong>UNDER THE HOOD · ENGINE / CARB / MANIFOLD</strong>'+
+   '<p>Select PARTS to operate real saved bolts. The original-compatible workbench requires the right disassembly order and tightened parts.</p>'+
+   '<div><button type="button" data-v3-action="wrench">PARTS / TURN BOLTS</button>'+
+   '<button type="button" data-v3-action="tune">TUNE ENGINE</button>'+
+   '<button type="button" data-v3-action="inventory">SPARE PARTS</button>'+
+   '<button type="button" data-v3-action="garage">DONE / LOWER HOOD</button></div></div>';
+ }
+ if(room==='carinfo'){
+  const stats=src.querySelector('.ss-garage-stats');
+  const details=src.querySelector('.ss-workshop-preview');
+  return '<div class="sr-v3-carinfo"><strong>SHOP CLIPBOARD · CAR INFORMATION</strong>'+
+   '<p>Installed equipment, engine tune, paint, fuel and wear.</p>'+
+   (stats?stats.outerHTML:'<p>No car in the garage. Open the newspaper.</p>')+
+   (details?details.outerHTML:'')+
+   '<button type="button" data-v3-action="hood">POP THE HOOD</button></div>';
+ }
+ if(room==='rivalview'){
+  const rival=nativeRecords('diner')[page.diner||0];
+  if(!rival)return '<p class="sr-v3-empty">No driver has arrived.</p>';
+  return '<div class="sr-v3-rival-inspection"><strong>CHECK THE COMPETITION</strong>'+
+   '<p>'+safe(rival.querySelector('strong')?.textContent||'Rival driver')+'</p>'+
+   '<p>'+safe(rival.querySelector('p')?.textContent||'')+'</p>'+
+   '<p>Opponent details are from the saved roster. Detailed engine specs for rivals are not yet server-backed.</p>'+
+   cardHTML(rival)+'</div>';
+ }
  if(room==='paper'||room==='parts'||room==='diner'){
   const records=nativeRecords(room),index=page[room]||0;
   if(!records.length)return '<div class="sr-v3-empty">No '+safe(room)+' entries available yet.</div>';
