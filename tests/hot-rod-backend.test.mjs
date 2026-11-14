@@ -7,7 +7,7 @@ import {CARS} from '../docs/hot-rod-catalog.mjs';
 import {applyWorkshop,newCampaign} from '../docs/hot-rod-campaign.mjs';
 import {INPUT,createRace,recordInput,stepRace,courseCurve} from '../docs/hot-rod-racing.mjs';
 
-const migration = new URL('../supabase/migrations/20261114194518_hot_rod_classic_1963.sql', import.meta.url);
+const migration = new URL('../supabase/migrations/20261114203933_hot_rod_classic_1963.sql', import.meta.url);
 const origin = 'http://localhost';
 const raceCommand = (kind, data) => ({type:kind, ...data, operation:crypto.randomUUID()});
 
