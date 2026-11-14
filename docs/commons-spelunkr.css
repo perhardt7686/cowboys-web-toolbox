@@ -1,0 +1,29 @@
+/* Spelunkr shortcut is a link, not an embedded third-party player. */
+body.community-page #spelunkr-game-link{
+ display:flex;align-items:center;box-sizing:border-box;width:100%;max-width:100%;
+ margin:10px 0 20px;text-decoration:none!important;border:2px solid #d6a260;
+ border-radius:16px;background:linear-gradient(115deg,#39254e,#663d7c);
+ color:#fff6e5!important;box-shadow:0 5px 18px #0003;min-height:76px;
+}
+body.community-page #spelunkr-game-link .mahjong-entry-copy{min-width:0}
+body.community-page #spelunkr-game-link .mahjong-entry-copy strong{color:#fff5d0}
+body.community-page #spelunkr-game-link .mahjong-entry-copy small{color:#f7e7fb;line-height:1.45}
+body.community-page #spelunkr-game-link .mahjong-chevron{color:#fff0c7}
+body.community-page #spelunkr-game-link:hover,body.community-page #spelunkr-game-link:focus-visible{background:linear-gradient(115deg,#573a71,#806095);border-color:#fff0b5}
+body.community-page #spelunkr-arcade-link{
+ display:flex;align-items:center;gap:12px;box-sizing:border-box;color:#fef4d8;
+ background:#281e36;border:2px solid #ddb773;border-radius:8px;padding:12px;
+ text-decoration:none;min-width:0;min-height:75px;
+}
+body.community-page #spelunkr-arcade-link:hover,body.community-page #spelunkr-arcade-link:focus-visible{background:#463159;border-color:#ffe4ae}
+body.community-page #spelunkr-arcade-link .arcade-program-name{min-width:0;flex:1}
+body.community-page #spelunkr-arcade-link .arcade-program-name strong{display:block;color:#fff0d0}
+body.community-page #spelunkr-arcade-link .arcade-program-name small{display:block;color:#f5dbf5}
+body.community-page #spelunkr-arcade-link .arcade-program-number,
+body.community-page #spelunkr-arcade-link .arcade-program-mark,
+body.community-page #spelunkr-arcade-link .arcade-program-state{flex:0 0 auto}
+@media(max-width:400px){
+ body.community-page #spelunkr-game-link .mahjong-entry-copy small{font-size:12px}
+ body.community-page #spelunkr-arcade-link{gap:7px;padding:9px}
+ body.community-page #spelunkr-arcade-link .arcade-program-state{font-size:11px}
+}
