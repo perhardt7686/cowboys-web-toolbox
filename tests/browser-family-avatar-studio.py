@@ -44,6 +44,7 @@ async def main():
                 # Test external TV link using the same class+DOM location that
                 # Drawing Studio injects during approved account mount.
                 await page.evaluate("""()=>{
+                    if(document.getElementById('drawing-studio-game-root'))return;
                     const main=document.querySelector('#conversations .community-main');
                     const drawing=document.createElement('section');
                     drawing.id='drawing-studio-game-root';
@@ -54,9 +55,11 @@ async def main():
                 assert await link.get_attribute('href')=='https://spelunkr.tv/?tv'
                 assert await link.get_attribute('target')=='_blank'
                 assert await link.get_attribute('rel')=='noopener noreferrer'
-                await page.wait_for_function("""()=>
-                    document.getElementById('spelunkr-game-link')?.previousElementSibling?.id
-                     ==='drawing-studio-game-root'""",timeout=10000)
+                await page.wait_for_function("""()=>{
+                    const link=document.getElementById('spelunkr-game-link');
+                    const drawing=document.getElementById('drawing-studio-game-root');
+                    return link&&drawing&&drawing.nextElementSibling===link;
+                }""",timeout=10000)
                 overflow=await page.evaluate('document.documentElement.scrollWidth-innerWidth')
                 assert overflow<=2,(width,'horizontal overflow',overflow)
                 assert not errors,(width,errors)
