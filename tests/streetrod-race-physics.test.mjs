@@ -120,3 +120,19 @@ test('Full road course reaches the 2.5-mile finish within race-trace storage lim
  assert.ok(m.distance>=13200,'Road race did not finish: '+Math.round(m.distance)+'ft');
  assert.ok(elapsed>=42000&&elapsed<240000,'Road trace would be rejected: '+elapsed+'ms');
 });
+
+test('Newly applied race RPC accepts recorded long shifts and reaction rather than fabricating quick shifts',async()=>{
+ const season=await readFile(new URL('../docs/commons-streetrod-summer.mjs',import.meta.url),'utf8');
+ assert.doesNotMatch(season,/p_launch_ms:300/);
+ assert.doesNotMatch(season,/\[3100,5500,9200\]/);
+ assert.match(season,/p_launch_ms:launch,p_shifts:shifts,p_trace:r\.trace/);
+ assert.match(season,/m\.shiftedAt\.length>r\.shifts\.length/);
+ assert.match(season,/while\(shifts\.length<3\)shifts\.push\(250000/);
+ const migration=await readFile(new URL('../supabase/migrations/20261114131126_streetrod_race_authentic_shift_and_launch_timing.sql',import.meta.url),'utf8');
+ for(const token of ['p_launch_ms>120000','p_shifts[1] NOT BETWEEN 500 AND 300000',
+  'p_shifts[3]>300000','community_streetrod_member()','SECURITY DEFINER',
+  "SET search_path TO 'pg_catalog', 'public'"]){
+  assert.ok(migration.includes(token),'Missing real-race safety or timing rule: '+token);
+ }
+ assert.doesNotMatch(migration,/DROP TABLE|TRUNCATE|DELETE FROM auth\.users|REVOKE EXECUTE/);
+});
