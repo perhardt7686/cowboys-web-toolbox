@@ -177,6 +177,8 @@ function displayRecord(){
  const host=$('ss-dos-pocket');if(!host)return;
  const now=room(),cards=activeCards();
  const openChallenge=host.querySelector('.ss-challenge-form');
+ const openTiming=host.querySelector('.ss-timing-bench');
+ const openTuneForm=host.querySelector('form[data-ss-form="tune"]');
  host.replaceChildren();
  const stage=$('ss-dos-stage');if(!stage)return;
  if(cards.length){
@@ -192,8 +194,10 @@ function displayRecord(){
   stripActions(source(),new Set(['refuel','repair','bumpers','roof']),quick,4);
   if(quick.childElementCount)host.append(quick);
  }else if(now==='tune'){
-  const dial=source()?.querySelector('.ss-timing-bench')?.cloneNode(true);
-  const form=source()?.querySelector('form[data-ss-form="tune"]')?.cloneNode(true);
+  // Move the REAL timing dial and saved form, preserving the one authoritative
+  // select input. Cloning them made the seven-step distributor misleading.
+  const dial=source()?.querySelector(':scope > .ss-timing-bench')||openTiming;
+  const form=source()?.querySelector(':scope > form[data-ss-form="tune"]')||openTuneForm;
   if(dial){dial.classList.add('ss-dos-timing');host.append(dial);}
   if(form){form.classList.add('ss-dos-tune-form');host.append(form);}
  }else if(now==='parts'){
