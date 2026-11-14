@@ -198,7 +198,7 @@ function updateScorePills(){
  const labels=active==='mahjong'?[['BEST',safe('mahjong-ribbon-mine')],['TOP',safe('mahjong-ribbon-record')]]:
    active==='plates'?[['LEAD',safe('plate-ribbon-lead')],['MINE',safe('plate-ribbon-mine')]]:
    active==='streetrod'?[['CREDITS',safe('ss-credits')||safe('sr-credits')],['WINS',safe('sr-wins')]]:
-   active==='wordle'?[['LEVEL',safe('arcade-passport-level')],['GUESS',safe('letter-lock-summary')]]]:
+   active==='wordle'?[['LEVEL',safe('arcade-passport-level')],['GUESS',safe('letter-lock-summary')]]:
    active==='wordquest'?[['MINE',safe('commons-word-my-points')],['TOP',safe('word-ribbon-record')]]:
    active==='study'?[['STUDY',safe('vdacs-study-summary')]]:[];
  const pills=labels.filter(x=>x[1]).slice(0,2);
