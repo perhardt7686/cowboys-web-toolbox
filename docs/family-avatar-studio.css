@@ -1,0 +1,58 @@
+/* Family Profile & Avatar Studio. Scoped to the members-only board. */
+body.community-page .content-dialog.profile-dialog{width:min(96vw,960px);max-width:960px;padding:clamp(18px,3vw,32px);max-height:92dvh;overflow-y:auto;border-radius:24px}
+body.community-page .profile-studio{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(255px,.82fr);gap:clamp(14px,2.5vw,28px);align-items:start;margin-top:14px}
+body.community-page .profile-studio .studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;margin:0 0 17px;border:1px solid #bd9bc7;border-radius:14px;background:#eee2f1}
+body.community-page .profile-studio .studio-tabs button{min-height:51px!important;padding:8px!important;white-space:normal;font-weight:800;border-radius:10px;color:#432b53!important;font-size:clamp(13px,2vw,15px)!important}
+body.community-page .profile-studio .studio-tabs button[aria-selected="true"]{background:#5b3272!important;color:#fff!important;box-shadow:0 3px 7px #2b113145}
+body.community-page .family-avatar-methods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0 17px}
+body.community-page .family-avatar-methods button{border:2px solid #a982bd;background:#fff9f1;color:#40294f;border-radius:13px;min-height:53px!important;font-weight:850;font-size:clamp(12px,2.5vw,15px)!important;padding:6px!important}
+body.community-page .family-avatar-methods button[aria-pressed="true"]{border-color:#5b3272;background:#5b3272;color:#fff;outline:2px solid #eed0a2;outline-offset:2px}
+body.community-page .family-character-editor{background:#fff7ee;border:2px solid #c7a1cc;border-radius:18px;padding:clamp(11px,2vw,18px);color:#39254e}
+body.community-page .family-character-top{display:grid;grid-template-columns:minmax(115px,180px) minmax(0,1fr);gap:14px;align-items:center}
+body.community-page .family-character-portrait{aspect-ratio:1;background:#eee2f1;border:4px solid #fff;outline:2px solid #ae83be;border-radius:22px;overflow:hidden;box-shadow:0 5px 16px #3020362e}
+body.community-page #family-avatar-canvas{width:100%;height:100%;display:block}
+body.community-page .family-character-intro h3{color:#382349;font-size:clamp(17px,3vw,22px);margin:0 0 5px}
+body.community-page .family-character-intro p{font-size:14px;line-height:1.5;margin:0 0 10px;color:#57475e}
+body.community-page .family-character-intro button{border-radius:11px;min-height:44px!important;font-size:14px!important}
+body.community-page .family-avatar-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 6px}
+body.community-page .family-avatar-field{border:1px solid #dbc6df;border-radius:13px;min-width:0;margin:0;padding:9px;background:#fffcf6}
+body.community-page .family-avatar-field legend{font-weight:850;color:#463050;font-size:14px;padding:0 5px}
+body.community-page .family-avatar-picks{display:flex;flex-wrap:wrap;gap:5px}
+body.community-page .family-avatar-choice{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px!important;padding:6px 8px!important;min-width:0;border:2px solid #dac7de;border-radius:10px;background:#fff9f3;color:#3c2a49!important;font-size:13px!important;font-weight:800;cursor:pointer}
+body.community-page .family-avatar-choice[aria-pressed="true"]{border-color:#4c2772;background:#ecdef6;box-shadow:inset 0 0 0 1px #4c2772}
+body.community-page .family-avatar-color{width:21px;height:21px;border-radius:50%;border:1px solid #34254255;flex:0 0 21px}
+body.community-page .family-avatar-help{font-size:13px;margin:14px 0 0;color:#5b4b60;line-height:1.5}
+body.community-page .family-avatar-pane[hidden],body.community-page .family-avatar-method-panel[hidden]{display:none!important}
+body.community-page .profile-studio .studio-preview{position:sticky;top:0;max-height:65dvh;overflow:auto}
+body.community-page .profile-studio .studio-preview .member-card{box-shadow:0 5px 19px #26103228}
+body.community-page .profile-studio .profile-save-area{margin-top:15px;padding-top:13px}
+body.community-page .profile-studio .profile-save-area button[type="submit"]{width:100%;min-height:52px;background:#5b3272;color:#fff;border-radius:13px;font-size:17px;font-weight:850}
+body.community-page .family-photo-tip{font-size:13px;line-height:1.5;color:#5a475d}
+body.community-page .profile-studio .avatar-modes{display:none}
+body.community-page #family-avatar-quick{display:grid;place-items:center;width:56px;height:56px;padding:5px;border:2px solid #e2b87d;border-radius:18px;background:linear-gradient(135deg,#f1d9ef,#c6a4e2);color:#362245;cursor:pointer;box-shadow:0 4px 12px #0005}
+body.community-page #family-avatar-quick .avatar{display:grid;place-items:center;margin:0;width:43px;height:43px;flex:0 0 43px;border:2px solid #fff8ed;border-radius:50%;overflow:hidden;font-size:20px}
+body.community-page #family-avatar-quick img{width:100%;height:100%;object-fit:cover}
+body.community-page #family-avatar-quick:focus-visible{outline:3px solid #fff0ce;outline-offset:4px}
+body.community-page .cowboy-site-nav{display:flex;align-items:center;gap:9px}
+body.community-page .profile-studio .avatar-method-pane:not([hidden]){display:block}
+body.community-page .family-account-privacy{padding:12px 15px;background:#f9f1e7;border:1px solid #debc9f;border-radius:14px;line-height:1.5}
+body.community-page .family-avatar-summary{font-weight:750;font-size:14px;color:#4b3655;margin:8px 0 10px}
+@media(max-width:720px){
+ body.community-page .profile-studio{display:flex;flex-direction:column-reverse}
+ body.community-page .profile-studio .studio-preview{position:relative;width:100%;max-height:none}
+ body.community-page .profile-studio>.profile-form-column{width:100%;min-width:0}
+ body.community-page .profile-studio .studio-preview .member-card{display:none}
+ body.community-page .profile-studio .studio-preview .preview-caption{display:none}
+ body.community-page .profile-studio .studio-preview #profile-completion{display:none}
+ body.community-page .profile-studio .studio-preview #profile-meter{display:none}
+ body.community-page .profile-studio .studio-preview>.privacy-notice{display:none}
+ body.community-page .family-avatar-fields{grid-template-columns:1fr}
+ body.community-page .family-character-top{grid-template-columns:120px minmax(0,1fr)}
+ body.community-page #family-avatar-quick{width:50px;height:50px;border-radius:15px}
+ body.community-page #family-avatar-quick .avatar{width:38px;height:38px}
+ body.community-page .cowboy-site-nav{gap:6px}
+ body.community-page .cowboy-nav-toggle{width:54px;height:54px}
+ body.community-page .cowboy-nav-heading strong{font-size:clamp(17px,4.7vw,22px)}
+}
+@media(max-width:380px){body.community-page .family-character-top{grid-template-columns:100px minmax(0,1fr)}body.community-page .family-avatar-methods button{font-size:11px!important}body.community-page .masthead .brand{display:none}}
+@media(prefers-reduced-motion:reduce){body.community-page .family-avatar-choice,body.community-page #family-avatar-quick{transition:none!important;animation:none!important}}
