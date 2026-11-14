@@ -1,0 +1,51 @@
+/* Shared Toolbox + Commons navigation. Scoped to both page types; no game canvas changes. */
+body.cowboy-nav-ready .masthead{z-index:90;background:#110b20f8;border-bottom:1px solid #76568c;box-shadow:0 8px 28px #06030b99}
+body.cowboy-nav-ready .masthead .header-inner{height:auto;min-height:88px;padding-block:12px;display:flex;gap:clamp(9px,1.6vw,20px);align-items:center}
+body.cowboy-nav-ready .masthead .header-inner > nav[aria-label="Main navigation"]{display:none!important}
+body.cowboy-nav-ready .masthead .brand{flex:0 0 auto;min-width:0}
+body.cowboy-nav-ready .cowboy-nav-heading{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px;line-height:1.15}
+body.cowboy-nav-ready .cowboy-nav-heading strong{display:block;font-size:clamp(19px,2.5vw,30px);font-weight:850;letter-spacing:-.025em;color:#fff7e9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.cowboy-nav-ready .cowboy-nav-heading small{display:block;font-size:clamp(11px,1.25vw,15px);font-weight:620;color:#d8bee8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.cowboy-nav-ready .cowboy-site-nav{flex:0 0 auto;position:relative;z-index:100}
+body.cowboy-nav-ready .cowboy-nav-toggle{width:60px;height:60px;border:2px solid #c987e8;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:linear-gradient(145deg,#683d85,#2b173f);color:#fff0d3;box-shadow:inset 0 1px 0 #ffffff55,0 4px 13px #0009;cursor:pointer;padding:0}
+body.cowboy-nav-ready .cowboy-nav-toggle > span{display:block;width:27px;height:3px;background:currentColor;border-radius:99px;transition:transform .16s ease,opacity .16s ease}
+body.cowboy-nav-ready .cowboy-nav-toggle[aria-expanded="true"] > span:first-child{transform:translateY(10px) rotate(45deg)}
+body.cowboy-nav-ready .cowboy-nav-toggle[aria-expanded="true"] > span:nth-child(2){opacity:0}
+body.cowboy-nav-ready .cowboy-nav-toggle[aria-expanded="true"] > span:last-child{transform:translateY(-10px) rotate(-45deg)}
+body.cowboy-nav-ready .cowboy-nav-toggle:focus-visible,
+body.cowboy-nav-ready .cowboy-nav-panel :is(a,button,select):focus-visible{outline:3px solid #fff0cb;outline-offset:3px}
+body.cowboy-nav-ready .cowboy-nav-panel{position:absolute;right:0;top:calc(100% + 15px);width:min(342px,calc(100vw - 24px));max-height:min(76dvh,690px);overflow-y:auto;overscroll-behavior:contain;border:2px solid #d79aec;border-radius:24px;background:linear-gradient(155deg,#402452 0%,#251332 70%,#1a0e28 100%);box-shadow:0 16px 45px #000c, inset 0 1px 0 #ffffff35;color:#fff3e5;padding:12px;scrollbar-color:#b78bd0 #271636}
+body.cowboy-nav-ready .cowboy-nav-panel[hidden]{display:none!important}
+body.cowboy-nav-ready .cowboy-nav-panel::before{content:"";position:absolute;top:0;right:22px;width:15px;height:3px;background:#eed0ff;border-radius:4px}
+body.cowboy-nav-ready .cowboy-nav-panel-title{display:block;font-weight:850;font-size:15px;letter-spacing:.07em;text-transform:uppercase;color:#ffedca;padding:9px 11px 12px}
+body.cowboy-nav-ready .cowboy-nav-section-label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#e3c7ef;font-weight:850;margin:12px 8px 5px;padding:7px 7px 3px;border-top:1px solid #ffffff37}
+body.cowboy-nav-ready .cowboy-nav-item{display:flex;align-items:center;width:100%;min-height:50px;gap:12px;border:0;border-radius:12px;background:transparent;color:#fff7ec!important;padding:10px 12px;text-decoration:none!important;text-align:left;font:700 16px/1.25 system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer}
+body.cowboy-nav-ready .cowboy-nav-item:hover,body.cowboy-nav-ready .cowboy-nav-item:focus-visible{background:#785092;color:#fff!important}
+body.cowboy-nav-ready .cowboy-nav-item[aria-current="page"]{background:#644376}
+body.cowboy-nav-ready .cowboy-nav-item svg{width:24px;height:24px;flex:0 0 24px;color:#ffe8b8;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.cowboy-nav-ready .cowboy-nav-item + .cowboy-nav-item{border-top:1px solid #f6dfff1e}
+body.cowboy-nav-ready .cowboy-menu-utility{border-top:1px solid #f6dfff42;margin:12px 3px 0;padding:12px 7px 6px;display:grid;gap:10px}
+body.cowboy-nav-ready .cowboy-menu-utility:empty{display:none}
+body.cowboy-nav-ready .cowboy-menu-utility .language-control{display:flex!important;align-items:center;gap:10px;color:#fff3e5;max-width:100%;margin:0}
+body.cowboy-nav-ready .cowboy-menu-utility .language-control select{max-width:170px;min-height:42px}
+body.cowboy-nav-ready .cowboy-menu-utility .public-label{display:inline-flex!important;align-items:center;color:#f2dffb;margin:0;font-size:12px}
+body.cowboy-nav-ready .cowboy-menu-utility #account-actions{display:flex!important;flex-wrap:wrap;gap:9px;margin:0;width:100%;justify-content:flex-start}
+body.cowboy-nav-ready .cowboy-menu-utility #account-actions button{min-height:42px;white-space:normal;font-size:14px}
+body.cowboy-nav-ready .cowboy-menu-utility #account-actions a{color:#fff0d3}
+body.cowboy-nav-ready .cowboy-nav-note{display:block;font-size:12px;line-height:1.45;color:#d3bddc;padding:10px 12px 3px}
+@media(max-width:760px){
+ body.cowboy-nav-ready .masthead .header-inner{min-height:82px;padding-block:10px}
+ body.cowboy-nav-ready .masthead .brand>span:not(.brand-symbol){display:none!important}
+ body.cowboy-nav-ready .masthead .brand,.cowboy-nav-ready .masthead .brand-symbol{width:49px;min-width:49px}
+ body.cowboy-nav-ready .masthead .brand-symbol,body.cowboy-nav-ready .masthead .brand-symbol img{width:49px;height:49px}
+ body.cowboy-nav-ready .cowboy-nav-toggle{width:56px;height:56px;border-radius:18px}
+ body.cowboy-nav-ready .cowboy-nav-heading strong{font-size:clamp(19px,5.1vw,24px)}
+ body.cowboy-nav-ready .cowboy-nav-heading small{font-size:clamp(11px,3.1vw,13px)}
+}
+@media(max-width:360px){
+ body.cowboy-nav-ready .masthead .header-inner{gap:8px}
+ body.cowboy-nav-ready .cowboy-nav-heading small{font-size:11px}
+ body.cowboy-nav-ready .cowboy-nav-toggle{width:52px;height:52px}
+}
+@media(prefers-reduced-motion:reduce){body.cowboy-nav-ready .cowboy-nav-toggle > span{transition:none}}
+/* Games, including Street Rod, retain their own full-screen HUD; this is site navigation only. */
