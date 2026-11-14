@@ -82,7 +82,7 @@ function roomHtml(room){
   '<button data-ss-action="workshop">Open workbench</button>'+
   '<button data-ss-action="service_cancel">Cancel job</button></section>';
  if(room==='diner')return '<div class="ss-rivals">'+['The Rookie','Blackjack','The King','Cipher Van X'].map((n,i)=>
-  '<article class="ss-rival"><strong>'+n+'</strong><button data-ss-action="choose_rival" data-rival="'+(i===3?'cipher':'r'+i)+'">Call out</button></article>').join('')+'</div>';
+  '<article class="ss-rival" data-rival-key="'+(i===3?'cipher':'r'+i)+'"><strong>'+n+'</strong><button data-ss-action="choose_rival" data-rival="'+(i===3?'cipher':'r'+i)+'">Call out</button></article>').join('')+'</div>';
  if(room==='drive')return '<div class="ss-cockpit"><canvas width="960" height="340" id="ss-race-canvas"></canvas><div id="ss-start-lights">GREEN</div></div>'+
  '<div class="ss-drive-metrics"><div><strong id="ss-speed">64 mph</strong></div><div><strong id="ss-rpm">3400</strong></div><div><strong id="ss-gear">3</strong></div><div><strong id="ss-distance">25%</strong></div></div>'+
  '<div class="ss-drive-controls"><button data-ss-hold="left">STEER LEFT</button><button data-ss-hold="right">STEER RIGHT</button><button data-ss-hold="gas">GAS</button><button data-ss-hold="brake">BRAKE</button><button data-ss-action="shift">SHIFT UP</button><button data-ss-action="downshift">SHIFT DOWN</button></div>'+
