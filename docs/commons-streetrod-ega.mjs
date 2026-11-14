@@ -308,7 +308,8 @@ window.COWBOY_STREETROD_PAINT=function(canvas,scene='garage',options={}){
   scene==='tune'||scene==='hood'?'engine':scene==='drive'?'dash':
   scene==='calendar'?'calendar':scene==='gearbox'?'gearbox':scene;
  const render={garage,diner,engine,newspaper,gas,dash,parts:partsSheet,calendar:vintageCalendar,gearbox};
- (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
+ if(kind==='dash')dash(ctx,options);
+ else (render[kind]||garage)(ctx,options.carKey||'rattler',options.body||'coupe');
  // Original palette and proportions, but never copied asset pixels.
  if(options.label&&['garage','diner'].includes(kind)){
   box(ctx,12,172,Math.min(270,String(options.label).length*6+10),11,0);
