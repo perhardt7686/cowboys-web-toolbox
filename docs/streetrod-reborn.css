@@ -378,3 +378,80 @@ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-co
   transition:none!important;animation:none!important
  }
 }
+
+/* Road controls: distinguish physical gearbox selection from the abort action. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-drive-mode{
+ display:flex!important;justify-content:center!important;gap:4px!important;
+ min-height:33px!important;max-height:42px!important;margin:0!important;padding:0!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #sr-reborn .sr-v3-drive-mode button{
+ width:100%!important;max-width:100%!important;min-height:34px!important;
+ background:#244b3a!important;color:#ffff55!important
+}
+/* Real saved wrench work: one assembly, visible bolts, arrow pager, no scrolling. */
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-assembly-pager{
+ display:grid!important;grid-template-columns:52px minmax(0,1fr) 52px!important;
+ align-items:center!important;flex:0 0 48px!important;min-height:48px!important;
+ gap:5px!important;padding:2px!important;margin:0!important;
+ background:#05051b!important;border:2px ridge #999!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-assembly-pager button{
+ display:grid!important;place-items:center!important;min-width:0!important;
+ min-height:42px!important;height:42px!important;margin:0!important;
+ border:2px outset #aaa!important;border-radius:0!important;
+ padding:2px!important;background:#0000aa!important;color:#fff!important;
+ font:bold 18px/1 monospace!important;touch-action:manipulation!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-assembly-pager output{
+ overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+ color:#ffff55!important;font:bold clamp(11px,3.3vw,15px)/1.2 monospace!important;
+ text-align:center!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-components>.ssb-component:not(.ssb-current-assembly){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-components>.ssb-current-assembly{
+ display:flex!important;flex-direction:column!important;gap:4px!important;
+ flex:1 1 auto!important;min-height:0!important;height:100%!important;
+ max-height:100%!important;margin:0!important;padding:5px!important;
+ overflow:hidden!important;justify-content:space-between!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-current-assembly .ssb-bolts{
+ display:flex!important;flex-wrap:wrap!important;gap:8px!important;
+ align-content:center!important;justify-content:space-evenly!important;
+ flex:1 1 auto!important;min-height:0!important;max-height:100%!important;
+ overflow:hidden!important;margin:0!important;padding:4px!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-current-assembly .ssb-bolts button{
+ width:clamp(54px,18vw,82px)!important;height:clamp(54px,11dvh,83px)!important;
+ min-width:54px!important;min-height:48px!important;max-height:100%!important;
+ border:3px ridge #d7af58!important;border-radius:12px!important;
+ padding:4px!important;touch-action:none!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-current-assembly .ssb-component-controls{
+ display:flex!important;flex-wrap:wrap!important;gap:4px!important;
+ align-items:center!important;justify-content:center!important;
+ flex:0 0 auto!important;max-height:110px!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-current-assembly .ssb-component-controls button{
+ min-height:37px!important;max-width:48%!important;padding:3px 7px!important;
+ margin:0!important;font:800 clamp(9px,2.6vw,12px)/1.12 monospace!important
+}
+body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-mechanical-art{
+ max-height:13dvh!important;min-height:0!important
+}
+@media(orientation:landscape) and (max-height:550px){
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-mechanical-art,
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-torque-guide{
+  display:none!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-assembly-pager{
+  flex-basis:35px!important;min-height:35px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-assembly-pager button{
+  min-height:31px!important;height:31px!important
+ }
+ body.community-page.arcade-on[data-arcade-game=streetrod] #ss-season-bay .ssb-current-assembly .ssb-bolts button{
+  width:clamp(44px,9vw,63px)!important;height:clamp(44px,13dvh,62px)!important
+ }
+}
