@@ -155,6 +155,15 @@ function prepareDrawing(){
   control.setAttribute('aria-expanded',String(open));
   control.textContent=open?'CLOSE OPTIONS ✕':'TOOLS / LAYERS ⚙';
  });
+ const canvas=$('commons-art-canvas');
+ const fit=()=>{
+  if(!viewport.isConnected||viewport.clientWidth<90||viewport.clientHeight<90)return;
+  if($('art-zoom')?.value!=='1')return;
+  const w=Math.floor(Math.min(viewport.clientWidth-8,(viewport.clientHeight-8)*1000/640));
+  canvas.style.width=Math.max(100,w)+'px';canvas.style.height='auto';
+ };
+ if('ResizeObserver' in window)new ResizeObserver(fit).observe(viewport);
+ requestAnimationFrame(fit);
 }
 function launch(id){
  const g=game(id);if(!g||!menu||!available(g))return;
