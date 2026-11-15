@@ -3,7 +3,7 @@ import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './av
 import {normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=cel1';
 
 import {prizeAction} from './avatar-prize-actions.mjs?v=cel1';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=cel1';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=cel2';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
@@ -115,7 +115,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   const reduceAnimation=()=>Boolean(reduceMotion?.()||document.body.classList.contains('forum-reduce-motion'));
   const pets=createPetStudio({
     rpc,catalog,have,unlocksKnown:()=>Boolean(data),checkError:()=>loadError,
-    openReward:item=>setSection('collection',item.id),tryOn,reduceMotion:reduceAnimation,
+    openReward:item=>setSection('collection',item.id),
+    tryOn(item){tryOn(item);setSection('avatar');},
+    reduceMotion:reduceAnimation,
     isOpen:()=>contains()&&section==='pets'&&Boolean(pane?.getClientRects().length)
   });
 
@@ -151,7 +153,11 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     if(section==='pets')pets.showPet(id);
     if(contains()){
       draw();
-      if(detail)focusDetail();
+      if(section==='pets'&&detail){
+        requestAnimationFrame(()=>{
+          if(contains()&&section==='pets')results?.querySelector('select')?.focus({preventScroll:true});
+        });
+      }else if(detail)focusDetail();
     }
   }
 
@@ -459,6 +465,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function draw(){
     if(!contains())return;
+    editor.dataset.rewardView=section;
     editor.classList.toggle('reward-browsing',section!=='avatar');
     editor.querySelector('.family-avatar-fields').hidden=section!=='avatar';
     editor.querySelector('#avatar-outfits').hidden=section!=='avatar';
@@ -488,7 +495,8 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       const next=asButton(label,()=>setSection(key));
       next.dataset.rewardSection=key;tabs.append(next);
     }
-    editor.prepend(tabs);pane.append(filters,results);editor.append(pane);
+    editor.prepend(tabs);pane.append(filters,results);
+    editor.insertBefore(pane,editor.querySelector('#avatar-equipped'));
     privateControls=root.querySelector('.family-avatar-methods');
     section=nextSection;detail=item;
     if(section==='pets')pets.showPet(item);
