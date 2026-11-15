@@ -97,10 +97,12 @@ async def run_one(browser,width,height):
   await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world')")
   assert 'Volcanic Foundry' in await page.locator('#dash-builder-help').inner_text()
   assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world' && x.args.p_world==='Volcanic Foundry' && x.args.p_boss_style==='volcanic')")
+  await page.wait_for_function("document.querySelector('#dash-editor-save-state')?.textContent.includes('DRAFT SAVED')",timeout=10000)
   # A one-tap playtest saves current edits first, starts the exact draft and returns to editor.
   await page.locator('#dash-editor-grid [data-dash-cell="10"]').click()
   await page.locator('[data-dash-action="test"]').click()
   await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_save_world').length>=2")
+  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_start' && x.args.p_level_id===100)",timeout=10000)
   await page.locator('#dash-play-overlay').wait_for(state='visible',timeout=10000)
   assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_start' && x.args.p_level_id===100)")
   assert 'BACK TO LEVEL CREATOR' in await page.locator('[data-dash-action="leave"]').inner_text()
