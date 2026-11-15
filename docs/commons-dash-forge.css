@@ -214,3 +214,52 @@ body.community-page #dash-forge-root .dash-playing-head{flex-wrap:wrap}
 body.community-page #dash-forge-root #dash-sound{min-width:94px;min-height:40px!important;background:#223455!important;border-color:#70bfdf!important;color:#e2faff!important;white-space:nowrap}
 body.community-page #dash-forge-root #dash-sound[aria-pressed=true]{background:#105b57!important;color:#adfff4!important;border-color:#74ffd7!important}
 @media(max-width:400px){body.community-page #dash-forge-root .dash-playing-head{gap:3px}body.community-page #dash-forge-root #dash-sound{min-width:76px;padding:4px!important;font-size:11px!important}}
+
+/* Boss Creator: scenery selection, unique enemy identity and visible preview. */
+body.community-page #dash-forge-root .dash-builder-form{
+ grid-template-columns:minmax(160px,2fr) repeat(2,minmax(85px,1fr));
+}
+body.community-page #dash-forge-root .dash-builder-form label:has(#dash-world){
+ grid-column:span 2;min-width:0
+}
+body.community-page #dash-forge-root .dash-builder-form label:has(#dash-boss-style){grid-column:span 1}
+body.community-page #dash-forge-root #dash-boss-style{
+ background:#efe2ff;border-color:#e5a3ff;color:#321a48;
+}
+body.community-page #dash-forge-root .dash-builder-preview{
+ display:grid;gap:5px;justify-items:center;min-width:0;max-width:680px;
+ margin:7px 0 11px;padding:9px;border:2px solid #8db8ef;border-radius:12px;
+ background:linear-gradient(140deg,#131c40,#32204b)
+}
+body.community-page #dash-forge-root .dash-builder-preview canvas{
+ display:block;width:100%;max-width:600px;height:auto;
+ aspect-ratio:120/29;object-fit:contain;border:2px solid #5d6299;
+ border-radius:4px;image-rendering:pixelated
+}
+body.community-page #dash-forge-root .dash-builder-preview small{
+ color:#c9ecff;font:900 10px/1.25 system-ui;letter-spacing:.05em;text-align:center
+}
+body.community-page #dash-forge-root .dash-phase-guide{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;
+ max-width:860px;margin:7px 0
+}
+body.community-page #dash-forge-root .dash-phase-guide>span{
+ padding:7px 5px;border-radius:7px;text-align:center;
+ border:1px solid #7f69af;background:#29234d;color:#edebfc;
+ font:850 clamp(10px,1.45vw,13px)/1.2 system-ui
+}
+body.community-page #dash-forge-root .dash-phase-guide>span:nth-child(1){border-color:#70f4dd}
+body.community-page #dash-forge-root .dash-phase-guide>span:nth-child(2){border-color:#ffe085}
+body.community-page #dash-forge-root .dash-phase-guide>span:nth-child(3){border-color:#ff96c1}
+@media(max-width:680px){
+ body.community-page #dash-forge-root .dash-builder-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.community-page #dash-forge-root .dash-builder-form label:first-child{grid-column:1/-1}
+ body.community-page #dash-forge-root .dash-builder-form label:has(#dash-world){grid-column:1/-1}
+ body.community-page #dash-forge-root .dash-builder-form label:has(#dash-boss-style){grid-column:1/-1}
+ body.community-page #dash-forge-root .dash-builder-preview{padding:4px}
+}
+@media(orientation:landscape) and (max-height:550px){
+ body.community-page #dash-forge-root .dash-builder-preview{padding:3px}
+ body.community-page #dash-forge-root .dash-builder-preview canvas{max-height:72px}
+ body.community-page #dash-forge-root .dash-builder-form{gap:4px;margin:4px 0}
+}
