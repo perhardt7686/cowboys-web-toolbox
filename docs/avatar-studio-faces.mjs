@@ -243,6 +243,31 @@ function noseAndMouth(head,v,tone,palette){
     [.036,-.195,.150]],.0037,14);
 }
 
+// Model the beard against the same six jaw cross-sections used for its ink.
+// The former hard-coded strokes projected off the hair surface at side angles;
+// the upper front ring also folded below the preceding ring near the mouth.
+export function beardJawSections(width=1,jaw=1){
+  return [
+    [-.286,.070,.070,0,.049],
+    [-.278,.123*jaw*width,.112,0,.050],
+    [-.249,.151*jaw*width,.139,0,.041],
+    [-.218,.174*jaw*width,.148,0,.033],
+    [-.179,.194*width,.158,0,.028],
+    [-.135,.210*width,.172,0,.018]
+  ];
+}
+export function beardJawPoint(rings,index,angle,offset=0){
+  const [height,width,depth,cx=0,cz=0]=rings[index];
+  // A narrow lowered lip lets the mouth stay visible without folding the
+  // upper beard ring into the lower one, including at strict profile.
+  const cheekRise=Math.pow(Math.abs(Math.sin(angle)),2.3)*index*.014;
+  const mouthClearance=index===rings.length-1
+    ?.042*Math.pow(Math.max(0,Math.cos(angle)),3):0;
+  return [cx+width*Math.sin(angle),
+    height+cheekRise-mouthClearance,
+    cz+depth*Math.cos(angle)+offset];
+}
+
 function introduceBeard(head,v,palette,w,jaw){
   if(v.beard==='none')return;
   const hair=surface(shade(palette.hair,v.beard==='stubble'?1.24:.81));
@@ -270,20 +295,24 @@ function introduceBeard(head,v,palette,w,jaw){
     stroke(head,light,[[-.025,-.211,.192],[-.010,-.238,.194],[.010,-.252,.177]],.003);
     return;
   }
-  const chin=shell(head,hair,[
-    [-.286,.07,.070,0,.049],[-.278,.123*jaw*w,.112,0,.050],
-    [-.249,.151*jaw*w,.139,0,.041],[-.218,.174*jaw*w,.148,0,.033],
-    [-.179,.194*jaw*w,.158,0,.028],[-.135,.210*w,.172,0,.018]
-  ], {start:-1.68,end:1.68,segments:30,warp([x,y,z],a,i){
-    const side=Math.pow(Math.abs(Math.sin(a)),2.3);
-    return [x,y+side*i*.014-(i===5?.061*Math.max(0,Math.cos(a))**3:0),z];
-  }});
+  const rings=beardJawSections(w,jaw);
+  const chin=shell(head,hair,rings,{
+    start:-1.68,end:1.68,segments:40,
+    warp(point,angle,index){return beardJawPoint(rings,index,angle);}
+  });
   chin.material.side=THREE.DoubleSide;
+  chin.userData.studioPart='fitted-beard';
   for(const s of [-1,1]){
-    stroke(head,edge,[[s*.199*w,-.062,.115],[s*.174*w,-.136,.149],
-      [s*.117*jaw*w,-.173,.170],[s*.065*jaw*w,-.193,.195]],.0047);
-    stroke(head,light,[[s*.188*w,-.094,.116],[s*.161*w,-.176,.151],
-      [s*.115*jaw*w,-.233,.167],[s*.035*jaw*w,-.265,.165]],.005);
+    // Each ink point is sampled from the actual beard shell, not guessed from
+    // a front-view silhouette. The same contour stays attached at 90 degrees.
+    const outer=[[5,1.31],[4,1.32],[3,1.22],[2,.86],[1,.35]]
+      .map(([ring,angle])=>beardJawPoint(rings,ring,s*angle,.004));
+    const inner=[[5,1.08],[4,.99],[3,.77],[2,.54],[1,.24]]
+      .map(([ring,angle])=>beardJawPoint(rings,ring,s*angle,.006));
+    const outline=stroke(head,edge,outer,.0047,24);
+    const shine=stroke(head,light,inner,.0035,24);
+    outline.userData.studioPart='fitted-beard-ink';
+    shine.userData.studioPart='fitted-beard-ink';
   }
 }
 
