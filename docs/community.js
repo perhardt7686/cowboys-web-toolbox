@@ -1,5 +1,5 @@
 import {CATEGORIES,RULES_VERSION,escapeHTML as esc,renderBody,initials,displayName,validatePost,edwardReply,canPost,safeHttps,reviewContent} from './community-core.mjs';
-import {createProfileStudio} from './community-profiles.mjs?v=studio2';
+import {createProfileStudio} from './community-profiles.mjs?v=studio3';
 import {createOwnerCenter} from './community-owner.mjs?v=lab1-core1';
 import {PROFILE_DEFAULTS} from './profile-core.mjs?v=powers1';
 import {createPowerHouse} from './community-powers.mjs?v=private1';
@@ -66,7 +66,7 @@ function renderBoardAccess(){
       const host=$('family-overview');
       if(host&&!host.childNodes.length){
         const id=state.member.user_id;
-        void import('./avatar-reward-studio.mjs?v=studio2').then(({makeAvatarShowcase})=>{
+        void import('./avatar-reward-studio.mjs?v=studio3').then(({makeAvatarShowcase})=>{
           if(!canReadBoard(state.member)||state.member.user_id!==id||host.childNodes.length)return;
           host.hidden=false;
           host.append(makeAvatarShowcase(item=>void showProfile('avatar',{section:'collection',item})));

@@ -1,4 +1,4 @@
-import {STAGE_WIDTH as W,STAGE_HEIGHT as H,projectTurn,wrapAngle} from './avatar-full-body.mjs?v=studio2';
+import {STAGE_WIDTH as W,STAGE_HEIGHT as H,projectTurn,wrapAngle} from './avatar-full-body.mjs?v=studio3';
 
 export function turntableHTML({editor=false}={}){
   return '<div class="avatar-turntable" data-avatar-turntable>'+

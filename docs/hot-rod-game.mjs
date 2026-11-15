@@ -1,6 +1,6 @@
 import {button as makeButton, el, preference} from './family-board-core.mjs?v=family3';
 import {getAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
-import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=turn1';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=studio3';
 import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, makeCar, matches, repairCost, roadProblem, saleValue} from './hot-rod-campaign.mjs';
 import {BOLTS, CAR_LIST, CARS, COLORS, DOLLARS, FUEL_TANK, MAKES, PART_LIST, PARTS, RIVALS,
   SLOT_NAMES, SLOTS, WAGERS, WHEELS, fullBolts, isWheel} from './hot-rod-catalog.mjs';

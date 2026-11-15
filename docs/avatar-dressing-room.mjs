@@ -1,9 +1,11 @@
-import {THREE,attach,box,color,disposeFigure,group,hash,oval,picture,shade,shell,surface} from './avatar-studio-geometry.mjs?v=studio2';
-import {buildAvatar} from './avatar-studio-character.mjs?v=studio2';
-import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio2';
-import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=studio2';
-import {normalizeLoadout} from './avatar-reward-render.mjs?v=studio2';
-import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=studio2';
+import {THREE,attach,color,disposeFigure,group,hash,picture,shade,surface} from './avatar-studio-geometry.mjs?v=studio3';
+import {buildAvatar} from './avatar-studio-character.mjs?v=studio3';
+import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
+import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=studio3';
+import {normalizeLoadout} from './avatar-reward-render.mjs?v=studio3';
+import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=studio3';
+import {createInkLayer,drawInkedRoom} from './avatar-studio-ink.mjs?v=studio3';
+import {poseStudioAction} from './avatar-studio-actions.mjs?v=studio3';
 
 const PALETTES={
   lavender:['#9baec6','#63778d','#50596d'],night:['#6d7995','#454963','#30354a'],
@@ -29,6 +31,26 @@ function clothBackground(palette,theme=''){
   const wash=g.createRadialGradient(395,236,30,406,335,610);
   wash.addColorStop(0,shine);wash.addColorStop(.66,mid);wash.addColorStop(1,low);
   g.fillStyle=wash;g.fillRect(0,0,768,768);
+  g.fillStyle='#17192d24';
+  g.beginPath();
+  g.moveTo(0,492);g.bezierCurveTo(191,481,260,528,422,489);
+  g.bezierCurveTo(540,458,657,474,768,445);g.lineTo(768,768);
+  g.lineTo(0,768);g.fill();
+  g.strokeStyle='#e9f1f21c';g.lineWidth=2;
+  for(let i=0;i<6;i++){
+    const y=560+i*(9+i*2);
+    g.beginPath();g.moveTo(0,y);g.quadraticCurveTo(405,y+49,768,y-19);g.stroke();
+  }
+  const skyline=theme==='night'||theme==='moss';
+  if(skyline){
+    g.fillStyle='#191d331b';
+    for(let i=0;i<15;i++){
+      const x=i*54,top=366+(i*61%104);
+      g.fillRect(x,top,39,505-top);
+      g.beginPath();g.moveTo(x-6,top);g.lineTo(x+20,top-26);
+      g.lineTo(x+46,top);g.fill();
+    }
+  }
   g.strokeStyle='#e9f4f527';g.lineWidth=1.6;
   for(let i=0;i<3;i++){
     const x=187+i*66;
@@ -81,19 +103,16 @@ function initialize(){
     if(context){
       renderer=new THREE.WebGLRenderer({canvas,context,alpha:false,antialias:true});
       renderer.outputColorSpace=THREE.SRGBColorSpace;
-      renderer.toneMapping=THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure=1.10;
+      renderer.toneMapping=THREE.NoToneMapping;
     }
   }catch{renderer=null;}
   try{
     const scene=new THREE.Scene();
     const camera=new THREE.OrthographicCamera(-1.3,1.3,1.8,-1.8,.05,50);
-    scene.add(new THREE.HemisphereLight('#f1eaff','#a4a1ba',2.05));
-    const key=new THREE.DirectionalLight('#ffe8d7',3.20);
+    scene.add(new THREE.HemisphereLight('#ffede3','#b2b4cf',1.68));
+    const key=new THREE.DirectionalLight('#fff0d8',2.34);
     key.position.set(-3.2,5.2,4.2);scene.add(key);
-    const fill=new THREE.DirectionalLight('#bdddea',1.32);
-    fill.position.set(4,1.9,3.8);scene.add(fill);
-    const rim=new THREE.DirectionalLight('#dce5ff',2.65);
+    const rim=new THREE.DirectionalLight('#c9d8f5',.62);
     rim.position.set(.6,3.2,-3.3);scene.add(rim);
     const base=group(scene);
     const ballast=surface('#5b6480',{roughness:.71,metalness:.21});
@@ -109,7 +128,8 @@ function initialize(){
     const petSpot=picture(base,shadow,.897,.009,.235,.62,.52);petSpot.rotation.x=-Math.PI/2;
     const floor=picture(base,shadow,0,-.169,.09,3.85,2.77);floor.rotation.x=-Math.PI/2;
     const aura=new THREE.PointLight('#ffd383',0,2.4,1.55);scene.add(aura);
-    runtime={renderer,scene,camera,base,deck,alloy,petSpot,aura};
+    const ink=renderer?createInkLayer():null;
+    runtime={renderer,scene,camera,base,deck,alloy,petSpot,aura,ink};
   }catch{runtime=null;}
   return runtime;
 }
@@ -169,10 +189,10 @@ function draw(canvas,state,viewOptions,background,surfaceColor,platform=true){
   cameraFor(active.camera,width,height,viewOptions);
   if(hardware){
     if(renderer.domElement.width!==width||renderer.domElement.height!==height)renderer.setSize(width,height,false);
-    renderer.render(active.scene,active.camera);
+    drawInkedRoom(renderer,active.ink,active.scene,active.camera,state.actor.root,active.base,width,height);
     screen.clearRect(0,0,width,height);
     screen.drawImage(renderer.domElement,0,0,width,height);
-  }else renderSoftwareRoom(canvas,active.scene,active.camera);
+  }else renderSoftwareRoom(canvas,active.scene,active.camera,state.actor.root,active.aura);
   canvas.dataset.renderer='3d';
   canvas.dataset.backend=hardware?'webgl':'canvas';
   state.camera=viewOptions;
@@ -186,67 +206,6 @@ function paletteFor(recipe,backdrop){
   return [color(neutral[0]).lerp(color(motif),.63).getStyle(),
     color(neutral[1]).lerp(shade(motif,.74),.53).getStyle(),
     color(neutral[2]).lerp(shade(motif,.45),.48).getStyle()];
-}
-
-function handleMotion(actor,t,motion,light){
-  const progress=motion?.progress??0;
-  const swing=motion?Math.sin(progress*Math.PI):0;
-  const prize=motion&&Object.values(actor.cosmetics).find(item=>item.id===motion.id);
-  const towardFace=prize&&['hat','eyewear','hair','eyes'].includes(prize.slot);
-  actor.head.rotation.y=(t?Math.sin(t*.51)*.055:0)+(towardFace?swing*.16:0);
-  if(actor.hat)actor.hat.rotation.z=prize?.slot==='hat'?Math.sin(progress*5)*.12:0;
-  actor.figure.rotation.z=actor.cosmetics.outerwear?.id===motion?.id&&motion?.id==='phantom-cloak'?
-    .025*Math.sin(progress*7):0;
-  poseCompanion(actor.pet,t,motion?.id===actor.pet?.item.id?motion:null);
-  if(actor.aura){
-    actor.aura.root.rotation.y=t*.73+progress*3.9;
-    actor.aura.root.scale.setScalar(1+swing*.27);
-    for(const p of actor.aura.points)p.rotation.set(t*.94+progress*4,.5,progress*2.6);
-  }
-  light.intensity=0;
-  if(prize&&prize.slot!=='companion'){
-    if(!actor.spark){
-      const root=group(actor.root);
-      const paint=new THREE.MeshBasicMaterial({color:'#e8ce9e',transparent:true,opacity:0,depthWrite:false});
-      const sparks=Array.from({length:9},()=>attach(root,new THREE.OctahedronGeometry(.027),paint));
-      actor.spark={root,paint,sparks};
-    }
-    const {root,paint,sparks}=actor.spark;
-    root.visible=progress>0;
-    root.position.set(0,(towardFace?2.55:1.39)*actor.figure.scale.y,.21);
-    const flare=rewardPigment(prize);
-    paint.color.copy(shade(flare,1.63));
-    paint.opacity=.65*swing;
-    for(const [i,part] of sparks.entries()){
-      const ring=i/sparks.length*2*Math.PI+progress*2.1;
-      const spread=(towardFace?.35:.63)+progress*.16;
-      part.position.set(Math.sin(ring)*spread,Math.cos(ring)*spread*.81,.06+Math.sin(i)*.11);
-      part.rotation.set(progress*1.4,i*.39,progress*2.45);
-    }
-    if(!['prop','offhand'].includes(prize.slot)){
-      light.position.set(0,(towardFace?2.62:1.58)*actor.figure.scale.y,.70);
-      light.color.set(flare);light.intensity=swing*3.4;
-    }
-  }else if(actor.spark)actor.spark.root.visible=false;
-  for(const prop of actor.props){
-    const triggered=motion?.id===prop.item.id&&Boolean(motion);
-    prop.shape.rotation.y=triggered?Math.sin(progress*Math.PI*2)*.82:0;
-    prop.shape.rotation.z=triggered?Math.sin(progress*8)*.23:0;
-    if(prop.trail){
-      prop.trail.visible=triggered&&swing>0;
-      prop.trail.material.opacity=swing*.54;
-      prop.trail.rotation.z=progress*.90;
-    }
-    if(prop.glow){
-      prop.glow.emissiveIntensity=triggered?.55+swing*2.7:.41;
-      if(prop.item.id.includes('lantern')){
-        const point=prop.root.getWorldPosition(new THREE.Vector3());
-        light.position.copy(point).add(new THREE.Vector3(0,-.23,.12));
-        light.intensity=triggered?4.3+swing*9.2:1.26;
-        light.color.set('#ffbf65');
-      }
-    }
-  }
 }
 
 export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='body'){
@@ -266,10 +225,12 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
     y:1.47*scale+(view.y||0)/160,height:bodyHeight,zoom:cameraZoom};
   const crop={x:.015,y:(actor.hat?2.47:2.34)*scale,height:(actor.hat?1.12:.92)*scale,anglePitch:.018};
   if(view.zoom>=2.3&&view.y>=158)full.y=2.41*scale;
-  handleMotion(actor,time,motion,active.aura);
+  const action=poseStudioAction(actor,time,motion,active.aura);
+  canvas.dataset.studioAction=action.id;
+  canvas.dataset.studioReaction=action.response;
   const backgroundItem=actor.cosmetics.background;
   const palette=paletteFor(recipe,backgroundItem);
-  return draw(canvas,state,frame==='portrait'?crop:full,clothBackground(palette,backgroundItem?.id),palette[1],frame!=='portrait');
+  return draw(canvas,state,frame==='portrait'?crop:full,clothBackground(palette,backgroundItem?.id||recipe.background),palette[1],frame!=='portrait');
 }
 
 export function paintRoomPet(canvas,item,view={},activity){
@@ -281,8 +242,9 @@ export function paintRoomPet(canvas,item,view={},activity){
   active.aura.intensity=0;
   const main=rewardPigment(item);
   const palette=['#c8bbca','#8c8ca4','#565672'].map((hex,i)=>color(hex).lerp(color(main),.15+i*.08).getStyle());
-  return draw(canvas,state,{x:-(view.x||0)/700,y:.320+(view.y||0)/600,
-    height:Math.max(.952,.91/(canvas.width/canvas.height)),zoom:view.zoom||1,anglePitch:.049},
+  const gargoyle=item.id==='bell-tower-gargoyle';
+  return draw(canvas,state,{x:-(view.x||0)/700,y:(gargoyle?.408:.342)+(view.y||0)/600,
+    height:Math.max(gargoyle?1.19:activity?1.08:.952,.91/(canvas.width/canvas.height)),zoom:view.zoom||1,anglePitch:.049},
   clothBackground(palette,item.id),palette[1],false);
 }
 
