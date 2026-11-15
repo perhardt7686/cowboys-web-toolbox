@@ -26,5 +26,5 @@ test('trade UI is scoped to family profile, not the public toolbox',()=>{
  const html=read('docs/community.html');
  assert.match(html,/avatar-pet-trading\.css\?v=trade2/);
  assert.match(html,/community\.js\?v=arcade6/);
- assert.match(read('docs/avatar-reward-studio.mjs'),/avatar-studio-pets\.mjs\?v=toon3/);
+ assert.match(read('docs/avatar-reward-studio.mjs'),/avatar-studio-pets\.mjs\?v=arcade6/);
 });
