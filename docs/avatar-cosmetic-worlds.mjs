@@ -1,4 +1,4 @@
-import {PET_ART} from './avatar-pet-art.mjs?v=cel1';
+import {PET_ART} from './avatar-pet-art.mjs?v=workshop1';
 
 // Original vector illustrations for the family character canvas.
 // Props and companions occupy opposite shoulder corners of a 256×256 square.

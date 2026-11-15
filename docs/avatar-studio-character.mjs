@@ -1,17 +1,19 @@
-import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=studio3';
-import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=studio3';
-import {BY_ID} from './avatar-reward-catalog.mjs?v=finish5';
-import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
-import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=finish5';
-import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=finish5';
+import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=workshop1';
+import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=workshop1';
+import {BY_ID} from './avatar-reward-catalog.mjs?v=workshop1';
+import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
+import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=workshop1';
+import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=workshop1';
 
 const BODY={
   detective:{height:1.045,width:.85},
   mechanic:{height:1.012,width:1.18},
   sleuth:{height:.931,width:.89},
   specter:{height:1.048,width:.87},
+  marsh:{height:1.094,width:.97},
   armor:{height:1.062,width:1.20},
   automaton:{height:.940,width:1.105},
+  radio:{height:.855,width:1.03},
   scout:{height:.914,width:.89}
 };
 const avColor=(field,key)=>AVATAR_OPTIONS[field].find(([id])=>id===key)?.[2];
@@ -328,15 +330,15 @@ export function buildAvatar(recipe){
   const outfits=normalizeBody(recipe);
   const model=outfits.model;
   const shape=BODY[model];
-  const mechanical=['armor','automaton','scout'].includes(model);
-  const specter=model==='specter';
+  const mechanical=['armor','automaton','scout','radio'].includes(model);
+  const specter=model==='specter'||model==='marsh';
   const cosmetics=Object.fromEntries(Object.entries(recipe.cosmetics||{}).flatMap(([slot,id])=>{
     const item=BY_ID.get(id);
     return item&&fitsBody(recipe,item)?[[slot,item]]:[];
   }));
   const tint=avColor('skin',recipe.skin)||'#dbad86';
   const palette={
-    skin:specter?new THREE.Color(tint).lerp(new THREE.Color('#73a086'),.70):tint,
+    skin:specter?new THREE.Color(tint).lerp(new THREE.Color(model==='marsh'?'#598e61':'#73a086'),.74):tint,
     cloth:avColor('shirt',recipe.shirt)||'#62663d',
     hair:avColor('hair',recipe.hair)||'#513020',
     eye:cosmetics.eyes?rewardPigment(cosmetics.eyes):(avColor('eyes',recipe.eyes)||'#513421')
@@ -364,9 +366,16 @@ export function buildAvatar(recipe){
   const neck=surface(mechanical?'#a9afb7':palette.skin,{metalness:mechanical?.5:0});
   join(figure,neck,[0,2.020,0],[0,2.304,0],.113,mechanical?.089:.101);
   const head=group(figure,model==='armor'?-.032:0,2.440,0);
+  head.rotation.y={detective:.065,mechanic:-.075,sleuth:.08,specter:-.115,marsh:.17,armor:-.04,scout:.10,radio:.08}[model]||0;
+  head.rotation.z={detective:-.055,mechanic:.035,sleuth:-.079,specter:.048,marsh:.06,radio:-.043}[model]||0;
+  if(model==='detective')head.scale.set(.93,1.055,.98);
+  if(model==='mechanic')head.scale.set(1.07,.99,1.07);
+  if(model==='sleuth')head.scale.set(1,.99,.985);
+  if(model==='specter')head.scale.set(.90,1.075,.965);
+  if(model==='marsh')head.scale.set(1.02,1.065,1.09);
   if(model==='armor')head.rotation.z=-.10;
   if(recipe.pose==='tilt')head.rotation.z=-.14;
-  sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',specter,
+  sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',radio:model==='radio',marsh:model==='marsh',specter,
     jawTune:Number(outfits.jaw)||0,eyeSpacing:Number(outfits.eye_spacing)||0,
     styleReward:cosmetics.hair,eyeReward:cosmetics.eyes});
   const gearFit={round:1.08,square:1.07,long:.92,heart:1.015,angular:.99,oval:1}[recipe.face]||1;
@@ -376,19 +385,25 @@ export function buildAvatar(recipe){
       oval(head,surface(rewardPigment(gear)),.112,.014,.214,.064,.044,.029);
       stroke(head,surface(dark),[[-.221,.030,.005],[-.088,.055,.194],[.152,.014,.230],[.228,.059,-.004]],.009,20);
     }else{
-      const kind=gear.id.includes('visor')||gear.id.includes('pixel')?'visor':gear.id.includes('heart')?'cat-eye':'round';
+      const kind=gear.cut|| (gear.id.includes('visor')||gear.id.includes('pixel')?'visor':gear.id.includes('heart')?'cat-eye':'round');
       addGlasses(head,kind,rewardPigment(gear),gear.id.includes('monocle'),gearFit);
     }
   }else if(!mechanical)addGlasses(head,recipe.glasses==='none'&&recipe.accessory==='glasses'?'round':recipe.glasses,'#6b4948',false,gearFit);
   const headwear=cosmetics.hat||recipe.hat;
   const hat=studioHat(head,headwear,recipe.accessory);
-  const visor=cosmetics.bodypart?.id==='carnival-visor-plate'?controlVisor(head,rewardPigment(cosmetics.bodypart)):null;
+  const visor=(cosmetics.bodypart?.id==='carnival-visor-plate'||cosmetics.bodypart?.art==='visor')?controlVisor(head,rewardPigment(cosmetics.bodypart)):null;
   const arms=[arm(figure,-1,recipe,body,wardrobe,palette,materials,cosmetics.prop),
     arm(figure,1,recipe,body,wardrobe,palette,materials,cosmetics.offhand)];
   const props=arms.flatMap(arm=>arm.prop?[arm.prop]:[]);
   const pet=cosmetics.companion&&buildCompanion(cosmetics.companion);
-  if(pet){pet.root.position.set(.897,0,.242);root.add(pet.root);}
+  if(pet){pet.root.position.set(.897,0,.242);pet.home=pet.root.position.clone();root.add(pet.root);}
+  if(model==='marsh'){
+    const tail=group(figure,0,1.16,-.16);
+    stroke(tail,surface('#557760'),[[0,0,0],[-.09,-.20,-.29],[-.21,-.36,-.46],
+      [-.41,-.30,-.48],[-.50,-.215,-.43]],.059,22);
+    for(let i=0;i<3;i++)oval(tail,surface('#8fac6f'),-.29-i*.07,-.32+i*.025,-.50,.064,.029,.034);
+  }
   const aura=cosmetics.effect&&makeAura(figure,cosmetics.effect);
-  return {root,figure,head,pet,aura,arms,props,hat,visor,cosmetics,capeParts:materials.capeParts};
+  return {root,figure,head,pet,aura,arms,props,hat,visor,cosmetics,capeParts:materials.capeParts,headTilt:head.rotation.z};
 }
 

@@ -1,4 +1,4 @@
-import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
+import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
 
 const HEAD_SHAPES={
   oval:[1,1,1], angular:[.98,1.065,1.08], round:[1.09,.94,.92],
@@ -159,13 +159,13 @@ function browsAndEyes(head,v,palette,w,spacing){
         [.022,-.012,.038],[.051,.003,.018]],.0073,16);
       stroke(eye,skin,[[-.049,-.027,.011],[0,-.027,.031],[.045,-.023,.009]],.0045,12);
     }else{
-      const ew=expression.width,eh=expression.height*expression.squint;
+      const ew=expression.width*.92,eh=expression.height*expression.squint*.87;
       // A pronounced ink lid gives facial expressions definition at thumbnail scale.
       oval(eye,faceInk,0,-.002,.001,ew+.008,eh+.010,.017);
       oval(eye,ivory,0,0,.012,ew,eh,.012);
       const look=expression.pupil*(side===1?1:.55);
-      oval(eye,eyeColor,look-.006,-.005,.025,.025,eh*.76,.008);
-      oval(eye,pupil,look-.008,-.004,.033,.012,eh*.60,.006);
+      oval(eye,eyeColor,look-.006,-.004,.025,.022,eh*.75,.008);
+      oval(eye,pupil,look-.008,-.004,.033,.013,eh*.58,.006);
       oval(eye,glint,look-.017,.012,.037,.007,.007,.003);
       if(sleepy){
         oval(eye,skin,0,eh*.76,.027,ew+.009,eh*.46,.012);
@@ -363,14 +363,18 @@ export function controlVisor(head,pigment){
   return {signal,emitter,beam,shutters};
 }
 
-export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=false,specter=false,jawTune=0,eyeSpacing=0,styleReward,eyeReward}={}){
+export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=false,radio=false,marsh=false,specter=false,jawTune=0,eyeSpacing=0,styleReward,eyeReward}={}){
   if(mechanical||armor){
     const alloy=surface(shade(palette.cloth,.88),{metalness:.58,roughness:.39});
     const edge=surface(armor?'#d5ac6d':'#c7d7d6',{metalness:.68,roughness:.34});
     const screen=surface('#252536',{roughness:.36});
     const signal=surface(palette.eye,{emissive:palette.eye,emissiveIntensity:.49});
     const width=1+jawTune*.054;
-    if(scout){
+    if(radio){
+      shell(head,alloy,[[-.196,.164,.121],[-.156,.226,.168],[.145,.225,.171],[.199,.185,.141],[.213,.074,.070]],{segments:42});
+      box(head,edge,0,.174,.025,.403,.067,.323);
+      for(let index=0;index<4;index++)box(head,screen,-.12+index*.076,-.137,.161,.034,.026,.025);
+    }else if(scout){
       oval(head,alloy,0,.012,0,.245*width,.198,.204);
       oval(head,edge,0,.051,.151,.199,.101,.084);
     }else if(armor){
@@ -430,6 +434,16 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
       const x=side*(.098+(i%4)*.016),y=-.086-(i%3)*.01;
       oval(head,fleck,x,y,.182-Math.abs(x)*.11,v.cheeks==='rosy'?.025:.003,.003,.004);
     }
+  }
+  if(marsh){
+    const leaf=surface('#668a52'),darkFin=surface('#375b50'),ridge=surface('#a5b266');
+    for(const side of [-1,1]){
+      const fin=oval(head,leaf,side*.24,.103,-.035,.068,.157,.045);fin.rotation.z=-side*.46;
+      join(head,ridge,[side*.205,-.025,-.006],[side*.320,.194,-.020],.014,.004,12);
+      for(let i=0;i<3;i++)stroke(head,darkFin,[[side*.231,.045+i*.029,.060],[side*.259,.039+i*.029,.039],
+        [side*.282,.060+i*.028,-.009]],.0058);
+    }
+    const crest=oval(head,leaf,-.031,.292,-.042,.085,.057,.165);crest.rotation.z=.14;
   }
   const shadeHair=styleReward?palette.rewardHair:palette.hair;
   const hair=surface(shadeHair),shine=surface(shade(shadeHair,1.19),{roughness:.56});

@@ -1,9 +1,9 @@
-import {drawPetPortrait,paintPrizeDemo,paintThumbnail,renderLoadout} from './avatar-reward-render.mjs?v=finish5';
+import {drawPetPortrait,paintPrizeDemo,paintThumbnail,renderLoadout} from './avatar-reward-render.mjs?v=workshop1';
 
 // Load the local rendering engine only when a member opens a character view.
 let active=null,loading=null;
 export function prepareStudioRenderer(){
-  loading ||= import('./avatar-dressing-room.mjs?v=finish5').then(renderer=>active=renderer).catch(()=>null);
+  loading ||= import('./avatar-dressing-room.mjs?v=workshop1').then(renderer=>active=renderer).catch(()=>null);
   return loading;
 }
 
@@ -36,7 +36,7 @@ export function studioPortrait(recipe,size=128){
   active.releaseStudioView(canvas);
   return url;
 }
-export {avatarSnapshot} from './avatar-reward-render.mjs?v=studio3';
+export {avatarSnapshot} from './avatar-reward-render.mjs?v=workshop1';
 
 export function studioLook(canvas,id){
   const drawn=active?.paintRoomLook(canvas,id);

@@ -1,14 +1,14 @@
 import {escapeHTML as esc,initials,renderBody,displayName,safeHttps,canPost} from './community-core.mjs';
 import {DETAIL_DEFAULTS,forumBody} from './forum-core.mjs?v=powers1';
 import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProfile,profileCompletion} from './profile-core.mjs?v=powers1';
-import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=stable1';
-import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=studio3';
-import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=studio3';
-import {watchRewardGame} from './avatar-reward-session.mjs?v=return3';
+import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=workshop1';
+import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=workshop1';
+import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
+import {watchRewardGame} from './avatar-reward-session.mjs?v=workshop1';
 
-import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=studio3';
-import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
-import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
+import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=workshop1';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
+import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=workshop1';
 
 export function createProfileStudio(ctx){
   const cache=new Map(),images=new Map(),characterURLs=new Map();
@@ -78,10 +78,8 @@ export function createProfileStudio(ctx){
       if(input.value!==step)input.value=step;
     }
     const canvas=form.querySelector('#family-avatar-canvas');
-    if (canvas&&selectedTab==='avatar'&&avatarMethod==='character') {
-      rewards?.paintPreview();
-      previewImage=rewardModule?.avatarSnapshot(avatarRecipe,128)||previewImage;
-    }
+    if (canvas&&selectedTab==='avatar'&&avatarMethod==='character') rewards?.paintPreview();
+    else if(avatarChanged&&avatarMethod==='character') previewImage=rewardModule?.avatarSnapshot(avatarRecipe,128)||previewImage;
     const preview=document.getElementById('profile-live-preview');
     if(preview){
       const showDraft=selectedTab==='avatar'||avatarChanged||photoChanged;
@@ -98,14 +96,21 @@ export function createProfileStudio(ctx){
     if(progress)progress.value=profileCompletion(draft);
     const vis=document.getElementById('profile-visibility');
     if(vis)vis.textContent=draft.published?'Visible to approved family members when saved':'Private profile';
-    const save=document.querySelector('#profile-studio-form button[type="submit"]');
-    if(save)save.textContent=selectedTab==='avatar'?'Save my avatar':'Save my changes';
+    const save=form.querySelector('button[type="submit"]');
+    if(save)save.textContent=selectedTab==='avatar'?'Save look':'Save my changes';
+    const characterView=selectedTab==='avatar'&&avatarMethod==='character';
+    form.classList.toggle('studio-character-method',characterView);
+    const settingsShare=form.querySelector('[data-studio-share]');
+    if(settingsShare)settingsShare.checked=draft.published;
     const share=form.querySelector('.profile-publish b');
     if(share)share.textContent=selectedTab==='avatar'?'Share with family':'Show my avatar and profile to approved family';
   }
   function tabs(){
     document.querySelectorAll('[data-profile-pane]').forEach(p=>p.hidden=p.dataset.profilePane!==selectedTab);
     document.querySelectorAll('[data-profile-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.profileTab===selectedTab)));
+    const workspace=document.getElementById('content-dialog');
+    workspace.classList.toggle('studio-workspace-dialog',selectedTab==='avatar');
+    if(selectedTab!=='avatar')rewards?.pause?.();
     document.getElementById('content-title').textContent=selectedTab==='avatar'?'Avatar Studio':'Your family profile';
   }
   function field(label,name,value,max,extra=''){return `<label class="field"><span>${label}</span><input name="${name}" value="${esc(value||'')}" maxlength="${max}" ${extra}></label>`;}
@@ -113,7 +118,7 @@ export function createProfileStudio(ctx){
     if(!approved())throw new Error('Only approved family members can use Avatar Studio.');
     if(ctx.isPreview){
       if(!previewRPC){
-        const {makePreviewRewardRPC}=await import('./avatar-reward-preview.mjs?v=turn1');
+        const {makePreviewRewardRPC}=await import('./avatar-reward-preview.mjs?v=workshop1');
         previewRPC ||= makePreviewRewardRPC();
       }
       return previewRPC(name,args);
@@ -141,7 +146,7 @@ export function createProfileStudio(ctx){
     if(node)node.textContent=message;
   }
   async function ensureRewards(){
-    rewardModule ||= await import('./avatar-reward-studio.mjs?v=finish5');
+    rewardModule ||= await import('./avatar-reward-studio.mjs?v=workshop1');
     if(!approved())return null;
     rewards ||= rewardModule.createRewardStudio({
       getLoadout:()=>avatarRecipe,setLoadout:setPreview,setStatus,playGame,rpc,checkAccess:approved,
@@ -238,7 +243,8 @@ export function createProfileStudio(ctx){
     if(!options.resume){
       sculpting=null;
       draft=getOwn();
-      savedRecipe=normalizeAvatarRecipe(draft.avatar_display||draft.details.avatar_recipe);
+      const starting=draft.avatar_display||draft.details.avatar_recipe||SHOWROOM_LOOKS.detective;
+      savedRecipe=toLoadout(starting);
       avatarRecipe=savedRecipe;
       const state=rewards?.getData();
       if(state?.loadout&&Number(state.revision)>=revision)savedRecipe=avatarRecipe=toLoadout(state.loadout);
@@ -255,9 +261,9 @@ export function createProfileStudio(ctx){
     activeCelebration?.remove();activeCelebration=null;
     const readonly=ctx.state.member.role==='owner'?'readonly':'';
     const html=[
-      '<p class="eyebrow">FAMILY MESSAGE BOARD · YOUR SPACE</p>',
+      '<p class="eyebrow studio-profile-eyebrow">FAMILY MESSAGE BOARD</p>',
       '<h2 id="content-title">',selectedTab==='avatar'?'Avatar Studio':'Your family profile','</h2>',
-      '<p class="dialog-lead">Make an avatar, share a little about yourself, and save your favorite look.</p>',
+      '<p class="dialog-lead studio-profile-lead">Make an avatar, share a little about yourself, and save your favorite look.</p>',
       ctx.isPreview?'<div class="preview-message">Design preview. Nothing is saved to the live board.</div>':'',
       '<div class="profile-studio">',
        '<div class="profile-form-column"><form id="profile-studio-form">',
@@ -274,12 +280,15 @@ export function createProfileStudio(ctx){
          '<p class="family-account-privacy">Your profile is only available to approved family members when you choose to share it. You never need to provide your address or birthday.</p>',
         '</div>',
         '<div data-profile-pane="avatar" hidden><div id="avatar-celebration"></div>',
-
-         '<div class="family-avatar-methods" role="group" aria-label="Avatar type">',
-          '<button type="button" data-avatar-method="character" aria-pressed="false">🎨 Build a character</button>',
-          '<button type="button" data-avatar-method="photo" aria-pressed="false">📷 Use a photo</button>',
-          '<button type="button" data-avatar-method="initials" aria-pressed="false">🔤 My initials</button>',
-         '</div>',
+         '<div class="studio-settings-row"><details class="studio-profile-settings">',
+          '<summary>Avatar &amp; sharing</summary><div class="studio-profile-sheet">',
+          '<div class="family-avatar-methods" role="group" aria-label="Avatar type">',
+           '<button type="button" data-avatar-method="character" aria-pressed="false">Character</button>',
+           '<button type="button" data-avatar-method="photo" aria-pressed="false">Use a photo</button>',
+           '<button type="button" data-avatar-method="initials" aria-pressed="false">Initials</button>',
+          '</div><label class="studio-settings-share"><input type="checkbox" data-studio-share ',
+          draft.published?'checked':'','><span>Share with approved family</span></label></div></details>',
+          '<button type="button" class="studio-profile-link" data-back-to-profile>Profile</button></div>',
          '<div class="avatar-method-pane" data-avatar-method-panel="character">',makeAvatarStudioHTML(avatarRecipe),
          '</div>',
          '<div class="avatar-method-pane" data-avatar-method-panel="photo" hidden>',
@@ -412,11 +421,11 @@ export function createProfileStudio(ctx){
       cache.set(id,profile);
       draft=getOwn();photoChanged=false;avatarChanged=false;
       undo=[];
+      status.classList.add('success');
+      status.textContent=ctx.isPreview?'Preview saved locally for this session.':'Your changes are saved.';
       await imageURLs([draft]);
       if(!current())return;
       refresh();ctx.renderAccount();applyReader(profile.details);
-      status.classList.add('success');
-      status.textContent=ctx.isPreview?'Preview saved locally for this session.':'Your changes are saved.';
       window.dispatchEvent(new CustomEvent('family-avatar-updated',{detail:{path:clean.avatar_path,user_id:id}}));
       rewards?.warm();ctx.onSaved?.();
     }catch(error){
@@ -450,7 +459,7 @@ export function createProfileStudio(ctx){
     panel?.addEventListener('toggle',async ()=>{
       if(!panel.open){memberView?.stop();return;}
       if(memberView){memberView.draw();return;}
-      const {studioCharacter,prepareStudioRenderer,releaseStudioArt}=await import('./avatar-studio-preview.mjs?v=studio3');
+      const {studioCharacter,prepareStudioRenderer,releaseStudioArt}=await import('./avatar-studio-preview.mjs?v=workshop1');
       if(!panel.isConnected||!panel.open||!dialog.open||!canPost(ctx.state.member)||memberView)return;
       const stage=panel.querySelector('[data-avatar-turntable]');
       const canvas=stage.querySelector('canvas');
@@ -482,6 +491,9 @@ export function createProfileStudio(ctx){
           void mountRewards();
         }
         tabs();refresh();
+      }else if(b.hasAttribute('data-back-to-profile')){
+        selectedTab='profile';tabs();refresh();
+        document.querySelector('[data-profile-tab="profile"]')?.focus();
       }else if(b.hasAttribute('data-avatar-method')){
         avatarMethod=b.dataset.avatarMethod;avatarChanged=true;photoChanged=false;
         if(avatarMethod==='photo'&&!chosenPhoto){
@@ -524,10 +536,20 @@ export function createProfileStudio(ctx){
       }
     }catch(error){ctx.toast(error.message);}
   });
-  document.addEventListener('keydown',e=>{const b=e.target.closest('[data-profile-tab]');if(!b||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const all=[...document.querySelectorAll('[data-profile-tab]')],index=all.indexOf(b),next=e.key==='Home'?0:e.key==='End'?all.length-1:(index+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;all[next].click();all[next].focus();});
+  document.addEventListener('keydown',e=>{
+    const settings=e.target.closest('.studio-profile-settings[open]');
+    if(e.key==='Escape'&&settings){
+      e.preventDefault();
+      settings.open=false;
+      settings.querySelector('summary').focus();
+    }
+    const b=e.target.closest('[data-profile-tab]');if(!b||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const all=[...document.querySelectorAll('[data-profile-tab]')],index=all.indexOf(b),next=e.key==='Home'?0:e.key==='End'?all.length-1:(index+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;all[next].click();all[next].focus();});
   document.addEventListener('input',e=>{
     const input=e.target,sculpt=input.dataset.studioSculpt;
-    if(input.id==='profile-zoom')drawCrop();
+    if(input.hasAttribute('data-studio-share')){
+      input.form.elements.published.checked=input.checked;
+      refresh();
+    }else if(input.id==='profile-zoom')drawCrop();
     else if(sculpt&&approved()&&input.closest('#profile-studio-form')){
       setPreview({...avatarRecipe,full_body:{...normalizeBody(avatarRecipe),[sculpt]:input.value}},sculpting!==input);
       sculpting=input;
@@ -541,6 +563,7 @@ export function createProfileStudio(ctx){
   document.getElementById('content-dialog').addEventListener('close',()=>{
     if(!document.getElementById('content-dialog').open){
       activeCelebration?.remove();activeCelebration=null;
+      rewards?.detach();
       memberView?.destroy();memberView=null;
     }
   });

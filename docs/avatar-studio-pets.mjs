@@ -1,10 +1,11 @@
 import {button,el} from './family-board-core.mjs?v=family3';
-import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
-import {playCel} from './avatar-reward-render.mjs?v=studio3';
-import {createPetTradeUI} from './avatar-pet-trading.mjs?v=toon3';
+import {FIRST_PET_ID} from './avatar-collection-edition.mjs';
+import {petBehavior} from './avatar-prize-actions.mjs?v=workshop1';
+import {playCel} from './avatar-reward-render.mjs?v=workshop1';
+import {createPetTradeUI} from './avatar-pet-trading.mjs?v=workshop1';
 
-import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
-import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=studio3';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
+import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=workshop1';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;
@@ -14,9 +15,9 @@ const actionButton=(label,action,kind='')=>{
   return control;
 };
 
-export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openReward,tryOn,isOpen,reduceMotion,onInventoryChange}) {
+export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKnown,checkError,openReward,tryOn,isOpen,reduceMotion,onInventoryChange}) {
   let root,selected='',state='idle',pets=new Map(),pending=false,message='',epoch=0,stop=()=>{},inspection=null;
-  const trading=createPetTradeUI({rpc,catalog,onChanged:()=>{refresh();onInventoryChange?.();},isOpen});
+  const trading=createPetTradeUI({rpc,catalog:tradeCatalog,onChanged:()=>{refresh();onInventoryChange?.();},isOpen});
   function showPet(id) {
     selected=id||selected;
     message='';
@@ -81,7 +82,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     const known=unlocksKnown();
     const earned=chosen.filter(item=>have(item.id)||pets.has(item.id));
     const waiting=chosen.filter(item=>!have(item.id)&&!pets.has(item.id));
-    const item=chosen.find(entry=>entry.id===selected)||earned[0]||chosen.find(entry=>entry.id==='trail-husky');
+    const item=chosen.find(entry=>entry.id===selected)||earned.find(entry=>entry.id===FIRST_PET_ID)||earned[0]||chosen[0];
     if(!item)return;
     selected=item.id;
     const pet=pets.get(item.id),owned=have(item.id)||Boolean(pet);
@@ -129,7 +130,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
       }));
     }else if(!pet){
       const adopt=actionButton('Adopt',()=>void act(item,'adopt'),'primary');adopt.dataset.petAction='adopt';
-      details.append(el('p','avatar-reward-copy','Earned in a game'),adopt);
+      details.append(el('p','avatar-reward-copy',item.id===FIRST_PET_ID?'Starter companion':'Earned in a game'),adopt);
     }else{
       const bar=el('progress','avatar-reward-meter');
       bar.max=BOND_MAX;bar.value=pet.bond;bar.setAttribute('aria-label','Pet bond');

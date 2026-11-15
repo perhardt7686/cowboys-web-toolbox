@@ -1,6 +1,6 @@
-import {THREE,attach,disposeFigure,group,shade} from './avatar-studio-geometry.mjs?v=studio3';
-import {poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=finish5';
-import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
+import {THREE,attach,disposeFigure,group,shade} from './avatar-studio-geometry.mjs?v=workshop1';
+import {poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=workshop1';
+import {prizeAction} from './avatar-prize-actions.mjs?v=workshop1';
 
 const radius=new THREE.Vector3(),rayEnd=new THREE.Vector3(),lensAt=new THREE.Vector3();
 const tip=new THREE.Vector3();
@@ -117,7 +117,7 @@ function sweepVisor(actor,p){
   beam.visible=open>.02;
   signal.emissiveIntensity=.34+open*1.43;
   if(!beam.visible)return;
-  const home=actor.pet?.item.id==='wind-up-gremlin'?actor.pet.head:actor.root;
+  const home=actor.pet?.item.id.includes('gremlin')?actor.pet.head:actor.root;
   rayEnd.set(.64-ease(p,.22,.78)*1.37,.24,.61);
   if(home!==actor.root)rayEnd.set(.74-ease(p,.22,.78)*.86,.02,.14);
   home.localToWorld(rayEnd);
@@ -175,7 +175,7 @@ export function poseStudioAction(actor,time,motion,light){
   const petAction=active&&prize.slot==='companion';
   const wearable=active&&!['companion','prop','offhand'].includes(prize.slot);
   const face=wearable&&['hat','eyewear','hair','eyes','bodypart'].includes(prize.slot);
-  const scanner=active&&id==='carnival-visor-plate';
+  const scanner=active&&(id==='carnival-visor-plate'||prize.art==='visor');
   // Very restrained character acting. Never alter a saved recipe to animate it.
   const idle=!active&&time>0&&Number.isFinite(time);
   const breath=idle?Math.sin(time*1.18):0;
@@ -183,12 +183,14 @@ export function poseStudioAction(actor,time,motion,light){
   actor.figure.rotation.z=idle?breath*.008:0;
   actor.head.userData.studioRestTilt ??= actor.head.rotation.z;
   actor.head.rotation.z=actor.head.userData.studioRestTilt+(idle?Math.sin(time*.77+.5)*.018:0);
-  actor.head.rotation.y=(time?Math.sin(time*.51)*.042:0)+(face?amount*.18:0);
+  actor.head.userData.studioRestYaw ??= actor.head.rotation.y;
+  actor.head.rotation.y=actor.head.userData.studioRestYaw+(time?Math.sin(time*.51)*.042:0)+(face?amount*.18:0);
   actor.head.rotation.x=petAction?amount*.20:scanner?amount*.27:idle?Math.sin(time*.62)*.012:0;
   if(actor.hat)actor.hat.rotation.z=prize?.slot==='hat'?Math.sin(p*5)*amount*.12:0;
-  foldCape(actor.capeParts,id==='phantom-cloak'?amount:0);
+  foldCape(actor.capeParts,id==='phantom-cloak'||prize?.art==='cape'?amount:0);
   light.intensity=0;
   if(actor.lanternPool)for(const pool of actor.lanternPool)pool.visible=false;
+  if(actor.pet)actor.pet.root.position.copy(actor.pet.home);
   let response=petAction?{...motion,action:motion.action||'play'}:null;
   for(const arm of actor.arms){
     const prop=arm.prop;
@@ -204,18 +206,30 @@ export function poseStudioAction(actor,time,motion,light){
       if(triggered&&sword)bladeTrail(actor,arm,p);
     }
     if(prop.glow)prop.glow.emissiveIntensity=.38+(triggered?amount*2.1:0);
-    if(!prop.item.id.includes('lantern'))continue;
-    const position=prop.shape.localToWorld(lensAt.set(0,-.23,.045));
+    if(prop.item.art==='telescope'){
+      prop.movable.position.x=.20+(triggered?amount*.189:0);
+      if(triggered&&actor.pet?.species==='moth'){
+        const landing=prop.movable.localToWorld(new THREE.Vector3(.087,.091,.012));
+        actor.root.worldToLocal(landing);landing.y-=.09;
+        const follow=hold(p)**.65;
+        actor.pet.root.position.lerp(landing,follow);
+        response={action:'perch',progress:p};
+        actor.head.rotation.y=actor.head.userData.studioRestYaw+amount*.22;
+      }
+    }
+    if(prop.item.art==='compass')prop.movable.rotation.z=triggered?Math.sin(p*14)*(1-p)*2.4+amount*.62:0;
+    if(!prop.item.id.includes('lantern')&&prop.item.art!=='flashlight')continue;
+    const position=prop.shape.localToWorld(lensAt.set(0,prop.item.art==='flashlight'?.166:-.23,.045));
     light.position.copy(position);
     light.color.set('#ffb958');
     light.intensity=.52+(triggered?amount*5.1:0);
     if(triggered)groundLight(actor,position,amount);
-    if(triggered&&actor.pet?.item.id==='fog-hound'){
+    if(triggered&&actor.pet?.item.id.includes('hound')){
       response={action:'sniff',progress:p,target:actor.pet.root.worldToLocal(position.clone())};
       actor.head.rotation.y=amount*.33;
     }
   }
-  if(scanner&&actor.pet?.item.id==='wind-up-gremlin')
+  if(scanner&&actor.pet?.item.id.includes('gremlin'))
     response={action:'scan',progress:p,target:actor.pet.root.worldToLocal(actor.head.getWorldPosition(new THREE.Vector3()))};
   poseCompanion(actor.pet,time,response);
   if(actor.visor)sweepVisor(actor,scanner?p:0);

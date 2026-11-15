@@ -1,4 +1,4 @@
-import {INK,PAPER,path,oval} from './avatar-cel-art.mjs?v=cel1';
+import {INK,PAPER,path,oval} from './avatar-cel-art.mjs?v=workshop1';
 
 function eye(c,x,y,color='#6f563a'){
   oval(c,x,y,4,5,PAPER,INK,1.4,-.13);

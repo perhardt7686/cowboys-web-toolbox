@@ -1,19 +1,23 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=finish5';
-import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=finish5';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=workshop1';
+import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=workshop1';
 
-import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=studio3';
+import {prizeAction} from './avatar-prize-actions.mjs?v=workshop1';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=workshop1';
 
-import {fitsBody} from './avatar-full-body.mjs?v=studio3';
-import {mountTurntable} from './avatar-turntable-controls.mjs?v=studio3';
-import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v=studio3';
-import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=finish5';
+import {BODY_MODELS,fitsBody,normalizeBody} from './avatar-full-body.mjs?v=workshop1';
+import {mountTurntable} from './avatar-turntable-controls.mjs?v=workshop1';
+import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v=workshop1';
+import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=workshop1';
+
+import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=workshop1';
+import {NEW_STUDIO_REWARDS,STUDIO_EDITION} from './avatar-collection-edition.mjs';
 
 const PAGE=18;
+const currentItems=new Set(NEW_STUDIO_REWARDS.map(item=>item.id));
 const labels=Object.entries(GAME_LABELS);
 const gameEntries={mahjong:'mahjong-toggle',wordle:'letter-lock-toggle',wordquest:'word-game-toggle',plates:'plate-game-open',hotrod:'hot-rod-entry',fleet:'star-squadron-toggle',maze:'mystery-maze-toggle',dashforge:'dash-forge-toggle'};
-const sections=[['avatar','My Avatar'],['collection','Unlockables'],['pets','Pets'],['achievements','Achievements']];
+const sections=[['avatar','Create'],['wardrobe','Wardrobe'],['pets','Companions'],['collection','Rewards']];
 const num=value=>Number(value||0).toLocaleString();
 const row=(...children)=>{const n=el('div','avatar-reward-row');n.append(...children);return n;};
 const text=label=>el('p','avatar-reward-copy',label);
@@ -25,8 +29,8 @@ export {normalizeLoadout};
 export const avatarSnapshot=(recipe,size)=>studioPortrait(recipe,size)||fallbackSnapshot(recipe,size);
 
 export function rewardRatio(achievement) {
+  if(achievement?.earned_at)return 1;
   if(!achievement?.requirements?.length)return 0;
-  if(achievement.earned_at)return 1;
   const values=achievement.requirements.map(goal=>Math.max(0,Math.min(1,Number(goal.current)/Math.max(1,Number(goal.target)))));
   return achievement.match==='any'?Math.max(...values):values.reduce((a,b)=>a+b,0)/values.length;
 }
@@ -77,7 +81,7 @@ export function makeAvatarShowcase(open){
   const root=el('details','family-panel avatar-reward-showcase');
   root.open=preference('reward-showcase')!=='closed';
   root.addEventListener('toggle',()=>preference('reward-showcase',root.open?'open':'closed'));
-  const summary=el('summary','','Awesome things to unlock');
+  const summary=el('summary','','Avatar rewards');
   const items=el('div','avatar-showcase-items');
   let rendered=false;
   const render=()=>{
@@ -112,6 +116,7 @@ function combobox(label, options, selected, changed){
   const holder=el('label','avatar-reward-filter');
   holder.append(el('span','',label));
   const node=el('select');
+  node.setAttribute('aria-label',label);
   for(const [value,name] of options){const option=el('option','',name);option.value=value;node.append(option);}
   node.value=selected;
   node.addEventListener('change',()=>changed(node.value));
@@ -148,7 +153,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   let data=null,achievements=new Map(),owned=new Map(),epoch=0,query='',section='avatar';
   let slot='all',filter='all',game='all',sort='catalog',limit=PAGE,detail=null,loading=false,loadError='';
   let pending=null,frame=0,lastFrame=0,stopDemo=()=>{},stopPreview=()=>{},turntable=null;
-  let privateControls=null,layoutWatch=null,viewEvents=null;
+  let layoutWatch=null,viewEvents=null,family='human',facePart='looks',wardrobePart='clothes',fitOnly=false;
   let stagedLook=null,stageNote=null;
   const pendingAcks=new Set();
 
@@ -157,10 +162,13 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function have(id){return owned.has(id);}
   const contains=()=>root?.isConnected&&checkAccess();
   const catalog=()=>data?.catalog?.length?data.catalog.map(spec=>BY_ID.get(spec.id)).filter(Boolean):CATALOG;
+  const workshop=()=>data?.catalog_version===STUDIO_EDITION;
+  const visibleRewards=()=>workshop()||!data?catalog().filter(item=>currentItems.has(item.id)):catalog();
+  const isEditing=()=>section==='avatar'||section==='wardrobe';
 
   const reduceAnimation=()=>Boolean(reduceMotion?.()||document.body.classList.contains('forum-reduce-motion'));
   const pets=createPetStudio({
-    rpc,catalog,have,unlocksKnown:()=>Boolean(data),checkError:()=>loadError,
+    rpc,catalog:()=>workshop()?catalog().filter(item=>currentItems.has(item.id)||have(item.id)):catalog(),tradeCatalog:catalog,have,unlocksKnown:()=>Boolean(data),checkError:()=>loadError,
     openReward:item=>setSection('collection',item.id),
     tryOn(item){tryOn(item);setSection('avatar');},
     reduceMotion:reduceAnimation,
@@ -195,9 +203,10 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   }
 
   function setSection(next, id=null){
-    section=sections.some(([key])=>key===next)?next:'avatar';
+    section=next==='achievements'||sections.some(([key])=>key===next)?next:'avatar';
     detail=id;
     if(section==='pets')pets.showPet(id);
+    if(section!=='collection')stagedLook=null;
     if(contains()){
       draw();
       if(section==='pets'&&detail){
@@ -223,6 +232,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     setStatus(have(item.id)?item.name+' is ready to save.':item.name+' is on your preview. Earn it to save it.');
     drawEquipped();
     paintPreview();
+    if(turntable&&!reduceAnimation()&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      turntable.canvas.parentElement.animate([{outlineColor:'#f8e5a477'},{outlineColor:'#f8e5a400'}],
+        {duration:500,easing:'ease-out'});
     return true;
   }
 
@@ -269,6 +281,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     if(!turntable||!stageNote)return;
     stopPreview();cancelAnimationFrame(frame);turntable.stop();
     stagedLook=normalizeLoadout(SHOWROOM_LOOKS[collection.look]);
+    setStatus('');
     for(const id of collection.pieces){
       const item=BY_ID.get(id);
       if(fitsBody(stagedLook,item))stagedLook.cosmetics[item.slot]=id;
@@ -401,7 +414,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function matches(item){
     const achievement=current(item.achievement_id),ratio=rewardRatio(achievement);
-    if(slot!=='all'&&slot!==item.slot)return false;
+    if(slot!=='all'&&slot!==item.slot||fitOnly&&!fitsBody(getLoadout(),item))return false;
     if(game!=='all'&&game!==item.group&&!(achievement?.requirements||[]).some(req=>req.game===game))return false;
     if(filter==='unlocked'&&!have(item.id)||filter==='locked'&&have(item.id)||
       filter==='almost'&&(have(item.id)||ratio<.65)||filter==='legendary'&&item.tier!=='legendary')return false;
@@ -439,7 +452,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     const recipe=normalizeLoadout(getLoadout());
     const fit=fitsBody(recipe,item);
     if(fit)recipe.cosmetics[item.slot]=item.id;
-    const preview=fit?recipe:null;
+    const preview=fit&&item.slot!=='companion'?recipe:null;
     const art=thumbnail(item,224,{recipe:preview});
     art.classList.add('avatar-prize-art');
     const content=el('div','avatar-prize-copy');
@@ -480,26 +493,15 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function overview(){
     const node=el('div','avatar-collection-overview');
-    const available=catalog();
+    const available=visibleRewards();
     const count=available.filter(item=>have(item.id)).length;
     const total=available.length;
     node.append(el('h3','',count+' / '+total+' unlocked'),meter(count,total,'Collection progress'));
     if(loadError)node.append(row(text(loadError),asButton('Retry progress',refresh)));
     else if(loading&&!data)node.append(text('Checking your game progress…'));
     if(data){
-      const building=available.filter(item=>!have(item.id)&&current(item.achievement_id)).sort((a,b)=>
-        rewardRatio(current(b.achievement_id))-rewardRatio(current(a.achievement_id)));
-      const next=building[0];
-      const recent=[...owned.values()].sort((a,b)=>String(b.awarded_at).localeCompare(String(a.awarded_at))).map(x=>BY_ID.get(x.id)).filter(Boolean).slice(0,3);
-      if(next)node.append(row(el('span','','Closest reward'),asButton(next.name,()=>{detail=next.id;renderResults();focusDetail();})));
-      if(recent.length)node.append(row(el('span','','Recent unlocks'),...recent.map(item=>asButton(item.name,()=>{detail=item.id;renderResults();focusDetail();}))));
-      const breakdown=el('details','avatar-reward-breakdown');
-      const facts=el('div','avatar-collection-facts');
-      const counts=(label,x)=>el('span','',label+' '+x.filter(item=>have(item.id)).length+' / '+x.length);
-      facts.append(...labels.map(([key,name])=>counts(name,available.filter(item=>item.group===key))),
-        ...Object.entries(RARITIES).map(([key,name])=>counts(name,available.filter(item=>item.tier===key))));
-      breakdown.append(el('summary','','Progress by game and rarity'),facts);
-      node.append(breakdown);
+      node.append(asButton('Game achievements',()=>setSection('achievements')));
+
     }
     return node;
   }
@@ -516,31 +518,36 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     }else if(section==='collection'){
       filters.hidden=false;
       results.append(overview());
-      if(!query&&slot==='all'&&game==='all'){
+      if((workshop()||!data)&&!query&&slot==='all'&&game==='all'&&filter==='all'&&!fitOnly){
         const looks=el('section','avatar-matching-looks');
-        looks.append(el('h4','','Matching looks'));
+        looks.append(el('h4','','Collections'));
         for(const collection of STUDIO_COLLECTIONS){
           const look=el('article','avatar-matching-look');
-          const preview=asButton(collection.label,()=>showCollection(collection));
+          const preview=asButton('',()=>showCollection(collection),'studio-collection-cover');
+          preview.style.setProperty('--collection-scene','url("./avatar-scenes/'+collection.scene+'.webp?v=paint1")');
           preview.setAttribute('aria-label','Preview '+collection.label+' look');
-          const pieces=el('div','avatar-matching-pieces');
+          preview.append(el('strong','',collection.label),el('small','',collection.caption));
+          const pieces=el('details','avatar-matching-pieces');
+          pieces.append(el('summary','','View '+collection.pieces.length+' rewards'));
+          const items=el('div','studio-collection-pieces');
           for(const id of collection.pieces){
             const item=BY_ID.get(id);
             const open=asButton(item.name,()=>{detail=id;renderResults();focusDetail();});
-            pieces.append(open);
+            items.append(open);
           }
+          pieces.append(items);
           look.append(preview,pieces);
           looks.append(look);
         }
         results.append(looks);
       }
-      let items=catalog().filter(matches);
+      let items=visibleRewards().filter(matches);
       if(sort==='name')items=items.sort((a,b)=>a.name.localeCompare(b.name));
       if(sort==='closest')items=items.sort((a,b)=>rewardRatio(current(b.achievement_id))-rewardRatio(current(a.achievement_id)));
       const count=el('p','avatar-reward-count',items.length+' '+(items.length===1?'reward':'rewards'));
       count.setAttribute('aria-live','polite');results.append(count);listItems(items);
     }else if(section==='achievements'){
-      filters.hidden=false;renderAchievements();
+      filters.hidden=false;results.append(asButton('Back to rewards',()=>setSection('collection')));renderAchievements();
     }else if(section==='pets'){
       filters.hidden=true;
       pets.mount(results);
@@ -549,39 +556,93 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function makeFilters(){
     const base=el('div','avatar-reward-filters');
-    const gameSelect=combobox('Game',[['all','All games'],...labels],game,value=>{game=value;limit=PAGE;renderResults();});
-    const search=el('input'); search.type='search';search.placeholder='Search rewards';search.value=query;
+    if(section==='achievements'){
+      base.append(combobox('Game',[['all','All games'],...labels],game,value=>{game=value;renderResults();}),
+        asButton('Refresh achievements',refresh));
+      return base;
+    }
+    if(section!=='collection')return base;
+
+    const search=el('input','studio-search');search.type='search';search.placeholder='Search rewards';search.value=query;
     search.setAttribute('aria-label','Search rewards');
-    search.addEventListener('input',()=>{query=search.value.trim();limit=PAGE;renderResults();});
-    if(section==='collection')base.append(search,
-      combobox('Type',[['all','All types'],...Object.entries(SLOT_LABELS)],slot,value=>{slot=value;limit=PAGE;renderResults();}),
-      combobox('Show',[['all','All rewards'],['unlocked','Unlocked'],['locked','Locked'],['almost','Almost earned'],['legendary','Legendary']],filter,
-        value=>{filter=value;limit=PAGE;renderResults();}),
-      gameSelect,combobox('Sort',[['catalog','Collection order'],['name','Name A–Z'],['closest','Closest to unlock']],sort,value=>{sort=value;limit=PAGE;renderResults();}));
-    else if(section==='achievements')base.append(gameSelect,asButton('Refresh achievements',refresh));
+    const redraw=()=>{limit=PAGE;renderResults();};
+    search.addEventListener('input',()=>{query=search.value.trim();redraw();});
+    const choices=el('div','studio-filter-chips');
+    choices.setAttribute('role','group');choices.setAttribute('aria-label','Filter rewards');
+    const all=asButton('All',()=>{filter='all';sync();redraw();});
+    const unlocked=asButton('Owned',()=>{filter=filter==='unlocked'?'all':'unlocked';sync();redraw();});
+    const fit=asButton('Fits my body',()=>{fitOnly=!fitOnly;sync();redraw();});
+    const sheet=el('dialog','studio-filter-sheet');
+    const heading=el('h3','','Reward filters');
+    heading.id='studio-filter-title';sheet.setAttribute('aria-labelledby',heading.id);
+    const more=asButton('Filters',()=>{
+      [typeField,gameField,sortField].forEach(({control,key})=>control.value=state[key]());
+      sheet.showModal();
+      typeField.control.focus();
+    });
+    const sync=()=>{
+      all.setAttribute('aria-pressed',String(filter==='all'));
+      unlocked.setAttribute('aria-pressed',String(filter==='unlocked'));
+      fit.setAttribute('aria-pressed',String(fitOnly));
+      const active=[slot!=='all',game!=='all',sort!=='catalog'].filter(Boolean).length;
+      more.textContent=active?'Filters ('+active+')':'Filters';
+    };
+    const state={type:()=>slot,game:()=>game,sort:()=>sort};
+    const select=(key,label,options)=>{
+      const node=combobox(label,options,state[key](),()=>{});
+      return {node,key,control:node.querySelector('select')};
+    };
+    const typeField=select('type','Type',[['all','All types'],...Object.entries(SLOT_LABELS)]);
+    const gameField=select('game','Game',[['all','All games'],...labels]);
+    const sortField=select('sort','Sort',[['catalog','Collection order'],['name','Name A–Z'],['closest','Closest to unlock']]);
+    const clear=asButton('Clear',()=>{typeField.control.value=gameField.control.value='all';sortField.control.value='catalog';});
+    const apply=asButton('Apply',()=>{
+      slot=typeField.control.value;game=gameField.control.value;sort=sortField.control.value;
+      sheet.close();sync();redraw();
+    },'primary');
+    sheet.addEventListener('close',()=>{if(more.isConnected)more.focus();});
+    sheet.append(heading,typeField.node,gameField.node,sortField.node,
+      row(clear,asButton('Cancel',()=>sheet.close()),apply));
+    choices.append(all,unlocked,fit,more);
+    base.append(search,choices,sheet);
+    sync();
     return base;
   }
 
   function draw(){
     if(!contains())return;
     editor.dataset.rewardView=section;
-    editor.classList.toggle('reward-browsing',section!=='avatar');
-    editor.querySelector('.family-avatar-fields').hidden=section!=='avatar';
-    editor.querySelector('#avatar-outfits').hidden=section!=='avatar';
-    for(const b of tabs.children)b.setAttribute('aria-pressed',String(b.dataset.rewardSection===section));
-    if(privateControls)privateControls.hidden=section!=='avatar';
-    pane.hidden=section==='avatar';
+    editor.classList.toggle('reward-browsing',!isEditing());
+    editor.querySelector('.family-avatar-fields').hidden=!isEditing();
+    editor.querySelector('#avatar-outfits').hidden=section!=='wardrobe';
+    editor.querySelector('#avatar-equipped').hidden=!isEditing();
+    for(const control of tabs.children)
+      control.setAttribute('aria-pressed',String(control.dataset.rewardSection===(section==='achievements'?'collection':section)));
+    pane.hidden=isEditing();
     if(!pane.hidden){
-      const built=makeFilters();
-      filters.replaceChildren(...built.children);
+      if(filters.dataset.section!==section||!filters.childElementCount){
+        const built=makeFilters();
+        filters.replaceChildren(...built.children);
+        filters.dataset.section=section;
+      }
       renderResults();
     }
-    drawEquipped();
-    if(section==='avatar')drawOutfits();
-    paintPreview();
+    if(isEditing()){
+      for(const control of editor.querySelectorAll('[data-part-area]'))control.hidden=control.dataset.partArea!==section;
+      choosePart(section==='avatar'?facePart:wardrobePart);
+      drawEquipped();
+    }
+    if(section==='wardrobe')drawOutfits();
+    if(stagedLook)turntable.draw();
+    else paintPreview();
+  }
+
+  function pause(){
+    stopDemo();stopPreview();cancelAnimationFrame(frame);turntable?.stop();
   }
 
   function releaseStage(){
+    pause();
     releaseRewardArt(results);
     layoutWatch?.disconnect();layoutWatch=null;
     viewEvents?.abort();viewEvents=null;
@@ -590,10 +651,35 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   }
 
   function choosePart(part){
+    if(['looks','face','hair'].includes(part))facePart=part;
+    else wardrobePart=part;
     for(const panel of editor.querySelectorAll('[data-studio-panel]'))
       panel.hidden=panel.dataset.studioPanel!==part;
     for(const button of editor.querySelectorAll('[data-studio-part]'))
       button.setAttribute('aria-pressed',String(button.dataset.studioPart===part));
+    for(const tile of editor.querySelectorAll('[data-studio-panel="'+part+'"] canvas[data-clothing-art]')){
+      if(tile.dataset.painted)continue;
+      const context=tile.getContext('2d');
+      context.setTransform(tile.width/256,0,0,tile.height/256,0,0);
+      const {clothingArt:slot,cut,color}=tile.dataset;
+      drawWardrobeReward(context,{slot,cut,color,id:'starter-'+cut});
+      tile.dataset.painted='true';
+    }
+  }
+
+  function chooseFamily(next){
+    family=next;
+    for(const pill of editor.querySelectorAll('[data-studio-family]'))
+      pill.setAttribute('aria-pressed',String(pill.dataset.studioFamily===family));
+    for(const panel of editor.querySelectorAll('[data-family-looks]'))panel.hidden=panel.dataset.familyLooks!==family;
+    paintLookCards();
+  }
+
+  function paintLookCards(){
+    for(const tile of editor.querySelectorAll('[data-family-looks="'+family+'"] [data-look-preview]')){
+      if(!studioLook(tile,tile.dataset.lookPreview))
+        renderLoadout(tile,SHOWROOM_LOOKS[tile.dataset.lookPreview],0,null,{angle:18,crop:{size:198}});
+    }
   }
 
   function mount(nextRoot,{nextSection='avatar',item=null}={}){
@@ -608,12 +694,14 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     stageNote.hidden=true;stageNote.setAttribute('role','status');
     stage.after(stageNote);
     viewEvents=new AbortController();
+    family=BODY_MODELS[normalizeBody(getLoadout()).model].family;
     editor.addEventListener('click',event=>{
+      const familyPick=event.target.closest('[data-studio-family]');
+      if(familyPick){chooseFamily(familyPick.dataset.studioFamily);return;}
       const toggle=event.target.closest('[data-studio-part]');
       if(!toggle)return;
       choosePart(toggle.dataset.studioPart);
       if(toggle.dataset.studioPart==='face'||toggle.dataset.studioPart==='hair')turntable?.face();
-      else stage.querySelector('[data-turn="body"]').click();
     },{signal:viewEvents.signal});
     turntable=mountTurntable(stage,(camera,t,activity)=>
       studioCharacter(canvas,stagedLook||getLoadout(),camera,t,activity),reduceAnimation,(x,y,view)=>{
@@ -621,7 +709,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
         const part=pickStudioPart(canvas,x,y)||
           (canvas.dataset.renderer!=='3d'&&x>.20&&x<.79&&y>.13&&y<.71?(y<.34?'face':'clothes'):null);
         if(!part)return;
-        setSection(part==='pets'?'pets':'avatar');
+        setSection(part==='pets'?'pets':part==='face'?'avatar':'wardrobe');
         if(part!=='pets')choosePart(part);
         if(part==='face'&&view.zoom<2)turntable?.face();
       });
@@ -634,8 +722,11 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       turntable.draw();
     };
     layoutWatch=new ResizeObserver(resize);layoutWatch.observe(frame);resize();
-    for(const tile of editor.querySelectorAll('[data-look-preview]'))
-      renderLoadout(tile,SHOWROOM_LOOKS[tile.dataset.lookPreview],0,null,{angle:18,crop:{size:198}});
+    chooseFamily(family);
+    document.addEventListener('avatar-scene-ready',()=>{
+      if(!contains()||!turntable.canvas.getClientRects().length)return;
+      turntable.draw();paintLookCards();
+    },{signal:viewEvents.signal});
     pane=el('section','avatar-reward-pane');
     filters=el('div','avatar-reward-filters');
     results=el('div','avatar-reward-results');
@@ -647,16 +738,14 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     }
     editor.prepend(tabs);pane.append(filters,results);
     editor.querySelector('.studio-editor-panel').insertBefore(pane,editor.querySelector('#avatar-equipped'));
-    privateControls=root.querySelector('.family-avatar-methods');
     section=nextSection;detail=item;
     if(section==='pets')pets.showPet(item);
     draw();
     void prepareStudioRenderer().then(renderer=>{
       if(!renderer||turntable?.canvas!==canvas||!contains())return;
       paintPreview();
-      for(const tile of editor.querySelectorAll('[data-look-preview]'))
-        studioLook(tile,tile.dataset.lookPreview);
-      if(section!=='avatar')renderResults();
+      paintLookCards();
+      if(!isEditing())renderResults();
     });
     if(detail)focusDetail();
     void refresh();
@@ -664,21 +753,24 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function restore(next){
     if(next.collection){
-      ({query,slot,filter,game,sort,limit}=next.collection);
+      ({query,slot,filter,game,sort,limit,fitOnly=false}=next.collection);
+      if(filters)delete filters.dataset.section;
     }
     setSection(next.section,next.detail);
   }
-  function stateForReturn(){return {section,detail,collection:{query,slot,filter,game,sort,limit}};}
+  function stateForReturn(){return {section,detail,collection:{query,slot,filter,game,sort,limit,fitOnly}};}
+  function detach(){
+    releaseStage();
+    root=editor=pane=results=filters=tabs=null;
+    pets.clear();
+  }
+
   function clear(){
     epoch+=1;
     pending=null;loading=false;loadError='';data=null;achievements.clear();owned.clear();pendingAcks.clear();
     query='';section='avatar';slot=filter=game='all';sort='catalog';limit=PAGE;detail=null;
-    cancelAnimationFrame(frame);
-    stopDemo();
-    stopPreview();
-    releaseStage();
-    root=editor=pane=results=filters=tabs=privateControls=null;
-    pets.clear();
+    detach();
+    facePart='looks';wardrobePart='clothes';fitOnly=false;
   }
 
   async function acknowledge(items){
@@ -696,11 +788,11 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function recentUnseen(){
     if(!data)return [];
-    return [...owned.values()].filter(item=>!item.seen&&!pendingAcks.has(item.id)&&BY_ID.has(item.id))
+    return [...owned.values()].filter(item=>!item.seen&&!pendingAcks.has(item.id)&&(workshop()?currentItems.has(item.id):BY_ID.has(item.id)))
       .sort((a,b)=>String(a.awarded_at).localeCompare(String(b.awarded_at)));
   }
 
-  return {mount,refresh,getData,have,tryOn,clear,paintPreview,drawEquipped,stateForReturn,
+  return {mount,refresh,getData,have,tryOn,clear,pause,detach,paintPreview,drawEquipped,stateForReturn,
     restore,recentUnseen,acknowledge,warm:()=>void refresh()};
 }
 

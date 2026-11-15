@@ -1,5 +1,5 @@
-import {INK,PAPER,tint,path,oval,paintScene} from './avatar-cel-art.mjs?v=cel1';
-import {SPECIAL_HAIR_STYLES,paintMysteryHair,paintMysteryExpression,paintMysteryGlasses,paintMysteryGarment} from './avatar-mystery-features.mjs?v=mystery3';
+import {INK,PAPER,tint,path,oval,paintScene} from './avatar-cel-art.mjs?v=workshop1';
+import {SPECIAL_HAIR_STYLES,paintMysteryHair,paintMysteryExpression,paintMysteryGlasses,paintMysteryGarment} from './avatar-mystery-features.mjs?v=workshop1';
 
 const warmShade = color => tint(color,'#763a43',.36);
 const warmLight = color => tint(color,'#ffe3b1',.33);

@@ -18,7 +18,7 @@ export async function cacheAvatarCharacter(member,recipe) {
   const epoch=generation;
   record.promise=(async()=>{
     try {
-      draws||=import('./avatar-studio-preview.mjs?v=studio3').catch(error=>{draws=null;throw error;});
+      draws||=import('./avatar-studio-preview.mjs?v=workshop1').catch(error=>{draws=null;throw error;});
       const {prepareStudioRenderer,studioPortrait,avatarSnapshot}=await draws;
       await prepareStudioRenderer();
       if(epoch!==generation||entries.get(key)!==record)return null;

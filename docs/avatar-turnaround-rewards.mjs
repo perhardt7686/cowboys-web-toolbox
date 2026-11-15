@@ -1,6 +1,6 @@
-import {INK,PAPER,glint,oval,path,tint} from './avatar-cel-art.mjs?v=cel1';
-import {paintAura} from './avatar-prize-actions.mjs?v=turn1';
-import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=finish5';
+import {INK,PAPER,glint,oval,path,tint} from './avatar-cel-art.mjs?v=workshop1';
+import {paintAura} from './avatar-prize-actions.mjs?v=workshop1';
+import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=workshop1';
 
 function spectralSword(c,{angle,progress}){
   c.save();c.rotate(-angle.depth*.43 + (progress==null?0:Math.sin(Math.PI*2*progress)*.57));
@@ -235,3 +235,79 @@ export const TURNAROUND_REWARDS=Object.freeze([...wearables,...faces,...held,
     draw:attic,animated:true,tags:['mystery','scene'],
     action:['spark','Light the window','Moonlight drifts through the attic window.','gold']}
 ]);
+
+function moth(c,{angle,progress}){
+  const lean=angle.depth*8;
+  const flap=progress==null?1:.62+.38*Math.abs(Math.sin(progress*18));
+  c.save();c.translate(lean,0);
+  for(const side of [-1,1]){
+    c.save();c.scale(side*flap,1);
+    path(c,[2,2],[[9,-26,30,-29,37,-19],[44,-8,31,3,21,8],[24,28,7,22,2,8]],
+      '#dba76d',INK,2.2);
+    path(c,[5,4],[[13,-7,23,-13,33,-17],[31,-4,19,5,8,11]],'#864d59',INK,1.5);
+    oval(c,22,-11,4,5,'#f4d77f',INK,1.4);
+    path(c,[3,-10],[[10,-22],[16,-21]],null,INK,1.7);
+    c.restore();
+  }
+  oval(c,0,4,5,12,'#705051',INK,1.8);
+  oval(c,0,-8,7,6,'#9c5e49',INK,1.8);
+  petFace(c,0,-9,angle.across,angle.depth,'#f8e8af');
+  c.restore();
+}
+
+function instrument(c,{angle,progress},item){
+  const use=progress==null?0:Math.sin(Math.PI*progress);
+  if(item.cut==='lantern'){museumLantern(c,{angle,progress});return;}
+  if(item.cut==='compass'){
+    oval(c,0,0,14,14,'#a77951',INK,2.2);
+    oval(c,0,0,10,10,'#f2dfaa',INK,1.4);
+    c.save();c.rotate(-.45+use*5);
+    path(c,[0,-9],[[3,2],[0,8],[-3,2]],'#9b4c51',INK,1.1);
+    c.restore();
+    return;
+  }
+  c.save();c.rotate(-.29+angle.depth*.28-use*.38);
+  const length=item.cut==='telescope'?38+27*use:36;
+  path(c,[-15,-10],[[length-9,-9],[length,-13],[length,11],[-16,8]],item.color,INK,2.3);
+  path(c,[-10,-11],[[5,-11],[6,10],[-11,10]],'#73534e',INK,1.6);
+  path(c,[15,-9],[[length-5,-10]],null,'#ead298',1.6);
+  oval(c,length,0,6,12,'#567a78',INK,2.2);
+  oval(c,length+1,0,3,7,use?'#fff0ac':'#a3c3af',null);
+  if(use&&item.cut==='flashlight')
+    path(c,[length+3,-6],[[105,-24],[112,27],[length+3,6]],'#ffdc705c',null);
+  if(use&&item.cut==='telescope')glint(c,length+5,-8,8,'#ffecaa');
+  c.restore();
+}
+
+function illustratedScene(c,item){
+  const glow=tint(item.color,'#ecd99e',.65);
+  c.fillStyle=tint(item.color,'#292439',.45);c.fillRect(0,0,256,256);
+  oval(c,174,64,30,29,glow);
+  path(c,[0,161],[[40,127,99,120,134,146],[190,107,224,126,256,145],[256,256],[0,256]],'#4c3d55',null);
+  path(c,[20,203],[[20,142],[31,133],[31,113],[46,97],[63,113],[63,139],[88,155],
+    [88,199],[125,210],[125,256],[0,256],[0,217]],'#2d293e',INK,2.5);
+  path(c,[42,153],[[55,151],[55,173],[42,173]],glow,INK,1.7);
+  path(c,[0,241],[[110,198,188,192,256,212],[256,256],[0,256]],item.color,INK,1.9);
+}
+
+export function workshopRewardArt(item){
+  const angle={across:.85,depth:.52};
+  if(item.slot==='companion'){
+    const creature={moth,hound:fogHound,gremlin,gargoyle,ghost:lampGhost}[item.art];
+    return {creature,draw(c,time=0){
+      c.save();c.translate(210,193);creature(c,{angle,time});c.restore();
+    }};
+  }
+  if(item.slot==='prop'||item.slot==='offhand'){
+    const stageDraw=(c,pose)=>instrument(c,pose,item);
+    return {stageDraw,draw(c,time=0){c.save();c.translate(44,194);stageDraw(c,{angle,time});c.restore();}};
+  }
+  if(item.slot==='background')return {draw(c){illustratedScene(c,item);}};
+  if(item.slot==='eyewear')return {draw(c){
+    path(c,[82,107],[[103,104],[114,117],[142,117],[153,104],[174,107],[166,133],
+      [149,138],[139,121],[116,121],[107,138],[89,133]],item.color,INK,2.7);
+    oval(c,101,119,12,8,'#8ea9a9',INK,1.5);
+    oval(c,154,119,12,8,'#8ea9a9',INK,1.5);
+  }};
+  return {draw(c){drawWardrobeReward(c,item);}};
+}

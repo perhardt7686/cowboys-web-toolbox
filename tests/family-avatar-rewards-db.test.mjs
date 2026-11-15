@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {installUpgradeSchema} from './helpers/community-db.mjs';
-import {CATALOG,GROUPS,SHOWCASE} from '../docs/avatar-reward-catalog.mjs';
+import {CATALOG,LEGACY_CATALOG,GROUPS,SHOWCASE} from '../docs/avatar-reward-catalog.mjs';
 import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
 import {FREE_OPTION_COUNT} from '../docs/family-avatar-builder.mjs';
 
@@ -11,11 +11,12 @@ test('free choices and complete, distinct cosmetic IDs',()=>{
   assert.equal(FREE_OPTION_COUNT,154);
   const counts={hat:51,eyewear:38,hair:41,eyes:30,prop:46,companion:51,background:35,effect:24,
     outerwear:4,top:2,bottoms:3,footwear:2,hands:1,waist:1,neckwear:1,back:2,bodypart:2,offhand:2};
-  assert.equal(CATALOG.length,336);
-  assert.deepEqual({...Object.fromEntries(Object.entries(Object.groupBy(CATALOG,item=>item.slot))
+  assert.equal(LEGACY_CATALOG.length,336);
+  assert.equal(CATALOG.length,362);
+  assert.deepEqual({...Object.fromEntries(Object.entries(Object.groupBy(LEGACY_CATALOG,item=>item.slot))
     .map(([slot,items])=>[slot,items.length]))},counts);
   assert.equal(new Set(CATALOG.map(item=>item.id)).size,CATALOG.length);
-  assert.equal(new Set(CATALOG.map(item=>item.achievement_id)).size,Object.values(GROUPS).flat().length);
+  assert.equal(new Set(LEGACY_CATALOG.map(item=>item.achievement_id)).size,Object.values(GROUPS).flat().length);
   for(const id of SHOWCASE)assert.ok(CATALOG.some(item=>item.id===id));
 });
 
@@ -75,8 +76,17 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await refused(petAction('trail-husky','adopt'));
   await refused(petAction('giant-taco-hat','adopt'));
   assert.deepEqual(fresh.catalog,CATALOG.map(({id,slot,achievement_id,name,tags})=>({id,slot,achievement_id,name,tags})));
-  assert.equal(fresh.achievements.length,70);
-  assert.equal(fresh.earned.length,0);
+  assert.equal(fresh.achievements.length,72);
+  assert.equal(fresh.catalog_version,2);
+  assert.deepEqual(fresh.earned.map(i=>i.id),['studio-attic-ghost']);
+  assert.deepEqual((await state()).earned,fresh.earned);
+  await refused(sql('select * from community_private.avatar_studio_release_receipt'));
+  await refused(outfit('Preview gear',normalizeLoadout({full_body:{model:'radio'},cosmetics:{bodypart:'studio-workshop-visor'}})));
+  for(const model of ['marsh','radio']){
+    const newBody=normalizeLoadout({full_body:{model}});
+    assert.deepEqual((await outfit('New starter',newBody))[0].recipe,newBody);
+  }
+  await outfit('',null);
   const first=normalizeLoadout({hair:'purple',style:'bun',shirt:'navy'});
   const locked=normalizeLoadout({...first,cosmetics:{hat:'dragon-crown'}});
   await refused(equip(locked));await refused(outfit('Locked look',locked));
@@ -209,6 +219,12 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await switchRole(null,'system');
   await sql("insert into community_private.avatar_reward_earned(member_id,achievement_id) values($1,'fleet-gunner'),($1,'dash-first-boss') on conflict do nothing",[member]);
   await switchRole(member);
+  const buildWith=(model,cosmetics)=>normalizeLoadout({full_body:{model},cosmetics});
+  await refused(outfit('Wrong fit',buildWith('marsh',{hands:'studio-workshop-gloves'})));
+  for(const item of [{bodypart:'studio-workshop-visor'},{hands:'studio-workshop-gloves'}]){
+    const fitted=buildWith('radio',item);
+    assert.deepEqual((await outfit('Workshop fit',fitted))[0].recipe,fitted);
+  }
   const withPlate=normalizeLoadout({full_body:{model:'automaton',neckwear:'ascot'},
     cosmetics:{bodypart:'carnival-visor-plate',prop:'spectral-case-sword',outerwear:'phantom-cloak',offhand:'museum-lantern'}});
   await refused(equip({...withPlate,full_body:{...withPlate.full_body,model:'detective'}},3));
@@ -218,6 +234,40 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await switchRole(other);
   assert.deepEqual((await show(member))[0].avatar_display,withPlate);
   await refused(equip(withPlate,2));
+
+  assert.equal(get(await state(),'studio-refit').earned_at,null);
+  await switchRole(null,'system');
+  await sql("insert into public.community_word_days(game_date,word_id) values('2026-11-14',1)");
+  await sql(`insert into public.community_word_guesses(game_date,user_id,guess,feedback,points)
+    values('2026-11-14',$1,'CLUES',array['correct','present','absent','absent','absent'],5)`,[other]);
+  await switchRole(other);
+  const afterClue=await state();
+  assert.ok(get(afterClue,'studio-refit').earned_at);
+  assert.ok(get(afterClue,'quest-first-clue').earned_at);
+  assert.equal(afterClue.earned.filter(i=>i.id.startsWith('studio-backlot-')).length,5);
+  assert.deepEqual((await state()).earned,afterClue.earned);
+
+  // An offered starter pet is still owned by its sender after an explicit decline.
+  const starter=await petAction('studio-attic-ghost','adopt');
+  const gift=await tradeOffer(member,'studio-attic-ghost',null,starter.revision);
+  await switchRole(member);
+  assert.equal((await tradeAction(gift.id,'decline')).status,'declined');
+  assert.ok(!(await petState()).some(p=>p.cosmetic_id==='studio-attic-ghost'));
+
+  // Reapply rollout over legacy inventories and compare the recoverable state.
+  await switchRole(null,'system');
+  const migration=await readFile(new URL(files.find(f=>f.endsWith('_avatar_studio_workshop.sql')),dir),'utf8');
+  await pg.exec(migration);
+  const receipt=()=>sql(`select member_id,saved_character,saved_outfits,converted_at
+    from community_private.avatar_studio_release_receipt where edition=2 order by member_id`);
+  const captured=await receipt();
+  assert.equal(captured.rows.length,2);
+  assert.deepEqual(captured.rows[0].saved_character.recipe,withPlate);
+  assert.deepEqual(captured.rows[0].saved_outfits[0].recipe,withPlate);
+  await pg.exec(migration);
+  assert.deepEqual((await receipt()).rows,captured.rows);
+  await switchRole(other);
+  assert.ok((await petState()).some(p=>p.cosmetic_id==='studio-attic-ghost'));
   await switchRole(null,'system');
   const profile=(await sql('select avatar_mode,avatar_path,published from public.community_profiles where user_id=$1',[member])).rows[0];
   assert.deepEqual(profile,{avatar_mode:'photo',avatar_path:member+'/avatar.png',published:true});

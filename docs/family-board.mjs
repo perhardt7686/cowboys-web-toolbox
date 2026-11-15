@@ -1,7 +1,7 @@
 import {PROFILE_ICONS} from './profile-core.mjs?v=powers1';
-import {getAvatarPhoto,cachedAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
+import {getAvatarPhoto,cachedAvatarPhoto} from './family-avatar-cache.mjs?v=workshop1';
 import {boardTime, button, el, preference, statusLine} from './family-board-core.mjs?v=family3';
-import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=studio3';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 import {makeFridge} from './family-fridge.mjs?v=family3';
 import {makeCalendar} from './family-calendar.mjs?v=family3';
 
@@ -94,7 +94,7 @@ export function createFamilyBoard() {
     const celebration = el('div');
     celebration.id = 'avatar-lobby-celebration';
     host.append(nav, scoreboard, celebration, gamesTitle);
-    void import('./avatar-reward-studio.mjs?v=reward1').then(({makeAvatarShowcase})=>{
+    void import('./avatar-reward-studio.mjs?v=workshop1').then(({makeAvatarShowcase})=>{
       if(!active())return;
       const showcase=makeAvatarShowcase(item=>document.dispatchEvent(new CustomEvent('family-open-avatar-studio',{
         detail:{section:'collection',item}

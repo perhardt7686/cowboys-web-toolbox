@@ -34,8 +34,8 @@ test('all maze clue cells are reachable without invented teleports',()=>{
 });
 test('21 unique unlockables include real pet, gadget, eyewear, scene and effect art',()=>{
  assert.equal(ARCADE_REWARDS.length,21);
- assert.equal(CATALOG.length,336);
- assert.equal(new Set(CATALOG.map(r=>r.id)).size,336);
+ assert.equal(CATALOG.filter(item=>!item.id.startsWith('studio-')).length,336);
+ assert.equal(new Set(CATALOG.map(r=>r.id)).size,CATALOG.length);
  assert.equal(ARCADE_REWARDS.filter(r=>r.slot==='companion').length,6);
  for(const item of ARCADE_REWARDS){
   assert.equal(typeof item.draw,'function',item.id);

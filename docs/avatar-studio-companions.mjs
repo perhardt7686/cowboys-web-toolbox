@@ -1,5 +1,5 @@
-import {THREE,attach,band,box,color,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
-import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
+import {THREE,attach,band,box,color,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
+import {petBehavior} from './avatar-prize-actions.mjs?v=workshop1';
 
 const collection=['#b76e61','#63968f','#9686b4','#d3aa67','#647ca8','#b880a0','#93a56f','#b77652','#6499ab','#b395c7'];
 const brass='#d4ab6a',iron='#3a3d50',ink='#272838',silver='#a5b8c1';
@@ -195,8 +195,38 @@ export function heldItem(parent,item,point=[0,0,0],side=-1){
   const material=surface(pigment,{roughness:.59}),edge=surface(brass,{metalness:.67,roughness:.34});
   const alloy=surface('#b9d4d0',{roughness:.35,metalness:.58});
   const dark=surface('#463848'),high=surface(shade(pigment,1.45),{roughness:.52});
-  let glow=null,trail=null;
-  if(/sword|saber|dagger/.test(id)){
+  let glow=null,trail=null,movable=null;
+  if(item.art==='telescope'){
+    join(shape,dark,[0,-.15,.01],[0,.11,.01],.035,.039);
+    join(shape,edge,[-.19,.15,.031],[.24,.15,.031],.062,.077,28);
+    movable=group(shape,.20,.15,.031);
+    join(movable,edge,[0,0,0],[.16,0,0],.061,.069,26);
+    join(movable,material,[.148,0,0],[.185,0,0],.083,.083,28);
+    glow=surface('#9ad1db',{emissive:'#fbd897',emissiveIntensity:.17});
+    join(movable,glow,[.184,0,0],[.190,0,0],.061,.061,26);
+    join(shape,dark,[-.27,.15,.031],[-.19,.15,.031],.040,.054,22);
+    for(const x of [-.123,.033,.18])join(shape,alloy,[x,.15,.031],[x+.014,.15,.031],.073,.073,26);
+  }else if(item.art==='compass'){
+    const paper=surface('#f4dca2');
+    medallion(shape,edge,0,-.015,0,.100,.057,32);
+    medallion(shape,paper,0,-.015,.032,.084,.010,28);
+    for(let i=0;i<12;i++){
+      const a=i*Math.PI/6;
+      const tick=box(shape,dark,Math.sin(a)*.070,-.015+Math.cos(a)*.070,.040,.006,i%3?.009:.019,.007);
+      tick.rotation.z=-a;
+    }
+    movable=group(shape,0,-.015,.048);
+    join(movable,surface('#ac4e53'),[0,-.018,.002],[0,.058,.002],.015,.001,8);
+    join(movable,surface('#465b70'),[0,.015,.002],[0,-.054,.002],.014,.001,8);
+    medallion(movable,edge,0,0,.007,.011,.01,8);
+    band(shape,edge,0,.115,.008,.021,.008);
+  }else if(item.art==='flashlight'){
+    join(shape,material,[0,-.15,0],[0,.08,0],.043,.045,24);
+    join(shape,edge,[0,.07,0],[0,.157,0],.043,.070,26);
+    glow=surface('#f3e6ad',{emissive:'#ebb068',emissiveIntensity:.22});
+    join(shape,glow,[0,.156,0],[0,.166,0],.061,.062,26);
+    box(shape,dark,0,-.034,.044,.018,.038,.011);
+  }else if(/sword|saber|dagger/.test(id)){
     glow=surface(pigment,{metalness:.37,roughness:.32,emissive:pigment,emissiveIntensity:.26});
     dagger(shape,glow,dark,edge);
     trail=attach(shape,new THREE.TorusGeometry(.302,.028,10,40,2.75),
@@ -266,7 +296,7 @@ export function heldItem(parent,item,point=[0,0,0],side=-1){
       oval(shape,high,.133*Math.sin(turn),.191+.129*Math.cos(turn),.018,.019,.020,.019);
     }
   }
-  return {root,shape,item,glow,trail};
+  return {root,shape,item,glow,trail,movable};
 }
 
 const CREATURES=[
@@ -313,7 +343,7 @@ function critterEyes(head,cream,dark,kind){
 }
 
 export function buildCompanion(item){
-  const id=item.id,species=CREATURES.find(([match])=>match.test(id))?.[1]||'woodland';
+  const id=item.id,species=item.art==='moth'?'moth':CREATURES.find(([match])=>match.test(id))?.[1]||'woodland';
   const [pigment,accent]=ITEM_COATS[id]||[rewardPigment(item),shade(rewardPigment(item),1.61)];
   const shellMat=surface(pigment),cream=surface(accent),
     black=surface('#413548'),bronzeMat=surface(brass,{metalness:.63,roughness:.46});
@@ -321,14 +351,39 @@ export function buildCompanion(item){
   const animal=group(stage),head=group(animal);
   const tails=[],wings=[],ears=[];
   let antenna=null,spark=null,steam=null,perch=0;
-  if(id==='bell-tower-gargoyle'){
+  if(id==='bell-tower-gargoyle'||item.art==='gargoyle'){
     perch=.104;
     const stone=surface('#777787'),edge=surface('#aaa5a0');
     attach(stage,new THREE.CylinderGeometry(.208,.231,.088,8),stone,0,.046,.05);
     attach(stage,new THREE.CylinderGeometry(.212,.212,.025,8),edge,0,.090,.05);
     stroke(stage,black,[[-.14,.098,.145],[-.079,.099,.112],[-.025,.100,.119],[.021,.098,.168]],.004);
   }
-  if(species==='phantom'){
+  if(species==='moth'){
+    const fur=surface('#86625b');
+    oval(animal,fur,0,.29,-.002,.070,.155,.071);
+    oval(animal,cream,0,.212,.032,.052,.082,.047);
+    head.position.set(0,.441,.025);
+    oval(head,shellMat,0,0,0,.096,.078,.072);
+    for(const side of [-1,1]){
+      oval(head,black,side*.043,-.001,.067,.021,.026,.014);
+      oval(head,cream,side*.047,.009,.080,.007,.009,.005);
+      stroke(head,bronzeMat,[[side*.033,.055,.010],[side*.079,.111,-.011],[side*.103,.127,-.047]],.008);
+      oval(head,cream,side*.103,.127,-.047,.013,.015,.011);
+      const hinge=group(animal,side*.036,.268,-.006);
+      const outline=new THREE.Shape();
+      outline.moveTo(0,0);
+      outline.bezierCurveTo(side*.11,.232,side*.31,.247,side*.329,.119);
+      outline.bezierCurveTo(side*.361,.021,side*.217,-.069,side*.139,-.013);
+      outline.bezierCurveTo(side*.237,-.130,side*.110,-.184,side*.035,-.082);
+      outline.lineTo(0,0);
+      attach(hinge,new THREE.ExtrudeGeometry(outline,{depth:.009,bevelSize:.006,bevelSegments:1,bevelThickness:.005}),shellMat);
+      const patch=oval(hinge,fur,side*.215,.105,.019,.074,.052,.013);patch.rotation.z=side*.42;
+      oval(hinge,cream,side*.215,.107,.030,.031,.026,.005);
+      stroke(hinge,cream,[[side*.028,.004,.021],[side*.128,.113,.020],[side*.285,.134,.020]],.006);
+      wings.push(hinge);
+    }
+    for(const side of [-1,1])join(animal,fur,[side*.026,.170,.01],[side*.054,.089,.035],.015,.008,8);
+  }else if(species==='phantom'){
     const sheen=surface(pigment,{roughness:.35,emissive:pigment,emissiveIntensity:.22});
     shell(animal,sheen,[[.10,.005,.028,.095],[.14,.168,.132],[.225,.185,.126],
       [.363,.147,.149],[.477,.149,.133],[.55,.098,.105],[.585,.002,.002]],
@@ -417,7 +472,7 @@ export function buildCompanion(item){
       oval(head,black,0,-.039,.203,.045,.026,.034);
       stroke(head,black,[[-.044,-.083,.188],[0,-.093,.205],[.044,-.080,.190]],.005);
     }
-    if(id==='fog-hound'){
+    if(id==='fog-hound'||item.art==='hound'){
       for(const side of [-1,1]){
         stroke(head,black,[[side*.044,.071,.154],[side*.074,.084,.158],[side*.108,.065,.136]],.007);
         join(head,cream,[side*.057,-.055,.159],[side*.039,-.062,.225],.031,.019);
@@ -505,8 +560,8 @@ export function poseCompanion(pet,time,motion){
   const lean=Math.max(-1.34,Math.min(1.34,aim))*amount;
   const bounce=move==='hop'?Math.sin(p*Math.PI)**2:amount;
   const activeHeight=action==='scan'?.072:gesture||seek?0:trick?.23:.10;
-  const wingPose=pet.perch?1.16-bounce*.95:.17+amount*Math.cos(p*19)*.60;
-  pet.animal.position.set(Math.sin(lean)*.081,pet.perch+(pet.species==='phantom'?.022:0)+bounce*activeHeight+float,
+  const wingPose=pet.species==='moth'?(action==='perch'?.78:amount>.03?Math.sin(p*28)*.80:.22):pet.perch?1.16-bounce*.95:.17+amount*Math.cos(p*19)*.60;
+  pet.animal.position.set(Math.sin(lean)*.081,pet.perch+(pet.species==='phantom'?.022:pet.species==='moth'?-.085:0)+bounce*activeHeight+float,
     move==='glide'&&!seek?amount*.12:0);
   pet.animal.rotation.z=move==='wobble'?Math.sin(p*13)*amount*.16:0;
   pet.head.rotation.set((gesture||action==='sniff'?.26:-.10)*amount+(idle?.018*Math.sin(time*.5):0),

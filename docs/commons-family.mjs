@@ -1,7 +1,7 @@
-import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=studio3';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 /* The Commons · family word quest and drawing studio, members only. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {getAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
+import {getAvatarPhoto} from './family-avatar-cache.mjs?v=workshop1';
 import {letterKnowledge} from './family-word-clues.mjs?v=personal9';
 import {startDrawingStudio} from './commons-drawing.mjs?v=1';
 

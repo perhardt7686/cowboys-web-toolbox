@@ -1,5 +1,5 @@
-import {INK,PAPER,oval,path,tint} from './avatar-cel-art.mjs?v=cel1';
-import {BODY_MODELS,CENTER,normalizeBody,projectTurn} from './avatar-full-body.mjs?v=turn1';
+import {INK,PAPER,oval,path,tint} from './avatar-cel-art.mjs?v=workshop1';
+import {BODY_MODELS,CENTER,normalizeBody,projectTurn} from './avatar-full-body.mjs?v=workshop1';
 
 const PANTS='#705043',LEATHER='#634333',BUCKLE='#d7a75b';
 const palette=(v,highlight=.29,shadow=.34)=>[v,tint(v,'#ffd697',highlight),tint(v,'#252b42',shadow)];

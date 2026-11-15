@@ -17,13 +17,13 @@ test('simple profile settings preserve advanced saved fields and send editable a
  const s=read('docs/community-profiles.mjs'),client=read('docs/forum-core.mjs'),
    server=read('supabase/functions/community-api/forum-core.mjs');
  for(const label of ['My Profile','Avatar Studio','Privacy & Account','family-avatar-canvas',
-   "community_avatar_equip","getOwn()","Save my avatar","getAvatarPhoto"]){
+   "community_avatar_equip","getOwn()","Save look","getAvatarPhoto"]){
      assert.ok(s.includes(label),label);
  }
  assert.match(s,/character=replaceAvatar&&avatarMethod==='character'/);
  assert.match(s,/\.upload\(path,blob/);
  assert.match(client,/avatar_recipe/);assert.match(server,/avatar_recipe/);
- assert.match(read('docs/community.html'),/family-avatar-studio\.css\?v=turn1/);
+ assert.match(read('docs/community.html'),/family-avatar-studio\.css\?v=workshop1/);
 });
 test('photo and icon preferences stay private and Hot Rod is untouched',()=>{
  const nav=read('docs/unified-nav.js'),studio=read('docs/community-profiles.mjs');

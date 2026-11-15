@@ -1,23 +1,33 @@
-import {CATALOG,GROUPS,GAME_LABELS} from './avatar-reward-catalog.mjs?v=studio3';
+import {CATALOG,GROUPS,GAME_LABELS} from './avatar-reward-catalog.mjs?v=workshop1';
+
+import {STUDIO_EDITION} from './avatar-collection-edition.mjs';
 
 export function makePreviewRewardRPC(){
   let loadout=null,active=false,revision=0;
   const outfits=new Map(),seen=new Set(),pets=new Map();
   const tiers=['starter','starter','bronze','bronze','silver','gold','legendary'];
-  const completed=['mahjong-first-board','quest-first-clue'];
+  const completed=['mahjong-first-board','quest-first-clue','studio-welcome','studio-refit'];
   const achievements=Object.entries(GROUPS).flatMap(([group,ids])=>ids.map((id,index)=>{
     const name=id.replace(/(^|-)([a-z])/g,(_,space,letter)=>(space?' ':'')+letter.toUpperCase());
     const games=group==='cross'?['mahjong','hotrod']:group==='family'?['wordle','wordquest']:group==='plates'?['plates','mahjong']:[group];
     const targets=games.map(game=>({game,label:'Sample '+GAME_LABELS[game]+' objective',target:index+1,current:completed.includes(id)?index+1:0}));
     return {id,name,tier:group==='family'?'family':tiers[index],group,match:group==='plates'?'any':'all',requirements:targets,earned_at:completed.includes(id)?'2026-11-14T12:00:00Z':null};
   }));
+  achievements.push(
+    {id:'studio-welcome',name:'Open the Workshop',group:'family',tier:'starter',match:'all',
+      requirements:[],earned_at:'2026-11-14T12:00:00Z'},
+    {id:'studio-refit',name:'Backlot Detectives',group:'wordquest',tier:'starter',match:'all',
+      requirements:[{game:'wordquest',label:'Days with a Word Quest clue',target:1,current:1}],
+      earned_at:'2026-11-14T12:00:00Z'}
+  );
   const owned=new Set(CATALOG.filter(item=>completed.includes(item.achievement_id)).map(item=>item.id));
+  for(const item of CATALOG)if(item.id.startsWith('studio-'))seen.add(item.id);
   const validate=value=>{
     if (Object.values(value?.cosmetics||{}).some(id=>!owned.has(id)))throw new Error('Earn each cosmetic before saving.');
   };
   return async function rpc(name,args={}){
     if(name==='community_avatar_reward_state')return {
-      loadout,active,revision,outfits:[...outfits.values()],achievements,catalog:CATALOG,plate_access:false,
+      loadout,active,revision,catalog_version:STUDIO_EDITION,outfits:[...outfits.values()],achievements,catalog:CATALOG,plate_access:false,
       earned:[...owned].map(id=>({id,awarded_at:'2026-11-14T12:00:00Z',seen:seen.has(id)}))
     };
     if(name==='community_avatar_pet_state')return [...pets.values()];

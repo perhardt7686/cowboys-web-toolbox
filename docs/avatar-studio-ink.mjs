@@ -1,9 +1,9 @@
-import {THREE} from './avatar-studio-geometry.mjs?v=studio3';
+import {THREE} from './avatar-studio-geometry.mjs?v=workshop1';
 
 export const inkColor='#17141d';
 
 export function inkWidth(width,height){
-  return Math.max(1,Math.min(3.5,Math.min(width,height)*.0068));
+  return Math.max(1,Math.min(4.2,Math.min(width,height)*.0074));
 }
 
 export function createInkLayer(){

@@ -7,8 +7,10 @@ export const BODY_MODELS=Object.freeze({
   mechanic:{name:'Stocky mechanic',family:'human',head:109,scale:1.1,shoulder:72,waist:52,hip:55,leg:119,depth:40,face:'square',shirt:'burntorange'},
   sleuth:{name:'Compact sleuth',family:'human',head:126,scale:.92,shoulder:49,waist:32,hip:50,leg:119,depth:26,face:'heart',shirt:'gold'},
   specter:{name:'Moorland specter',family:'monster',head:85,scale:1.05,shoulder:56,waist:37,hip:49,leg:139,depth:29,face:'angular',shirt:'forest'},
+  marsh:{name:'Marsh watchkeeper',family:'monster',head:95,scale:1.08,shoulder:68,waist:44,hip:53,leg:127,depth:32,face:'long',shirt:'forest'},
   armor:{name:'Crooked armor',family:'monster',head:113,scale:1.01,shoulder:74,waist:43,hip:55,leg:124,depth:38,face:'square',shirt:'navy'},
   automaton:{name:'Boardwalk automaton',family:'robot',head:107,scale:1,shoulder:65,waist:43,hip:53,leg:121,depth:34,face:'square',shirt:'turquoise'},
+  radio:{name:'Radio courier',family:'robot',head:145,scale:.89,shoulder:56,waist:42,hip:49,leg:105,depth:37,face:'round',shirt:'maroon'},
   scout:{name:'Wind-up surveyor',family:'robot',head:145,scale:.96,shoulder:53,waist:39,hip:48,leg:113,depth:30,face:'round',shirt:'rust'}
 });
 
@@ -40,6 +42,8 @@ const starter={
   mechanic:{bottoms:'overalls',footwear:'boots',waist:'utility'},
   sleuth:{bottoms:'pleats',footwear:'maryjanes',neckwear:'scarf'},
   specter:{bottoms:'slacks',footwear:'highboots',outerwear:'raincoat'},
+  marsh:{bottoms:'cuffs',footwear:'boots',outerwear:'cape',neckwear:'pendant'},
+  radio:{bottoms:'cuffs',footwear:'sneakers',back:'pack'},
   armor:{bottoms:'slacks',footwear:'boots',hands:'gauntlets',outerwear:'cape'},
   automaton:{bottoms:'slacks',footwear:'boots',waist:'utility'},
   scout:{bottoms:'cuffs',footwear:'sneakers',back:'pack'}
