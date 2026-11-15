@@ -9,8 +9,8 @@ import {FREE_OPTION_COUNT} from '../docs/family-avatar-builder.mjs';
 
 test('free choices and complete, distinct cosmetic IDs',()=>{
   assert.equal(FREE_OPTION_COUNT,154);
-  const counts={hat:50,eyewear:35,hair:41,eyes:30,prop:40,companion:41,background:31,effect:21};
-  assert.equal(CATALOG.length,289);
+  const counts={hat:51,eyewear:38,hair:41,eyes:30,prop:45,companion:47,background:34,effect:24};
+  assert.equal(CATALOG.length,310);
   assert.deepEqual({...Object.fromEntries(Object.entries(Object.groupBy(CATALOG,item=>item.slot))
     .map(([slot,items])=>[slot,items.length]))},counts);
   assert.equal(new Set(CATALOG.map(item=>item.id)).size,CATALOG.length);
@@ -74,7 +74,7 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await refused(petAction('trail-husky','adopt'));
   await refused(petAction('giant-taco-hat','adopt'));
   assert.deepEqual(fresh.catalog,CATALOG.map(({id,slot,achievement_id,name,tags})=>({id,slot,achievement_id,name,tags})));
-  assert.equal(fresh.achievements.length,49);
+  assert.equal(fresh.achievements.length,70);
   assert.equal(fresh.earned.length,0);
   const first=normalizeLoadout({hair:'purple',style:'bun',shirt:'navy'});
   const locked=normalizeLoadout({...first,cosmetics:{hat:'dragon-crown'}});
