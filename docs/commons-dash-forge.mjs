@@ -264,13 +264,13 @@ function build(){
  $('dash-jump').addEventListener('pointerdown',event=>{event.preventDefault();jump();},{passive:false});
  $('dash-jump').addEventListener('click',event=>{if(event.detail===0)jump();});
  for(const id of ['dash-title','dash-difficulty']){
-  $(id).addEventListener('change',()=>{draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);});
+  $(id).addEventListener('change',()=>{draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);draftDirty=true;creatorTestOutcome='';renderBuilder();});
  }
  for(const [id,field] of [['dash-world','world'],['dash-boss-style','bossStyle']]){
-  $(id).addEventListener('change',event=>{draft[field]=event.target.value;renderBuilder();});
+  $(id).addEventListener('change',event=>{draft[field]=event.target.value;draftDirty=true;creatorTestOutcome='';renderBuilder();});
  }
  $('dash-length').addEventListener('change',e=>{
-  const n=Number(e.target.value),a=[...draft.pattern];draft.pattern=a.slice(0,n).join('').padEnd(n,'.');
+  const n=Number(e.target.value),a=[...draft.pattern];if(n!==a.length)saveUndo();draft.pattern=a.slice(0,n).join('').padEnd(n,'.');
   draft.pattern='....'+draft.pattern.slice(4,-4)+'....';renderBuilder();
  });
  try{const t=localStorage.getItem('dash-forge-theme');if(THEMES.some(row=>row[0]===t))theme=t;}catch{}
@@ -289,40 +289,57 @@ async function refresh(quiet=false){
  catch(e){setStatus('Saved game unavailable: '+e.message,true);}
 }
 function onClick(event){
- const target=event.target.closest('[data-dash-tab],[data-dash-play],[data-dash-edit],[data-dash-publish],[data-dash-action],[data-dash-brush],[data-dash-cell],[data-dash-theme]');
+ const target=event.target.closest('[data-dash-tab],[data-dash-play],[data-dash-edit],[data-dash-publish],[data-dash-action],[data-dash-brush],[data-dash-cell],[data-dash-page],[data-dash-theme]');
  if(!target||target.disabled||busy)return;
  const d=target.dataset;
  if(d.dashTab){choosePane(d.dashTab);return;}
  if(d.dashPlay){void startLevel(Number(d.dashPlay));return;}
  if(d.dashEdit){const l=levels().find(x=>Number(x.id)===Number(d.dashEdit));if(l){
    draft={id:l.id,title:l.title,difficulty:l.difficulty,pattern:l.pattern,
-    world:l.world||'Maker Studio',bossStyle:l.boss_style||'none'};choosePane('builder');}return;}
+    world:l.world||'Maker Studio',bossStyle:l.boss_style||'none'};editorPage=0;undoHistory=[];redoHistory=[];draftDirty=false;creatorTestOutcome='';choosePane('builder');}return;}
  if(d.dashPublish){void publishLevel(Number(d.dashPublish));return;}
- if(d.dashBrush!==undefined){brush=d.dashBrush;root.querySelectorAll('[data-dash-brush]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.dashBrush===brush));return;}
- if(d.dashCell!==undefined){const i=Number(d.dashCell),a=[...draft.pattern];if(i>=4&&i<a.length-4){a[i]=brush;draft.pattern=a.join('');renderBuilder();}return;}
+ if(d.dashBrush!==undefined){brush=d.dashBrush;renderBuilder();return;}
+ if(d.dashCell!==undefined){editTile(d.dashCell,brush);return;}
+ if(d.dashPage!==undefined){editorPage=Math.max(0,Math.min(Math.ceil(draft.pattern.length/EDITOR_SPAN)-1,Number(d.dashPage)||0));renderBuilder();return;}
  if(d.dashTheme){const t=THEMES.find(row=>row[0]===d.dashTheme);if(t&&profile().clears>=t[2]){
   theme=t[0];try{localStorage.setItem('dash-forge-theme',theme);}catch{}renderAwards();}return;}
  switch(d.dashAction){
   case 'new':draft={id:null,title:'My New Dash',difficulty:2,pattern:'.'.repeat(48),
-     world:'Maker Studio',bossStyle:'none'};renderBuilder();break;
+     world:'Maker Studio',bossStyle:'none'};editorPage=0;undoHistory=[];redoHistory=[];draftDirty=true;creatorTestOutcome='';renderBuilder();break;
   case 'save':void saveDraft();break;
-  case 'test':if(!draft.id)setStatus('Save a draft first, then playtest it.',true);
-    else void startLevel(Number(draft.id));break;
-  case 'publish':if(!draft.id)setStatus('Save and beat your draft before publishing.',true);
+  case 'test':void playtestDraft();break;
+   case 'page-prev':editorPage=Math.max(0,editorPage-1);renderBuilder();break;
+   case 'page-next':editorPage=Math.min(Math.ceil(draft.pattern.length/EDITOR_SPAN)-1,editorPage+1);renderBuilder();break;
+   case 'undo':travelHistory('undo');break;
+   case 'redo':travelHistory('redo');break;
+   /* Previous test route kept below only as historical note. */
+   /*
+    */
+  case 'publish':if(!draft.id||draftDirty)setStatus('Save and successfully playtest this exact draft before publishing.',true);
     else void publishLevel(Number(draft.id));break;
   case 'sound':toggleSound();break;
   case 'leave':void leaveRun();break;
  }
 }
 async function saveDraft(){
- if(busy||run)return;busy=true;setStatus('Saving your editable level draft…');
+ if(busy||run)return null;
+ busy=true;setStatus('Saving your exact editable level so the playtest matches your changes…');
  try{
   draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);
   const saved=await call('community_dash_save_world',{p_title:draft.title,p_difficulty:draft.difficulty,
    p_pattern:draft.pattern,p_level_id:draft.id,p_world:draft.world,p_boss_style:draft.bossStyle});
-  draft.id=saved.id;
-  await refresh(true);setStatus('Draft saved. Beat this version in Playtest before publishing.');renderBuilder();
- }catch(e){setStatus(e.message,true);}finally{busy=false;}
+  draft.id=saved.id;draftDirty=false;
+  await refresh(true);
+  setStatus('Saved this exact version. Playtest it before publishing.');renderBuilder();
+  return saved.id;
+ }catch(e){setStatus('Save failed: '+e.message,true);return null;}finally{busy=false;}
+}
+async function playtestDraft(){
+ if(busy||run)return;
+ const id=await saveDraft();if(!id)return;
+ runFromBuilder=true;
+ await startLevel(Number(id));
+ if(!run)runFromBuilder=false;
 }
 async function publishLevel(id){
  if(busy||run)return;busy=true;setStatus('Checking your verified playtest…');
