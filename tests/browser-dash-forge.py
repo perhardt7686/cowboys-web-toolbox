@@ -35,17 +35,20 @@ export function createClient(){
     user_id:uid,levels,progress:mock.progress,awards:mock.awards,leaders:[],
     campaign_current:1,campaign_max:1000000000,
     mine:{player_points:0,designer_points:0,clears:0,published:0}},error:null};
-   if(name==='community_dash_save'){
+   if(name==='community_dash_save_world'){
     const id=args.p_level_id||100;
     const existing=levels.find(x=>x.id===id);
-    if(existing){existing.title=args.p_title;existing.pattern=args.p_pattern;}
+    if(existing){existing.title=args.p_title;existing.pattern=args.p_pattern;existing.world=args.p_world;existing.boss_style=args.p_boss_style;existing.boss=args.p_boss_style!=='none';}
     else levels.push({id,title:args.p_title,pattern:args.p_pattern,difficulty:args.p_difficulty,
-     kind:'member',stage:null,creator:uid,creator_name:'Test Member',published:false,verified_solves:0});
+     kind:'member',stage:null,creator:uid,creator_name:'Test Member',published:false,verified_solves:0,
+     world:args.p_world,boss_style:args.p_boss_style,boss:args.p_boss_style!=='none',
+     boss_name:args.p_boss_style==='volcanic'?'Magma Titan':null});
     return {data:{id,status:'draft'},error:null};}
    if(name==='community_dash_start'){
     const item=levels.find(x=>x.id===args.p_level_id);
     return {data:{run_id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',title:item.title,
-      level_id:item.id,pattern:item.pattern,pace_ms:210},error:null};}
+      level_id:item.id,pattern:item.pattern,pace_ms:item.pace_ms||210,world:item.world,
+      boss:item.boss,boss_style:item.boss_style,boss_name:item.boss_name},error:null};}
    if(name==='community_dash_finish')return {data:{won:false,death_tile:6,elapsed_ms:1550,server_verified:true},error:null};
    if(name==='community_dash_publish')return {data:null,error:{message:'Beat the draft before publishing.'}};
    return {data:null,error:{message:'Unknown simulated RPC '+name}};
@@ -72,11 +75,16 @@ async def run_one(browser,width,height):
   assert 'ONE BILLION NUMBERED STAGES' in await page.locator('.dash-forever-counter').inner_text()
   assert await page.locator('[data-dash-play="2"]').is_disabled(), 'Next campaign stage locked'
   await page.locator('#dash-forge-root [data-dash-tab="builder"]').click()
+  await page.locator('#dash-world').select_option('Volcanic Foundry')
+  await page.locator('#dash-boss-style').select_option('volcanic')
+  assert await page.locator('#dash-phase-guide').is_visible(), 'Boss Creator must expose three attack phases'
+  assert await page.locator('#dash-creator-preview').is_visible(), 'Creator must preview chosen world'
   await page.locator('#dash-editor-grid [data-dash-cell="9"]').click()
   assert await page.locator('#dash-editor-grid [data-dash-cell="9"]').inner_text()=='▲'
   await page.locator('#dash-forge-root [data-dash-action="save"]').click()
-  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_save')")
-  assert await page.locator('#dash-builder-help').inner_text() != 'New level · safe first and last four tiles'
+  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world')")
+  assert 'Volcanic Foundry' in await page.locator('#dash-builder-help').inner_text()
+  assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world' && x.args.p_world==='Volcanic Foundry' && x.args.p_boss_style==='volcanic')")
   await page.locator('#dash-forge-root [data-dash-tab="community"]').click()
   assert await page.locator('#dash-community-list .dash-level').count()==1, 'Draft visible to author'
   await page.locator('#dash-forge-root [data-dash-tab="campaign"]').click()
