@@ -13,6 +13,7 @@ const labels = {
   study: {cards: 'Study cards', awards: 'Milestones', sources: 'Study resources'}
 };
 const instructions = {
+  skyboard:'Steer with left and right buttons or arrow keys. Jump over gaps and bars with JUMP, Space or Up. Hold DRIFT to slide faster around curves; collect stars and boost pads. Six boards unlock across thirty colorful courses. Scores and milestone prizes save to your own approved family account.',
   fleet:'Move left or right; hold FIRE or Space to shoot the alien swarms. Every fifth commander is worth extra points. Trophies require server-verified scores.',
   maze:'Navigate with direction buttons or arrow keys, collect clue lights, and evade the wisps. Special orbs give temporary protection. Trophies require verified scores.',
   dashforge: 'Tap the screen or JUMP to leap over blocks, spikes and gaps. Advance through one billion shared stages. Every 25th stage has the same three-phase boss for every family member. In Level Studio, draw a level, save a draft, beat your own playtest, and publish it. Designer points come only from the first other member’s validated active time to solve that level. Likes, views, drafts and your own wins pay no creator awards.',
@@ -27,6 +28,7 @@ const get = id => document.getElementById(id);
 const sceneAction = (label, scene, scope) => ({label, scene, scope});
 const clickAction = (label, target, scene) => ({label, target, scene});
 const actions = {
+  skyboard:[sceneAction('Ride current stage','play'),sceneAction('Choose board','boards'),sceneAction('Milestone trophies','awards'),sceneAction('Family leaderboard','leaders')],
   fleet:[sceneAction('Play Star Squadron','play'),sceneAction('Trophy cabinet','trophies'),sceneAction('Family high scores','leaders')],
   maze:[sceneAction('Play Mystery Maze','play'),sceneAction('Trophy cabinet','trophies'),sceneAction('Family high scores','leaders')],
   dashforge: [sceneAction('Campaign stages','campaign'),sceneAction('Family-made levels','community'),
@@ -178,6 +180,7 @@ export function makeArcadeNav({leave, view, settings}) {
     if (!selected || header.hidden) return;
     const text = id => (get(id)?.textContent || '').trim();
     const values = ({
+      skyboard: [text('skyboard-stage'),text('skyboard-coins')],
       dashforge: [text('dash-forge-summary').slice(0,45),text('dash-live-progress')],
       mahjong: [text('mahjong-run-title').replace(/ · Combo .+$/, ''), text('mahjong-remaining')],
       wordle: [...(get('letter-lock-statline')?.children || [])].slice(1, 4).map(item => {
