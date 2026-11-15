@@ -1,0 +1,40 @@
+/* Private family-only pet exchange. Responsive 44px minimum controls. */
+body.community-page .avatar-pet-trade-host{margin-top:19px;border-top:2px solid #bba1ca;padding-top:13px}
+body.community-page .avatar-pet-trades{display:grid;gap:12px;min-width:0;}
+body.community-page .avatar-pet-trades h3{font:850 clamp(18px,3vw,24px)/1.2 system-ui;color:#4d2f5a;margin:0;}
+body.community-page .avatar-pet-trades h4{font:850 17px/1.2 system-ui;color:#533263;margin:0 0 8px}
+body.community-page .avatar-pet-trades .avatar-reward-copy{line-height:1.5;margin:3px 0 9px;color:#44324b}
+body.community-page .avatar-pet-trade-new,body.community-page .avatar-pet-trade-inbox{
+ display:grid;gap:10px;min-width:0;padding:14px;
+ border-radius:17px;border:2px solid #c8acda;background:linear-gradient(150deg,#fff9ed,#f1e9f9);
+}
+body.community-page .avatar-pet-trade-field{display:grid;gap:6px;min-width:0;font-size:14px;font-weight:800;color:#352744}
+body.community-page .avatar-pet-trade-field select{
+ display:block;min-width:0;width:100%;height:48px;padding:8px 11px;
+ font:750 15px/1.3 system-ui;color:#362b4a;background:#fff;border:2px solid #9676a7;border-radius:11px;
+}
+body.community-page .avatar-pet-trade-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+body.community-page .avatar-pet-trades .avatar-reward-button{min-height:44px;white-space:normal}
+body.community-page .avatar-pet-trade-offer{
+ border:1px solid #b18fc5;border-radius:13px;padding:13px;background:#fffcf6;min-width:0;
+}
+body.community-page .avatar-pet-trade-offer>strong{font-size:16px;color:#45245c}
+body.community-page .avatar-pet-trade-meta{display:block;color:#645371;line-height:1.5;font-weight:700}
+body.community-page .avatar-pet-trade-review{
+ border:3px solid #dfb15f;border-radius:16px;padding:14px;background:#fff2d1;
+ box-shadow:0 4px 14px #7b493123;
+}
+body.community-page .avatar-pet-trades .avatar-pet-trade-warning{
+ font-weight:750;color:#653525;line-height:1.4
+}
+body.community-page .avatar-pet-trade-message{
+ padding:9px 12px;border:1px solid #b48bc9;border-radius:10px;background:#f3e7fa;
+ color:#47295f;font-weight:800
+}
+body.community-page .avatar-pet-trades :is(button,select):focus-visible{
+ outline:3px solid #197dc1;outline-offset:2px
+}
+@media(max-width:430px){
+ body.community-page .avatar-pet-trade-new,body.community-page .avatar-pet-trade-inbox{padding:10px}
+ body.community-page .avatar-pet-trade-actions>.avatar-reward-button{flex:1 1 135px}
+}

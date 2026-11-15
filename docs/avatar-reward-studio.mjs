@@ -3,7 +3,7 @@ import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './av
 import {normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=mystery2';
 
 import {prizeAction} from './avatar-prize-actions.mjs?v=mystery2';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=mystery2';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=trade2';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
@@ -118,6 +118,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     openReward:item=>setSection('collection',item.id),
     tryOn(item){tryOn(item);setSection('avatar');},
     reduceMotion:reduceAnimation,
+    onInventoryChange:()=>void refresh(),
     isOpen:()=>contains()&&section==='pets'&&Boolean(pane?.getClientRects().length)
   });
 

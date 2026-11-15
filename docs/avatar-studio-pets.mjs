@@ -1,6 +1,7 @@
 import {button,el} from './family-board-core.mjs?v=family3';
 import {petBehavior} from './avatar-prize-actions.mjs?v=mystery2';
 import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=mystery2';
+import {createPetTradeUI} from './avatar-pet-trading.mjs?v=trade2';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;
@@ -10,8 +11,9 @@ const actionButton=(label,action,kind='')=>{
   return control;
 };
 
-export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openReward,tryOn,isOpen,reduceMotion}) {
+export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openReward,tryOn,isOpen,reduceMotion,onInventoryChange}) {
   let root,selected='',state='idle',pets=new Map(),pending=false,message='',epoch=0,stop=()=>{};
+  const trading=createPetTradeUI({rpc,catalog,onChanged:()=>{refresh();onInventoryChange?.();},isOpen});
   function showPet(id) {
     selected=id||selected;
     message='';
@@ -73,12 +75,12 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     stop();
     const chosen=catalog().filter(item=>item.slot==='companion');
     const known=unlocksKnown();
-    const earned=chosen.filter(item=>have(item.id));
-    const waiting=chosen.filter(item=>!have(item.id));
+    const earned=chosen.filter(item=>have(item.id)||pets.has(item.id));
+    const waiting=chosen.filter(item=>!have(item.id)&&!pets.has(item.id));
     const item=chosen.find(entry=>entry.id===selected)||earned[0]||chosen.find(entry=>entry.id==='trail-husky');
     if(!item)return;
     selected=item.id;
-    const owned=have(item.id),pet=pets.get(item.id);
+    const pet=pets.get(item.id),owned=have(item.id)||Boolean(pet);
     const focus=document.activeElement?.dataset.petAction;
     const focusSelect=root.contains(document.activeElement)&&document.activeElement?.tagName==='SELECT';
     const selection=el('select');
@@ -161,7 +163,9 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     const status=el('p','avatar-pet-status');status.setAttribute('role','status');
     details.append(status);
     card.append(canvas,details);
-    root.replaceChildren(tab,card);
+    const tradeHost=el('div','avatar-pet-trade-host');
+    root.replaceChildren(tab,card,tradeHost);
+    trading.mount(tradeHost,pets,selected);
     drawPetPortrait(canvas,item);
     if(message)status.textContent=message;
     if(activity==='pet'||activity==='play'||activity==='trick')
@@ -179,7 +183,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
       render();
     },
     clear(){
-      stop();epoch++;root=null;selected='';state='idle';pets.clear();pending=false;message='';
+      stop();epoch++;trading.clear();root=null;selected='';state='idle';pets.clear();pending=false;message='';
     }
   };
 }
