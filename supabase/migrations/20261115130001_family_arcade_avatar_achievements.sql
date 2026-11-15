@@ -139,7 +139,7 @@ AS $function$
   from plate_total,classic,duels;
 $function$
 ;
-insert into community_private.avatar_reward_achievement(id,name,tier,group_id,match_type,position) values
+insert into community_private.avatar_reward_achievement(id,name,tier,group_id,match_type,position) overriding system value values
 ('fleet-first-flight','First Flight','starter','fleet','all',50),
 ('fleet-scout','Star Scout','starter','fleet','all',51),
 ('fleet-ace','Squadron Ace','bronze','fleet','all',52),
@@ -162,7 +162,7 @@ insert into community_private.avatar_reward_achievement(id,name,tier,group_id,ma
 ('dash-century','Dash Century','gold','dashforge','all',69),
 ('dash-legend','Dash Legend','legendary','dashforge','all',70)
 on conflict(id) do nothing;
-insert into community_private.avatar_reward_requirement(achievement_id,metric_id,target,position) values
+insert into community_private.avatar_reward_requirement(achievement_id,metric_id,target,position) overriding system value values
 ('fleet-first-flight','fleet-runs',1,74),
 ('fleet-scout','fleet-best',60,75),
 ('fleet-ace','fleet-best',200,76),
@@ -185,7 +185,7 @@ insert into community_private.avatar_reward_requirement(achievement_id,metric_id
 ('dash-century','dash-stages',100,93),
 ('dash-legend','dash-stages',250,94)
 on conflict(achievement_id,metric_id) do nothing;
-insert into community_private.avatar_reward_cosmetic(id,slot,achievement_id,name,tags,position) values
+insert into community_private.avatar_reward_cosmetic(id,slot,achievement_id,name,tags,position) overriding system value values
 ('starling-owl','companion','fleet-first-flight','Starling Owl',array['arcade','retro','mystery']::text[],290),
 ('nebula-visor','eyewear','fleet-scout','Nebula Visor',array['arcade','retro','mystery']::text[],291),
 ('meteor-jetpack','prop','fleet-ace','Meteor Jetpack',array['arcade','retro','mystery']::text[],292),
