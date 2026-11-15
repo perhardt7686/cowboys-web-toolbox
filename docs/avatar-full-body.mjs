@@ -30,6 +30,10 @@ export const WARDROBE_LABELS=Object.freeze({
   model:'Body',bottoms:'Bottoms & dresses',footwear:'Shoes',outerwear:'Outerwear',neckwear:'Neckwear',
   waist:'Belts',hands:'Gloves',back:'Bags'
 });
+export const SCULPT_LABELS=Object.freeze({
+  height:'Height',build:'Shoulder width',jaw:'Jaw contour',eye_spacing:'Eye spacing'
+});
+const SCULPT_STEPS=new Set(['-2','-1','0','1','2']);
 
 const starter={
   detective:{bottoms:'flares',footwear:'loafers',neckwear:'ascot'},
@@ -44,8 +48,11 @@ const starter={
 export function normalizeBody(value) {
   const input=value?.full_body;
   if(!input||typeof input!=='object'||Array.isArray(input))return BODY_DEFAULTS;
-  return Object.fromEntries(Object.entries(FULL_BODY_OPTIONS).map(([field,choices])=>
+  const fitted=Object.fromEntries(Object.entries(FULL_BODY_OPTIONS).map(([field,choices])=>
     [field,choices.some(([id])=>id===input[field])?input[field]:BODY_DEFAULTS[field]]));
+  for(const field of Object.keys(SCULPT_LABELS))
+    if(SCULPT_STEPS.has(input[field]))fitted[field]=input[field];
+  return fitted;
 }
 
 export function starterBody(value,model) {

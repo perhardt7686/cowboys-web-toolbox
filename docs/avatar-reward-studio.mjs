@@ -1,12 +1,14 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
 import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=turn1';
-import {avatarSnapshot, normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=turn1';
+import {avatarSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=studio2';
 
 import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=turn1';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=studio2';
 
-import {fitsBody} from './avatar-full-body.mjs?v=turn1';
-import {mountTurntable} from './avatar-turntable-controls.mjs?v=turn1';
+import {fitsBody} from './avatar-full-body.mjs?v=studio2';
+import {mountTurntable} from './avatar-turntable-controls.mjs?v=studio2';
+import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio2';
+import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPrize} from './avatar-studio-preview.mjs?v=studio2';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
@@ -37,7 +39,8 @@ function thumbnail(item,size=96){
   const node=el('canvas','avatar-reward-thumbnail');
   node.width=node.height=size;
   node.setAttribute('aria-hidden','true');
-  paintThumbnail(node,item);
+  studioPrize(node,item);
+  releaseStudioArt(node);
   return node;
 }
 
@@ -51,14 +54,24 @@ export function makeAvatarShowcase(open){
   const render=()=>{
     if(!root.open||rendered)return;
     rendered=true;
+    const pictures=[];
     for(const id of SHOWCASE){
       const item=BY_ID.get(id);
       if(!item)continue;
       const card=asButton('',()=>open(id),'avatar-showcase-card');
       card.setAttribute('aria-label','See '+item.name);
-      card.append(thumbnail(item,64),el('span','',item.name));
+      const art=thumbnail(item,86);
+      pictures.push({art,item});
+      card.append(art,el('span','',item.name));
       items.append(card);
     }
+    void prepareStudioRenderer().then(renderer=>{
+      if(!renderer||!root.isConnected)return;
+      for(const {art,item} of pictures){
+        studioPrize(art,item);
+        releaseStudioArt(art);
+      }
+    });
   };
   root.append(summary,items);
   root.addEventListener('toggle',render);
@@ -106,7 +119,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   let data=null,achievements=new Map(),owned=new Map(),epoch=0,query='',section='avatar';
   let slot='all',filter='all',game='all',sort='catalog',limit=PAGE,detail=null,loading=false,loadError='';
   let pending=null,frame=0,lastFrame=0,stopDemo=()=>{},stopPreview=()=>{},turntable=null;
-  let privateControls=null;
+  let privateControls=null,layoutWatch=null,viewEvents=null;
   const pendingAcks=new Set();
 
   function getData(){return data;}
@@ -376,7 +389,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     const state=el('p','avatar-prize-caption',action.description);
     const handle=item.slot==='companion'?()=>setSection('pets',item.id):()=>{
       stopDemo();
-      stopDemo=playCel(art,progress=>paintPrizeDemo(art,item,progress),reduceAnimation);
+      stopDemo=playCel(art,progress=>studioPrize(art,item,progress),reduceAnimation);
     };
     const fit=fitsBody(getLoadout(),item);
     const trial=asButton('Try it on',()=>tryOn(item));trial.disabled=!fit;
@@ -437,6 +450,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function renderResults(){
     if(!results)return;
     stopDemo();
+    results.querySelectorAll('canvas').forEach(releaseStudioArt);
     results.replaceChildren();
     const selected=detail&&BY_ID.get(detail);
     if(section==='collection'&&selected){
@@ -492,14 +506,55 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     paintPreview();
   }
 
+  function releaseStage(){
+    layoutWatch?.disconnect();layoutWatch=null;
+    viewEvents?.abort();viewEvents=null;
+    if(turntable){releaseStudioArt(turntable.canvas);turntable.destroy();turntable=null;}
+  }
+
+  function choosePart(part){
+    for(const panel of editor.querySelectorAll('[data-studio-panel]'))
+      panel.hidden=panel.dataset.studioPanel!==part;
+    for(const button of editor.querySelectorAll('[data-studio-part]'))
+      button.setAttribute('aria-pressed',String(button.dataset.studioPart===part));
+  }
+
   function mount(nextRoot,{nextSection='avatar',item=null}={}){
+    releaseStage();
     root=nextRoot;
     editor=root.querySelector('.family-character-editor');
     if(!editor)return;
-    turntable?.destroy();
     const stage=editor.querySelector('[data-avatar-turntable]');
+    const canvas=stage.querySelector('canvas');
+    const frame=canvas.parentElement;
+    viewEvents=new AbortController();
+    editor.addEventListener('click',event=>{
+      const toggle=event.target.closest('[data-studio-part]');
+      if(!toggle)return;
+      choosePart(toggle.dataset.studioPart);
+      if(toggle.dataset.studioPart==='face'||toggle.dataset.studioPart==='hair')turntable?.face();
+      else stage.querySelector('[data-turn="body"]').click();
+    },{signal:viewEvents.signal});
     turntable=mountTurntable(stage,(camera,t,activity)=>
-      renderLoadout(stage.querySelector('canvas'),getLoadout(),t,activity,camera),reduceAnimation);
+      studioCharacter(canvas,getLoadout(),camera,t,activity),reduceAnimation,(x,y,view)=>{
+        const part=pickStudioPart(canvas,x,y)||
+          (canvas.dataset.renderer!=='3d'&&x>.20&&x<.79&&y>.13&&y<.71?(y<.34?'face':'clothes'):null);
+        if(!part)return;
+        setSection(part==='pets'?'pets':'avatar');
+        if(part!=='pets')choosePart(part);
+        if(part==='face'&&view.zoom<2)turntable?.face();
+      });
+    const resize=()=>{
+      if(!frame.clientWidth||!frame.clientHeight||turntable?.canvas!==canvas)return;
+      const detail=Math.min(window.devicePixelRatio||1,1.5);
+      const width=Math.round(frame.clientWidth*detail),height=Math.round(frame.clientHeight*detail);
+      if(width===canvas.width&&height===canvas.height)return;
+      canvas.width=width;canvas.height=height;
+      turntable.draw();
+    };
+    layoutWatch=new ResizeObserver(resize);layoutWatch.observe(frame);resize();
+    for(const tile of editor.querySelectorAll('[data-look-preview]'))
+      renderLoadout(tile,SHOWROOM_LOOKS[tile.dataset.lookPreview],0,null,{angle:18,crop:{size:198}});
     pane=el('section','avatar-reward-pane');
     filters=el('div','avatar-reward-filters');
     results=el('div','avatar-reward-results');
@@ -510,11 +565,18 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       next.dataset.rewardSection=key;tabs.append(next);
     }
     editor.prepend(tabs);pane.append(filters,results);
-    editor.insertBefore(pane,editor.querySelector('#avatar-equipped'));
+    editor.querySelector('.studio-editor-panel').insertBefore(pane,editor.querySelector('#avatar-equipped'));
     privateControls=root.querySelector('.family-avatar-methods');
     section=nextSection;detail=item;
     if(section==='pets')pets.showPet(item);
     draw();
+    void prepareStudioRenderer().then(renderer=>{
+      if(!renderer||turntable?.canvas!==canvas||!contains())return;
+      paintPreview();
+      for(const tile of editor.querySelectorAll('[data-look-preview]'))
+        studioLook(tile,tile.dataset.lookPreview);
+      if(section!=='avatar')renderResults();
+    });
     if(detail)focusDetail();
     void refresh();
   }
@@ -529,7 +591,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     cancelAnimationFrame(frame);
     stopDemo();
     stopPreview();
-    turntable?.destroy();turntable=null;
+    releaseStage();
     pets.clear();
   }
 

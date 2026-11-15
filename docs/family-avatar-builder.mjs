@@ -1,7 +1,7 @@
 /* Family Avatar Studio: original, fully local character art.
    No external images, tracking, accounts, or third-party avatar service. */
-import {FULL_BODY_OPTIONS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=turn1';
-import {turntableHTML} from './avatar-turntable-controls.mjs?v=turn1';
+import {FULL_BODY_OPTIONS,SCULPT_LABELS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=studio2';
+import {turntableHTML} from './avatar-turntable-controls.mjs?v=studio2';
 import {paintPortrait} from './avatar-cel-portrait.mjs?v=toon3';
 
 export const AVATAR_OPTIONS = Object.freeze({
@@ -67,38 +67,53 @@ export function drawFamilyAvatar(canvas, value, overlays = {}, t = 0) {
 }
 export function makeAvatarStudioHTML(recipe) {
   const v=normalizeAvatarRecipe(recipe);
-  const groups=[
-    ['Body & wardrobe',['model','bottoms','footwear','outerwear','neckwear','waist','hands','back']],
-    ['Face & skin',['skin','face','nose','cheeks']],
-    ['Hair & facial hair',['style','hair','beard']],
-    ['Eyes & expressions',['eyes','eye_shape','brows','expression']],
-    ['Groovy wardrobe',['shirt','garment','hat','glasses','accessory']],
-    ['Backdrop & pose',['background','pose']]
-  ];
   const kit=normalizeBody(recipe);
-  const renderGroup=key=>{
+  const renderField=key=>{
     const full=Boolean(FULL_BODY_OPTIONS[key]);
     const label=full?WARDROBE_LABELS[key]:AVATAR_LABELS[key];
     const choices=full?FULL_BODY_OPTIONS[key]:AVATAR_OPTIONS[key];
     const selected=full?kit[key]:v[key];
-    return '<fieldset class="family-avatar-field"><legend>'+label+'</legend><div class="family-avatar-picks">'+
+    return '<fieldset class="family-avatar-field" data-studio-field="'+key+'"><legend>'+label+'</legend><div class="family-avatar-picks">'+
       choices.map(([id,name,hex])=>
         '<button type="button" class="family-avatar-choice" '+(full?'data-avatar-body':'data-avatar-feature')+
         '="'+key+'" data-avatar-value="'+id+'" aria-pressed="'+(selected===id)+'" aria-label="'+label+': '+name+'">'+
+        (key==='model'?'<canvas class="studio-look-art" width="156" height="176" data-look-preview="'+id+'" aria-hidden="true"></canvas>':'')+
         (hex?'<span class="family-avatar-color" style="background:'+hex+'"></span>':'')+'<span>'+name+'</span></button>'
       ).join('')+'</div></fieldset>';
   };
-  return '<section class="family-character-editor" aria-labelledby="family-character-title">'+
-    '<div class="family-character-top">'+turntableHTML({editor:true})+
-    '<div class="family-character-intro"><h3 id="family-character-title">My mystery-cartoon character</h3>'+
-    '<p id="avatar-preview-status" role="status">Choose a look, then save your avatar.</p>'+
-    '<div class="avatar-preview-actions"><button type="button" class="button-quiet" data-avatar-random>Surprise me</button>'+
-    '<button type="button" class="button-quiet" data-avatar-undo>Undo</button>'+
-    '<button type="button" class="button-quiet" data-avatar-reset>Reset preview</button></div></div></div>'+
-    '<div class="family-avatar-fields">'+groups.map(([title,keys],index)=>
-      '<details class="avatar-feature-group"'+(index<2?' open':'')+'><summary>'+title+'</summary>'+
-      '<div>'+keys.map(renderGroup).join('')+'</div></details>').join('')+'</div>'+
-    '<div id="avatar-equipped"></div><div id="avatar-outfits"></div>'+
+  const panels=[
+    ['looks','Looks',[['Body styles',['model']],['Pose',['pose']]]],
+    ['face','Face',[['Face & skin',['skin','face','nose','cheeks']],['Eyes & expressions',['eyes','eye_shape','brows','expression']]]],
+    ['hair','Hair',[['Hair & facial hair',['style','hair','beard']]]],
+    ['clothes','Clothes',[['Tops & jackets',['garment','shirt','outerwear']],['Bottoms & shoes',['bottoms','footwear']]]],
+    ['gear','Gear',[['Hats & glasses',['hat','glasses','accessory']],['Layers & accessories',['neckwear','waist','hands','back']]]],
+    ['scenes','Scenes',[['Backdrops',['background']]]]
+  ];
+  const sliders=keys=>'<fieldset class="studio-sculpt"><legend>Fine tune</legend>'+
+    keys.map(key=>'<label><span>'+SCULPT_LABELS[key]+'</span><input type="range" min="-2" max="2" step="1" value="'+
+      (kit[key]??'0')+'" data-studio-sculpt="'+key+'"></label>').join('')+'</fieldset>';
+  return '<section class="family-character-editor avatar-dressing-studio" aria-label="Avatar editor">'+
+    '<div class="family-character-top studio-stage">'+
+      '<div class="studio-stage-title"><h3 id="family-character-title">Character</h3>'+
+      '<div class="avatar-preview-actions" role="group" aria-label="Edit history">'+
+      '<button type="button" class="studio-text-button" data-avatar-undo>Undo</button>'+
+      '<button type="button" class="studio-text-button" data-avatar-reset>Restore saved</button></div></div>'+
+      turntableHTML({editor:true})+
+      '<p id="avatar-preview-status" class="studio-preview-message" role="status"></p>'+
+    '</div>'+
+    '<div class="studio-editor-panel">'+
+      '<div class="family-avatar-fields"><div class="studio-edit-tabs" role="group" aria-label="Character parts">'+
+      panels.map(([id,label],index)=>'<button type="button" data-studio-part="'+id+'" aria-pressed="'+(!index)+'">'+label+'</button>').join('')+
+      '</div>'+
+      panels.map(([id,label,groups],index)=>'<div data-studio-panel="'+id+'" role="region" aria-label="'+label+'"'+(index?' hidden':'')+'>'+
+        groups.map(([title,keys],position)=>'<details class="avatar-feature-group"'+(!position?' open':'')+'><summary>'+title+'</summary>'+
+          '<div>'+keys.map(renderField).join('')+'</div></details>').join('')+
+        (id==='looks'?sliders(['height','build']):id==='face'?sliders(['jaw','eye_spacing']):'')+
+        (!index?'<button type="button" class="studio-shuffle studio-text-button" data-avatar-random>Surprise me</button>':'')+
+        '</div>').join('')+
+      '</div>'+
+      '<div id="avatar-equipped"></div><div id="avatar-outfits"></div>'+
+    '</div>'+
     '</section>';
 }
 export function randomAvatarRecipe(random=Math.random){

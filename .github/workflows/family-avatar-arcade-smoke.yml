@@ -60,6 +60,7 @@ jobs:
           name: family-avatar-arcade-mobile
           path: |
             reports/avatar-turntable-iphone.png
+            reports/avatar-studio-desktop.png
             reports/avatar-rewards-*.png
             reports/family-avatar-studio-*.png
             reports/family-pet-trade-*.png

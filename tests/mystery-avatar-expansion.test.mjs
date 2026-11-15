@@ -35,7 +35,7 @@ test('new face, nose, cheek and garment options remain completely free',()=>{
  const old=normalizeAvatarRecipe({skin:'sand',shirt:'violet',style:'wavy'});
  assert.equal(old.face,'oval');assert.equal(old.garment,'collared');
  for(const key of Object.keys(DEFAULT_AVATAR_RECIPE))assert.ok(old[key]);
- assert.match(read('docs/community.html'),/community\.js\?v=turn1/);
+ assert.match(read('docs/community.html'),/community\.js\?v=[\w-]+"/);
 });
 test('profile photos remain available, while unlocks stay server-gated',()=>{
  const p=read('docs/community-profiles.mjs'),s=read('docs/avatar-reward-studio.mjs');

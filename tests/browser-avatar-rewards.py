@@ -17,10 +17,11 @@ async def visit(browser, width, full=False):
     await page.locator('#family-avatar-quick').click()
     editor = page.locator('#profile-studio-form')
     await expect(editor.get_by_role('button', name='My Avatar', exact=True)).to_be_visible()
-    await editor.locator('summary').filter(has_text='Hair & facial hair').click()
+    await editor.locator('[data-studio-part="hair"]').click()
     await editor.locator('[data-avatar-feature=hair][data-avatar-value=purple]').click()
     canvas = editor.locator('#family-avatar-canvas')
     retro_before=await canvas.evaluate('n=>n.toDataURL()')
+    await editor.locator('[data-studio-part="face"]').click()
     await editor.locator('summary').filter(has_text='Eyes & expressions').click()
     await editor.locator('[data-avatar-feature=eye_shape][data-avatar-value=dramatic]').click()
     retro_after=await canvas.evaluate('n=>n.toDataURL()')
@@ -51,6 +52,7 @@ async def visit(browser, width, full=False):
         await expect(editor.get_by_text('Remove the preview-only items before saving your avatar.')).to_be_visible()
         await card.get_by_role('button', name='See Dragon Crown').click()
         artwork = editor.locator('.avatar-prize-art')
+        await expect(artwork).to_have_attribute('data-renderer', '3d', timeout=12000)
         resting = await artwork.evaluate('node => node.toDataURL()')
         await editor.get_by_role('button', name='Wake the dragon').click()
         assert resting != await artwork.evaluate('node => node.toDataURL()'), 'Dragon embers'
@@ -91,6 +93,7 @@ async def visit(browser, width, full=False):
         await expect(editor.get_by_text('Game reward · Locked')).to_be_visible()
         await expect(editor.get_by_role('button', name='Adopt', exact=True)).to_have_count(0)
         portrait = editor.locator('.avatar-pet-portrait')
+        await expect(portrait).to_have_attribute('data-renderer', '3d')
         resting = await portrait.evaluate('node => node.toDataURL()')
         await editor.get_by_role('button', name='Preview pet', exact=True).click()
         assert resting != await portrait.evaluate('node => node.toDataURL()'), 'Locked pet preview'
