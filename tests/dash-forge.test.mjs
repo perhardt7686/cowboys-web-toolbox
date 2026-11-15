@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {DASH_CEILING,DASH_MODES,createDashCourse,createDashRun,dashShape,replayDash,stepDash} from '../docs/dash-physics.mjs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const modulePath='docs/commons-dash-forge.mjs';
 const src=read(modulePath),css=read('docs/commons-dash-forge.css');
@@ -37,6 +38,17 @@ test('Six fixed campaign tracks are solvable and stage-gated',()=>{
    jumps.push(jump);last=jump;
   }
   assert.ok(jumps.length>=3,'Each stage has at least three skill jumps');
+  const course=createDashCourse(pattern,210),run=createDashRun(course),trace=[];
+  let previousInput=0;
+  while(!run.done){
+   const next=course.cells.find(tile=>tile.token!=='.'&&tile.x+.32>run.x);
+   const distance=next?next.x-run.x:100;
+   const aim=next?.token==='g'?.93:.25*1000/course.pace+.38;
+   const input=Number(run.supported&&distance>=.45&&distance<=aim);
+   if(input!==previousInput){trace.push([run.tick,input]);previousInput=input;}
+   stepDash(run,input);
+  }
+  assert.equal(replayDash(pattern,210,{},trace).won,true,'Fixed-step starting stage '+stage);
  }
  assert.match(migration,/Finish the previous campaign stage to unlock this level/);
  assert.match(src,/campaign_current/);
@@ -53,7 +65,7 @@ test('Players and designers have isolated rewards verified only by privileged se
  assert.match(migration,/v_designer_ms>=90000/);
  assert.match(migration,/on conflict do nothing/);
  assert.doesNotMatch(migration,/community_dash_like|community_dash_view_reward/i);
- assert.match(src,/community_dash_finish/);
+ assert.match(src,/submitArcadeReplay\(client,cfg,'dash'/);
  assert.match(src,/data-dash-cell/);
  assert.match(src,/pointerdown/);
  assert.match(src,/e\.code==='Space'/);
@@ -87,13 +99,51 @@ test('Billion-stage family campaign regenerates deterministic worlds and safegua
  assert.match(world,/v_expected:=\(v_sim->>'tiles'\)::int\*v_level\.pace_ms/);
  assert.match(world,/100\+least\(300,v_level\.stage\)\*40/);
  assert.match(pattern,/\^\[\.sbglwcpfrmodh\]\+\$/);
- assert.match(src,/Math\.floor\(run\.elapsed\/\(run\.pace\|\|210\)\)/);
- assert.match(src,/renderHazard/);
+ assert.match(src,/stepDash\(physics,input\)/);
+ assert.match(src,/drawDashObject/);
  assert.match(src,/backdrop\(g,cam,ground\)/);
  assert.match(src,/THEMES=\[/);
  assert.match(src,/ONE BILLION NUMBERED STAGES/);
  assert.match(src,/function originalBeat\(/);
  assert.match(src,/id=\\"dash-sound\\"|id="dash-sound"/);
  assert.match(src,/THUNDER|Thunder Rails/);
- assert.match(src,/renderHazard\(g,run\.pattern\[i\]/);
+ assert.match(src,/drawDashObject\(g,r\.course,cell/);
+});
+
+test('The eight modes change real physics rather than only the player sprite',()=>{
+ const outcomes=new Map();
+ for(const mode of Object.keys(DASH_MODES)){
+  const run=createDashRun(createDashCourse('......'+mode+'.'.repeat(17)),{tile:7,practice:true});
+  const previous=run.y;stepDash(run,3);
+  assert.equal(run.mode,mode);
+  outcomes.set(mode,[run.gravity,run.vy,Math.round((run.y-previous)*100)].join('/'));
+  if(mode==='P')assert.ok(run.y>DASH_CEILING-.4);
+  if(mode==='B')assert.equal(run.gravity,-1);
+ }
+ assert.equal(new Set(outcomes.values()).size,8);
+});
+test('Ground spikes collide, raised hazards clear, and transforms share one geometry',()=>{
+ const pattern='......s'.padEnd(24,'.');
+ const ground=replayDash(pattern,210,{},[]);
+ assert.equal(ground.death_tile,6);
+ assert.equal(replayDash(pattern,210,{layout:[[6,3,3,1,0]]},[]).won,true);
+ assert.equal(replayDash(pattern,210,{},[[126,3],[127,0]]).won,true);
+ assert.throws(()=>replayDash(pattern,210,{},[[9999,1]]),/extend past/);
+ const field=createDashCourse('......d.......M.........',210,{layout:[[6,2,3,0,2]]});
+ assert.notEqual(dashShape(field,field.cells[6],0).x,dashShape(field,field.cells[6],.6).x);
+ assert.notEqual(dashShape(field,field.cells[14],0).low,dashShape(field,field.cells[14],.6).low);
+});
+test('Portals, practice checkpoints, fast lanes and boss phases use authored geometry',()=>{
+ const pattern='....K.F.J.C.E...'.padEnd(24,'.');
+ const normal=createDashRun(createDashCourse(pattern,210));
+ while(!normal.done)stepDash(normal);
+ const practice=createDashRun(createDashCourse(pattern,210),{practice:true});
+ while(!practice.done)stepDash(practice);
+ assert.ok(normal.won);
+ assert.equal(practice.checkpoint,5);
+ assert.equal(normal.checkpoint,0);
+ assert.ok(normal.elapsed<24*.21);
+ const boss=createDashCourse('.'.repeat(48),210,{boss:true,bossStyle:'volcanic'});
+ assert.equal(boss.cells.filter(o=>o.attack).length,3);
+ assert.equal(replayDash(boss.pattern,210,{boss:true,bossStyle:'volcanic'},[]).won,false);
 });

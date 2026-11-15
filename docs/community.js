@@ -80,12 +80,18 @@ function renderBoardAccess(){
   $('board-access-content').innerHTML=`<span class="board-access-mark" aria-hidden="true">⌑</span><p class="eyebrow">FAMILY MESSAGE BOARD</p><h2>${esc(copy.title)}</h2><p>${esc(copy.text)}</p><div class="board-access-actions">${!state.member?'<button class="button-primary" data-auth="login">Log in</button><button class="button-quiet" data-auth="signup">Request membership</button>':copy.pending?'<button class="button-primary" data-check-membership>Check approval status</button>':''}<a class="button-quiet" href="./">Explore the website collection</a></div><p class="board-access-foot">The website collection is open to everyone. Reading or posting on the boards requires approved membership.</p>`;return false;
 }
 function renderCategories(){$('community-categories').innerHTML=[{id:'all',name:'All conversations',icon:'◌'},...CATEGORIES].map(c=>`<button data-category="${c.id}" aria-pressed="${state.category===c.id}"><span class="category-icon" aria-hidden="true">${c.icon}</span>${esc(c.name)}</button>`).join('');}
+function publishAvatarShortcut(){
+  const member=state.member,visible=canReadBoard(member);
+  const html=visible?profiles.avatar({...state.profile,user_id:member.user_id,display_name:member.display_name}):'';
+  window.dispatchEvent(new CustomEvent('family-avatar-state',{detail:{visible,html}}));
+}
+window.addEventListener('family-avatar-state-request',publishAvatarShortcut);
 function renderAccount(){
-  if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Request access</button>';window.dispatchEvent(new CustomEvent('family-avatar-state',{detail:{visible:false}}));return}
+  if(!state.member){$('account-actions').innerHTML='<button class="button-quiet" data-auth="login">Log in</button><button class="button-primary button-small" data-auth="signup">Request access</button>';publishAvatarShortcut();return}
   const member=state.member;
   $('account-actions').innerHTML=`<details class="account-menu"><summary>${profiles.avatar({...state.profile,user_id:member.user_id,display_name:member.display_name})}<span>${esc(member.display_name)}</span><span aria-hidden="true">⌄</span></summary><div class="account-dropdown"><button data-profile>Edit family profile</button>${member.role==='owner'?'<button data-owner>Owner dashboard</button>':''}<button data-signout>Log out</button></div></details>`;
   if(canReadBoard(member)){hub.decorateAccount();powers.decorateAccount();}
-  window.dispatchEvent(new CustomEvent('family-avatar-state',{detail:{visible:canReadBoard(member),html:profiles.avatar({...state.profile,user_id:member.user_id,display_name:member.display_name})}}));
+  publishAvatarShortcut();
 }
 function renderNotice(){
   let html='';

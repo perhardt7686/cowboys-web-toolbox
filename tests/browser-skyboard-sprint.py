@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke-test Emma's playable Skyboard controls on a synthetic, approved member.
-No real family credentials, scores, member records or database writes are used.
-"""
+"""Play actual Skyboard controls against a synthetic approved-member session."""
 import asyncio
 from pathlib import Path
 from playwright.async_api import async_playwright
@@ -11,29 +9,36 @@ URL="http://127.0.0.1:8765/__skyboard__/community.html"
 HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-board-rush.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true,supabaseUrl:'https://demo.supabase.co',publishableKey:'test'};</script>
-</head><body class="community-page" style="margin:0;background:#171334">
+</head><body class="community-page" style="margin:0;background:#171334;--arcade-top:0px;--arcade-bottom:0px">
 <section id="conversations"><div class="community-main"><div id="dash-forge-root"></div></div></section>
-<script type="module" src="/commons-board-rush.mjs"></script>
-</body></html>"""
-MOCK="""export const createClient=()=>({
- auth:{
-  getSession:async()=>({data:{session:{user:{id:'test-member'}}}}),
-  onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})
- },
+<script type="module" src="/commons-board-rush.mjs"></script></body></html>"""
+MOCK="""const id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+export const createClient=()=>({
+ auth:{getSession:async()=>({data:{session:{user:{id},access_token:'test-token'}}}),
+  onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},
  from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:{status:'approved'},error:null})})})}),
  rpc:async(name,args={})=>{
+  if(name==='community_avatar_projections')return {data:[{user_id:id,avatar_display:{skin:'tan',shirt:'teal',hair:'red',garment:'denim'}}],error:null};
   if(name==='community_boardride_state')return {data:{
-   mine:{user_id:'test-member',stage:1,points:0,coins:0,clears:0,runs:0},
-   badges:[],leaders:[]},error:null};
-  if(name==='community_boardride_start')return {data:{run_id:'test-run',seed:12345678,stage:1,board:args.p_board},error:null};
-  if(name==='community_boardride_finish')return {data:{saved:true,points:240,new_badges:['first']},error:null};
+   mine:{user_id:id,stage:1,points:0,coins:0,clears:0,runs:0},badges:[],leaders:[]},error:null};
+  if(name==='community_boardride_start_v2')return {data:{
+   run_id:'11111111-1111-4111-9111-111111111111',seed:555,stage:1,board:args.p_board,
+   ghost:{name:'QA ghost',frames:[[12,142,0,50],[24,284,0,50]],time_ms:10000}},error:null};
   return {data:null,error:{message:'Unexpected request '+name}}
  }
-});"""
+});
+const fetchOriginal=window.fetch.bind(window);
+window.fetch=async (url,options)=>{
+  if(!String(url).endsWith('/functions/v1/family-arcade'))return fetchOriginal(url,options);
+  const {replaySky}=await import(new URL('/skyboard-physics.mjs',window.location.origin).href);
+  const body=JSON.parse(options.body),result=replaySky(1,555,'sunny',body.trace);
+  window.replayChecked={...result,game:body.game,token:options.headers.Authorization};
+  return Response.json({...result,saved:result.won,points:240,new_badges:['first','ball-survivor']});
+};"""
 
-async def verify(browser,size):
+async def verify(browser,size,full_race=False):
  width,height=size
- page=await browser.new_page(viewport={"width":width,"height":height},device_scale_factor=1)
+ page=await browser.new_page(viewport={"width":width,"height":height},device_scale_factor=1,has_touch=True)
  errors=[]
  page.on("pageerror",lambda err:errors.append(str(err)))
  await page.route(URL,lambda route:route.fulfill(status=200,content_type="text/html",body=HTML))
@@ -41,42 +46,66 @@ async def verify(browser,size):
   status=200,content_type="text/javascript",headers={"access-control-allow-origin":"*"},body=MOCK))
  try:
   await page.goto(URL,wait_until="load")
-  await page.locator("#skyboard-root").wait_for(state="attached",timeout=15000)
-  await page.locator("#skyboard-toggle").click()
-  await page.evaluate("""document.body.classList.add("arcade-on");document.documentElement.classList.add("arcade-on");
+  await page.locator("#skyboard-toggle").click(timeout=15000)
+  await page.evaluate("""document.body.classList.add("arcade-on");
   document.body.dataset.arcadeGame="skyboard";document.body.dataset.arcadeScene="play";
   document.getElementById("skyboard-root").classList.add("arcade-game-active");""")
   assert await page.locator("#skyboard-inside").is_visible()
   assert await page.locator("#skyboard-board-list [data-sky-board]").count()==6
-  assert await page.locator("#skyboard-badge-list .skyboard-badge").count()==6
+  assert await page.locator("#skyboard-badge-list .skyboard-badge").count()==8
   assert not await page.locator("[data-sky-board='star']").is_enabled()
   await page.locator("#skyboard-start").click()
-  await page.locator("#skyboard-message").wait_for(state="hidden",timeout=8000)
-  await page.wait_for_timeout(450)
-  assert await page.locator("#skyboard-live-distance").inner_text()!="0%"
+  canvas=page.locator("#skyboard-canvas")
+  await page.wait_for_function("Number(document.querySelector('#skyboard-canvas').dataset.distance)>2",timeout=14000)
+  assert "Asynchronous ghost" in await page.locator("#skyboard-status").inner_text()
   assert await page.locator("[data-sky-hold='left']").is_visible()
   assert await page.locator("[data-sky-action='jump']").is_visible()
-  data=await page.locator("#skyboard-canvas").evaluate(
-   "canvas=>{let c=canvas.getContext('2d');let p=c.getImageData(480,270,1,1).data;return [...p]}")
-  assert data[3]>0,("Game scene did not paint",size,data)
-  await page.locator("[data-sky-scene='boards']").click()
-  assert await page.locator("#skyboard-boards").is_visible()
-  await page.locator("[data-sky-scene='play']").click()
-  assert await page.locator("#skyboard-pause").inner_text()=="RESUME"
-  await page.locator("#skyboard-pause").click()
-  await page.locator("[data-sky-action='jump']").click()
-  await page.keyboard.press("ArrowRight")
-  await page.locator("#skyboard-retry").click()
-  assert await page.locator("#skyboard-message").is_hidden()
+  assert await canvas.evaluate("c=>c.getContext('2d').getImageData(480,270,1,1).data[3]===255")
+  assert await page.evaluate("document.documentElement.scrollWidth<=innerWidth+1"),size
+  if full_race:
+   assert await canvas.get_attribute('data-renderer')=='webgl'
+   await page.evaluate("""() => {
+    const canvas=document.querySelector('#skyboard-canvas');
+    const seen=window.skyTimeline=[];
+    new MutationObserver(()=>{
+     const d=canvas.dataset;
+     seen.push([d.raceState,Number(d.distance),Number(d.multiplier),Number(d.ballHits)]);
+    }).observe(canvas,{attributes:true,attributeFilter:['data-distance']});
+   }""")
+   (ROOT/'reports').mkdir(parents=True,exist_ok=True)
+   await page.screenshot(path=str(ROOT/'reports'/'skyboard-sprint-iphone.png'))
+   await page.wait_for_function("window.skyTimeline.some(x=>x[0]==='boost'&&x[2]===10)",timeout=14000)
+   await page.wait_for_function("window.skyTimeline.some((x,i,a)=>i>1&&x[0]==='hit'&&x[1]<a[i-1][1]-.03&&x[3]>0)",timeout=14000)
+   await page.wait_for_function("window.skyTimeline.some((x,i,a)=>x[0]==='ride'&&x[3]>0&&x[1]>a.find(y=>y[3]>0)[1])",timeout=14000)
+   await page.wait_for_function("window.replayChecked?.won&&window.replayChecked.ball_hits>0",timeout=45000)
+   assert await page.evaluate("window.replayChecked.token==='Bearer test-token'")
+   await page.locator("#skyboard-message").get_by_text("STAGE 1 CLEAR!").wait_for(timeout=10000)
+  else:
+   await page.locator("[data-sky-scene='boards']").click()
+   assert await page.locator("#skyboard-boards").is_visible()
+   await page.locator("[data-sky-scene='play']").click()
+   assert await page.locator("#skyboard-pause").inner_text()=="RESUME"
+   await page.locator("#skyboard-pause").click()
+   await page.locator("[data-sky-action='jump']").tap()
+   await page.keyboard.down("ArrowRight")
+   await page.wait_for_timeout(150)
+   await page.keyboard.up("ArrowRight")
+   await page.locator("#skyboard-retry").click()
+   assert await page.locator("#skyboard-message").is_hidden()
   assert not errors,("JS console errors",errors,size)
-  print("SKYBOARD actual playable controls PASS",width,height)
+  print("Skyboard controls and geometry PASS",width,height,"full replay" if full_race else "surface")
  finally:await page.close()
 
 async def main():
- async with async_playwright() as p:
-  browser=await p.chromium.launch(headless=True)
+ async with async_playwright() as engine:
+  chromium=await engine.chromium.launch(headless=True,args=['--enable-unsafe-swiftshader','--use-angle=swiftshader'])
   try:
-   for size in [(390,844),(820,1180)]:
-    await verify(browser,size)
-  finally:await browser.close()
+   await verify(chromium,(390,844),True)
+   await verify(chromium,(1160,810))
+  finally:await chromium.close()
+  webkit=await engine.webkit.launch(headless=True)
+  try:
+   await verify(webkit,(390,844))
+   await verify(webkit,(844,390))
+  finally:await webkit.close()
 if __name__=="__main__":asyncio.run(main())

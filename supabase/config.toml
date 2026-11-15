@@ -8,3 +8,7 @@ verify_jwt = false
 [functions.hot-rod]
 # The function verifies each bearer with Supabase Auth before any DB operation.
 verify_jwt = false
+
+[functions.family-arcade]
+# The handler authenticates player JWTs with Supabase Auth before loading any run.
+verify_jwt = false
