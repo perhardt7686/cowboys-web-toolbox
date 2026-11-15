@@ -1,9 +1,12 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=arcade6';
-import {normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=arcade6';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=turn1';
+import {avatarSnapshot, normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=turn1';
 
-import {prizeAction} from './avatar-prize-actions.mjs?v=arcade5';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=arcade6';
+import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=turn1';
+
+import {fitsBody} from './avatar-full-body.mjs?v=turn1';
+import {mountTurntable} from './avatar-turntable-controls.mjs?v=turn1';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
@@ -15,7 +18,7 @@ const text=label=>el('p','avatar-reward-copy',label);
 const asButton=(label,run,kind='')=>{const n=button(label,run);n.className=kind?'avatar-reward-button '+kind:'avatar-reward-button';return n;};
 
 export const rewardById=id=>BY_ID.get(id);
-export {normalizeLoadout};
+export {avatarSnapshot,normalizeLoadout};
 
 export function rewardRatio(achievement) {
   if(!achievement?.requirements?.length)return 0;
@@ -102,7 +105,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   let root=null,editor=null,pane=null,tabs=null,filters=null,results=null;
   let data=null,achievements=new Map(),owned=new Map(),epoch=0,query='',section='avatar';
   let slot='all',filter='all',game='all',sort='catalog',limit=PAGE,detail=null,loading=false,loadError='';
-  let pending=null,frame=0,lastFrame=0,stopDemo=()=>{},stopPreview=()=>{};
+  let pending=null,frame=0,lastFrame=0,stopDemo=()=>{},stopPreview=()=>{},turntable=null;
   let privateControls=null;
   const pendingAcks=new Set();
 
@@ -168,11 +171,16 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function tryOn(item){
     const draft=normalizeLoadout(getLoadout());
+    if(!fitsBody(draft,item)){
+      setStatus(item.name+' fits '+item.families.join(' or ')+' bodies.');
+      return false;
+    }
     draft.cosmetics[item.slot]=item.id;
     setLoadout(draft);
     setStatus(have(item.id)?item.name+' is ready to save.':item.name+' is on your preview. Earn it to save it.');
     drawEquipped();
     paintPreview();
+    return true;
   }
 
   function forget(item){
@@ -184,22 +192,18 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   }
 
   function paintPreview(){
-    if(!contains())return;
-    const canvas=root.querySelector('#family-avatar-canvas');
-    if(!canvas)return;
-    stopPreview();
-    cancelAnimationFrame(frame);
+    if(!contains()||!turntable)return;
+    stopPreview();cancelAnimationFrame(frame);
+    turntable.draw();
     const draft=normalizeLoadout(getLoadout());
-    const quick=Object.values(draft.cosmetics).map(id=>BY_ID.get(id));
-    const animate=quick.some(item=>item.animated)&&!document.hidden&&
-      !reduceAnimation()&&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    renderLoadout(canvas,draft,0);
+    const animate=Object.values(draft.cosmetics).some(id=>BY_ID.get(id)?.animated)&&!document.hidden&&
+      !reduceAnimation()&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!animate)return;
     lastFrame=0;
     const loop=now=>{
-      if(!contains()||!canvas.getClientRects().length||document.hidden)return;
-      if(now-lastFrame>85){lastFrame=now;renderLoadout(canvas,draft,now/1000);}
+      if(!contains()||!turntable?.canvas.getClientRects().length||document.hidden||
+        !root.closest('dialog')?.open)return;
+      if(now-lastFrame>105){lastFrame=now;turntable.draw(now/1000);}
       frame=requestAnimationFrame(loop);
     };
     frame=requestAnimationFrame(loop);
@@ -210,12 +214,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       setSection('pets',item.id);
       return;
     }
-    const canvas=root?.querySelector('#family-avatar-canvas');
-    if(!canvas||!contains())return;
-    const draft=normalizeLoadout(getLoadout());
-    cancelAnimationFrame(frame);
-    stopPreview();
-    stopPreview=playCel(canvas,progress=>renderLoadout(canvas,draft,0,{id:item.id,progress}),reduceAnimation);
+    if(!turntable||!contains())return;
+    cancelAnimationFrame(frame);turntable.stop();stopPreview();
+    stopPreview=playCel(turntable.canvas,progress=>turntable.draw(0,{id:item.id,progress}),reduceAnimation);
     setStatus(prizeAction(item).description);
   }
 
@@ -227,10 +228,12 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     if(!worn.length)return;
     panel.append(el('h4','','On your character'));
     for(const item of worn){
-      const label=el('span','',item.name+(have(item.id)?'':' · Preview only'));
+      const fit=fitsBody(getLoadout(),item);
+      const label=el('span','',item.name+(fit?'':' · Fits '+item.families.join(' or '))+(have(item.id)?'':' · Preview only'));
       const remove=asButton('Remove',()=>forget(item));
       remove.setAttribute('aria-label','Remove '+item.name);
       const activate=asButton(item.slot==='companion'?'Visit pet':'Activate',()=>activateEquipped(item));
+      activate.disabled=!fit;
       activate.setAttribute('aria-label',(item.slot==='companion'?'Visit ':'Activate ')+item.name);
       panel.append(row(label,activate,remove));
     }
@@ -266,6 +269,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
         const name=input.value.trim();
         if(!name){input.focus();setStatus('Give this outfit a name.');return;}
         const draft=normalizeLoadout(getLoadout());
+        if(Object.values(draft.cosmetics).some(id=>!fitsBody(draft,BY_ID.get(id)))){setStatus('Remove the items that do not fit this body before saving.');return;}
         if(Object.values(draft.cosmetics).some(id=>!have(id))){setStatus('Remove preview-only items before saving an outfit.');return;}
         void saveOutfit(free,name,draft);
       });
@@ -312,6 +316,8 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     const aim=el('small','avatar-reward-aim',achievement?.name||GAME_LABELS[item.group]);
     const tryButton=asButton('Try it on',()=>tryOn(item));
     tryButton.setAttribute('aria-label','Try on '+item.name);
+    tryButton.disabled=!fitsBody(getLoadout(),item);
+    if(tryButton.disabled)aim.textContent+=' · Fits '+item.families.join(' or ');
     card.dataset.rewardItem=item.id;
     card.dataset.owned=String(have(item.id));
     card.append(open,status,aim,meter(rewardRatio(achievement),1,item.name+' progress'),tryButton);
@@ -372,7 +378,10 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       stopDemo();
       stopDemo=playCel(art,progress=>paintPrizeDemo(art,item,progress),reduceAnimation);
     };
-    content.append(title,state,row(asButton(action.label,handle,'primary'),asButton('Try it on',()=>tryOn(item))));
+    const fit=fitsBody(getLoadout(),item);
+    const trial=asButton('Try it on',()=>tryOn(item));trial.disabled=!fit;
+    content.append(title,state,row(asButton(action.label,handle,'primary'),trial));
+    if(!fit)content.append(text('Fits '+item.families.join(' or ')+' bodies.'));
     stage.append(art,content);
     card.append(header,stage);
     if(achievement)card.append(el('h4','',achievement.name));
@@ -487,6 +496,10 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     root=nextRoot;
     editor=root.querySelector('.family-character-editor');
     if(!editor)return;
+    turntable?.destroy();
+    const stage=editor.querySelector('[data-avatar-turntable]');
+    turntable=mountTurntable(stage,(camera,t,activity)=>
+      renderLoadout(stage.querySelector('canvas'),getLoadout(),t,activity,camera),reduceAnimation);
     pane=el('section','avatar-reward-pane');
     filters=el('div','avatar-reward-filters');
     results=el('div','avatar-reward-results');
@@ -516,6 +529,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     cancelAnimationFrame(frame);
     stopDemo();
     stopPreview();
+    turntable?.destroy();turntable=null;
     pets.clear();
   }
 

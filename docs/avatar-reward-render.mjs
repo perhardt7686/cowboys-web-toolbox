@@ -1,7 +1,10 @@
-import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=toon3';
-import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=arcade6';
+import {AVATAR_OPTIONS,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=turn1';
+import {normalizeBody,projectTurn} from './avatar-full-body.mjs?v=turn1';
+import {drawTurnaround} from './avatar-turnaround.mjs?v=turn1';
+import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=turn1';
+import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=turn1';
 import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
-import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=arcade5';
+import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=turn1';
 
 export const COSMETIC_SLOTS=Object.freeze(Object.keys(SLOT_LABELS));
 const thumbnails=new WeakSet();
@@ -14,7 +17,8 @@ export function normalizeLoadout(value) {
     const id=value?.cosmetics?.[slot];
     if(typeof id==='string'&&BY_ID.get(id)?.slot===slot)cosmetics[slot]=id;
   }
-  return {...normalizeAvatarRecipe(value),cosmetics};
+  const body=value?.full_body?{full_body:normalizeBody(value)}:{};
+  return {...normalizeAvatarRecipe(value),...body,cosmetics};
 }
 
 function newCel(size=256) {
@@ -74,18 +78,35 @@ function paintPrize(c,item,t=0,activity,detailed=false) {
   if(spec)paintReaction(c,item,spec,progress);
 }
 
-export function renderLoadout(canvas, value, t=0, activity=null) {
-  const loadout=normalizeLoadout(value),overlays={};
-  for(const id of Object.values(loadout.cosmetics)) {
-    const item=BY_ID.get(id);
-    const target=item.slot==='effect'&&item.behind?'behind':item.slot;
-    const active=activity?.id===id?activity:null;
-    overlays[target]=ctx=>paintPrize(ctx,item,t,active);
-  }
-  drawFamilyAvatar(canvas,loadout,overlays,t);
+export function renderLoadout(canvas,value,t=0,activity=null,camera={}) {
+  const loadout=normalizeLoadout(value);
+  const colors=Object.fromEntries(['skin','hair','shirt','eyes'].map(key=>
+    [key,AVATAR_OPTIONS[key].find(([id])=>id===loadout[key])[2]]));
+  drawTurnaround(canvas,loadout,colors,id=>BY_ID.get(id),camera,t,activity);
+}
+
+const cropAt={
+  top:{y:247,size:204},outerwear:{y:282,size:278},bottoms:{y:399,size:240},footwear:{y:479,size:176},
+  hands:{y:308,size:214},waist:{y:317,size:165},neckwear:{y:187,size:164},back:{y:257,size:220},
+  bodypart:{y:218,size:218},prop:{y:241,size:277},offhand:{y:286,size:281}
+};
+
+function displayFitted(c,item,activity){
+  const model=item.families?.includes('robot')?'automaton':item.families?.includes('monster')?'armor':'detective';
+  const angle=item.slot==='back'&&item.cut==='pack'?180:31;
+  renderLoadout(c,{full_body:{model},cosmetics:{[item.slot]:item.id}},0,
+    activity&&{id:item.id,progress:activity.progress}, {angle,crop:{x:216,...cropAt[item.slot]}});
 }
 
 function displayFrame(canvas,item,activity=null) {
+  if(item.creature){
+    drawPetPortrait(canvas,item,activity?'trick':null,activity?.progress);
+    return;
+  }
+  if(item.stageDraw||!bounds[item.slot]){
+    displayFitted(canvas,item,activity);
+    return;
+  }
   const c=canvas.getContext('2d');
   if(!c)return;
   const [x,y]=bounds[item.slot];
@@ -98,7 +119,7 @@ function displayFrame(canvas,item,activity=null) {
   c.scale(canvas.width/256,canvas.height/256);
   c.clearRect(0,0,256,256);
   const [light,shadow]={
-    starter:['#635262','#2d2339'],bronze:['#744e43','#422e39'],silver:['#44636a','#26373f'],
+    starter:['#465366','#282635'],bronze:['#765644','#432d3b'],silver:['#46646a','#263743'],
     gold:['#7a5944','#3e2d39'],legendary:['#573f64','#25233d'],family:['#4d675b','#2b393e']
   }[item.tier];
   const scene=c.createLinearGradient(0,0,220,256);
@@ -128,8 +149,21 @@ export function paintPrizeDemo(canvas,item,progress) {
   displayFrame(canvas,item,{progress});
 }
 
-export function drawPetPortrait(canvas,item,action,progress=0) {
+export function drawPetPortrait(canvas,item,action,progress=0,camera={}) {
   const c=canvas.getContext('2d');
+  if(item.creature){
+    c.save();
+    const size=Math.min(canvas.width,canvas.height);
+    c.clearRect(0,0,canvas.width,canvas.height);
+    c.fillStyle='#263447';c.fillRect(0,0,canvas.width,canvas.height);
+    c.translate(canvas.width/2,canvas.height/2);
+    const factor=size/173*(camera.zoom||1);
+    c.scale(factor,factor);c.translate((camera.x||0)*.28,(camera.y||0)*.25);
+    c.save();c.scale(.4,.32);c.translate(-216,-354);
+    paintTurnaroundScene(c,{background:'moss'});c.restore();
+    item.creature(c,{angle:projectTurn(camera.angle??31),action,progress:action?progress:undefined});
+    c.restore();return;
+  }
   c.save();
   c.scale(canvas.width/256,canvas.height/256);
   c.clearRect(0,0,256,256);
@@ -143,7 +177,7 @@ export function avatarSnapshot(value, size=128) {
   if(!value||typeof value!=='object')return null;
   const canvas=document.createElement('canvas');
   canvas.width=canvas.height=size;
-  renderLoadout(canvas,value,0);
+  renderLoadout(canvas,value,0,null,{angle:22.5,crop:{size:174}});
   return canvas.toDataURL('image/png');
 }
 

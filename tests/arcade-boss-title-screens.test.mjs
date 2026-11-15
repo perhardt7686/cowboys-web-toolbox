@@ -55,7 +55,7 @@ test('Arcade shell opens title before touching existing saved game controllers',
  assert.match(shell,/case 'title-start'/);
  assert.match(html,/commons-arcade-shell\.mjs\?v=retro4/);
  assert.match(html,/commons-arcade-shell\.css\?v=titles3/);
- assert.match(html,/commons-dash-forge\.mjs\?v=boss3/);
+ assert.match(html,/commons-dash-forge\.mjs\?v=[\w-]+"/);
  assert.match(styles,/#arcade-game-title-view/);
 });
 test('Global level numbers and bosses are not player-seeded or client-writable',()=>{

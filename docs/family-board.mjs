@@ -1,7 +1,7 @@
 import {PROFILE_ICONS} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cachedAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';
 import {boardTime, button, el, preference, statusLine} from './family-board-core.mjs?v=family3';
-import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=reward1';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=turn1';
 import {makeFridge} from './family-fridge.mjs?v=family3';
 import {makeCalendar} from './family-calendar.mjs?v=family3';
 

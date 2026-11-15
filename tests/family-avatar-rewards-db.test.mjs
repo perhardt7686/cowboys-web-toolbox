@@ -9,8 +9,9 @@ import {FREE_OPTION_COUNT} from '../docs/family-avatar-builder.mjs';
 
 test('free choices and complete, distinct cosmetic IDs',()=>{
   assert.equal(FREE_OPTION_COUNT,154);
-  const counts={hat:51,eyewear:38,hair:41,eyes:30,prop:45,companion:47,background:34,effect:24};
-  assert.equal(CATALOG.length,310);
+  const counts={hat:51,eyewear:38,hair:41,eyes:30,prop:46,companion:51,background:35,effect:24,
+    outerwear:4,top:2,bottoms:3,footwear:2,hands:1,waist:1,neckwear:1,back:2,bodypart:2,offhand:2};
+  assert.equal(CATALOG.length,336);
   assert.deepEqual({...Object.fromEntries(Object.entries(Object.groupBy(CATALOG,item=>item.slot))
     .map(([slot,items])=>[slot,items.length]))},counts);
   assert.equal(new Set(CATALOG.map(item=>item.id)).size,CATALOG.length);
@@ -80,6 +81,9 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   const locked=normalizeLoadout({...first,cosmetics:{hat:'dragon-crown'}});
   await refused(equip(locked));await refused(outfit('Locked look',locked));
   await refused(equip({...first,extra:'invalid'}), '22023');
+  await refused(equip({...first,full_body:{model:'made-up'}}),'22023');
+  await refused(equip({...first,full_body:{model:'detective',footwear:52}}),'22023');
+  await refused(equip({...first,full_body:['armor']}),'22023');
   assert.equal((await equip(first)).revision,1);
   assert.equal((await equip(first)).revision,1);
   assert.deepEqual((await show(member))[0].avatar_display,first);
@@ -166,8 +170,10 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   assert.equal((await petState())[0].name,'Scout');
   assert.equal((await petState())[0].bond,7);
   assert.ok((await state()).earned.some(i=>i.id==='trail-husky'));
-  const newlyOwned=normalizeLoadout({cosmetics:{companion:'trail-husky'}});
+  const newlyOwned=normalizeLoadout({full_body:{model:'sleuth',bottoms:'dress',footwear:'boots'},
+    cosmetics:{companion:'trail-husky'}});
   assert.ok((await equip(newlyOwned)).active);
+  assert.deepEqual((await outfit('Full-body draft',newlyOwned))[0].recipe,newlyOwned);
   await refused(tradeAction(offering.id,'accept'),'22023');
   await switchRole(member);
   assert.equal((await petState()).length,0);
@@ -189,12 +195,27 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   assert.ok((await petState()).some(p=>p.cosmetic_id==='lantern-raccoon'));
   assert.ok(!(await petState()).some(p=>p.cosmetic_id==='trail-husky'));
   assert.equal((await state()).loadout.cosmetics?.companion,undefined);
+  assert.deepEqual((await state()).loadout.full_body,newlyOwned.full_body);
+  assert.deepEqual((await state()).outfits[0].recipe.full_body,newlyOwned.full_body);
+  assert.equal((await state()).outfits[0].recipe.cosmetics?.companion,undefined);
   await switchRole(member);
   const returned=(await petState()).find(p=>p.cosmetic_id==='trail-husky');
   assert.equal(returned.name,'Scout');
   assert.equal(returned.bond,7);
   assert.ok((await state()).earned.some(i=>i.id==='trail-husky'));
 
+  await switchRole(null,'system');
+  await sql("insert into community_private.avatar_reward_earned(member_id,achievement_id) values($1,'fleet-gunner'),($1,'dash-first-boss') on conflict do nothing",[member]);
+  await switchRole(member);
+  const withPlate=normalizeLoadout({full_body:{model:'automaton',neckwear:'ascot'},
+    cosmetics:{bodypart:'carnival-visor-plate',prop:'spectral-case-sword',outerwear:'phantom-cloak',offhand:'museum-lantern'}});
+  await refused(equip({...withPlate,full_body:{...withPlate.full_body,model:'detective'}},3));
+  const wardrobe=await equip(withPlate,3);
+  assert.deepEqual(wardrobe.loadout,withPlate);
+  assert.deepEqual((await outfit('Clockwork dusk',withPlate))[0].recipe,withPlate);
+  await switchRole(other);
+  assert.deepEqual((await show(member))[0].avatar_display,withPlate);
+  await refused(equip(withPlate,2));
   await switchRole(null,'system');
   const profile=(await sql('select avatar_mode,avatar_path,published from public.community_profiles where user_id=$1',[member])).rows[0];
   assert.deepEqual(profile,{avatar_mode:'photo',avatar_path:member+'/avatar.png',published:true});

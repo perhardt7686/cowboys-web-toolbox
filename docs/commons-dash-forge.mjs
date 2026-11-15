@@ -619,7 +619,8 @@ function onKeys(e){
  if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}
 }
 function syncArcade(){
- const active=document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='dashforge';
+ if(!root?.isConnected)return;
+ const active=root.classList.contains('arcade-game-active')&&document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='dashforge';
  if(active){
   if(!open){open=true;inside.hidden=false;$('dash-forge-toggle').setAttribute('aria-expanded','true');void refresh(true);}
   const s=document.body.dataset.arcadeScene;

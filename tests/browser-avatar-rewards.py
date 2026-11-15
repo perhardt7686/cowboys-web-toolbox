@@ -28,7 +28,7 @@ async def visit(browser, width, full=False):
     before = await canvas.evaluate('n=>n.toDataURL()')
     await editor.get_by_role('button', name='Save outfit', exact=True).wait_for()
     await editor.get_by_role('button', name='Unlockables', exact=True).click()
-    await expect(editor.get_by_text('310 rewards')).to_be_visible()
+    await expect(editor.get_by_text('336 rewards')).to_be_visible()
     achievement_tab=editor.get_by_role('button',name='Achievements',exact=True)
     assert await achievement_tab.evaluate("""node => {
       const text=document.createRange();
@@ -128,8 +128,8 @@ async def visit(browser, width, full=False):
         await expect(portrait).to_be_in_viewport(ratio=.8)
         assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth') <= 2
         art = await page.evaluate("""async()=>{
-          const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=cel1');
-          const {paintThumbnail,paintPrizeDemo,drawPetPortrait,renderLoadout}=await import('/avatar-reward-render.mjs?v=toon3');
+          const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=turn1');
+          const {paintThumbnail,paintPrizeDemo,drawPetPortrait,renderLoadout}=await import('/avatar-reward-render.mjs?v=turn1');
           const seen=new Set(), unchanged=[], inert=[];
           for(const item of CATALOG){
             const canvas=document.createElement('canvas');canvas.width=canvas.height=96;
@@ -140,13 +140,14 @@ async def visit(browser, width, full=False):
             else paintPrizeDemo(canvas,item,.43);
             if(idle===canvas.toDataURL())inert.push(item.id);
             const test=document.createElement('canvas');test.width=test.height=128;
-            renderLoadout(test,{}); const initial=test.toDataURL();
-            renderLoadout(test,{cosmetics:{[item.slot]:item.id}});
+            const model=item.families?.includes('robot')?'automaton':item.families?.includes('monster')?'armor':'detective';
+            renderLoadout(test,{full_body:{model}}); const initial=test.toDataURL();
+            renderLoadout(test,{full_body:{model},cosmetics:{[item.slot]:item.id}});
             if(initial===test.toDataURL())unchanged.push(item.id);
           }
           return [seen.size,unchanged,inert];
         }""")
-        assert art == [310, [], []], art
+        assert art == [336, [], []], art
     assert not errors, (width, errors)
     (ROOT/'reports').mkdir(exist_ok=True)
     if width in (390,1280):

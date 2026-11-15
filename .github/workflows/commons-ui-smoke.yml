@@ -89,6 +89,7 @@ jobs:
           python tests/browser-shared-navigation.py
           python tests/browser-family-avatar-studio.py
           python tests/browser-mahjong-kids.py
+          python tests/browser-avatar-turntable.py
           python tests/browser-avatar-rewards.py
           python tests/browser-family-board.py
           python tests/browser-plate-review.py
@@ -111,6 +112,7 @@ jobs:
             reports/family-avatar-studio-375.png
             reports/family-avatar-studio-390.png
             reports/mahjong-kid-colors-*.png
+            reports/avatar-turntable-iphone.png
             reports/avatar-rewards-*.png
             reports/streetrod-ega-iphone-sample.png
             reports/arcade-one-screen-iphone-sample.png
