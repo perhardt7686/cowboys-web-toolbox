@@ -11,7 +11,7 @@ test('36 original collectibles include 12 real adoptable pets plus gadgets, scen
  const counts={};for(const item of MYSTERY_EXTRAS)counts[item.slot]=(counts[item.slot]||0)+1;
  assert.deepEqual(counts,{companion:12,prop:12,background:6,effect:6});
  assert.equal(new Set(MYSTERY_EXTRAS.map(v=>v.id)).size,36);
- assert.equal(CATALOG.length,310);
+ assert.equal(CATALOG.length,336);
  for(const item of MYSTERY_EXTRAS){
   assert.equal(typeof item.draw,'function');
   assert.equal(BY_ID.get(item.id)?.achievement_id,item.achievement_id);
@@ -35,7 +35,7 @@ test('new face, nose, cheek and garment options remain completely free',()=>{
  const old=normalizeAvatarRecipe({skin:'sand',shirt:'violet',style:'wavy'});
  assert.equal(old.face,'oval');assert.equal(old.garment,'collared');
  for(const key of Object.keys(DEFAULT_AVATAR_RECIPE))assert.ok(old[key]);
- assert.match(read('docs/community.html'),/community\.js\?v=arcade6/);
+ assert.match(read('docs/community.html'),/community\.js\?v=turn1/);
 });
 test('profile photos remain available, while unlocks stay server-gated',()=>{
  const p=read('docs/community-profiles.mjs'),s=read('docs/avatar-reward-studio.mjs');

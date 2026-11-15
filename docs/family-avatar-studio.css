@@ -256,3 +256,69 @@ body.community-page .family-avatar-fields .family-avatar-choice:focus-visible{
 @media(prefers-reduced-motion:reduce){
  body.community-page .family-avatar-fields .family-avatar-choice{transition:none!important}
 }
+
+body.community-page .avatar-turntable{min-width:0;max-width:100%;display:grid;gap:8px;}
+body.community-page .avatar-turntable-frame{
+  width:100%;justify-self:center;
+  overflow:hidden;border:3px solid #a87949;border-radius:11px;background:#1d2232;
+  box-shadow:0 2px 0 #553746,0 5px 16px #2f223e33;
+}
+body.community-page .avatar-turntable-canvas,
+body.community-page #family-avatar-canvas.avatar-turntable-canvas{
+  width:100%;height:auto;aspect-ratio:432/572;display:block;
+  touch-action:pan-y;cursor:grab;outline-offset:-5px;
+}
+body.community-page .avatar-turntable-canvas:active,
+body.community-page #family-avatar-canvas.avatar-turntable-canvas:active{cursor:grabbing;}
+body.community-page .avatar-turntable-canvas:not([data-zoom="1"]),
+body.community-page #family-avatar-canvas.avatar-turntable-canvas:not([data-zoom="1"]){touch-action:none;}
+body.community-page .avatar-turntable-canvas:focus-visible{outline:3px solid #ffe28b;}
+body.community-page .avatar-turntable-controls{
+  display:grid;grid-template-columns:minmax(42px,.65fr) minmax(55px,1fr) minmax(42px,.68fr) minmax(70px,1.18fr);
+  gap:5px;align-items:stretch;
+}
+body.community-page .avatar-turntable-controls button{
+  min-width:0;min-height:44px;padding:5px 4px;border:1.5px solid #b68f78;border-radius:8px;
+  background:#fffaea;color:#45294f;font-size:clamp(13px,1.65vw,16px)!important;font-weight:800;
+}
+body.community-page .avatar-turntable-controls button[data-turn=left],
+body.community-page .avatar-turntable-controls button[data-turn=right],
+body.community-page .avatar-turntable-controls button[data-turn=more],
+body.community-page .avatar-turntable-controls button[data-turn=less]{font-size:23px!important;line-height:1!important;}
+body.community-page .avatar-turntable-controls button[aria-pressed=true]{
+  background:#472b57;color:#fff4df;
+}
+body.community-page .avatar-turntable-controls button:disabled{opacity:.58;}
+body.community-page .avatar-view-angle{
+  display:grid;place-items:center;align-self:stretch;padding:3px 4px;text-align:center;
+  color:#fbefd8;background:#453148;border-radius:8px;font-weight:800;font-size:13px;line-height:1.15;
+}
+body.community-page .member-avatar-inspection,
+body.community-page .avatar-pet-inspection{
+  max-width:440px;margin:12px auto;border:1px solid #aa838d;border-radius:12px;
+  padding:8px;background:#faf0dc;color:#432b4e;
+}
+body.community-page .member-avatar-inspection summary,
+body.community-page .avatar-pet-inspection summary{
+  min-height:44px;align-content:center;font-weight:800;cursor:pointer;
+}
+body.community-page .avatar-pet-inspection .avatar-turntable-frame,
+body.community-page .avatar-pet-inspection .avatar-turntable-controls{max-width:300px;margin:auto;}
+body.community-page .avatar-pet-portrait{object-fit:contain;}
+body.community-page .profile-studio .family-character-top{
+  grid-template-columns:minmax(0,1fr);gap:12px;
+}
+body.community-page .family-character-top .avatar-turntable-frame{
+  max-width:min(100%,calc(56dvh * 432 / 572));justify-self:center;
+}
+body.community-page .profile-studio .family-character-intro h3{margin-block-start:0;}
+body.community-page .profile-studio .reward-browsing .family-character-top{position:static;}
+@media(min-width:721px){
+  body.community-page .family-character-editor:has(.avatar-turntable){grid-template-columns:minmax(239px,.8fr) minmax(0,1.2fr);}
+  body.community-page .avatar-turntable-controls{width:min(100%,340px);justify-self:center;}
+}
+@media(max-width:720px){
+  body.community-page .family-character-top .avatar-turntable-frame{max-width:min(100%,calc(51dvh * 432 / 572));}
+  body.community-page .family-character-top .avatar-turntable{width:min(100%,400px);justify-self:center;}
+  body.community-page .reward-browsing .family-character-top .avatar-turntable-frame{max-width:min(100%,200px);}
+}

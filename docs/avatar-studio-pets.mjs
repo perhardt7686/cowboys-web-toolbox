@@ -1,7 +1,9 @@
 import {button,el} from './family-board-core.mjs?v=family3';
-import {petBehavior} from './avatar-prize-actions.mjs?v=arcade5';
-import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=arcade6';
+import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
+import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=turn1';
 import {createPetTradeUI} from './avatar-pet-trading.mjs?v=toon3';
+
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=turn1';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;
@@ -12,7 +14,7 @@ const actionButton=(label,action,kind='')=>{
 };
 
 export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openReward,tryOn,isOpen,reduceMotion,onInventoryChange}) {
-  let root,selected='',state='idle',pets=new Map(),pending=false,message='',epoch=0,stop=()=>{};
+  let root,selected='',state='idle',pets=new Map(),pending=false,message='',epoch=0,stop=()=>{},inspection=null;
   const trading=createPetTradeUI({rpc,catalog,onChanged:()=>{refresh();onInventoryChange?.();},isOpen});
   function showPet(id) {
     selected=id||selected;
@@ -72,7 +74,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
 
   function render(activity=null){
     if(!root||!isOpen())return;
-    stop();
+    stop();inspection?.destroy();inspection=null;
     const chosen=catalog().filter(item=>item.slot==='companion');
     const known=unlocksKnown();
     const earned=chosen.filter(item=>have(item.id)||pets.has(item.id));
@@ -160,6 +162,18 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
         status.textContent=petBehavior(item,'play').caption;
       }));
     }
+    if(item.creature){
+      const closeUp=el('details','avatar-pet-inspection');
+      closeUp.append(el('summary','','Inspect pet'));
+      closeUp.insertAdjacentHTML('beforeend',turntableHTML());
+      closeUp.addEventListener('toggle',()=>{
+        if(!closeUp.open){inspection?.stop();return;}
+        if(inspection){inspection.draw();return;}
+        const stage=closeUp.querySelector('[data-avatar-turntable]');
+        inspection=mountTurntable(stage,(camera)=>drawPetPortrait(stage.querySelector('canvas'),item,null,0,camera),reduceMotion);
+      });
+      details.append(closeUp);
+    }
     const status=el('p','avatar-pet-status');status.setAttribute('role','status');
     details.append(status);
     card.append(canvas,details);
@@ -183,7 +197,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
       render();
     },
     clear(){
-      stop();epoch++;trading.clear();root=null;selected='';state='idle';pets.clear();pending=false;message='';
+      stop();inspection?.destroy();inspection=null;epoch++;trading.clear();root=null;selected='';state='idle';pets.clear();pending=false;message='';
     }
   };
 }

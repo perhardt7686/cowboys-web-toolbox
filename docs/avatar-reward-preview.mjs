@@ -1,4 +1,4 @@
-import {CATALOG,GROUPS,GAME_LABELS} from './avatar-reward-catalog.mjs?v=cel1';
+import {CATALOG,GROUPS,GAME_LABELS} from './avatar-reward-catalog.mjs?v=turn1';
 
 export function makePreviewRewardRPC(){
   let loadout=null,active=false,revision=0;

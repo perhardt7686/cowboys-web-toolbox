@@ -1,6 +1,7 @@
 import {WEARABLES} from './avatar-cosmetic-wearables.mjs?v=cel1';
 import {WORLDS} from './avatar-cosmetic-worlds.mjs?v=cel1';
 import {MYSTERY_EXTRAS} from './avatar-mystery-extras.mjs?v=mystery2';
+import {TURNAROUND_REWARDS} from './avatar-turnaround-rewards.mjs?v=turn1';
 import {ARCADE_REWARDS} from './avatar-arcade-rewards.mjs?v=arcade6';
 
 export const GAME_LABELS=Object.freeze({
@@ -21,7 +22,9 @@ export const GROUPS=Object.freeze({
   family:['family-first-word','family-quest-crew','family-friendly-run','family-two-word-games','family-puzzle-party','family-garage-rivals','family-all-star-crew']
 });
 export const SLOT_LABELS=Object.freeze({hat:'Hats',eyewear:'Glasses & masks',hair:'Hair',eyes:'Eyes & face',
-  prop:'Props',companion:'Pets',background:'Backgrounds',effect:'Effects'});
+  prop:'Props',companion:'Pets',background:'Backgrounds',effect:'Effects',
+  top:'Tops',outerwear:'Outerwear',bottoms:'Bottoms & dresses',footwear:'Shoes',hands:'Gloves',waist:'Belts',
+  neckwear:'Neckwear',back:'Bags',bodypart:'Body parts',offhand:'Off-hand gear'});
 export const RARITIES=Object.freeze({starter:'Starter',bronze:'Bronze',silver:'Silver',gold:'Gold',legendary:'Legendary',family:'Family Special'});
 const special={
   'dragon-crown':'mahjong-ten-stages','giant-taco-hat':'mahjong-first-board','rubber-chicken-helmet':'quest-first-clue',
@@ -39,7 +42,7 @@ const tierNames=['starter','starter','bronze','bronze','silver','gold','legendar
 const rank=new Map(routes.flatMap(([group,ids])=>ids.map((id,step)=>[id,{group,tier:group==='family'?'family':tierNames[step]}])));
 const countBySlot=new Map();
 
-export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...ARCADE_REWARDS].map(item=>{
+export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...ARCADE_REWARDS,...TURNAROUND_REWARDS].map(item=>{
   const slotIndex=countBySlot.get(item.slot)||0;
   countBySlot.set(item.slot,slotIndex+1);
   const slotOrdinal=Object.keys(SLOT_LABELS).indexOf(item.slot);

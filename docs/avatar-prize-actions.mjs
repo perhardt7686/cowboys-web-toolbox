@@ -41,12 +41,16 @@ const special = {
 
 export function prizeAction(item) {
   if(item.slot==='companion')return {kind:'pet',label:'Meet this pet',description:'Earn it in a game to adopt, play and teach a trick.',accent:LIGHTS.gold};
-  const [kind,label,description,light]=special[item.id]
+  const [kind,label,description,light]=item.action||special[item.id]
     ||signatures.find(([match])=>match.test(item.id))?.slice(1)||bySlot[item.slot];
   return {kind,label,description,accent:LIGHTS[light]};
 }
 
 const petMoves = {
+  'bell-tower-gargoyle':['Closes its stone wings.','Springs off the perch.','Unfolds into a full bell-tower salute.','hop','gold','Bell-tower salute'],
+  'fog-hound':['Lowers its muzzle into your hand.','Sniffs a ribbon of fog.','Tracks a scent through rolling mist.','glide','mint','Fog trail'],
+  'lamp-house-ghost':['Glows softly under its sheet.','Bobs down the hallway.','Lights its lantern from the inside.','float','gold','Lantern flare'],
+  'wind-up-gremlin':['Leans in and blinks.','Takes a wind-up leap.','Whirls its brass key in a shower of sparks.','wobble','ember','Wind-up spark'],
   'mini-dragon':['Nestles against your hand.','Hops and chases a spark.','Puffs a tiny shower of embers.','hop','ember','Ember puff'],
   'floating-crocodile':['Closes its eyes and grins.','Bobs after a bubble.','Blows a trail of turquoise bubbles.','float','ice','Bubble trail'],
   'tin-robot':['Blinks its indicator.','Bounces to a mechanical beat.','Sends out a bright scan.','wobble','ice','Scanner salute'],

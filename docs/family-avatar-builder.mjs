@@ -1,5 +1,7 @@
 /* Family Avatar Studio: original, fully local character art.
    No external images, tracking, accounts, or third-party avatar service. */
+import {FULL_BODY_OPTIONS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=turn1';
+import {turntableHTML} from './avatar-turntable-controls.mjs?v=turn1';
 import {paintPortrait} from './avatar-cel-portrait.mjs?v=toon3';
 
 export const AVATAR_OPTIONS = Object.freeze({
@@ -66,27 +68,35 @@ export function drawFamilyAvatar(canvas, value, overlays = {}, t = 0) {
 export function makeAvatarStudioHTML(recipe) {
   const v=normalizeAvatarRecipe(recipe);
   const groups=[
+    ['Body & wardrobe',['model','bottoms','footwear','outerwear','neckwear','waist','hands','back']],
     ['Face & skin',['skin','face','nose','cheeks']],
     ['Hair & facial hair',['style','hair','beard']],
     ['Eyes & expressions',['eyes','eye_shape','brows','expression']],
     ['Groovy wardrobe',['shirt','garment','hat','glasses','accessory']],
     ['Backdrop & pose',['background','pose']]
   ];
-  const renderGroup=key=>'<fieldset class="family-avatar-field"><legend>'+AVATAR_LABELS[key]+'</legend><div class="family-avatar-picks">'+
-    AVATAR_OPTIONS[key].map(([id,name,hex])=>
-      '<button type="button" class="family-avatar-choice" data-avatar-feature="'+key+'" data-avatar-value="'+id+'" aria-pressed="'+(v[key]===id)+'" aria-label="'+AVATAR_LABELS[key]+': '+name+'">'+
-      (hex?'<span class="family-avatar-color" style="background:'+hex+'"></span>':'')+'<span>'+name+'</span></button>'
-    ).join('')+'</div></fieldset>';
+  const kit=normalizeBody(recipe);
+  const renderGroup=key=>{
+    const full=Boolean(FULL_BODY_OPTIONS[key]);
+    const label=full?WARDROBE_LABELS[key]:AVATAR_LABELS[key];
+    const choices=full?FULL_BODY_OPTIONS[key]:AVATAR_OPTIONS[key];
+    const selected=full?kit[key]:v[key];
+    return '<fieldset class="family-avatar-field"><legend>'+label+'</legend><div class="family-avatar-picks">'+
+      choices.map(([id,name,hex])=>
+        '<button type="button" class="family-avatar-choice" '+(full?'data-avatar-body':'data-avatar-feature')+
+        '="'+key+'" data-avatar-value="'+id+'" aria-pressed="'+(selected===id)+'" aria-label="'+label+': '+name+'">'+
+        (hex?'<span class="family-avatar-color" style="background:'+hex+'"></span>':'')+'<span>'+name+'</span></button>'
+      ).join('')+'</div></fieldset>';
+  };
   return '<section class="family-character-editor" aria-labelledby="family-character-title">'+
-    '<div class="family-character-top"><div class="family-character-portrait">'+
-    '<canvas id="family-avatar-canvas" width="256" height="256" role="img" aria-label="Preview of your custom character"></canvas></div>'+
+    '<div class="family-character-top">'+turntableHTML({editor:true})+
     '<div class="family-character-intro"><h3 id="family-character-title">My mystery-cartoon character</h3>'+
     '<p id="avatar-preview-status" role="status">Choose a look, then save your avatar.</p>'+
     '<div class="avatar-preview-actions"><button type="button" class="button-quiet" data-avatar-random>Surprise me</button>'+
     '<button type="button" class="button-quiet" data-avatar-undo>Undo</button>'+
     '<button type="button" class="button-quiet" data-avatar-reset>Reset preview</button></div></div></div>'+
     '<div class="family-avatar-fields">'+groups.map(([title,keys],index)=>
-      '<details class="avatar-feature-group"'+(index===0?' open':'')+'><summary>'+title+'</summary>'+
+      '<details class="avatar-feature-group"'+(index<2?' open':'')+'><summary>'+title+'</summary>'+
       '<div>'+keys.map(renderGroup).join('')+'</div></details>').join('')+'</div>'+
     '<div id="avatar-equipped"></div><div id="avatar-outfits"></div>'+
     '</section>';

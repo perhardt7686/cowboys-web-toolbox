@@ -2,9 +2,12 @@ import {escapeHTML as esc,initials,renderBody,displayName,safeHttps,canPost} fro
 import {DETAIL_DEFAULTS,forumBody} from './forum-core.mjs?v=powers1';
 import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProfile,profileCompletion} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=stable1';
-import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,drawFamilyAvatar,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=toon3';
-import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=arcade6';
+import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=turn1';
+import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=turn1';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=return3';
+
+import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=turn1';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=turn1';
 
 export function createProfileStudio(ctx){
   const cache=new Map(),images=new Map(),characterURLs=new Map();
@@ -13,7 +16,7 @@ export function createProfileStudio(ctx){
   let bitmap=null,draft=null,photoChanged=false,selectedTab='profile',avatarRecipe=null,avatarMethod='photo';
   let rewards=null,rewardModule=null,ownerId=null,previewRPC=null,avatarChanged=false,savedRecipe=null;
   let undo=[],revision=0,editorSession=0,stopTrip=null,stopWait=null,chosenPhoto=null,previewImage='',activeCelebration=null;
-  let warmTimer=0;
+  let warmTimer=0,memberView=null;
   const portrait=p=>p?.avatar_display&&characterURLs.get(p?.user_id);
   const icon=p=>PROFILE_ICONS.find(i=>i.id===p?.avatar_icon)?.symbol||'◈';
   const getOwn=()=>({...PROFILE_DEFAULTS,...ctx.state.profile,details:{...DETAIL_DEFAULTS,...ctx.state.profile?.details},user_id:ctx.state.member?.user_id,display_name:ctx.state.member?.display_name||'Your name',badge:ctx.state.member?.role==='owner'?'Owner':null});
@@ -65,11 +68,14 @@ export function createProfileStudio(ctx){
     for(const b of form.querySelectorAll('[data-avatar-feature]')){
       b.setAttribute('aria-pressed',String(avatarRecipe[b.dataset.avatarFeature]===b.dataset.avatarValue));
     }
+    const kit=normalizeBody(avatarRecipe);
+    for(const b of form.querySelectorAll('[data-avatar-body]')){
+      b.setAttribute('aria-pressed',String(kit[b.dataset.avatarBody]===b.dataset.avatarValue));
+    }
     const canvas=form.querySelector('#family-avatar-canvas');
     if (canvas&&selectedTab==='avatar'&&avatarMethod==='character') {
-      if(rewards)rewards.paintPreview();
-      else drawFamilyAvatar(canvas,avatarRecipe);
-      previewImage=canvas.toDataURL('image/png');
+      rewards?.paintPreview();
+      previewImage=rewardModule?.avatarSnapshot(avatarRecipe,128)||previewImage;
     }
     const preview=document.getElementById('profile-live-preview');
     if(preview){
@@ -96,7 +102,7 @@ export function createProfileStudio(ctx){
     if(!approved())throw new Error('Only approved family members can use Avatar Studio.');
     if(ctx.isPreview){
       if(!previewRPC){
-        const {makePreviewRewardRPC}=await import('./avatar-reward-preview.mjs?v=cel1');
+        const {makePreviewRewardRPC}=await import('./avatar-reward-preview.mjs?v=turn1');
         previewRPC ||= makePreviewRewardRPC();
       }
       return previewRPC(name,args);
@@ -106,7 +112,9 @@ export function createProfileStudio(ctx){
     return data;
   }
   function toLoadout(value){
-    return rewardModule?.normalizeLoadout(value)||normalizeAvatarRecipe(value);
+    return rewardModule?.normalizeLoadout(value)||{
+      ...normalizeAvatarRecipe(value),...(value?.full_body?{full_body:normalizeBody(value)}:{})
+    };
   }
   function setPreview(value){
     undo.push(toLoadout(avatarRecipe));
@@ -120,7 +128,7 @@ export function createProfileStudio(ctx){
     if(node)node.textContent=message;
   }
   async function ensureRewards(){
-    rewardModule ||= await import('./avatar-reward-studio.mjs?v=arcade6');
+    rewardModule ||= await import('./avatar-reward-studio.mjs?v=turn1');
     if(!approved())return null;
     rewards ||= rewardModule.createRewardStudio({
       getLoadout:()=>avatarRecipe,setLoadout:setPreview,setStatus,playGame,rpc,checkAccess:approved,
@@ -152,8 +160,7 @@ export function createProfileStudio(ctx){
         await rewards.refresh();
         const item=rewardModule.rewardById(options.item);
         if(valid()&&item&&rewards.have(item.id)){
-          rewards.tryOn(item);
-          form.requestSubmit();
+          if(rewards.tryOn(item))form.requestSubmit();
         }
       }else renderCelebration();
     }catch{
@@ -199,8 +206,7 @@ export function createProfileStudio(ctx){
       equip(item){
         dismiss();
         if(!document.getElementById('content-dialog')?.open)return show('avatar',{section:'collection',item:item.id,equip:true});
-        rewards.tryOn(item);
-        document.getElementById('profile-studio-form')?.requestSubmit();
+        if(rewards.tryOn(item))document.getElementById('profile-studio-form')?.requestSubmit();
       }
     });
     if(activeCelebration)holder.append(activeCelebration);
@@ -208,6 +214,7 @@ export function createProfileStudio(ctx){
 
   async function show(requested='profile',options={}){
     if(!ctx.state.member)return;
+    memberView?.destroy();memberView=null;
     const who=ctx.state.member.user_id;
     if(ownerId&&ownerId!==who)clear();
     const session=++editorSession;
@@ -324,6 +331,9 @@ export function createProfileStudio(ctx){
         if(Object.values(nextRecipe.cosmetics).some(item=>!rewards.have(item))){
           throw new Error('Remove the preview-only items before saving your avatar.');
         }
+        if(Object.values(nextRecipe.cosmetics).some(id=>!fitsBody(nextRecipe,rewardModule.rewardById(id)))){
+          throw new Error('Remove the items that do not fit this body before saving.');
+        }
       }
       let path=prior.avatar_path,mode=prior.avatar_mode,blob=null;
       if(replaceAvatar&&avatarMethod==='photo'){
@@ -400,7 +410,47 @@ export function createProfileStudio(ctx){
         (error.message||'Your profile could not save.');
     }finally{button.disabled=false;}
   }
-  async function showMember(id){if(!id)return;if(!canPost(ctx.state.member)){ctx.toast('Approved membership is required to view shared profiles.');return;}await load([id]);if(!canPost(ctx.state.member))return;const p=cache.get(id);if(!p||(!ctx.isPreview&&id!==ctx.state.member?.user_id&&(!p.published||!p.account_active))){ctx.showDialog('<p class="eyebrow">Member profile</p><h2 id="content-title">A little privacy.</h2><p class="dialog-lead">This member has not shared a member profile. You can still read their published conversations.</p>');return;}ctx.showDialog(`<h2 id="content-title" class="sr-only">${esc(p.display_name)}’s profile</h2>${card(p)}<button class="button-quiet" data-member-posts="${esc(id)}">Published activity ↗</button>${id===ctx.state.member?.user_id?'<button class="button-primary" data-profile>Edit my profile ↗</button>':''}`);document.getElementById('content-dialog').classList.add('member-dialog');if(!ctx.isPreview&&ctx.client()){const {data}=await ctx.client().from('community_badges').select('badge,reason').eq('user_id',id).limit(12);if(data?.length){const section=document.createElement('section');section.className='lab-recognition';section.innerHTML='<h3>A little recognition.</h3>'+data.map(b=>'<details><summary>'+esc(b.badge)+'</summary><p>'+esc(b.reason)+'</p></details>').join('');document.getElementById('dialog-content').append(section);}}await ctx.onMemberShown?.(id);void import('./commons-mahjong-profile.mjs?v=pause3').then(m=>m.showAchievements(ctx,id)).catch(()=>{});}
+  async function showMember(id){
+    if(!id)return;
+    if(!canPost(ctx.state.member)){
+      ctx.toast('Approved membership is required to view shared profiles.');
+      return;
+    }
+    await load([id]);
+    if(!canPost(ctx.state.member))return;
+    const p=cache.get(id);
+    if(!p||(!ctx.isPreview&&id!==ctx.state.member?.user_id&&(!p.published||!p.account_active))){
+      ctx.showDialog('<p class="eyebrow">Member profile</p><h2 id="content-title">A little privacy.</h2><p class="dialog-lead">This member has not shared a member profile. You can still read their published conversations.</p>');
+      return;
+    }
+    const inspect=p.avatar_display?
+      '<details class="member-avatar-inspection"><summary>Inspect full avatar</summary>'+turntableHTML()+'</details>':'';
+    ctx.showDialog(`<h2 id="content-title" class="sr-only">${esc(p.display_name)}’s profile</h2>${card(p)}${inspect}
+      <button class="button-quiet" data-member-posts="${esc(id)}">Published activity ↗</button>${id===ctx.state.member?.user_id?'<button class="button-primary" data-profile>Edit my profile ↗</button>':''}`);
+    const dialog=document.getElementById('content-dialog');
+    dialog.classList.add('member-dialog');
+    memberView?.destroy();memberView=null;
+    const panel=dialog.querySelector('.member-avatar-inspection');
+    panel?.addEventListener('toggle',async ()=>{
+      if(!panel.open){memberView?.stop();return;}
+      if(memberView){memberView.draw();return;}
+      const {renderLoadout}=await import('./avatar-reward-render.mjs?v=turn1');
+      if(!panel.isConnected||!panel.open||!dialog.open||!canPost(ctx.state.member)||memberView)return;
+      const stage=panel.querySelector('[data-avatar-turntable]');
+      memberView=mountTurntable(stage,(camera,t)=>renderLoadout(stage.querySelector('canvas'),p.avatar_display,t,null,camera),
+        ()=>Boolean(ctx.state.profile?.details?.reduce_motion));
+    });
+    if(!ctx.isPreview&&ctx.client()){
+      const {data}=await ctx.client().from('community_badges').select('badge,reason').eq('user_id',id).limit(12);
+      if(data?.length&&(!panel||panel.isConnected)){
+        const section=document.createElement('section');section.className='lab-recognition';
+        section.innerHTML='<h3>A little recognition.</h3>'+data.map(b=>'<details><summary>'+esc(b.badge)+'</summary><p>'+esc(b.reason)+'</p></details>').join('');
+        document.getElementById('dialog-content').append(section);
+      }
+    }
+    await ctx.onMemberShown?.(id);
+    void import('./commons-mahjong-profile.mjs?v=pause3').then(m=>m.showAchievements(ctx,id)).catch(()=>{});
+  }
   document.addEventListener('click',async e=>{
     const b=e.target.closest('button');
     if(!b)return;
@@ -430,10 +480,15 @@ export function createProfileStudio(ctx){
           }
         }
         refresh();
+      }else if(b.hasAttribute('data-avatar-body')){
+        const key=b.dataset.avatarBody,value=b.dataset.avatarValue;
+        const next=key==='model'?starterBody(avatarRecipe,value):
+          {...avatarRecipe,full_body:{...normalizeBody(avatarRecipe),[key]:value}};
+        setPreview(next);
       }else if(b.hasAttribute('data-avatar-feature')){
         setPreview({...avatarRecipe,[b.dataset.avatarFeature]:b.dataset.avatarValue});
       }else if(b.hasAttribute('data-avatar-random')){
-        setPreview({...randomAvatarRecipe(),cosmetics:avatarRecipe.cosmetics});
+        setPreview({...randomAvatarRecipe(),full_body:avatarRecipe.full_body,cosmetics:avatarRecipe.cosmetics});
       }else if(b.hasAttribute('data-avatar-undo')){
         avatarRecipe=undo.pop()||avatarRecipe;
         refresh();rewards?.drawEquipped();setStatus('Previous preview restored.');
@@ -456,6 +511,7 @@ export function createProfileStudio(ctx){
   document.getElementById('content-dialog').addEventListener('close',()=>{
     if(!document.getElementById('content-dialog').open){
       activeCelebration?.remove();activeCelebration=null;
+      memberView?.destroy();memberView=null;
     }
   });
   document.addEventListener('family-game-progress',()=>{
@@ -469,6 +525,7 @@ export function createProfileStudio(ctx){
     },700);
   });
   function clear(){
+    memberView?.destroy();memberView=null;
     ++editorSession;clearTimeout(warmTimer);stopTrip?.();stopWait?.();stopTrip=stopWait=null;
     ownerId=null;revision=0;previewRPC=null;chosenPhoto=null;draft=null;avatarRecipe=savedRecipe=null;
     previewImage='';undo=[];rewards?.clear();
