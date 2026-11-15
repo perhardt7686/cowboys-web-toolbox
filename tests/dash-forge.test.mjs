@@ -12,7 +12,7 @@ const authFix=read('supabase/migrations/20261115050002_dash_forge_independent_ap
 test('Original Dash Forge modules parse and load only within the private member board',()=>{
  assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(new URL('../'+modulePath,import.meta.url))]));
  assert.match(html,/commons-dash-forge\.mjs\?v=[\w-]+"/);
- assert.match(html,/commons-dash-forge\.css\?v=boss3/);
+ assert.match(html,/commons-dash-forge\.css\?v=[\w-]+/);
  assert.match(shell,/id:'dashforge',root:'dash-forge-root',toggle:'dash-forge-toggle'/);
  assert.match(shell,/GEOMETRY-DASH STYLE/);
  assert.match(src,/member\?\.status!=='approved'/);
