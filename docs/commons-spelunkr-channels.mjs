@@ -31,6 +31,7 @@ export const RETRO_CHANNELS=Object.freeze([
   Object.freeze({number:203,name:"Ray Gun",url:"https://spelunkr.tv/ray-gun",group:"scifi"}),
   Object.freeze({number:204,name:"Signpost",url:"https://spelunkr.tv/signpost",group:"afterdark"}),
   Object.freeze({number:300,name:"Waku Waku",url:"https://spelunkr.tv/waku-waku",group:"classic"}),
+  Object.freeze({number:301,name:"Henshin",url:"https://spelunkr.tv/henshin",group:"scifi"}),
   Object.freeze({number:400,name:"Rubber Hose",url:"https://spelunkr.tv/rubber-hose",group:"kids"}),
   Object.freeze({number:401,name:"Meddling Kids",url:"https://spelunkr.tv/meddling-kids",group:"kids"}),
   Object.freeze({number:500,name:"Suplex",url:"https://spelunkr.tv/suplex",group:"classic"}),

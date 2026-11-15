@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {RETRO_CHANNELS,RETRO_GROUPS} from '../docs/commons-spelunkr-channels.mjs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
-test('35 direct watch links match observed official directory entries',()=>{
- assert.equal(RETRO_CHANNELS.length,35);
- assert.equal(new Set(RETRO_CHANNELS.map(x=>x.number)).size,35);
- assert.equal(new Set(RETRO_CHANNELS.map(x=>x.url)).size,35);
+test('36 direct watch links match observed official directory entries',()=>{
+ assert.equal(RETRO_CHANNELS.length,36);
+ assert.equal(new Set(RETRO_CHANNELS.map(x=>x.number)).size,36);
+ assert.equal(new Set(RETRO_CHANNELS.map(x=>x.url)).size,36);
  assert.ok(RETRO_CHANNELS.every(x=>/^https:\/\/spelunkr\.tv\/[a-z0-9-]+$/.test(x.url)));
  assert.deepEqual(RETRO_CHANNELS.map(x=>x.number),[...RETRO_CHANNELS.map(x=>x.number)].sort((a,b)=>a-b));
  assert.equal(RETRO_CHANNELS.find(x=>x.number===300).url,'https://spelunkr.tv/waku-waku');
@@ -23,7 +23,7 @@ test('private board presents accessible local channel guide, not a copied player
 });
 test('family page loads new responsive styling and module',()=>{
  const s=read('docs/community.html');
- assert.match(s,/commons-spelunkr\.mjs\?v=guide2/);
+ assert.match(s,/commons-spelunkr\.mjs\?v=guide3/);
  assert.match(s,/commons-spelunkr\.css\?v=guide2/);
  const css=read('docs/commons-spelunkr.css');
  assert.match(css,/#family-retro-guide/);

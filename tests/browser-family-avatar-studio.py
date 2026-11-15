@@ -81,12 +81,15 @@ async def main():
                 guide=page.locator('#family-retro-guide')
                 await expect(guide).to_be_visible(timeout=15000)
                 cards=guide.locator('.family-retro-channel')
-                await expect(cards).to_have_count(35)
+                await expect(cards).to_have_count(36)
                 assert await guide.get_attribute('aria-modal')=='true'
                 guide_bounds=await guide.bounding_box()
                 assert guide_bounds and guide_bounds['width']<=width+1,(
                     width,'Retro TV dialog overflows phone',guide_bounds)
                 search=guide.locator('#family-retro-search')
+                await search.fill('301')
+                await expect(cards).to_have_count(1)
+                assert await cards.first.locator('.family-retro-watch').get_attribute('href')=='https://spelunkr.tv/henshin'
                 await search.fill('waku')
                 await expect(cards).to_have_count(1)
                 watch=cards.first.locator('a.family-retro-watch')
