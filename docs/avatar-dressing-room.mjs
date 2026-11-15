@@ -1,11 +1,12 @@
 import {THREE,attach,color,disposeFigure,group,hash,picture,shade,surface} from './avatar-studio-geometry.mjs?v=studio3';
 import {buildAvatar} from './avatar-studio-character.mjs?v=studio3';
 import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
-import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=studio3';
+import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=ink4';
 import {normalizeLoadout} from './avatar-reward-render.mjs?v=studio3';
 import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=studio3';
 import {createInkLayer,drawInkedRoom} from './avatar-studio-ink.mjs?v=studio3';
-import {poseStudioAction} from './avatar-studio-actions.mjs?v=studio3';
+import {poseStudioAction} from './avatar-studio-actions.mjs?v=ink4';
+import {paintMysteryBackdrop} from './avatar-mystery-backdrops.mjs?v=ink4';
 
 const PALETTES={
   lavender:['#9baec6','#63778d','#50596d'],night:['#6d7995','#454963','#30354a'],
@@ -31,6 +32,8 @@ function clothBackground(palette,theme=''){
   const wash=g.createRadialGradient(395,236,30,406,335,610);
   wash.addColorStop(0,shine);wash.addColorStop(.66,mid);wash.addColorStop(1,low);
   g.fillStyle=wash;g.fillRect(0,0,768,768);
+  // Original, inked scenery shares the same palette and lives behind every body and pet.
+  paintMysteryBackdrop(g,theme,{opacity:.67});
   g.fillStyle='#17192d24';
   g.beginPath();
   g.moveTo(0,492);g.bezierCurveTo(191,481,260,528,422,489);
@@ -41,39 +44,16 @@ function clothBackground(palette,theme=''){
     const y=560+i*(9+i*2);
     g.beginPath();g.moveTo(0,y);g.quadraticCurveTo(405,y+49,768,y-19);g.stroke();
   }
-  const skyline=theme==='night'||theme==='moss';
-  if(skyline){
-    g.fillStyle='#191d331b';
-    for(let i=0;i<15;i++){
-      const x=i*54,top=366+(i*61%104);
-      g.fillRect(x,top,39,505-top);
-      g.beginPath();g.moveTo(x-6,top);g.lineTo(x+20,top-26);
-      g.lineTo(x+46,top);g.fill();
-    }
-  }
-  g.strokeStyle='#e9f4f527';g.lineWidth=1.6;
-  for(let i=0;i<3;i++){
-    const x=187+i*66;
-    g.beginPath();g.moveTo(x,627);g.lineTo(x,239+i*4);
-    g.bezierCurveTo(x,38-i*10,768-x,38-i*10,768-x,239+i*4);
-    g.lineTo(768-x,627);g.stroke();
-  }
+  // A little hand-painted cel grain, not a recurring generic sparkle motif.
   const seed=hash(theme||'studio');
-  for(let i=0;i<105;i++){
-    const x=(i*97+seed)%768,y=(i*71+seed)%768;
-    g.fillStyle=i%3?'#f2f8fa17':'#2f2a4010';
-    g.beginPath();g.arc(x,y,.4+(i%4)*.21,0,Math.PI*2);g.fill();
+  g.save();
+  g.globalAlpha=.16;
+  for(let i=0;i<122;i++){
+    const x=(i*97+seed)%768,y=(i*151+seed)%768;
+    g.fillStyle=i%4===0?'#20243b':'#f2e9d8';
+    g.fillRect(x,y,1+(i%3)*.46,1+(i%2)*.52);
   }
-  if(theme){
-    g.save();g.translate(250+(seed%3)*115,290);g.rotate((seed%5-2)*.10);
-    const spokes=5+seed%7;
-    g.strokeStyle='#e6edf54a';g.lineWidth=2;
-    for(let i=0;i<spokes;i++){
-      g.rotate(Math.PI*2/spokes);
-      g.beginPath();g.moveTo(0,68);g.quadraticCurveTo(48,105,0,153);g.quadraticCurveTo(-40,108,0,68);g.stroke();
-    }
-    g.restore();
-  }
+  g.restore();
   const texture=new THREE.CanvasTexture(canvas);
   texture.colorSpace=THREE.SRGBColorSpace;
   if(savedBackdrops.size>=30){
@@ -109,16 +89,16 @@ function initialize(){
   try{
     const scene=new THREE.Scene();
     const camera=new THREE.OrthographicCamera(-1.3,1.3,1.8,-1.8,.05,50);
-    scene.add(new THREE.HemisphereLight('#ffede3','#b2b4cf',1.68));
-    const key=new THREE.DirectionalLight('#fff0d8',2.34);
+    scene.add(new THREE.HemisphereLight('#f4e2d0','#8494ad',1.19));
+    const key=new THREE.DirectionalLight('#fff0d8',1.70);
     key.position.set(-3.2,5.2,4.2);scene.add(key);
-    const rim=new THREE.DirectionalLight('#c9d8f5',.62);
+    const rim=new THREE.DirectionalLight('#c9d8f5',.44);
     rim.position.set(.6,3.2,-3.3);scene.add(rim);
     const base=group(scene);
-    const ballast=surface('#5b6480',{roughness:.71,metalness:.21});
-    const deck=surface('#d0d5db',{roughness:.57,metalness:.19});
-    const alloy=surface('#9eaebf',{roughness:.41,metalness:.53});
-    const skirting=surface('#6e7c91',{roughness:.77,metalness:.10});
+    const ballast=surface('#4b4355',{roughness:1,metalness:0});
+    const deck=surface('#858098',{roughness:1,metalness:0});
+    const alloy=surface('#5a5369',{roughness:1,metalness:0});
+    const skirting=surface('#40394b',{roughness:1,metalness:0});
     attach(base,new THREE.CylinderGeometry(1.246,1.289,.119,96),ballast,0,-.105,0);
     attach(base,new THREE.CylinderGeometry(1.245,1.247,.027,96),alloy,0,-.053,0);
     attach(base,new THREE.CylinderGeometry(1.216,1.243,.043,96),deck,0,-.022,0);
