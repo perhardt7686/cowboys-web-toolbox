@@ -61,6 +61,15 @@ async def main():
                     painted=contrast(computed['paint'],computed['bg'])
                     assert painted>=4.5,(label,'text fill color',painted)
                 findings.append((label,round(value,2)))
+            count=page.locator('#compact-feed-count')
+            await count.wait_for(state='visible')
+            computed=await count.evaluate("""el=>{
+                const style=getComputedStyle(el);
+                return [style.webkitTextFillColor || style.color, style.backgroundColor];
+            }""")
+            value=contrast(*computed)
+            assert value>=4.5,('loaded conversation count',computed,value)
+            findings.append(('loaded conversation count',round(value,2)))
             last=page.locator('#community-feed .thread-card .forum-last-reply').first
             if await last.count():
                 latest=page.locator('#community-feed .thread-card .forum-last-reply button[data-forum-latest]').first

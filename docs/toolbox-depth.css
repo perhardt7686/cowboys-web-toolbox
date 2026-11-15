@@ -87,7 +87,17 @@ body.toolbox-page .toolbox-map-card>.toolbox-route-icon{display:grid;place-items
 body.toolbox-page .toolbox-map-card .toolbox-route-copy{display:grid;gap:4px;min-width:0}
 body.toolbox-page .toolbox-map-card strong{font-size:17px;line-height:1.2;color:#2e213e}
 body.toolbox-page .toolbox-map-card small{font-size:13px;line-height:1.45;color:#51465a}
-body.toolbox-page .toolbox-route-arrow{font-size:24px;font-weight:900;color:#422b5a;margin-left:auto;flex:none}
+body.toolbox-page .toolbox-route-arrow{
+  position:relative;width:16px;height:20px;color:#422b5a;margin-left:auto;flex:none
+}
+body.toolbox-page .toolbox-route-arrow::before{
+  content:"";position:absolute;top:3px;bottom:5px;left:7px;border-left:2px solid currentColor
+}
+body.toolbox-page .toolbox-route-arrow::after{
+  content:"";position:absolute;bottom:5px;left:4px;width:8px;height:8px;
+  border-right:2px solid currentColor;border-bottom:2px solid currentColor;
+  transform:rotate(45deg);box-sizing:border-box
+}
 body.toolbox-page .route-find{border-color:#77b7ae;background:#e7fbf3}
 body.toolbox-page .route-find .toolbox-route-icon{background:#1c786f;color:#fff}
 body.toolbox-page .route-guides{border-color:#c4a5e6;background:#f4ecff}
@@ -270,7 +280,6 @@ body.toolbox-page :is(.toolbox-map-card,.pack-link,.site-card){min-width:0}
 }
 @media(max-width:350px){
   body.toolbox-page .toolbox-map-card small{font-size:12px}
-  body.toolbox-page .toolbox-route-arrow{font-size:19px}
   body.toolbox-page .view-tabs button{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){
