@@ -4,8 +4,6 @@
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {SKY_DT,SKY_INPUT,buildSkyCourse,createSkyRide,skyTrack,skyObjectX,stepSky} from './skyboard-physics.mjs';
-import {createSkyScene} from './skyboard-scene.mjs';
-import {AVATAR_OPTIONS} from './family-avatar-builder.mjs';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
 const host=document.getElementById('conversations'), config=window.COWBOY_COMMUNITY_CONFIG;
 const $=id=>document.getElementById(id);
@@ -39,7 +37,7 @@ const BADGES=[
 ];
 let client=null,user=null,root=null,profile=null,leaders=[],awards=[],open=false,booted=false;
 let selectedBoard='sunny',currentScene='play',run=null,request=0,last=0,held=new Set(),busy=false;
-let scene=null,compatibility=false,jumpQueued=false,accumulator=0,preview=null,showGhost=true,shareReplay=false,riderLook=null;
+let scene=null,createSkyScene=null,sceneLoading=false,compatibility=false,jumpQueued=false,accumulator=0,preview=null,showGhost=true,shareReplay=false,riderLook=null;
 const status=(message,isError=false)=>{const node=$('skyboard-status');if(node){node.textContent=message;node.dataset.error=String(isError)}};
 const boardType=()=>BOARDS.find(b=>b.id===selectedBoard)||BOARDS[0];
 const stage=()=>Math.max(1,Math.min(31,Number(profile?.stage||1)));
@@ -351,7 +349,12 @@ function draw(){
   preview.y=skyTrack(preview.course,preview.progress).y;
  }
  const r=run||preview;
- if(!compatibility){
+ if(!compatibility&&!createSkyScene&&!sceneLoading){
+  sceneLoading=true;
+  import('./skyboard-scene.mjs').then(module=>{createSkyScene=module.createSkyScene;draw();})
+   .catch(()=>{compatibility=true;draw();});
+ }
+ if(!compatibility&&createSkyScene){
   try{
    if(!scene)scene=createSkyScene(WIDTH,HEIGHT);
    scene.draw(c,r,r.theme,r.board,run&&ghostPosition(r));
@@ -361,7 +364,7 @@ function draw(){
    console.info('Skyboard compatibility graphics enabled.',e.message);
   }
  }
- if(compatibility){drawCompatibility(c,r);canvas.dataset.renderer='compatibility';}
+ if(compatibility||!createSkyScene){drawCompatibility(c,r);canvas.dataset.renderer=compatibility?'compatibility':'loading';}
  if(!run)return;
  canvas.dataset.raceState=r.hurt>0?'hit':r.boost>0?'boost':r.recovery>0?'checkpoint':r.done?'finish':'ride';
  canvas.dataset.distance=r.progress.toFixed(3);
@@ -430,6 +433,7 @@ async function verify(){
   const {data:avatars}=await client.rpc('community_avatar_projections',{p_members:[id]});
   const recipe=avatars?.find?.(row=>row.user_id===id)?.avatar_display;
   if(recipe){
+   const {AVATAR_OPTIONS}=await import('./family-avatar-builder.mjs');
    const tone=(part)=>AVATAR_OPTIONS[part].find(([key])=>key===recipe[part])?.[2];
    riderLook={shirt:tone('shirt'),skin:tone('skin'),hair:tone('hair'),body:recipe.full_body?.model,garment:recipe.garment,
     trail:({turquoise:'#a7fcfa',burntorange:'#ffe281',maroon:'#ffa4a7',teal:'#9afafa',navy:'#bac2ff'})[recipe.shirt]};

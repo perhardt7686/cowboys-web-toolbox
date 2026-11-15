@@ -150,6 +150,7 @@
   header.querySelector('.brand')?.after(shell);
   header.append(root);
   document.body.classList.add('cowboy-nav-ready');
+  if(avatarQuick)window.dispatchEvent(new Event('family-avatar-state-request'));
   function close(returnFocus = false) {
     if (panel.hidden) return;
     panel.hidden = true;

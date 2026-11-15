@@ -57,7 +57,7 @@ export function createClient(){
 const fetchOriginal=window.fetch.bind(window);
 window.fetch=async (url,options)=>{
   if(!String(url).endsWith('/functions/v1/family-arcade'))return fetchOriginal(url,options);
-  const {replayDash}=await import('/dash-physics.mjs');
+  const {replayDash}=await import(new URL('/dash-physics.mjs',window.location.origin).href);
   const body=JSON.parse(options.body),item=mock.active;
   const sim=replayDash(item.pattern,item.pace_ms||210,{boss:item.boss,bossStyle:item.boss_style,layout:item.layout,stage:item.stage},body.trace);
   mock.lastReplay={...sim,trace:body.trace,game:body.game};

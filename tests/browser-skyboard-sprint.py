@@ -30,7 +30,7 @@ export const createClient=()=>({
 const fetchOriginal=window.fetch.bind(window);
 window.fetch=async (url,options)=>{
   if(!String(url).endsWith('/functions/v1/family-arcade'))return fetchOriginal(url,options);
-  const {replaySky}=await import('/skyboard-physics.mjs');
+  const {replaySky}=await import(new URL('/skyboard-physics.mjs',window.location.origin).href);
   const body=JSON.parse(options.body),result=replaySky(1,555,'sunny',body.trace);
   window.replayChecked={...result,game:body.game,token:options.headers.Authorization};
   return Response.json({...result,saved:result.won,points:240,new_badges:['first','ball-survivor']});

@@ -20,7 +20,12 @@ async def main():
                 page.on('pageerror',lambda error: errors.append(str(error)))
                 await page.goto(URL,wait_until='domcontentloaded',timeout=30000)
                 quick=page.locator('#family-avatar-quick')
-                await expect(quick).to_be_visible(timeout=25000)
+                try:
+                    await expect(quick).to_be_visible(timeout=25000)
+                except AssertionError:
+                    board=await page.locator('#conversations').get_attribute('hidden')
+                    print('Avatar startup diagnostic',width,board,errors)
+                    raise
                 bounds=await quick.bounding_box()
                 assert bounds and bounds['width']>=44 and bounds['height']>=44,(width,bounds)
                 assert await quick.get_attribute('aria-label')=='Open my avatar studio'
