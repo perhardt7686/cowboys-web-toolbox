@@ -1,6 +1,7 @@
 import {button, el} from './family-board-core.mjs?v=family3';
 
 const labels = {
+  dashforge: {campaign:'Family campaign',community:'Created family levels',builder:'Level Studio',awards:'Achievements and skins',leaders:'Family leaderboards'},
   mahjong: {play: 'Playing board', levels: 'Campaign levels', scores: 'Leaderboard', personal: 'My scores', badges: 'Achievements', history: 'Game history'},
   wordle: {play: 'Today’s puzzle', scores: 'Leaderboard', awards: 'Achievements', history: 'Game history'},
   wordquest: {play: 'Today’s puzzle', scores: 'Leaderboard', progress: 'Level and achievements', history: 'Game history'},
@@ -9,6 +10,7 @@ const labels = {
   study: {cards: 'Study cards', awards: 'Milestones', sources: 'Study resources'}
 };
 const instructions = {
+  dashforge: 'Tap the screen or JUMP to leap over blocks, spikes and gaps. Clear six campaign stages to unlock rewards. In Level Studio, draw a level, save a draft, beat your own playtest, and publish it. Designer points come only from the first other member’s validated active time to solve that level. Likes, views, drafts and your own wins pay no creator awards.',
   mahjong: 'Match tiles with the same picture and corner mark. A playable tile is uncovered and has an open left or right side. Zoom in, then swipe to pan. Fit board brings the full layout back into view. Campaign stages unlock as you qualify.',
   wordle: 'Guess five-letter words as a team. Green means the correct position and earns 12 personal points. Gold means the letter belongs elsewhere and earns 5. A solve adds a bonus and awards contributing players 35 team-victory points each. You each get nine valid guesses per day; everyone shares every guess and saved green-letter position. The shared word resets at midnight Eastern.',
   wordquest: 'Use the clue to solve today’s five-letter word together. Valid guesses score 5 points, with bonus points for solving. Everyone who contributes gets a team win when the team solves. Open Level, XP and achievements to see your progress. The puzzle resets at midnight Eastern.',
@@ -20,6 +22,9 @@ const get = id => document.getElementById(id);
 const sceneAction = (label, scene, scope) => ({label, scene, scope});
 const clickAction = (label, target, scene) => ({label, target, scene});
 const actions = {
+  dashforge: [sceneAction('Campaign stages','campaign'),sceneAction('Family-made levels','community'),
+    sceneAction('Build a new level','builder'),sceneAction('Achievements and cube skins','awards'),
+    sceneAction('Family leaderboards','leaders')],
   mahjong: [
     {label: 'Resume game', scene: 'play', action: 'resume'},
     sceneAction('Current level', 'levels'), clickAction('Level selection', 'mahjong-browse-level', 'levels'),
