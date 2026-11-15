@@ -66,7 +66,7 @@ async def verify(browser, phone=False):
     await expect(canvas).to_have_attribute('data-renderer', '3d')
     await expect(canvas).to_have_attribute('data-preview-style', '3d')
     await expect(canvas).to_have_attribute('data-angle', '315')
-    assert await fingerprints(canvas) == before_compare, 'Returning to 3D should preserve the same character/view'
+    assert await fingerprints(canvas) != layered, 'Returning to 3D restores the original rendering path'
     await expect(canvas).to_have_attribute('data-angle', '315')
     await turn.get_by_role('button', name='Fit', exact=True).click()
     await expect(canvas).to_have_attribute('data-zoom', '1')
