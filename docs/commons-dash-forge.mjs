@@ -125,12 +125,18 @@ function useSelection(action){
  renderBuilder();
 }
 function moveTile(source,target){
- if(!editableTile(source)||!editableTile(target)||source===target)return;
- const token=draft.pattern[source],detail=detailAt(source);
- if(token==='.'&&!detail[3]&&detail[4]==='.'&&detail[5]==='.')return;
+ if(!editableTile(source)||!editableTile(target)||source===target||tokenAt(source)==='.')return;
  saveUndo();
- const destination=draft.pattern[target],destinationDetail=detailAt(target);
- writeTile(target,token,detail);writeTile(source,destination,destinationDetail);
+ const from=detailAt(source),to=detailAt(target);
+ if(editLayer==='track'){
+  const token=draft.pattern[source],destination=draft.pattern[target];
+  writeTile(target,token,[...from.slice(0,3),...to.slice(3)]);
+  writeTile(source,destination,[...to.slice(0,3),...from.slice(3)]);
+ }else{
+  const layer=editLayer==='above'?4:5;
+  [from[layer],to[layer]]=[to[layer],from[layer]];
+  setDetail(source,from);setDetail(target,to);
+ }
  tileSelected=target;editorPage=Math.floor(target/EDITOR_SPAN);renderBuilder();
 }
 function paintPalette(){
@@ -248,8 +254,8 @@ function renderBuilder(){
    '" title="Tile '+(i+1)+' · '+esc(label)+'"><small>'+String(i+1).padStart(2,'0')+'</small><strong>'+
    PAINT_GLYPHS[cell]+'</strong></button>';
  }).join('');
- const count=[...draft.pattern].filter(x=>x!=='.').length;
- const range=$('dash-editor-range');if(range)range.textContent='TILES '+(first+1)+'–'+end+' OF '+draft.pattern.length+' · '+count+' obstacles';
+ const count=[...draft.pattern].reduce((n,_,i)=>n+Number(tokenAt(i)!=='.'),0);
+ const range=$('dash-editor-range');if(range)range.textContent='TILES '+(first+1)+'–'+end+' OF '+draft.pattern.length+' · '+count+' objects';
  const badge=$('dash-editor-save-state');if(badge)badge.textContent=draftDirty?'Autosaving on this device…':'✓ Saved to family account';
  const detail=detailAt(tileSelected);
  for(const [id,i] of [['dash-tile-lane',0],['dash-tile-scale',1],['dash-tile-flip',2],['dash-tile-decor',3]]){
@@ -271,7 +277,8 @@ function renderBuilder(){
    '">'+start+'–'+stop+'</button>';
  }).join('');
  const overview=$('dash-editor-overview');
- if(overview)overview.innerHTML=[...draft.pattern].map((cell,i)=>{
+ if(overview)overview.innerHTML=[...draft.pattern].map((_,i)=>{
+  const cell=tokenAt(i);
   const color=PAINT_COLORS[cell]||'#eee';
   return '<span class="dash-overview-tile'+(i>=first&&i<end?' in-view':'')+
    '" style="--dash-overview-color:'+color+'" title="Tile '+(i+1)+': '+
@@ -364,8 +371,8 @@ function build(){
    '<label>World / Scenery<select id="dash-world">'+CREATOR_WORLDS.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')+'</select></label>'+
    '<label>Song<select id="dash-song">'+Object.entries(DASH_SONGS).map(([key,item])=>'<option value="'+key+'">'+esc(item.title)+'</option>').join('')+'</select></label>'+
    '<label>Boss Arena<select id="dash-boss-style">'+BOSS_FORMS.map(([key,name])=>'<option value="'+key+'">'+esc(name)+'</option>').join('')+'</select></label></div>'+
-   '<div class="dash-builder-preview"><div class="dash-preview-label"><strong>1 · SEE YOUR LEVEL IN THE REAL GAME</strong><span id="dash-editor-save-state" aria-live="polite">● UNSAVED CHANGES</span></div><canvas id="dash-creator-preview" width="960" height="360" role="img" aria-label="Full-sized actual game view of currently selected track section with scenery, hazards and boss"></canvas>'+
-   '<small id="dash-preview-explanation">This preview shows actual level scenery and obstacle drawings.</small></div>'+
+   '<div class="dash-builder-preview"><div class="dash-preview-label"><strong>PLAYFIELD PREVIEW</strong><span id="dash-editor-save-state" aria-live="polite">● UNSAVED CHANGES</span></div><canvas id="dash-creator-preview" width="960" height="360" role="img" aria-label="Full-sized actual game view of currently selected track section with scenery, hazards and boss"></canvas>'+
+   '<small id="dash-preview-explanation">Tap a tile in the preview or place objects on the grid.</small></div>'+
    '<div class="dash-builder-view"><button type="button" id="dash-selection-mode" data-dash-action="select" aria-pressed="false">Select a tile</button><button type="button" data-dash-action="zoom"><span id="dash-zoom-label">Fit section</span></button><button type="button" data-dash-action="practice">Practice from selected tile</button></div>'+
    '<div class="dash-section-tools"><label>Course section<select id="dash-blueprint"><option value="">Choose a section</option>'+
    DASH_SECTIONS.map(item=>'<option value="'+item.id+'">'+esc(item.label)+'</option>').join('')+'</select></label>'+
@@ -376,14 +383,14 @@ function build(){
    '<div class="dash-palette" id="dash-palette" role="group" aria-label="Level tile brushes"></div>'+
    '<p id="dash-brush-info" class="dash-brush-info" aria-live="polite"></p>'+ 
     '<div id="dash-phase-guide" class="dash-phase-guide" hidden aria-label="Three boss attack phases"><span>PHASE I · OPENING</span><span>PHASE II · ESCALATION</span><span>PHASE III · FINAL ATTACK</span></div>'+
-   '<div class="dash-editor-tools"><h4>3 · EDIT THE NUMBERED TILES</h4><strong id="dash-editor-range">TILES 1–24 OF 48</strong></div><div class="dash-editor-utilities"><button type="button" id="dash-editor-prev" data-dash-action="page-prev">◀ Previous tiles</button><button type="button" id="dash-undo" data-dash-action="undo" disabled>↶ Undo</button><button type="button" id="dash-redo" data-dash-action="redo" disabled>↷ Redo</button><button type="button" id="dash-editor-next" data-dash-action="page-next">Next tiles ▶</button></div><div id="dash-page-buttons" class="dash-page-buttons" role="group" aria-label="Jump to another track section"></div><div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a numbered tile to paint that obstacle; first and last four tiles are always safe"></div><div class="dash-editor-overview-wrap"><strong>WHOLE LEVEL AT A GLANCE</strong><div id="dash-editor-overview" class="dash-editor-overview" aria-label="Miniature map of all tiles; highlighted tiles are the selected section"></div></div>'+
+   '<div class="dash-editor-tools"><h4>PLACE OBJECTS</h4><strong id="dash-editor-range">TILES 1–24 OF 48</strong></div><div class="dash-editor-utilities"><button type="button" id="dash-editor-prev" data-dash-action="page-prev">◀ Previous tiles</button><button type="button" id="dash-undo" data-dash-action="undo" disabled>↶ Undo</button><button type="button" id="dash-redo" data-dash-action="redo" disabled>↷ Redo</button><button type="button" id="dash-editor-next" data-dash-action="page-next">Next tiles ▶</button></div><div id="dash-page-buttons" class="dash-page-buttons" role="group" aria-label="Jump to another track section"></div><div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a numbered tile to paint that obstacle; first and last four tiles are always safe"></div><div class="dash-editor-overview-wrap"><strong>WHOLE LEVEL AT A GLANCE</strong><div id="dash-editor-overview" class="dash-editor-overview" aria-label="Miniature map of all tiles; highlighted tiles are the selected section"></div></div>'+
    '<fieldset id="dash-inspector" class="dash-inspector"><legend id="dash-selected-tile">Selected tile</legend>'+
    '<label>Height<select id="dash-tile-lane"><option value="0">Floor</option><option value="1">Low air</option><option value="2">High air</option><option value="3">Ceiling</option></select></label>'+
    '<label>Size<select id="dash-tile-scale"><option value="1">Small</option><option value="2">Standard</option><option value="3">Large</option></select></label>'+
    '<label>Orientation<select id="dash-tile-flip"><option value="0">Default</option><option value="1">180°</option></select></label>'+
    '<label>Scenery layer<select id="dash-tile-decor"><option value="0">None</option><option value="1">Lantern</option><option value="2">Sky frame</option></select></label>'+
    '<div><button type="button" data-dash-action="copy">Copy</button><button type="button" data-dash-action="paste">Paste</button><button type="button" data-dash-action="erase">Delete</button></div></fieldset>'+
-   '<p id="dash-builder-help" class="dash-note"></p><h4 class="dash-tools-label">4 · SAVE, TRY IT, THEN SHARE</h4><div class="dash-builder-actions"><button type="button" data-dash-action="new">New draft</button>'+
+   '<p id="dash-builder-help" class="dash-note"></p><h4 class="dash-tools-label">SAVE AND SHARE</h4><div class="dash-builder-actions"><button type="button" data-dash-action="new">New draft</button>'+
    '<button type="button" data-dash-action="save">Save draft</button><button type="button" data-dash-action="test" class="dash-playtest-now">▶ SAVE &amp; PLAYTEST</button>'+
    '<button type="button" data-dash-action="publish">Publish solved level</button></div>'+
    '<p class="dash-note">A creator never earns a designer award for self-testing. The first other member’s server-validated time to victory determines its one-time design award.</p></section>'+

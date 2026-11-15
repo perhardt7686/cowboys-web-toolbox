@@ -8,7 +8,7 @@ from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
 URL='http://127.0.0.1:8765/__dash_forge_smoke__.html'
-HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+HTML="""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-dash-forge.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true,supabaseUrl:'https://mock.supabase.co',publishableKey:'test-publishable'}</script>
 <script type="module" src="/commons-dash-forge.mjs"></script>
@@ -136,6 +136,11 @@ async def run_one(browser,width,height):
   await page.locator('[data-dash-brush="p"]').click()
   await page.locator('[data-dash-cell="11"]').click()
   assert 'Pillar' in await page.locator('#dash-selected-tile').inner_text()
+  if width==820:
+   await page.locator('[data-dash-cell="11"]').drag_to(page.locator('[data-dash-cell="12"]'))
+   assert 'Pillar' in await page.locator('[data-dash-cell="12"]').get_attribute('title')
+   await page.locator('#dash-undo').click()
+   assert 'Pillar' in await page.locator('[data-dash-cell="11"]').get_attribute('title')
   await page.locator('[data-dash-layer="cue"]').click()
   await page.locator('[data-dash-brush="Q"]').click()
   await page.locator('[data-dash-cell="11"]').click()

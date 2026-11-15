@@ -219,15 +219,15 @@ export function createSkyScene(width,height){
       if(shadow)ghost.figure.position.set(skyTrack(course,shadow.z).center+shadow.x,shadow.y,-shadow.z);
       const x=track.center+state.x,rumble=!lowMotion&&state.hurt>0?Math.sin(t*88)*.14:0;
       const pace=boosted&&!lowMotion?1:0;
-      if(snap||Math.abs(camera.position.z-(-z+5.5))>20){
-        camera.position.set(x*.92,track.y+3.62,-z+5.55+pace);snap=false;
+      if(snap||Math.abs(camera.position.z-(-z+5.9))>20){
+        camera.position.set(x*.92,track.y+3.62,-z+5.90+pace);snap=false;
       }else{
         camera.position.x+=(x*.92+rumble-camera.position.x)*.25;
         camera.position.y+=(track.y+3.62-camera.position.y)*.22;
-        camera.position.z=-z+5.55+pace;
+        camera.position.z=-z+5.90+pace;
       }
       sun.position.z=-z-166;
-      aim.set(skyTrack(course,z+11).center+state.x*.28,state.y*.30+track.y*.70+1.5,-z-11);
+      aim.set(skyTrack(course,z+11).center+state.x*.28,state.y*.30+track.y*.70+.45,-z-11);
       camera.lookAt(aim);
       if(camera.fov!==51+pace*9){camera.fov=51+pace*9;camera.updateProjectionMatrix();}
       renderer.render(scene,camera);

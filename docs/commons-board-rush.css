@@ -146,8 +146,8 @@ body.community-page #skyboard-root .skyboard-courses{
 body.community-page #skyboard-root .skyboard-courses summary{
  min-height:44px;display:flex;align-items:center;gap:7px;padding:7px 4px;cursor:pointer;font-weight:850
 }
-body.community-page #skyboard-root .skyboard-courses summary::before{content:'▸';color:#b4f2df}
-body.community-page #skyboard-root .skyboard-courses[open] summary::before{content:'▾'}
+body.community-page #skyboard-root .skyboard-courses summary::before{content:'\25b8';color:#b4f2df}
+body.community-page #skyboard-root .skyboard-courses[open] summary::before{content:'\25be'}
 body.community-page #skyboard-root .skyboard-map-actions{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
 body.community-page #skyboard-root #skyboard-course-map{
  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:9px;max-height:47dvh;overflow:auto

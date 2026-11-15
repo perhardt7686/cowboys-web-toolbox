@@ -198,7 +198,8 @@ function reset(){
  held.clear();last=accumulator=0;jumpQueued=false;run=null;preview=null;
  const next=$('skyboard-next'),startButton=$('skyboard-start'),pauseButton=$('skyboard-pause'),message=$('skyboard-message');
  if(next)next.hidden=true;if(startButton)startButton.disabled=false;
- if(pauseButton)pauseButton.textContent='PAUSE';if(message)message.hidden=false;
+ if(pauseButton)pauseButton.textContent='PAUSE';
+ if(message){message.innerHTML='<strong>READY TO RIDE?</strong><p>Pick a board and press Start Stage.</p>';message.hidden=false;}
 }
 async function start(retry=false){
  if(busy||!user||host.hidden)return;
@@ -208,7 +209,7 @@ async function start(retry=false){
  status('Preparing your course and saved family checkpoint…');
  const n=currentCourse(),pick=boardType();
  const b={...pick,look:riderLook,trail:riderLook?.trail||pick.trail};
- let seed=practiceSeed??(Math.imul(n,212561)^196930),id=null,practice=false,ghost=null,edition=SKY_COURSE_EDITION;
+ let seed=practiceSeed??(Math.imul(n,212561)^196930),id=null,practice=false,ghost=null,edition=SKY_COURSE_EDITION,unavailable='';
  try{
   if(practiceChoice||stage()>30)practice=true;
   else{
@@ -217,7 +218,7 @@ async function start(retry=false){
    id=data.run_id;seed=Number(data.seed);ghost=data.ghost||null;edition=Number(data.edition||1);
   }
  }catch(e){
-  practice=true;status('Practice mode · '+e.message,true);
+  practice=true;unavailable=e.message;
  }
  const course=buildSkyCourse(n,seed,edition);
  run=Object.assign(createSkyRide(course,b.id),{
@@ -225,7 +226,8 @@ async function start(retry=false){
  });
  busy=false;$('skyboard-start').disabled=false;$('skyboard-next').hidden=true;
  $('skyboard-message').hidden=true;$('skyboard-pause').textContent='PAUSE';
- status(practice?'Practice ride · results stay on this device.':
+ if(unavailable)status('Official race unavailable. Practice ride · '+unavailable,true);
+ else status(practice?'Practice ride · results stay on this device.':
    ghost&&showGhost?'Asynchronous ghost · '+ghost.name+'’s saved race.':'Stage '+n+' · race to the finish!');
  last=accumulator=0;draw();request=requestAnimationFrame(frame);
 }
