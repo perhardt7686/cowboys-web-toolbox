@@ -162,6 +162,10 @@ async def run_one(browser,width,height):
   assert await page.locator('#dash-sound').is_visible()
   assert 'SOUND OFF' in await page.locator('#dash-sound').inner_text()
   if width==820:
+   await page.wait_for_function("window.__dashMock.lastReplay?.game==='dash'",timeout=8000)
+   assert await page.evaluate("window.__dashMock.lastReplay.death_tile===6")
+   await page.locator('#dash-retry-live').click()
+   await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_start_v2' && x.args.p_level_id===1).length===2")
    (ROOT/'reports').mkdir(parents=True,exist_ok=True)
    await page.screenshot(path=str(ROOT/'reports'/'dash-forge-tablet.png'))
   await page.locator('[data-dash-action="leave"]').click()

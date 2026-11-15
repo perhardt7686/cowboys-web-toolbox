@@ -419,3 +419,7 @@ body.community-page #dash-forge-inside .dash-playing-head button{min-height:44px
  body.community-page #dash-forge-inside .dash-editor-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
  body.community-page #dash-forge-inside .dash-cell{min-height:44px}
 }
+
+body.community-page.dash-playing:not(.arcade-on) #dash-play-overlay{
+ position:fixed;inset:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);z-index:2147481900;
+}

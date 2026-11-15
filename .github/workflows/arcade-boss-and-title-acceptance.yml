@@ -70,10 +70,11 @@ jobs:
       - name: Verify tablet graphics, creator, boss title, and game navigation
         run: |
           python -m http.server 8765 --directory docs >/tmp/arcade-titles-http.log 2>&1 &
-          python tests/browser-arcade-titles.py
-          python tests/browser-dash-forge.py
-          python tests/browser-arcade-shell.py
-          python tests/browser-skyboard-sprint.py
+          failed=0
+          for fixture in arcade-titles dash-forge arcade-shell skyboard-sprint; do
+            python "tests/browser-${fixture}.py" || failed=1
+          done
+          exit "$failed"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

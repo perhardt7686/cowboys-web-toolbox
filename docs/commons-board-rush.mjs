@@ -220,6 +220,8 @@ function pause(silent=false){
  if(!run||run.done)return;
  run.paused=silent?true:!run.paused;
  $('skyboard-pause').textContent=run.paused?'RESUME':'PAUSE';
+ if(run.paused&&request){cancelAnimationFrame(request);request=0;}
+ if(!run.paused&&!request){last=0;request=requestAnimationFrame(frame);}
  if(!silent)status(run.paused?'Race paused.':'Back on the board!');
 }
 function inputMask(){
@@ -386,7 +388,7 @@ function frame(ts){
   while(accumulator>=SKY_DT&&!run.done){accumulator-=SKY_DT;tick();}
  }
  draw();
- if(run&&!run.done)request=requestAnimationFrame(frame);
+ if(run&&!run.done&&!run.paused)request=requestAnimationFrame(frame);
 }
 function onKeyDown(e){
  if(!active()||!run||run.done||e.target?.closest?.('input,textarea,select,[contenteditable]'))return;

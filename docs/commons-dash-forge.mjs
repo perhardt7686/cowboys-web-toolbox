@@ -737,6 +737,7 @@ function updateControls(){
 function beginDraw(l){
  try{if(!soundOn&&localStorage.getItem('dash-forge-audio')==='on')toggleSound();}catch{}
  const overlay=$('dash-play-overlay');overlay.hidden=false;overlay.dataset.finished='false';
+ run.inArcade=document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='dashforge';
  document.body.classList.add('dash-playing');
  $('dash-run-title').textContent=l.title;
  const returnButton=root?.querySelector('[data-dash-action="leave"]');
@@ -849,7 +850,7 @@ function syncArcade(){
   if(!open){open=true;inside.hidden=false;$('dash-forge-toggle').setAttribute('aria-expanded','true');void refresh(true);}
   const s=document.body.dataset.arcadeScene;
   if(TABS.some(([id])=>id===s)&&!run)choosePane(s);
- }else if(run){
+ }else if(run?.inArcade){
   // Safe teardown: no synthetic success is sent when family exits the game.
   cancelAnimationFrame(frame);run=null;runFromBuilder=false;$('dash-play-overlay').hidden=true;document.body.classList.remove('dash-playing');
  }
