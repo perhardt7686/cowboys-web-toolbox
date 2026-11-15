@@ -14,6 +14,7 @@ const startsInAir=new Set(['S','U','W','V']);
 const designs={s:[.41,1.02],b:[.45,1.08],l:[.33,1.2],w:[.39,1.02],c:[.36,1.29],p:[.31,1.29],
   f:[.35,1.16],r:[.35,.98],m:[.39,1.06],o:[.33,.91],d:[.30,.74],h:[.36,1.19]};
 export const dashCanTransform=token=>transformable.has(token);
+export const dashCanRotate=token=>['s','c','f'].includes(token);
 
 export function validateDashLayout(pattern,layout=[]){
   if(!Array.isArray(layout)||layout.length>pattern.length)throw Error('Invalid level layout.');
@@ -22,6 +23,7 @@ export function validateDashLayout(pattern,layout=[]){
     if(!Array.isArray(item)||item.length!==5||!item.every(Number.isInteger)||
       item[0]<=previous||item[0]<4||item[0]>=pattern.length-4||
       (!transformable.has(pattern[item[0]])&&(item[1]!==0||item[2]!==2||item[3]!==0))||
+      (item[3]!==0&&!dashCanRotate(pattern[item[0]]))||
       item[1]<0||item[1]>3||item[2]<1||item[2]>3||item[3]<0||item[3]>1||item[4]<0||item[4]>2)
       throw Error('Invalid tile transform.');
     previous=item[0];
@@ -72,7 +74,7 @@ export function dashShape(course,cell,elapsed){
   if(token==='O'){low+=.62;height=.56*scale;half=.28*scale;}
   const inverted=lane===3?!flip:flip;
   if(lane===3)low-=height;
-  return {x,low,high:low+height,half,tip:token==='s'||token==='c'||token==='f',inverted};
+  return {x,low,high:low+height,half,tip:dashCanRotate(token),inverted};
 }
 
 export function createDashRun(course,{tile=0,practice=false}={}){

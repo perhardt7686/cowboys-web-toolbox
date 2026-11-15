@@ -38,6 +38,17 @@ test('Six fixed campaign tracks are solvable and stage-gated',()=>{
    jumps.push(jump);last=jump;
   }
   assert.ok(jumps.length>=3,'Each stage has at least three skill jumps');
+  const course=createDashCourse(pattern,210),run=createDashRun(course),trace=[];
+  let previousInput=0;
+  while(!run.done){
+   const next=course.cells.find(tile=>tile.token!=='.'&&tile.x+.32>run.x);
+   const distance=next?next.x-run.x:100;
+   const aim=next?.token==='g'?.93:.25*1000/course.pace+.38;
+   const input=Number(run.supported&&distance>=.45&&distance<=aim);
+   if(input!==previousInput){trace.push([run.tick,input]);previousInput=input;}
+   stepDash(run,input);
+  }
+  assert.equal(replayDash(pattern,210,{},trace).won,true,'Fixed-step starting stage '+stage);
  }
  assert.match(migration,/Finish the previous campaign stage to unlock this level/);
  assert.match(src,/campaign_current/);
@@ -118,7 +129,7 @@ test('Ground spikes collide, raised hazards clear, and transforms share one geom
  assert.equal(replayDash(pattern,210,{layout:[[6,3,3,1,0]]},[]).won,true);
  assert.equal(replayDash(pattern,210,{},[[126,3],[127,0]]).won,true);
  assert.throws(()=>replayDash(pattern,210,{},[[9999,1]]),/extend past/);
- const field=createDashCourse('......d.......M.........',210,{layout:[[6,2,3,1,2]]});
+ const field=createDashCourse('......d.......M.........',210,{layout:[[6,2,3,0,2]]});
  assert.notEqual(dashShape(field,field.cells[6],0).x,dashShape(field,field.cells[6],.6).x);
  assert.notEqual(dashShape(field,field.cells[14],0).low,dashShape(field,field.cells[14],.6).low);
 });

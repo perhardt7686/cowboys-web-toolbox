@@ -108,12 +108,19 @@ function makeRider(board,ghost=false){
   const helmetColor=ghost?'#6cefff':look?.hair||'#ff548c',shirtColor=ghost?'#a5fff5':look?.shirt||'#504aca';
   const skin=look?.skin||'#f2ae83';
   const metal=look?.body==='robot'||look?.body?.startsWith?.('robot-');
-  put(deck,cube(.77,.11,1.68,board.color),0,.14,0);
-  for(const z of [-.84,.84]){
-    const lip=put(deck,cube(.77,.09,.23,board.color),0,.17,z);
+  const sizes={sunny:[.77,1.68],snow:[.70,1.95],rocket:[.61,1.87],
+    flower:[.91,1.59],dragon:[.83,1.87],star:[.69,1.99]};
+  const [wide,long]=sizes[board.id]||sizes.sunny;
+  put(deck,cube(wide,.11,long,board.color),0,.14,0);
+  for(const z of [-.42,0,.42]){
+    const stamp=put(deck,flat(new THREE.CylinderGeometry(.135,.135,.025,board.id==='flower'?7:4),board.trail),0,.211,z);
+    stamp.rotation.y=Math.PI/4;
+  }
+  for(const z of [-long/2,long/2]){
+    const lip=put(deck,cube(wide*.94,.09,.23,board.color),0,.17,z);
     lip.rotation.x=Math.sign(z)*-.27;
-    put(deck,flat(new THREE.BoxGeometry(.62,.025,.17),board.trail),0,.21,z*.65);
-    for(const x of [-.29,.29])put(deck,ground(new THREE.CylinderGeometry(.115,.115,.12,10),'#1a2044'),x,.115,z*.65).rotation.z=Math.PI/2;
+    put(deck,flat(new THREE.BoxGeometry(wide*.80,.025,.17),board.trail),0,.21,z*.65);
+    for(const x of [-wide*.37,wide*.37])put(deck,ground(new THREE.CylinderGeometry(.115,.115,.12,10),'#1a2044'),x,.115,z*.65).rotation.z=Math.PI/2;
   }
   const person=new THREE.Group();person.position.y=.2;figure.add(person);
   put(person,ground(new THREE.CapsuleGeometry(.27,.33,5,10),shirtColor),0,.77,0).scale.set(1.12,1,.71);

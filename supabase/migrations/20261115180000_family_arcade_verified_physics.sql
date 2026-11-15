@@ -90,6 +90,15 @@ begin
 end;
 $$;
 
+create function public.community_boardride_unshare_replays()
+returns void language plpgsql security definer set search_path='' as $$
+declare v_owner uuid:=public.community_boardride_allowed();
+begin
+  update public.community_boardride_runs set share_replay=false,replay_frames=null
+  where user_id=v_owner and share_replay;
+end;
+$$;
+
 create function public.community_boardride_commit_v2(p_owner uuid,p_id uuid,p_result jsonb)
 returns jsonb language plpgsql security definer set search_path='' as $$
 declare v_run public.community_boardride_runs%rowtype;v_stage integer;
@@ -187,7 +196,8 @@ begin
     v_tile:=(v_item->>0)::integer;
     if v_tile<=v_previous or v_tile<4 or v_tile>=length(p_pattern)-4 or
       (substring(p_pattern from v_tile+1 for 1) !~ '^[sblwcpfrmodhDMO]$'
-         and (v_item->>1<>'0' or v_item->>2<>'2' or v_item->>3<>'0')) then
+         and (v_item->>1<>'0' or v_item->>2<>'2' or v_item->>3<>'0'))
+      or (v_item->>3<>'0' and substring(p_pattern from v_tile+1 for 1) !~ '^[scf]$') then
       raise exception 'This tile cannot use that transform' using errcode='22023';
     end if;
     v_previous:=v_tile;
@@ -423,10 +433,12 @@ returns jsonb language sql security definer set search_path='' as $$
 $$;
 
 revoke all on function public.community_boardride_start_v2(text,boolean),
+  public.community_boardride_unshare_replays(),
   public.community_dash_start_v2(bigint),
   public.community_dash_save_layout(text,text,integer,bigint,text,text,jsonb)
   from public,anon,authenticated;
 grant execute on function public.community_boardride_start_v2(text,boolean),
+  public.community_boardride_unshare_replays(),
   public.community_dash_start_v2(bigint),
   public.community_dash_save_layout(text,text,integer,bigint,text,text,jsonb) to authenticated;
 revoke all on function public.community_dash_open_run(bigint,boolean),

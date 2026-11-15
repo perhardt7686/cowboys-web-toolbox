@@ -100,10 +100,14 @@ function build(){
   if(showGhost&&run?.ghost)status('Asynchronous ghost · '+run.ghost.name+'’s saved race.');
  });
   $('skyboard-share').setAttribute('aria-pressed',String(shareReplay));
- $('skyboard-share').addEventListener('click',e=>{
+ $('skyboard-share').addEventListener('click',async e=>{
   shareReplay=!shareReplay;e.target.setAttribute('aria-pressed',String(shareReplay));
   try{localStorage.setItem('skyboard-share-'+user,shareReplay?'yes':'no');}catch{}
-  status(shareReplay?'New verified races can appear as ghosts for approved family members.':'New replays will stay private.');
+  if(shareReplay){status('New verified races can appear as ghosts for approved family members.');return;}
+  e.target.disabled=true;
+  try{await rpc('community_boardride_unshare_replays');status('Your replays are private.');}
+  catch(error){status('New replays will stay private. Existing shared replays could not be removed. '+error.message,true);}
+  finally{e.target.disabled=false;}
  });
  root.querySelectorAll('[data-sky-hold]').forEach(b=>{
   const action=b.dataset.skyHold;b.style.touchAction='none';
@@ -269,7 +273,7 @@ async function finish(win){
    Number(result.points||0).toLocaleString()+' points · '+snapshot.coins+' stars · '+(snapshot.elapsed).toFixed(1)+' seconds</p>';
   await refreshAfterWin();
   $('skyboard-next').hidden=stage()>30;
-  status('Saved to your family account! '+(result.new_badges?.length?'New trophies: '+result.new_badges.join(', '):'Next stage unlocked.'));
+  status('Saved to your family account! '+(result.new_badges?.length?'New trophies: '+result.new_badges.map(id=>BADGES.find(entry=>entry[0]===id)?.[1]||id).join(', '):'Next stage unlocked.'));
   document.dispatchEvent(new Event('family-game-score-changed'));
  }catch(e){status('Finish could not be verified or saved: '+e.message,true);message.innerHTML+='<p>Your result was not added to the family leaderboard.</p>';}
  finally{busy=false;}
@@ -425,7 +429,7 @@ async function verify(){
   const recipe=avatars?.find?.(row=>row.user_id===id)?.avatar_display;
   if(recipe){
    const tone=(part)=>AVATAR_OPTIONS[part].find(([key])=>key===recipe[part])?.[2];
-   riderLook={shirt:tone('shirt'),skin:tone('skin'),hair:tone('hair'),body:recipe.body,garment:recipe.garment,
+   riderLook={shirt:tone('shirt'),skin:tone('skin'),hair:tone('hair'),body:recipe.full_body?.model,garment:recipe.garment,
     trail:({turquoise:'#a7fcfa',burntorange:'#ffe281',maroon:'#ffa4a7',teal:'#9afafa',navy:'#bac2ff'})[recipe.shirt]};
   }
  }

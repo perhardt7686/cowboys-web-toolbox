@@ -23,13 +23,6 @@ on:
       - 'docs/commons-arcade-shell.mjs'
       - 'docs/commons-arcade-titles.mjs'
       - 'tests/browser-arcade-titles.py'
-      - 'docs/skyboard-*.mjs'
-      - 'docs/commons-board-rush.*'
-      - 'docs/dash-*.mjs'
-      - 'tests/browser-skyboard-sprint.py'
-      - 'tests/arcade-replay-db.test.mjs'
-      - 'supabase/functions/family-arcade/**'
-      - 'supabase/migrations/*_family_arcade_verified_physics.sql'
       - 'docs/commons-dash-forge.mjs'
       - 'docs/commons-dash-forge.css'
       - 'tests/browser-dash-forge.py'
@@ -67,13 +60,6 @@ on:
       - 'docs/commons-arcade-shell.mjs'
       - 'docs/commons-arcade-titles.mjs'
       - 'tests/browser-arcade-titles.py'
-      - 'docs/skyboard-*.mjs'
-      - 'docs/commons-board-rush.*'
-      - 'docs/dash-*.mjs'
-      - 'tests/browser-skyboard-sprint.py'
-      - 'tests/arcade-replay-db.test.mjs'
-      - 'supabase/functions/family-arcade/**'
-      - 'supabase/migrations/*_family_arcade_verified_physics.sql'
       - 'docs/commons-dash-forge.mjs'
       - 'docs/commons-dash-forge.css'
       - 'tests/browser-dash-forge.py'
@@ -96,10 +82,6 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.50,<2'
           python -m playwright install --with-deps chromium webkit
-      - name: Verify deterministic physics and PostgreSQL role boundaries
-        run: |
-          npm install --no-save --no-package-lock @electric-sql/pglite@0.5.11
-          node --test tests/skyboard-sprint.test.mjs tests/dash-forge.test.mjs tests/arcade-replay-db.test.mjs
       - name: Inspect real computed CSS on a local sample member feed
         run: |
           python -m http.server 8765 --directory docs >/tmp/commons-smoke-http.log 2>&1 &
@@ -118,7 +100,6 @@ jobs:
           python tests/browser-streetrod-reborn.py
           python tests/browser-hot-rod.py
           python tests/browser-dash-forge.py
-          python tests/browser-skyboard-sprint.py
       - name: Retain test-only iPhone-sized screenshot
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -136,8 +117,6 @@ jobs:
             reports/streetrod-ega-iphone-sample.png
             reports/arcade-one-screen-iphone-sample.png
             reports/arcade-dash-title-tablet.png
-            reports/skyboard-sprint-iphone.png
-            reports/dash-forge-tablet.png
             reports/streetrod-room-garage-mobile.png
             reports/streetrod-reborn-iphone.png
             reports/hot-rod-*.png

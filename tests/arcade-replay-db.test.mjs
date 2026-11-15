@@ -111,6 +111,8 @@ test('real PostgreSQL roles preserve old rows, verify exact drafts and privately
     assert.equal(match.ghost.name,'QA Author');
     assert.ok(match.ghost.frames.length>30);
     assert.deepEqual(Object.keys(match.ghost).sort(),['board','frames','name','time_ms']);
+    await member(author,()=>one('select community_boardride_unshare_replays()'));
+    assert.equal((await openSky(solver,false)).ghost,null);
     assert.equal(await one('select count(*)::int from community_boardride_runs where status=$1',['finished']),3);
   }finally{await db.close();}
 });

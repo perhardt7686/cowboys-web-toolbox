@@ -1,7 +1,7 @@
 /* Dash Forge · Original member-only rhythm-platformer. No Geometry Dash assets,
  * music or proprietary levels. Server owns timing validation, achievements and awards. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {DASH_DT,DASH_CEILING,DASH_MODES,DASH_TOOLS,dashCanTransform,createDashCourse,createDashRun,stepDash} from './dash-physics.mjs';
+import {DASH_DT,DASH_CEILING,DASH_MODES,DASH_TOOLS,dashCanTransform,dashCanRotate,createDashCourse,createDashRun,stepDash} from './dash-physics.mjs';
 import {DASH_PALETTES,drawDashObject,drawDashPlayer} from './dash-art.mjs';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
@@ -83,7 +83,8 @@ function setDetail(index,value){
  draft.layout.sort((a,b)=>a[0]-b[0]);
 }
 function writeTile(index,newToken,detail=detailAt(index)){
- const pattern=draft.pattern,object=dashCanTransform(newToken)?detail:[0,2,0,detail[3]];
+ const pattern=draft.pattern,object=dashCanTransform(newToken)?[...detail]:[0,2,0,detail[3]];
+ if(!dashCanRotate(newToken))object[2]=0;
  draft.pattern=pattern.slice(0,index)+newToken+pattern.slice(index+1);setDetail(index,object);
 }
 function editTile(index,newBrush){
@@ -225,7 +226,7 @@ function renderBuilder(){
  const detail=detailAt(tileSelected);
  for(const [id,i] of [['dash-tile-lane',0],['dash-tile-scale',1],['dash-tile-flip',2],['dash-tile-decor',3]]){
   const control=$(id);if(!control)continue;
-  control.value=String(detail[i]);control.disabled=i!==3&&!dashCanTransform(draft.pattern[tileSelected]);
+  control.value=String(detail[i]);control.disabled=i===2?!dashCanRotate(draft.pattern[tileSelected]):i!==3&&!dashCanTransform(draft.pattern[tileSelected]);
  }
  const selectedTile=$('dash-selected-tile');
  if(selectedTile)selectedTile.textContent='Tile '+(tileSelected+1)+' · '+(PAINTS.find(([key])=>key===draft.pattern[tileSelected])?.[1]||'Clear');
@@ -358,7 +359,7 @@ function build(){
   '<div id="dash-play-overlay" class="dash-play-overlay" hidden>'+
     '<header class="dash-playing-head"><div><small>NOW PLAYING</small><strong id="dash-run-title">Loading…</strong></div>'+
       '<strong id="dash-live-progress">0%</strong><button type="button" id="dash-sound" data-dash-action="sound" aria-pressed="false">♪ SOUND OFF</button><button type="button" id="dash-retry-live" data-dash-action="retry" hidden>Retry</button><button type="button" id="dash-practice-retry" data-dash-action="practice-retry" hidden>Checkpoint</button><button type="button" data-dash-action="leave">Leave track</button></header>'+
-    '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" role="img" aria-label="Running level. Tap Jump to vault over obstacles."></canvas>'+
+    '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" tabindex="0" role="img" aria-label="Running level. Press Space or Up to control your character."></canvas>'+
      '<div class="dash-run-overlay" id="dash-run-message" hidden></div></div>'+
     '<footer class="dash-game-controls"><div><small id="dash-control-mode">Cube</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
     '<button type="button" id="dash-jump" aria-label="Jump">↗ JUMP</button></footer>'+
@@ -710,17 +711,18 @@ function frameStep(timestamp){
  if(!run||run.finishing)return;
  if(run.lastFrame===null)run.lastFrame=timestamp;
  run.accumulator+=Math.min(.12,Math.max(0,(timestamp-run.lastFrame)/1000));run.lastFrame=timestamp;
- const physics=run.physics;
+ const physics=run.physics,mode=physics.mode;
  while(run.accumulator>=DASH_DT&&!physics.done){
   run.accumulator-=DASH_DT;
-  const pad=navigator.getGamepads?.()?.find?.(p=>p?.connected);
+  const pads=navigator.getGamepads?.();
+  const pad=pads&&Array.from(pads).find(p=>p?.connected);
   const input=(inputHeld||pad?.buttons[0]?.pressed?1:0)|(inputTapped?2:0);
   inputTapped=false;
   if(input!==run.input){run.trace.push([physics.tick,input]);run.input=input;}
   stepDash(physics,input);
-  if(physics.event==='mode')updateControls();
   if(physics.event==='checkpoint')$('dash-live-status').textContent='Practice checkpoint set at tile '+(physics.checkpoint+1)+'.';
  }
+ if(physics.mode!==mode)updateControls();
  run.elapsed=physics.elapsed*1000;originalBeat();draw();
  $('dash-live-progress').textContent=Math.min(100,Math.floor(physics.x/run.pattern.length*100))+'%';
  if(physics.done){void finishRun();return;}
@@ -743,6 +745,7 @@ function beginDraw(l){
  $('dash-retry-live').hidden=true;$('dash-practice-retry').hidden=true;
  run.lastFrame=null;run.elapsed=0;run.trace=[];run.input=0;run.accumulator=0;run.finishing=false;lastBeat=-1;
  inputHeld=inputTapped=false;
+ $('dash-canvas').focus({preventScroll:true});
  updateControls();draw();frame=requestAnimationFrame(frameStep);
 }
 function startPractice(again=null){
