@@ -1,0 +1,169 @@
+/* Dash Forge: tablet-first original geometric arcade, family members only. */
+body.community-page #dash-forge-root,body.community-page #dash-forge-root *{box-sizing:border-box}
+body.community-page #dash-forge-root{margin:14px 0 22px;min-width:0;font-family:system-ui,-apple-system,sans-serif;color:#f9f5ff}
+body.community-page #dash-forge-root > #dash-forge-toggle{
+ display:flex;width:100%;align-items:center;gap:12px;border:3px solid #9465e9;border-radius:15px;
+ background:linear-gradient(110deg,#171839,#49306a 59%,#22305a);color:#fff;box-shadow:0 5px 0 #271a4c;
+ min-height:69px;padding:10px 16px;text-align:left
+}
+body.community-page #dash-forge-toggle .mahjong-entry-icon{font-size:35px;color:#79f8fe;text-shadow:0 0 15px #35e6f9}
+body.community-page #dash-forge-toggle strong{display:block;color:#fff;font:900 clamp(19px,3.4vw,27px)/1.1 system-ui}
+body.community-page #dash-forge-toggle small{display:block;color:#f6e5ff;font:700 clamp(11px,1.75vw,13px)/1.35 system-ui}
+body.community-page #dash-forge-toggle .mahjong-chevron{margin-left:auto;color:#fff;font-size:24px}
+body.community-page #dash-forge-toggle:focus-visible{outline:4px solid #76f5ff;outline-offset:3px}
+body.community-page #dash-forge-inside{
+ position:relative;display:flex;flex-direction:column;min-width:0;min-height:470px;
+ border:2px solid #a77cef;border-radius:18px;
+ background:linear-gradient(156deg,#12132c,#272044 57%,#141831);color:#fff;
+ padding:clamp(8px,1.5vw,15px);margin-top:12px;overflow:hidden
+}
+body.community-page #dash-forge-inside[hidden],
+body.community-page #dash-forge-root [hidden]{display:none!important}
+body.community-page #dash-forge-inside button{
+ min-height:43px;border:2px solid #816cb1;border-radius:10px;background:#322e64;color:#fff;
+ padding:8px 12px;font:850 clamp(12px,1.65vw,15px)/1.2 system-ui;cursor:pointer
+}
+body.community-page #dash-forge-inside button:where(:hover,:focus-visible){background:#5b419b;border-color:#77e8f8}
+body.community-page #dash-forge-inside button:disabled{opacity:.48;cursor:not-allowed;filter:saturate(.6)}
+body.community-page #dash-forge-inside button:focus-visible{outline:3px solid #fff193;outline-offset:2px}
+body.community-page #dash-forge-inside p{margin:0;color:#d9d3ee}
+body.community-page .dash-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:0 0 10px}
+body.community-page .dash-top h2{margin:3px 0!important;font:1000 clamp(24px,4vw,35px)/1.1 system-ui!important;color:#83f2ff!important}
+body.community-page .dash-top small{color:#ffc7f4;font-size:11px;font-weight:800;letter-spacing:.07em}
+body.community-page .dash-top p{font:650 13px/1.4 system-ui}
+body.community-page .dash-head-stats{display:flex;flex-wrap:wrap;gap:7px}
+body.community-page .dash-head-stats span{display:grid;gap:4px;border:1px solid #7664b1;border-radius:10px;padding:7px 9px;
+ background:#242248;color:#efe5ff;font:700 10px/1.2 system-ui}
+body.community-page .dash-head-stats b{font-size:18px;color:#ffe48e;font-variant-numeric:tabular-nums}
+body.community-page .dash-tabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:thin;margin:0 0 10px;flex:0 0 auto}
+body.community-page .dash-tabs button{flex:1 0 auto;min-height:44px!important;background:#232346!important;border:1px solid #72699e!important}
+body.community-page .dash-tabs button[aria-current=page]{background:#ffdd87!important;color:#242245!important;border-color:#fff5b9!important}
+body.community-page .dash-pane{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding:4px 3px 10px}
+body.community-page .dash-pane-title{margin:0 0 13px}
+body.community-page .dash-pane h3{margin:2px 0 6px;font:900 clamp(19px,3vw,25px)/1.13 system-ui;color:#fff}
+body.community-page .dash-pane-title p{font:600 clamp(11px,1.6vw,14px)/1.4 system-ui}
+body.community-page .dash-level-list{display:grid;gap:9px}
+body.community-page .dash-level{
+ display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:11px;align-items:center;
+ border:2px solid #554e99;border-radius:13px;background:#292650;padding:10px;
+ min-width:0;box-shadow:inset 0 1px #a68be255
+}
+body.community-page .dash-level-number{width:43px;height:43px;display:grid;place-items:center;border-radius:10px;
+ background:#5043a1;color:#ffe1a8;font:950 21px/1 system-ui}
+body.community-page .dash-level-copy{min-width:0;display:grid;gap:4px}
+body.community-page .dash-level-copy strong{color:#fff;font:850 clamp(14px,2.3vw,18px)/1.2 system-ui}
+body.community-page .dash-level-copy small{color:#d8d4eb;font:650 11px/1.35 system-ui}
+body.community-page .dash-level-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:end;gap:5px}
+body.community-page .dash-level-actions button:first-child{background:#145e79!important;border-color:#5cdddf!important}
+body.community-page .dash-level-actions button:disabled{background:#3c3951!important;border-color:#6b687d!important}
+body.community-page .dash-reward{color:#ffda80;font:800 11px/1.2 system-ui}
+body.community-page .dash-draft-tag{color:#f7b7e3;font:750 10px/1.2 system-ui}
+body.community-page .dash-builder-form{display:grid;grid-template-columns:minmax(180px,2fr) repeat(2,minmax(70px,1fr));gap:9px;margin:10px 0}
+body.community-page .dash-builder-form label{display:grid;gap:5px;min-width:0;font:800 11px/1.2 system-ui;color:#eee}
+body.community-page .dash-builder-form :is(input,select){
+ width:100%;min-width:0;min-height:44px;padding:7px 9px;border:2px solid #8476be;border-radius:8px;
+ background:#fbf3ff;color:#231b3b;font:800 16px/1.3 system-ui
+}
+body.community-page .dash-palette{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0}
+body.community-page .dash-palette button[aria-pressed=true]{background:#fedb88!important;color:#211633!important;border-color:#fff5b0!important}
+body.community-page .dash-editor-grid{display:grid;grid-template-columns:repeat(var(--dash-cols,12),minmax(0,1fr));gap:4px;
+ border:2px solid #7365aa;border-radius:12px;padding:8px;background:#0c1226;max-width:860px;margin-bottom:10px}
+body.community-page #dash-forge-inside .dash-cell{display:grid;place-items:center;
+ width:100%;min-width:0;min-height:28px;padding:1px;border:1px solid #777197;border-radius:3px;
+ background:#2f294c;color:#a6a8c9;font:900 clamp(10px,2.6vw,20px)/1 system-ui}
+body.community-page #dash-forge-inside .dash-cell.type-spike{background:#762c55;color:#ffa5c1}
+body.community-page #dash-forge-inside .dash-cell.type-block{background:#a75a2f;color:#ffddb9}
+body.community-page #dash-forge-inside .dash-cell.type-gap{background:#153b62;color:#89ddff}
+body.community-page #dash-forge-inside .dash-cell:disabled{background:#181a36;color:#575778;opacity:1;border-color:#292744}
+body.community-page .dash-builder-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+body.community-page .dash-builder-actions button:last-child{background:#17625a!important;border-color:#69e6d1!important}
+body.community-page .dash-note{margin-top:10px!important;color:#ddd0f1!important;font:650 12px/1.5 system-ui}
+body.community-page .dash-themes{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 24px}
+body.community-page #dash-forge-inside .dash-theme{display:grid;gap:5px;justify-items:center;min-width:100px}
+body.community-page .dash-theme span{width:28px;height:28px;border:3px solid #fff7c3;transform:rotate(12deg)}
+body.community-page .dash-theme strong{font-size:13px}
+body.community-page .dash-theme small{font-size:10px;color:inherit}
+body.community-page #dash-forge-inside .dash-theme[aria-pressed=true]{border-color:#ffde8f!important;background:#654484!important}
+body.community-page .dash-earned{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
+ border:1px solid #79659e;border-radius:10px;padding:12px;background:#26234a;margin:7px 0}
+body.community-page .dash-earned strong{color:#ffdb82}
+body.community-page .dash-earned span{color:#e4d9ef;font-size:12px}
+body.community-page .dash-leader{display:grid;grid-template-columns:38px minmax(110px,1fr) auto auto;
+ gap:9px;align-items:center;padding:12px;border:1px solid #7160ad;background:#252348;border-radius:10px;margin:7px 0}
+body.community-page .dash-leader strong{color:#fff;min-width:0}
+body.community-page .dash-leader>span{color:#ffe1a4;font-weight:800}
+body.community-page .dash-leader small{grid-column:2/-1;color:#d4cde7}
+body.community-page .dash-status{flex:0 0 auto;margin-top:7px;padding:8px 10px;border:1px solid #4c619c;
+ border-radius:8px;background:#19203b;color:#bbf7ff;font:700 12px/1.3 system-ui}
+body.community-page .dash-status[data-error=true]{background:#602f4d;color:#fff}
+body.community-page #dash-play-overlay{
+ position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;gap:8px;min-height:0;
+ padding:clamp(5px,1.2vw,14px);background:#101127;color:#fff
+}
+body.community-page .dash-playing-head{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:10px}
+body.community-page .dash-playing-head>div{display:grid;gap:3px}
+body.community-page .dash-playing-head small{font-size:10px;color:#a0fdff}
+body.community-page .dash-playing-head strong{font-size:clamp(15px,3vw,20px);color:#fff}
+body.community-page #dash-live-progress{font:900 clamp(19px,4vw,32px)/1 system-ui;color:#ffe98c}
+body.community-page .dash-canvas-wrap{position:relative;display:grid;place-items:center;flex:1 1 auto;min-height:0;
+ background:radial-gradient(circle at center,#343053,#080d1f);border:3px solid #5645a3;
+ border-radius:14px;overflow:hidden;touch-action:none}
+body.community-page #dash-canvas{display:block;width:100%;height:100%;max-width:1400px;max-height:100%;
+ object-fit:contain;aspect-ratio:8/3;touch-action:none;image-rendering:auto;cursor:pointer}
+body.community-page .dash-run-overlay{position:absolute;inset:20% 7%;display:grid;place-items:center;
+ background:#13122ddb;color:#ffed99;text-align:center;
+ font:1000 clamp(20px,4.5vw,40px)/1.2 system-ui;pointer-events:none;text-shadow:0 0 20px #ff99b4}
+body.community-page .dash-game-controls{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:10px}
+body.community-page .dash-game-controls small{color:#91ebff;font-size:10px;font-weight:900}
+body.community-page .dash-game-controls p{margin:4px 0 0;font:650 clamp(10px,1.7vw,14px)/1.3 system-ui;color:#fff}
+body.community-page #dash-jump{width:clamp(136px,25vw,220px);height:clamp(65px,14dvh,112px);border:4px solid #ffe09a!important;
+ background:linear-gradient(160deg,#ef79bc,#743cce)!important;color:#fff!important;
+ border-radius:19px!important;font:1000 clamp(20px,3vw,31px)/1 system-ui!important;
+ box-shadow:0 5px 0 #483075;touch-action:none;user-select:none}
+body.community-page #dash-jump:active{transform:translateY(3px);box-shadow:0 2px 0 #483075}
+body.community-page.arcade-on #dash-forge-root:not(.arcade-game-active){display:none!important}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-root.arcade-game-active{
+ position:fixed!important;inset:var(--arcade-top,88px) 0 var(--arcade-bottom,0px) 0!important;
+ z-index:2147481900!important;display:block!important;
+ width:100vw!important;max-width:none!important;margin:0!important;padding:5px!important;
+ height:calc(100dvh - var(--arcade-top,88px) - var(--arcade-bottom,0px))!important;
+ max-height:none!important;border:0!important;border-radius:0!important;
+ background:#0e0f29!important;color:#fff!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-toggle{display:none!important}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-inside{
+ height:100%!important;max-height:100%!important;min-height:0!important;margin:0!important;
+ border:0!important;border-radius:0!important;padding:4px!important
+}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-inside .dash-top{display:none!important}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-inside .dash-tabs{display:none!important}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-inside .dash-status{
+ padding:4px 7px!important;min-height:23px!important;font-size:11px!important
+}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-forge-inside .dash-pane{height:100%!important}
+body.community-page.arcade-on[data-arcade-game=dashforge] #dash-play-overlay{inset:0!important}
+body.community-page.arcade-on[data-arcade-game=dashforge] .dash-playing-head{min-height:45px}
+@media(max-width:680px){
+ body.community-page .dash-level{grid-template-columns:37px minmax(0,1fr);gap:6px;padding:7px}
+ body.community-page .dash-level-number{width:34px;height:34px;font-size:15px}
+ body.community-page .dash-level-actions{grid-column:2;justify-content:start}
+ body.community-page .dash-builder-form{grid-template-columns:minmax(0,1fr) minmax(72px,auto)}
+ body.community-page .dash-builder-form label:first-child{grid-column:1/-1}
+ body.community-page .dash-leader{grid-template-columns:27px minmax(90px,1fr) auto;font-size:12px}
+ body.community-page .dash-leader>span:nth-of-type(3){grid-column:3}
+ body.community-page .dash-leader small{grid-column:2/-1}
+ body.community-page #dash-forge-inside .dash-cell{min-height:28px}
+ body.community-page .dash-playing-head>button{min-height:40px!important;padding:5px 8px!important}
+}
+@media(orientation:landscape) and (max-height:580px){
+ body.community-page #dash-play-overlay{gap:2px!important;padding:3px!important}
+ body.community-page .dash-playing-head{min-height:33px!important}
+ body.community-page .dash-game-controls{min-height:53px!important}
+ body.community-page #dash-jump{height:52px!important;width:145px!important;font-size:19px!important}
+ body.community-page .dash-playing-head>button{min-height:31px!important;padding:3px 8px!important}
+ body.community-page .dash-pane-title p{display:none!important}
+ body.community-page .dash-level{padding:5px 8px!important}
+ body.community-page #dash-editor-grid{gap:2px;padding:3px}
+ body.community-page #dash-forge-inside .dash-cell{min-height:22px}
+}
+@media(prefers-reduced-motion:reduce){body.community-page #dash-forge-root *,body.community-page #dash-forge-root *::before{animation:none!important;transition:none!important}}
