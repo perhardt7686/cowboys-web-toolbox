@@ -643,11 +643,14 @@ body.community-page .avatar-dressing-studio [data-studio-field] button:has(.stud
 body.community-page .avatar-dressing-studio [data-studio-field] button:has(.studio-option-art)[aria-pressed=true] span::before{
   content:"✓ ";color:#28524a;
 }
-@media (max-width:730px){
-  body.community-page .studio-workspace-dialog .profile-studio .avatar-dressing-studio .avatar-reward-tabs{
-    grid-template-columns:.83fr 1.06fr 1.29fr .91fr;
-  }
+body.community-page .studio-workspace-dialog .profile-studio .avatar-dressing-studio .avatar-reward-tabs{
+  grid-template-columns:.83fr 1.06fr 1.29fr .91fr;
+}
+body.community-page .studio-workspace-dialog .profile-studio .avatar-dressing-studio .avatar-reward-tabs button{
+  white-space:nowrap;
+}
+@media (max-width:850px){
   body.community-page .studio-workspace-dialog .profile-studio .avatar-dressing-studio .avatar-reward-tabs button{
-    font-size:clamp(.71rem,3.23vw,.84rem)!important;white-space:nowrap;
+    font-size:clamp(.71rem,3.23vw,.84rem)!important;
   }
 }

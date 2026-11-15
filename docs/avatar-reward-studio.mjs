@@ -168,7 +168,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   const reduceAnimation=()=>Boolean(reduceMotion?.()||document.body.classList.contains('forum-reduce-motion'));
   const pets=createPetStudio({
-    rpc,catalog:()=>workshop()?catalog().filter(item=>currentItems.has(item.id)||have(item.id)):catalog(),have,unlocksKnown:()=>Boolean(data),checkError:()=>loadError,
+    rpc,catalog:()=>workshop()?catalog().filter(item=>currentItems.has(item.id)||have(item.id)):catalog(),tradeCatalog:catalog,have,unlocksKnown:()=>Boolean(data),checkError:()=>loadError,
     openReward:item=>setSection('collection',item.id),
     tryOn(item){tryOn(item);setSection('avatar');},
     reduceMotion:reduceAnimation,
