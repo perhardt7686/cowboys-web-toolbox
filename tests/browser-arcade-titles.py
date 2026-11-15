@@ -85,6 +85,7 @@ async def run_size(browser,width,height):
    else:
     await cover.locator('[data-arcade-action="title-start"]').click()
    assert await page.locator("#"+('streetrod-root' if game=="streetrod" else
+    'dash-forge-root' if game=="dashforge" else
     'letter-lock-root' if game=="wordle" else
     'word-game-root' if game=="wordquest" else
     'plate-game-root' if game=="plates" else
