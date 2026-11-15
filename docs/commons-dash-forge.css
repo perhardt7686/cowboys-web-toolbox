@@ -208,3 +208,9 @@ body.community-page #dash-forge-root .dash-palette{
  body.community-page #dash-forge-root .dash-palette button{min-width:calc(25% - 7px);padding:6px 3px}
  body.community-page #dash-forge-root .dash-forever-counter{font-size:10px;padding:7px}
 }
+
+/* Small tablets retain reachable sound, stage, and exit controls. */
+body.community-page #dash-forge-root .dash-playing-head{flex-wrap:wrap}
+body.community-page #dash-forge-root #dash-sound{min-width:94px;min-height:40px!important;background:#223455!important;border-color:#70bfdf!important;color:#e2faff!important;white-space:nowrap}
+body.community-page #dash-forge-root #dash-sound[aria-pressed=true]{background:#105b57!important;color:#adfff4!important;border-color:#74ffd7!important}
+@media(max-width:400px){body.community-page #dash-forge-root .dash-playing-head{gap:3px}body.community-page #dash-forge-root #dash-sound{min-width:76px;padding:4px!important;font-size:11px!important}}
