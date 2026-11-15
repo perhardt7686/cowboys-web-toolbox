@@ -32,6 +32,9 @@ const special={
   'trail-husky':'quest-first-clue','lantern-raccoon':'hotrod-first-drag'
 };
 const routes=Object.entries(GROUPS);
+// The first 289 established prizes use a deterministic legacy distribution.
+// New arcade categories must NOT reshuffle their original achievements.
+const legacyRoutes=routes.filter(([group])=>!['fleet','maze','dashforge'].includes(group));
 const tierNames=['starter','starter','bronze','bronze','silver','gold','legendary'];
 const rank=new Map(routes.flatMap(([group,ids])=>ids.map((id,step)=>[id,{group,tier:group==='family'?'family':tierNames[step]}])));
 const countBySlot=new Map();
@@ -40,9 +43,9 @@ export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...
   const slotIndex=countBySlot.get(item.slot)||0;
   countBySlot.set(item.slot,slotIndex+1);
   const slotOrdinal=Object.keys(SLOT_LABELS).indexOf(item.slot);
-  const [,track]=routes[(slotOrdinal*2+slotIndex)%routes.length];
-  const round=Math.floor(slotIndex/routes.length);
-  const id=item.achievement_id||special[item.id]||track[(round+(slotIndex%routes.length)*3+slotOrdinal)%track.length];
+  const [,track]=legacyRoutes[(slotOrdinal*2+slotIndex)%legacyRoutes.length];
+  const round=Math.floor(slotIndex/legacyRoutes.length);
+  const id=item.achievement_id||special[item.id]||track[(round+(slotIndex%legacyRoutes.length)*3+slotOrdinal)%track.length];
   return Object.freeze({...item,achievement_id:id,...rank.get(id),tags:Object.freeze(item.tags||[])});
 }));
 export const BY_ID=new Map(CATALOG.map(item=>[item.id,item]));
