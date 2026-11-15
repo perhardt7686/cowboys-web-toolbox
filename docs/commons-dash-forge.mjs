@@ -91,10 +91,12 @@ function renderBuilder(){
  grid.style.setProperty('--dash-cols','12');
  grid.innerHTML=[...draft.pattern].map((cell,i)=>{
   const fixed=i<4||i>=draft.pattern.length-4;
-  return '<button type="button" class="dash-cell type-'+(cell==='.'?'clear':cell==='s'?'spike':cell==='b'?'block':'gap')+
+  const label=PAINTS.find(([key])=>key===cell)?.[1]||'Hazard';
+  const glyph={'.':'·',s:'▲',b:'■',g:'∇',l:'ϟ',w:'✺',c:'◆',p:'▮',f:'♨',r:'◎',m:'♣',o:'◉',d:'▣',h:'⚒'}[cell]||'·';
+  const type=label.toLowerCase().replace(/[^a-z]+/g,'-');
+  return '<button type="button" class="dash-cell type-'+type+
    '" data-dash-cell="'+i+'" '+(fixed?'disabled':'')+
-   ' aria-label="Tile '+(i+1)+' '+(cell==='.'?'empty':cell==='s'?'spike':cell==='b'?'block':'gap')+'">'+
-   (cell==='s'?'▲':cell==='b'?'■':cell==='g'?'∇':'·')+'</button>';
+   ' aria-label="Tile '+(i+1)+' '+(cell==='.'?'empty':label.toLowerCase())+'">'+glyph+'</button>';
  }).join('');
  $('dash-builder-help').textContent=draft.id?'Draft #'+draft.id+' · edits require another successful playtest':'New level · safe first and last four tiles';
 }
@@ -126,9 +128,9 @@ function build(){
     '<div id="dash-head-stats" class="dash-head-stats"></div></header>'+
   '<nav class="dash-tabs" aria-label="Dash Forge locations">'+TABS.map(([id,name])=>'<button data-dash-tab="'+id+
     '" type="button">'+name+'</button>').join('')+'</nav>'+
-  '<section class="dash-pane" id="dash-pane-campaign"><div class="dash-pane-title"><h3>Six-stage family campaign</h3>'+
-    '<p>Everyone races the same six stages. Clear each chapter to unlock the next.</p></div>'+
-    '<div class="dash-forever-counter">◆ ONE BILLION UNIQUE STAGES · 12 ROTATING WORLDS · A WORLD TRIAL EVERY 25 STAGES · NEW TRACKS APPEAR AS YOU ADVANCE ◆</div><div id="dash-campaign-list" class="dash-level-list"></div></section>'+
+  '<section class="dash-pane" id="dash-pane-campaign"><div class="dash-pane-title"><h3>One-billion-stage family campaign</h3>'+
+    '<p>Every member has the same sequential, procedurally generated challenge. Beat your current stage to reveal new chapters and worlds.</p></div>'+
+    '<div class="dash-forever-counter">◆ ONE BILLION NUMBERED STAGES · 12 ROTATING WORLDS · A WORLD TRIAL EVERY 25 STAGES · NEW TRACKS APPEAR AS YOU ADVANCE ◆</div><div id="dash-campaign-list" class="dash-level-list"></div></section>'+
   '<section class="dash-pane" id="dash-pane-community" hidden><div class="dash-pane-title"><h3>Levels made by the family</h3>'+
     '<p>Creator awards pay only when another member genuinely beats the published level, scaled by active solve time.</p></div>'+
     '<div id="dash-community-list" class="dash-level-list"></div></section>'+
