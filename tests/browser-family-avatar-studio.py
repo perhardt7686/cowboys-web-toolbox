@@ -81,18 +81,30 @@ async def main():
                 guide=page.locator('#family-retro-guide')
                 await expect(guide).to_be_visible(timeout=15000)
                 cards=guide.locator('.family-retro-channel')
-                await expect(cards).to_have_count(35)
+                await expect(cards).to_have_count(36)
                 assert await guide.get_attribute('aria-modal')=='true'
                 guide_bounds=await guide.bounding_box()
                 assert guide_bounds and guide_bounds['width']<=width+1,(
                     width,'Retro TV dialog overflows phone',guide_bounds)
                 search=guide.locator('#family-retro-search')
+                await search.fill('301')
+                await expect(cards).to_have_count(1)
+                assert await cards.first.locator('.family-retro-watch').get_attribute('href')=='https://spelunkr.tv/henshin'
                 await search.fill('waku')
                 await expect(cards).to_have_count(1)
                 watch=cards.first.locator('a.family-retro-watch')
                 assert await watch.get_attribute('href')=='https://spelunkr.tv/waku-waku'
                 assert await watch.get_attribute('target')=='_blank'
                 assert await watch.get_attribute('rel')=='noopener noreferrer'
+                await page.context.route('https://spelunkr.tv/waku-waku',
+                    lambda route:route.fulfill(content_type='text/html',body='<title>Fixture channel</title>'))
+                async with page.context.expect_page() as opened:
+                    await watch.click()
+                channel=await opened.value
+                await channel.wait_for_url('https://spelunkr.tv/waku-waku')
+                assert await channel.title()=='Fixture channel'
+                await channel.close()
+                await expect(guide).to_be_visible()
                 fav=cards.first.locator('.family-retro-fav')
                 await fav.click()
                 await guide.locator('[data-retro-group="favorites"]').click()

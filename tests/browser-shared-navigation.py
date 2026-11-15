@@ -5,7 +5,7 @@ Uses local GitHub Pages files and no credentials, accounts, or real posts.
 import asyncio
 import os
 from pathlib import Path
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, expect
 
 ROOT=Path(__file__).resolve().parents[1]
 BASE='http://127.0.0.1:8765/'
@@ -13,6 +13,51 @@ CASES=[
     ('Toolbox','index.html','Toolbox','community.html'),
     ('Commons','community.html?preview=1&role=visitor','Family Message Board',None)
 ]
+
+async def check_account_menu(browser, engine):
+    for width,height in [(320,568),(390,844),(844,390)]:
+        page=await browser.new_page(viewport={'width':width,'height':height},
+                                    is_mobile=True,has_touch=True,reduced_motion='reduce')
+        try:
+            await page.goto(BASE+'community.html?preview=1&role=owner',wait_until='domcontentloaded')
+            panel=page.locator('#cowboy-nav-panel')
+            await page.locator('.cowboy-nav-toggle').click()
+            account=panel.locator('details.account-menu')
+            await account.locator('summary').click()
+            actions=account.locator('.account-dropdown')
+            await expect(account).to_have_attribute('open','')
+            await expect(actions.get_by_role('button',name='Power House')).to_be_visible()
+            await expect(actions.get_by_role('button',name='Owner dashboard')).to_be_visible()
+            await expect(actions.get_by_role('button',name='Edit family profile')).to_be_visible()
+
+            if height>390:
+                await page.wait_for_function("""()=>{
+                  const panel=document.querySelector('#cowboy-nav-panel').getBoundingClientRect();
+                  const actions=document.querySelector('#cowboy-nav-panel .account-dropdown').getBoundingClientRect();
+                  return actions.top>=panel.top && actions.bottom<=panel.bottom+1;
+                }""")
+            bounds=await actions.evaluate("""actions=>{
+                const panel=actions.closest('nav');
+                const a=actions.getBoundingClientRect(),p=panel.getBoundingClientRect();
+                return {a:[a.left,a.right],p:[p.left,p.right],
+                        horizontalOverflow:panel.scrollWidth-panel.clientWidth};
+            }""")
+            assert bounds['a'][0]>=bounds['p'][0] and bounds['a'][1]<=bounds['p'][1], (
+                engine,width,height,'clipped account actions',bounds)
+            assert bounds['horizontalOverflow']<=2,(engine,width,height,bounds)
+
+            logout=actions.get_by_role('button',name='Log out')
+            await logout.scroll_into_view_if_needed()
+            assert await logout.evaluate("""button=>{
+              const r=button.getBoundingClientRect();
+              return r.height>=44 && button.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));
+            }"""),(engine,width,height,'unreachable account action')
+            await actions.get_by_role('button',name='Edit family profile').click()
+            await expect(page.locator('#profile-studio-form')).to_be_visible()
+            print(f'Family account menu PASS {engine} at {width}x{height}')
+        finally:
+            await page.close()
+
 
 async def main():
     async with async_playwright() as p:
@@ -102,8 +147,14 @@ async def main():
                     print(name+' shared dropdown PASS: mobile 390px, no clipping, vertical links, keyboard escape, repeat toggle')
                 finally:
                     await page.close()
+            await check_account_menu(browser,'Chromium')
         finally:
             await browser.close()
+        webkit=await p.webkit.launch(headless=True)
+        try:
+            await check_account_menu(webkit,'WebKit')
+        finally:
+            await webkit.close()
 
 if __name__=='__main__':
     asyncio.run(main())

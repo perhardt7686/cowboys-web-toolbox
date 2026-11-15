@@ -23,6 +23,30 @@ body.community-page .account-menu>summary { color:#39254e!important; background:
 body.community-page .account-dropdown { color:#39254e!important; background:#fffdf6!important; border-color:#99642b; min-width:min(90vw,260px); box-shadow:0 12px 28px #39254e33; z-index:1000; }
 body.community-page .account-dropdown :is(a,button) { color:#39254e!important; background:transparent; font-size:16px!important; font-weight:700; line-height:1.45; text-align:left; min-height:48px; padding:11px 14px; }
 body.community-page .account-dropdown :is(a,button):is(:hover,:focus-visible) { background:#ffe2a3!important; color:#39254e!important; }
+/* Keep profile actions in the shared menu's scrollable layout. */
+body.community-page .cowboy-menu-utility .account-menu {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+body.community-page .cowboy-menu-utility .account-menu > summary > span:nth-child(2) {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body.community-page .cowboy-menu-utility .account-dropdown {
+  position: static;
+  width: 100%;
+  min-width: 0;
+  margin-top: 8px;
+  padding: 5px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+body.community-page .cowboy-menu-utility .account-dropdown button:focus-visible {
+  outline-color: #57316b;
+  outline-offset: -3px;
+}
+
 body.community-page :is(.studio-tabs,.theme-choices,.cover-choices,.icon-choices,.avatar-modes) button,
 body.community-page .profile-studio button, body.community-page .community-categories button { color:#39254e; font-size:16px!important; line-height:1.35!important; min-height:46px; padding:11px 13px; }
 body.community-page .studio-tabs { gap:6px; flex-wrap:wrap; overflow:visible; }

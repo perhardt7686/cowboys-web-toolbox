@@ -1,7 +1,7 @@
 /* Private Family Message Board channel directory.
    Each Watch button opens the official Spelunkr broadcast page.
    No iframe, duplicated video or pretend live program schedule. */
-import {RETRO_CHANNELS,RETRO_GROUPS} from './commons-spelunkr-channels.mjs?v=guide2';
+import {RETRO_CHANNELS,RETRO_GROUPS} from './commons-spelunkr-channels.mjs?v=guide3';
 (() => {
   'use strict';
   const targetURL='https://spelunkr.tv/?tv';
@@ -31,10 +31,10 @@ import {RETRO_CHANNELS,RETRO_GROUPS} from './commons-spelunkr-channels.mjs?v=gui
     a.setAttribute('aria-haspopup','dialog');a.setAttribute('aria-controls','family-retro-guide');
     if(arcade){
       a.className='spelunkr-arcade-link';
-      a.innerHTML='<span class="arcade-program-number" aria-hidden="true">TV</span><span class="arcade-program-mark" aria-hidden="true">▣</span><span class="arcade-program-name"><strong>Spelunkr Retro TV</strong><small>35 CHANNELS · EASY MOBILE GUIDE</small></span><span class="arcade-program-state">CHANNELS ↗</span>';
+      a.innerHTML='<span class="arcade-program-number" aria-hidden="true">TV</span><span class="arcade-program-mark" aria-hidden="true">▣</span><span class="arcade-program-name"><strong>Spelunkr Retro TV</strong><small>'+RETRO_CHANNELS.length+' CHANNELS · EASY MOBILE GUIDE</small></span><span class="arcade-program-state">CHANNELS ↗</span>';
     }else{
       a.className='mahjong-entry-button spelunkr-game-link';
-      a.innerHTML='<span class="mahjong-entry-icon" aria-hidden="true">📺</span><span class="mahjong-entry-copy"><strong>Spelunkr Retro TV</strong><small>Browse 35 channels · Choose what to watch</small></span><span class="mahjong-chevron" aria-hidden="true">↗</span>';
+      a.innerHTML='<span class="mahjong-entry-icon" aria-hidden="true">📺</span><span class="mahjong-entry-copy"><strong>Spelunkr Retro TV</strong><small>Browse '+RETRO_CHANNELS.length+' channels · Choose what to watch</small></span><span class="mahjong-chevron" aria-hidden="true">↗</span>';
     }
     a.addEventListener('click',event=>{
       if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||board.hidden)return;

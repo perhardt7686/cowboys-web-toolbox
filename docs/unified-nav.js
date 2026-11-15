@@ -102,7 +102,19 @@
     if (publicLabel) utility.append(publicLabel);
   } else {
     const account = header.querySelector('#account-actions');
-    if (account) utility.append(account);
+    if (account) {
+      utility.append(account);
+      account.addEventListener('toggle', event => {
+        const menu = event.target;
+        if (panel.hidden || !menu.matches('.account-menu[open]')) return;
+        const actions = menu.querySelector('.account-dropdown');
+        if (!actions) return;
+        const bounds = panel.getBoundingClientRect();
+        const overflow = actions.getBoundingClientRect().bottom - bounds.bottom + 8;
+        const room = menu.getBoundingClientRect().top - bounds.top - 8;
+        panel.scrollTop += Math.max(0, Math.min(overflow, room));
+      }, true);
+    }
   }
   let avatarQuick=null;
   if(page==='commons'){
