@@ -1,6 +1,6 @@
 import {button,el} from './family-board-core.mjs?v=family3';
-import {petBehavior} from './avatar-prize-actions.mjs?v=cel1';
-import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=cel1';
+import {petBehavior} from './avatar-prize-actions.mjs?v=mystery2';
+import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=mystery2';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;
