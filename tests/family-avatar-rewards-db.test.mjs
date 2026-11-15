@@ -175,6 +175,26 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   assert.equal((await state()).earned.some(i=>i.id==='trail-husky'),false);
   assert.ok(get(await state(),'quest-first-clue').earned_at);
 
+  // A later TWO-WAY family swap is atomic and preserves the pets' own
+  // identities, while clearing the previous owner's equipped companion.
+  await switchRole(null,'system');
+  await sql("update community_private.avatar_pet_trade set created_at=now()-interval '2 minutes' where id=$1",[offering.id]);
+  await sql("insert into community_private.avatar_reward_earned(member_id,achievement_id) values($1,'hotrod-first-drag') on conflict do nothing",[member]);
+  await switchRole(member);
+  const raccoon=await petAction('lantern-raccoon','adopt');
+  const swap=await tradeOffer(other,'lantern-raccoon','trail-husky',raccoon.revision);
+  assert.equal(swap.requested_pet,'trail-husky');
+  await switchRole(other);
+  assert.equal((await tradeAction(swap.id,'accept')).status,'accepted');
+  assert.ok((await petState()).some(p=>p.cosmetic_id==='lantern-raccoon'));
+  assert.ok(!(await petState()).some(p=>p.cosmetic_id==='trail-husky'));
+  assert.equal((await state()).loadout.cosmetics?.companion,undefined);
+  await switchRole(member);
+  const returned=(await petState()).find(p=>p.cosmetic_id==='trail-husky');
+  assert.equal(returned.name,'Scout');
+  assert.equal(returned.bond,7);
+  assert.ok((await state()).earned.some(i=>i.id==='trail-husky'));
+
   await switchRole(null,'system');
   const profile=(await sql('select avatar_mode,avatar_path,published from public.community_profiles where user_id=$1',[member])).rows[0];
   assert.deepEqual(profile,{avatar_mode:'photo',avatar_path:member+'/avatar.png',published:true});
