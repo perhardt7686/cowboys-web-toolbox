@@ -1,0 +1,42 @@
+begin;
+-- Original new collectible pets, props, scenery, and supernatural FX.
+-- Awards use the existing server-verified achievement graph.
+insert into community_private.avatar_reward_cosmetic(id,slot,achievement_id,name,tags) values
+ ('midnight-owl','companion','quest-first-solve','Midnight Clue Owl',array['mystery','retro','collectible']::text[]),
+ ('phantom-puppy','companion','family-first-word','Phantom Puppy',array['mystery','retro','collectible']::text[]),
+ ('clockwork-cat','companion','hotrod-first-run','Clockwork Cat',array['mystery','retro','collectible']::text[]),
+ ('moon-fox','companion','wordle-first-solve','Moonlit Fox',array['mystery','retro','collectible']::text[]),
+ ('cactus-hedgehog','companion','mahjong-first-board','Cactus Hedgehog',array['mystery','retro','collectible']::text[]),
+ ('bubble-axolotl','companion','quest-xp-50','Bubble Axolotl',array['mystery','retro','collectible']::text[]),
+ ('detective-ferret','companion','plates-first-approval','Detective Ferret',array['mystery','retro','collectible']::text[]),
+ ('neon-firefly','companion','wordle-score-25','Neon Firefly',array['mystery','retro','collectible']::text[]),
+ ('satellite-turtle','companion','hotrod-first-drag','Satellite Turtle',array['mystery','retro','collectible']::text[]),
+ ('bonsai-dragon','companion','mahjong-five-wins','Bonsai Dragon',array['mystery','retro','collectible']::text[]),
+ ('carnival-bat','companion','family-puzzle-party','Carnival Bat',array['mystery','retro','collectible']::text[]),
+ ('gear-gecko','companion','cross-three-games','Gear Gecko',array['mystery','retro','collectible']::text[]),
+ ('cipher-wheel','prop','cross-double-play','Cipher Wheel',array['mystery','retro','collectible']::text[]),
+ ('flashbulb-camera','prop','plates-first-approval','Flashbulb Camera',array['mystery','retro','collectible']::text[]),
+ ('ghost-lantern','prop','family-first-word','Ghost Lantern',array['mystery','retro','collectible']::text[]),
+ ('brass-compass','prop','mahjong-first-board','Brass Compass',array['mystery','retro','collectible']::text[]),
+ ('storm-umbrella','prop','quest-first-clue','Storm Umbrella',array['mystery','retro','collectible']::text[]),
+ ('rocket-hoverboard','prop','hotrod-first-drag','Rocket Hoverboard',array['mystery','retro','collectible']::text[]),
+ ('twin-jetpack','prop','cross-three-games','Twin Jetpack',array['mystery','retro','collectible']::text[]),
+ ('field-radio','prop','hotrod-first-run','Field Radio',array['mystery','retro','collectible']::text[]),
+ ('secret-map','prop','wordle-first-clue','Secret Treasure Map',array['mystery','retro','collectible']::text[]),
+ ('spectral-scanner','prop','quest-xp-50','Spectral Scanner',array['mystery','retro','collectible']::text[]),
+ ('starlight-magnifier','prop','mahjong-five-wins','Starlight Magnifier',array['mystery','retro','collectible']::text[]),
+ ('detective-notebook','prop','plates-two-approvals','Detective Notebook',array['mystery','retro','collectible']::text[]),
+ ('foggy-marsh','background','family-first-word','Foggy Detective Marsh',array['mystery','retro','collectible']::text[]),
+ ('velvet-theater','background','quest-xp-50','Velvet Ghost Theater',array['mystery','retro','collectible']::text[]),
+ ('roadside-motel','background','hotrod-first-road','Roadside Mystery Motel',array['mystery','retro','collectible']::text[]),
+ ('moon-boardwalk','background','cross-three-games','Moonlit Boardwalk',array['mystery','retro','collectible']::text[]),
+ ('rocket-hangar','background','hotrod-first-drag','Retro Rocket Hangar',array['mystery','retro','collectible']::text[]),
+ ('ivy-library','background','wordle-first-solve','Ivy Mystery Library',array['mystery','retro','collectible']::text[]),
+ ('glowing-footprints','effect','mahjong-first-board','Glowing Footprints',array['mystery','retro','collectible']::text[]),
+ ('mystery-echo-rings','effect','wordle-first-clue','Mystery Echo Rings',array['mystery','retro','collectible']::text[]),
+ ('comet-trails','effect','cross-three-games','Comet Trails',array['mystery','retro','collectible']::text[]),
+ ('dream-bubbles','effect','quest-first-clue','Dream Bubbles',array['mystery','retro','collectible']::text[]),
+ ('stormlight-bolts','effect','hotrod-five-wins','Stormlight Bolts',array['mystery','retro','collectible']::text[]),
+ ('tiny-ghost-parade','effect','family-puzzle-party','Tiny Ghost Parade',array['mystery','retro','collectible']::text[])
+on conflict (id) do nothing;
+commit;
