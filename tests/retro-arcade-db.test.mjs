@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PGlite} from '@electric-sql/pglite';
+import {readFile,readdir} from 'node:fs/promises';
 import {installUpgradeSchema} from './helpers/community-db.mjs';
 import {RETRO_GAME_RULES,initialRetro,retroStep} from '../docs/retro-arcade-engine.mjs';
 function trace(game,seed,max){
@@ -15,6 +16,19 @@ function trace(game,seed,max){
 test('authoritative SQL replays the same verified control trace as both client engines',async()=>{
  const db=new PGlite();
  try{
+  await db.exec(`create role anon nologin;
+    create role authenticated nologin;
+    create role service_role nologin bypassrls;
+    create schema auth;
+    create table auth.users(id uuid primary key);
+    create function auth.uid() returns uuid language sql stable as $
+      select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid
+    $;
+    grant usage on schema public,auth to anon,authenticated,service_role;
+    grant execute on function auth.uid() to anon,authenticated,service_role;`);
+  const dir=new URL('../supabase/migrations/',import.meta.url);
+  const files=await readdir(dir);
+  await db.exec(await readFile(new URL(files.find(f=>f.endsWith('_community.sql')),dir),'utf8'));
   await installUpgradeSchema(db);
   for(const game of ['fleet','maze']){
    for(const seed of [0,4,11,61]){
