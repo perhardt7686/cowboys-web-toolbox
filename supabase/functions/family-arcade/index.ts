@@ -46,13 +46,13 @@ Deno.serve(async (request)=>{
     const {data:input,error}=await verifier.rpc('community_arcade_replay_input',{p_owner:user.id,p_game:game,p_id:id});
     if(error)return answer({message:error.message},error.code==='42501'?403:422);
     if(game==='skyboard'){
-      const result=replaySky(input.stage,input.seed,input.board,trace,{sample:input.sample});
+      const result=replaySky(input.stage,input.seed,input.board,trace,{sample:input.sample,edition:input.edition??1});
       const {data,error:commit}=await verifier.rpc('community_boardride_commit_v2',{p_owner:user.id,p_id:id,p_result:result});
       if(commit)return answer({message:commit.message},422);
       return answer(data);
     }
     const rules=input.rules;
-    const result=replayDash(input.pattern,rules.pace,{boss:rules.boss,bossStyle:rules.boss_style,layout:rules.layout,stage:rules.stage},trace);
+    const result=replayDash(input.pattern,rules.pace,{boss:rules.boss,bossStyle:rules.boss_style,layout:rules.layout,stage:rules.stage,edition:rules.edition??1},trace);
     const {data,error:commit}=await verifier.rpc('community_dash_commit_v2',{p_owner:user.id,p_id:id,p_trace:trace,p_result:result});
     if(commit)return answer({message:commit.message},422);
     return answer(data);

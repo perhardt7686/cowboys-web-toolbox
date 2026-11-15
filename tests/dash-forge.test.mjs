@@ -107,7 +107,7 @@ test('Billion-stage family campaign regenerates deterministic worlds and safegua
  assert.match(src,/function originalBeat\(/);
  assert.match(src,/id=\\"dash-sound\\"|id="dash-sound"/);
  assert.match(src,/THUNDER|Thunder Rails/);
- assert.match(src,/drawDashObject\(g,r\.course,cell/);
+ assert.match(src,/drawDashObject\(g,r\.course,object/);
 });
 
 test('The eight modes change real physics rather than only the player sprite',()=>{
@@ -146,4 +146,45 @@ test('Portals, practice checkpoints, fast lanes and boss phases use authored geo
  const boss=createDashCourse('.'.repeat(48),210,{boss:true,bossStyle:'volcanic'});
  assert.equal(boss.cells.filter(o=>o.attack).length,3);
  assert.equal(replayDash(boss.pattern,210,{boss:true,bossStyle:'volcanic'},[]).won,false);
+});
+
+test('Expanded campaign uses deterministic authored sections and distinct three-phase trials',()=>{
+ const blank='.'.repeat(90);
+ const seen=new Set(),trials=new Set();
+ const bosses=['canopy','clockwork','crystal','skyglass','solar','thunder','reef','volcanic','pixel','garden','starfall','aurora'];
+ for(let stage=2;stage<=320;stage++){
+  const boss=stage%25===0,bossStyle=boss?bosses[(stage/25-1)%12]:'none';
+  const settings={edition:2,stage,boss,bossStyle};
+  const course=createDashCourse(blank,200,settings);
+  assert.deepEqual(course,createDashCourse(blank,200,settings));
+  assert.ok(course.sections.length>=2);
+  if(boss){
+   assert.ok(course.cells.filter(c=>c.cue?.token==='Q').length>=3);
+   trials.add(course.pattern);
+  }
+  for(const {label} of course.sections)seen.add(label);
+ }
+ assert.equal(trials.size,12);
+ assert.equal(seen.size,12);
+ assert.equal(createDashCourse(blank,200,{stage:2}).pattern,blank);
+});
+
+test('Layered cues run in the occupied tile and malformed or conflicting versions reject',()=>{
+ const pattern='....A...N...............',layout=[[12,0,2,0,1,'p','Q']];
+ const course=createDashCourse(pattern,210,{layout,edition:2});
+ const player=createDashRun(course);
+ let slowed=false,jumped=false;
+ while(!player.done){
+  stepDash(player);
+  if(player.speed===.62)slowed=true;
+  if(player.event==='pad')jumped=true;
+ }
+ assert.ok(player.won&&slowed&&jumped);
+ assert.equal(player.lightCue,1);
+ assert.equal(player.speed,1);
+ assert.equal(course.cells[12].above.token,'p');
+ assert.equal(course.cells[12].cue.token,'Q');
+ assert.equal(replayDash(pattern,210,{layout,edition:2},[]).won,true);
+ assert.throws(()=>createDashCourse(pattern,210,{layout:[[12,0,2,0,1,null,'Q']]}),/invalid tile/i);
+ assert.throws(()=>createDashCourse(pattern,210,{layout:[[12,0,2,0,1,'g','Q']]}),/invalid tile/i);
 });

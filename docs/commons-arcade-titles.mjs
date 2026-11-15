@@ -1,3 +1,4 @@
+import {SKY_COLORS,SKY_COURSE_EDITION} from './skyboard-courses.mjs';
 /* Original, game-specific welcome screens for the family-only arcade.
  * Procedural canvas illustrations only, no external media or copied sprites.
  * The existing games and RPCs remain the source of truth after pressing Start. */
@@ -122,15 +123,15 @@ async function paintSkyboardTitle(canvas,reducedMotion){
  const token={};canvas.skyboardTitleToken=token;
  try{
   const [{createSkyScene},{buildSkyCourse,createSkyRide,skyTrack}]=await Promise.all([
-   import('./skyboard-scene.mjs'),import('./skyboard-physics.mjs')
+   import('./skyboard-scene.mjs?v=courses2'),import('./skyboard-physics.mjs?v=courses2')
   ]);
   if(!canvas.isConnected||canvas.skyboardTitleToken!==token)return;
-  const board={id:'sunny',color:'#ffbf53',trail:'#fffb9c'},course=buildSkyCourse(1,196930);
-  const theme={sky:['#4caff1','#f9d6fb'],road:['#ffcb5c','#ffaa65'],border:'#fa63bb',accent:'#ae72e5',env:'cloud'};
+  const board={id:'sunny',color:'#ffbf53',trail:'#fffb9c'},course=buildSkyCourse(1,196930,SKY_COURSE_EDITION);
+  const theme=SKY_COLORS[0];
   const renderer=createSkyScene(640,400),state=createSkyRide(course);
   const context=canvas.getContext('2d');
   animateTitle(canvas,reducedMotion,t=>{
-   state.progress=69.6+2*Math.sin(t*.62);state.x=-1.33;state.lean=-.23;
+   state.progress=66.2+2.25*Math.sin(t*.65);state.x=-1.08;state.lean=-.23;
    state.y=skyTrack(course,state.progress).y+.15;state.boost=1;state.elapsed=t;
    renderer.draw(context,state,theme,board,null);
    context.fillStyle='#291b64';context.fillRect(9,10,96,24);

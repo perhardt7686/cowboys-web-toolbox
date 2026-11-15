@@ -1,3 +1,4 @@
+import {buildSkyCourseEdition,editionTrack,SKY_COURSE_EDITION} from './skyboard-courses.mjs';
 // Simulation and replay share the same fixed clock, track and contact shapes.
 export const SKY_HZ=120, SKY_DT=1/SKY_HZ, MAX_SKY_TICKS=18000;
 export const SKY_INPUT={left:1,right:2,jump:4,drift:8,brake:16};
@@ -17,8 +18,9 @@ function random(seed){
   };
 }
 
-export function buildSkyCourse(stage,seed){
+export function buildSkyCourse(stage,seed,edition=1){
   if(!Number.isInteger(stage)||stage<1||stage>30||!Number.isInteger(seed))throw Error('Invalid Skyboard course.');
+  if(edition===SKY_COURSE_EDITION)return buildSkyCourseEdition(stage,seed);
   const rng=random(seed^Math.imul(stage,3313));
   const length=300+Math.min(105,stage*3), things=[];
   function add(kind,z,x=0,shape={}){
@@ -51,6 +53,7 @@ export function buildSkyCourse(stage,seed){
 }
 
 export function skyTrack(course,z){
+  if(course.edition===SKY_COURSE_EDITION)return editionTrack(course,z);
   const s=clamp(z,0,course.length);
   const center=Math.sin(s*.027+course.phase)*course.sway+Math.sin(s*.011)*2.7;
   const y=Math.sin(s*.038+course.phase)*.94+Math.sin(s*.021)*.73;
@@ -152,7 +155,7 @@ export function stepSky(s,mask=0){
   const old=s.progress,oldX=s.x,oldY=s.y;
   let z=clamp(old+s.speed*dt,0,course.length),x=clamp(oldX+s.vx*dt,-8.25,8.25);
   const floor=trackGround(course,z,x,s.elapsed);
-  if(jump&&s.grounded){s.grounded=false;s.vy=7.8;s.event='jump';}
+  if(jump&&s.grounded){s.grounded=false;s.vy=7.8+(skyTrack(course,old).lift||0)*1.24;s.event='jump';}
   let y=oldY;
   if(s.grounded&&floor!==null){y=floor;s.vy=0;}
   else{
@@ -180,6 +183,11 @@ export function stepSky(s,mask=0){
     let contact=null;
     if(obstacle.kind==='ball'){
       contact=sweepSphere(a,b,ballCenter(course,obstacle,oldTime),ballCenter(course,obstacle,s.elapsed),obstacle.radius+.60);
+    }else if(obstacle.kind==='sweeper'){
+      const before=track.center+skyObjectX(obstacle,oldTime),after=track.center+skyObjectX(obstacle,s.elapsed);
+      contact=sweepBox([a[0]-before,a[1],a[2]],[b[0]-after,b[1],b[2]],
+        [-obstacle.half-.35,track.y-.30,obstacle.z-.66],
+        [obstacle.half+.35,track.y+obstacle.height+.44,obstacle.z+.66]);
     }else if(['bar','spikes','gate'].includes(obstacle.kind)){
       contact=sweepBox(a,b,[center-obstacle.half-.43,track.y-.23,obstacle.z-.82],
         [center+obstacle.half+.43,track.y+obstacle.height+.53,obstacle.z+.82]);
@@ -205,7 +213,7 @@ export function stepSky(s,mask=0){
   return s;
 }
 
-export function replaySky(stage,seed,boardId,trace,{sample=false,maxTicks=MAX_SKY_TICKS}={}){
+export function replaySky(stage,seed,boardId,trace,{sample=false,maxTicks=MAX_SKY_TICKS,edition=1}={}){
   if(!Array.isArray(trace)||trace.length>1500||!Number.isInteger(maxTicks)||maxTicks<1||maxTicks>MAX_SKY_TICKS)
     throw Error('Invalid Skyboard controls.');
   let last=-1;
@@ -214,7 +222,7 @@ export function replaySky(stage,seed,boardId,trace,{sample=false,maxTicks=MAX_SK
       event[0]<=last||event[0]>=maxTicks||event[1]<0||event[1]>31)throw Error('Invalid Skyboard control event.');
     last=event[0];
   }
-  const state=createSkyRide(buildSkyCourse(stage,seed),boardId);
+  const state=createSkyRide(buildSkyCourse(stage,seed,edition),boardId);
   const frames=[];
   let input=0,cursor=0;
   while(!state.done&&state.tick<maxTicks){

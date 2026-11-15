@@ -15,8 +15,8 @@ test('Skyboard ships with independently executable and accessible board source',
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',
    fileURLToPath(new URL('../'+path,import.meta.url))]));
  }
- assert.match(html,/commons-board-rush\.mjs\?v=skyboard2/);
- assert.match(html,/commons-board-rush\.css\?v=skyboard2/);
+ assert.match(html,/commons-board-rush\.mjs\?v=skyboard3/);
+ assert.match(html,/commons-board-rush\.css\?v=skyboard3/);
  assert.match(shell,/id:'skyboard',root:'skyboard-root',toggle:'skyboard-toggle'/);
  assert.match(nav,/skyboard:\[sceneAction\('Ride current stage'/);
  assert.match(nav,/skyboard:'Steer with left and right/);
@@ -48,7 +48,7 @@ test('All thirty stages have reproducible seeded original obstacle courses',()=>
   assert.ok(r.won,'Passable race '+stage);
  }
  for(const name of ['Sunshine Skyway','Candy Canyon','Crystal Coast','Glacier Glow','Moonlight Metro','Rainbow Rapids'])
-  assert.ok(game.includes(name));
+  assert.ok(read('docs/skyboard-courses.mjs').includes(name));
  for(const kind of ['bar','spikes','gap','gate','coin','boost','ball','platform'])assert.ok(types.has(kind),kind);
 });
 test('A boost moves ten times as far per step and a moving ball interrupts it with real retreat',()=>{
@@ -94,4 +94,30 @@ test('Skyboard starts only with an approved family member, and saves under owner
  assert.match(sql,/grant execute on function public\.community_boardride_state\(\) to authenticated/);
  assert.match(sql,/revoke all on public\.community_boardride_profiles/);
  assert.doesNotMatch(sql,/grant (?:select|insert|update|delete) on public\.community_boardride_(?:profiles|runs|badges) to anon/i);
+});
+
+test('Expanded routes are distinct, and all thirty seeded courses replay to the finish',()=>{
+ const names=new Set(),worlds=new Set(),shape=new Set();
+ for(let stage=1;stage<=30;stage++){
+  const seed=(stage*212561)^196930,course=buildSkyCourse(stage,seed,2);
+  assert.notEqual(course.length,buildSkyCourse(stage,seed).length);
+  assert.deepEqual(course,buildSkyCourse(stage,seed,2));
+  assert.notEqual(course.phase,buildSkyCourse(stage,seed+1,2).phase);
+  names.add(course.info.name);worlds.add(course.info.scene);
+  for(const object of course.things)shape.add(object.kind);
+  const ride=createSkyRide(course),trace=[];
+  while(!ride.done){
+   const gap=course.things.find(object=>object.kind==='gap'&&object.z+object.span*.5>ride.progress);
+   const edge=gap?gap.z-gap.span*.5-ride.progress:Infinity;
+   const target=ride.speed>30?Math.min(9,ride.speed*.12):3.8;
+   const mask=ride.grounded&&edge>0&&edge<target&&!(ride.mask&4)?4:0;
+   if(ride.mask!==mask)trace.push([ride.tick,mask]);
+   stepSky(ride,mask);
+  }
+  assert.ok(ride.won,course.info.name);
+  assert.ok(replaySky(stage,seed,'sunny',trace,{edition:2}).won,course.info.name);
+ }
+ assert.equal(names.size,30);
+ assert.equal(worlds.size,6);
+ for(const kind of ['sweeper','ramp','platform','gap','ball','boost'])assert.ok(shape.has(kind),kind);
 });

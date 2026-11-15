@@ -23,6 +23,7 @@ on:
       - 'tests/arcade-replay-db.test.mjs'
       - 'supabase/functions/family-arcade/**'
       - 'supabase/migrations/*_family_arcade_verified_physics.sql'
+      - 'supabase/migrations/*_family_arcade_course_expansion.sql'
       - '.github/workflows/arcade-boss-and-title-acceptance.yml'
   pull_request:
     paths:
@@ -42,6 +43,7 @@ on:
       - 'tests/arcade-replay-db.test.mjs'
       - 'supabase/functions/family-arcade/**'
       - 'supabase/migrations/*_family_arcade_verified_physics.sql'
+      - 'supabase/migrations/*_family_arcade_course_expansion.sql'
       - '.github/workflows/arcade-boss-and-title-acceptance.yml'
   workflow_dispatch:
 permissions:
@@ -82,7 +84,9 @@ jobs:
           path: |
             reports/arcade-dash-title-tablet.png
             reports/dash-forge-tablet.png
+            reports/dash-forge-creator-tablet.png
             reports/skyboard-sprint-iphone.png
+            reports/skyboard-course-worlds.png
             reports/arcade-one-screen-iphone-sample.png
           if-no-files-found: ignore
           retention-days: 7

@@ -6,7 +6,7 @@ from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
 URL="http://127.0.0.1:8765/__skyboard__/community.html"
-HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+HTML="""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-board-rush.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true,supabaseUrl:'https://demo.supabase.co',publishableKey:'test'};</script>
 </head><body class="community-page" style="margin:0;background:#171334;--arcade-top:0px;--arcade-bottom:0px">
@@ -21,8 +21,8 @@ export const createClient=()=>({
   if(name==='community_avatar_projections')return {data:[{user_id:id,avatar_display:{skin:'tan',shirt:'teal',hair:'red',garment:'denim'}}],error:null};
   if(name==='community_boardride_state')return {data:{
    mine:{user_id:id,stage:1,points:0,coins:0,clears:0,runs:0},badges:[],leaders:[]},error:null};
-  if(name==='community_boardride_start_v2')return {data:{
-   run_id:'11111111-1111-4111-9111-111111111111',seed:555,stage:1,board:args.p_board,
+  if(name==='community_boardride_start_v3')return {data:{
+   run_id:'11111111-1111-4111-9111-111111111111',seed:212561^196930,stage:1,board:args.p_board,edition:2,
    ghost:{name:'QA ghost',frames:[[12,142,0,50],[24,284,0,50]],time_ms:10000}},error:null};
   return {data:null,error:{message:'Unexpected request '+name}}
  }
@@ -31,10 +31,43 @@ const fetchOriginal=window.fetch.bind(window);
 window.fetch=async (url,options)=>{
   if(!String(url).endsWith('/functions/v1/family-arcade'))return fetchOriginal(url,options);
   const {replaySky}=await import(new URL('/skyboard-physics.mjs',window.location.origin).href);
-  const body=JSON.parse(options.body),result=replaySky(1,555,'sunny',body.trace);
+  const body=JSON.parse(options.body),result=replaySky(1,212561^196930,'sunny',body.trace,{edition:2});
   window.replayChecked={...result,game:body.game,token:options.headers.Authorization};
   return Response.json({...result,saved:result.won,points:240,new_badges:['first','ball-survivor']});
 };"""
+
+async def capture_worlds(page):
+ color_count=await page.evaluate("""async()=>{
+  const [{createSkyScene},{buildSkyCourse,createSkyRide,skyTrack},{SKY_COLORS}]=await Promise.all([
+   import('/skyboard-scene.mjs?v=courses2'),import('/skyboard-physics.mjs?v=courses2'),import('/skyboard-courses.mjs')
+  ]);
+  const sheet=document.createElement('canvas');sheet.width=960;sheet.height=420;sheet.id='sky-course-sheet';
+  sheet.style.cssText='display:block;width:100%;height:auto;position:fixed;inset:0;z-index:999999999';
+  document.body.append(sheet);
+  const g=sheet.getContext('2d'),view=document.createElement('canvas');
+  view.width=320;view.height=180;
+  const scene=createSkyScene(320,180),board={id:'sunny',color:'#ffb95b',trail:'#ffed8a'};
+  const sample=new Set();
+  for(let i=0;i<SKY_COLORS.length;i++){
+   const stage=1+i*5,course=buildSkyCourse(stage,stage*212561^196930,2),ride=createSkyRide(course);
+   ride.progress=17;ride.y=skyTrack(course,17).y;
+   const context=view.getContext('2d');
+   scene.draw(context,ride,SKY_COLORS[i],board,null);
+   sample.add(Array.from(context.getImageData(230,13,1,1).data).join(','));
+   const x=i%3*320,y=Math.floor(i/3)*210;
+   g.drawImage(view,x,y);
+   g.fillStyle='#18233e';g.fillRect(x,y+180,320,30);
+   g.font='600 14px system-ui';g.fillStyle='#fff4dc';
+   g.fillText(course.info.world,x+10,y+200);
+  }
+  scene.dispose();return sample.size;
+ }""")
+ assert color_count>=5, 'Scenery render should visibly separate the six worlds'
+ # Export the canvas at native resolution rather than scaling to the test phone.
+ png=await page.locator('#sky-course-sheet').evaluate("canvas=>canvas.toDataURL('image/png')")
+ from base64 import b64decode
+ (ROOT/'reports'/'skyboard-course-worlds.png').write_bytes(b64decode(png.partition(',')[2]))
+ await page.locator('#sky-course-sheet').evaluate('canvas=>canvas.remove()')
 
 async def verify(browser,size,full_race=False):
  width,height=size
@@ -54,6 +87,14 @@ async def verify(browser,size,full_race=False):
   assert await page.locator("#skyboard-board-list [data-sky-board]").count()==6
   assert await page.locator("#skyboard-badge-list .skyboard-badge").count()==8
   assert not await page.locator("[data-sky-board='star']").is_enabled()
+  assert await page.locator("#skyboard-world").inner_text()=="Cloudline Cruise"
+  await page.locator("#skyboard-courses summary").click()
+  assert await page.locator("#skyboard-course-map button").count()==30
+  assert await page.locator('[data-sky-practice="2"]').is_disabled()
+  await page.locator('[data-sky-practice="shuffle"]').click()
+  assert "PRACTICE" in await page.locator("#skyboard-start").inner_text()
+  await page.locator("#skyboard-courses summary").click()
+  await page.locator('[data-sky-practice="clear"]').click()
   await page.locator("#skyboard-start").click()
   canvas=page.locator("#skyboard-canvas")
   await page.wait_for_function("Number(document.querySelector('#skyboard-canvas').dataset.distance)>2",timeout=14000)
@@ -80,6 +121,7 @@ async def verify(browser,size,full_race=False):
    await page.wait_for_function("window.replayChecked?.won&&window.replayChecked.ball_hits>0",timeout=45000)
    assert await page.evaluate("window.replayChecked.token==='Bearer test-token'")
    await page.locator("#skyboard-message").get_by_text("STAGE 1 CLEAR!").wait_for(timeout=10000)
+   await capture_worlds(page)
   else:
    await page.locator("[data-sky-scene='boards']").click()
    assert await page.locator("#skyboard-boards").is_visible()

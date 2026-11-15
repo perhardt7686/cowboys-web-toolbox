@@ -3,8 +3,9 @@
  * Supabase score authority remain in place. Never awards offline wins.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {SKY_DT,SKY_INPUT,buildSkyCourse,createSkyRide,skyTrack,skyObjectX,stepSky} from './skyboard-physics.mjs';
+import {SKY_DT,SKY_INPUT,buildSkyCourse,createSkyRide,skyTrack,skyObjectX,stepSky} from './skyboard-physics.mjs?v=courses2';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
+import {SKY_COURSE_EDITION,SKY_WORLDS,SKY_COLORS,skyCourseInfo} from './skyboard-courses.mjs';
 const host=document.getElementById('conversations'), config=window.COWBOY_COMMUNITY_CONFIG;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,14 +17,6 @@ const BOARDS=[
  {id:'flower',title:'Flower Power',sub:'Unlocked after Stage 10 · nimble control',speed:1.01,turn:1.3,need:11,color:'#ffafe0',trail:'#fbe79a',icon:'🌸'},
  {id:'dragon',title:'Dragon Cruiser',sub:'Unlocked after Stage 18 · championship deck',speed:1.13,turn:1.12,need:19,color:'#8dffb7',trail:'#77eeab',icon:'🐉'},
  {id:'star',title:'Starlight Legend',sub:'Unlocked after Stage 30 · victory reward',speed:1.17,turn:1.18,need:31,color:'#e3b8ff',trail:'#c2acff',icon:'🌟'}
-];
-const WORLDS=[
- {name:'Sunshine Skyway',sky:['#52c5ff','#d6fbff'],road:['#ffe762','#ffbf3e'],border:'#e652c3',env:'cloud',accent:'#ff5c9b'},
- {name:'Candy Canyon',sky:['#fd96c8','#fff2b7'],road:['#ffaf66','#ffdd85'],border:'#b14be7',env:'canyon',accent:'#9a4dff'},
- {name:'Crystal Coast',sky:['#4dd7d8','#e5fff8'],road:['#6be7d3','#b7f6d1'],border:'#fff3a6',env:'palm',accent:'#097d9a'},
- {name:'Glacier Glow',sky:['#498ccf','#e9f9ff'],road:['#d8f7ff','#a4d8fa'],border:'#7166e9',env:'ice',accent:'#4387ed'},
- {name:'Moonlight Metro',sky:['#241953','#785cbd'],road:['#8af7fc','#8f96ff'],border:'#ff91d8',env:'city',accent:'#e7bcff'},
- {name:'Rainbow Rapids',sky:['#77bfff','#fbdfff'],road:['#a2ffbd','#e3ff89'],border:'#ff72bb',env:'forest',accent:'#ffe36e'}
 ];
 const BADGES=[
  ['first','First Flight','Finish your first stage','🥇',1],
@@ -37,13 +30,15 @@ const BADGES=[
 ];
 let client=null,user=null,root=null,profile=null,leaders=[],awards=[],open=false,booted=false;
 let selectedBoard='sunny',currentScene='play',run=null,request=0,last=0,held=new Set(),busy=false;
+let practiceChoice=0,practiceSeed=null;
 let scene=null,createSkyScene=null,sceneLoading=false,compatibility=false,jumpQueued=false,accumulator=0,preview=null,showGhost=true,shareReplay=false,riderLook=null;
 const status=(message,isError=false)=>{const node=$('skyboard-status');if(node){node.textContent=message;node.dataset.error=String(isError)}};
 const boardType=()=>BOARDS.find(b=>b.id===selectedBoard)||BOARDS[0];
 const stage=()=>Math.max(1,Math.min(31,Number(profile?.stage||1)));
 const available=b=>stage()>=b.need;
 const active=()=>!host.hidden&&document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='skyboard';
-function palette(n){return WORLDS[Math.floor((n-1)/5)%WORLDS.length];}
+function palette(n){return SKY_COLORS[Math.floor((n-1)/5)%SKY_COLORS.length];}
+const currentCourse=()=>practiceChoice||Math.min(30,stage());
 function build(){
  if(root?.isConnected)return;
  const main=host.querySelector('.community-main');if(!main)return;
@@ -60,9 +55,10 @@ function build(){
  '<section id="skyboard-play" class="skyboard-pane"><div class="skyboard-game-head">'+
  '<div><strong id="skyboard-world">Sunshine Skyway</strong><small id="skyboard-level-desc">Stage 1 · Training slopes</small></div>'+
  '<button type="button" id="skyboard-start" class="skyboard-primary">▶ START STAGE</button></div>'+
- '<div id="skyboard-viewport" class="skyboard-viewport"><canvas id="skyboard-canvas" width="960" height="540" role="img" aria-label="Third-person board race with colorful tracks, gaps, bars, coins and boosts"></canvas>'+
+ '<div id="skyboard-viewport" class="skyboard-viewport"><canvas id="skyboard-canvas" width="960" height="540" role="img" aria-label="Third-person board race with ramps, gaps, moving platforms and red balls"></canvas>'+
  '<div class="skyboard-hud"><span id="skyboard-live-stage">01 / 30</span><span id="skyboard-live-distance">0%</span><span id="skyboard-live-lives">♥♥♥</span><span id="skyboard-live-coins">★ 0</span></div>'+
  '<div id="skyboard-speed" class="skyboard-speed" hidden></div>'+
+ '<div class="skyboard-progress" aria-hidden="true"><span id="skyboard-progress-fill"></span></div>'+
  '<div id="skyboard-message" class="skyboard-message"><strong>READY TO RIDE?</strong><p>Pick a board and press Start Stage.</p></div></div>'+
  '<div class="skyboard-touch" aria-label="Game touch controls"><button data-sky-hold="left" type="button" aria-label="Steer left">◀ LEFT</button>'+
  '<button data-sky-hold="brake" type="button" aria-label="Brake">BRAKE</button>'+
@@ -71,7 +67,10 @@ function build(){
  '<button data-sky-hold="right" type="button" aria-label="Steer right">RIGHT ▶</button></div>'+
  '<div class="skyboard-help">Steer with ← →, jump with Space, drift with Shift and brake with ↓. A gamepad uses the stick, A to jump, X to drift and B to brake.</div>'+
  '<div class="skyboard-round-actions"><button type="button" id="skyboard-pause">PAUSE</button>'+
- '<button type="button" id="skyboard-retry">RETRY STAGE</button><button type="button" id="skyboard-ghost" aria-pressed="true">Family ghost on</button><button type="button" id="skyboard-share" aria-pressed="false">Share my ghost</button><button type="button" id="skyboard-next" hidden>NEXT STAGE ▶</button></div></section>'+
+ '<button type="button" id="skyboard-retry">RETRY STAGE</button><button type="button" id="skyboard-ghost" aria-pressed="true">Family ghost on</button><button type="button" id="skyboard-share" aria-pressed="false">Share my ghost</button><button type="button" id="skyboard-next" hidden>NEXT STAGE ▶</button></div>'+
+ '<details id="skyboard-courses" class="skyboard-courses"><summary>Course map &amp; practice</summary>'+
+ '<div class="skyboard-map-actions"><button type="button" data-sky-practice="clear">Return to current stage</button>'+
+ '<button type="button" data-sky-practice="shuffle">Shuffle a practice layout</button></div><div id="skyboard-course-map"></div></details></section>'+
  '<section id="skyboard-boards" class="skyboard-pane" hidden><h3>CHOOSE YOUR RIDE</h3><p>Earn new boards by completing stages. No purchases, no ads, just family prizes.</p><div id="skyboard-board-list" class="skyboard-board-grid"></div></section>'+
  '<section id="skyboard-awards" class="skyboard-pane" hidden><h3>EMMA’S TROPHY ROAD</h3><p>Milestone awards are recorded on your family member account.</p><div id="skyboard-badge-list" class="skyboard-badge-grid"></div></section>'+
  '<section id="skyboard-leaders" class="skyboard-pane" hidden><h3>FAMILY LEADERBOARD</h3><p>Saved family progress, ordered by cleared stages and points.</p><div id="skyboard-leader-list" class="skyboard-leader-list"></div></section>'+
@@ -79,11 +78,13 @@ function build(){
  const base=$('dash-forge-root');if(base&&main.contains(base))base.after(root);else main.append(root);
  $('skyboard-toggle').addEventListener('click',()=>{
    open=!open;$('skyboard-inside').hidden=!open;$('skyboard-toggle').setAttribute('aria-expanded',String(open));
-   if(open){render();void refresh();}else pause(true);
+   if(open){render();draw();void refresh();}else pause(true);
  });
  root.addEventListener('click',e=>{
   const tab=e.target.closest('[data-sky-scene]');
   if(tab){choose(tab.dataset.skyScene);return;}
+  const route=e.target.closest('[data-sky-practice]');
+  if(route){choosePractice(route.dataset.skyPractice);return;}
   const pick=e.target.closest('[data-sky-board]');
   if(pick){pickBoard(pick.dataset.skyBoard);return;}
   if(e.target.closest('[data-sky-action="jump"]'))jump();
@@ -134,17 +135,35 @@ function pickBoard(id){
  if(!available(b)){status('Unlock '+b.title+' by reaching stage '+b.need+'.');return;}
  if(run&&!run.done){status('Finish or leave the current run before changing boards.');return;}
  selectedBoard=id;try{localStorage.setItem('skyboard-board-'+user,id)}catch{}
- render();status(b.title+' equipped. Ready to roll!');
+ render();draw();status(b.title+' equipped. Ready to roll!');
+}
+function choosePractice(choice){
+ if(busy)return;
+ const n=choice==='shuffle'?currentCourse():Number(choice);
+ if(choice!=='clear'&&(!Number.isInteger(n)||n<1||n>Math.min(30,stage())))return;
+ reset();
+ practiceChoice=choice==='clear'?0:n;
+ practiceSeed=choice==='shuffle'?crypto.getRandomValues(new Uint32Array(1))[0]%2000000000:null;
+ $('skyboard-courses').open=false;
+ render();draw();
+ status(practiceChoice?'Practice · '+skyCourseInfo(practiceChoice).name:'Ready to race your current stage.');
 }
 function render(){
  if(!root?.isConnected)return;
  $('skyboard-stage').textContent='STAGE '+String(Math.min(30,stage())).padStart(2,'0')+' / 30';
  $('skyboard-points').textContent=Number(profile?.points||0).toLocaleString()+' PTS';
  $('skyboard-coins').textContent=Number(profile?.coins||0)+' ★';
- $('skyboard-world').textContent=palette(Math.min(30,stage())).name;
- $('skyboard-level-desc').textContent=stage()>30?'All thirty stages cleared · Champion!':
-  'Stage '+stage()+' · '+(stage()%5===0?'Grand finale':'Ride, jump, drift and collect');
- $('skyboard-start').textContent=stage()>30?'🏆 PLAY BONUS RUN':'▶ START STAGE';
+ const n=currentCourse(),course=skyCourseInfo(n);
+ $('skyboard-world').textContent=course.name;
+ $('skyboard-level-desc').textContent=course.world+' · '+course.description;
+ $('skyboard-start').textContent=practiceChoice||stage()>30?'▶ PRACTICE':'▶ START STAGE';
+ const map=$('skyboard-course-map');
+ map.innerHTML=SKY_WORLDS.map((world,group)=>'<section><h4>'+esc(world.name)+'</h4><ol>'+
+  world.routes.map((name,route)=>{
+   const index=group*5+route+1,locked=index>stage();
+   return '<li><button type="button" data-sky-practice="'+index+'" '+(locked?'disabled':'')+
+    '><span>'+String(index).padStart(2,'0')+'</span>'+esc(name)+(locked?' <small>Locked</small>':'')+'</button></li>';
+  }).join('')+'</ol></section>').join('');
  $('skyboard-next').hidden=true;
  for(const s of ['play','boards','awards','leaders'])$('skyboard-'+s).hidden=s!==currentScene;
  root.querySelectorAll('[data-sky-scene]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.skyScene===currentScene)));
@@ -179,7 +198,8 @@ function reset(){
  held.clear();last=accumulator=0;jumpQueued=false;run=null;preview=null;
  const next=$('skyboard-next'),startButton=$('skyboard-start'),pauseButton=$('skyboard-pause'),message=$('skyboard-message');
  if(next)next.hidden=true;if(startButton)startButton.disabled=false;
- if(pauseButton)pauseButton.textContent='PAUSE';if(message)message.hidden=false;
+ if(pauseButton)pauseButton.textContent='PAUSE';
+ if(message){message.innerHTML='<strong>READY TO RIDE?</strong><p>Pick a board and press Start Stage.</p>';message.hidden=false;}
 }
 async function start(retry=false){
  if(busy||!user||host.hidden)return;
@@ -187,26 +207,27 @@ async function start(retry=false){
  if(run)reset();
  busy=true;$('skyboard-start').disabled=true;
  status('Preparing your course and saved family checkpoint…');
- const n=stage()>30?30:stage(),pick=boardType();
+ const n=currentCourse(),pick=boardType();
  const b={...pick,look:riderLook,trail:riderLook?.trail||pick.trail};
- let seed=(Math.imul(n,212561)^196930),id=null,practice=false,ghost=null;
+ let seed=practiceSeed??(Math.imul(n,212561)^196930),id=null,practice=false,ghost=null,edition=SKY_COURSE_EDITION,unavailable='';
  try{
-  if(stage()>30)practice=true;
+  if(practiceChoice||stage()>30)practice=true;
   else{
-   const data=await rpc('community_boardride_start_v2',{p_board:b.id,p_share:shareReplay});
+   const data=await rpc('community_boardride_start_v3',{p_board:b.id,p_share:shareReplay});
    if(Number(data.stage)!==n)throw Error('Your stage changed. Refresh and try again.');
-   id=data.run_id;seed=Number(data.seed);ghost=data.ghost||null;
+   id=data.run_id;seed=Number(data.seed);ghost=data.ghost||null;edition=Number(data.edition||1);
   }
  }catch(e){
-  practice=true;status('Practice mode · '+e.message,true);
+  practice=true;unavailable=e.message;
  }
- const course=buildSkyCourse(n,seed);
+ const course=buildSkyCourse(n,seed,edition);
  run=Object.assign(createSkyRide(course,b.id),{
   stage:n,id,seed,practice,board:b,paused:false,theme:palette(n),trace:[],lastInput:0,ghost,announced:false,countdown:1.75
  });
  busy=false;$('skyboard-start').disabled=false;$('skyboard-next').hidden=true;
  $('skyboard-message').hidden=true;$('skyboard-pause').textContent='PAUSE';
- status(practice?'Practice ride · results stay on this device.':
+ if(unavailable)status('Official race unavailable. Practice ride · '+unavailable,true);
+ else status(practice?'Practice ride · results stay on this device.':
    ghost&&showGhost?'Asynchronous ghost · '+ghost.name+'’s saved race.':'Stage '+n+' · race to the finish!');
  last=accumulator=0;draw();request=requestAnimationFrame(frame);
 }
@@ -309,10 +330,10 @@ function project(r,x,z,y=0){
 function drawCompatibility(c,r){
  const t=r.elapsed,p=r.theme;
  sky(c,p,t);
- const gap=r.course.things.find(o=>o.kind==='gap');
+ const gaps=r.course.things.filter(o=>o.kind==='gap');
  for(let z=Math.min(r.course.length,r.progress+152);z>r.progress;z-=3){
   const prev=Math.max(r.progress,z-3);
-  if(gap&&prev<gap.z+gap.span/2&&z>gap.z-gap.span/2)continue;
+  if(gaps.some(gap=>prev<gap.z+gap.span/2&&z>gap.z-gap.span/2))continue;
   const ends=[prev,z].map(k=>{const half=skyTrack(r.course,k).half;return [-half,half].map(x=>project(r,x,k).slice(0,2));});
   poly(c,[...ends[0],...ends[1].reverse()],p.road[Math.floor(z/12)%2],p.border,1.3);
  }
@@ -326,7 +347,7 @@ function drawCompatibility(c,r){
   }
   if(o.kind==='coin'){circle(c,x,y-48*q,21*q,'#ffe365');text(c,'★',x,y-40*q,25*q,'#895a15');}
   if(o.kind==='boost')text(c,'10× SPEED',x,y,Math.max(18,45*q),'#14395e');
-  if(o.kind==='bar'||o.kind==='gate'||o.kind==='spikes'){
+  if(['bar','gate','spikes','sweeper'].includes(o.kind)){
    c.fillStyle='#e4417b';c.fillRect(x-o.half*50*q,y-o.height*58*q,o.half*100*q,o.height*58*q);
   }
   if(o.kind==='gap')text(c,'JUMP',x,y-14,Math.max(14,31*q),'#2b195a');
@@ -340,18 +361,18 @@ function drawCompatibility(c,r){
 function draw(){
  const canvas=$('skyboard-canvas');if(!canvas)return;
  const c=canvas.getContext('2d');if(!c)return;
- const n=Math.min(30,stage());
+ const n=currentCourse(),seed=practiceSeed??(Math.imul(n,212561)^196930);
  if(!run&&!active()&&!open)return;
- if(!run&&(preview?.stage!==n||preview?.board.id!==selectedBoard)){
-  preview=Object.assign(createSkyRide(buildSkyCourse(n,196930),boardType().id),{
-    stage:n,board:boardType(),theme:palette(n),progress:70
+ if(!run&&(preview?.stage!==n||preview?.course.seed!==seed||preview?.board.id!==selectedBoard)){
+  preview=Object.assign(createSkyRide(buildSkyCourse(n,seed,SKY_COURSE_EDITION),boardType().id),{
+    stage:n,board:boardType(),theme:palette(n),progress:48
   });
   preview.y=skyTrack(preview.course,preview.progress).y;
  }
  const r=run||preview;
  if(!compatibility&&!createSkyScene&&!sceneLoading){
   sceneLoading=true;
-  import('./skyboard-scene.mjs').then(module=>{createSkyScene=module.createSkyScene;draw();})
+  import('./skyboard-scene.mjs?v=courses2').then(module=>{createSkyScene=module.createSkyScene;draw();})
    .catch(()=>{compatibility=true;draw();});
  }
  if(!compatibility&&createSkyScene){
@@ -378,7 +399,9 @@ function draw(){
  alert.hidden=!callout;
  alert.dataset.mode=r.hurt>0?'hit':'boost';
  $('skyboard-live-stage').textContent=String(r.stage).padStart(2,'0')+' / 30';
- $('skyboard-live-distance').textContent=Math.round(100*r.progress/r.course.length)+'%';
+ const progress=Math.round(100*r.progress/r.course.length)+'%';
+ $('skyboard-live-distance').textContent=progress;
+ $('skyboard-progress-fill').style.width=progress;
  $('skyboard-live-lives').textContent='♥'.repeat(r.lives)+'♡'.repeat(3-r.lives);
  $('skyboard-live-coins').textContent='★ '+r.coins;
 }
@@ -425,7 +448,7 @@ async function verify(){
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
  if(error||member?.status!=='approved'){reset();root?.remove();root=null;user=null;open=false;return;}
  if(user!==id){reset();root?.remove();root=null;user=id;profile=null;awards=[];leaders=[];open=false;
-  riderLook=null;
+  riderLook=null;practiceChoice=0;practiceSeed=null;
   try{
    selectedBoard=localStorage.getItem('skyboard-board-'+id)||'sunny';
    shareReplay=localStorage.getItem('skyboard-share-'+id)==='yes';

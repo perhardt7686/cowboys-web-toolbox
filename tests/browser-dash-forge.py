@@ -8,7 +8,7 @@ from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
 URL='http://127.0.0.1:8765/__dash_forge_smoke__.html'
-HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+HTML="""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-dash-forge.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true,supabaseUrl:'https://mock.supabase.co',publishableKey:'test-publishable'}</script>
 <script type="module" src="/commons-dash-forge.mjs"></script>
@@ -35,20 +35,20 @@ export function createClient(){
     user_id:uid,levels,progress:mock.progress,awards:mock.awards,leaders:[],
     campaign_current:1,campaign_max:1000000000,
     mine:{player_points:0,designer_points:0,clears:0,published:0}},error:null};
-   if(name==='community_dash_save_layout'){
+   if(name==='community_dash_save_v3'){
     const id=args.p_level_id||100;
     const existing=levels.find(x=>x.id===id);
-    if(existing){existing.title=args.p_title;existing.pattern=args.p_pattern;existing.world=args.p_world;existing.boss_style=args.p_boss_style;existing.boss=args.p_boss_style!=='none';existing.layout=args.p_layout;}
+    if(existing){existing.title=args.p_title;existing.pattern=args.p_pattern;existing.world=args.p_world;existing.boss_style=args.p_boss_style;existing.boss=args.p_boss_style!=='none';existing.layout=args.p_layout;existing.soundtrack=args.p_song;}
     else levels.push({id,title:args.p_title,pattern:args.p_pattern,difficulty:args.p_difficulty,
      kind:'member',stage:null,creator:uid,creator_name:'Test Member',published:false,verified_solves:0,
-     layout:args.p_layout,world:args.p_world,boss_style:args.p_boss_style,boss:args.p_boss_style!=='none',
+     layout:args.p_layout,soundtrack:args.p_song,world:args.p_world,boss_style:args.p_boss_style,boss:args.p_boss_style!=='none',
      boss_name:args.p_boss_style==='volcanic'?'Magma Titan':null});
     return {data:{id,status:'draft'},error:null};}
-   if(name==='community_dash_start_v2'){
+   if(name==='community_dash_start_v3'){
     const item=levels.find(x=>x.id===args.p_level_id);mock.active=item;
     return {data:{run_id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',title:item.title,
       level_id:item.id,pattern:item.pattern,pace_ms:item.pace_ms||210,world:item.world,
-      boss:item.boss,boss_style:item.boss_style,boss_name:item.boss_name,layout:item.layout},error:null};}
+      boss:item.boss,boss_style:item.boss_style,boss_name:item.boss_name,layout:item.layout,edition:2,soundtrack:item.soundtrack},error:null};}
    if(name==='community_dash_publish')return {data:null,error:{message:'Beat the draft before publishing.'}};
    return {data:null,error:{message:'Unknown simulated RPC '+name}};
   }
@@ -59,7 +59,7 @@ window.fetch=async (url,options)=>{
   if(!String(url).endsWith('/functions/v1/family-arcade'))return fetchOriginal(url,options);
   const {replayDash}=await import(new URL('/dash-physics.mjs',window.location.origin).href);
   const body=JSON.parse(options.body),item=mock.active;
-  const sim=replayDash(item.pattern,item.pace_ms||210,{boss:item.boss,bossStyle:item.boss_style,layout:item.layout,stage:item.stage},body.trace);
+  const sim=replayDash(item.pattern,item.pace_ms||210,{boss:item.boss,bossStyle:item.boss_style,layout:item.layout,stage:item.stage,edition:2},body.trace);
   mock.lastReplay={...sim,trace:body.trace,game:body.game};
   return Response.json({...sim,server_verified:true});
 };"""
@@ -112,18 +112,59 @@ async def run_one(browser,width,height):
   await page.locator('[data-dash-cell="15"]').click()
   await page.locator('[data-dash-action="practice"]').click()
   await page.wait_for_function("document.querySelector('#dash-canvas').dataset.mode==='Ship'",timeout=8000)
-  assert await page.evaluate("!window.__dashMock.calls.some(x=>x.name==='community_dash_start_v2')")
+  assert await page.evaluate("!window.__dashMock.calls.some(x=>x.name==='community_dash_start_v3')")
   await page.locator('[data-dash-action="leave"]').click()
   await page.locator('[data-dash-action="zoom"]').click()
   assert (await page.locator('#dash-zoom-label').inner_text())=='200%'
+  canvas=page.locator('#dash-creator-preview')
+  pinned=int(await canvas.get_attribute('data-start-tile'))
+  await page.locator('[data-dash-group="Hazards"]').click()
+  await page.locator('[data-dash-brush="s"]').click()
+  # Both coordinates land in the geometric middle of their displayed slot,
+  # including wide layouts where the canvas has horizontal letterboxing.
+  for offset in (1,6):
+   x=await canvas.evaluate("""(c,offset)=>{
+     const r=c.getBoundingClientRect(),w=r.width-2*c.clientLeft,h=r.height-2*c.clientTop;
+     const content=Math.min(w,h*c.width/c.height);
+     return c.clientLeft+(w-content)/2+content*(offset+.5)/Number(c.dataset.visibleTiles);
+   }""",offset)
+   await canvas.click(position={'x':x,'y':35})
+   assert int(await canvas.get_attribute('data-start-tile'))==pinned
+   assert f'Tile {pinned+offset+1} ·' in await page.locator('#dash-selected-tile').inner_text()
   await page.locator('[data-dash-action="zoom"]').click()
+  await page.locator('[data-dash-layer="above"]').click()
+  await page.locator('[data-dash-brush="p"]').click()
+  await page.locator('[data-dash-cell="11"]').click()
+  assert 'Pillar' in await page.locator('#dash-selected-tile').inner_text()
+  if width==820:
+   await page.locator('[data-dash-cell="11"]').drag_to(page.locator('[data-dash-cell="12"]'))
+   assert 'Pillar' in await page.locator('[data-dash-cell="12"]').get_attribute('title')
+   await page.locator('#dash-undo').click()
+   assert 'Pillar' in await page.locator('[data-dash-cell="11"]').get_attribute('title')
+  await page.locator('[data-dash-layer="cue"]').click()
+  await page.locator('[data-dash-brush="Q"]').click()
+  await page.locator('[data-dash-cell="11"]').click()
+  assert 'Light cue' in await page.locator('#dash-selected-tile').inner_text()
+  await page.select_option('#dash-song','hangar')
+  await page.locator('[data-dash-action="song-preview"]').click()
+  await page.wait_for_function("document.querySelector('#dash-status').textContent.includes('Playing Hangar Radio')")
+  await page.locator('[data-dash-action="select"]').click()
+  await page.locator('[data-dash-cell="20"]').click()
+  await page.select_option('#dash-blueprint','spring')
+  await page.locator('[data-dash-action="blueprint"]').click()
+  assert 'Springworks inserted at tiles 21' in await page.locator('#dash-status').inner_text()
+  await page.locator('[data-dash-layer="track"]').click()
+  assert 'Spring pad' in await page.locator('[data-dash-cell="21"]').get_attribute('title')
   await page.locator('[data-dash-group="Hazards"]').click()
   await page.locator('[data-dash-brush="s"]').click()
   await page.locator('#dash-forge-root [data-dash-action="save"]').click()
-  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_save_layout')")
+  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_save_v3')")
   assert 'Volcanic Foundry' in await page.locator('#dash-builder-help').inner_text()
-  assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_save_layout' && x.args.p_world==='Volcanic Foundry' && x.args.p_boss_style==='volcanic' && x.args.p_layout.some(item=>item[0]===9&&item[1]===3))")
+  assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_save_v3' && x.args.p_world==='Volcanic Foundry' && x.args.p_boss_style==='volcanic' && x.args.p_layout.some(item=>item[0]===9&&item[1]===3) && x.args.p_layout.some(item=>item[0]===11&&item[5]==='p'&&item[6]==='Q') && x.args.p_song==='hangar' && x.args.p_pattern[21]==='A' && x.args.p_pattern[11]==='s' && x.args.p_pattern[16]==='s')")
   await page.wait_for_function("document.querySelector('#dash-editor-save-state')?.textContent.includes('Saved to family account')",timeout=10000)
+  if width==820:
+   (ROOT/'reports').mkdir(parents=True,exist_ok=True)
+   await page.locator('#dash-pane-builder').screenshot(path=str(ROOT/'reports'/'dash-forge-creator-tablet.png'))
   # The family arcade owns the fullscreen active-game state before any real playtest.
   await page.evaluate("""() => {document.body.classList.add('arcade-on');
     document.body.dataset.arcadeGame='dashforge';document.body.dataset.arcadeScene='builder';
@@ -131,10 +172,10 @@ async def run_one(browser,width,height):
   # A one-tap playtest saves current edits first, starts the exact draft and returns to editor.
   await page.locator('#dash-editor-grid [data-dash-cell="10"]').click()
   await page.locator('[data-dash-action="test"]').click()
-  await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_save_layout').length>=2")
-  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_start_v2' && x.args.p_level_id===100)",timeout=10000)
+  await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_save_v3').length>=2")
+  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_start_v3' && x.args.p_level_id===100)",timeout=10000)
   await page.locator('#dash-play-overlay').wait_for(state='visible',timeout=10000)
-  assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_start_v2' && x.args.p_level_id===100)")
+  assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_start_v3' && x.args.p_level_id===100)")
   assert 'BACK TO LEVEL CREATOR' in await page.locator('[data-dash-action="leave"]').inner_text()
   await page.locator('[data-dash-action="leave"]').click()
   assert await page.locator('#dash-pane-builder').is_visible()
@@ -145,6 +186,10 @@ async def run_one(browser,width,height):
     document.querySelector('#dash-forge-root').classList.remove('arcade-game-active');}""")
   await page.locator('#dash-forge-root [data-dash-tab="community"]').click()
   assert await page.locator('#dash-community-list .dash-level').count()==1, 'Draft visible to author'
+  await page.locator('[data-dash-edit="100"]').click()
+  assert await page.locator('#dash-song').input_value()=='hangar'
+  await page.locator('[data-dash-layer="cue"]').click()
+  assert 'Light cue' in await page.locator('[data-dash-cell="11"]').get_attribute('title')
   await page.locator('#dash-forge-root [data-dash-tab="campaign"]').click()
   # Synthetic arcade mode uses the actual fixed tablet frame and no altered game controls.
   await page.evaluate("""() => { document.body.classList.add('arcade-on');
@@ -165,7 +210,7 @@ async def run_one(browser,width,height):
    await page.wait_for_function("window.__dashMock.lastReplay?.game==='dash'",timeout=8000)
    assert await page.evaluate("window.__dashMock.lastReplay.death_tile===6")
    await page.locator('#dash-retry-live').click()
-   await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_start_v2' && x.args.p_level_id===1).length===2")
+   await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_start_v3' && x.args.p_level_id===1).length===2")
    (ROOT/'reports').mkdir(parents=True,exist_ok=True)
    await page.screenshot(path=str(ROOT/'reports'/'dash-forge-tablet.png'))
   await page.locator('[data-dash-action="leave"]').click()

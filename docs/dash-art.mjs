@@ -1,10 +1,10 @@
-import {DASH_CEILING,DASH_MODES,DASH_TOOLS,dashShape} from './dash-physics.mjs';
+import {DASH_CEILING,DASH_MODES,DASH_TOOLS,dashShape} from './dash-physics.mjs?v=courses2';
 
 export const DASH_PALETTES={C:'#ffda68',S:'#69eaff',B:'#ed9aff',U:'#93ffc2',W:'#ff9b6e',
   R:'#a4b4ff',P:'#ff83af',V:'#fff5ac',I:'#fa8ce2',F:'#fe9a5f',L:'#8bcdff',E:'#acfbcd',
-  J:'#ffdb56',O:'#ff944e',M:'#7be9ca',K:'#ceabff',D:'#8983da',T:'#8fff73'};
+  J:'#ffdb56',O:'#ff944e',M:'#7be9ca',K:'#ceabff',D:'#8983da',T:'#8fff73',H:'#f6d878',A:'#95f6b6',N:'#7bb3fb',Q:'#f58eec'};
 const hazards={s:'#ff608d',b:'#ffad52',l:'#f087fb',w:'#ffbf77',c:'#9ae3ff',
-  p:'#bc9dfd',f:'#ffa231',r:'#69f5cc',m:'#ed97d8',o:'#ff72c6',d:'#81e8fc',h:'#bd9bff'};
+  p:'#bc9dfd',H:'#ffd768',f:'#ffa231',r:'#69f5cc',m:'#ed97d8',o:'#ff72c6',d:'#81e8fc',h:'#bd9bff'};
 function bounds(g,poly,fill,stroke='#241a43',width=2.6){
   g.fillStyle=fill;g.strokeStyle=stroke;g.lineWidth=width;g.beginPath();
   for(const [i,p] of poly.entries())i?g.lineTo(...p):g.moveTo(...p);
@@ -65,26 +65,29 @@ export function drawDashObject(g,course,cell,cam,ground,size,time,{disabled=fals
         g.fillStyle='#fff0c0';g.fillRect(x-6,y-h*.54,12,4);
       }else{
         g.strokeStyle='#fff2bb';g.lineWidth=2;g.strokeRect(x-w*.72,y-h*.79,w*1.44,h*.59);
-        if(token==='l'){g.fillStyle=disabled?'#615489':'#fce6ff';g.fillRect(x-w,y-h*.55,w*2,5);}
+        if(token==='l'||token==='H'){
+          g.fillStyle=disabled?'#615489':token==='H'?'#fff5ba':'#fce6ff';
+          g.fillRect(x-w,y-h*.55,w*2,5);
+        }
       }
     }
     if(cell.attack)label(g,'BOSS',x,y-h-5,'#ffcb87');
   }else if(token==='O'){
     circle(g,x,y-h*.5,Math.min(w,h*.5),disabled?'#71638e':'#ffaa50','#ffed9f',3);
     circle(g,x,y-h*.5,Math.min(w,h*.5)*.39,'#fff5b0','#b36546',1.3);
-  }else if(token==='M'||token==='J'){
+  }else if(['M','J','A','N'].includes(token)){
     const color=DASH_PALETTES[token];
-    const deck=token==='J'?ground:y-h;
+    const deck=token==='M'?y-h:ground;
     g.fillStyle=color;g.strokeStyle='#182449';g.lineWidth=2;
     g.fillRect(x-w,deck-7,w*2,7);g.strokeRect(x-w,deck-7,w*2,7);
-    label(g,token==='M'?'LIFT':'PAD',x,deck-10,color);
-  }else if(token==='K'||token==='T'){
+    label(g,{M:'LIFT',J:'PAD',A:'SPRING',N:'BRAKE'}[token],x,deck-10,color);
+  }else if(['K','T','Q'].includes(token)){
     const color=DASH_PALETTES[token];
     g.fillStyle=color;g.fillRect(x-2,ground-46,4,46);
     bounds(g,[[x,ground-46],[x+18,ground-44],[x+15,ground-33],[x,ground-33]],color);
-    label(g,token==='K'?'CHECKPOINT':'LASER OFF',x,ground-51,color);
+    label(g,{K:'CHECKPOINT',T:'LASER OFF',Q:'LIGHTS'}[token],x,ground-51,color);
   }
-  if(selected){
+  if(selected&&!cell.layer){
     g.globalAlpha=1;g.strokeStyle='#fff9a7';g.lineWidth=3;g.setLineDash([5,3]);
     g.strokeRect(index*size-cam+2,52,size-4,ground-49);g.setLineDash([]);
   }
