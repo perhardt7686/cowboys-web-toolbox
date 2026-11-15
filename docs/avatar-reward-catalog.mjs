@@ -1,12 +1,17 @@
 import {WEARABLES} from './avatar-cosmetic-wearables.mjs?v=cel1';
 import {WORLDS} from './avatar-cosmetic-worlds.mjs?v=cel1';
 import {MYSTERY_EXTRAS} from './avatar-mystery-extras.mjs?v=mystery2';
+import {ARCADE_REWARDS} from './avatar-arcade-rewards.mjs?v=arcade5';
 
 export const GAME_LABELS=Object.freeze({
   mahjong:'Mahjong',wordle:'w0rdle',wordquest:'Word Quest',plates:'License Plates',hotrod:'Hot Rod',
+  fleet:'Star Squadron',maze:'Mystery Maze',dashforge:'Dash Forge',
   cross:'Across games',family:'Family Specials'
 });
 export const GROUPS=Object.freeze({
+  fleet:['fleet-first-flight','fleet-scout','fleet-ace','fleet-regular','fleet-gunner','fleet-veteran','fleet-command'],
+  maze:['maze-first-clue','maze-sleuth','maze-tracker','maze-explorer','maze-shadow','maze-labyrinth','maze-master'],
+  dashforge:['dash-first-clear','dash-five-levels','dash-twentyfive','dash-first-boss','dash-first-designer','dash-century','dash-legend'],
   mahjong:['mahjong-first-board','mahjong-level-three','mahjong-five-wins','mahjong-tilesmith','mahjong-five-stages','mahjong-ten-stages','mahjong-stargazer'],
   wordle:['wordle-first-clue','wordle-score-25','wordle-first-solve','wordle-three-days','wordle-score-75','wordle-team-three','wordle-streak-four'],
   wordquest:['quest-first-clue','quest-xp-50','quest-first-solve','quest-three-team-days','quest-xp-200','quest-xp-400','quest-master'],
@@ -31,7 +36,7 @@ const tierNames=['starter','starter','bronze','bronze','silver','gold','legendar
 const rank=new Map(routes.flatMap(([group,ids])=>ids.map((id,step)=>[id,{group,tier:group==='family'?'family':tierNames[step]}])));
 const countBySlot=new Map();
 
-export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS].map(item=>{
+export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...ARCADE_REWARDS].map(item=>{
   const slotIndex=countBySlot.get(item.slot)||0;
   countBySlot.set(item.slot,slotIndex+1);
   const slotOrdinal=Object.keys(SLOT_LABELS).indexOf(item.slot);
@@ -41,4 +46,4 @@ export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS].ma
   return Object.freeze({...item,achievement_id:id,...rank.get(id),tags:Object.freeze(item.tags||[])});
 }));
 export const BY_ID=new Map(CATALOG.map(item=>[item.id,item]));
-export const SHOWCASE=Object.freeze(['dragon-crown','rainbow-lightning-hair','floating-crocodile','rubber-chicken-helmet','galaxy-eyes']);
+export const SHOWCASE=Object.freeze(['dragon-crown','rainbow-lightning-hair','floating-crocodile','rubber-chicken-helmet','galaxy-eyes','boss-dragonlet','wisp-pup']);

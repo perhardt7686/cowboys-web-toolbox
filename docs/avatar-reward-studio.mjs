@@ -7,7 +7,7 @@ import {createPetStudio} from './avatar-studio-pets.mjs?v=toon3';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
-const gameEntries={mahjong:'mahjong-toggle',wordle:'letter-lock-toggle',wordquest:'word-game-toggle',plates:'plate-game-open',hotrod:'hot-rod-entry'};
+const gameEntries={mahjong:'mahjong-toggle',wordle:'letter-lock-toggle',wordquest:'word-game-toggle',plates:'plate-game-open',hotrod:'hot-rod-entry',fleet:'star-squadron-toggle',maze:'mystery-maze-toggle',dashforge:'dash-forge-toggle'};
 const sections=[['avatar','My Avatar'],['collection','Unlockables'],['pets','Pets'],['achievements','Achievements']];
 const num=value=>Number(value||0).toLocaleString();
 const row=(...children)=>{const n=el('div','avatar-reward-row');n.append(...children);return n;};
