@@ -106,7 +106,7 @@ function groundLight(actor,where,amount){
     pool.visible=amount>.01;
     pool.position.x=radius.x;pool.position.z=radius.z;
     pool.scale.set(1+amount*.34,1+amount*.11,1);
-    pool.material.opacity=(.09+i*.046)*amount;
+    pool.material.opacity=(.16+i*.043)*amount;
   }
 }
 

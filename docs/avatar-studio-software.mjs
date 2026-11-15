@@ -81,7 +81,7 @@ function sample(node,w,h,light){
     normal.fromBufferAttribute(normals,i).applyMatrix3(normalMatrix).normalize();
     const direct=Math.max(0,normal.dot(LIGHT));
     let bounce=0;
-    if(light.intensity>0&&!unlit){
+    if(light.intensity>.6&&!unlit){
       point.set(x,y,z).applyMatrix4(world);
       const delta=toLight.subVectors(lampAt,point);
       const distance=delta.length();
@@ -96,15 +96,15 @@ function sample(node,w,h,light){
 
 function inkSilhouette(buffer,coverage,w,h){
   const radius=Math.round(inkWidth(w,h));
-  const diagonal=Math.max(1,Math.round(radius*.707));
-  const neighbors=[[radius,0],[-radius,0],[0,radius],[0,-radius],
-    [diagonal,diagonal],[diagonal,-diagonal],[-diagonal,-diagonal],[-diagonal,diagonal]];
+  const edgePixels=[];
+  for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++)
+    if(dx*dx+dy*dy<=(radius+.33)**2)edgePixels.push(dy*w+dx);
   for(let y=radius;y<h-radius;y++)for(let x=radius,i=y*w+x;x<w-radius;x++,i++){
-    if(coverage[i])continue;
-    for(const [dx,dy] of neighbors){
-      if(!coverage[i+dy*w+dx])continue;
-      buffer[i*4]=23;buffer[i*4+1]=20;buffer[i*4+2]=29;
-      break;
+    if(!coverage[i]||coverage[i-1]&&coverage[i+1]&&coverage[i-w]&&coverage[i+w])continue;
+    for(const offset of edgePixels){
+      const pixel=i+offset;
+      if(coverage[pixel])continue;
+      buffer[pixel*4]=23;buffer[pixel*4+1]=20;buffer[pixel*4+2]=29;
     }
   }
 }

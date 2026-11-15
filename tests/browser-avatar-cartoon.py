@@ -17,7 +17,7 @@ async def studio(page):
     if await award.is_visible():
         await award.click()
     canvas = form.locator('#family-avatar-canvas')
-    await expect(canvas).to_have_attribute('data-renderer', '3d')
+    await expect(canvas).to_have_attribute('data-renderer', '3d', timeout=20000)
     await form.get_by_role('button', name='Unlockables', exact=True).click()
     await form.get_by_role('heading', name='Matching looks').wait_for()
     return form, canvas

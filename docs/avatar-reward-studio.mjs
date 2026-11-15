@@ -44,6 +44,14 @@ function paintThumbnail(node,item){
   releaseStudioArt(node);
 }
 
+function releaseRewardArt(container){
+  for(const canvas of container?.querySelectorAll('canvas')||[]){
+    thumbnailObserver?.unobserve(canvas);
+    thumbnails.delete(canvas);
+    releaseStudioArt(canvas);
+  }
+}
+
 function thumbnail(item,size=96,{lazy=false,recipe=null}={}){
   const node=el('canvas','avatar-reward-thumbnail');
   node.width=node.height=size;
@@ -499,11 +507,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function renderResults(){
     if(!results)return;
     stopDemo();
-    for(const canvas of results.querySelectorAll('canvas')){
-      thumbnailObserver?.unobserve(canvas);
-      thumbnails.delete(canvas);
-      releaseStudioArt(canvas);
-    }
+    releaseRewardArt(results);
     results.replaceChildren();
     const selected=detail&&BY_ID.get(detail);
     if(section==='collection'&&selected){
@@ -578,6 +582,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   }
 
   function releaseStage(){
+    releaseRewardArt(results);
     layoutWatch?.disconnect();layoutWatch=null;
     viewEvents?.abort();viewEvents=null;
     if(turntable){releaseStudioArt(turntable.canvas);turntable.destroy();turntable=null;}
@@ -668,11 +673,11 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     epoch+=1;
     pending=null;loading=false;loadError='';data=null;achievements.clear();owned.clear();pendingAcks.clear();
     query='';section='avatar';slot=filter=game='all';sort='catalog';limit=PAGE;detail=null;
-    root=editor=pane=results=filters=tabs=privateControls=null;
     cancelAnimationFrame(frame);
     stopDemo();
     stopPreview();
     releaseStage();
+    root=editor=pane=results=filters=tabs=privateControls=null;
     pets.clear();
   }
 

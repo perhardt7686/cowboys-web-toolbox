@@ -1,4 +1,4 @@
-import {THREE,attach,box,color,disposeFigure,group,hash,oval,picture,shade,shell,surface} from './avatar-studio-geometry.mjs?v=studio3';
+import {THREE,attach,color,disposeFigure,group,hash,picture,shade,surface} from './avatar-studio-geometry.mjs?v=studio3';
 import {buildAvatar} from './avatar-studio-character.mjs?v=studio3';
 import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
 import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=studio3';

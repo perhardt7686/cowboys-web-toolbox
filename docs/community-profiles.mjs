@@ -166,9 +166,10 @@ export function createProfileStudio(ctx){
       await ensureRewards();
       const form=document.getElementById('profile-studio-form');
       if(!form||!valid()||!rewards)return;
-      if(!form.querySelector('.avatar-reward-tabs'))rewards.mount(form,{nextSection:options.section||'avatar',item:options.item||null});
+      const mounted=Boolean(form.querySelector('.avatar-reward-tabs'));
+      if(!mounted)rewards.mount(form,{nextSection:options.section||'avatar',item:options.item||null});
       if(options.rewardState)rewards.restore(options.rewardState);
-      else if(options.section||options.item)rewards.restore({section:options.section,detail:options.item});
+      else if(mounted&&(options.section||options.item))rewards.restore({section:options.section,detail:options.item});
       refresh();
       if(options.equip&&options.item){
         await rewards.refresh();
