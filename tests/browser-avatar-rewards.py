@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check the shipped Avatar Studio and real arcade navigation with local preview accounts."""
 import asyncio
+import base64
 from pathlib import Path
 from playwright.async_api import async_playwright, expect
 
@@ -151,6 +152,39 @@ async def visit(browser, width, full=False):
           return [seen.size,unchanged,inert];
         }""")
         assert art == [336, [], []], art
+        # Capture and pixel-check all eighteen previously missing garment icons.
+        wardrobe_sheet = await page.evaluate("""async()=>{
+          const ids=['cinder-trench','carburetor-jacket','vault-keeper-cape',
+            'phantom-cloak','night-patrol-sweater','carnival-stripes',
+            'copperline-flares','lantern-pleats','midnight-a-line',
+            'switchyard-boots','moonlit-straps','watchtower-gloves',
+            'casefile-utility-belt','dockmaster-ascot','night-dispatch-satchel',
+            'telescope-backpack','carnival-visor-plate','moorland-heartplate'];
+          const {BY_ID}=await import('/avatar-reward-catalog.mjs?v=finish5');
+          const {paintThumbnail}=await import('/avatar-reward-render.mjs?v=finish5');
+          const sheet=document.createElement('canvas');sheet.width=1080;sheet.height=660;
+          const c=sheet.getContext('2d');
+          c.fillStyle='#f4eee3';c.fillRect(0,0,sheet.width,sheet.height);
+          const variants=new Set();
+          for(const [i,id] of ids.entries()){
+            const tile=document.createElement('canvas');tile.width=tile.height=160;
+            const item=BY_ID.get(id);if(!item||typeof item.draw!=='function')throw Error('Missing art '+id);
+            paintThumbnail(tile,item);
+            const encoded=tile.toDataURL('image/png');
+            if(encoded.length<1200)throw Error('Blank art '+id);
+            variants.add(encoded);
+            const x=i%6*180+10,y=Math.floor(i/6)*220+8;
+            c.fillStyle='#ffffff';c.fillRect(x-2,y-2,164,194);
+            c.drawImage(tile,x,y);
+            c.fillStyle='#282239';c.font='bold 12px system-ui';
+            c.fillText(item.name.slice(0,24),x,y+177,155);
+          }
+          if(variants.size!==18)throw Error('Wardrobe art silhouettes not unique');
+          return sheet.toDataURL('image/png');
+        }""")
+        (ROOT/'reports'/'avatar-wardrobe-audit.png').write_bytes(
+            base64.b64decode(wardrobe_sheet.split(',',1)[1]))
+
     assert not errors, (width, errors)
     (ROOT/'reports').mkdir(exist_ok=True)
     if width in (390,1280):
