@@ -263,3 +263,126 @@ body.community-page #dash-forge-root .dash-phase-guide>span:nth-child(3){border-
  body.community-page #dash-forge-root .dash-builder-preview canvas{max-height:72px}
  body.community-page #dash-forge-root .dash-builder-form{gap:4px;margin:4px 0}
 }
+
+/* Elliot's Creator: actual-game preview, clear sections and finger-friendly controls. */
+body.community-page #dash-forge-root #dash-pane-builder{min-width:0;overflow-x:hidden}
+body.community-page #dash-forge-root .dash-editor-walkthrough{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:960px;margin:9px 0;
+}
+body.community-page #dash-forge-root .dash-editor-walkthrough span{
+ display:flex;align-items:center;gap:6px;background:#29264d;border:1px solid #7e7fc8;border-radius:9px;
+ color:#f4f4ff;padding:8px;font:850 clamp(10px,1.6vw,13px)/1.2 system-ui;justify-content:center
+}
+body.community-page #dash-forge-root .dash-editor-walkthrough b{
+ background:#b6f3ec;color:#17254b;width:22px;height:22px;border-radius:50%;
+ display:grid;place-items:center;font:900 12px/1 system-ui;flex-shrink:0
+}
+body.community-page #dash-forge-root .dash-tools-label{
+ font:900 clamp(13px,2vw,17px)/1.2 system-ui;color:#ffe7a6;margin:15px 0 8px
+}
+body.community-page #dash-forge-root .dash-builder-preview{
+ width:100%;max-width:960px;justify-items:stretch;gap:8px;padding:10px;
+ border-color:#85e6ed;border-width:3px;margin:12px 0
+}
+body.community-page #dash-forge-root .dash-preview-label{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+ color:#fff3c0;font:900 clamp(12px,2vw,16px)/1.2 system-ui
+}
+body.community-page #dash-forge-root #dash-editor-save-state{
+ border:1px solid #a9eecc;border-radius:8px;padding:5px 8px;
+ background:#142844;color:#d8ffe7;font:800 11px/1.2 system-ui
+}
+body.community-page #dash-forge-root #dash-creator-preview{
+ display:block;width:100%;max-width:960px;height:auto;
+ aspect-ratio:8/3;max-height:none;border:3px solid #b8f6ff;border-radius:9px;
+ image-rendering:auto;object-fit:contain;cursor:crosshair;touch-action:manipulation
+}
+body.community-page #dash-forge-root #dash-preview-explanation{
+ font-size:clamp(11px,1.6vw,13px);font-weight:700;letter-spacing:0;line-height:1.4;color:#e7f4ff
+}
+body.community-page #dash-forge-root .dash-palette{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;max-width:960px;margin:10px 0
+}
+body.community-page #dash-forge-root .dash-palette button{
+ display:grid;gap:2px;align-content:center;justify-items:center;min-width:0;min-height:53px!important;
+ padding:7px 3px!important;font:800 clamp(10px,1.1vw,12px)/1.15 system-ui!important;
+ border-radius:9px!important;overflow-wrap:anywhere
+}
+body.community-page #dash-forge-root .dash-palette button span{font-size:clamp(17px,2.2vw,24px);line-height:1.1}
+body.community-page #dash-forge-root .dash-brush-info{
+ border:1px solid #8aa8d9;background:#162347;color:#fff!important;border-radius:8px;
+ padding:9px 11px;font:750 13px/1.35 system-ui!important;max-width:960px
+}
+body.community-page #dash-forge-root .dash-editor-tools{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+ max-width:960px;margin:10px 0 8px
+}
+body.community-page #dash-forge-root .dash-editor-tools h4{margin:0;color:#ffe7a6;font:900 clamp(13px,2vw,17px)/1.2 system-ui}
+body.community-page #dash-forge-root #dash-editor-range{
+ background:#123d5d;border:1px solid #7bdef4;border-radius:7px;padding:7px;color:#fff;
+ font:850 12px/1.2 system-ui
+}
+body.community-page #dash-forge-root .dash-editor-utilities{
+ display:grid;grid-template-columns:1.4fr .8fr .8fr 1.4fr;gap:7px;max-width:960px;margin:6px 0
+}
+body.community-page #dash-forge-root .dash-editor-utilities button,
+body.community-page #dash-forge-root .dash-page-buttons button{
+ min-height:44px;border:2px solid #8e8ed0;border-radius:9px;
+ background:#25264e;color:#f8f5ff;font:850 clamp(11px,1.65vw,14px)/1.2 system-ui
+}
+body.community-page #dash-forge-root .dash-editor-utilities button:disabled{
+ opacity:.38;cursor:not-allowed
+}
+body.community-page #dash-forge-root .dash-page-buttons{
+ display:flex;gap:7px;max-width:960px;flex-wrap:wrap;margin:5px 0 10px
+}
+body.community-page #dash-forge-root .dash-page-buttons button{padding:6px 13px}
+body.community-page #dash-forge-root .dash-page-buttons button[aria-current=page]{
+ background:#befff0;color:#13354e;border-color:#fff9bb
+}
+body.community-page #dash-forge-root #dash-editor-grid{
+ grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;
+ max-width:960px;width:100%;padding:10px;border-color:#a1e6ed
+}
+body.community-page #dash-forge-root #dash-editor-grid .dash-cell{
+ min-height:70px;padding:4px 2px;display:flex;flex-direction:column;justify-content:space-between;
+ gap:3px;border:2px solid #8e8dbd;border-radius:9px;color:#fff;
+ font:900 22px/1.2 system-ui
+}
+body.community-page #dash-forge-root #dash-editor-grid .dash-cell small{
+ display:block;align-self:start;color:#f3f7ff;font:900 11px/1 system-ui
+}
+body.community-page #dash-forge-root #dash-editor-grid .dash-cell strong{color:inherit;font:900 clamp(20px,2.5vw,28px)/1 system-ui}
+body.community-page #dash-forge-root #dash-editor-grid .dash-cell.type-clear{background:#205448;border-color:#4dad88;color:#fff}
+body.community-page #dash-forge-root #dash-editor-grid .dash-cell:disabled{color:#bbc0d6;background:#29304d;border-color:#5c687f}
+body.community-page #dash-forge-root .dash-editor-overview-wrap{max-width:960px;margin:10px 0 12px;padding:10px;
+ border:2px solid #758ad1;border-radius:10px;background:#171932}
+body.community-page #dash-forge-root .dash-editor-overview-wrap>strong{display:block;color:#e9faff;font:900 12px/1.2 system-ui;margin-bottom:8px}
+body.community-page #dash-forge-root .dash-editor-overview{display:flex;gap:2px;min-height:26px;align-items:stretch;width:100%}
+body.community-page #dash-forge-root .dash-overview-tile{flex:1;min-width:2px;max-width:20px;min-height:26px;
+ background:var(--dash-overview-color);opacity:.42;border:1px solid #14132b;border-radius:2px}
+body.community-page #dash-forge-root .dash-overview-tile.in-view{opacity:1;box-shadow:inset 0 0 0 1px #fff}
+body.community-page #dash-forge-root .dash-builder-actions{max-width:960px}
+body.community-page #dash-forge-root .dash-builder-actions button{
+ min-height:46px!important;padding:9px 14px!important;border-radius:9px!important
+}
+body.community-page #dash-forge-root .dash-builder-actions .dash-playtest-now{
+ background:#f9dc85!important;color:#211a3c!important;border:3px solid #fff3b1!important;
+ box-shadow:0 3px 0 #8b653b;font-weight:1000!important;letter-spacing:.02em
+}
+@media(max-width:720px){
+ body.community-page #dash-forge-root .dash-palette{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ body.community-page #dash-forge-root .dash-editor-walkthrough{gap:3px}
+ body.community-page #dash-forge-root .dash-editor-walkthrough span{gap:3px;padding:5px 2px;font-size:9px}
+ body.community-page #dash-forge-root .dash-editor-walkthrough b{width:18px;height:18px;font-size:10px}
+ body.community-page #dash-forge-root #dash-editor-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+ body.community-page #dash-forge-root #dash-editor-grid .dash-cell{min-height:57px;font-size:23px}
+ body.community-page #dash-forge-root #dash-creator-preview{max-height:none!important}
+ body.community-page #dash-forge-root .dash-editor-utilities{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ body.community-page #dash-forge-root .dash-editor-utilities button{min-height:43px;padding:5px}
+ body.community-page #dash-forge-root .dash-builder-preview{max-width:100%;padding:6px}
+}
+@media(orientation:landscape) and (max-height:550px){
+ body.community-page #dash-forge-root #dash-creator-preview{max-height:45dvh!important}
+ body.community-page #dash-forge-root .dash-builder-preview{overflow:visible}
+}
