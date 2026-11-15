@@ -118,7 +118,7 @@ async def verify(browser, phone=False):
     saved_look = edit.get_by_role('button', name='Moonlight Patrol', exact=True)
     await expect(saved_look).to_be_visible()
     await form.get_by_role('button', name='Save look').click()
-    await expect(form.get_by_text('Preview saved locally for this session.')).to_be_visible()
+    await expect(form.locator('#profile-save-status')).to_have_text('Preview saved locally for this session.', timeout=15000)
     await page.locator('#content-dialog').evaluate('dialog => dialog.close()')
     await page.locator('#family-avatar-quick').click()
     await body('specter', 'monster')

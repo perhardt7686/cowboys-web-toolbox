@@ -421,11 +421,11 @@ export function createProfileStudio(ctx){
       cache.set(id,profile);
       draft=getOwn();photoChanged=false;avatarChanged=false;
       undo=[];
+      status.classList.add('success');
+      status.textContent=ctx.isPreview?'Preview saved locally for this session.':'Your changes are saved.';
       await imageURLs([draft]);
       if(!current())return;
       refresh();ctx.renderAccount();applyReader(profile.details);
-      status.classList.add('success');
-      status.textContent=ctx.isPreview?'Preview saved locally for this session.':'Your changes are saved.';
       window.dispatchEvent(new CustomEvent('family-avatar-updated',{detail:{path:clean.avatar_path,user_id:id}}));
       rewards?.warm();ctx.onSaved?.();
     }catch(error){
