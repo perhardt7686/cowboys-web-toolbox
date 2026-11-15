@@ -478,6 +478,7 @@ async function leaveRun(){
 }
 function onKeys(e){
  if(!root||!open||!root.isConnected||board.hidden||!run||run.finishing||e.repeat)return;
+ if(e.target?.closest?.('button,input,select,textarea,[contenteditable]'))return;
  if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}
 }
 function syncArcade(){
