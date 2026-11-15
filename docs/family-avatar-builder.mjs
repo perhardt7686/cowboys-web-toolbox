@@ -2,6 +2,7 @@
    No external images, tracking, accounts, or third-party avatar service. */
 import {BODY_MODELS,FULL_BODY_OPTIONS,SCULPT_LABELS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=workshop1';
 import {turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
+import {SCENE_BY_COLOR} from './avatar-collection-edition.mjs';
 import {paintPortrait} from './avatar-cel-portrait.mjs?v=workshop1';
 
 export const AVATAR_OPTIONS = Object.freeze({
@@ -65,6 +66,9 @@ export function drawFamilyAvatar(canvas, value, overlays = {}, t = 0) {
   },layer);
   ctx.restore();
 }
+const illustratedClothes=Object.freeze({garment:'top',outerwear:'outerwear',bottoms:'bottoms',footwear:'footwear'});
+const garmentPigments=['#a47252','#526e70','#706586','#90804f','#a26465','#55768e'];
+
 export function makeAvatarStudioHTML(recipe) {
   const v=normalizeAvatarRecipe(recipe);
   const kit=normalizeBody(recipe);
@@ -72,13 +76,20 @@ export function makeAvatarStudioHTML(recipe) {
     const full=Boolean(FULL_BODY_OPTIONS[key]);
     const label=full?WARDROBE_LABELS[key]:AVATAR_LABELS[key];
     const choices=full?FULL_BODY_OPTIONS[key]:AVATAR_OPTIONS[key];
-    const selected=full?kit[key]:v[key];
+    const selected=full?kit[key]:v[key],clothing=illustratedClothes[key];
+    const art=(id,index)=>{
+      if(key==='model')return '<canvas class="studio-look-art" width="180" height="188" data-look-preview="'+id+'" aria-hidden="true"></canvas>';
+      if(key==='background')return '<img class="studio-option-art" width="104" height="64" loading="lazy" alt="" src="./avatar-scenes/'+SCENE_BY_COLOR[id]+'.webp?v=paint1">';
+      if(clothing&&id!=='none')return '<canvas class="studio-option-art" width="90" height="74" aria-hidden="true" data-clothing-art="'+clothing+
+        '" data-cut="'+id+'" data-color="'+garmentPigments[index%garmentPigments.length]+'"></canvas>';
+      return '';
+    };
     return '<fieldset class="family-avatar-field" data-studio-field="'+key+'"><legend>'+label+'</legend><div class="family-avatar-picks">'+
-      choices.filter(([id])=>!family||BODY_MODELS[id]?.family===family).map(([id,name,hex])=>
+      choices.filter(([id])=>!family||BODY_MODELS[id]?.family===family).map(([id,name,hex],index)=>
         '<button type="button" class="family-avatar-choice" '+(full?'data-avatar-body':'data-avatar-feature')+
         '="'+key+'" data-avatar-value="'+id+'" aria-pressed="'+(selected===id)+'" aria-label="'+label+': '+name+'">'+
-        (key==='model'?'<canvas class="studio-look-art" width="180" height="188" data-look-preview="'+id+'" aria-hidden="true"></canvas>':'')+
-        (hex?'<span class="family-avatar-color" style="background:'+hex+'"></span>':'')+'<span>'+name+'</span></button>'
+        art(id,index)+
+        (hex&&key!=='background'?'<span class="family-avatar-color" style="background:'+hex+'"></span>':'')+'<span>'+name+'</span></button>'
       ).join('')+'</div></fieldset>';
   };
   const panels=[

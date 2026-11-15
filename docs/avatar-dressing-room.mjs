@@ -6,6 +6,7 @@ import {normalizeLoadout} from './avatar-reward-render.mjs?v=workshop1';
 import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=workshop1';
 import {createInkLayer,drawInkedRoom} from './avatar-studio-ink.mjs?v=workshop1';
 import {poseStudioAction} from './avatar-studio-actions.mjs?v=workshop1';
+import {SCENE_BY_COLOR} from './avatar-collection-edition.mjs';
 import {paintMysteryBackdrop} from './avatar-mystery-backdrops.mjs?v=workshop1';
 
 const PALETTES={
@@ -22,10 +23,6 @@ let runtime,activeView=null;
 const views=new WeakMap();
 const savedBackdrops=new Map();
 const paintedScenes=new Map();
-const setByColor={lavender:'attic',night:'attic',ocean:'rain',mint:'rain',moss:'rain',
-  sky:'observatory',cloud:'observatory',heather:'tower',sand:'tower',sunset:'backlot',peach:'backlot',
-  rose:'workshop',ochre:'workshop',sunflower:'workshop'};
-
 export function roomSceneURL(theme){
   return new URL('./avatar-scenes/'+theme+'.webp?v=paint1',import.meta.url).href;
 }
@@ -247,14 +244,14 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   const scale=actor.figure.scale.y;
   const full={x:(actor.pet?.root.position.x||0)*.14-(view.x||0)/145,
     y:(max.y+min.y)*.5+.015+(view.y||0)/160,height:bodyHeight,zoom:cameraZoom,anglePitch:.081};
-  const crop={x:.015,y:(actor.hat?2.47:2.34)*scale,height:(actor.hat?1.12:.92)*scale,anglePitch:.018};
+  const crop={x:.015,y:(actor.hat?2.49:2.385)*scale,height:(actor.hat?1.19:1.06)*scale,anglePitch:.018};
   if(view.zoom>=2.3&&view.y>=158)full.y=2.41*scale;
   const action=poseStudioAction(actor,time,motion,active.aura);
   canvas.dataset.studioAction=action.id;
   canvas.dataset.studioReaction=action.response;
   const backgroundItem=actor.cosmetics.background;
   const palette=paletteFor(recipe,backgroundItem);
-  const theme=backgroundItem?.scene||(!backgroundItem&&setByColor[recipe.background]);
+  const theme=backgroundItem?.scene||(!backgroundItem&&SCENE_BY_COLOR[recipe.background]);
   const background=theme?paintedTexture(theme):clothBackground(palette,backgroundItem?.id||recipe.background);
   return draw(canvas,state,frame==='portrait'?crop:full,background,palette[1],frame!=='portrait'&&!theme,frame!=='portrait'&&Boolean(theme));
 }
@@ -269,8 +266,11 @@ export function paintRoomPet(canvas,item,view={},activity){
   const main=rewardPigment(item);
   const palette=['#c8bbca','#8c8ca4','#565672'].map((hex,i)=>color(hex).lerp(color(main),.15+i*.08).getStyle());
   const gargoyle=item.id==='bell-tower-gargoyle'||item.art==='gargoyle';
+  const {min,max}=state.bounds;
+  const petWidth=Math.hypot(Math.max(Math.abs(min.x),Math.abs(max.x)),Math.max(Math.abs(min.z),Math.abs(max.z)));
+  const height=Math.max(gargoyle?1.19:activity?1.08:.952,(2*petWidth+.18)/(canvas.width/canvas.height));
   return draw(canvas,state,{x:-(view.x||0)/700,y:(gargoyle?.408:.342)+(view.y||0)/600,
-    height:Math.max(gargoyle?1.19:activity?1.08:.952,.91/(canvas.width/canvas.height)),zoom:view.zoom||1,anglePitch:.049},
+    height,zoom:view.zoom||1,anglePitch:.049},
   paintedTexture(item.collection||'attic'),palette[1],false);
 }
 

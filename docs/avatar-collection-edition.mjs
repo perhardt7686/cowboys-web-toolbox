@@ -82,5 +82,8 @@ export const NEW_STUDIO_COLLECTIONS=Object.freeze(collections.map(set=>Object.fr
   id:set.id,label:set.label,look:set.look,scene:set.scene,color:set.color,caption:set.caption,
   pieces:set.pieces.map(([key])=>'studio-'+set.id+'-'+key),action:'studio-'+set.id+'-'+set.pieces[0][0]
 })));
+export const SCENE_BY_COLOR=Object.freeze({lavender:'attic',night:'attic',ocean:'rain',mint:'rain',moss:'rain',
+  sky:'observatory',cloud:'observatory',heather:'tower',sand:'tower',sunset:'backlot',peach:'backlot',
+  rose:'workshop',ochre:'workshop',sunflower:'workshop'});
 export const SCENE_LABELS=Object.freeze({attic:'Mystery Attic',observatory:'Observatory Terrace',rain:'Lamplit Alley',
   workshop:'Midway Workshop',tower:'Belfry Lookout',backlot:'Dusk Backlot'});

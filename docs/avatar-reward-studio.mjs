@@ -10,6 +10,7 @@ import {mountTurntable} from './avatar-turntable-controls.mjs?v=workshop1';
 import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v=workshop1';
 import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=workshop1';
 
+import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=workshop1';
 import {NEW_STUDIO_REWARDS,STUDIO_EDITION} from './avatar-collection-edition.mjs';
 
 const PAGE=18;
@@ -115,6 +116,7 @@ function combobox(label, options, selected, changed){
   const holder=el('label','avatar-reward-filter');
   holder.append(el('span','',label));
   const node=el('select');
+  node.setAttribute('aria-label',label);
   for(const [value,name] of options){const option=el('option','',name);option.value=value;node.append(option);}
   node.value=selected;
   node.addEventListener('change',()=>changed(node.value));
@@ -655,6 +657,14 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       panel.hidden=panel.dataset.studioPanel!==part;
     for(const button of editor.querySelectorAll('[data-studio-part]'))
       button.setAttribute('aria-pressed',String(button.dataset.studioPart===part));
+    for(const tile of editor.querySelectorAll('[data-studio-panel="'+part+'"] canvas[data-clothing-art]')){
+      if(tile.dataset.painted)continue;
+      const context=tile.getContext('2d');
+      context.setTransform(tile.width/256,0,0,tile.height/256,0,0);
+      const {clothingArt:slot,cut,color}=tile.dataset;
+      drawWardrobeReward(context,{slot,cut,color,id:'starter-'+cut});
+      tile.dataset.painted='true';
+    }
   }
 
   function chooseFamily(next){

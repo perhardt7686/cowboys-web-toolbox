@@ -32,6 +32,12 @@ async def visit(browser, width, full=False):
     await expect(editor.get_by_text('26 rewards',exact=True)).to_be_visible()
     await editor.locator('.studio-camera-presets').get_by_role('button',name='Fit',exact=True).click()
 
+    no_crowding = await nav.get_by_role('button').evaluate_all('''buttons => buttons.every(node => {
+      const label=document.createRange();label.selectNodeContents(node);
+      const text=label.getBoundingClientRect(), button=node.getBoundingClientRect();
+      return text.left>=button.left+2&&text.right<=button.right-2;
+    })''')
+    assert no_crowding, (width, 'Avatar Studio navigation labels must fit their buttons')
     for control in [nav.get_by_role('button',name='Companions'),
                     editor.get_by_role('searchbox',name='Search rewards')]:
         box = await control.bounding_box()
