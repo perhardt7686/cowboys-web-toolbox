@@ -1,6 +1,7 @@
 import {button, el} from './family-board-core.mjs?v=family3';
 
 const labels = {
+  skyboard:{play:'Ride your current course',boards:'Choose a board',awards:'Trophy road',leaders:'Family rankings'},
   fleet:{play:'Defend the starlanes',trophies:'Trophy cabinet',leaders:'Family high scores'},
   maze:{play:'Explore Mystery Maze',trophies:'Trophy cabinet',leaders:'Family high scores'},
   dashforge: {campaign:'Family campaign',community:'Created family levels',builder:'Level Studio',awards:'Achievements and skins',leaders:'Family leaderboards'},
