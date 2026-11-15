@@ -93,6 +93,15 @@ async def main():
                 assert await watch.get_attribute('href')=='https://spelunkr.tv/waku-waku'
                 assert await watch.get_attribute('target')=='_blank'
                 assert await watch.get_attribute('rel')=='noopener noreferrer'
+                await page.context.route('https://spelunkr.tv/waku-waku',
+                    lambda route:route.fulfill(content_type='text/html',body='<title>Fixture channel</title>'))
+                async with page.context.expect_page() as opened:
+                    await watch.click()
+                channel=await opened.value
+                await channel.wait_for_url('https://spelunkr.tv/waku-waku')
+                assert await channel.title()=='Fixture channel'
+                await channel.close()
+                await expect(guide).to_be_visible()
                 fav=cards.first.locator('.family-retro-fav')
                 await fav.click()
                 await guide.locator('[data-retro-group="favorites"]').click()
