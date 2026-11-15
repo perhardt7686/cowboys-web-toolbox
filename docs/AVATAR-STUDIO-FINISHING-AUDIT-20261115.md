@@ -30,7 +30,7 @@ No family accounts, character recipes, rewards, ownership, approval lists, photo
 
 ## Private data inventory before the final release
 
-Read-only Supabase table inventory showed **336** `community_private.avatar_reward_cosmetic` records, **70** reward achievements, **47** earned rows, **4** current selections, **1** saved outfit and **1** pet record. Those are current counts, **not** evidence of which individual earned or owns an item. The same connected Supabase project and current row-level security remain in place.
+The read-only Supabase audit confirmed that the **336** established cosmetic catalog records and owner-private reward, pet, outfit and trade tables remain present with row-level security enabled. Private member inventory counts, individual names, and ownership details are deliberately excluded from this public source repository. The same connected Supabase project remains in place.
 
 ## Honest verification boundary
 
