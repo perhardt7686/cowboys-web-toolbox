@@ -1,4 +1,5 @@
 import {INK,PAPER,tint,path,oval,paintScene} from './avatar-cel-art.mjs?v=cel1';
+import {SPECIAL_HAIR_STYLES,paintMysteryHair,paintMysteryExpression,paintMysteryGlasses,paintMysteryGarment} from './avatar-mystery-features.mjs?v=mystery3';
 
 const warmShade = color => tint(color,'#763a43',.36);
 const warmLight = color => tint(color,'#ffe3b1',.33);
@@ -160,10 +161,23 @@ function classicFace(c,v,skin){
   };
   const [start,segments]=starts[v.face]||starts.oval;
   path(c,start,segments,skin,INK,3.4);
-  // Only two restrained paint values, like an actual photographed cel.
-  path(c,[70,101],[[75,87,90,83,95,81],[81,108,83,130,86,148],[92,170,111,186,134,190],
-    [104,178,83,152,71,123],[66,113,70,101]],warmShade(skin),null);
-  path(c,[98,87],[[112,74,137,73,152,81],[135,81,125,87,112,94],[100,99,98,87]],warmLight(skin),null);
+  // Paint the shadow INSIDE the chosen silhouette. The previous fixed
+  // shadow erased the visual difference between the six face shapes.
+  c.save();
+  c.beginPath();c.moveTo(...start);
+  for(const segment of segments){
+    if(segment.length===2)c.lineTo(...segment);
+    else if(segment.length===4)c.quadraticCurveTo(...segment);
+    else c.bezierCurveTo(...segment);
+  }
+  c.closePath();c.clip();
+  path(c,[47,63],[[67,94,63,128,78,160],[88,188,105,201,135,211],
+    [82,204,52,161,48,119],[42,95,47,63]],warmShade(skin),null);
+  path(c,[91,87],[[116,69,147,66,162,82],[150,82,129,91,113,99],
+    [103,100,91,87]],warmLight(skin),null);
+  path(c,[158,113],[[177,132,173,149,164,155],[164,140,158,125,158,113]],
+    tint(skin,'#cf7361',.22),null);
+  c.restore();
 }
 function cheekDetails(c,v,skin){
  const shade=tint(skin,'#b25a62',.58);
@@ -215,8 +229,8 @@ function face(c,v,skin,hair,iris) {
   path(c,[60,119],[[67,113,70,130,65,133]],null,tint(shade,INK,.45),1.9);
   path(c,[179,107],[[199,101,201,117,194,129],[190,135,187,141,181,135]],shade);
   classicFace(c,v,skin);
-  path(c,[68,97],[[70,80,90,72],[77,100,98,110,87,126],[76,149,111,186,137,189],
-    [121,191,98,177,89,167],[75,153,68,137,67,123],[63,112,68,97]],shade,null);
+  // Silhouette-aware cel shade is already applied in classicFace.
+  path(c,[78,147],[[87,169,105,182,120,184]],null,tint(skin,INK,.25),1.35);
   path(c,[103,101],[[113,89,133,88,148,94],[127,93,118,101,103,101]],warmLight(skin),null);
   path(c,[153,149],[[164,143,174,145,172,150],[168,154,157,155,153,149]],tint(skin,'#da674e',.34),null);
   cheekDetails(c,v,skin);
@@ -330,13 +344,20 @@ export function paintPortrait(c,v,colors,layer) {
   layer('behind');
   if(!layer.hasHair)backHair(c,v.style,hair);
   shirtAndNeck(c,v,skin,shirt);
+  paintMysteryGarment(c,v,shirt);
   c.save();
   if(v.pose==='tilt'){c.translate(126,150);c.rotate(-.12);c.translate(-126,-150);}
   face(c,v,skin,hair,eyes);
-  if(!layer('hair'))frontHair(c,v.style,hair);
-  expression(c,v,eyes,skin);
+  if(!layer('hair')){
+    if(SPECIAL_HAIR_STYLES.includes(v.style))paintMysteryHair(c,v.style,hair);
+    else frontHair(c,v.style,hair);
+  }
+  paintMysteryExpression(c,v,eyes,skin);
   layer('eyes');
-  if(!layer('eyewear')&&(v.glasses!=='none'||v.accessory==='glasses'))glasses(c,v.glasses==='none'?'round':v.glasses);
+  if(!layer('eyewear')&&(v.glasses!=='none'||v.accessory==='glasses')){
+    if(['aviator','cat-eye','retro-square'].includes(v.glasses))paintMysteryGlasses(c,v.glasses);
+    else glasses(c,v.glasses==='none'?'round':v.glasses);
+  }
   if(!layer('hat')) {
     if(v.hat!=='none')basicHat(c,v.hat);
     else if(v.accessory==='headphones'){

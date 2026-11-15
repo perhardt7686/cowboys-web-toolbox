@@ -222,3 +222,37 @@ body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden])
   }
   body.community-page .avatar-pet-card .avatar-pet-portrait{width:min(100%,176px)}
 }
+
+/* Mystery Cartoon v3: clearer free-option controls for younger family members. */
+body.community-page .family-character-portrait{
+ border:4px solid #492e52;border-radius:20px;
+ background:linear-gradient(145deg,#f8eac8,#efcea0);
+ box-shadow:inset 0 0 0 5px #d5aa73,0 8px 22px #2c1d3b3b;
+}
+body.community-page .family-avatar-fields .avatar-feature-group{
+ border:2px solid #c6adcd;border-radius:15px;padding:7px 11px 10px;
+ background:linear-gradient(160deg,#fff9ed,#f5ebf6);
+}
+body.community-page .family-avatar-fields .avatar-feature-group summary{
+ color:#492956;font:850 16px/1.35 system-ui,sans-serif;
+ padding:10px 2px;cursor:pointer;min-height:42px;
+}
+body.community-page .family-avatar-fields .avatar-feature-group[open] summary{
+ color:#673465;border-bottom:1px solid #d7bed3;margin-bottom:8px;
+}
+body.community-page .family-avatar-fields .family-avatar-choice{
+ min-height:44px;border-radius:10px;
+ border:2px solid #b9a4bf;background:#fffdf6;color:#392b43!important;
+ font-size:clamp(12px,2.8vw,14px);font-weight:750;
+ transition:border-color .15s ease,background .15s ease,transform .16s ease;
+}
+body.community-page .family-avatar-fields .family-avatar-choice[aria-pressed="true"]{
+ border-color:#5b317a!important;background:#ead9f0!important;
+ color:#332042!important;box-shadow:0 0 0 2px #dbb5e9;
+}
+body.community-page .family-avatar-fields .family-avatar-choice:focus-visible{
+ outline:3px solid #197dc1;outline-offset:2px
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .family-avatar-fields .family-avatar-choice{transition:none!important}
+}
