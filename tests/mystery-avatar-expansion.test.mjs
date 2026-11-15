@@ -30,12 +30,12 @@ test('all new pets can be named, petted and taught unique tricks',()=>{
  assert.equal(new Set(pets.map(item=>petBehavior(item,'trick').label)).size,12);
 });
 test('new face, nose, cheek and garment options remain completely free',()=>{
- const extra={face:6,nose:5,cheeks:4,garment:7};
+ const extra={face:6,nose:5,cheeks:4,garment:11};
  for(const [key,num] of Object.entries(extra))assert.equal(AVATAR_OPTIONS[key]?.length,num);
  const old=normalizeAvatarRecipe({skin:'sand',shirt:'violet',style:'wavy'});
  assert.equal(old.face,'oval');assert.equal(old.garment,'collared');
  for(const key of Object.keys(DEFAULT_AVATAR_RECIPE))assert.ok(old[key]);
- assert.match(read('docs/community.html'),/community\.js\?v=mystery2/);
+ assert.match(read('docs/community.html'),/community\.js\?v=toon3/);
 });
 test('profile photos remain available, while unlocks stay server-gated',()=>{
  const p=read('docs/community-profiles.mjs'),s=read('docs/avatar-reward-studio.mjs');
