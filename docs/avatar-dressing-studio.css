@@ -420,7 +420,7 @@ body.community-page .avatar-dressing-studio .avatar-reward-card button:disabled{
 }
 @media(min-width:731px) and (max-height:960px){
   body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{
-    height:clamp(310px,46dvh,445px);
+    height:clamp(290px,40dvh,400px);
   }
 }
 @media(max-width:730px){
