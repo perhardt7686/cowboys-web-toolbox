@@ -75,6 +75,35 @@ async def main():
                     const drawing=document.getElementById('drawing-studio-game-root');
                     return link&&drawing&&drawing.nextElementSibling===link;
                 }""",timeout=10000)
+                # Clicking the original game button should open our own
+                # mobile-readable guide, not Spelunkr's cramped external TV UI.
+                await link.click()
+                guide=page.locator('#family-retro-guide')
+                await expect(guide).to_be_visible(timeout=15000)
+                cards=guide.locator('.family-retro-channel')
+                await expect(cards).to_have_count(35)
+                assert await guide.get_attribute('aria-modal')=='true'
+                guide_bounds=await guide.bounding_box()
+                assert guide_bounds and guide_bounds['width']<=width+1,(
+                    width,'Retro TV dialog overflows phone',guide_bounds)
+                search=guide.locator('#family-retro-search')
+                await search.fill('waku')
+                await expect(cards).to_have_count(1)
+                watch=cards.first.locator('a.family-retro-watch')
+                assert await watch.get_attribute('href')=='https://spelunkr.tv/waku-waku'
+                assert await watch.get_attribute('target')=='_blank'
+                assert await watch.get_attribute('rel')=='noopener noreferrer'
+                fav=cards.first.locator('.family-retro-fav')
+                await fav.click()
+                await guide.locator('[data-retro-group="favorites"]').click()
+                await expect(cards).to_have_count(1)
+                assert await guide.locator('.family-retro-count').inner_text()!=''
+                await search.fill('')
+                await guide.locator('[data-retro-group="kids"]').click()
+                assert await cards.count()>=5,(width,'kids filter empty')
+                await guide.locator('#family-retro-close').click()
+                await expect(guide).to_be_hidden()
+                await expect(link).to_be_visible()
                 overflow=await page.evaluate('document.documentElement.scrollWidth-innerWidth')
                 assert overflow<=2,(width,'horizontal overflow',overflow)
                 assert not errors,(width,errors)
