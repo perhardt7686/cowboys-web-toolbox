@@ -19,7 +19,7 @@ async def verify(browser, phone=False):
         is_mobile=phone, has_touch=phone, reduced_motion='reduce' if phone else 'no-preference',
     )
     errors = []
-    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.on('pageerror', lambda error: errors.append(error.stack or str(error)))
     await page.goto(URL, wait_until='domcontentloaded')
     await page.locator('#family-avatar-quick').click()
     form = page.locator('#profile-studio-form')
@@ -116,6 +116,7 @@ async def verify(browser, phone=False):
     await expect(edit.get_by_text('Spectral Case Sword · Preview only')).to_be_visible()
     await prize.get_by_role('button', name='See Spectral Case Sword').click()
     await page.evaluate('''() => {
+      if(document.getElementById('dash-forge-toggle'))return;
       const root=document.createElement('section');root.id='dash-forge-root';
       root.innerHTML='<button id="dash-forge-toggle" type="button">Sample Dash Forge</button>';
       document.querySelector('#conversations .community-main').append(root);
