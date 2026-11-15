@@ -17,12 +17,18 @@ async def visit(browser, width, full=False):
     await page.locator('#family-avatar-quick').click()
     editor = page.locator('#profile-studio-form')
     await expect(editor.get_by_role('button', name='My Avatar', exact=True)).to_be_visible()
+    await editor.locator('summary').filter(has_text='Hair & facial hair').click()
     await editor.locator('[data-avatar-feature=hair][data-avatar-value=purple]').click()
     canvas = editor.locator('#family-avatar-canvas')
+    retro_before=await canvas.evaluate('n=>n.toDataURL()')
+    await editor.locator('summary').filter(has_text='Eyes & expressions').click()
+    await editor.locator('[data-avatar-feature=eye_shape][data-avatar-value=dramatic]').click()
+    retro_after=await canvas.evaluate('n=>n.toDataURL()')
+    assert retro_before!=retro_after,'New eye shapes must visibly redraw the portrait'
     before = await canvas.evaluate('n=>n.toDataURL()')
     await editor.get_by_role('button', name='Save outfit', exact=True).wait_for()
     await editor.get_by_role('button', name='Unlockables', exact=True).click()
-    await expect(editor.get_by_text('253 rewards')).to_be_visible()
+    await expect(editor.get_by_text('289 rewards')).to_be_visible()
     achievement_tab=editor.get_by_role('button',name='Achievements',exact=True)
     assert await achievement_tab.evaluate("""node => {
       const text=document.createRange();
@@ -123,7 +129,7 @@ async def visit(browser, width, full=False):
         assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth') <= 2
         art = await page.evaluate("""async()=>{
           const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=cel1');
-          const {paintThumbnail,paintPrizeDemo,drawPetPortrait,renderLoadout}=await import('/avatar-reward-render.mjs?v=cel1');
+          const {paintThumbnail,paintPrizeDemo,drawPetPortrait,renderLoadout}=await import('/avatar-reward-render.mjs?v=toon3');
           const seen=new Set(), unchanged=[], inert=[];
           for(const item of CATALOG){
             const canvas=document.createElement('canvas');canvas.width=canvas.height=96;
