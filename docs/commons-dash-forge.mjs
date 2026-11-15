@@ -389,9 +389,9 @@ const WORLDS={
  'Endless Aurora':['#07252d','#165450','#d1ffab','aurora'],
  'Maker Studio':['#1f183a','#44377d','#ffdcaa','city']
 };
-function backdrop(g,cam,ground){
- const [top,bot,accent,kind]=WORLDS[run.world]||WORLDS['Maker Studio'];
- const t=run.elapsed/1000,seed=Number(run.stage||1),par=cam*.14;
+function backdrop(g,cam,ground,data=run){
+ const [top,bot,accent,kind]=WORLDS[data.world]||WORLDS['Maker Studio'];
+ const t=data.elapsed/1000,seed=Number(data.stage||1),par=cam*.14;
  const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,top);sky.addColorStop(1,bot);
  g.fillStyle=sky;g.fillRect(0,0,W,H);
  for(let i=0;i<46;i++){
@@ -490,25 +490,25 @@ const BOSS_COLORS={
  reef:'#69ffeb',volcanic:'#ff9866',pixel:'#ef8fff',
  garden:'#ffa5de',starfall:'#ffffff',aurora:'#baff9c'
 };
-function drawBoss(g,pos,t){
- if(!run?.boss)return;
- const style=run.bossStyle||'canopy',color=BOSS_COLORS[style]||'#ffdc8a';
- const phase=Math.min(3,Math.floor(pos/run.pattern.length*3)+1);
+function drawBoss(g,pos,t,data=run){
+ if(!data?.boss)return;
+ const style=data.bossStyle||'canopy',color=BOSS_COLORS[style]||'#ffdc8a';
+ const phase=Math.min(3,Math.floor(pos/data.pattern.length*3)+1);
  const x=835+Math.sin(t*1.5)*9,y=112+Math.sin(t*2+phase)*6;
- const strength=Math.max(0,1-pos/run.pattern.length);
+ const strength=Math.max(0,1-pos/data.pattern.length);
  // The target's stability bar is synchronized to actual level progress.
  g.save();g.globalAlpha=.95;
  g.fillStyle='#0a0d24';g.fillRect(608,46,330,33);
  g.strokeStyle=color;g.lineWidth=2;g.strokeRect(608,46,330,33);
  g.fillStyle=color;g.fillRect(615,67,316*strength,6);
  g.fillStyle='#fff';g.font='bold 15px monospace';
- g.fillText((run.bossName||'WORLD GUARDIAN').toUpperCase().slice(0,28),617,62);
+ g.fillText((data.bossName||'WORLD GUARDIAN').toUpperCase().slice(0,28),617,62);
  g.font='bold 12px monospace';g.fillText('PHASE '+phase+' / 3',810,62);
  // Attack telegraph is cosmetic. Its target is a real hazard tile from the
  // canonical saved track, never a client-only invisible trap.
  let next=-1;
- for(let i=Math.floor(pos)+1;i<Math.min(run.pattern.length,Math.floor(pos)+16);i++){
-  if(run.pattern[i]!=='.'){next=i;break;}
+ for(let i=Math.floor(pos)+1;i<Math.min(data.pattern.length,Math.floor(pos)+16);i++){
+  if(data.pattern[i]!=='.'){next=i;break;}
  }
  if(next>=0){
   const camera=Math.max(0,pos*TILE-5*TILE);
