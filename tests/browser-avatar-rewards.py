@@ -184,6 +184,32 @@ async def visit(browser, width, full=False):
         }""")
         (ROOT/'reports'/'avatar-wardrobe-audit.png').write_bytes(
             base64.b64decode(wardrobe_sheet.split(',',1)[1]))
+        face_sheet = await page.evaluate("""async()=>{
+          const names=['detective','mechanic','sleuth','specter','armor','automaton','scout'];
+          const {SHOWROOM_LOOKS}=await import('/avatar-showroom-presets.mjs?v=studio3');
+          const {paintRoomAvatar,releaseStudioView}=await import('/avatar-dressing-room.mjs?v=finish5');
+          const sheet=document.createElement('canvas');sheet.width=4*230;sheet.height=2*305;
+          const c=sheet.getContext('2d');c.fillStyle='#f4eee4';c.fillRect(0,0,sheet.width,sheet.height);
+          let unique=new Set();
+          for(const [i,name] of names.entries()){
+            const tile=document.createElement('canvas');tile.width=tile.height=230;
+            const base=SHOWROOM_LOOKS[name];
+            if(!base)throw Error('Missing model '+name);
+            paintRoomAvatar(tile,base,{angle:18},0,null,'portrait');
+            const encoded=tile.toDataURL('image/png');
+            unique.add(encoded);
+            const x=i%4*230,y=Math.floor(i/4)*305;
+            c.drawImage(tile,x,y,220,264);
+            c.fillStyle='#272039';c.font='bold 17px system-ui';
+            c.fillText(name.toUpperCase(),x+9,y+283,205);
+            releaseStudioView(tile);
+          }
+          if(unique.size!==names.length)throw Error('Several models render exactly the same');
+          return sheet.toDataURL('image/png');
+        }""")
+        (ROOT/'reports'/'avatar-face-silhouettes.png').write_bytes(
+            base64.b64decode(face_sheet.split(',',1)[1]))
+
 
     assert not errors, (width, errors)
     (ROOT/'reports').mkdir(exist_ok=True)
