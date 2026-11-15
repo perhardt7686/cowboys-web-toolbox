@@ -80,11 +80,43 @@ async def run_one(browser,width,height):
   assert await page.locator('#dash-phase-guide').is_visible(), 'Boss Creator must expose three attack phases'
   assert await page.locator('#dash-creator-preview').is_visible(), 'Creator must preview chosen world'
   await page.locator('#dash-editor-grid [data-dash-cell="9"]').click()
-  assert await page.locator('#dash-editor-grid [data-dash-cell="9"]').inner_text()=='▲'
+  assert (await page.locator('#dash-editor-grid [data-dash-cell="9"]').inner_text()).endswith('▲')
+  assert await page.locator('#dash-creator-preview').evaluate('c=>c.width===960&&c.height===360')
+  assert await page.locator('#dash-editor-grid .dash-cell').count()==24
+  assert await page.locator('#dash-editor-overview .dash-overview-tile').count()==48
+  await page.locator('#dash-undo').click()
+  assert (await page.locator('#dash-editor-grid [data-dash-cell="9"]').inner_text()).endswith('·')
+  await page.locator('#dash-redo').click()
+  assert (await page.locator('#dash-editor-grid [data-dash-cell="9"]').inner_text()).endswith('▲')
+  await page.locator('#dash-editor-next').click()
+  assert await page.locator('#dash-editor-grid [data-dash-cell="24"]').is_visible()
+  await page.locator('#dash-editor-prev').click()
+  assert await page.locator('#dash-editor-grid [data-dash-cell="9"]').is_visible()
+  assert await page.locator('#dash-creator-preview').evaluate('c=>c.getContext("2d").getImageData(120,100,1,1).data[3]===255')
   await page.locator('#dash-forge-root [data-dash-action="save"]').click()
   await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world')")
   assert 'Volcanic Foundry' in await page.locator('#dash-builder-help').inner_text()
   assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world' && x.args.p_world==='Volcanic Foundry' && x.args.p_boss_style==='volcanic')")
+  await page.wait_for_function("document.querySelector('#dash-editor-save-state')?.textContent.includes('DRAFT SAVED')",timeout=10000)
+  # The family arcade owns the fullscreen active-game state before any real playtest.
+  await page.evaluate("""() => {document.body.classList.add('arcade-on');
+    document.body.dataset.arcadeGame='dashforge';document.body.dataset.arcadeScene='builder';
+    document.querySelector('#dash-forge-root').classList.add('arcade-game-active');}""")
+  # A one-tap playtest saves current edits first, starts the exact draft and returns to editor.
+  await page.locator('#dash-editor-grid [data-dash-cell="10"]').click()
+  await page.locator('[data-dash-action="test"]').click()
+  await page.wait_for_function("window.__dashMock.calls.filter(x=>x.name==='community_dash_save_world').length>=2")
+  await page.wait_for_function("window.__dashMock.calls.some(x=>x.name==='community_dash_start' && x.args.p_level_id===100)",timeout=10000)
+  await page.locator('#dash-play-overlay').wait_for(state='visible',timeout=10000)
+  assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_start' && x.args.p_level_id===100)")
+  assert 'BACK TO LEVEL CREATOR' in await page.locator('[data-dash-action="leave"]').inner_text()
+  await page.locator('[data-dash-action="leave"]').click()
+  assert await page.locator('#dash-pane-builder').is_visible()
+  assert await page.locator('#dash-play-overlay').is_hidden()
+  # Leave the synthetic fullscreen monitor to exercise existing inline list tabs.
+  await page.evaluate("""() => {document.body.classList.remove('arcade-on');
+    document.body.dataset.arcadeGame='';document.body.dataset.arcadeScene='';
+    document.querySelector('#dash-forge-root').classList.remove('arcade-game-active');}""")
   await page.locator('#dash-forge-root [data-dash-tab="community"]').click()
   assert await page.locator('#dash-community-list .dash-level').count()==1, 'Draft visible to author'
   await page.locator('#dash-forge-root [data-dash-tab="campaign"]').click()

@@ -195,6 +195,37 @@ function introduceBeard(head,v,palette,w,jaw){
     [s*.115,-.230,.161],[s*.025,-.264,.165]],.006);
 }
 
+function faceReward(head,item,pigment,width,spacing){
+  const finish=surface(pigment,{roughness:.37,emissive:pigment,emissiveIntensity:.11});
+  const light=surface(shade(pigment,1.62));
+  const seed=hash(item.id);
+  if(/eyes|iris/.test(item.id)){
+    for(const side of [-1,1]){
+      const x=side*(.092+spacing*.009)*width;
+      const motif=medallion(head,finish,x,.015,.213,.018+seed%6*.0015,.016,5+seed%7);
+      motif.rotation.y=side*.22;motif.rotation.z=(seed%9)*.21;
+      oval(head,light,x-.004,.022,.229,.005,.006,.0035);
+    }
+  }else if(item.id.includes('brows')){
+    for(const side of [-1,1])stroke(head,finish,[[side*.051,.082,.186],[side*.096,.100,.188],
+      [side*.140,.074,.166]],.011+seed%3*.003);
+  }else if(/grin|mouth/.test(item.id)){
+    const smile=surface(shade(pigment,.48));
+    oval(head,smile,0,-.154,.208,.055,.021,.010);
+    for(const s of [-1,1])oval(head,light,s*.021,-.146,.222,.013,.014+seed%5*.002,.008);
+  }else{
+    const size=.020+seed%6*.002;
+    const s=seed%2?1:-1,x=s*(.126+.008*(seed%4));
+    const kind=item.id.includes('scar')||item.id.includes('warpaint')?'stroke':'mark';
+    if(kind==='stroke')stroke(head,finish,[[x-s*.044,-.057,.195],[x,-.078,.171],
+      [x+s*.021,-.109,.142]],.008+seed%4*.0015);
+    else{
+      for(let i=0;i<2+seed%3;i++)medallion(head,i%2?light:finish,
+        x-s*i*.021,-.072-i*.018,.171+i*.009,size-i*.003,.008,4+seed%5).rotation.y=s*.35;
+    }
+  }
+}
+
 export function addGlasses(head,kind,metal,single=false){
   if(kind==='none')return;
   const frame=surface(metal,{metalness:.52,roughness:.37});
@@ -216,14 +247,25 @@ export function addGlasses(head,kind,metal,single=false){
   if(!single)stroke(head,frame,[[-.035,.020,.236],[0,.031,.254],[.035,.020,.236]],.006);
 }
 
-export function sculptFace(head,v,palette,{mechanical=false,armor=false,specter=false,jawTune=0,eyeSpacing=0,styleReward}={}){
+export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=false,specter=false,jawTune=0,eyeSpacing=0,styleReward,eyeReward}={}){
   if(mechanical||armor){
     const alloy=surface(shade(palette.cloth,.88),{metalness:.58,roughness:.39});
     const edge=surface(armor?'#d5ac6d':'#c7d7d6',{metalness:.68,roughness:.34});
     const screen=surface('#252536',{roughness:.36});
     const signal=surface(palette.eye,{emissive:palette.eye,emissiveIntensity:.49});
-    box(head,alloy,0,0,0,.435,armor?.49:.38,.377);
-    box(head,edge,0,.163,0,.408,.052,.344);
+    const width=1+jawTune*.054;
+    if(scout){
+      oval(head,alloy,0,.012,0,.245*width,.198,.204);
+      oval(head,edge,0,.051,.151,.199,.101,.084);
+    }else if(armor){
+      shell(head,alloy,[[-.233,.131*width,.137],[-.203,.177*width,.179],[-.044,.209,.194],
+        [.163,.205,.182],[.244,.147,.143],[.276,.005,.007]],{segments:38});
+      const crest=oval(head,edge,.024,.273,.009,.060,.141,.140);
+      crest.rotation.x=-.17;
+    }else{
+      box(head,alloy,0,0,0,.435*width,.38,.377);
+      box(head,edge,0,.163,0,.408,.052,.344);
+    }
     box(head,screen,0,.038,.183,.375,.137,.062);
     for(const s of [-1,1]){
       oval(head,signal,s*(.098+eyeSpacing*.009),.042,.217,.043,.027,.008);
@@ -237,6 +279,7 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,specter=
       join(head,edge,[.091,.167,-.035],[.146,.316,-.044],.012,.008);
       oval(head,signal,.146,.316,-.044,.025,.022,.025);
     }
+    if(eyeReward)faceReward(head,eyeReward,palette.eye,1,eyeSpacing);
     return;
   }
 
@@ -255,6 +298,7 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,specter=
   browsAndEyes(head,v,palette,w,eyeSpacing);
   noseAndMouth(head,v,tone,palette);
   introduceBeard(head,v,palette,w,jaw);
+  if(eyeReward)faceReward(head,eyeReward,palette.eye,w,eyeSpacing);
   if(['freckles','rosy','dimples'].includes(v.cheeks)||v.accessory==='freckles'){
     const fleck=surface(shade(palette.skin,v.cheeks==='rosy'?.92:.68));
     const count=v.cheeks==='rosy'?2:v.cheeks==='dimples'?1:9;

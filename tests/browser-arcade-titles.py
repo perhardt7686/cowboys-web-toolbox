@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only synthetic member UI: each of ten actual arcade entries must have
+"""Read-only synthetic member UI: each of eleven actual arcade entries must have
 its own illustrated title screen and working Start, Help and Settings routes.
 This test uses NO real family account, paid service, or member database.
 """
@@ -12,6 +12,7 @@ URL="http://127.0.0.1:8765/__titles__/community.html"
 ROOTS=[
  ("streetrod","sr-toggle","STREET R0D"),
  ("dashforge","dash-forge-toggle","DASH FORGE"),
+ ("skyboard","skyboard-toggle","SKYBOARD SPRINT"),
  ("fleet","star-squadron-toggle","STAR SQUADRON"),
  ("maze","mystery-maze-toggle","MYSTERY MAZE"),
  ("mahjong","mahjong-toggle","MAHJONG"),
@@ -29,6 +30,7 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <div id="sr-inside" hidden><div id="src-classic-hub"><div id="streetrod-summer"><div id="ss-tabs"></div></div></div></div></section>
 <section id="dash-forge-root"><button id="dash-forge-toggle" aria-expanded="false">Dash Forge</button>
 <div id="dash-forge-inside" hidden><section id="dash-pane-builder"><h3>Level Studio</h3></section></div></section>
+<section id="skyboard-root"><button id="skyboard-toggle" aria-expanded="false">Skyboard Sprint</button><div id="skyboard-inside" hidden>Race</div></section>
 <section id="star-squadron-root"><button id="star-squadron-toggle" aria-expanded="false">Star Squadron</button><div id="star-squadron-inside" hidden>Swarm</div></section>
 <section id="mystery-maze-root"><button id="mystery-maze-toggle" aria-expanded="false">Mystery Maze</button><div id="mystery-maze-inside" hidden>Clues</div></section>
 <section id="mahjong-root"><button id="mahjong-toggle" aria-expanded="false">Mahjong</button><div id="mahjong-inside" hidden>Tiles</div></section>
@@ -44,7 +46,7 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <script>window.__creatorEvents=[];
 window.addEventListener('dashforge:creator-mode',e=>window.__creatorEvents.push(e.detail.boss));
 for(const [a,b] of [
- ['sr-toggle','sr-inside'],['dash-forge-toggle','dash-forge-inside'],
+ ['sr-toggle','sr-inside'],['dash-forge-toggle','dash-forge-inside'],['skyboard-toggle','skyboard-inside'],
  ['star-squadron-toggle','star-squadron-inside'],['mystery-maze-toggle','mystery-maze-inside'],
  ['mahjong-toggle','mahjong-inside'],['letter-lock-toggle','letter-lock-content'],
  ['word-game-toggle','word-game-inside'],['plate-game-open','plate-game-content'],
@@ -102,7 +104,7 @@ async def run_size(browser,width,height):
    assert await page.locator("#arcade-game-title-view").is_hidden(),("Title obscures gameplay",game)
    await page.keyboard.press("Escape")
    assert not await page.evaluate("document.body.classList.contains('arcade-on')"),(game,"Can't exit")
-  assert len(set(covers))==10,"Every game must have unique original artwork"
+  assert len(set(covers))==11,"Every game must have unique original artwork"
   if width==820:
    (ROOT/"reports").mkdir(parents=True,exist_ok=True)
    await page.locator("#dash-forge-toggle").click()
@@ -111,7 +113,7 @@ async def run_size(browser,width,height):
    assert await page.evaluate("window.__creatorEvents.at(-1)===false")
    await page.keyboard.press("Escape")
   assert not errors,"JS errors: "+"; ".join(errors)
-  print("TEN unique functional game title screens PASS",width,height)
+  print("ELEVEN unique functional game title screens PASS",width,height)
  finally:await page.close()
 
 async def main():

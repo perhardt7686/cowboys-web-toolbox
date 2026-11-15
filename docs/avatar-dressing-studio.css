@@ -1,8 +1,8 @@
 /* The dressing room uses the board's existing profile dialog and save action. */
-body.community-page .profile-dialog:has(.avatar-dressing-studio:not([hidden])):has([data-profile-pane="avatar"]:not([hidden])){
+body.community-page #content-dialog.profile-dialog:has([data-profile-pane="avatar"]:not([hidden])){
   --studio-ink:#20263a;--studio-muted:#545b70;--studio-line:#dcd9e4;
   --studio-accent:#543f75;--studio-paper:#faf8fd;
-  width:min(96vw,1180px);max-width:1180px;max-height:94dvh;
+  width:min(96vw,1180px)!important;max-width:1180px!important;max-height:94dvh!important;
   padding:19px 22px 0;background:var(--studio-paper);color:var(--studio-ink);
   border:1px solid #dad2e9;border-radius:24px;overscroll-behavior:contain;
 }
@@ -140,6 +140,9 @@ body.community-page .avatar-dressing-studio .family-avatar-fields .avatar-featur
 body.community-page .avatar-dressing-studio .family-avatar-fields .avatar-feature-group summary{
   color:#29283c;font-weight:820;font-size:.93rem;min-height:44px;padding:7px 1px;border:0;margin:0;
 }
+body.community-page .avatar-dressing-studio .avatar-feature-group > div:has([data-studio-field=model]){
+  grid-template-columns:minmax(0,1fr);padding-inline:0;
+}
 body.community-page .avatar-dressing-studio .family-avatar-field{
   border:0;border-radius:0;padding:5px 0 9px;background:transparent;
 }
@@ -160,7 +163,7 @@ body.community-page .avatar-dressing-studio [data-studio-field=model] .family-av
 }
 body.community-page .avatar-dressing-studio [data-studio-field=model] .family-avatar-choice{
   display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;text-align:center;
-  padding:4px!important;gap:4px;line-height:1.25;white-space:normal;overflow-wrap:anywhere;
+  padding:4px!important;gap:4px;line-height:1.25;white-space:normal;overflow-wrap:normal;
 }
 body.community-page .avatar-dressing-studio .studio-look-art{
   display:block;width:100%;height:auto;aspect-ratio:1.12;object-fit:cover;background:#637587;border-radius:5px;
@@ -206,7 +209,9 @@ body.community-page .profile-studio:has(.avatar-dressing-studio):has([data-profi
   padding:8px 0 max(8px,env(safe-area-inset-bottom));background:#faf8fd;
   border-top:1px solid #ded7e5;display:grid;align-items:center;grid-template-columns:1fr minmax(132px,210px);gap:7px;
 }
-body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .profile-publish{margin:0;line-height:1.25;font-size:.8rem;}
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .profile-publish{
+  align-items:center;margin:0;line-height:1.25;font-size:.8rem;min-height:44px;
+}
 body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .profile-publish small{display:none;}
 body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .profile-save-area button[type=submit]{
   min-height:46px!important;background:#4c3b69;border-radius:9px;font-size:.93rem!important;
@@ -215,15 +220,15 @@ body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden
 body.community-page .profile-studio:has([data-reward-view=pets]) .profile-save-area{visibility:hidden;}
 
 @media(max-width:730px){
-  body.community-page .profile-dialog:has(.avatar-dressing-studio):has([data-profile-pane="avatar"]:not([hidden])){
-    width:calc(100% - 12px);padding:14px 9px 0;border-radius:16px;
+  body.community-page #content-dialog.profile-dialog:has([data-profile-pane="avatar"]:not([hidden])){
+    width:calc(100% - 12px)!important;max-height:calc(100dvh - 16px)!important;padding:9px 7px 0;border-radius:16px;
   }
   body.community-page .profile-dialog:has([data-profile-pane="avatar"]:not([hidden])) .dialog-close{right:9px;top:6px;}
   body.community-page .avatar-dressing-studio.family-character-editor:has(.avatar-turntable){
     grid-template-columns:minmax(0,1fr);grid-template-areas:"menu" "stage" "panel";grid-template-rows:auto;gap:7px;
   }
   body.community-page .avatar-dressing-studio .studio-stage{position:relative;top:0;padding:7px;}
-  body.community-page .avatar-dressing-studio .avatar-turntable-frame{height:clamp(290px,46dvh,470px);}
+  body.community-page .avatar-dressing-studio .avatar-turntable-frame{height:clamp(280px,43dvh,470px);}
   body.community-page .avatar-dressing-studio .studio-camera-presets{left:13px;top:64px;}
   body.community-page .avatar-dressing-studio .avatar-turntable-controls{
     grid-template-columns:minmax(40px,.64fr) minmax(54px,1fr) minmax(40px,.64fr) minmax(60px,1.17fr);

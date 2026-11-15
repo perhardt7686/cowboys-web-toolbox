@@ -1,4 +1,4 @@
-import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio2';
+import {THREE,attach,band,box,color,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio2';
 
 const collection=['#b76e61','#63968f','#9686b4','#d3aa67','#647ca8','#b880a0','#93a56f','#b77652','#6499ab','#b395c7'];
 const brass='#d4ab6a',iron='#3a3d50',ink='#272838',silver='#a5b8c1';
@@ -11,7 +11,11 @@ export function rewardPigment(item){
     retro:['#8e769e','#bc815f','#8d9b66'],royal:['#a1779f','#bd9165','#9f7698'],
     science:['#629a96','#79a3aa','#879ac4'],neon:['#66b3ab','#a788c9','#cf92ac']};
   const range=themes[prominent]||collection;
-  return item.color||range[hash(item.id)%range.length];
+  if(item.color)return item.color;
+  const seed=hash(item.id);
+  return color(range[seed%range.length])
+    .offsetHSL(((seed>>>8)%53-26)*.0026,((seed>>>15)%19-9)*.009,((seed>>>20)%37-18)*.005)
+    .getStyle();
 }
 
 function hatBrim(head,pigment,hat,kind){
@@ -74,6 +78,7 @@ function crown(head,hat,pigment){
 export function studioHat(head,hat,accessory){
   if((!hat||hat==='none')&&accessory!=='crown')return null;
   const root=group(head);
+  root.userData.studioPart='gear';
   const custom=typeof hat==='object'?hat:null;
   const pigment=custom?rewardPigment(custom):hat==='western'?'#8f5c46':hat==='cap'?'#637c91':hat==='beanie'?'#7f658f':'#9f514e';
   const id=custom?.id||String(hat);
@@ -131,6 +136,7 @@ function metalLantern(node,alloy,pigment){
 
 export function heldItem(parent,item,point=[0,0,0],side=-1){
   const root=group(parent,point[0],point[1]-.043,point[2]+.100);
+  root.userData.studioPart='gear';
   root.rotation.set(.11,side*.11,-side*.22);
   const shape=group(root);
   const id=item.id,pigment=rewardPigment(item);

@@ -29,8 +29,8 @@ async def verify(browser, phone=False):
     await expect(canvas).to_have_attribute('data-angle', '0')
     await expect(turn.get_by_role('button', name='Rotate left')).to_be_visible()
     assert await canvas.evaluate('n => n.height >= 220 && n.width >= 230')
-    if not phone:
-        await expect(canvas).to_have_attribute('data-renderer', '3d', timeout=15000)
+    await expect(canvas).to_have_attribute('data-renderer', '3d', timeout=15000)
+    backend = await canvas.get_attribute('data-backend')
     signatures = set()
     for angle in range(0, 360, 45):
         await expect(canvas).to_have_attribute('data-angle', str(angle))
@@ -146,6 +146,8 @@ async def verify(browser, phone=False):
     await canvas.scroll_into_view_if_needed()
     await expect(canvas).to_be_in_viewport(ratio=.86)
     assert await page.locator('#content-dialog').evaluate('n => n.scrollWidth <= n.clientWidth + 2')
+    assert await edit.locator('[data-avatar-body=model]').first.evaluate('e => e.clientWidth >= 81')
+    await page.locator('#content-dialog').evaluate('n => n.scrollTop = 0')
     (ROOT / 'reports').mkdir(exist_ok=True)
     if phone:
         await page.screenshot(path=str(ROOT / 'reports' / 'avatar-turntable-iphone.png'), animations='disabled')
@@ -165,7 +167,7 @@ async def verify(browser, phone=False):
     assert await fingerprints(pet) != old_pet
     assert not errors, errors
     await page.close()
-    print(f'Full-body avatar turntable PASS in {"iPhone-sized WebKit" if phone else "desktop Chromium"}')
+    print(f'Full-body avatar turntable PASS in {"iPhone-sized WebKit" if phone else "desktop Chromium"} ({backend})')
 
 
 async def main():

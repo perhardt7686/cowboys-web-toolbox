@@ -100,6 +100,8 @@ export function createProfileStudio(ctx){
     if(vis)vis.textContent=draft.published?'Visible to approved family members when saved':'Private profile';
     const save=document.querySelector('#profile-studio-form button[type="submit"]');
     if(save)save.textContent=selectedTab==='avatar'?'Save my avatar':'Save my changes';
+    const share=form.querySelector('.profile-publish b');
+    if(share)share.textContent=selectedTab==='avatar'?'Share with family':'Show my avatar and profile to approved family';
   }
   function tabs(){
     document.querySelectorAll('[data-profile-pane]').forEach(p=>p.hidden=p.dataset.profilePane!==selectedTab);
@@ -302,7 +304,7 @@ export function createProfileStudio(ctx){
          '<button type="button" class="text-button" data-signout-all>Log out on all devices</button>',
         '</div>',
         '<div class="profile-save-area">',
-         '<label class="profile-publish"><input type="checkbox" name="published" ',draft.published?'checked':'',
+         '<label class="profile-publish"><input type="checkbox" name="published" aria-label="Share my avatar and profile with approved family" ',draft.published?'checked':'',
           '><span><b>Show my avatar and profile to approved family</b><small>Everyone in the family can see your character. Visitors cannot.</small></span></label>',
          '<button class="button-primary" type="submit">Save my changes</button>',
          '<p id="profile-save-status" class="form-message" role="status" hidden></p></div>',

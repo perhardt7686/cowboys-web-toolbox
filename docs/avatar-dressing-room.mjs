@@ -3,6 +3,7 @@ import {buildAvatar} from './avatar-studio-character.mjs?v=studio2';
 import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio2';
 import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=studio2';
 import {normalizeLoadout} from './avatar-reward-render.mjs?v=studio2';
+import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=studio2';
 
 const PALETTES={
   lavender:['#9baec6','#63778d','#50596d'],night:['#6d7995','#454963','#30354a'],
@@ -74,21 +75,25 @@ function initialize(){
   if(runtime!==undefined)return runtime;
   runtime=null;
   const canvas=document.createElement('canvas');
-  const context=canvas.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'low-power',preserveDrawingBuffer:true});
-  if(!context)return null;
+  let renderer=null;
   try{
-    const renderer=new THREE.WebGLRenderer({canvas,context,alpha:false,antialias:true});
-    renderer.outputColorSpace=THREE.SRGBColorSpace;
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.32;
+    const context=canvas.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'low-power',preserveDrawingBuffer:true});
+    if(context){
+      renderer=new THREE.WebGLRenderer({canvas,context,alpha:false,antialias:true});
+      renderer.outputColorSpace=THREE.SRGBColorSpace;
+      renderer.toneMapping=THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure=1.10;
+    }
+  }catch{renderer=null;}
+  try{
     const scene=new THREE.Scene();
     const camera=new THREE.OrthographicCamera(-1.3,1.3,1.8,-1.8,.05,50);
-    scene.add(new THREE.HemisphereLight('#f1eaff','#a4a1ba',2.62));
-    const key=new THREE.DirectionalLight('#ffe8d7',3.85);
+    scene.add(new THREE.HemisphereLight('#f1eaff','#a4a1ba',2.05));
+    const key=new THREE.DirectionalLight('#ffe8d7',3.20);
     key.position.set(-3.2,5.2,4.2);scene.add(key);
-    const fill=new THREE.DirectionalLight('#bdddea',1.89);
+    const fill=new THREE.DirectionalLight('#bdddea',1.32);
     fill.position.set(4,1.9,3.8);scene.add(fill);
-    const rim=new THREE.DirectionalLight('#dce5ff',3.26);
+    const rim=new THREE.DirectionalLight('#dce5ff',2.65);
     rim.position.set(.6,3.2,-3.3);scene.add(rim);
     const base=group(scene);
     const ballast=surface('#5b6480',{roughness:.71,metalness:.21});
@@ -153,7 +158,7 @@ function draw(canvas,state,viewOptions,background,surfaceColor,platform=true){
   const screen=canvas.getContext('2d');
   if(!screen)return false;
   const renderer=active.renderer;
-  if(renderer.getContext().isContextLost())return false;
+  const hardware=Boolean(renderer&&!renderer.getContext().isContextLost());
   setView(active,state);
   active.scene.background=background;
   active.base.visible=platform;
@@ -162,11 +167,14 @@ function draw(canvas,state,viewOptions,background,surfaceColor,platform=true){
   active.alloy.color.copy(shade(surfaceColor,.77));
   const {width,height}=canvas;
   cameraFor(active.camera,width,height,viewOptions);
-  if(renderer.domElement.width!==width||renderer.domElement.height!==height)renderer.setSize(width,height,false);
-  renderer.render(active.scene,active.camera);
-  screen.clearRect(0,0,width,height);
-  screen.drawImage(renderer.domElement,0,0,width,height);
+  if(hardware){
+    if(renderer.domElement.width!==width||renderer.domElement.height!==height)renderer.setSize(width,height,false);
+    renderer.render(active.scene,active.camera);
+    screen.clearRect(0,0,width,height);
+    screen.drawImage(renderer.domElement,0,0,width,height);
+  }else renderSoftwareRoom(canvas,active.scene,active.camera);
   canvas.dataset.renderer='3d';
+  canvas.dataset.backend=hardware?'webgl':'canvas';
   state.camera=viewOptions;
   return true;
 }
@@ -256,7 +264,7 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   const scale=actor.figure.scale.y;
   const full={x:(actor.pet?.root.position.x||0)*.14-(view.x||0)/145,
     y:1.47*scale+(view.y||0)/160,height:bodyHeight,zoom:cameraZoom};
-  const crop={x:.015,y:2.33*scale,height:.89*scale,anglePitch:.018};
+  const crop={x:.015,y:(actor.hat?2.47:2.34)*scale,height:(actor.hat?1.12:.92)*scale,anglePitch:.018};
   if(view.zoom>=2.3&&view.y>=158)full.y=2.41*scale;
   handleMotion(actor,time,motion,active.aura);
   const backgroundItem=actor.cosmetics.background;
@@ -324,6 +332,7 @@ export function hitStudioAvatar(canvas,x,y){
   const hit=ray.intersectObject(actor.root,true)[0];
   if(!hit)return null;
   for(let current=hit.object;current;current=current.parent){
+    if(current.userData.studioPart)return current.userData.studioPart;
     if(current===actor.head)return 'face';
     if(current===actor.pet?.root)return 'pets';
     if(current===actor.figure)return 'clothes';
