@@ -204,6 +204,11 @@ function launch(id){
  $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=true;
  const view=$('arcade-game-title-view');view.hidden=false;view.innerHTML=titleMarkup(g.id);
  drawGameTitle(view.querySelector('canvas'),g.id,settings?.motion==='reduce');
+ const sound=view.querySelector('[data-arcade-action="title-sound"]');
+ if(sound){let enabled=false;try{enabled=localStorage.getItem('dash-forge-audio')==='on';}catch{}
+  sound.setAttribute('aria-pressed',String(enabled));
+  sound.textContent=enabled?'♫ GAME SOUND ON':'♪ GAME SOUND OFF';
+ }
  view.querySelector('[data-arcade-action="title-start"]')?.focus({preventScroll:true});
 }
 function enterGame(destination){
@@ -414,6 +419,15 @@ function onMenuClick(e){
    const help=$('arcade-title-how');if(!help)return;
    help.hidden=!help.hidden;
    target.setAttribute('aria-expanded',String(!help.hidden));
+   break;
+  }
+  case 'title-sound':{
+   if(active!=='dashforge')break;
+   let desired=false;
+   try{desired=localStorage.getItem('dash-forge-audio')!=='on';localStorage.setItem('dash-forge-audio',desired?'on':'off');}catch{desired=target.getAttribute('aria-pressed')!=='true';}
+   target.setAttribute('aria-pressed',String(desired));
+   target.textContent=desired?'♫ GAME SOUND ON':'♪ GAME SOUND OFF';
+   window.dispatchEvent(new CustomEvent('dashforge:audio-setting',{detail:{enabled:desired}}));
    break;
   }
   case 'title-settings':showOptions();break;
