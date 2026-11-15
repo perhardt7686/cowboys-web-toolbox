@@ -79,7 +79,7 @@ create or replace function public.community_dash_allowed()
 returns boolean language sql stable security definer
 set search_path to pg_catalog,public
 as $$
- select auth.uid() is not null and public.community_mahjong_allowed();
+ select auth.uid() is not null and exists (select 1 from public.community_members m where m.user_id=auth.uid() and m.status='approved');
 $$;
 
 -- Pure deterministic validator. The client may render the jump animations;
