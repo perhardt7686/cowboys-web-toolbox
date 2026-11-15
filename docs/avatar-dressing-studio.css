@@ -51,7 +51,7 @@ body.community-page .avatar-dressing-studio.family-character-editor:has(.avatar-
   gap:10px 14px;align-items:start;padding:0;border:0;border-radius:0;background:none;
   color:var(--studio-ink,#20263a);min-width:0;
 }
-body.community-page .avatar-dressing-studio .studio-stage{
+body.community-page .profile-studio .avatar-dressing-studio .studio-stage{
   grid-area:stage;min-width:0;padding:12px;border:1px solid #4a596b;border-radius:17px;
   background:#232c40;color:#f4f3fc;box-shadow:0 7px 20px #24233129;
   display:grid;grid-template-columns:1fr;gap:6px;position:sticky;top:6px;
@@ -72,9 +72,9 @@ body.community-page .avatar-dressing-studio .studio-camera-presets button{
 }
 body.community-page .avatar-dressing-studio .studio-text-button:disabled{color:#aab6ca;}
 body.community-page .avatar-dressing-studio .avatar-turntable{
-  width:100%;max-width:none;grid-template-columns:minmax(0,1fr);gap:6px;
+  width:100%;max-width:none;grid-template-columns:minmax(0,1fr);gap:6px;position:relative;
 }
-body.community-page .avatar-dressing-studio .avatar-turntable-frame{
+body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{
   width:100%;max-width:none;height:clamp(320px,58dvh,610px);
   background:#3a475a;border-radius:12px;border:1px solid #617483;box-shadow:none;
   position:relative;
@@ -83,7 +83,7 @@ body.community-page .avatar-dressing-studio #family-avatar-canvas.avatar-turntab
   width:100%;height:100%;aspect-ratio:auto;object-fit:contain;max-height:100%;
 }
 body.community-page .avatar-dressing-studio .studio-camera-presets{
-  position:absolute;left:21px;top:70px;display:flex;gap:4px;z-index:1;
+  position:absolute;left:8px;top:8px;display:flex;gap:4px;z-index:1;
 }
 body.community-page .avatar-dressing-studio .studio-camera-presets button{
   background:#223047ee;border-color:#788999;
@@ -254,9 +254,8 @@ body.community-page .profile-studio:has([data-reward-view=pets]) .profile-save-a
   body.community-page .avatar-dressing-studio.family-character-editor:has(.avatar-turntable){
     grid-template-columns:minmax(0,1fr);grid-template-areas:"menu" "stage" "panel";grid-template-rows:auto;gap:7px;
   }
-  body.community-page .avatar-dressing-studio .studio-stage{position:relative;top:0;padding:7px;}
-  body.community-page .avatar-dressing-studio .avatar-turntable-frame{height:clamp(280px,43dvh,470px);}
-  body.community-page .avatar-dressing-studio .studio-camera-presets{left:13px;top:64px;}
+  body.community-page .profile-studio .avatar-dressing-studio .studio-stage{position:relative;top:0;padding:7px;}
+  body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{height:clamp(280px,43dvh,470px);}
   body.community-page .avatar-dressing-studio .avatar-turntable-controls{
     grid-template-columns:minmax(40px,.64fr) minmax(54px,1fr) minmax(40px,.64fr) minmax(60px,1.17fr);
   }
@@ -268,7 +267,7 @@ body.community-page .profile-studio:has([data-reward-view=pets]) .profile-save-a
   body.community-page .avatar-dressing-studio .studio-edit-tabs{grid-template-columns:repeat(3,minmax(0,1fr));}
 }
 @media(orientation:landscape) and (max-height:525px){
-  body.community-page .avatar-dressing-studio .studio-stage{position:relative;top:0;}
-  body.community-page .avatar-dressing-studio .avatar-turntable-frame{height:clamp(240px,69dvh,400px);}
+  body.community-page .profile-studio .avatar-dressing-studio .studio-stage{position:relative;top:0;}
+  body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{height:clamp(240px,69dvh,400px);}
   body.community-page .avatar-dressing-studio .avatar-turntable-controls{grid-template-columns:repeat(4,minmax(0,1fr));}
 }

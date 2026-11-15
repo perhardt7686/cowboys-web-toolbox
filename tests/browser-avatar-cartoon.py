@@ -52,6 +52,8 @@ async def reduce_motion_walk(browser):
         if look == 'Lantern Detective':
             await stage.evaluate("element => element.scrollIntoView({block:'start'})")
             await expect(canvas).to_be_in_viewport(ratio=.96)
+            assert await canvas.evaluate("node => node.clientWidth >= node.closest('.studio-stage').clientWidth * .91")
+            await expect(stage.get_by_role('button', name='Face', exact=True)).to_be_in_viewport()
             await expect(note.get_by_role('button', name=action)).to_be_in_viewport()
             await page.screenshot(path=str(REPORTS/'avatar-cartoon-iphone.png'), animations='disabled')
         await note.get_by_role('button', name='My character', exact=True).click()
