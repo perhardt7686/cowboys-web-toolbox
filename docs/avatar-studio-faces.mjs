@@ -303,14 +303,14 @@ function introduceBeard(head,v,palette,w,jaw){
   chin.material.side=THREE.DoubleSide;
   chin.userData.studioPart='fitted-beard';
   for(const s of [-1,1]){
-    // Each ink point is sampled from the actual beard shell, not guessed from
-    // a front-view silhouette. The same contour stays attached at 90 degrees.
-    const outer=[[5,1.31],[4,1.32],[3,1.22],[2,.86],[1,.35]]
+    // Keep detail below the cheek transition: longer contours reached bare skin
+    // in front view. These short ink paths follow the jaw surface at 90 degrees.
+    const outer=[[3,1.03],[2,.72],[1,.31]]
       .map(([ring,angle])=>beardJawPoint(rings,ring,s*angle,.004));
-    const inner=[[5,1.08],[4,.99],[3,.77],[2,.54],[1,.24]]
+    const inner=[[3,.77],[2,.46],[1,.17]]
       .map(([ring,angle])=>beardJawPoint(rings,ring,s*angle,.006));
-    const outline=stroke(head,edge,outer,.0047,24);
-    const shine=stroke(head,light,inner,.0035,24);
+    const outline=stroke(head,edge,outer,.0034,20);
+    const shine=stroke(head,light,inner,.0029,20);
     outline.userData.studioPart='fitted-beard-ink';
     shine.userData.studioPart='fitted-beard-ink';
   }
