@@ -9,7 +9,9 @@ test('every approved family member sees a direct avatar studio shortcut by menu'
  assert.match(nav,/family-open-avatar-studio/);
  assert.match(community,/family-avatar-state/);
  assert.match(community,/showProfile\('avatar'\)/);
- assert.match(community,/visible:canReadBoard\(member\)/);
+ assert.match(community,/visible=canReadBoard\(member\)/);
+ assert.match(community,/addEventListener\('family-avatar-state-request',publishAvatarShortcut\)/);
+ assert.match(nav,/dispatchEvent\(new Event\('family-avatar-state-request'\)\)/);
 });
 test('simple profile settings preserve advanced saved fields and send editable avatar recipe',()=>{
  const s=read('docs/community-profiles.mjs'),client=read('docs/forum-core.mjs'),
