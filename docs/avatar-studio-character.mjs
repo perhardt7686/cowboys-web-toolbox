@@ -2,8 +2,8 @@ import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=studio3';
 import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=studio3';
 import {BY_ID} from './avatar-reward-catalog.mjs?v=studio3';
 import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
-import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=studio3';
-import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=studio3';
+import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=finish5';
+import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=finish5';
 
 const BODY={
   detective:{height:1.045,width:.85},
