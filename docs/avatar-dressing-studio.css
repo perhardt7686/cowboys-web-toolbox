@@ -271,3 +271,91 @@ body.community-page .profile-studio:has([data-reward-view=pets]) .profile-save-a
   body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{height:clamp(240px,69dvh,400px);}
   body.community-page .avatar-dressing-studio .avatar-turntable-controls{grid-template-columns:repeat(4,minmax(0,1fr));}
 }
+
+/* The mystery-cartoon finish: one visual language for the stage, editor and prizes. */
+body.community-page #content-dialog.profile-dialog:has([data-profile-pane="avatar"]:not([hidden])){
+  --studio-ink:#242036;--studio-accent:#624573;--studio-line:#a9a0ac;
+  --studio-paper:#f7f1e4;
+  background:var(--studio-paper);
+  border:2px solid #30253b;
+  box-shadow:0 20px 65px #17131e55,inset 0 0 0 4px #e4d4b4;
+}
+body.community-page .profile-dialog:has([data-profile-pane="avatar"]:not([hidden])) #content-title{
+  color:#30233f;
+  text-shadow:1px 1px 0 #e1c9a4;
+}
+body.community-page .profile-studio .avatar-dressing-studio .studio-stage{
+  border:3px solid #242037;
+  background:linear-gradient(160deg,#333047,#22283e);
+  box-shadow:inset 0 0 0 2px #77677b,0 9px 20px #24233135;
+}
+body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{
+  border:3px solid #a99586;
+  border-radius:13px;
+  background:#4f586b;
+  box-shadow:0 0 0 2px #202033,inset 0 0 23px #17182b60;
+}
+body.community-page .avatar-dressing-studio .avatar-turntable-controls button,
+body.community-page .avatar-dressing-studio .studio-camera-presets button,
+body.community-page .avatar-dressing-studio .studio-text-button{
+  border:2px solid #79778b;
+  color:#fff7e9;
+  background:#3a3552;
+  font-weight:800;
+  touch-action:manipulation;
+}
+body.community-page .avatar-dressing-studio .avatar-turntable-controls button:hover,
+body.community-page .avatar-dressing-studio .studio-camera-presets button:hover,
+body.community-page .avatar-dressing-studio .studio-text-button:hover{
+  background:#594a6b;
+}
+body.community-page .avatar-dressing-studio .studio-camera-presets button[aria-pressed=true],
+body.community-page .avatar-dressing-studio .avatar-turntable-controls button[aria-pressed=true]{
+  background:#f0d5a3;
+  color:#292139;
+  border-color:#f0d5a3;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-tabs button[aria-pressed=true],
+body.community-page .avatar-dressing-studio .studio-edit-tabs button[aria-pressed=true]{
+  background:#654778;
+  box-shadow:inset 0 0 0 2px #dbc59b;
+}
+body.community-page .avatar-dressing-studio :is(.studio-editor-panel,.avatar-matching-looks,.avatar-reward-card,.avatar-reward-detail){
+  border-color:#c5b9bd;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-card{
+  transition:box-shadow .18s ease,transform .18s ease;
+}
+@media(hover:hover){
+  body.community-page .avatar-dressing-studio .avatar-reward-card:hover{
+    box-shadow:0 5px 15px #261b3422;
+    transform:translateY(-2px);
+  }
+}
+body.community-page .avatar-dressing-studio :is(button,a,select,input,canvas,summary):focus-visible{
+  outline:3px solid #c77b2e!important;
+  outline-offset:3px;
+}
+body.community-page .avatar-dressing-studio .avatar-turntable-canvas{
+  touch-action:pan-y;
+}
+@media(max-width:730px){
+  body.community-page #content-dialog.profile-dialog:has([data-profile-pane="avatar"]:not([hidden])){
+    box-shadow:0 4px 15px #13101c55,inset 0 0 0 2px #e4d4b4;
+  }
+  body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{
+    height:clamp(282px,43dvh,470px);
+  }
+  body.community-page .avatar-dressing-studio .studio-editor-panel{
+    scroll-margin-top:12px;
+  }
+  body.community-page .avatar-dressing-studio .avatar-reward-tabs button{
+    font-weight:800;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.community-page .avatar-dressing-studio .avatar-reward-card{
+    transition:none;
+    transform:none!important;
+  }
+}

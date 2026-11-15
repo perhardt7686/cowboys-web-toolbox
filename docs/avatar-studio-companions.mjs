@@ -403,6 +403,10 @@ export function buildCompanion(item){
 export function poseCompanion(pet,time,motion){
   if(!pet)return;
   const p=motion?.progress??0,amount=motion?Math.sin(p*Math.PI):0;
+  // Calm species-specific life between tricks, without affecting the ownership record.
+  const idle=!motion&&time>0&&Number.isFinite(time);
+  const sway=idle?Math.sin(time*(pet.species==='automaton'?1.92:.84)):0;
+  const float=idle?(pet.species==='phantom'?.022:pet.species==='automaton'?.004:.008)*sway:0;
   const action=motion?.action||'play';
   const trick=action==='trick',gesture=action==='pet';
   const move=petBehavior(pet.item,trick?'trick':gesture?'pet':'play').move;
@@ -413,17 +417,17 @@ export function poseCompanion(pet,time,motion){
   const bounce=move==='hop'?Math.sin(p*Math.PI)**2:amount;
   const activeHeight=action==='scan'?.072:gesture||seek?0:trick?.23:.10;
   const wingPose=pet.perch?1.16-bounce*.95:.17+amount*Math.cos(p*19)*.60;
-  pet.animal.position.set(Math.sin(lean)*.081,pet.perch+(pet.species==='phantom'?.022:0)+bounce*activeHeight,
+  pet.animal.position.set(Math.sin(lean)*.081,pet.perch+(pet.species==='phantom'?.022:0)+bounce*activeHeight+float,
     move==='glide'&&!seek?amount*.12:0);
   pet.animal.rotation.z=move==='wobble'?Math.sin(p*13)*amount*.16:0;
-  pet.head.rotation.set((gesture||action==='sniff'?.26:-.10)*amount,
-    lean+(seek?0:Math.sin(time*2.3)*.07*amount),-.15*amount);
-  for(const [i,w] of pet.wings.entries())w.rotation.y=(i===0?-1:1)*wingPose;
-  for(const {ear,roll} of pet.ears)ear.rotation.z=roll+Math.sign(roll)*amount*.16;
-  for(const t of pet.tails)t.rotation.y=amount*Math.sin(p*16)*.52;
+  pet.head.rotation.set((gesture||action==='sniff'?.26:-.10)*amount+(idle?.018*Math.sin(time*.5):0),
+    lean+(seek?0:Math.sin(time*2.3)*.07*amount)+(idle?.045*Math.sin(time*.63):0),-.15*amount);
+  for(const [i,w] of pet.wings.entries())w.rotation.y=(i===0?-1:1)*(wingPose+(idle?Math.sin(time*.71)*.035:0));
+  for(const {ear,roll} of pet.ears)ear.rotation.z=roll+Math.sign(roll)*amount*.16+(idle?.023*sway:0);
+  for(const t of pet.tails)t.rotation.y=amount*Math.sin(p*16)*.52+(idle?Math.sin(time*.88)*.13:0);
   if(pet.species==='automaton'){
     pet.tails[0].rotation.z=seek||trick?p*Math.PI*4:amount*.41;
-    pet.antenna.material.emissiveIntensity=.43+(seek||trick?amount*1.6:0);
+    pet.antenna.material.emissiveIntensity=.43+(seek||trick?amount*1.6:0)+(idle?.11*(1+sway):0);
     pet.antenna.scale.set(.028*(1+amount*.26),.028*(1+amount*.26),.026*(1+amount*.26));
   }
   if(pet.spark){

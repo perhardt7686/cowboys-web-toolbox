@@ -8,7 +8,7 @@ import {createPetStudio} from './avatar-studio-pets.mjs?v=studio3';
 import {fitsBody} from './avatar-full-body.mjs?v=studio3';
 import {mountTurntable} from './avatar-turntable-controls.mjs?v=studio3';
 import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v=studio3';
-import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=studio3';
+import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=ink4';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
