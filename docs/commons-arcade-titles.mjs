@@ -2,6 +2,14 @@
  * Procedural canvas illustrations only, no external media or copied sprites.
  * The existing games and RPCs remain the source of truth after pressing Start. */
 export const titleProfiles={
+ skyboard:{
+  eyebrow:'EMMA’S SKY RACING ADVENTURE · FAMILY ARCADE',
+  name:'SKYBOARD SPRINT',tag:'Thirty floating tracks. Six colorful worlds. One champion.',
+  subtitle:'Choose a skateboard, snowboard or magical cruiser. Jump gaps, drift past hazards, grab boosts and collect stars all the way to the flag.',
+  help:'Choose your board, press Start Stage, and steer with the big left and right buttons or arrow keys. Jump over gaps and barriers using JUMP, Space or Up; hold DRIFT for faster sliding. Collect stars and aim for glowing boosts. Every clear saves to your approved member account, unlocks more courses and earns new boards and trophies.',
+  first:'START RIDING',secondary:[['boards','CHOOSE BOARD'],['awards','TROPHY ROAD'],['leaders','FAMILY RANKS']],
+  accent:'#a8f7ff',scene:'skyboard'
+ },
  fleet:{
   eyebrow:'STAR SQUADRON · FAMILY ARCADE',
   name:'STAR SQUADRON',tag:'One pilot against an alien swarm.',
@@ -108,7 +116,15 @@ export function drawGameTitle(canvas,id,reducedMotion=false){
  gradient.addColorStop(0,'#08101f');gradient.addColorStop(1,id==='dashforge'?'#48205c':'#28274c');
  c.fillStyle=gradient;c.fillRect(0,0,320,200);
  for(let i=0;i<36;i++){R((i*71+17)%320,(i*31+11)%190,i%6?1:2,2,i%4?'#4e5486':A);}
- if(id==='streetrod'){
+ if(id==='skyboard'){
+   const bg=c.createLinearGradient(0,0,0,200);bg.addColorStop(0,'#62cbff');bg.addColorStop(1,'#effdff');c.fillStyle=bg;c.fillRect(0,0,320,200);
+   C(264,46,22,'#fff2a0');
+   for(let i=0;i<9;i++){C((i*53+17)%320,32+(i*39)%90,16,'#fff');C((i*53+32)%320,34+(i*39)%90,12,'#fff');}
+   c.fillStyle='#ffe572';c.beginPath();c.moveTo(105,85);c.lineTo(222,85);c.lineTo(310,200);c.lineTo(5,200);c.fill();
+   L(105,85,5,200,'#f247ad',7);L(222,85,310,200,'#f247ad',7);
+   R(143,114,36,9,'#181b44');R(151,96,18,22,'#5946ae');C(160,87,11,'#edb38f');
+   R(147,72,27,9,'#fa6ba4');T('JUMP!',18,44,22,'#39348a');T('STAGE 01 / 30',170,185,13,'#463271');
+  }else if(id==='streetrod'){
   R(0,142,320,58,'#26273a');
   for(let i=0;i<9;i++)L(i*46,143,i*62-60,200,'#d29d60',1);
   R(17,39,284,96,'#555769');R(22,43,274,86,'#1a2733');

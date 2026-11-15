@@ -1,0 +1,125 @@
+/* Emma's Skyboard Sprint: original colorful, screen-safe family arcade UI. */
+body.community-page #skyboard-root,body.community-page #skyboard-root *{box-sizing:border-box}
+body.community-page #skyboard-root{margin:14px 0 18px;color:#f8faff;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;min-width:0}
+body.community-page #skyboard-root [hidden]{display:none!important}
+body.community-page #skyboard-root button{cursor:pointer;border:2px solid #39336f;font:800 .87rem/1.2 system-ui,sans-serif;letter-spacing:.015em}
+body.community-page #skyboard-root button:focus-visible{outline:3px solid #ffe67c;outline-offset:3px}
+body.community-page #skyboard-root button:disabled{opacity:.47;cursor:not-allowed}
+body.community-page #skyboard-root .skyboard-entry{display:flex;align-items:center;text-align:left;width:100%;min-height:84px;border:3px solid #79eaf4;border-radius:15px;background:linear-gradient(115deg,#251e60,#4735a2 57%,#c450a3);color:#fff;box-shadow:0 7px 0 #17143b;gap:14px;padding:12px 16px}
+body.community-page #skyboard-root .skyboard-entry-symbol{font-size:2.4rem;padding:3px 12px;border-radius:15px;background:#ffffff1f}
+body.community-page #skyboard-root .skyboard-entry span:nth-child(2){display:grid;gap:5px;flex:1}
+body.community-page #skyboard-root .skyboard-entry strong{font-size:1.25rem;color:#fff3b1}
+body.community-page #skyboard-root .skyboard-entry small{color:#e2f8ff;font-size:.75rem}
+body.community-page #skyboard-root .skyboard-entry b{background:#fff4a5;color:#241d5c;border-radius:8px;padding:10px 13px;white-space:nowrap}
+body.community-page #skyboard-root .skyboard-inside{background:linear-gradient(145deg,#17183b,#282252 65%,#423474);border:2px solid #80e5fa;border-radius:16px;padding:12px;margin-top:13px;min-width:0;max-width:100%;box-shadow:0 14px 40px #08072555}
+body.community-page #skyboard-root .skyboard-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:5px 9px 12px}
+body.community-page #skyboard-root .skyboard-kicker{font-size:.69rem;letter-spacing:.13em;font-weight:900;color:#81fff0}
+body.community-page #skyboard-root h2{font-size:clamp(1.45rem,3vw,2.6rem);line-height:1.08;letter-spacing:-.045em;color:#fff5ad;margin:4px 0!important;font-weight:1000;text-shadow:2px 3px 0 #633c93}
+body.community-page #skyboard-root h2 em{color:#9ce7ff;font-style:normal}
+body.community-page #skyboard-root p{color:#dceafd;line-height:1.4;font-size:.88rem;margin:6px 0}
+body.community-page #skyboard-root .skyboard-stats{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}
+body.community-page #skyboard-root .skyboard-stats span{font-weight:900;border-radius:9px;background:#1a1942;border:1px solid #7d81ca;color:#fff5c3;padding:7px 10px;font-size:.76rem;white-space:nowrap}
+body.community-page #skyboard-root .skyboard-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:0 4px 10px}
+body.community-page #skyboard-root .skyboard-tabs button{flex:1;min-width:90px;min-height:42px;border-radius:10px;color:#e5e6ff;background:#353063;padding:8px 9px}
+body.community-page #skyboard-root .skyboard-tabs button[aria-current=true]{color:#1c2248;background:#a7f5ef;border-color:#f2ffff}
+body.community-page #skyboard-root .skyboard-pane{margin:0 3px}
+body.community-page #skyboard-root .skyboard-game-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:5px 0 9px}
+body.community-page #skyboard-root .skyboard-game-head div{display:grid;gap:3px;min-width:0}
+body.community-page #skyboard-root .skyboard-game-head strong{font-size:1rem;color:#fff1b0}
+body.community-page #skyboard-root .skyboard-game-head small{font-size:.75rem;color:#d1dfff}
+body.community-page #skyboard-root .skyboard-primary{background:#ffe780;color:#262053;border-color:#fff6cc;border-radius:10px;padding:12px 17px;min-height:44px;white-space:nowrap}
+body.community-page #skyboard-root .skyboard-viewport{position:relative;overflow:hidden;border:4px solid #96efff;border-radius:15px;background:#84d3ed;box-shadow:0 6px 0 #1b1a44,0 0 25px #45dbf04d;isolation:isolate}
+body.community-page #skyboard-root canvas{display:block;width:100%;height:auto;max-height:49dvh;object-fit:contain;aspect-ratio:16 / 9;touch-action:none}
+body.community-page #skyboard-root .skyboard-hud{position:absolute;top:9px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;gap:6px;pointer-events:none}
+body.community-page #skyboard-root .skyboard-hud span{background:#24215cdd;border:2px solid #e9f9ff;color:#fff;font-weight:900;font-size:clamp(.65rem,1.6vw,.91rem);padding:5px 9px;border-radius:8px;text-shadow:1px 1px #252558;white-space:nowrap}
+body.community-page #skyboard-root .skyboard-hud #skyboard-live-lives{color:#ff9bbd;letter-spacing:2px}
+body.community-page #skyboard-root .skyboard-message{position:absolute;inset:auto 9% 12%;border:2px solid #fff4ae;background:#221d60e8;border-radius:16px;text-align:center;padding:12px 16px;box-shadow:0 6px 25px #1a144d8a}
+body.community-page #skyboard-root .skyboard-message strong{display:block;font-size:clamp(1.2rem,2.6vw,2.15rem);color:#ffeb88;letter-spacing:.04em}
+body.community-page #skyboard-root .skyboard-message p{color:#fff}
+body.community-page #skyboard-root .skyboard-touch{display:grid;grid-template-columns:1fr .86fr 1.18fr 1fr;gap:9px;margin:14px 0 8px}
+body.community-page #skyboard-root .skyboard-touch button{min-height:68px;border-radius:14px;background:linear-gradient(#8174de,#5545ad);color:#fff;border:3px solid #b9afff;box-shadow:0 5px 0 #171139;font-size:clamp(.72rem,1.5vw,1rem);touch-action:none!important;user-select:none;-webkit-user-select:none}
+body.community-page #skyboard-root .skyboard-touch button.skyboard-jump{background:linear-gradient(#ffe78c,#ffae4e);border-color:#fff3b6;color:#392458;font-size:1.1rem}
+body.community-page #skyboard-root .skyboard-touch button.pressed,body.community-page #skyboard-root .skyboard-touch button:active{transform:translateY(3px);box-shadow:0 2px 0 #171139}
+body.community-page #skyboard-root .skyboard-help{text-align:center;color:#d4e9ff;font-size:.78rem;line-height:1.5;margin:6px 0}
+body.community-page #skyboard-root .skyboard-round-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}
+body.community-page #skyboard-root .skyboard-round-actions button{min-height:39px;background:#25234e;border-color:#8182c5;color:#fff;border-radius:8px;padding:8px 16px}
+body.community-page #skyboard-root .skyboard-round-actions #skyboard-next{background:#8df7cf;color:#162444;border-color:#cefff0}
+body.community-page #skyboard-root h3{font-size:1.3rem;margin:6px 0;color:#fff4b7;font-weight:950}
+body.community-page #skyboard-root .skyboard-board-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin-top:15px;max-height:55dvh;overflow:auto;padding:5px}
+body.community-page #skyboard-root .skyboard-board-card{display:flex;align-items:center;flex-direction:column;gap:8px;background:linear-gradient(145deg,#45428e,#241c52);border:2px solid #a7b6fa;border-radius:16px;padding:17px 13px;color:#fff;min-height:195px;text-align:center}
+body.community-page #skyboard-root .skyboard-board-card[aria-pressed=true]{border-color:#fff5ac;box-shadow:0 0 0 2px #ffdf7588}
+body.community-page #skyboard-root .skyboard-board-icon{font-size:3.6rem;filter:drop-shadow(0 6px 0 #18163e)}
+body.community-page #skyboard-root .skyboard-board-card strong{font-size:1rem;color:#fff4ad}
+body.community-page #skyboard-root .skyboard-board-card small{font-size:.73rem;color:#d6d9ff;line-height:1.35}
+body.community-page #skyboard-root .skyboard-board-state{font-size:.73rem;font-weight:900;background:#ffe586;color:#201c4e;border-radius:20px;padding:7px 12px;margin-top:auto}
+body.community-page #skyboard-root .skyboard-badge-grid,#skyboard-root .skyboard-leader-list{display:grid;gap:10px;max-height:55dvh;overflow:auto;padding:5px}
+body.community-page #skyboard-root .skyboard-badge{display:flex;align-items:center;gap:13px;border:2px solid #69649e;border-radius:12px;background:#28264f;padding:13px;opacity:.72}
+body.community-page #skyboard-root .skyboard-badge.earned{background:linear-gradient(110deg,#38587c,#394d77);border-color:#bffde2;opacity:1}
+body.community-page #skyboard-root .skyboard-badge>span{font-size:2.4rem;min-width:55px;text-align:center}
+body.community-page #skyboard-root .skyboard-badge>div{display:grid;gap:4px;flex:1}
+body.community-page #skyboard-root .skyboard-badge strong{color:#fff1b0}
+body.community-page #skyboard-root .skyboard-badge small{color:#d9e0ff}
+body.community-page #skyboard-root .skyboard-badge b{font-size:.68rem;color:#ccf8eb}
+body.community-page #skyboard-root .skyboard-leader{display:grid;grid-template-columns:45px 1fr auto;align-items:center;gap:5px 9px;border:2px solid #858cd7;background:#302c63;padding:12px;border-radius:10px}
+body.community-page #skyboard-root .skyboard-leader>b{color:#ffef9e}
+body.community-page #skyboard-root .skyboard-leader>strong{color:#fff}
+body.community-page #skyboard-root .skyboard-leader>span{color:#8ef4e8;font-weight:900}
+body.community-page #skyboard-root .skyboard-leader>small{grid-column:2 / 4;color:#d2ddff}
+body.community-page #skyboard-root .skyboard-status{margin:12px 0 0!important;border-left:4px solid #77f4e9;background:#151735;border-radius:8px;color:#fff!important;padding:10px 13px;font-weight:700}
+body.community-page #skyboard-root .skyboard-status[data-error=true]{border-left-color:#ffb19d}
+body.community-page.arcade-ready:not(.arcade-on) #skyboard-inside{display:none!important}
+body.community-page.arcade-on #skyboard-root:not(.arcade-game-active){display:none!important}
+body.community-page.arcade-on #skyboard-root.arcade-game-active{
+ position:fixed!important;inset:var(--arcade-top) 0 var(--arcade-bottom) 0!important;
+ z-index:2147481901!important;width:100vw!important;max-width:100vw!important;
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ display:block!important;overflow:hidden!important;margin:0!important;padding:3px!important;
+ border:0!important;border-radius:0!important;background:#131538!important;
+ color:#fff!important;box-shadow:none!important
+}
+body.community-page.arcade-on #skyboard-root.arcade-game-active>.skyboard-entry{display:none!important}
+body.community-page.arcade-on #skyboard-root.arcade-game-active>.skyboard-inside{
+ height:100%!important;overflow:auto!important;overscroll-behavior:contain;
+ min-height:0!important;margin:0!important;border-radius:0!important;padding:8px!important;
+ display:flex;flex-direction:column;gap:1px
+}
+body.community-page.arcade-on #skyboard-root .skyboard-top{padding:0 4px 6px}
+body.community-page.arcade-on #skyboard-root .skyboard-top h2{font-size:1.45rem!important}
+body.community-page.arcade-on #skyboard-root .skyboard-top p{display:none}
+body.community-page.arcade-on #skyboard-root .skyboard-top .skyboard-kicker{font-size:.55rem}
+body.community-page.arcade-on #skyboard-root .skyboard-tabs{margin-bottom:5px}
+body.community-page.arcade-on #skyboard-root .skyboard-tabs button{min-height:34px}
+body.community-page.arcade-on #skyboard-root .skyboard-game-head{margin:0 0 5px}
+body.community-page.arcade-on #skyboard-root .skyboard-touch{margin:8px 0 6px}
+body.community-page.arcade-on #skyboard-root .skyboard-touch button{min-height:54px}
+body.community-page.arcade-on #skyboard-root .skyboard-help{font-size:.69rem}
+body.community-page.arcade-on #skyboard-root .skyboard-status{padding:6px;font-size:.71rem}
+@media(max-width:680px){
+ body.community-page #skyboard-root .skyboard-top{align-items:flex-start;flex-wrap:wrap;gap:8px}
+ body.community-page #skyboard-root .skyboard-stats{justify-content:flex-start}
+ body.community-page #skyboard-root .skyboard-stats span{padding:4px 7px;font-size:.67rem}
+ body.community-page #skyboard-root .skyboard-touch{gap:5px}
+ body.community-page #skyboard-root .skyboard-touch button{min-height:61px;padding:8px 2px;font-size:.72rem}
+ body.community-page #skyboard-root .skyboard-touch button.skyboard-jump{font-size:.91rem}
+ body.community-page #skyboard-root .skyboard-game-head strong{font-size:.81rem}
+ body.community-page #skyboard-root .skyboard-primary{padding:8px;min-height:40px;font-size:.72rem}
+ body.community-page #skyboard-root .skyboard-tabs button{min-width:calc(50% - 4px);font-size:.69rem;min-height:34px}
+ body.community-page #skyboard-root .skyboard-message{bottom:10%;padding:6px}
+ body.community-page #skyboard-root .skyboard-message strong{font-size:1.15rem}
+ body.community-page #skyboard-root .skyboard-message p{font-size:.74rem}
+ body.community-page #skyboard-root .skyboard-hud{top:5px;left:4px;right:4px;gap:3px}
+ body.community-page #skyboard-root .skyboard-hud span{border-width:1px;padding:4px;font-size:.58rem}
+ body.community-page.arcade-on #skyboard-root .skyboard-top h2{font-size:1.2rem!important}
+ body.community-page.arcade-on #skyboard-root .skyboard-help{display:none}
+}
+@media(max-height:620px){
+ body.community-page.arcade-on #skyboard-root .skyboard-kicker{display:none}
+ body.community-page.arcade-on #skyboard-root .skyboard-top{padding-bottom:0}
+ body.community-page.arcade-on #skyboard-root .skyboard-top h2{font-size:1.15rem!important}
+ body.community-page.arcade-on #skyboard-root .skyboard-tabs{margin:0 0 3px}
+ body.community-page.arcade-on #skyboard-root .skyboard-tabs button{min-height:30px;padding:4px}
+ body.community-page.arcade-on #skyboard-root canvas{max-height:40dvh}
+ body.community-page.arcade-on #skyboard-root .skyboard-touch button{min-height:42px}
+ body.community-page.arcade-on #skyboard-root .skyboard-touch{margin:5px 0 4px}
+}
+@media(prefers-reduced-motion:reduce){body.community-page #skyboard-root *{scroll-behavior:auto!important;transition:none!important}}
