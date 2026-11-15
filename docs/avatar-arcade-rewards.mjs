@@ -139,7 +139,7 @@ function object(c,id,t){
 }
 function effect(c,id,t){
  const wave=Math.sin(t*3)*5;
- if(id==='meteor-shower'){
+ if(id==='squadron-meteor-rain'){
   for(let i=0;i<12;i++){
    const x=14+(i*59)%255,y=22+(i*37)%190+wave;
    stroke(c,[[x-20,y-16],[x,y]],i%3===0?C:G,2.6);
@@ -203,7 +203,7 @@ const specs=[
  ['nebula-visor','Nebula Visor','eyewear','fleet-scout'],
  ['meteor-jetpack','Meteor Jetpack','prop','fleet-ace'],
  ['comet-signal','Comet Signal','prop','fleet-regular'],
- ['meteor-shower','Meteor Shower','effect','fleet-gunner'],
+ ['squadron-meteor-rain','Squadron Meteor Rain','effect','fleet-gunner'],
  ['starfield-cockpit','Starfield Cockpit','background','fleet-veteran'],
  ['queen-drone','Queen Drone','companion','fleet-command'],
  ['clue-mouse','Clue Mouse','companion','maze-first-clue'],
