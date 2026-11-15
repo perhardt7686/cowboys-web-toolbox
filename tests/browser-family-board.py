@@ -19,7 +19,7 @@ import {createFamilyBoard} from '/family-board.mjs';
 const app = createFamilyBoard();
 const me = new URL(location).searchParams.get('id') || 'First member';
 const today = new Date().toISOString();
-let rows = [], events = [], sequential = 0, pendingError = false, handler;
+let rows = [], events = [], sequential = 0, pendingError = false, handler, calendarDelay;
 const sync = new BroadcastChannel('fixture-family');
 const rpc = async (name, values) => {
   if(name==='community_family_scoreboard') {
@@ -39,7 +39,10 @@ const rpc = async (name, values) => {
     if(values.p_action==='check') rows.find(x=>x.id===values.p_id).done=values.p_done;
     sync.postMessage(rows); return {data:{items:structuredClone(rows)}};
   }
-  if(name==='community_family_calendar_feed') return {data:{events,last_synced:today}};
+  if(name==='community_family_calendar_feed'){
+    await calendarDelay;
+    return {data:{events,last_synced:today}};
+  }
   if(name==='community_family_calendar_change'){
     const value=values.p_event;
     if(values.p_action==='add')events.push({id:values.p_id,title:value.title,start:value.start+'-05:00',end:value.end+'-05:00',
@@ -56,6 +59,7 @@ const client={
 };
 sync.onmessage=event=>{rows=event.data;handler?.({new:{topic:'fridge'}});};
 window.fixtureReject=()=>{pendingError=true;};
+window.fixtureHoldCalendar=()=>{calendarDelay=new Promise(resolve=>{window.fixtureReleaseCalendar=resolve;});};
 window.fixtureLogout=()=>{document.querySelector('#conversations').hidden=true;app.setAccess(null,null);};
 if(me!=='Visitor'){document.querySelector('#conversations').hidden=false;app.setAccess(client,{user_id:me,status:'approved'});}
 </script></body></html>"""
@@ -103,6 +107,14 @@ async def layout(page, width):
     await expect(page.locator('.family-date-grid button')).to_have_count(7)
     await page.locator('.family-date-grid button').first.click()
     await expect(page.locator('.family-date-grid button').first).to_have_attribute('aria-pressed', 'true')
+    await page.evaluate('fixtureHoldCalendar()')
+    await page.get_by_role('button', name='Next week').click()
+    next_week_day = page.locator('.family-date-grid button').first
+    await next_week_day.click()
+    await expect(next_week_day).to_be_focused()
+    await page.evaluate('fixtureReleaseCalendar()')
+    await expect(page.get_by_text('No events scheduled.', exact=True)).to_be_visible()
+    await expect(next_week_day).to_be_focused()
     await page.get_by_role('button', name='Today', exact=True).click()
     await page.get_by_role('button', name='Month', exact=True).click()
     await expect(page.locator('.family-date-grid button[aria-current=date]')).to_have_attribute('aria-pressed', 'true')

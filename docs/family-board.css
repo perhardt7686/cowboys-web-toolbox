@@ -230,7 +230,6 @@ body.community-page #conversations .family-conversation-bar #new-thread:focus-vi
   outline: 3px solid var(--family-focus);
   outline-offset: 2px;
 }
-body.community-page #compact-feed-count { color: #f2dffb!important; }
 body.community-page #conversations .community-sidebar { margin-top: .75rem!important; }
 
 @media(max-width: 520px) {

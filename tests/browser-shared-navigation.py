@@ -89,6 +89,10 @@ async def main():
                             assert box['x']>=0 and box['x']+box['width']<=width+1, (width, box)
                             assert toggle_box and box['x']+box['width']<=toggle_box['x']+1, (width, box, toggle_box)
                             assert abs(box['y']-toggle_box['y'])<=10, (width, box, toggle_box)
+                            arrows=await page.locator('.toolbox-map-card .toolbox-route-arrow').evaluate_all("""arrows=>arrows.map(el=>[
+                                el.closest('a').hash, el.textContent, el.getBoundingClientRect().width,
+                                getComputedStyle(el,'::after').borderBottomStyle])""")
+                            assert arrows==[['#explore','',16,'solid'],['#starter-packs','',16,'solid']], (width,arrows)
                         await page.set_viewport_size({'width':390,'height':844})
                         assert await entry.inner_text() == 'Family Message Board'
                         assert await entry.locator('.family-board-stars i').count() == 3

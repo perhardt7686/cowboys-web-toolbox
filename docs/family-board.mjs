@@ -3,7 +3,7 @@ import {getAvatarPhoto,cachedAvatarPhoto} from './family-avatar-cache.mjs?v=work
 import {boardTime, button, el, preference, statusLine} from './family-board-core.mjs?v=family3';
 import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 import {makeFridge} from './family-fridge.mjs?v=family3';
-import {makeCalendar} from './family-calendar.mjs?v=family3';
+import {makeCalendar} from './family-calendar.mjs?v=family4';
 
 const games = {
   mahjong: {label: 'Mahjong', unit: 'best score', achievement: 'wins', entry: 'mahjong-toggle'},

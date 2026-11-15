@@ -21,7 +21,7 @@ standalone=standalone.replace('<script src="community-config.js" defer></script>
 standalone=standalone.replace('<script src="site-shots/manifest.js?v=preview2" defer></script>','<script>'+(r/'docs/site-shots/manifest.js').read_text()+'</script>')
 standalone=standalone.replace('href="toolbox-favicon.png"','href="'+icon+'"')
 standalone=standalone.replace('<link rel="stylesheet" href="purple-night.css">','<style>'+(r/'docs/purple-night.css').read_text()+'</style>')
-standalone=standalone.replace('<link rel="stylesheet" href="toolbox-depth.css?v=depth7">','<style>'+(r/'docs/toolbox-depth.css').read_text()+'</style>')
+standalone=standalone.replace('<link rel="stylesheet" href="toolbox-depth.css?v=depth8">','<style>'+(r/'docs/toolbox-depth.css').read_text()+'</style>')
 standalone=standalone.replace('<link rel="stylesheet" href="toolbox-clarity.css?v=clarity1">','<style>'+(r/'docs/toolbox-clarity.css').read_text()+'</style>')
 standalone=standalone.replace('<link rel="stylesheet" href="site-preview-capture.css?v=preview2">','<style>'+(r/'docs/site-preview-capture.css').read_text()+'</style>')
 standalone=standalone.replace('<link rel="stylesheet" href="unified-nav.css?v=family4">','<style>'+(r/'docs/unified-nav.css').read_text()+'</style>')

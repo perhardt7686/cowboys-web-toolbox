@@ -86,8 +86,9 @@ body.community-page #community-feed .thread-card .thread-count{
  font-size:.71rem!important;line-height:1.2!important
 }
 body.community-page #compact-feed-count{
- font:700 .75rem/1.3 system-ui,-apple-system,sans-serif!important;
- color:#624d69!important;text-align:center!important;margin:8px 0 4px!important
+ font:700 .8rem/1.4 system-ui,-apple-system,sans-serif!important;
+ background:#fff8e7;color:#452953!important;text-align:center!important;
+ width:fit-content;max-width:100%;margin:8px auto 4px!important;padding:.2em .65em;border-radius:8px
 }
 body.community-page #compact-feed-more{
  display:block;width:min(100%,500px);min-height:43px;margin:7px auto 14px!important;

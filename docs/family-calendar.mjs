@@ -68,6 +68,7 @@ export function makeCalendar({rpc}) {
     for (const control of modes.children) control.setAttribute('aria-pressed', String(control.dataset.calendarView === view));
     grid.hidden = view === 'agenda';
     grid.classList.toggle('family-date-grid-week', view === 'week');
+    const focusedDate = grid.contains(document.activeElement) ? document.activeElement.dataset.calendarDate : null;
     grid.replaceChildren();
     if (view === 'month') {
       for (const name of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']) grid.append(el('span', 'family-weekday', name));
@@ -82,11 +83,13 @@ export function makeCalendar({rpc}) {
           grid.querySelector('[aria-pressed="true"]')?.focus();
         }, {'aria-pressed': String(date === selected),
           'aria-label': dayFormat.format(dateFromKey(date)) + (matches ? ', ' + matches + ' events' : '')});
+        control.dataset.calendarDate = date;
         if (date === today()) control.setAttribute('aria-current', 'date');
         if (matches) control.append(el('small', 'family-date-count', String(matches)));
         grid.append(control);
       }
     }
+    if (focusedDate) grid.querySelector(`[data-calendar-date="${focusedDate}"]`)?.focus({preventScroll: true});
     list.replaceChildren();
     if (!current) return;
     const items = view === 'agenda' ? events : events.filter(event => eventOnDate(event, selected));

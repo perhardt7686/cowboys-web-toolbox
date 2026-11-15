@@ -379,7 +379,11 @@ async function boot(){
   new MutationObserver(schedule).observe(board,{attributes:true,attributeFilter:['hidden']});
   new MutationObserver(syncArcade).observe(document.body,
    {attributes:true,attributeFilter:['class','data-arcade-game','data-arcade-scene']});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});
+  document.addEventListener('visibilitychange',()=>{
+   if(document.hidden)held.clear();
+   else schedule();
+  });
+  window.addEventListener('blur',()=>held.clear());
   client.auth.onAuthStateChange(schedule);
   window.addEventListener('keydown',onKeyDown);
   window.addEventListener('keyup',onKeyUp);

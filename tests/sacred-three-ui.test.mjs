@@ -58,7 +58,7 @@ test('Original Toolbox logo and build system keep final stylesheet',()=>{
  const ref='href="toolbox-clarity.css?v=clarity1"';
  assert.equal(template.split(ref).length-1,1,'template needs exactly one CSS reference');
  assert.equal(index.split(ref).length-1,1,'generated index needs exactly one CSS reference');
- assert.ok(index.indexOf(ref)>index.indexOf('href="toolbox-depth.css?v=depth7"'));
+ assert.ok(index.indexOf(ref)>index.indexOf('href="toolbox-depth.css?v=depth8"'));
  assert.ok(build.includes("docs/toolbox-clarity.css"),'offline preview must inline clarity CSS');
  assert.ok(boardHTML.includes('commons-message-board-contrast.css?v=contrast1'));
  assert.ok(boardHTML.indexOf('commons-message-board-contrast.css')>boardHTML.indexOf('commons-games-polish.css'));
