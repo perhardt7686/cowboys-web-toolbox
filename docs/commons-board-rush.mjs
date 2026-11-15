@@ -116,6 +116,7 @@ function build(){
 }
 function choose(next){
  if(!['play','boards','awards','leaders'].includes(next))return;
+ if(next!=='play'&&run&&!run.done)pause(true);
  currentScene=next;
  if(active()&&document.body.dataset.arcadeScene!==next)document.body.dataset.arcadeScene=next;
  render();
