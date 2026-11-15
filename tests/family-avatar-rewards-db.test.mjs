@@ -8,7 +8,7 @@ import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
 import {FREE_OPTION_COUNT} from '../docs/family-avatar-builder.mjs';
 
 test('free choices and complete, distinct cosmetic IDs',()=>{
-  assert.equal(FREE_OPTION_COUNT,120);
+  assert.equal(FREE_OPTION_COUNT,154);
   const counts={hat:50,eyewear:35,hair:41,eyes:30,prop:40,companion:41,background:31,effect:21};
   assert.equal(CATALOG.length,289);
   assert.deepEqual({...Object.fromEntries(Object.entries(Object.groupBy(CATALOG,item=>item.slot))
