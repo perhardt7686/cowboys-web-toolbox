@@ -170,7 +170,7 @@ export function makeArcadeNav({leave, view, settings}) {
   function updateStats() {
     if (!selected || header.hidden) return;
     const text = id => (get(id)?.textContent || '').trim();
-    const values = {
+    const values = ({
       dashforge: [text('dash-forge-summary').slice(0,45),text('dash-live-progress')],
       mahjong: [text('mahjong-run-title').replace(/ · Combo .+$/, ''), text('mahjong-remaining')],
       wordle: [...(get('letter-lock-statline')?.children || [])].slice(1, 4).map(item => {
