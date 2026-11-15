@@ -1,18 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createCommunityDb,installUpgradeSchema} from './helpers/community-db.mjs';
+import {PGlite} from '@electric-sql/pglite';
+import {installUpgradeSchema} from './helpers/community-db.mjs';
 import {RETRO_GAME_RULES,initialRetro,retroStep} from '../docs/retro-arcade-engine.mjs';
 function trace(game,seed,max){
  let state=initialRetro(game,seed),actions='';
  for(let i=0;i<max&&!state.done;i++){
   const code=game==='fleet'?['N','F','L','D','A','R','F'][(i*3+seed)%7]:
-                           ['L','R','U','D','N'][(i*5+seed)%5];
+                           ['L','R','U','D','N'][(i*3+seed)%5];
   actions+=code;state=retroStep(state,code);
  }
  return {state,actions};
 }
 test('authoritative SQL replays the same verified control trace as both client engines',async()=>{
- const db=await createCommunityDb();
+ const db=new PGlite();
  try{
   await installUpgradeSchema(db);
   for(const game of ['fleet','maze']){
