@@ -14,6 +14,7 @@ on:
       - 'docs/community-profiles.mjs'
       - 'tests/browser-avatar-rewards.py'
       - 'tests/browser-family-avatar-studio.py'
+      - 'tests/browser-pet-trading.py'
       - 'tests/browser-arcade-shell.py'
       - '.github/workflows/family-avatar-arcade-smoke.yml'
   workflow_dispatch:
@@ -37,6 +38,7 @@ jobs:
           python -m http.server 8765 --directory docs >/tmp/family-arcade-http.log 2>&1 &
           python tests/browser-avatar-rewards.py
           python tests/browser-family-avatar-studio.py
+          python tests/browser-pet-trading.py
           python tests/browser-arcade-shell.py
           python tests/browser-arcade-titles.py
       - name: Keep synthetic mobile acceptance screenshots
@@ -47,6 +49,7 @@ jobs:
           path: |
             reports/avatar-rewards-*.png
             reports/family-avatar-studio-*.png
+            reports/family-pet-trade-*.png
             reports/arcade-one-screen-iphone-sample.png
             reports/arcade-dash-title-tablet.png
           if-no-files-found: ignore
