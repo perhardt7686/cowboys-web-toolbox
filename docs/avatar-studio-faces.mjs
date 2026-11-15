@@ -140,6 +140,9 @@ function facePlanes(head,v,palette,w,h,jaw,specter){
     [.052*jaw*w,-.247*h,.099]],.0046,14);
 }
 
+// Eye layers are cel-thin and nearly follow the face surface. The original stack
+// projected ~0.04 units ahead of the socket and looked like loose globes in profile.
+// Keep color/pupil readability while limiting the forward depth on every head shape.
 function browsAndEyes(head,v,palette,w,spacing){
   const faceInk=surface('#2c2232'),ivory=surface('#fff3dc');
   const eyeColor=surface(palette.eye),glint=surface('#fffdf2');
@@ -150,37 +153,38 @@ function browsAndEyes(head,v,palette,w,spacing){
   const expression=cartoonFaceExpression(v);
   for(const side of [-1,1]){
     const x=side*(.100+spacing*.010)*w;
-    const eye=group(head,x,.014,.181);
+    const eye=group(head,x,.014,.173);
+    eye.userData.studioEye=true; // Testable fitted cel layer, not a floating spherical eyeball.
     eye.rotation.y=side*.225;
     const asymmetry=expression.mouth==='curious'&&side===1?.012:0;
     const sleepy=expression.eyes==='sleepy';
     if(expression.wink&&side===1){
-      stroke(eye,faceInk,[[-.053,-.004,.021],[-.016,-.014,.035],
-        [.022,-.012,.038],[.051,.003,.018]],.0073,16);
-      stroke(eye,skin,[[-.049,-.027,.011],[0,-.027,.031],[.045,-.023,.009]],.0045,12);
+      stroke(eye,faceInk,[[-.053,-.004,.012],[-.016,-.014,.021],
+        [.022,-.012,.024],[.051,.003,.012]],.0073,16);
+      stroke(eye,skin,[[-.049,-.027,.009],[0,-.027,.019],[.045,-.023,.008]],.0045,12);
     }else{
       const ew=expression.width*.92,eh=expression.height*expression.squint*.87;
       // A pronounced ink lid gives facial expressions definition at thumbnail scale.
-      oval(eye,faceInk,0,-.002,.001,ew+.008,eh+.010,.017);
-      oval(eye,ivory,0,0,.012,ew,eh,.012);
+      oval(eye,faceInk,0,-.002,.001,ew+.008,eh+.010,.008);
+      oval(eye,ivory,0,0,.009,ew,eh,.005);
       const look=expression.pupil*(side===1?1:.55);
-      oval(eye,eyeColor,look-.006,-.004,.025,.022,eh*.75,.008);
-      oval(eye,pupil,look-.008,-.004,.033,.013,eh*.58,.006);
-      oval(eye,glint,look-.017,.012,.037,.007,.007,.003);
+      oval(eye,eyeColor,look-.006,-.004,.016,.022,eh*.75,.004);
+      oval(eye,pupil,look-.008,-.004,.021,.013,eh*.58,.003);
+      oval(eye,glint,look-.017,.012,.025,.007,.007,.002);
       if(sleepy){
-        oval(eye,skin,0,eh*.76,.027,ew+.009,eh*.46,.012);
-        stroke(eye,shadow,[[-ew,eh*.60,.016],[0,eh*.70,.031],[ew,eh*.56,.016]],.0055);
+        oval(eye,skin,0,eh*.76,.018,ew+.009,eh*.46,.007);
+        stroke(eye,shadow,[[-ew,eh*.60,.013],[0,eh*.70,.021],[ew,eh*.56,.013]],.0055);
       }else{
-        stroke(eye,faceInk,[[-ew-.005,.004,.013],[-ew*.52,eh*.94,.018],
-          [0,eh*1.06,.020],[ew*.64,eh*.94,.016],[ew+.004,.002,.011]],.0078,18);
+        stroke(eye,faceInk,[[-ew-.005,.004,.010],[-ew*.52,eh*.94,.013],
+          [0,eh*1.06,.015],[ew*.64,eh*.94,.013],[ew+.004,.002,.010]],.0078,18);
         if(expression.eyes==='dramatic'){
           for(let i=0;i<3;i++)stroke(eye,faceInk,[
             [ew*.66+i*.009,eh*.74-i*.005,.015],
             [ew*.93+i*.014,eh*(1.52-i*.10),.014]],.0043,9);
         }
       }
-      stroke(eye,shadow,[[-ew*.64,-eh*.94,.009],
-        [0,-eh*1.06,.017],[ew*.62,-eh*.89,.009]],.0035);
+      stroke(eye,shadow,[[-ew*.64,-eh*.94,.008],
+        [0,-eh*1.06,.013],[ew*.62,-eh*.89,.008]],.0035);
     }
     const brows=expression.brow+(v.brows==='arching'?.013:0);
     const height=.071+asymmetry+(v.brows==='bold'?.004:0);
@@ -324,7 +328,7 @@ export function addGlasses(head,kind,metal,single=false,fit=1){
   const angular=['square','retro-square','cat-eye','visor'].includes(kind);
   const height=kind==='aviator'?1.02:kind==='oval'?.70:.86;
   for(const s of (single?[1]:[-1,1])){
-    const piece=group(frameRoot,s*.105,.010,.225);
+    const piece=group(frameRoot,s*.105,.010,.209);
     piece.rotation.y=s*.22;
     if(angular){
       stroke(piece,frame,[[-.071,-.036,0],[.068,-.038,0],[.070,.041,0],[-.070,.042,0],[-.071,-.036,0]],.0075);
@@ -333,9 +337,9 @@ export function addGlasses(head,kind,metal,single=false,fit=1){
       band(piece,frame,0,0,0,.061,.006,1.16,height);
       oval(piece,lens,0,0,0,.065,.060*height,.007);
     }
-    join(frameRoot,frame,[s*.17,.020,.224],[s*.239,.037,.004],.0058);
+    join(frameRoot,frame,[s*.17,.020,.210],[s*.239,.037,.004],.0058);
   }
-  if(!single)stroke(frameRoot,frame,[[-.035,.020,.236],[0,.031,.254],[.035,.020,.236]],.006);
+  if(!single)stroke(frameRoot,frame,[[-.035,.020,.221],[0,.031,.239],[.035,.020,.221]],.006);
 }
 
 export function controlVisor(head,pigment){
