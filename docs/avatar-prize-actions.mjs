@@ -75,11 +75,23 @@ const petMoves = {
   'alpaca-scarf':['Leans into a neck scratch.','Bounces and sways.','Throws a swirl of petals.','hop','coral','Scarf twirl'],
   'golden-koi':['Flashes a golden scale.','Swims a little loop.','Sends bubbles spiraling upward.','glide','gold','Golden whirl'],
   'trail-husky':['Cocks its head and leans into the scratch.','Bounds up to meet you.','Does a double hop with a trail of stars.','hop','ice','Trail hop'],
+  'midnight-owl':['Its feathers settle as it blinks.','Flutters around the clue board.','Projects a tiny constellation.','glide','orchid','Constellation call'],
+  'phantom-puppy':['Wags its ghostly tail.','Dashes through a glowing hoop.','Leaves little spectral pawprints.','hop','ice','Ghost-paw parade'],
+  'clockwork-cat':['Purrs with little clicking gears.','Bats a tiny brass pendulum.','Unwinds a shower of clockwork stars.','wobble','gold','Gearstorm'],
+  'moon-fox':['Ears perk for a cuddle.','Leaps after moonlit moths.','Whirls up a misty moon halo.','hop','orchid','Moon halo'],
+  'cactus-hedgehog':['Shows its softest side.','Rolls around a cactus flower.','Makes a ring of desert blossoms.','wobble','mint','Desert bloom'],
+  'bubble-axolotl':['Wiggles its cheek frills.','Swims a sparkling little loop.','Blows a ribbon of luminous bubbles.','float','ice','Bubble ribbon'],
+  'detective-ferret':['Sniffs a hidden clue.','Darts around your shoulder.','Points out a mystery with glowing footprints.','hop','gold','Clue finder'],
+  'neon-firefly':['Glows warmly in your hand.','Orbits the character twice.','Calls a swirl of golden lights.','glide','gold','Luminous spiral'],
+  'satellite-turtle':['Raises its head for a scratch.','Trundles around a tiny moon.','Launches a playful satellite beam.','wobble','ice','Satellite scan'],
+  'bonsai-dragon':['Curls around your finger.','Flutters through the branches.','Breathes a tiny emerald ember cloud.','glide','mint','Emerald flame'],
+  'carnival-bat':['Folds its velvet wings.','Loops over a carnival light.','Summons a parade of glowing ghost lights.','glide','coral','Carnival glide'],
+  'gear-gecko':['Wiggles its toes happily.','Climbs around a brass cog.','Lights up a tiny mechanical maze.','wobble','gold','Gear maze'],
   'lantern-raccoon':['Tilts its head and lifts the lantern.','Waddles over with the light.','Lights the clearing with a lantern salute.','wobble','ember','Lantern salute']
 };
 
 export function petBehavior(item, action) {
-  const [pet,play,trick,move,light,trickName]=petMoves[item.id];
+  const [pet,play,trick,move,light,trickName]=petMoves[item.id]||['Looks up at you.','Bounces happily.','Performs a little trick.','wobble','gold','Little surprise'];
   const cue=action==='trick'
     ? /bubble|whirlpool/.test(trickName.toLowerCase())?'bubbles':item.id==='lantern-raccoon'?'lamp':
       /beam|scanner/.test(trickName.toLowerCase())?'scan':
