@@ -1,6 +1,6 @@
 /* Family Avatar Studio: original, fully local character art.
    No external images, tracking, accounts, or third-party avatar service. */
-import {paintPortrait} from './avatar-cel-portrait.mjs?v=mystery2';
+import {paintPortrait} from './avatar-cel-portrait.mjs?v=toon3';
 
 export const AVATAR_OPTIONS = Object.freeze({
   skin:[['porcelain','Fair','#f5d2bb'],['bisque','Bisque','#eac3a4'],['sand','Warm','#dbad86'],['tan','Tan','#ce966a'],['amber','Golden','#bf8154'],['copper','Brown','#895138'],['deep','Deep','#603722'],['espresso','Rich','#402824']],
