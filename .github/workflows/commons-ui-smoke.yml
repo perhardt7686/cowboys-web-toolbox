@@ -21,6 +21,9 @@ on:
       - 'tests/browser-streetrod-ega.py'
       - 'tests/browser-arcade-shell.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-dash-forge.mjs'
+      - 'docs/commons-dash-forge.css'
+      - 'tests/browser-dash-forge.py'
       - 'docs/commons-streetrod-scene-flow.mjs'
       - 'docs/commons-streetrod-scene-flow.css'
       - 'docs/commons-streetrod-ega.mjs'
@@ -53,6 +56,9 @@ on:
       - 'docs/hot-rod*'
       - 'tests/browser-hot-rod.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-dash-forge.mjs'
+      - 'docs/commons-dash-forge.css'
+      - 'tests/browser-dash-forge.py'
       - 'docs/unified-nav.*'
       - 'tests/browser-*.py'
       - '.github/workflows/commons-ui-smoke.yml'
@@ -87,6 +93,7 @@ jobs:
           python tests/browser-streetrod-scenes.py
           python tests/browser-streetrod-reborn.py
           python tests/browser-hot-rod.py
+          python tests/browser-dash-forge.py
       - name: Retain test-only iPhone-sized screenshot
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
