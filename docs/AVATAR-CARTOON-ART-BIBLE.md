@@ -62,3 +62,11 @@ Reduced-motion users get a meaningful stationary frame and readable text instead
 - No backend schema or family content modifications in this pass.
 
 This is an art direction reference and implementation record, **not** a substitute for visual approval on real devices.
+
+## Profile eye-fitting iteration | November 15, 2026 | PR #36
+
+- **Observed before:** the 3D eye meshes had multiple rounded, forward-offset layers that looked detached in profile, and eyewear hovered noticeably ahead of the face. This comes from the face renderer's sphere scales and mounted depth, not a subjective claim about CI.
+- **Code change:** seat flattened cel-ink, sclera, iris, pupil, highlight and wink layers nearer the head; move lenses, bridge and ear stems nearer the corresponding eye plane. No appearance recipes, unlock IDs or user data change.
+- **Verification contract:** `tests/avatar-cel-eye-depth.test.mjs` tests human body/expression combinations plus supported fitting-frame examples. The existing GitHub Actions synthetic member preview captures front, three-quarter and profile faces; compare the new screenshot with the previous release from identical fixtures. Technical CI status belongs to the actual PR SHA, not this note.
+- **Remaining art work:** the head, beard silhouette, body/pose shapes, costume joints and pet performances still require artistic review. A geometry fix and a green screenshot-generation test alone are **not** final style approval. Compare a direction-specific hand-painted 2D/2.5D alternative to the current WebGL body rig before a much larger renderer rewrite.
+- **Privacy and publication:** previews use synthetic members only. Real logged-in cross-member saves and trading remain separate acceptance requirements; do not imply they occurred.
