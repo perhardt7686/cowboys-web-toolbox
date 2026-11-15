@@ -91,8 +91,8 @@ test('Boss Creator makes truly editable boss scenes, validated by server not by 
  assert.match(dash,/dashforge:creator-mode/);
  assert.match(dash,/function drawBoss/);
  assert.match(dash,/(?:run|data)\.bossStyle/);
- assert.match(dash,/Math\.min\(3,Math\.floor\(pos\/run\.pattern\.length\*3\)\+1\)/);
- assert.match(dash,/run\.pattern\[i\]!=='.'/);
+ assert.match(dash,/Math\.min\(3,Math\.floor\(pos\/(?:run|data)\.pattern\.length\*3\)\+1\)/);
+ assert.match(dash,/(?:run|data)\.pattern\[i\]!=='.'/);
  assert.match(dash,/community_dash_finish/);
  assert.match(dash,/server-validated pattern/);
 });
