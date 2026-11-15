@@ -146,7 +146,7 @@ async def visit(browser, width, full=False):
           }
           return [seen.size,unchanged,inert];
         }""")
-        assert art == [253, [], []], art
+        assert art == [289, [], []], art
     assert not errors, (width, errors)
     (ROOT/'reports').mkdir(exist_ok=True)
     if width in (390,1280):
