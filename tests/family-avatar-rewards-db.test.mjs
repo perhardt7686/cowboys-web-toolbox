@@ -142,7 +142,7 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await refused(sql('select * from community_private.avatar_pet'));
   await switchRole(other);
   assert.deepEqual(await petState(),[]);
-  await refused(petAction('trail-husky','pet',named.revision));
+  await refused(petAction('trail-husky','pet',named.revision),'22023');
   await switchRole(member);
   assert.deepEqual(await petState(),[named]);
   await equip(null,2);
