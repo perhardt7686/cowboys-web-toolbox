@@ -232,7 +232,7 @@ async function publishLevel(id){
 }
 function eventJump(){
  if(!run||run.finishing)return;
- const pos=Math.min(run.pattern.length-1,Math.floor(run.elapsed/TICK));
+ const pos=Math.min(run.pattern.length-1,Math.floor(run.elapsed/(run.pace||210)));
  if(pos<0||pos<=run.lastJump+3||run.pattern[pos]!=='.')return;
  run.lastJump=pos;run.jumps.push(pos);
 }
@@ -244,7 +244,7 @@ function palette(){
 function draw(){
  if(!run)return;
  const canvas=$('dash-canvas'),g=canvas?.getContext('2d');if(!g)return;
- const p=run.elapsed/TICK,pos=Math.min(run.pattern.length,p),tile=Math.floor(pos);
+ const p=run.elapsed/(run.pace||210),pos=Math.min(run.pattern.length,p),tile=Math.floor(pos);
  const cam=Math.max(0,pos*TILE-5*TILE);
  const ground=284;
  const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#0b1130');sky.addColorStop(1,'#302553');
@@ -275,13 +275,13 @@ function frameStep(timestamp){
  if(run.lastFrame===null)run.lastFrame=timestamp;
  run.elapsed+=Math.min(80,Math.max(0,timestamp-run.lastFrame));run.lastFrame=timestamp;
  let end=null;
- const cursor=Math.min(run.pattern.length,Math.floor(run.elapsed/TICK));
+ const cursor=Math.min(run.pattern.length,Math.floor(run.elapsed/(run.pace||210)));
  while(run.checked<cursor){
   const i=run.checked++,ch=run.pattern[i],delta=i-run.lastJump;
   if(ch!=='.'&&(delta<1||delta>3)){end='dead';run.death=i;break;}
  }
  draw();
- $('dash-live-progress').textContent=Math.min(100,Math.floor(run.elapsed/(run.pattern.length*TICK)*100))+'%';
+ $('dash-live-progress').textContent=Math.min(100,Math.floor(run.elapsed/(run.pattern.length*(run.pace||210))*100))+'%';
  if(end==='dead'||run.checked>=run.pattern.length){void finishRun(end!=='dead');return;}
  frame=requestAnimationFrame(frameStep);
 }
@@ -301,7 +301,9 @@ async function startLevel(id){
  try{
   const item=levels().find(l=>Number(l.id)===id);if(!item)throw Error('Level is not available.');
   const result=await call('community_dash_start',{p_level_id:id});
-  run={id:result.run_id,level_id:id,pattern:result.pattern,title:result.title};
+  run={id:result.run_id,level_id:id,pattern:result.pattern,title:result.title,
+   pace:Number(result.pace_ms||210),world:result.world||item.world||'Maker Studio',
+   stage:item.stage||null,boss:Boolean(result.boss||item.boss)};
   beginDraw(item);
   setStatus('Run started. Your jump trace will be independently checked by the server.');
  }catch(e){setStatus(e.message,true);}finally{busy=false;}
