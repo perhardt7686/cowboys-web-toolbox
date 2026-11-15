@@ -41,11 +41,13 @@ test('full beards have a fitted continuous jaw mesh and two cheek-ink contours p
     }));
     const meshes=[],ink=[];
     actor.figure.traverse(node=>{
-      if(node.userData.studioPart==='fitted-beard')meshes.push(node);
-      if(node.userData.studioPart==='fitted-beard-ink')ink.push(node);
+      if(node.userData.studioBeard==='shell')meshes.push(node);
+      if(node.userData.studioBeard==='ink')ink.push(node);
     });
     assert.equal(meshes.length,1,face);
     assert.equal(ink.length,4,face);
+    for(const node of [...meshes,...ink])assert.equal(node.userData.studioPart,undefined,
+      face+' beard art must not intercept the face editing selection');
     assert.equal(meshes[0].geometry.attributes.position.count,6*41);
     const mesh=meshes[0],coords=mesh.geometry.attributes.position;
     assert.ok(mesh.material.side===THREE.DoubleSide);
@@ -74,7 +76,7 @@ test('clean-shaven and goatee characters do not gain a full beard overlay',()=>{
   for(const beard of ['none','goatee','stubble','moustache']){
     const actor=buildAvatar(normalizeLoadout({...SHOWROOM_LOOKS.mechanic,beard}));
     const parts=[];
-    actor.figure.traverse(node=>{if(node.userData.studioPart==='fitted-beard')parts.push(node);});
+    actor.figure.traverse(node=>{if(node.userData.studioBeard==='shell')parts.push(node);});
     assert.equal(parts.length,0,beard);
     disposeFigure(actor.root);
   }
