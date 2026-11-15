@@ -57,7 +57,7 @@ async def run_size(browser,width,height):
  await page.route(URL,lambda route:route.fulfill(status=200,content_type="text/html",body=HTML))
  try:
   await page.goto(URL,wait_until="load")
-  await page.locator("#arcade-program-grid").wait_for(timeout=15000)
+  await page.locator("#arcade-program-grid").wait_for(state="attached",timeout=15000)
   covers=[]
   for game,toggle,title in ROOTS:
    await page.locator("#"+toggle).click()
