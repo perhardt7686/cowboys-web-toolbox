@@ -9,8 +9,8 @@ import {FREE_OPTION_COUNT} from '../docs/family-avatar-builder.mjs';
 
 test('free choices and complete, distinct cosmetic IDs',()=>{
   assert.equal(FREE_OPTION_COUNT,98);
-  const counts={hat:50,eyewear:35,hair:41,eyes:30,prop:28,companion:27,background:25,effect:15};
-  assert.equal(CATALOG.length,251);
+  const counts={hat:50,eyewear:35,hair:41,eyes:30,prop:28,companion:29,background:25,effect:15};
+  assert.equal(CATALOG.length,253);
   assert.deepEqual({...Object.fromEntries(Object.entries(Object.groupBy(CATALOG,item=>item.slot))
     .map(([slot,items])=>[slot,items.length]))},counts);
   assert.equal(new Set(CATALOG.map(item=>item.id)).size,CATALOG.length);
@@ -33,6 +33,9 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   const state=()=>result('select public.community_avatar_reward_state() as value');
   const equip=(recipe,expected=0,fallback=null)=>result('select public.community_avatar_equip($1,null,$2,$3) as value',[recipe,expected,fallback]);
   const outfit=(name,recipe)=>result('select public.community_avatar_save_outfit(1,$1,$2) as value',[name,recipe]);
+  const petState=()=>result('select public.community_avatar_pet_state() as value');
+  const petAction=(id,action,revision=null,name=null)=>result(
+    'select public.community_avatar_pet_action($1,$2,$3,$4) as value',[id,action,revision,name]);
   const show=async(...ids)=>(await sql('select * from public.community_avatar_projections($1::uuid[])',[ids])).rows;
   const refused=(promise,code='42501')=>assert.rejects(promise,error=>error.code===code);
   const get=(state,id)=>state.achievements.find(item=>item.id===id);
@@ -54,12 +57,17 @@ test('approved family avatars derive rewards and restrict persistence and sharin
 
   await switchRole(null,'anon');
   await refused(state());await refused(show(member));await refused(equip(normalizeLoadout({})));
+  await refused(petState());await refused(petAction('trail-husky','adopt'));
   for(const id of [pending,suspended,outsider]){
     await switchRole(id);await refused(state());await refused(show(member));await refused(outfit('Test',normalizeLoadout({})));
+    await refused(petState());await refused(petAction('trail-husky','adopt'));
   }
 
   await switchRole(member);
   const fresh=await state();
+  assert.deepEqual(await petState(),[]);
+  await refused(petAction('trail-husky','adopt'));
+  await refused(petAction('giant-taco-hat','adopt'));
   assert.deepEqual(fresh.catalog,CATALOG.map(({id,slot,achievement_id,name,tags})=>({id,slot,achievement_id,name,tags})));
   assert.equal(fresh.achievements.length,49);
   assert.equal(fresh.earned.length,0);
@@ -105,7 +113,31 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   assert.equal((await state()).earned.some(i=>i.id==='giant-taco-hat'&&i.seen),false);
   assert.deepEqual((await show(member))[0].avatar_display,earnedLook);
 
+  await switchRole(null,'system');
+  await sql("insert into community_private.avatar_reward_earned(member_id,achievement_id) values($1,'quest-first-clue')",[member]);
   await switchRole(member);
+  await refused(petAction('lantern-raccoon','adopt'));
+  await refused(petAction('trail-husky','pet',1),'22023');
+  const adopted=await petAction('trail-husky','adopt');
+  assert.deepEqual(adopted,{cosmetic_id:'trail-husky',name:'Trail Husky',bond:0,revision:1});
+  assert.deepEqual(await petAction('trail-husky','adopt'),adopted);
+  await refused(petAction('trail-husky','trick',1),'22023');
+  assert.equal((await petAction('trail-husky','pet',1)).bond,1);
+  assert.equal((await petAction('trail-husky','play',2)).bond,3);
+  await refused(petAction('trail-husky','play',2),'40001');
+  assert.equal((await petAction('trail-husky','play',3)).bond,5);
+  assert.equal((await petAction('trail-husky','pet',4)).bond,6);
+  assert.equal((await petAction('trail-husky','trick',5)).bond,7);
+  await refused(petAction('trail-husky','rename',6,' '),'22023');
+  const named=await petAction('trail-husky','rename',6,'  Scout  ');
+  assert.equal(named.name,'Scout');
+  assert.equal(named.bond,7);
+  await refused(sql('select * from community_private.avatar_pet'));
+  await switchRole(other);
+  assert.deepEqual(await petState(),[]);
+  await refused(petAction('trail-husky','pet',named.revision));
+  await switchRole(member);
+  assert.deepEqual(await petState(),[named]);
   await equip(null,2);
   const inactive=await state();
   assert.equal(inactive.active,false);

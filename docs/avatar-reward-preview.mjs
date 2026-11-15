@@ -1,8 +1,8 @@
-import {CATALOG,GROUPS,GAME_LABELS} from './avatar-reward-catalog.mjs?v=reward1';
+import {CATALOG,GROUPS,GAME_LABELS} from './avatar-reward-catalog.mjs?v=cel1';
 
 export function makePreviewRewardRPC(){
   let loadout=null,active=false,revision=0;
-  const outfits=new Map(),seen=new Set();
+  const outfits=new Map(),seen=new Set(),pets=new Map();
   const tiers=['starter','starter','bronze','bronze','silver','gold','legendary'];
   const completed=['mahjong-first-board','quest-first-clue'];
   const achievements=Object.entries(GROUPS).flatMap(([group,ids])=>ids.map((id,index)=>{
@@ -20,6 +20,27 @@ export function makePreviewRewardRPC(){
       loadout,active,revision,outfits:[...outfits.values()],achievements,catalog:CATALOG,plate_access:false,
       earned:[...owned].map(id=>({id,awarded_at:'2026-11-14T12:00:00Z',seen:seen.has(id)}))
     };
+    if(name==='community_avatar_pet_state')return [...pets.values()];
+    if(name==='community_avatar_pet_action'){
+      const id=args.p_cosmetic;
+      const item=CATALOG.find(candidate=>candidate.id===id&&candidate.slot==='companion');
+      if(!item||!owned.has(id))throw new Error('Earn this pet before adopting it');
+      let pet=pets.get(id);
+      if(args.p_action==='adopt'){
+        pet ||= {cosmetic_id:id,name:item.name,bond:0,revision:1};
+      }else{
+        if(!pet||pet.revision!==args.p_revision)throw Object.assign(new Error('Pet changed.'),{code:'40001'});
+        if(args.p_action==='trick'&&pet.bond<6)throw new Error('Build your bond to teach this trick');
+        if(args.p_action==='rename'){
+          if(!args.p_name?.trim()||args.p_name.length>30)throw new Error('Enter a pet name');
+          pet={...pet,name:args.p_name.trim(),revision:pet.revision+1};
+        }else{
+          pet={...pet,bond:Math.min(12,pet.bond+(args.p_action==='play'?2:1)),revision:pet.revision+1};
+        }
+      }
+      pets.set(id,pet);
+      return pet;
+    }
     if(name==='community_avatar_reward_seen'){
       args.p_ids.forEach(id=>seen.add(id));
       return true;

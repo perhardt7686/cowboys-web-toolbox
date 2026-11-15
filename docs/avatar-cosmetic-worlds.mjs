@@ -1,3 +1,5 @@
+import {PET_ART} from './avatar-pet-art.mjs?v=cel1';
+
 // Original vector illustrations for the family character canvas.
 // Props and companions occupy opposite shoulder corners of a 256×256 square.
 const INK = '#2c2045';
@@ -136,28 +138,39 @@ function shell(ctx, fill, accent, center) {
 
 const props = [
   ['rubber-chicken','Rubber Chicken',ctx => {
-    floorShadow(ctx,0,27,22);
-    for (const x of [-10,4]) line(ctx,[[x,9],[x-1,24],[x+3,26],[x-5,26]],AMBER,3);
-    path(ctx,[-22,1],[[-23,15,-10,18,3,13],[13,10,17,3,14,-4],[7,-9,11,-18,16,-19],[22,-21,23,-29,16,-31],
-      [9,-35,2,-31,2,-23],[-4,-19,-3,-9,-5,-6],[-14,-9,-23,-16,-25,-13],[-23,-4,-22,1]],GOLD);
-    ell(ctx,17,-29,4,6,CORAL,INK,1.5);
-    poly(ctx,[[21,-26],[30,-23],[22,-19]],AMBER,INK,1.7);
-    ell(ctx,17,-20,3.4,4.5,RED);
-    eye(ctx,14,-26,2.8);
-    path(ctx,[-17,3],[[-8,-5,3,-6],[-1,9,-12,11]],AMBER,INK,1.4);
-    highlight(ctx,-16,-1,4);
+    floorShadow(ctx,0,29,26);
+    path(ctx,[-10,12],[[-12,20],[-15,25,-10,27],[-2,27,-2,29],[-13,30,-17,26],[-15,15]],AMBER,INK,1.55);
+    path(ctx,[3,11],[[3,19],[6,24,13,26],[11,29,2,27],[-1,23],[-2,15]],AMBER,INK,1.55);
+    path(ctx,[-24,-4],[[-19,0,-15,-2,-8,-1],[-2,-6,-1,-19,4,-24],[4,-33,14,-37,21,-32],
+      [26,-29,24,-19,20,-17],[15,-13,14,-9,16,-5],[23,8,9,17,-4,17],
+      [-17,17,-24,10,-22,4],[-32,-1,-31,-7,-24,-4]],'#e3a043');
+    path(ctx,[-23,5],[[-13,10,-6,5,5,4],[15,-1,12,-7,15,-14],[16,-17,20,-20,23,-22],
+      [23,-14,15,-11,16,-5],[22,8,10,18,-9,16],[-16,14,-20,12,-23,5]],'#b76c3d',null);
+    path(ctx,[-16,5],[[-9,-3,6,-3,10,0],[5,9,-5,12,-13,10],[-18,8,-18,7,-16,5]],'#eeb35c',INK,1.6);
+    path(ctx,[-12,4],[[-5,2,4,2,5,3]],null,CREAM,1.65);
+    path(ctx,[9,-32],[[7,-40,12,-40,14,-36],[13,-42,19,-40,19,-36],[22,-41,26,-37,24,-32],
+      [22,-29,15,-32,9,-32]],RED,INK,1.7);
+    path(ctx,[22,-26],[[29,-28,32,-25,34,-22],[29,-19,25,-19,21,-21]],'#e9a75c',INK,1.6);
+    ell(ctx,17,-26,4,5,CREAM,INK,1.3);ell(ctx,18,-26,2,2.8,INK);
+    path(ctx,[22,-20],[[26,-17,25,-12,22,-12],[19,-12,18,-17,22,-20]],RED,INK,1.35);
+    path(ctx,[7,-26],[[9,-19,3,-12,3,-8]],null,'#ffe2a0',2);
   }],
   ['viking-shield','Runic Viking Shield',ctx => {
-    floorShadow(ctx,0,28,24);
-    ell(ctx,0,-3,27,28,INK);
-    ell(ctx,0,-3,23.5,24.5,GOLD);
-    ell(ctx,0,-3,20.5,21.5,'#9d5756',INK,1.6);
-    line(ctx,[[-13,-19],[-13,13]],'#633d56',1.8);
-    line(ctx,[[11,-20],[11,14]],'#633d56',1.8);
-    for (const [x,y] of [[-16,-15],[16,-15],[-17,9],[17,9],[0,17]]) ell(ctx,x,y,1.7,1.7,CREAM);
-    ell(ctx,0,-3,8,8,SKY,INK,2);
-    highlight(ctx,-2,-6,3);
-    line(ctx,[[-4,-18],[0,-21],[4,-18]],CREAM,1.5);
+    floorShadow(ctx,0,30,23);
+    ell(ctx,1,-2,27,29,'#593a36',INK,2.6,-.15);
+    ell(ctx,-2,-4,25,27,'#c09660',INK,2.2,-.15);
+    ell(ctx,-2,-4,21,22,'#815341',INK,1.8,-.15);
+    path(ctx,[-17,-18],[[-14,-9,-17,6,-13,12]],null,'#c58b64',1.8);
+    path(ctx,[-10,-24],[[-8,-5,-13,9,-7,16]],null,'#533543',1.55);
+    path(ctx,[7,-23],[[9,-8,7,5,11,15]],null,'#5e3a3f',1.7);
+    path(ctx,[13,-20],[[15,-7,15,1,16,5]],null,'#c58b64',1.3);
+    for(const [x,y] of [[-17,-22],[0,-28],[17,-18],[21,-2],[14,14],[-2,21],[-20,11],[-24,-6]])
+      ell(ctx,x,y,1.7,1.7,'#f0cb8c',INK,.8);
+    ell(ctx,-2,-5,11,10,'#78737b',INK,2.2);
+    ell(ctx,-3,-6,8,7.5,'#a6aaa8',INK,1.1);
+    path(ctx,[-8,-6],[[-7,-11,-1,-12,2,-10]],null,'#fff2d3',1.55);
+    line(ctx,[[-9,12],[-7,6],[-4,11],[-9,9]],CREAM,1.25);
+    line(ctx,[[9,4],[10,13],[6,10],[12,8]],CREAM,1.25);
   }],
   ['magic-wand','Star-Tipped Magic Wand',ctx => {
     line(ctx,[[-20,27],[15,-20]],INK,7.5);
@@ -1628,5 +1641,6 @@ export const WORLDS = Object.freeze([
   ...props.map(item=>shoulder('prop',item)),
   ...companions.map(item=>shoulder('companion',item)),
   ...backgrounds.map(item=>scene('background',item)),
-  ...effects.map(item=>scene('effect',item))
+  ...effects.map(item=>scene('effect',item)),
+  ...PET_ART.map(item=>shoulder('companion',item))
 ]);

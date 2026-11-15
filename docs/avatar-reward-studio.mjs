@@ -1,11 +1,14 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=reward1';
-import {normalizeLoadout, paintThumbnail, renderLoadout} from './avatar-reward-render.mjs?v=reward1';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=cel1';
+import {normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=cel1';
+
+import {prizeAction} from './avatar-prize-actions.mjs?v=cel1';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=cel1';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
 const gameEntries={mahjong:'mahjong-toggle',wordle:'letter-lock-toggle',wordquest:'word-game-toggle',plates:'plate-game-open',hotrod:'hot-rod-entry'};
-const sections=[['avatar','My Avatar'],['collection','Unlockables'],['achievements','Achievements']];
+const sections=[['avatar','My Avatar'],['collection','Unlockables'],['pets','Pets'],['achievements','Achievements']];
 const num=value=>Number(value||0).toLocaleString();
 const row=(...children)=>{const n=el('div','avatar-reward-row');n.append(...children);return n;};
 const text=label=>el('p','avatar-reward-copy',label);
@@ -99,7 +102,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   let root=null,editor=null,pane=null,tabs=null,filters=null,results=null;
   let data=null,achievements=new Map(),owned=new Map(),epoch=0,query='',section='avatar';
   let slot='all',filter='all',game='all',sort='catalog',limit=PAGE,detail=null,loading=false,loadError='';
-  let pending=null,frame=0,lastFrame=0;
+  let pending=null,frame=0,lastFrame=0,stopDemo=()=>{},stopPreview=()=>{};
   let privateControls=null;
   const pendingAcks=new Set();
 
@@ -108,6 +111,13 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function have(id){return owned.has(id);}
   const contains=()=>root?.isConnected&&checkAccess();
   const catalog=()=>data?.catalog?.length?data.catalog.map(spec=>BY_ID.get(spec.id)).filter(Boolean):CATALOG;
+
+  const reduceAnimation=()=>Boolean(reduceMotion?.()||document.body.classList.contains('forum-reduce-motion'));
+  const pets=createPetStudio({
+    rpc,catalog,have,unlocksKnown:()=>Boolean(data),checkError:()=>loadError,
+    openReward:item=>setSection('collection',item.id),tryOn,reduceMotion:reduceAnimation,
+    isOpen:()=>contains()&&section==='pets'&&Boolean(pane?.getClientRects().length)
+  });
 
   async function refresh(){
     if(!checkAccess())return null;
@@ -138,6 +148,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function setSection(next, id=null){
     section=sections.some(([key])=>key===next)?next:'avatar';
     detail=id;
+    if(section==='pets')pets.showPet(id);
     if(contains()){
       draw();
       if(detail)focusDetail();
@@ -169,11 +180,12 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     if(!contains())return;
     const canvas=root.querySelector('#family-avatar-canvas');
     if(!canvas)return;
+    stopPreview();
     cancelAnimationFrame(frame);
     const draft=normalizeLoadout(getLoadout());
     const quick=Object.values(draft.cosmetics).map(id=>BY_ID.get(id));
     const animate=quick.some(item=>item.animated)&&!document.hidden&&
-      !reduceMotion?.()&&!document.body.classList.contains('forum-reduce-motion')&&
+      !reduceAnimation()&&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     renderLoadout(canvas,draft,0);
     if(!animate)return;
@@ -184,6 +196,20 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       frame=requestAnimationFrame(loop);
     };
     frame=requestAnimationFrame(loop);
+  }
+
+  function activateEquipped(item){
+    if(item.slot==='companion'){
+      setSection('pets',item.id);
+      return;
+    }
+    const canvas=root?.querySelector('#family-avatar-canvas');
+    if(!canvas||!contains())return;
+    const draft=normalizeLoadout(getLoadout());
+    cancelAnimationFrame(frame);
+    stopPreview();
+    stopPreview=playCel(canvas,progress=>renderLoadout(canvas,draft,0,{id:item.id,progress}),reduceAnimation);
+    setStatus(prizeAction(item).description);
   }
 
   function drawEquipped(){
@@ -197,7 +223,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       const label=el('span','',item.name+(have(item.id)?'':' · Preview only'));
       const remove=asButton('Remove',()=>forget(item));
       remove.setAttribute('aria-label','Remove '+item.name);
-      panel.append(row(label,remove));
+      const activate=asButton(item.slot==='companion'?'Visit pet':'Activate',()=>activateEquipped(item));
+      activate.setAttribute('aria-label',(item.slot==='companion'?'Visit ':'Activate ')+item.name);
+      panel.append(row(label,activate,remove));
     }
   }
 
@@ -327,10 +355,22 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     const card=el('article','avatar-reward-detail');
     const header=row(asButton('Back to collection',()=>{detail=null;renderResults();}),el('span','avatar-reward-tag',
       RARITIES[item.tier]+' · '+(have(item.id)?'Unlocked':'Locked')));
-    card.append(header,thumbnail(item,154),title,asButton('Try it on',()=>tryOn(item),'primary'));
+    const stage=el('div','avatar-prize-stage');
+    const art=thumbnail(item,224);
+    art.classList.add('avatar-prize-art');
+    const content=el('div','avatar-prize-copy');
+    const action=prizeAction(item);
+    const state=el('p','avatar-prize-caption',action.description);
+    const handle=item.slot==='companion'?()=>setSection('pets',item.id):()=>{
+      stopDemo();
+      stopDemo=playCel(art,progress=>paintPrizeDemo(art,item,progress),reduceAnimation);
+    };
+    content.append(title,state,row(asButton(action.label,handle,'primary'),asButton('Try it on',()=>tryOn(item))));
+    stage.append(art,content);
+    card.append(header,stage);
     if(achievement)card.append(el('h4','',achievement.name));
     card.append(requirements(achievement));
-    if(have(item.id)) card.append(text('Try it on, then save your avatar to keep it.'));
+    if(have(item.id))card.append(text('Try it on, then save your avatar to keep it.'));
     results.append(card);
   }
 
@@ -380,6 +420,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
 
   function renderResults(){
     if(!results)return;
+    stopDemo();
     results.replaceChildren();
     const selected=detail&&BY_ID.get(detail);
     if(section==='collection'&&selected){
@@ -395,6 +436,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       count.setAttribute('aria-live','polite');results.append(count);listItems(items);
     }else if(section==='achievements'){
       filters.hidden=false;renderAchievements();
+    }else if(section==='pets'){
+      filters.hidden=true;
+      pets.mount(results);
     }
   }
 
@@ -447,6 +491,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     editor.prepend(tabs);pane.append(filters,results);editor.append(pane);
     privateControls=root.querySelector('.family-avatar-methods');
     section=nextSection;detail=item;
+    if(section==='pets')pets.showPet(item);
     draw();
     if(detail)focusDetail();
     void refresh();
@@ -460,6 +505,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     query='';section='avatar';slot=filter=game='all';sort='catalog';limit=PAGE;detail=null;
     root=editor=pane=results=filters=tabs=privateControls=null;
     cancelAnimationFrame(frame);
+    stopDemo();
+    stopPreview();
+    pets.clear();
   }
 
   async function acknowledge(items){

@@ -22,7 +22,7 @@ async def visit(browser, width, full=False):
     before = await canvas.evaluate('n=>n.toDataURL()')
     await editor.get_by_role('button', name='Save outfit', exact=True).wait_for()
     await editor.get_by_role('button', name='Unlockables', exact=True).click()
-    await expect(editor.get_by_text('251 rewards')).to_be_visible()
+    await expect(editor.get_by_text('253 rewards')).to_be_visible()
     for node in [editor.get_by_role('button', name='Unlockables', exact=True),
                  editor.get_by_role('searchbox', name='Search rewards')]:
         box = await node.bounding_box()
@@ -38,6 +38,13 @@ async def visit(browser, width, full=False):
         await editor.get_by_role('button', name='Save my avatar').click()
         await expect(editor.get_by_text('Remove the preview-only items before saving your avatar.')).to_be_visible()
         await card.get_by_role('button', name='See Dragon Crown').click()
+        artwork = editor.locator('.avatar-prize-art')
+        resting = await artwork.evaluate('node => node.toDataURL()')
+        await editor.get_by_role('button', name='Wake the dragon').click()
+        assert resting != await artwork.evaluate('node => node.toDataURL()'), 'Dragon embers'
+        resting = await canvas.evaluate('node => node.toDataURL()')
+        await editor.get_by_role('button', name='Activate Dragon Crown').click()
+        assert resting != await canvas.evaluate('node => node.toDataURL()'), 'Equipped dragon embers'
         await page.evaluate("""()=>{
           const root=document.createElement('section'); root.id='mahjong-root';
           root.innerHTML='<button id="mahjong-toggle" type="button" aria-expanded="false">Fixture Mahjong</button><div id="mahjong-play">Fixture game</div>';
@@ -66,21 +73,64 @@ async def visit(browser, width, full=False):
         await editor.get_by_role('textbox', name='Outfit name').fill('Taco night')
         await editor.get_by_role('button', name='Save outfit', exact=True).click()
         await expect(editor.get_by_role('button', name='Taco night', exact=True)).to_be_visible()
+        await editor.get_by_role('button', name='Pets', exact=True).click()
+        pet_picker = editor.get_by_role('combobox', name='Choose a pet')
+        await pet_picker.select_option('lantern-raccoon')
+        await expect(editor.get_by_text('Game reward · Locked')).to_be_visible()
+        await expect(editor.get_by_role('button', name='Adopt', exact=True)).to_have_count(0)
+        portrait = editor.locator('.avatar-pet-portrait')
+        resting = await portrait.evaluate('node => node.toDataURL()')
+        await editor.get_by_role('button', name='Preview pet', exact=True).click()
+        assert resting != await portrait.evaluate('node => node.toDataURL()'), 'Locked pet preview'
+        await editor.get_by_role('button', name='See how to earn it').click()
+        await expect(editor.get_by_role('heading', name='Lantern Raccoon')).to_be_visible()
+        await expect(editor.get_by_role('button', name='Play Hot Rod to unlock')).to_be_visible()
+        await editor.get_by_role('button', name='Pets', exact=True).click()
+        await pet_picker.select_option('trail-husky')
+        await editor.get_by_role('button', name='Adopt', exact=True).click()
+        await expect(editor.get_by_text('Trail Husky is home.')).to_be_visible()
+        await expect(editor.get_by_role('button', name='Show trick')).to_be_disabled()
+        for bond in [2,4,6]:
+            await editor.get_by_role('button', name='Play', exact=True).click()
+            await expect(editor.get_by_text(f'Bond {bond} / 12')).to_be_visible()
+        await editor.get_by_role('button', name='Show trick').click()
+        await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
+        await expect(editor.get_by_text('Does a double hop with a trail of stars.')).to_be_visible()
+        await editor.get_by_text('Rename pet', exact=True).click()
+        await editor.get_by_role('textbox', name='Pet name').fill('Scout')
+        await editor.get_by_role('button', name='Save name').click()
+        await expect(editor.get_by_role('heading', name='Scout')).to_be_visible()
+        await editor.get_by_role('button', name='Take along').click()
+        await expect(editor.locator('#avatar-equipped').get_by_text('Trail Husky', exact=True)).to_be_visible()
+        await editor.get_by_role('button', name='Save my avatar').click()
+        await expect(editor.get_by_text('Preview saved locally for this session.')).to_be_visible()
+        await page.locator('#content-dialog').evaluate('node => node.close()')
+        await page.locator('#family-avatar-quick').click()
+        await editor.get_by_role('button', name='Pets', exact=True).click()
+        await pet_picker.select_option('trail-husky')
+        await expect(editor.get_by_role('heading', name='Scout')).to_be_visible()
+        await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
+        assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth') <= 2
         art = await page.evaluate("""async()=>{
-          const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=reward1');
-          const {paintThumbnail,renderLoadout}=await import('/avatar-reward-render.mjs?v=reward1');
-          const seen=new Set(), unchanged=[];
+          const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=cel1');
+          const {paintThumbnail,paintPrizeDemo,drawPetPortrait,renderLoadout}=await import('/avatar-reward-render.mjs?v=cel1');
+          const seen=new Set(), unchanged=[], inert=[];
           for(const item of CATALOG){
             const canvas=document.createElement('canvas');canvas.width=canvas.height=96;
             paintThumbnail(canvas,item); seen.add(canvas.toDataURL());
+            if(item.slot==='companion')drawPetPortrait(canvas,item);
+            const idle=canvas.toDataURL();
+            if(item.slot==='companion')drawPetPortrait(canvas,item,'trick',.43);
+            else paintPrizeDemo(canvas,item,.43);
+            if(idle===canvas.toDataURL())inert.push(item.id);
             const test=document.createElement('canvas');test.width=test.height=128;
             renderLoadout(test,{}); const initial=test.toDataURL();
             renderLoadout(test,{cosmetics:{[item.slot]:item.id}});
             if(initial===test.toDataURL())unchanged.push(item.id);
           }
-          return [seen.size,unchanged];
+          return [seen.size,unchanged,inert];
         }""")
-        assert art == [251, []], art
+        assert art == [253, [], []], art
     assert not errors, (width, errors)
     (ROOT/'reports').mkdir(exist_ok=True)
     if width in (390,1280):
@@ -96,7 +146,7 @@ async def main():
             await visit(browser, width, full=width == 390)
         await browser.close()
         safari = await p.webkit.launch()
-        await visit(safari,390)
+        await visit(safari,390,full=True)
         await safari.close()
 
 
