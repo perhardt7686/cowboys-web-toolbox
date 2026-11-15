@@ -1,5 +1,5 @@
-import {THREE} from './avatar-studio-geometry.mjs?v=studio3';
-import {inkWidth} from './avatar-studio-ink.mjs?v=studio3';
+import {THREE} from './avatar-studio-geometry.mjs?v=workshop1';
+import {inkWidth} from './avatar-studio-ink.mjs?v=workshop1';
 
 const linearToSrgb=value=>{
   const clipped=Math.max(0,Math.min(1,value));

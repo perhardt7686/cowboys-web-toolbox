@@ -1,10 +1,10 @@
 import {button,el} from './family-board-core.mjs?v=family3';
-import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
-import {playCel} from './avatar-reward-render.mjs?v=studio3';
-import {createPetTradeUI} from './avatar-pet-trading.mjs?v=toon3';
+import {petBehavior} from './avatar-prize-actions.mjs?v=workshop1';
+import {playCel} from './avatar-reward-render.mjs?v=workshop1';
+import {createPetTradeUI} from './avatar-pet-trading.mjs?v=workshop1';
 
-import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
-import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=studio3';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
+import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=workshop1';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;
@@ -81,7 +81,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     const known=unlocksKnown();
     const earned=chosen.filter(item=>have(item.id)||pets.has(item.id));
     const waiting=chosen.filter(item=>!have(item.id)&&!pets.has(item.id));
-    const item=chosen.find(entry=>entry.id===selected)||earned[0]||chosen.find(entry=>entry.id==='trail-husky');
+    const item=chosen.find(entry=>entry.id===selected)||earned[0]||chosen[0];
     if(!item)return;
     selected=item.id;
     const pet=pets.get(item.id),owned=have(item.id)||Boolean(pet);
@@ -129,7 +129,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
       }));
     }else if(!pet){
       const adopt=actionButton('Adopt',()=>void act(item,'adopt'),'primary');adopt.dataset.petAction='adopt';
-      details.append(el('p','avatar-reward-copy','Earned in a game'),adopt);
+      details.append(el('p','avatar-reward-copy',item.id==='studio-attic-ghost'?'Starter companion':'Earned in a game'),adopt);
     }else{
       const bar=el('progress','avatar-reward-meter');
       bar.max=BOND_MAX;bar.value=pet.bond;bar.setAttribute('aria-label','Pet bond');

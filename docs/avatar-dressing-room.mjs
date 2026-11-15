@@ -1,12 +1,12 @@
-import {THREE,attach,color,disposeFigure,group,hash,picture,shade,surface} from './avatar-studio-geometry.mjs?v=studio3';
-import {buildAvatar} from './avatar-studio-character.mjs?v=finish5';
-import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
-import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=finish5';
-import {normalizeLoadout} from './avatar-reward-render.mjs?v=finish5';
-import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=studio3';
-import {createInkLayer,drawInkedRoom} from './avatar-studio-ink.mjs?v=studio3';
-import {poseStudioAction} from './avatar-studio-actions.mjs?v=finish5';
-import {paintMysteryBackdrop} from './avatar-mystery-backdrops.mjs?v=ink4';
+import {THREE,attach,color,disposeFigure,group,hash,picture,shade,surface} from './avatar-studio-geometry.mjs?v=workshop1';
+import {buildAvatar} from './avatar-studio-character.mjs?v=workshop1';
+import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=workshop1';
+import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=workshop1';
+import {normalizeLoadout} from './avatar-reward-render.mjs?v=workshop1';
+import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=workshop1';
+import {createInkLayer,drawInkedRoom} from './avatar-studio-ink.mjs?v=workshop1';
+import {poseStudioAction} from './avatar-studio-actions.mjs?v=workshop1';
+import {paintMysteryBackdrop} from './avatar-mystery-backdrops.mjs?v=workshop1';
 
 const PALETTES={
   lavender:['#9baec6','#63778d','#50596d'],night:['#6d7995','#454963','#30354a'],
@@ -21,6 +21,31 @@ const PALETTES={
 let runtime,activeView=null;
 const views=new WeakMap();
 const savedBackdrops=new Map();
+const paintedScenes=new Map();
+const setByColor={lavender:'attic',night:'attic',ocean:'rain',mint:'rain',moss:'rain',
+  sky:'observatory',cloud:'observatory',heather:'tower',sand:'tower',sunset:'backlot',peach:'backlot',
+  rose:'workshop',ochre:'workshop',sunflower:'workshop'};
+
+export function roomSceneURL(theme){
+  return new URL('./avatar-scenes/'+theme+'.webp?v=paint1',import.meta.url).href;
+}
+
+function paintedTexture(theme){
+  if(paintedScenes.has(theme))return paintedScenes.get(theme);
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=512;
+  const context=canvas.getContext('2d');
+  paintMysteryBackdrop(context,theme,{width:512,height:512});
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+  const image=new Image();
+  image.onload=()=>{
+    context.drawImage(image,0,0,512,512);
+    texture.needsUpdate=true;
+    document.dispatchEvent(new CustomEvent('avatar-scene-ready',{detail:theme}));
+  };
+  image.src=roomSceneURL(theme);
+  paintedScenes.set(theme,texture);
+  return texture;
+}
 
 function clothBackground(palette,theme=''){
   const key=palette.join(':')+theme;
@@ -125,7 +150,8 @@ function viewFor(canvas,kind,key,create){
   const existing=views.get(canvas);
   if(existing?.signature===key&&existing.kind===kind)return existing;
   if(existing)releaseStudioView(canvas);
-  const next={signature:key,kind,actor:create(),camera:null};
+  const actor=create(),bounds=new THREE.Box3().setFromObject(actor.root);
+  const next={signature:key,kind,actor,bounds,camera:null};
   views.set(canvas,next);
   return next;
 }
@@ -199,10 +225,13 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   actor.root.updateMatrixWorld(true);
   const cameraZoom=view.zoom||1;
   const aspect=canvas.width/canvas.height;
-  const bodyHeight=Math.max(3.54,actor.figure.scale.y*3.49,2.02/aspect);
+  // Fit the entire assembled cast, including long props and different size heads.
+  const {min,max}=state.bounds;
+  const extent=(Math.max(Math.abs(min.x),Math.abs(max.x))+.13)*2;
+  const bodyHeight=Math.max(3.04,max.y-min.y+.44,extent/Math.max(.62,aspect));
   const scale=actor.figure.scale.y;
   const full={x:(actor.pet?.root.position.x||0)*.14-(view.x||0)/145,
-    y:1.47*scale+(view.y||0)/160,height:bodyHeight,zoom:cameraZoom};
+    y:(max.y+min.y)*.5+.015+(view.y||0)/160,height:bodyHeight,zoom:cameraZoom,anglePitch:.081};
   const crop={x:.015,y:(actor.hat?2.47:2.34)*scale,height:(actor.hat?1.12:.92)*scale,anglePitch:.018};
   if(view.zoom>=2.3&&view.y>=158)full.y=2.41*scale;
   const action=poseStudioAction(actor,time,motion,active.aura);
@@ -210,7 +239,9 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   canvas.dataset.studioReaction=action.response;
   const backgroundItem=actor.cosmetics.background;
   const palette=paletteFor(recipe,backgroundItem);
-  return draw(canvas,state,frame==='portrait'?crop:full,clothBackground(palette,backgroundItem?.id||recipe.background),palette[1],frame!=='portrait');
+  const theme=backgroundItem?.scene||(!backgroundItem&&setByColor[recipe.background]);
+  const background=theme?paintedTexture(theme):clothBackground(palette,backgroundItem?.id||recipe.background);
+  return draw(canvas,state,frame==='portrait'?crop:full,background,palette[1],frame!=='portrait'&&!theme);
 }
 
 export function paintRoomPet(canvas,item,view={},activity){
@@ -222,10 +253,10 @@ export function paintRoomPet(canvas,item,view={},activity){
   active.aura.intensity=0;
   const main=rewardPigment(item);
   const palette=['#c8bbca','#8c8ca4','#565672'].map((hex,i)=>color(hex).lerp(color(main),.15+i*.08).getStyle());
-  const gargoyle=item.id==='bell-tower-gargoyle';
+  const gargoyle=item.id==='bell-tower-gargoyle'||item.art==='gargoyle';
   return draw(canvas,state,{x:-(view.x||0)/700,y:(gargoyle?.408:.342)+(view.y||0)/600,
     height:Math.max(gargoyle?1.19:activity?1.08:.952,.91/(canvas.width/canvas.height)),zoom:view.zoom||1,anglePitch:.049},
-  clothBackground(palette,item.id),palette[1],false);
+  paintedTexture(item.collection||'attic'),palette[1],false);
 }
 
 export function paintRoomPrize(canvas,item,activity=null){
@@ -254,12 +285,12 @@ export function paintRoomPrize(canvas,item,activity=null){
   const recipe={...base,hat:'none',glasses:'none',beard:'none',back:'none',
     full_body:{...full,back:item.slot==='back'?'pack':'none',outerwear:'none'},
     cosmetics:{[item.slot]:item.id}};
-  const angle=item.slot==='back'?148:16;
+  const angle=item.slot==='back'?148:24;
   return paintRoomAvatar(canvas,recipe,{angle},0,activity?{id:item.id,...activity}:null,portrait?'portrait':'body');
 }
 
 export function paintRoomLook(canvas,id){
-  return paintRoomAvatar(canvas,SHOWROOM_LOOKS[id],{angle:22},0,null,'portrait');
+  return paintRoomAvatar(canvas,SHOWROOM_LOOKS[id],{angle:23},0,null,'body');
 }
 
 export function hitStudioAvatar(canvas,x,y){

@@ -207,15 +207,6 @@ body.community-page .profile-studio .studio-tabs button[aria-selected=false]{
 body.community-page .profile-studio .avatar-reward-tabs button{
   overflow-wrap:normal;
 }
-body.community-page .family-character-editor[data-reward-view=pets] :is(.family-character-top,#avatar-equipped){
-  display:none;
-}
-body.community-page .family-character-editor[data-reward-view=pets] .avatar-reward-pane{
-  grid-column:1/-1;margin-top:0;
-}
-body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden]) [data-avatar-method-panel=character]:not([hidden]) [data-reward-view=pets]) .profile-save-area{
-  display:none;
-}
 @media(max-width:440px){
   body.community-page .profile-studio .avatar-reward-tabs button{
     padding:6px 4px;font-size:clamp(.84rem,3.75vw,1rem)!important;

@@ -1,4 +1,4 @@
-import {INK,PAPER,glint,oval,path} from './avatar-cel-art.mjs?v=cel1';
+import {INK,PAPER,glint,oval,path} from './avatar-cel-art.mjs?v=workshop1';
 
 const LIGHTS = {
   ember:'#ffaf57', ice:'#8ff7f0', gold:'#ffd278', orchid:'#e7a3ff',
@@ -42,11 +42,13 @@ const special = {
 export function prizeAction(item) {
   if(item.slot==='companion')return {kind:'pet',label:'Meet this pet',description:'Earn it in a game to adopt, play and teach a trick.',accent:LIGHTS.gold};
   const [kind,label,description,light]=item.action||special[item.id]
-    ||signatures.find(([match])=>match.test(item.id))?.slice(1)||bySlot[item.slot];
+    ||signatures.find(([match])=>match.test(item.id))?.slice(1)||bySlot[item.slot]||['polish','Inspect the fit','Turn in the light to inspect the fit.','gold'];
   return {kind,label,description,accent:LIGHTS[light]};
 }
 
 const petMoves = {
+  'studio-observatory-moth':['Softly folds its wings.','Flutters in a loop after a light.','Lands beside the warm instrument lens.','glide','gold','Lamp landing'],
+  'studio-attic-ghost':['Bobs into your hand.','Swirls once around its attic lamp.','Raises its warm lamp to light the floor.','float','gold','Attic glimmer'],
   'bell-tower-gargoyle':['Closes its stone wings.','Springs off the perch.','Unfolds into a full bell-tower salute.','hop','gold','Bell-tower salute'],
   'fog-hound':['Lowers its muzzle into your hand.','Sniffs a ribbon of fog.','Tracks a scent through rolling mist.','glide','mint','Fog trail'],
   'lamp-house-ghost':['Glows softly under its sheet.','Bobs down the hallway.','Lights its lantern from the inside.','float','gold','Lantern flare'],
@@ -101,7 +103,7 @@ const petMoves = {
 };
 
 export function petBehavior(item, action) {
-  const [pet,play,trick,move,light,trickName]=petMoves[item.id]||['Looks up at you.','Bounces happily.','Performs a little trick.','wobble','gold','Little surprise'];
+  const [pet,play,trick,move,light,trickName]=petMoves[item.id]||petMoves[{'hound':'fog-hound','gargoyle':'bell-tower-gargoyle','gremlin':'wind-up-gremlin'}[item.art]]||['Looks up at you.','Bounces happily.','Performs a little trick.','wobble','gold','Little surprise'];
   const cue=action==='trick'
     ? /bubble|whirlpool/.test(trickName.toLowerCase())?'bubbles':item.id==='lantern-raccoon'?'lamp':
       /beam|scanner/.test(trickName.toLowerCase())?'scan':

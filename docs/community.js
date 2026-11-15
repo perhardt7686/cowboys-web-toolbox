@@ -1,5 +1,5 @@
 import {CATEGORIES,RULES_VERSION,escapeHTML as esc,renderBody,initials,displayName,validatePost,edwardReply,canPost,safeHttps,reviewContent} from './community-core.mjs';
-import {createProfileStudio} from './community-profiles.mjs?v=finish5';
+import {createProfileStudio} from './community-profiles.mjs?v=workshop1';
 import {createOwnerCenter} from './community-owner.mjs?v=lab1-core1';
 import {PROFILE_DEFAULTS} from './profile-core.mjs?v=powers1';
 import {createPowerHouse} from './community-powers.mjs?v=private1';
@@ -40,7 +40,7 @@ const previewRows=[
 let demoThreads=previewRows.map(r=>({...r})),demoReplies=new Map(),demoMembers=[{user_id:'66666666-6666-4666-8666-666666666666',display_name:'Example new member',status:'pending',created_at:'2026-10-23T12:15:00Z'}];
 const timeLabel=value=>{const date=new Date(value);if(!Number.isFinite(date.getTime()))return 'Recently';return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric'}).format(date)};
 function toast(message){$('community-toast').textContent=message;$('community-toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('community-toast').hidden=true,4000)}
-function showDialog(html,{allowUnapproved=false}={}){if(!allowUnapproved&&!canReadBoard(state.member))return;$('content-dialog').classList.remove('profile-dialog','member-dialog','power-dialog');$('dialog-content').innerHTML=html;const dialog=$('content-dialog');if(!dialog.open)dialog.showModal();}
+function showDialog(html,{allowUnapproved=false}={}){if(!allowUnapproved&&!canReadBoard(state.member))return;$('content-dialog').classList.remove('profile-dialog','member-dialog','power-dialog','studio-workspace-dialog');$('dialog-content').innerHTML=html;const dialog=$('content-dialog');if(!dialog.open)dialog.showModal();}
 function closeDialogs(){document.querySelectorAll('dialog[open]').forEach(d=>d.close())}
 function formMessage(form,message,success=false){let target=form.querySelector('.form-message');if(!target){target=document.createElement('div');target.className='form-message';target.setAttribute('role','alert');form.prepend(target)}target.classList.toggle('success',success);target.textContent=message;}
 function errorMessage(error){return error instanceof Error?error.message:'Please try again in a moment.';}
@@ -66,7 +66,7 @@ function renderBoardAccess(){
       const host=$('family-overview');
       if(host&&!host.childNodes.length){
         const id=state.member.user_id;
-        void import('./avatar-reward-studio.mjs?v=studio3').then(({makeAvatarShowcase})=>{
+        void import('./avatar-reward-studio.mjs?v=workshop1').then(({makeAvatarShowcase})=>{
           if(!canReadBoard(state.member)||state.member.user_id!==id||host.childNodes.length)return;
           host.hidden=false;
           host.append(makeAvatarShowcase(item=>void showProfile('avatar',{section:'collection',item})));

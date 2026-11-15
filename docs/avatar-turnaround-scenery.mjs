@@ -1,5 +1,5 @@
-import {oval,path,tint} from './avatar-cel-art.mjs?v=cel1';
-import {STAGE_WIDTH as W,STAGE_HEIGHT as H} from './avatar-full-body.mjs?v=turn1';
+import {oval,path,tint} from './avatar-cel-art.mjs?v=workshop1';
+import {STAGE_WIDTH as W,STAGE_HEIGHT as H} from './avatar-full-body.mjs?v=workshop1';
 
 const settings={
   lavender:['#393958','#786476','#d6ad79','#343b51','#252c3f'],

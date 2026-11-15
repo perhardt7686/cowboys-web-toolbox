@@ -1,7 +1,7 @@
 /* Mystery Cartoon 1970: expressive hand-inked faces, six wildly different
    hair silhouettes, groovy clothes, and oversized original eyewear.
    All original Canvas art. No licensed characters or tracing. */
-import {INK,PAPER,tint,path,oval,glint} from './avatar-cel-art.mjs?v=cel1';
+import {INK,PAPER,tint,path,oval,glint} from './avatar-cel-art.mjs?v=workshop1';
 const shade=c=>tint(c,'#372735',.52);
 const light=c=>tint(c,'#ffe7bf',.38);
 function line(c,p,width=3,color=INK){

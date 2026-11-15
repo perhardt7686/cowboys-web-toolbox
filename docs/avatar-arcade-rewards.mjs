@@ -2,7 +2,7 @@
  * No sprites, logos, or characters are copied from commercial arcade games.
  * Every reward visibly changes the avatar or surrounding mystery-cartoon scene.
  */
-import {INK,PAPER,oval,path,glint} from './avatar-cel-art.mjs?v=cel1';
+import {INK,PAPER,oval,path,glint} from './avatar-cel-art.mjs?v=workshop1';
 const G='#ffd47a',Q='#8be8db',V='#ab8cdb',C='#f6a5a4',D='#302640';
 function ellipse(c,x,y,w,h,fill,stroke=INK,line=2,angle=0){oval(c,x,y,w,h,fill,stroke,line,angle)}
 function polygon(c,pts,fill,stroke=INK,width=2){

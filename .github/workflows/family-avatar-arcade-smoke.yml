@@ -65,6 +65,7 @@ jobs:
             reports/avatar-studio-desktop.png
             reports/avatar-cartoon-iphone.png
             reports/avatar-cartoon-interaction.webm
+            reports/avatar-workshop-*.png
             reports/avatar-rewards-*.png
             reports/avatar-wardrobe-audit.png
             reports/avatar-face-silhouettes.png

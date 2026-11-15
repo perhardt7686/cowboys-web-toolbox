@@ -1,9 +1,9 @@
-import {INK,PAPER,glint,oval,path,tint} from './avatar-cel-art.mjs?v=cel1';
-import {paintAura,paintReaction,petBehavior,prizeAction} from './avatar-prize-actions.mjs?v=turn1';
-import {STAGE_WIDTH as W,STAGE_HEIGHT as H,normalizeBody,fitsBody,CENTER} from './avatar-full-body.mjs?v=turn1';
-import {figureAt,paintFigure} from './avatar-turnaround-figure.mjs?v=turn1';
-import {paintHead} from './avatar-turnaround-head.mjs?v=turn1';
-import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=turn1';
+import {INK,PAPER,glint,oval,path,tint} from './avatar-cel-art.mjs?v=workshop1';
+import {paintAura,paintReaction,petBehavior,prizeAction} from './avatar-prize-actions.mjs?v=workshop1';
+import {STAGE_WIDTH as W,STAGE_HEIGHT as H,normalizeBody,fitsBody,CENTER} from './avatar-full-body.mjs?v=workshop1';
+import {figureAt,paintFigure} from './avatar-turnaround-figure.mjs?v=workshop1';
+import {paintHead} from './avatar-turnaround-head.mjs?v=workshop1';
+import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=workshop1';
 
 const dye=['#a06446','#9f535d','#51777a','#785c8b','#956745','#6f845e','#435c77','#c68f4c'];
 const scopeFor={hat:[128,56,193],hair:[128,85,188],eyewear:[128,123,168],eyes:[128,128,164],

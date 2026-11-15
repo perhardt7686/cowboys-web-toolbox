@@ -1,4 +1,4 @@
-import {INK,PAPER,oval,path,tint,glint} from './avatar-cel-art.mjs?v=cel1';
+import {INK,PAPER,oval,path,tint,glint} from './avatar-cel-art.mjs?v=workshop1';
 
 const warm='#936755';
 const hairCuts={

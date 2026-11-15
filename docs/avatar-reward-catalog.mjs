@@ -1,8 +1,9 @@
-import {WEARABLES} from './avatar-cosmetic-wearables.mjs?v=cel1';
-import {WORLDS} from './avatar-cosmetic-worlds.mjs?v=cel1';
-import {MYSTERY_EXTRAS} from './avatar-mystery-extras.mjs?v=mystery2';
-import {TURNAROUND_REWARDS} from './avatar-turnaround-rewards.mjs?v=finish5';
-import {ARCADE_REWARDS} from './avatar-arcade-rewards.mjs?v=arcade6';
+import {NEW_STUDIO_REWARDS} from './avatar-collection-edition.mjs';
+import {WEARABLES} from './avatar-cosmetic-wearables.mjs?v=workshop1';
+import {WORLDS} from './avatar-cosmetic-worlds.mjs?v=workshop1';
+import {MYSTERY_EXTRAS} from './avatar-mystery-extras.mjs?v=workshop1';
+import {TURNAROUND_REWARDS} from './avatar-turnaround-rewards.mjs?v=workshop1';
+import {ARCADE_REWARDS} from './avatar-arcade-rewards.mjs?v=workshop1';
 
 export const GAME_LABELS=Object.freeze({
   mahjong:'Mahjong',wordle:'w0rdle',wordquest:'Word Quest',plates:'License Plates',hotrod:'Hot Rod',
@@ -42,7 +43,7 @@ const tierNames=['starter','starter','bronze','bronze','silver','gold','legendar
 const rank=new Map(routes.flatMap(([group,ids])=>ids.map((id,step)=>[id,{group,tier:group==='family'?'family':tierNames[step]}])));
 const countBySlot=new Map();
 
-export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...ARCADE_REWARDS,...TURNAROUND_REWARDS].map(item=>{
+export const LEGACY_CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...ARCADE_REWARDS,...TURNAROUND_REWARDS].map(item=>{
   const slotIndex=countBySlot.get(item.slot)||0;
   countBySlot.set(item.slot,slotIndex+1);
   const slotOrdinal=Object.keys(SLOT_LABELS).indexOf(item.slot);
@@ -51,5 +52,7 @@ export const CATALOG=Object.freeze([...WEARABLES,...WORLDS,...MYSTERY_EXTRAS,...
   const id=item.achievement_id||special[item.id]||track[(round+(slotIndex%legacyRoutes.length)*3+slotOrdinal)%track.length];
   return Object.freeze({...item,achievement_id:id,...rank.get(id),tags:Object.freeze(item.tags||[])});
 }));
+export const CATALOG=Object.freeze([...LEGACY_CATALOG,...NEW_STUDIO_REWARDS]);
 export const BY_ID=new Map(CATALOG.map(item=>[item.id,item]));
-export const SHOWCASE=Object.freeze(['dragon-crown','rainbow-lightning-hair','floating-crocodile','rubber-chicken-helmet','galaxy-eyes','boss-dragonlet','wisp-pup']);
+export const SHOWCASE=Object.freeze(['studio-observatory-telescope','studio-rain-cape','studio-workshop-visor',
+  'studio-tower-gargoyle','studio-backlot-flashlight','studio-attic-ghost']);

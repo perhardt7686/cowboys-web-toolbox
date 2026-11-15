@@ -1,10 +1,10 @@
-import {AVATAR_OPTIONS,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=studio3';
-import {normalizeBody,projectTurn} from './avatar-full-body.mjs?v=studio3';
-import {drawTurnaround} from './avatar-turnaround.mjs?v=turn1';
-import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=turn1';
-import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=finish5';
-import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
-import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=turn1';
+import {AVATAR_OPTIONS,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=workshop1';
+import {normalizeBody,projectTurn} from './avatar-full-body.mjs?v=workshop1';
+import {drawTurnaround} from './avatar-turnaround.mjs?v=workshop1';
+import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=workshop1';
+import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=workshop1';
+import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=workshop1';
+import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=workshop1';
 
 export const COSMETIC_SLOTS=Object.freeze(Object.keys(SLOT_LABELS));
 const thumbnails=new WeakSet();

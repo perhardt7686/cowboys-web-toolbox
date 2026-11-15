@@ -1,22 +1,24 @@
-import {STAGE_WIDTH as W,STAGE_HEIGHT as H,projectTurn,wrapAngle} from './avatar-full-body.mjs?v=studio3';
+import {STAGE_WIDTH as W,STAGE_HEIGHT as H,projectTurn,wrapAngle} from './avatar-full-body.mjs?v=workshop1';
 
 export function turntableHTML({editor=false}={}){
+  const zoom='<button type="button" data-turn="less" aria-label="Zoom out">−</button>'+
+    '<button type="button" data-turn="more" aria-label="Zoom in">+</button>';
+  const settings='<button type="button" data-turn="spin" aria-pressed="false">Spin</button>'+
+    '<button type="button" data-turn="reset">Reset view</button>';
   return '<div class="avatar-turntable" data-avatar-turntable>'+
     '<div class="avatar-turntable-frame"><canvas class="avatar-turntable-canvas" '+
     (editor?'id="family-avatar-canvas" ':'')+
     'width="'+(W*2)+'" height="'+(H*2)+'" tabindex="0" role="img" aria-label="Full-body preview. Drag to rotate or zoom in to pan."></canvas></div>'+
     (editor?'<div class="studio-camera-presets" role="group" aria-label="Camera presets">'+
-      '<button type="button" data-turn="body" aria-pressed="true">Full body</button>'+
+      '<button type="button" data-turn="body" aria-pressed="true">Fit</button>'+
       '<button type="button" data-turn="face" aria-pressed="false">Face</button></div>':'')+
     '<div class="avatar-turntable-controls" role="group" aria-label="Turntable view">'+
     '<button type="button" data-turn="left" aria-label="Rotate left">‹</button>'+
     '<output class="avatar-view-angle" data-view-angle aria-live="polite">Front</output>'+
     '<button type="button" data-turn="right" aria-label="Rotate right">›</button>'+
-    '<button type="button" data-turn="spin" aria-pressed="false">Spin</button>'+
-    '<button type="button" data-turn="less" aria-label="Zoom out">−</button>'+
-    '<button type="button" data-turn="more" aria-label="Zoom in">+</button>'+
-    '<button type="button" data-turn="fit">Fit</button>'+
-    '<button type="button" data-turn="reset">Reset view</button>'+
+    (editor?'<details class="studio-camera-menu"><summary>Camera</summary>'+
+      '<div class="studio-camera-sheet">'+zoom+settings+'</div></details>':
+      settings+zoom+'<button type="button" data-turn="fit">Fit</button>')+
     '</div></div>';
 }
 
@@ -113,6 +115,15 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false,selectPa
     if(action==='face'){face();return;}
     if(action==='reset')camera.angle=0;
     setZoom(action==='more'?camera.zoom+.35:action==='less'?camera.zoom-.35:1);
+  },{signal});
+
+  const menu=root.querySelector('.studio-camera-menu');
+  menu?.addEventListener('keydown',event=>{
+    if(event.key!=='Escape'||!menu.open)return;
+    event.stopPropagation();
+    event.preventDefault();
+    menu.open=false;
+    menu.querySelector('summary').focus();
   },{signal});
 
   canvas.addEventListener('keydown',event=>{

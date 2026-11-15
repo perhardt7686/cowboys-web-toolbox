@@ -17,122 +17,128 @@ async def visit(browser, width, full=False):
     await page.goto(URL, wait_until='domcontentloaded')
     await page.locator('#family-avatar-quick').click()
     editor = page.locator('#profile-studio-form')
-    await expect(editor.get_by_role('button', name='My Avatar', exact=True)).to_be_visible()
+    nav = editor.get_by_role('navigation', name='Avatar Studio sections')
+    await expect(nav.get_by_role('button',name='Create',exact=True)).to_be_visible()
     await editor.locator('[data-studio-part="hair"]').click()
     await editor.locator('[data-avatar-feature=hair][data-avatar-value=purple]').click()
     canvas = editor.locator('#family-avatar-canvas')
-    retro_before=await canvas.evaluate('n=>n.toDataURL()')
+    await expect(canvas).to_have_attribute('data-renderer','3d',timeout=18000)
     await editor.locator('[data-studio-part="face"]').click()
     await editor.locator('summary').filter(has_text='Eyes & expressions').click()
-    await editor.locator('[data-avatar-feature=eye_shape][data-avatar-value=dramatic]').click()
-    retro_after=await canvas.evaluate('n=>n.toDataURL()')
-    assert retro_before!=retro_after,'New eye shapes must visibly redraw the portrait'
     before = await canvas.evaluate('n=>n.toDataURL()')
-    await editor.get_by_role('button', name='Save outfit', exact=True).wait_for()
-    await editor.get_by_role('button', name='Unlockables', exact=True).click()
-    await expect(editor.get_by_text('336 rewards')).to_be_visible()
-    achievement_tab=editor.get_by_role('button',name='Achievements',exact=True)
-    assert await achievement_tab.evaluate("""node => {
-      const text=document.createRange();
-      text.selectNodeContents(node);
-      return text.getClientRects().length===1;
-    }"""), width
-    for node in [editor.get_by_role('button', name='Unlockables', exact=True),
-                 editor.get_by_role('searchbox', name='Search rewards')]:
-        box = await node.bounding_box()
+    await editor.locator('[data-avatar-feature=eye_shape][data-avatar-value=dramatic]').click()
+    assert before != await canvas.evaluate('n=>n.toDataURL()'), 'The face should visibly respond'
+    await nav.get_by_role('button', name='Rewards', exact=True).click()
+    await expect(editor.get_by_text('26 rewards',exact=True)).to_be_visible()
+    await editor.locator('.studio-camera-presets').get_by_role('button',name='Fit',exact=True).click()
+
+    for control in [nav.get_by_role('button',name='Companions'),
+                    editor.get_by_role('searchbox',name='Search rewards')]:
+        box = await control.bounding_box()
         assert box and box['width'] >= 44 and box['height'] >= 44, (width, box)
-    await editor.get_by_role('searchbox').fill('Dragon Crown')
-    card = editor.locator('[data-reward-item=dragon-crown]')
+    filters = editor.get_by_role('button',name='Filters',exact=True)
+    sheet = editor.get_by_role('dialog',name='Reward filters')
+    await filters.click()
+    await expect(sheet).to_be_in_viewport()
+    await page.keyboard.press('Escape')
+    await expect(sheet).to_be_hidden()
+    await expect(filters).to_be_focused()
+    await filters.click()
+    await sheet.get_by_label('Type',exact=True).select_option('companion')
+    await sheet.get_by_role('button',name='Apply').click()
+    await expect(editor.get_by_text('5 rewards',exact=True)).to_be_visible()
+    await editor.get_by_role('button',name='Filters (1)',exact=True).click()
+    await sheet.get_by_role('button',name='Clear').click()
+    await sheet.get_by_role('button',name='Apply').click()
+    await expect(editor.get_by_text('26 rewards',exact=True)).to_be_visible()
+    await editor.get_by_role('button',name='Fits my body').click()
+    await expect(editor.get_by_text('24 rewards',exact=True)).to_be_visible()
+    await editor.get_by_role('button',name='Fits my body').click()
+    await editor.get_by_role('button',name='Owned',exact=True).click()
+    await expect(editor.get_by_text('6 rewards',exact=True)).to_be_visible()
+    await editor.get_by_role('button',name='All',exact=True).click()
+
+    await editor.get_by_role('searchbox').fill('Brass Field Telescope')
+    card = editor.locator('[data-reward-item=studio-observatory-telescope]')
     await expect(card).to_be_visible()
-    await card.get_by_role('button', name='Try on Dragon Crown').click()
+    before = await canvas.evaluate('n=>n.toDataURL()')
+    await card.get_by_role('button', name='Try on Brass Field Telescope').click()
     assert before != await canvas.evaluate('n=>n.toDataURL()'), width
-    await expect(editor.get_by_text('Dragon Crown · Preview only')).to_be_visible()
+    await expect(editor.locator('#avatar-preview-status')).to_contain_text('Earn it to save it')
     assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth') <= 2
     if full:
-        await editor.get_by_role('button', name='Save my avatar').click()
+        await editor.get_by_role('button', name='Save look').click()
         await expect(editor.get_by_text('Remove the preview-only items before saving your avatar.')).to_be_visible()
-        await card.get_by_role('button', name='See Dragon Crown').click()
+        await card.get_by_role('button', name='See Brass Field Telescope').click()
         artwork = editor.locator('.avatar-prize-art')
         await expect(artwork).to_have_attribute('data-renderer', '3d', timeout=12000)
         resting = await artwork.evaluate('node => node.toDataURL()')
-        await editor.get_by_role('button', name='Wake the dragon').click()
-        assert resting != await artwork.evaluate('node => node.toDataURL()'), 'Dragon embers'
+        await editor.get_by_role('button', name='Extend the telescope').click()
+        assert resting != await artwork.evaluate('node => node.toDataURL()')
+        await nav.get_by_role('button',name='Wardrobe',exact=True).click()
+        await expect(editor.get_by_text('Brass Field Telescope · Preview only')).to_be_visible()
         resting = await canvas.evaluate('node => node.toDataURL()')
-        await editor.get_by_role('button', name='Activate Dragon Crown').click()
-        assert resting != await canvas.evaluate('node => node.toDataURL()'), 'Equipped dragon embers'
-        await page.evaluate("""()=>{
-          const root=document.createElement('section'); root.id='mahjong-root';
-          root.innerHTML='<button id="mahjong-toggle" type="button" aria-expanded="false">Fixture Mahjong</button><div id="mahjong-play">Fixture game</div>';
-          root.querySelector('button').addEventListener('click',event=>{
-            event.target.setAttribute('aria-expanded',String(event.target.getAttribute('aria-expanded')!=='true'));
-          });
-          document.querySelector('#conversations .community-main').append(root);
-        }""")
-        await editor.get_by_role('button', name='Play Mahjong to unlock').click()
-        back = page.get_by_role('button', name='Back to Avatar Studio', exact=True)
-        await expect(back).to_be_visible()
-        assert await page.locator('body').get_attribute('data-arcade-game') == 'mahjong'
-        await back.click()
-        await expect(editor.get_by_role('heading', name='Dragon Crown')).to_be_visible()
-        await expect(editor.get_by_text('Dragon Crown · Preview only')).to_be_visible()
-        await editor.get_by_role('button', name='Remove Dragon Crown').click()
-        await editor.get_by_role('button', name='Back to collection').click()
-        await editor.get_by_role('searchbox').fill('Giant Taco Hat')
-        await editor.get_by_role('button', name='Equip Giant Taco Hat').click()
-        await editor.get_by_role('button', name='Save my avatar').click()
+        await editor.get_by_role('button', name='Activate Brass Field Telescope').click()
+        assert resting != await canvas.evaluate('node => node.toDataURL()')
+        await editor.get_by_role('button', name='Remove Brass Field Telescope').click()
+
+        await nav.get_by_role('button',name='Rewards',exact=True).click()
+        await editor.get_by_role('searchbox').fill('Clue-Seeker Compass')
+        await editor.get_by_role('button', name='Equip Clue-Seeker Compass').click()
+        await editor.get_by_role('button',name='Wardrobe',exact=True).click()
+        await editor.get_by_role('textbox',name='Outfit name').fill('Backlot Night')
+        await editor.get_by_role('button',name='Save outfit').click()
+        await expect(editor.get_by_role('button',name='Backlot Night',exact=True)).to_be_visible()
+        await editor.get_by_role('button', name='Save look').click()
         await expect(editor.get_by_text('Preview saved locally for this session.')).to_be_visible()
         await page.locator('#content-dialog').evaluate('n=>n.close()')
         await expect(page.locator('#family-avatar-quick img')).to_be_visible()
         await page.locator('#family-avatar-quick').click()
-        await expect(editor.locator('#avatar-equipped').get_by_text('Giant Taco Hat', exact=True)).to_be_visible()
-        await editor.get_by_role('textbox', name='Outfit name').fill('Taco night')
-        await editor.get_by_role('button', name='Save outfit', exact=True).click()
-        await expect(editor.get_by_role('button', name='Taco night', exact=True)).to_be_visible()
-        await editor.get_by_role('button', name='Pets', exact=True).click()
-        pet_picker = editor.get_by_role('combobox', name='Choose a pet')
-        await pet_picker.select_option('lantern-raccoon')
+        await expect(editor.locator('#avatar-equipped').get_by_text('Clue-Seeker Compass',exact=True)).to_be_visible()
+
+        await nav.get_by_role('button',name='Companions',exact=True).click()
+        await expect(canvas).to_be_visible()
+        pet_picker = editor.get_by_role('combobox',name='Choose a pet')
+        await pet_picker.select_option('studio-observatory-moth')
         await expect(editor.get_by_text('Game reward · Locked')).to_be_visible()
-        await expect(editor.get_by_role('button', name='Adopt', exact=True)).to_have_count(0)
+        await expect(editor.get_by_role('button',name='Adopt',exact=True)).to_have_count(0)
         portrait = editor.locator('.avatar-pet-portrait')
-        await expect(portrait).to_have_attribute('data-renderer', '3d')
+        await expect(portrait).to_have_attribute('data-renderer','3d')
         resting = await portrait.evaluate('node => node.toDataURL()')
-        await editor.get_by_role('button', name='Preview pet', exact=True).click()
-        assert resting != await portrait.evaluate('node => node.toDataURL()'), 'Locked pet preview'
-        await editor.get_by_role('button', name='See how to earn it').click()
-        await expect(editor.get_by_role('heading', name='Lantern Raccoon')).to_be_visible()
-        await expect(editor.get_by_role('button', name='Play Hot Rod to unlock')).to_be_visible()
-        await editor.get_by_role('button', name='Pets', exact=True).click()
-        await pet_picker.select_option('trail-husky')
-        await editor.get_by_role('button', name='Adopt', exact=True).click()
-        await expect(editor.get_by_text('Trail Husky is home.')).to_be_visible()
-        await expect(editor.get_by_role('button', name='Show trick')).to_be_disabled()
+        await editor.get_by_role('button',name='Preview pet',exact=True).click()
+        assert resting != await portrait.evaluate('node => node.toDataURL()')
+        await pet_picker.select_option('studio-attic-ghost')
+        await editor.get_by_role('button',name='Adopt',exact=True).click()
+        await expect(editor.get_by_text('Wick the Attic Ghost is home.')).to_be_visible()
+        await expect(editor.get_by_role('button',name='Show trick')).to_be_disabled()
         for bond in [2,4,6]:
-            await editor.get_by_role('button', name='Play', exact=True).click()
+            await editor.get_by_role('button',name='Play',exact=True).click()
             await expect(editor.get_by_text(f'Bond {bond} / 12')).to_be_visible()
-        await editor.get_by_role('button', name='Show trick').click()
+        await editor.get_by_role('button',name='Show trick').click()
         await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
-        await expect(editor.get_by_text('Does a double hop with a trail of stars.')).to_be_visible()
-        await editor.get_by_text('Rename pet', exact=True).click()
-        await editor.get_by_role('textbox', name='Pet name').fill('Scout')
-        await editor.get_by_role('button', name='Save name').click()
-        await expect(editor.get_by_role('heading', name='Scout')).to_be_visible()
-        await expect(editor.get_by_role('button',name='Save my avatar')).to_be_hidden()
-        await editor.get_by_role('button', name='Take along').click()
-        await expect(editor.get_by_role('button',name='My Avatar',exact=True)).to_have_attribute('aria-pressed','true')
-        await expect(editor.locator('#avatar-equipped').get_by_text('Trail Husky', exact=True)).to_be_visible()
-        await editor.get_by_role('button', name='Save my avatar').click()
+        await editor.get_by_text('Rename pet',exact=True).click()
+        await editor.get_by_role('textbox',name='Pet name').fill('Wick')
+        await editor.get_by_role('button',name='Save name').click()
+        await expect(editor.get_by_role('heading',name='Wick',exact=True)).to_be_visible()
+        await editor.get_by_role('button',name='Take along').click()
+        await expect(nav.get_by_role('button',name='Create',exact=True)).to_have_attribute('aria-pressed','true')
+        await expect(editor.locator('#avatar-equipped').get_by_text('Wick the Attic Ghost',exact=True)).to_be_visible()
+        await editor.get_by_role('button',name='Save look').click()
         await expect(editor.get_by_text('Preview saved locally for this session.')).to_be_visible()
         await page.locator('#content-dialog').evaluate('node => node.close()')
         await page.locator('#family-avatar-quick').click()
-        await editor.get_by_role('button', name='Pets', exact=True).click()
-        await pet_picker.select_option('trail-husky')
-        await expect(editor.get_by_role('heading', name='Scout')).to_be_visible()
+        await nav.get_by_role('button',name='Companions',exact=True).click()
+        await pet_picker.select_option('studio-attic-ghost')
+        await expect(editor.get_by_role('heading',name='Wick',exact=True)).to_be_visible()
         await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
-        await portrait.scroll_into_view_if_needed()
-        await expect(portrait).to_be_in_viewport(ratio=.8)
-        assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth') <= 2
+        await editor.locator('.studio-profile-settings summary').click()
+        await editor.get_by_role('button',name='Use a photo',exact=True).click()
+        await expect(editor.locator('#profile-photo')).to_be_visible()
+        await editor.get_by_role('button',name='Character',exact=True).click()
+        await page.keyboard.press('Escape')
+        await expect(canvas).to_be_visible()
         art = await page.evaluate("""async()=>{
-          const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=turn1');
+          const {LEGACY_CATALOG:CATALOG}=await import('/avatar-reward-catalog.mjs?v=workshop1');
           const {paintThumbnail,paintPrizeDemo,drawPetPortrait,renderLoadout}=await import('/avatar-reward-render.mjs?v=turn1');
           const seen=new Set(), unchanged=[], inert=[];
           for(const item of CATALOG){
@@ -154,22 +160,18 @@ async def visit(browser, width, full=False):
         assert art == [336, [], []], art
         # Capture and pixel-check all eighteen previously missing garment icons.
         wardrobe_sheet = await page.evaluate("""async()=>{
-          const ids=['cinder-trench','carburetor-jacket','vault-keeper-cape',
-            'phantom-cloak','night-patrol-sweater','carnival-stripes',
-            'copperline-flares','lantern-pleats','midnight-a-line',
-            'switchyard-boots','moonlit-straps','watchtower-gloves',
-            'casefile-utility-belt','dockmaster-ascot','night-dispatch-satchel',
-            'telescope-backpack','carnival-visor-plate','moorland-heartplate'];
-          const {BY_ID}=await import('/avatar-reward-catalog.mjs?v=finish5');
-          const {paintThumbnail}=await import('/avatar-reward-render.mjs?v=finish5');
-          const sheet=document.createElement('canvas');sheet.width=1080;sheet.height=660;
+          const {NEW_STUDIO_REWARDS:items}=await import('/avatar-collection-edition.mjs');
+          const {paintRoomPrize,releaseStudioView}=await import('/avatar-dressing-room.mjs?v=workshop1');
+          const ids=items.map(item=>item.id);
+          const sheet=document.createElement('canvas');sheet.width=1080;sheet.height=1100;
           const c=sheet.getContext('2d');
           c.fillStyle='#f4eee3';c.fillRect(0,0,sheet.width,sheet.height);
           const variants=new Set();
           for(const [i,id] of ids.entries()){
             const tile=document.createElement('canvas');tile.width=tile.height=160;
-            const item=BY_ID.get(id);if(!item||typeof item.draw!=='function')throw Error('Missing art '+id);
-            paintThumbnail(tile,item);
+            const item=items.find(entry=>entry.id===id);
+            if(!paintRoomPrize(tile,item))throw Error('Missing art '+id);
+            releaseStudioView(tile);
             const encoded=tile.toDataURL('image/png');
             if(encoded.length<1200)throw Error('Blank art '+id);
             variants.add(encoded);
@@ -179,16 +181,16 @@ async def visit(browser, width, full=False):
             c.fillStyle='#282239';c.font='bold 12px system-ui';
             c.fillText(item.name.slice(0,24),x,y+177,155);
           }
-          if(variants.size!==18)throw Error('Wardrobe art silhouettes not unique');
+          if(variants.size!==ids.length)throw Error('Wardrobe art silhouettes not unique');
           return sheet.toDataURL('image/png');
         }""")
         (ROOT/'reports'/'avatar-wardrobe-audit.png').write_bytes(
             base64.b64decode(wardrobe_sheet.split(',',1)[1]))
         face_sheet = await page.evaluate("""async()=>{
-          const names=['detective','mechanic','sleuth','specter','armor','automaton','scout'];
+          const names=['detective','mechanic','sleuth','specter','marsh','armor','automaton','radio','scout'];
           const {SHOWROOM_LOOKS}=await import('/avatar-showroom-presets.mjs?v=studio3');
           const {paintRoomAvatar,releaseStudioView}=await import('/avatar-dressing-room.mjs?v=finish5');
-          const sheet=document.createElement('canvas');sheet.width=4*230;sheet.height=2*305;
+          const sheet=document.createElement('canvas');sheet.width=3*230;sheet.height=3*305;
           const c=sheet.getContext('2d');c.fillStyle='#f4eee4';c.fillRect(0,0,sheet.width,sheet.height);
           let unique=new Set();
           for(const [i,name] of names.entries()){
@@ -198,7 +200,7 @@ async def visit(browser, width, full=False):
             paintRoomAvatar(tile,base,{angle:18},0,null,'portrait');
             const encoded=tile.toDataURL('image/png');
             unique.add(encoded);
-            const x=i%4*230,y=Math.floor(i/4)*305;
+            const x=i%3*230,y=Math.floor(i/3)*305;
             c.drawImage(tile,x,y,220,264);
             c.fillStyle='#272039';c.font='bold 17px system-ui';
             c.fillText(name.toUpperCase(),x+9,y+283,205);

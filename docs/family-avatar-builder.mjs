@@ -1,8 +1,8 @@
 /* Family Avatar Studio: original, fully local character art.
    No external images, tracking, accounts, or third-party avatar service. */
-import {FULL_BODY_OPTIONS,SCULPT_LABELS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=studio3';
-import {turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
-import {paintPortrait} from './avatar-cel-portrait.mjs?v=toon3';
+import {BODY_MODELS,FULL_BODY_OPTIONS,SCULPT_LABELS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=workshop1';
+import {turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
+import {paintPortrait} from './avatar-cel-portrait.mjs?v=workshop1';
 
 export const AVATAR_OPTIONS = Object.freeze({
   skin:[['porcelain','Fair','#f5d2bb'],['bisque','Bisque','#eac3a4'],['sand','Warm','#dbad86'],['tan','Tan','#ce966a'],['amber','Golden','#bf8154'],['copper','Brown','#895138'],['deep','Deep','#603722'],['espresso','Rich','#402824']],
@@ -68,21 +68,21 @@ export function drawFamilyAvatar(canvas, value, overlays = {}, t = 0) {
 export function makeAvatarStudioHTML(recipe) {
   const v=normalizeAvatarRecipe(recipe);
   const kit=normalizeBody(recipe);
-  const renderField=key=>{
+  const renderField=(key,family)=>{
     const full=Boolean(FULL_BODY_OPTIONS[key]);
     const label=full?WARDROBE_LABELS[key]:AVATAR_LABELS[key];
     const choices=full?FULL_BODY_OPTIONS[key]:AVATAR_OPTIONS[key];
     const selected=full?kit[key]:v[key];
     return '<fieldset class="family-avatar-field" data-studio-field="'+key+'"><legend>'+label+'</legend><div class="family-avatar-picks">'+
-      choices.map(([id,name,hex])=>
+      choices.filter(([id])=>!family||BODY_MODELS[id]?.family===family).map(([id,name,hex])=>
         '<button type="button" class="family-avatar-choice" '+(full?'data-avatar-body':'data-avatar-feature')+
         '="'+key+'" data-avatar-value="'+id+'" aria-pressed="'+(selected===id)+'" aria-label="'+label+': '+name+'">'+
-        (key==='model'?'<canvas class="studio-look-art" width="156" height="176" data-look-preview="'+id+'" aria-hidden="true"></canvas>':'')+
+        (key==='model'?'<canvas class="studio-look-art" width="180" height="188" data-look-preview="'+id+'" aria-hidden="true"></canvas>':'')+
         (hex?'<span class="family-avatar-color" style="background:'+hex+'"></span>':'')+'<span>'+name+'</span></button>'
       ).join('')+'</div></fieldset>';
   };
   const panels=[
-    ['looks','Looks',[['Body styles',['model']],['Pose',['pose']]]],
+    ['looks','Body',[['Pose',['pose']]]],
     ['face','Face',[['Face & skin',['skin','face','nose','cheeks']],['Eyes & expressions',['eyes','eye_shape','brows','expression']]]],
     ['hair','Hair',[['Hair & facial hair',['style','hair','beard']]]],
     ['clothes','Clothes',[['Tops & jackets',['garment','shirt','outerwear']],['Bottoms & shoes',['bottoms','footwear']]]],
@@ -92,9 +92,15 @@ export function makeAvatarStudioHTML(recipe) {
   const sliders=keys=>'<fieldset class="studio-sculpt"><legend>Fine tune</legend>'+
     keys.map(key=>'<label><span>'+SCULPT_LABELS[key]+'</span><input type="range" min="-2" max="2" step="1" value="'+
       (kit[key]??'0')+'" data-studio-sculpt="'+key+'"></label>').join('')+'</fieldset>';
+  const families=[['human','Human'],['monster','Monster'],['robot','Robot']];
+  const bodyLooks='<div class="studio-family-pills" role="group" aria-label="Body family">'+families.map(([key,name])=>
+    '<button type="button" data-studio-family="'+key+'" aria-pressed="'+(key===BODY_MODELS[kit.model].family)+'">'+name+'</button>'
+  ).join('')+'</div>'+families.map(([key])=>
+    '<div data-family-looks="'+key+'"'+(key===BODY_MODELS[kit.model].family?'':' hidden')+'>'+renderField('model',key)+'</div>'
+  ).join('');
   return '<section class="family-character-editor avatar-dressing-studio" aria-label="Avatar editor">'+
     '<div class="family-character-top studio-stage">'+
-      '<div class="studio-stage-title"><h3 id="family-character-title">Character</h3>'+
+      '<div class="studio-stage-title"><h3 id="family-character-title">Dressing room</h3>'+
       '<div class="avatar-preview-actions" role="group" aria-label="Edit history">'+
       '<button type="button" class="studio-text-button" data-avatar-undo>Undo</button>'+
       '<button type="button" class="studio-text-button" data-avatar-reset>Restore saved</button></div></div>'+
@@ -103,12 +109,14 @@ export function makeAvatarStudioHTML(recipe) {
     '</div>'+
     '<div class="studio-editor-panel">'+
       '<div class="family-avatar-fields"><div class="studio-edit-tabs" role="group" aria-label="Character parts">'+
-      panels.map(([id,label],index)=>'<button type="button" data-studio-part="'+id+'" aria-pressed="'+(!index)+'">'+label+'</button>').join('')+
+      panels.map(([id,label],index)=>'<button type="button" data-studio-part="'+id+'" data-part-area="'+(index<3?'avatar':'wardrobe')+'" aria-pressed="'+(!index)+'">'+label+'</button>').join('')+
       '</div>'+
       panels.map(([id,label,groups],index)=>'<div data-studio-panel="'+id+'" role="region" aria-label="'+label+'"'+(index?' hidden':'')+'>'+
-        groups.map(([title,keys],position)=>'<details class="avatar-feature-group"'+(!position?' open':'')+'><summary>'+title+'</summary>'+
-          '<div>'+keys.map(renderField).join('')+'</div></details>').join('')+
-        (id==='looks'?sliders(['height','build']):id==='face'?sliders(['jaw','eye_spacing']):'')+
+        (id==='looks'?bodyLooks:'')+
+        groups.map(([title,keys],position)=>'<details class="avatar-feature-group"'+(!position&&id!=='looks'?' open':'')+'><summary>'+title+'</summary>'+
+          '<div>'+keys.map(key=>renderField(key)).join('')+'</div></details>').join('')+
+        (['looks','face'].includes(id)?'<details class="avatar-feature-group"><summary>Fine tune</summary>'+
+          sliders(id==='looks'?['height','build']:['jaw','eye_spacing'])+'</details>':'')+
         (!index?'<button type="button" class="studio-shuffle studio-text-button" data-avatar-random>Surprise me</button>':'')+
         '</div>').join('')+
       '</div>'+

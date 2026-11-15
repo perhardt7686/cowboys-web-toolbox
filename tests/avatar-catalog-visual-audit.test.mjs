@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {CATALOG,SLOT_LABELS,GROUPS,BY_ID} from '../docs/avatar-reward-catalog.mjs';
+import {CATALOG,LEGACY_CATALOG,SLOT_LABELS,GROUPS,BY_ID} from '../docs/avatar-reward-catalog.mjs';
 import {SHOWROOM_LOOKS} from '../docs/avatar-showroom-presets.mjs';
 import {BODY_MODELS,fitsBody} from '../docs/avatar-full-body.mjs';
 import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
@@ -23,11 +23,12 @@ const rawCanvas=()=>{
 };
 
 test('all rewards retain unique stable IDs, source artwork, and verified-achievement mappings',()=>{
-  assert.equal(CATALOG.length,336,'a missing or newly duplicated reward must never silently reshuffle earned items');
+  assert.equal(LEGACY_CATALOG.length,336,'legacy IDs remain stable for saved looks');
+  assert.equal(CATALOG.length-LEGACY_CATALOG.length,26);
   assert.equal(BY_ID.size,CATALOG.length);
   const ids=new Set();
   const approved=new Set(Object.keys(SLOT_LABELS));
-  const achievementIds=new Set(Object.values(GROUPS).flat());
+  const achievementIds=new Set([...Object.values(GROUPS).flat(),'studio-welcome','studio-refit']);
   const slots=new Map();
   for(const reward of CATALOG){
     assert.ok(typeof reward.id==='string'&&reward.id.length>2);

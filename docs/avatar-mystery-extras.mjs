@@ -1,7 +1,7 @@
 /* Extra original Mystery Arcade cosmetics: companions, props, locations and FX.
    All items are distinct hand-inked Canvas illustrations, never licensed characters.
    Their achievement IDs are trusted server definitions, not client-computed awards. */
-import {INK,PAPER,oval,path,glint} from './avatar-cel-art.mjs?v=cel1';
+import {INK,PAPER,oval,path,glint} from './avatar-cel-art.mjs?v=workshop1';
 const gold='#e8b45f',aqua='#7bd7c8',coral='#e97977',violet='#9472c7';
 function o(c,x,y,rx,ry,fill=gold,outline=INK,w=2,angle=0){oval(c,x,y,rx,ry,fill,outline,w,angle);}
 function ln(c,points,color=INK,width=2){
