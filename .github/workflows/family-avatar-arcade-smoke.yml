@@ -16,6 +16,7 @@ on:
       - 'tests/browser-family-avatar-studio.py'
       - 'tests/browser-pet-trading.py'
       - 'tests/browser-arcade-shell.py'
+      - 'tests/browser-arcade-titles.py'
       - '.github/workflows/family-avatar-arcade-smoke.yml'
   workflow_dispatch:
 permissions:
