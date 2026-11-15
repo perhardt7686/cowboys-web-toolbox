@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only synthetic member UI: each of eight actual arcade entries must have
+"""Read-only synthetic member UI: each of ten actual arcade entries must have
 its own illustrated title screen and working Start, Help and Settings routes.
 This test uses NO real family account, paid service, or member database.
 """
@@ -12,6 +12,8 @@ URL="http://127.0.0.1:8765/__titles__/community.html"
 ROOTS=[
  ("streetrod","sr-toggle","STREET R0D"),
  ("dashforge","dash-forge-toggle","DASH FORGE"),
+ ("fleet","star-squadron-toggle","STAR SQUADRON"),
+ ("maze","mystery-maze-toggle","MYSTERY MAZE"),
  ("mahjong","mahjong-toggle","MAHJONG"),
  ("wordle","letter-lock-toggle","W0RDLE"),
  ("wordquest","word-game-toggle","WORD QUEST"),
@@ -27,6 +29,8 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <div id="sr-inside" hidden><div id="src-classic-hub"><div id="streetrod-summer"><div id="ss-tabs"></div></div></div></div></section>
 <section id="dash-forge-root"><button id="dash-forge-toggle" aria-expanded="false">Dash Forge</button>
 <div id="dash-forge-inside" hidden><section id="dash-pane-builder"><h3>Level Studio</h3></section></div></section>
+<section id="star-squadron-root"><button id="star-squadron-toggle" aria-expanded="false">Star Squadron</button><div id="star-squadron-inside" hidden>Swarm</div></section>
+<section id="mystery-maze-root"><button id="mystery-maze-toggle" aria-expanded="false">Mystery Maze</button><div id="mystery-maze-inside" hidden>Clues</div></section>
 <section id="mahjong-root"><button id="mahjong-toggle" aria-expanded="false">Mahjong</button><div id="mahjong-inside" hidden>Tiles</div></section>
 <section id="letter-lock-root"><button id="letter-lock-toggle" aria-expanded="false">w0rdle</button><div id="letter-lock-content" hidden>Letters</div></section>
 <section id="word-game-root"><button id="word-game-toggle" aria-expanded="false">Word Quest</button><div id="word-game-inside" hidden>Words</div></section>
@@ -41,6 +45,7 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 window.addEventListener('dashforge:creator-mode',e=>window.__creatorEvents.push(e.detail.boss));
 for(const [a,b] of [
  ['sr-toggle','sr-inside'],['dash-forge-toggle','dash-forge-inside'],
+ ['star-squadron-toggle','star-squadron-inside'],['mystery-maze-toggle','mystery-maze-inside'],
  ['mahjong-toggle','mahjong-inside'],['letter-lock-toggle','letter-lock-content'],
  ['word-game-toggle','word-game-inside'],['plate-game-open','plate-game-content'],
  ['drawing-studio-toggle','drawing-studio-inside'],['vdacs-study-toggle','vdacs-study-inside']]){
@@ -86,6 +91,8 @@ async def run_size(browser,width,height):
     await cover.locator('[data-arcade-action="title-start"]').click()
    assert await page.locator("#"+('streetrod-root' if game=="streetrod" else
     'dash-forge-root' if game=="dashforge" else
+    'star-squadron-root' if game=="fleet" else
+    'mystery-maze-root' if game=="maze" else
     'letter-lock-root' if game=="wordle" else
     'word-game-root' if game=="wordquest" else
     'plate-game-root' if game=="plates" else
@@ -95,7 +102,7 @@ async def run_size(browser,width,height):
    assert await page.locator("#arcade-game-title-view").is_hidden(),("Title obscures gameplay",game)
    await page.keyboard.press("Escape")
    assert not await page.evaluate("document.body.classList.contains('arcade-on')"),(game,"Can't exit")
-  assert len(set(covers))==8,"Every game must have unique original artwork"
+  assert len(set(covers))==10,"Every game must have unique original artwork"
   if width==820:
    (ROOT/"reports").mkdir(parents=True,exist_ok=True)
    await page.locator("#dash-forge-toggle").click()
@@ -104,7 +111,7 @@ async def run_size(browser,width,height):
    assert await page.evaluate("window.__creatorEvents.at(-1)===false")
    await page.keyboard.press("Escape")
   assert not errors,"JS errors: "+"; ".join(errors)
-  print("EIGHT unique functional game title screens PASS",width,height)
+  print("TEN unique functional game title screens PASS",width,height)
  finally:await page.close()
 
 async def main():
