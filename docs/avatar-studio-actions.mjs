@@ -1,5 +1,5 @@
 import {THREE,attach,disposeFigure,group,shade} from './avatar-studio-geometry.mjs?v=studio3';
-import {poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=studio3';
+import {poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=ink4';
 import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
 
 const radius=new THREE.Vector3(),rayEnd=new THREE.Vector3(),lensAt=new THREE.Vector3();
@@ -176,9 +176,15 @@ export function poseStudioAction(actor,time,motion,light){
   const wearable=active&&!['companion','prop','offhand'].includes(prize.slot);
   const face=wearable&&['hat','eyewear','hair','eyes','bodypart'].includes(prize.slot);
   const scanner=active&&id==='carnival-visor-plate';
+  // Very restrained character acting. Never alter a saved recipe to animate it.
+  const idle=!active&&time>0&&Number.isFinite(time);
+  const breath=idle?Math.sin(time*1.18):0;
   actor.figure.rotation.y=wearable&&!face&&id!=='phantom-cloak'?Math.sin(p*Math.PI*1.6)*amount*.23:0;
+  actor.figure.rotation.z=idle?breath*.008:0;
+  actor.head.userData.studioRestTilt ??= actor.head.rotation.z;
+  actor.head.rotation.z=actor.head.userData.studioRestTilt+(idle?Math.sin(time*.77+.5)*.018:0);
   actor.head.rotation.y=(time?Math.sin(time*.51)*.042:0)+(face?amount*.18:0);
-  actor.head.rotation.x=petAction?amount*.20:scanner?amount*.27:0;
+  actor.head.rotation.x=petAction?amount*.20:scanner?amount*.27:idle?Math.sin(time*.62)*.012:0;
   if(actor.hat)actor.hat.rotation.z=prize?.slot==='hat'?Math.sin(p*5)*amount*.12:0;
   foldCape(actor.capeParts,id==='phantom-cloak'?amount:0);
   light.intensity=0;
@@ -188,6 +194,7 @@ export function poseStudioAction(actor,time,motion,light){
     const prop=arm.prop;
     const triggered=active&&prop?.item.id===id;
     poseArm(arm,triggered||petAction&&arm.side===1&&!prop?p:0,petAction);
+    if(idle&&!prop)arm.shoulder.rotation.z+=arm.side*(.009+.006*Math.sin(time*.91+arm.side));
     if(!prop)continue;
     if(prop.inkArc)prop.inkArc.mesh.visible=false;
     if(prop.trail){
