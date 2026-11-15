@@ -123,3 +123,12 @@ body.community-page.arcade-on #skyboard-root .skyboard-status{padding:6px;font-s
  body.community-page.arcade-on #skyboard-root .skyboard-touch{margin:5px 0 4px}
 }
 @media(prefers-reduced-motion:reduce){body.community-page #skyboard-root *{scroll-behavior:auto!important;transition:none!important}}
+body.community-page #skyboard-root .skyboard-touch{grid-template-columns:repeat(5,minmax(0,1fr))}
+body.community-page #skyboard-root .skyboard-speed{
+ position:absolute;left:50%;top:20%;translate:-50% 0;pointer-events:none;white-space:nowrap;
+ padding:.24em .64em;color:#122849;background:#fcf29a;border:2px solid #fff8ca;border-radius:9px;
+ font-size:clamp(1.02rem,3.5vw,2.8rem);font-weight:1000;letter-spacing:.045em;
+ box-shadow:0 4px 0 #104666,0 0 24px #39e4e8;
+}
+body.community-page #skyboard-root .skyboard-speed[data-mode=hit]{background:#85223f;border-color:#ffc4bb;color:#fff9f0;box-shadow:0 4px 0 #412348}
+body.community-page #skyboard-root #skyboard-ghost[aria-pressed=true]{border-color:#98f3e9;color:#b4fff2}

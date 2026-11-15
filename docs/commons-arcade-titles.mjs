@@ -6,7 +6,7 @@ export const titleProfiles={
   eyebrow:'EMMA’S SKY RACING ADVENTURE · FAMILY ARCADE',
   name:'SKYBOARD SPRINT',tag:'Thirty floating tracks. Six colorful worlds. One champion.',
   subtitle:'Choose a skateboard, snowboard or magical cruiser. Jump gaps, drift past hazards, grab boosts and collect stars all the way to the flag.',
-  help:'Choose your board, press Start Stage, and steer with the big left and right buttons or arrow keys. Jump over gaps and barriers using JUMP, Space or Up; hold DRIFT for faster sliding. Collect stars and aim for glowing boosts. Every clear saves to your approved member account, unlocks more courses and earns new boards and trophies.',
+  help:'Choose your board, press Start Stage, and steer with the big left and right buttons or arrow keys. Jump over gaps and barriers using JUMP, Space or Up; hold DRIFT for faster sliding. Aim for the glowing 10× pads. The giant red balls move across the track and knock you backward if you hit them. Verified clears unlock boards and trophies. The optional family ghost comes from a saved race.',
   first:'START RIDING',secondary:[['boards','CHOOSE BOARD'],['awards','TROPHY ROAD'],['leaders','FAMILY RANKS']],
   accent:'#a8f7ff',scene:'skyboard'
  },
@@ -37,7 +37,7 @@ export const titleProfiles={
   eyebrow:'THE NEXT LEVEL · FAMILY CAMPAIGN',
   name:'DASH FORGE',tag:'Jump into one billion shared stages.',
   subtitle:'Twelve evolving worlds. A different boss every 25 levels. Your next jump matters.',
-  help:'Tap the screen or press Jump/Space when safe tiles reach your cube. The stages and bosses are identical for the entire family. Beat your current stage to progress; every 25th stage is a three-phase boss battle. In Level Creator choose a world and hazards; in Boss Creator build a playable boss arena. Save, beat your draft, and publish it. Your design award depends only on another member’s verified time to solve it.',
+  help:'Tap or hold with Space or the on-screen action button. The portal changes how you steer, jump, fly, or flip. The Level Studio lets you test from a chosen tile or verify a complete run. The stages and bosses are identical for the entire family. Beat your current stage to progress; every 25th stage is a three-phase boss battle. In Level Creator choose a world and hazards; in Boss Creator build a playable boss arena. Save, beat your draft, and publish it. Your design award depends only on another member’s verified time to solve it.',
   first:'START CAMPAIGN',secondary:[['community','FAMILY LEVELS'],['awards','TROPHIES']],
   accent:'#8beaff',scene:'dash'},
  mahjong:{
@@ -103,7 +103,44 @@ export function titleMarkup(id){
   '<small class="arcade-title-save-note">Saves, achievements and leaderboards remain with your existing account.</small>'+
   '</div></div>';
 }
+const animatedTitles=new WeakMap();
+function animateTitle(canvas,reducedMotion,draw,cleanup=()=>{}){
+ const stop=animatedTitles.get(canvas);stop?.();
+ let frame=0,started=null,last=-Infinity;
+ const dispose=()=>{cancelAnimationFrame(frame);cleanup();};
+ animatedTitles.set(canvas,dispose);
+ if(reducedMotion){draw(.12);dispose();animatedTitles.delete(canvas);return;}
+ function tick(timestamp){
+  if(!canvas.isConnected){dispose();return;}
+  started??=timestamp;
+  if(timestamp-last>=33){last=timestamp;draw((timestamp-started)/1000);}
+  frame=requestAnimationFrame(tick);
+ }
+ frame=requestAnimationFrame(tick);
+}
+async function paintSkyboardTitle(canvas,reducedMotion){
+ const token={};canvas.skyboardTitleToken=token;
+ try{
+  const [{createSkyScene},{buildSkyCourse,createSkyRide,skyTrack}]=await Promise.all([
+   import('./skyboard-scene.mjs'),import('./skyboard-physics.mjs')
+  ]);
+  if(!canvas.isConnected||canvas.skyboardTitleToken!==token)return;
+  const board={id:'sunny',color:'#ffbf53',trail:'#fffb9c'},course=buildSkyCourse(1,196930);
+  const theme={sky:['#4caff1','#f9d6fb'],road:['#ffcb5c','#ffaa65'],border:'#fa63bb',accent:'#ae72e5',env:'cloud'};
+  const renderer=createSkyScene(640,400),state=createSkyRide(course);
+  const context=canvas.getContext('2d');
+  animateTitle(canvas,reducedMotion,t=>{
+   state.progress=69.6+2*Math.sin(t*.62);state.x=-1.33;state.lean=-.23;
+   state.y=skyTrack(course,state.progress).y+.15;state.boost=1;state.elapsed=t;
+   renderer.draw(context,state,theme,board,null);
+   context.fillStyle='#291b64';context.fillRect(9,10,96,24);
+   context.fillStyle='#ffefa4';context.font='900 15px system-ui';context.fillText('10× SPEED',18,27);
+  },()=>renderer.dispose());
+ }catch{/* The illustrated title remains available when WebGL is unavailable. */}
+}
 export function drawGameTitle(canvas,id,reducedMotion=false){
+ const stop=canvas&&animatedTitles.get(canvas);if(stop){stop();animatedTitles.delete(canvas);}
+
  const c=canvas?.getContext('2d');if(!c)return;
  const p=titleProfiles[id]||titleProfiles.streetrod;
  c.imageSmoothingEnabled=false;
@@ -123,7 +160,9 @@ export function drawGameTitle(canvas,id,reducedMotion=false){
    c.fillStyle='#ffe572';c.beginPath();c.moveTo(105,85);c.lineTo(222,85);c.lineTo(310,200);c.lineTo(5,200);c.fill();
    L(105,85,5,200,'#f247ad',7);L(222,85,310,200,'#f247ad',7);
    R(143,114,36,9,'#181b44');R(151,96,18,22,'#5946ae');C(160,87,11,'#edb38f');
-   R(147,72,27,9,'#fa6ba4');T('JUMP!',18,44,22,'#39348a');T('STAGE 01 / 30',170,185,13,'#463271');
+   R(147,72,27,9,'#fa6ba4');C(239,109,22,'#a12956');C(236,106,19,'#ed3454');C(231,100,5,'#ffae9b');
+   T('10× SPEED',12,33,17,'#343179');T('STAGE 01 / 30',170,185,13,'#463271');
+   void paintSkyboardTitle(canvas,reducedMotion);
   }else if(id==='streetrod'){
   R(0,142,320,58,'#26273a');
   for(let i=0;i<9;i++)L(i*46,143,i*62-60,200,'#d29d60',1);
@@ -134,14 +173,23 @@ export function drawGameTitle(canvas,id,reducedMotion=false){
   R(43,114,21,10,'#ffffcb');R(260,113,14,10,'#ffa34c');
   T('SUMMER 1963',93,30,15,'#ffe6a0');
  }else if(id==='dashforge'){
-  R(0,158,320,42,'#171630');L(0,158,320,158,'#82ebff',3);
-  for(let i=0;i<12;i++){const x=i*28;L(x,158,x-19,200,'#825bce',1);}
-  for(const x of [117,170,231]){c.fillStyle='#ff6198';c.beginPath();c.moveTo(x,158);c.lineTo(x+15,118);c.lineTo(x+30,158);c.fill();}
-  C(267,70,40,'#a746b8');C(267,70,28,'#190f39');
-  for(let i=0;i<8;i++){const an=i*Math.PI/4;C(267+Math.cos(an)*31,70+Math.sin(an)*31,7,'#ff83ca');}
-  C(257,66,6,'#fff');C(281,66,6,'#fff');
-  c.save();c.translate(74,126);c.rotate(-.24);R(-23,-23,46,46,'#80ecff');R(-13,-13,26,26,'#17204c');R(-9,-6,6,7,'#80ecff');R(4,-6,6,7,'#80ecff');c.restore();
-  T('STAGE 25 · BOSS FIGHT',24,30,12,'#fff29d');
+  const draw=t=>{
+   c.fillStyle=gradient;c.fillRect(0,0,320,200);
+   for(let i=0;i<25;i++)R(((i*61+300-t*7)%320+320)%320,(i*22+17)%139,2,2,i%4?'#655297':'#eec4fb');
+   for(let i=0;i<12;i++){const x=i*32-t*8%32;L(x,155,x-24,200,'#8a62cf',1);}
+   R(0,155,320,4,'#92f2f8');
+   for(const x of [133,185,231]){c.fillStyle='#fe699f';c.beginPath();c.moveTo(x,155);c.lineTo(x+13,123);c.lineTo(x+26,155);c.fill();}
+   C(264,68,40,'#a94abc');C(264,68,27,'#190f39');
+   for(let i=0;i<8;i++){const an=i*Math.PI/4+t*.52;C(264+Math.cos(an)*31,68+Math.sin(an)*31,6,'#ff83ca');}
+   C(256,65,5,'#fff2c4');C(273,65,5,'#fff2c4');
+   c.save();c.translate(77,113-Math.abs(Math.sin(t*2.4)) *25);c.rotate(-.19-t*2.3);
+   R(-19,-19,38,38,'#8eefff');R(-12,-12,24,24,'#17204c');R(-8,-4,5,6,'#80ecff');R(4,-4,5,6,'#80ecff');c.restore();
+   for(const [i,letter] of ['▲','◯','⇅','✦'].entries()){
+    R(16+i*32,170,26,22,'#392e69');T(letter,22+i*32,186,13,'#ffe3a0');
+   }
+   T('LEVEL STUDIO',171,185,13,'#e6e3fa');T('WORLD TRIAL / 25',13,28,12,'#fff29d');
+  };
+  draw(0);animateTitle(canvas,reducedMotion,draw);
  }else if(id==='fleet'){
   R(0,160,320,40,'#161b39');
   for(let i=0;i<11;i++){const x=18+i*28,y=22+(i%3)*14;

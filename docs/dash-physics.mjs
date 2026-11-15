@@ -1,0 +1,232 @@
+// The renderer, the level editor and the replay verifier use these world coordinates.
+export const DASH_HZ=120,DASH_DT=1/DASH_HZ,DASH_MAX_TICKS=14400,DASH_CEILING=4.65;
+export const DASH_PATTERN=/^[.sbglwcpfrmodhCSBUWRPVIFLEJOMKDT]+$/;
+export const DASH_MODES={C:'Cube',S:'Ship',B:'Ball',U:'UFO',W:'Wave',R:'Robot',P:'Spider',V:'Swing'};
+export const DASH_TOOLS={I:'Flip gravity',F:'Fast portal',L:'Slow portal',E:'Normal speed',J:'Jump pad',
+  O:'Jump orb',M:'Moving platform',K:'Checkpoint',D:'Scenery',T:'Laser switch'};
+const jaws=new Set(['s','w','c','l','p','f','r','m','o','d','h','b']);
+const transformable=new Set([...jaws,'D','M','O']);
+const clamp=(n,lo,hi)=>Math.min(hi,Math.max(lo,n));
+const phaseAt=(length,at)=>Math.min(2,Math.floor(Math.max(0,at)/Math.max(1,length)*3));
+const bodySizes={C:[.31,.34],S:[.41,.23],B:[.32,.32],U:[.34,.25],W:[.25,.25],R:[.31,.39],P:[.32,.26],V:[.29,.30]};
+const boosts={F:1.32,L:.76,E:1};
+const startsInAir=new Set(['S','U','W','V']);
+const designs={s:[.41,1.02],b:[.45,1.08],l:[.33,1.2],w:[.39,1.02],c:[.36,1.29],p:[.31,1.29],
+  f:[.35,1.16],r:[.35,.98],m:[.39,1.06],o:[.33,.91],d:[.30,.74],h:[.36,1.19]};
+export const dashCanTransform=token=>transformable.has(token);
+
+export function validateDashLayout(pattern,layout=[]){
+  if(!Array.isArray(layout)||layout.length>pattern.length)throw Error('Invalid level layout.');
+  let previous=-1;
+  for(const item of layout){
+    if(!Array.isArray(item)||item.length!==5||!item.every(Number.isInteger)||
+      item[0]<=previous||item[0]<4||item[0]>=pattern.length-4||
+      (!transformable.has(pattern[item[0]])&&(item[1]!==0||item[2]!==2||item[3]!==0))||
+      item[1]<0||item[1]>3||item[2]<1||item[2]>3||item[3]<0||item[3]>1||item[4]<0||item[4]>2)
+      throw Error('Invalid tile transform.');
+    previous=item[0];
+  }
+  return layout;
+}
+
+export function createDashCourse(pattern,pace=210,{boss=false,bossStyle='none',layout=[],stage=0}={}){
+  if(typeof pattern!=='string'||pattern.length<24||pattern.length>90||!DASH_PATTERN.test(pattern)||
+    !pattern.startsWith('....')||!pattern.endsWith('....')||
+    !Number.isInteger(pace)||pace<100||pace>400)throw Error('Invalid Dash Forge track.');
+  validateDashLayout(pattern,layout);
+  const settings=new Map(layout.map(([tile,...detail])=>[tile,detail]));
+  const cells=[...pattern].map((token,index)=>{
+    const [lane,scale,flip,decor]=settings.get(index)||[0,2,0,0];
+    return {token,index,x:index+.5,lane,scale:[0,.77,1,1.22][scale],flip:Boolean(flip),decor};
+  });
+  if(stage>=8&&stage%3!==0){
+    const modes=['S','B','U','W','R','P','V'];
+    const mode=modes[Math.floor((stage-8)/2)%modes.length];
+    const entry=cells.find((cell)=>cell.index>=6&&cell.index<pattern.length-10&&
+      cells.slice(cell.index-1,cell.index+5).every(item=>item.token==='.'));
+    if(entry){entry.token=mode;cells[entry.index+3].token='C';}
+  }
+  if(boss){
+    const attacks=['d','h','l'];
+    const styleOffset=[...bossStyle].reduce((n,c)=>n+c.charCodeAt(0),0)%attacks.length;
+    for(let phase=0;phase<3;phase++){
+      const slot=Math.round(pattern.length*(.22+phase*.26));
+      const free=cells.slice(Math.max(4,slot-3),Math.min(pattern.length-4,slot+4))
+        .filter((cell)=>cell.token==='.'&&cells.slice(cell.index-2,cell.index+3).every(entry=>entry.token==='.'))
+        .sort((a,b)=>Math.abs(a.index-slot)-Math.abs(b.index-slot))[0];
+      if(free){free.token=attacks[(styleOffset+phase)%attacks.length];free.attack=true;}
+    }
+  }
+  return {cells,pattern,pace,boss,bossStyle};
+}
+
+export function dashShape(course,cell,elapsed){
+  const {token,index,lane,scale,flip}=cell,phase=course.boss?phaseAt(course.pattern.length,index):0;
+  let x=cell.x,low=lane===0?0:lane===1?1.1:lane===2?2.32:DASH_CEILING;
+  let height=(designs[token]?.[1]||.55)*scale,half=(designs[token]?.[0]||.38)*scale;
+  if(token==='d'||token==='w'||token==='o'||token==='h'){
+    x+=Math.sin(elapsed*(2.6+phase*.75)+index*.76)*(.14+phase*.049);
+    if(token==='d'||token==='w')low+=.23+Math.sin(elapsed*(3+phase*.8)+index)*.19;
+  }
+  if(token==='M'){x+=Math.sin(elapsed*2.65+index)*.21;low+=.57+Math.sin(elapsed*3.88+index)*.36;height=.16;half=.46*scale;}
+  if(token==='O'){low+=.62;height=.56*scale;half=.28*scale;}
+  const inverted=lane===3?!flip:flip;
+  if(lane===3)low-=height;
+  return {x,low,high:low+height,half,tip:token==='s'||token==='c'||token==='f',inverted};
+}
+
+export function createDashRun(course,{tile=0,practice=false}={}){
+  const start=clamp(Math.floor(tile),0,course.pattern.length-1),x=start+.10;
+  const state={course,x,y:bodySizes.C[1],vy:0,mode:'C',gravity:1,speed:1,tick:0,elapsed:0,
+    pressed:false,supported:true,jumpTicks:0,done:false,won:false,deathTile:null,
+    event:'',checkpoint:start,laserOff:0,practice,immuneUntil:start?42:0,used:new Set()};
+  for(let i=0;i<start;i++){
+    const cell=course.cells[i];
+    if(cell.token in DASH_MODES||cell.token in boosts||cell.token==='I')enter(state,cell);
+  }
+  state.y=startsInAir.has(state.mode)?DASH_CEILING*.50:state.gravity>0?bodySizes[state.mode][1]:DASH_CEILING-bodySizes[state.mode][1];
+  state.supported=!startsInAir.has(state.mode);
+  return state;
+}
+
+function enter(s,cell){
+  const token=cell.token;
+  if(token in DASH_MODES){
+    if(token!==s.mode){
+      s.mode=token;s.vy=0;s.jumpTicks=0;s.event='mode';
+      if(startsInAir.has(token)){s.y=clamp(s.y,1.05,DASH_CEILING-1.05);s.supported=false;}
+    }
+  }else if(token==='I'){s.gravity*=-1;s.supported=false;s.event='gravity';}
+  else if(token in boosts){s.speed=boosts[token];s.event='speed';}
+  else if(token==='J'&&s.supported){
+    s.supported=false;s.vy=s.gravity*17.5;s.event='pad';
+  }else if(token==='K'&&s.practice){
+    s.checkpoint=cell.index+1;s.event='checkpoint';
+  }else if(token==='T'){
+    s.laserOff=cell.index+7;s.event='switch';
+  }
+}
+
+function control(s,hold,tap,dt){
+  switch(s.mode){
+    case 'C':
+      if(hold&&s.supported){s.vy=s.gravity*14.4;s.supported=false;s.event='jump';}
+      s.vy-=s.gravity*51*dt;break;
+    case 'R':
+      if(hold&&s.supported){s.vy=s.gravity*11;s.jumpTicks=24;s.supported=false;s.event='jump';}
+      if(!hold)s.jumpTicks=0;
+      if(s.jumpTicks>0){s.vy+=s.gravity*22*dt;s.jumpTicks--;}
+      s.vy-=s.gravity*49*dt;break;
+    case 'S':
+      s.vy=clamp(s.vy+s.gravity*(hold?29:-25)*dt,-8,8);s.supported=false;break;
+    case 'B':
+      if(tap&&s.supported){s.gravity*=-1;s.vy=0;s.supported=false;s.event='gravity';}
+      s.vy-=s.gravity*38*dt;break;
+    case 'U':
+      if(tap){s.vy=s.gravity*10.2;s.event='jump';}
+      s.vy-=s.gravity*29*dt;break;
+    case 'W':
+      s.vy=(hold?1:-1)*s.gravity*1000/s.course.pace*s.speed*.98;s.supported=false;break;
+    case 'P':
+      if(tap&&s.supported){
+        s.gravity*=-1;
+        s.y=s.gravity>0?bodySizes.P[1]:DASH_CEILING-bodySizes.P[1];
+        s.vy=0;s.event='warp';
+      }
+      s.vy-=s.gravity*50*dt;break;
+    case 'V':
+      if(tap){s.gravity*=-1;s.event='gravity';}
+      s.vy=clamp(s.vy-s.gravity*23*dt,-8.7,8.7);break;
+  }
+}
+
+function collide(s,cell,shape,oldY,halfW,halfH){
+  if(cell.token==='l'&&s.x<s.laserOff)return false;
+  const left=s.x-halfW,right=s.x+halfW,bottom=s.y-halfH,top=s.y+halfH;
+  if(right<=shape.x-shape.half||left>=shape.x+shape.half)return false;
+  if(cell.token==='M'||cell.token==='b'){
+    if(s.gravity>0&&s.vy<=0&&oldY-halfH>=shape.high-.016&&bottom<=shape.high){
+      s.y=shape.high+halfH;s.vy=0;s.supported=true;return false;
+    }
+    if(s.gravity<0&&s.vy>=0&&oldY+halfH<=shape.low+.016&&top>=shape.low){
+      s.y=shape.low-halfH;s.vy=0;s.supported=true;return false;
+    }
+  }
+  if(cell.token==='M')return false;
+  if(!jaws.has(cell.token)||top<=shape.low||bottom>=shape.high)return false;
+  if(!shape.tip)return true;
+  const dx=Math.max(0,left-shape.x,shape.x-right);
+  const slope=(shape.high-shape.low)*(1-dx/shape.half);
+  return shape.inverted?top>shape.high-slope:bottom<shape.low+slope;
+}
+function stop(s,cell){
+  s.done=true;s.won=false;s.deathTile=clamp(cell,0,s.course.pattern.length-1);s.event='crash';
+}
+export function stepDash(s,mask=0){
+  if(s.done)return s;
+  s.tick++;s.elapsed=s.tick/DASH_HZ;s.event='';
+  const hold=Boolean(mask&1),tap=Boolean(mask&2)||(hold&&!s.pressed);
+  s.pressed=hold;
+  const path=s.course,from=s.x;
+  s.x+=1000/path.pace*s.speed*DASH_DT;
+  const center=path.cells[Math.floor(s.x)];
+  if(center&&from<center.x&&s.x>=center.x)enter(s,center);
+  let [halfW,halfH]=bodySizes[s.mode];
+  const near=path.cells.slice(Math.max(0,Math.floor(s.x)-1),Math.ceil(s.x)+1);
+  let orb=false;
+  if(tap){
+    for(const cell of near){
+      if(cell.token!=='O'||s.used.has(cell.index))continue;
+      const shape=dashShape(path,cell,s.elapsed);
+      if(Math.abs(s.x-shape.x)<.70&&Math.abs(s.y-(shape.high+shape.low)/2)<.94){
+        s.used.add(cell.index);orb=true;s.event='orb';s.vy=s.gravity*15.8;s.supported=false;break;
+      }
+    }
+  }
+  if(!orb)control(s,hold||tap,tap,DASH_DT);
+  const oldY=s.y;
+  s.y+=s.vy*DASH_DT;s.supported=false;
+  const gap=center?.token==='g';
+  if((gap&&s.y-halfH<-.27)||(s.mode==='W'&&(s.y-halfH<0||s.y+halfH>DASH_CEILING))){
+    stop(s,center?.index??Math.floor(s.x));return s;
+  }
+  if(s.y-halfH<=0&&(!gap||s.mode==='W')){
+    s.y=halfH;
+    s.supported=s.gravity>0;
+    s.vy=0;
+  }
+  if(s.y+halfH>=DASH_CEILING){
+    s.y=DASH_CEILING-halfH;
+    s.supported=s.gravity<0;
+    s.vy=0;
+  }
+  // At 120 Hz the fastest player moves under .12 tiles per step. Player
+  // and obstacle shapes share the same clock and greatly exceed that span.
+  for(const cell of near){
+    if(collide(s,cell,dashShape(path,cell,s.elapsed),oldY,halfW,halfH)&&s.tick>s.immuneUntil){
+      stop(s,cell.index);return s;
+    }
+  }
+  if(s.y<-.34){stop(s,center?.index??Math.floor(s.x));return s;}
+  if(s.x>=path.pattern.length){s.done=true;s.won=true;s.event='finish';}
+  if(s.tick>=DASH_MAX_TICKS&&!s.done)stop(s,Math.floor(s.x));
+  return s;
+}
+
+export function replayDash(pattern,pace,options,trace){
+  if(!Array.isArray(trace)||trace.length>1800)throw Error('Invalid Dash Forge trace.');
+  let last=-1;
+  for(const event of trace){
+    if(!Array.isArray(event)||event.length!==2||!event.every(Number.isInteger)||
+      event[0]<=last||event[0]>=DASH_MAX_TICKS||event[1]<0||event[1]>3)throw Error('Invalid Dash Forge control event.');
+    last=event[0];
+  }
+  const state=createDashRun(createDashCourse(pattern,pace,options));
+  let input=0,cursor=0;
+  while(!state.done){
+    if(trace[cursor]?.[0]===state.tick)input=trace[cursor++][1];
+    stepDash(state,input);
+  }
+  if(cursor!==trace.length)throw Error('Control events extend past the run.');
+  return {won:state.won,elapsed_ms:Math.round(state.elapsed*1000),death_tile:state.deathTile,tiles:Math.floor(state.x)+1};
+}

@@ -3,6 +3,10 @@
  * Supabase score authority remain in place. Never awards offline wins.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {SKY_DT,SKY_INPUT,buildSkyCourse,createSkyRide,skyTrack,skyObjectX,stepSky} from './skyboard-physics.mjs';
+import {createSkyScene} from './skyboard-scene.mjs';
+import {AVATAR_OPTIONS} from './family-avatar-builder.mjs';
+import {submitArcadeReplay} from './family-arcade-replay.mjs';
 const host=document.getElementById('conversations'), config=window.COWBOY_COMMUNITY_CONFIG;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -29,30 +33,19 @@ const BADGES=[
  ['ten','Sky Surfer','Clear ten stages','🌈',11],
  ['fifteen','Ramp Ranger','Clear fifteen stages','🦊',16],
  ['twenty','Speed Artist','Clear twenty stages','⚡',21],
- ['finish','Skyboard Champion','Finish all thirty stages','🏆',31]
+ ['finish','Skyboard Champion','Finish all thirty stages','🏆',31],
+ ['boost-master','Tenfold Trailblazer','Finish after completing a full 10× boost','⚡',0],
+ ['ball-survivor','Red Ball Comeback','Recover from a red ball and finish the stage','🔴',0]
 ];
 let client=null,user=null,root=null,profile=null,leaders=[],awards=[],open=false,booted=false;
 let selectedBoard='sunny',currentScene='play',run=null,request=0,last=0,held=new Set(),busy=false;
+let scene=null,compatibility=false,jumpQueued=false,accumulator=0,preview=null,showGhost=true,shareReplay=false,riderLook=null;
 const status=(message,isError=false)=>{const node=$('skyboard-status');if(node){node.textContent=message;node.dataset.error=String(isError)}};
 const boardType=()=>BOARDS.find(b=>b.id===selectedBoard)||BOARDS[0];
 const stage=()=>Math.max(1,Math.min(31,Number(profile?.stage||1)));
 const available=b=>stage()>=b.need;
 const active=()=>!host.hidden&&document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='skyboard';
-function rand(seed){let s=(Number(seed)||1)>>>0;return ()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296;};}
 function palette(n){return WORLDS[Math.floor((n-1)/5)%WORLDS.length];}
-function buildCourse(number,seed) {
- const rng=rand(seed ^ Math.imul(number,3313)), length=300+Math.min(105,number*3), things=[];
- for(let z=45;z<length-28;z+=22+rng()*15){
-   const roll=rng(),lane=Math.round(rng()*2)-1;
-   let kind=roll<.24?'coin':roll<.39?'boost':roll<.56?'bar':roll<.75?'spikes':roll<.88?'gap':'gate';
-   if(number<3 && kind==='gap')kind='coin';
-   if(number<5 && kind==='gate')kind='boost';
-   things.push({z,kind,lane,x:lane*.79,used:false,spin:rng()*6.28});
-   if(kind==='bar'||kind==='spikes'||kind==='gate')things.push({z:z+8,kind:'coin',lane:-lane||1,x:(-lane||1)*.79,used:false,spin:rng()*6.28});
- }
- return {length,things};
-}
-function button(label,handler,cl=''){const b=document.createElement('button');b.type='button';b.textContent=label;b.className=cl;b.addEventListener('click',handler);return b;}
 function build(){
  if(root?.isConnected)return;
  const main=host.querySelector('.community-main');if(!main)return;
@@ -71,14 +64,16 @@ function build(){
  '<button type="button" id="skyboard-start" class="skyboard-primary">▶ START STAGE</button></div>'+
  '<div id="skyboard-viewport" class="skyboard-viewport"><canvas id="skyboard-canvas" width="960" height="540" role="img" aria-label="Third-person board race with colorful tracks, gaps, bars, coins and boosts"></canvas>'+
  '<div class="skyboard-hud"><span id="skyboard-live-stage">01 / 30</span><span id="skyboard-live-distance">0%</span><span id="skyboard-live-lives">♥♥♥</span><span id="skyboard-live-coins">★ 0</span></div>'+
+ '<div id="skyboard-speed" class="skyboard-speed" hidden></div>'+
  '<div id="skyboard-message" class="skyboard-message"><strong>READY TO RIDE?</strong><p>Pick a board and press Start Stage.</p></div></div>'+
  '<div class="skyboard-touch" aria-label="Game touch controls"><button data-sky-hold="left" type="button" aria-label="Steer left">◀ LEFT</button>'+
+ '<button data-sky-hold="brake" type="button" aria-label="Brake">BRAKE</button>'+
  '<button data-sky-hold="drift" type="button" aria-label="Drift around turns">↝ DRIFT</button>'+
  '<button data-sky-action="jump" type="button" class="skyboard-jump" aria-label="Jump">▲ JUMP</button>'+
  '<button data-sky-hold="right" type="button" aria-label="Steer right">RIGHT ▶</button></div>'+
- '<div class="skyboard-help">Hold LEFT / RIGHT to steer · Tap JUMP to clear gaps and barriers · Hold DRIFT for a faster slide · Collect stars and hit boost pads.</div>'+
+ '<div class="skyboard-help">Steer with ← →, jump with Space, drift with Shift and brake with ↓. A gamepad uses the stick, A to jump, X to drift and B to brake.</div>'+
  '<div class="skyboard-round-actions"><button type="button" id="skyboard-pause">PAUSE</button>'+
- '<button type="button" id="skyboard-retry">RETRY STAGE</button><button type="button" id="skyboard-next" hidden>NEXT STAGE ▶</button></div></section>'+
+ '<button type="button" id="skyboard-retry">RETRY STAGE</button><button type="button" id="skyboard-ghost" aria-pressed="true">Family ghost on</button><button type="button" id="skyboard-share" aria-pressed="false">Share my ghost</button><button type="button" id="skyboard-next" hidden>NEXT STAGE ▶</button></div></section>'+
  '<section id="skyboard-boards" class="skyboard-pane" hidden><h3>CHOOSE YOUR RIDE</h3><p>Earn new boards by completing stages. No purchases, no ads, just family prizes.</p><div id="skyboard-board-list" class="skyboard-board-grid"></div></section>'+
  '<section id="skyboard-awards" class="skyboard-pane" hidden><h3>EMMA’S TROPHY ROAD</h3><p>Milestone awards are recorded on your family member account.</p><div id="skyboard-badge-list" class="skyboard-badge-grid"></div></section>'+
  '<section id="skyboard-leaders" class="skyboard-pane" hidden><h3>FAMILY LEADERBOARD</h3><p>Saved family progress, ordered by cleared stages and points.</p><div id="skyboard-leader-list" class="skyboard-leader-list"></div></section>'+
@@ -99,6 +94,17 @@ function build(){
  $('skyboard-retry').addEventListener('click',()=>void start(true));
  $('skyboard-next').addEventListener('click',()=>void start());
  $('skyboard-pause').addEventListener('click',()=>pause());
+ $('skyboard-ghost').addEventListener('click',e=>{
+  showGhost=!showGhost;e.target.setAttribute('aria-pressed',String(showGhost));
+  e.target.textContent=showGhost?'Family ghost on':'Family ghost off';draw();
+  if(showGhost&&run?.ghost)status('Asynchronous ghost · '+run.ghost.name+'’s saved race.');
+ });
+  $('skyboard-share').setAttribute('aria-pressed',String(shareReplay));
+ $('skyboard-share').addEventListener('click',e=>{
+  shareReplay=!shareReplay;e.target.setAttribute('aria-pressed',String(shareReplay));
+  try{localStorage.setItem('skyboard-share-'+user,shareReplay?'yes':'no');}catch{}
+  status(shareReplay?'New verified races can appear as ghosts for approved family members.':'New replays will stay private.');
+ });
  root.querySelectorAll('[data-sky-hold]').forEach(b=>{
   const action=b.dataset.skyHold;b.style.touchAction='none';
   b.addEventListener('pointerdown',e=>{e.preventDefault();held.add(action);b.classList.add('pressed');try{b.setPointerCapture(e.pointerId)}catch{}});
@@ -168,7 +174,7 @@ async function refresh(){
 }
 function reset(){
  if(request){cancelAnimationFrame(request);request=0;}
- held.clear();last=0;run=null;
+ held.clear();last=accumulator=0;jumpQueued=false;run=null;preview=null;
  const next=$('skyboard-next'),startButton=$('skyboard-start'),pauseButton=$('skyboard-pause'),message=$('skyboard-message');
  if(next)next.hidden=true;if(startButton)startButton.disabled=false;
  if(pauseButton)pauseButton.textContent='PAUSE';if(message)message.hidden=false;
@@ -179,75 +185,74 @@ async function start(retry=false){
  if(run)reset();
  busy=true;$('skyboard-start').disabled=true;
  status('Preparing your course and saved family checkpoint…');
- const n=stage()>30?30:stage(),b=boardType();
- let seed=(Date.now() ^ Math.floor(Math.random()*1000000))>>>0,id=null,practice=false;
+ const n=stage()>30?30:stage(),pick=boardType();
+ const b={...pick,look:riderLook,trail:riderLook?.trail||pick.trail};
+ let seed=(Math.imul(n,212561)^196930),id=null,practice=false,ghost=null;
  try{
   if(stage()>30)practice=true;
   else{
-   const data=await rpc('community_boardride_start',{p_board:b.id});
-   id=data.run_id;seed=Number(data.seed);if(Number(data.stage)!==n)throw Error('Your stage changed. Refresh and try again.');
+   const data=await rpc('community_boardride_start_v2',{p_board:b.id,p_share:shareReplay});
+   if(Number(data.stage)!==n)throw Error('Your stage changed. Refresh and try again.');
+   id=data.run_id;seed=Number(data.seed);ghost=data.ghost||null;
   }
  }catch(e){
-  practice=true;status('Practice mode: '+e.message+' Results will not be saved.',true);
+  practice=true;status('Practice mode · '+e.message,true);
  }
- const course=buildCourse(n,seed);
- run={stage:n,id,seed,practice,board:b,course,progress:0,x:0,vx:0,speed:15,
-   height:0,vy:0,boost:0,coins:0,lives:3,points:0,invuln:0,elapsed:0,
-   checkpoint:0,done:false,paused:false,lastInput:0,theme:palette(n)};
+ const course=buildSkyCourse(n,seed);
+ run=Object.assign(createSkyRide(course,b.id),{
+  stage:n,id,seed,practice,board:b,paused:false,theme:palette(n),trace:[],lastInput:0,ghost,announced:false,countdown:1.75
+ });
  busy=false;$('skyboard-start').disabled=false;$('skyboard-next').hidden=true;
  $('skyboard-message').hidden=true;$('skyboard-pause').textContent='PAUSE';
- status(practice?'Practice run · not counted toward the family leaderboard.':'Stage '+n+' · race to the finish!');
- last=0;draw();request=requestAnimationFrame(frame);
+ status(practice?'Practice ride · results stay on this device.':
+   ghost&&showGhost?'Asynchronous ghost · '+ghost.name+'’s saved race.':'Stage '+n+' · race to the finish!');
+ last=accumulator=0;draw();request=requestAnimationFrame(frame);
 }
 function jump(){
- if(!run||run.done||run.paused||!active()||run.height>.01)return;
- run.vy=6.7;run.height=.02;
+ if(run&&!run.done&&!run.paused&&active())jumpQueued=true;
 }
 function pause(silent=false){
- held.clear();if(!run||run.done)return;
+ held.clear();jumpQueued=false;
+ if(!run||run.done)return;
  run.paused=silent?true:!run.paused;
  $('skyboard-pause').textContent=run.paused?'RESUME':'PAUSE';
  if(!silent)status(run.paused?'Race paused.':'Back on the board!');
 }
-function crash(){
- if(run.invuln>0)return;
- run.lives-=1;run.invuln=2.2;
- if(run.lives<=0){void finish(false);return;}
- const restart=Math.max(0,run.checkpoint-12);
- run.progress=restart;run.x=0;run.vx=0;run.speed=12;run.vy=0;run.height=0;
- for(const o of run.course.things)if(o.z>=restart)o.used=false;
- status('Oops, a tumble! '+run.lives+' hearts left. Back to your checkpoint.');
-}
-function collide(prev,next){
- for(const o of run.course.things){
-  if(o.used||o.z>next||o.z<=prev)continue;
-  o.used=true;
-  const close=Math.abs(run.x-o.x)<(o.kind==='gate'?.53:.40),air=run.height>.42;
-  if(o.kind==='coin'){if(close){run.coins++;run.points+=25;}continue;}
-  if(o.kind==='boost'){if(close){run.boost=2.6;run.points+=20;}continue;}
-  if(o.kind==='gap'){if(!air)crash();continue;}
-  if(['bar','spikes','gate'].includes(o.kind)&&close&&!air)crash();
+function inputMask(){
+ let mask=0;
+ for(const action of held)mask|=SKY_INPUT[action]||0;
+ const pads=navigator.getGamepads?.();
+ const pad=pads&&Array.from(pads).find(p=>p?.connected);
+ if(pad){
+  if(pad.axes[0]<-.28||pad.buttons[14]?.pressed)mask|=SKY_INPUT.left;
+  if(pad.axes[0]>.28||pad.buttons[15]?.pressed)mask|=SKY_INPUT.right;
+  if(pad.buttons[0]?.pressed)mask|=SKY_INPUT.jump;
+  if(pad.buttons[2]?.pressed)mask|=SKY_INPUT.drift;
+  if(pad.buttons[1]?.pressed)mask|=SKY_INPUT.brake;
  }
+ if(jumpQueued){mask|=SKY_INPUT.jump;jumpQueued=false;}
+ return mask;
 }
-function tick(dt){
- if(!run||run.done||run.paused)return;
- run.elapsed+=dt;run.invuln=Math.max(0,run.invuln-dt);run.boost=Math.max(0,run.boost-dt);
- const dir=(held.has('right')?1:0)-(held.has('left')?1:0),drift=held.has('drift');
- const target=dir*(drift?2.25:3.15)*run.board.turn;
- run.vx+=(target-run.vx)*Math.min(1,dt*(drift?3:7));
- run.x=Math.max(-1.23,Math.min(1.23,run.x+run.vx*dt));
- run.vy-=15.8*dt;run.height=Math.max(0,run.height+run.vy*dt);
- if(run.height===0)run.vy=0;
- const want=(15.2+Math.min(5,run.stage*.2))*run.board.speed+(run.boost>0?12:0)+(drift&&dir?2.4:0);
- run.speed+=(want-run.speed)*Math.min(1,dt*1.5);
- const was=run.progress;run.progress=Math.min(run.course.length,run.progress+run.speed*dt);
- if(Math.floor(run.progress/68)>Math.floor(was/68))run.checkpoint=Math.floor(run.progress/68)*68;
- collide(was,run.progress);
- if(run&&run.progress>=run.course.length&&!run.done)void finish(true);
+function tick(){
+ const mask=inputMask();
+ if(mask!==run.lastInput){run.trace.push([run.tick,mask]);run.lastInput=mask;}
+ stepSky(run,mask);
+ if(run.event==='ball-hit')status('Red ball hit! Recover and keep riding.');
+ if(run.event==='fall')status(run.lives?'Back at your checkpoint · '+run.lives+' hearts left.':'No hearts left. Retry the stage.');
+ if(run.done)void finish(run.won);
+}
+function ghostPosition(r){
+ const frames=showGhost&&r.ghost?.frames;
+ if(!Array.isArray(frames)||frames.length<2)return null;
+ const index=Math.min(frames.length-2,Math.max(0,Math.floor(r.tick/12)-1));
+ const a=frames[index],b=frames[index+1];
+ const mix=Math.min(1,Math.max(0,(r.tick-a[0])/Math.max(1,b[0]-a[0])));
+ if(r.tick>b[0]+18&&index===frames.length-2)return null;
+ return {z:(a[1]+(b[1]-a[1])*mix)/100,x:(a[2]+(b[2]-a[2])*mix)/100,y:(a[3]+(b[3]-a[3])*mix)/100};
 }
 async function finish(win){
- if(!run||run.done)return;
- const snapshot=run;run.done=true;if(request){cancelAnimationFrame(request);request=0;}
+ if(!run||run.announced)return;
+ const snapshot=run;run.announced=run.done=true;if(request){cancelAnimationFrame(request);request=0;}
  held.clear();
  const message=$('skyboard-message');message.hidden=false;
  message.innerHTML='<strong>'+(win?'FINISH LINE!':'TRY AGAIN!')+'</strong><p>'+
@@ -259,7 +264,7 @@ async function finish(win){
  }
  busy=true;status('Saving your finish and checking milestone prizes…');
  try{
-  const result=await rpc('community_boardride_finish',{p_run_id:snapshot.id,p_elapsed_ms:Math.round(snapshot.elapsed*1000),p_coins:snapshot.coins});
+  const result=await submitArcadeReplay(client,config,'skyboard',snapshot.id,snapshot.trace);
   message.innerHTML='<strong>STAGE '+snapshot.stage+' CLEAR!</strong><p>+'+
    Number(result.points||0).toLocaleString()+' points · '+snapshot.coins+' stars · '+(snapshot.elapsed).toFixed(1)+' seconds</p>';
   await refreshAfterWin();
@@ -292,116 +297,108 @@ function sky(c,p,t){
   if(env==='ice'){poly(c,[[x,215],[x+19,150-(i%3)*19],[x+45,214]],i%2?'#d7f7ff':'#a8e1fa');}
  }
 }
-function project(x,z){
- const q=1/(1+Math.max(0,z)*.043);
- const curve=Math.sin(((run?.progress||0)+z)*.010+((run?.stage||1)*.46))*.22;
- return [WIDTH/2+(x+curve-(run?.x||0)*.30)*340*q,HORIZON+405*q,q];
+function project(r,x,z,y=0){
+ const t=skyTrack(r.course,z),origin=skyTrack(r.course,r.progress);
+ const q=1/(1+Math.max(0,z-r.progress)*.050);
+ return [WIDTH/2+(t.center-origin.center+x-r.x*.47)*63*q,HORIZON+(398-(y+t.y-origin.y)*72)*q,q];
 }
-function road(c){
- const p=run.theme,skip=run.course.things.filter(o=>o.kind==='gap'&&!o.used).map(o=>o.z-run.progress);
- for(let z=177;z>=0;z-=6){
-  const z2=z+6,[lx,y]=project(-1.45,z),[rx]=project(1.45,z),
-   [flx,fy]=project(-1.45,z2),[frx]=project(1.45,z2),[center]=project(0,z);
-  const empty=skip.some(s=>s>=z-1&&s<z2+7);
-  if(empty)continue;
-  poly(c,[[flx,fy],[frx,fy],[rx,y],[lx,y]],p.road[Math.floor((run.progress+z)/22)%2]);
-  poly(c,[[flx,fy],[flx+5,fy],[lx+9,y],[lx,y]],p.border);
-  poly(c,[[frx-5,fy],[frx,fy],[rx,y],[rx-9,y]],p.border);
-  if(Math.floor((run.progress+z)/15)%3===0){const [a,b]=project(-.04,z2),[d,e]=project(.04,z);poly(c,[[a,b],[a+2,b],[d+3,e],[d,e]],'#ffffff70');}
-  if(z%18===0){
-   const [x1,y1]=project(-1.52,z),[x2,y2]=project(1.52,z);
-   circle(c,x1,y1,Math.max(2,(y1-HORIZON)*.017),p.accent);
-   circle(c,x2,y2,Math.max(2,(y2-HORIZON)*.017),p.accent);
+function drawCompatibility(c,r){
+ const t=r.elapsed,p=r.theme;
+ sky(c,p,t);
+ const gap=r.course.things.find(o=>o.kind==='gap');
+ for(let z=Math.min(r.course.length,r.progress+152);z>r.progress;z-=3){
+  const prev=Math.max(r.progress,z-3);
+  if(gap&&prev<gap.z+gap.span/2&&z>gap.z-gap.span/2)continue;
+  const ends=[prev,z].map(k=>{const half=skyTrack(r.course,k).half;return [-half,half].map(x=>project(r,x,k).slice(0,2));});
+  poly(c,[...ends[0],...ends[1].reverse()],p.road[Math.floor(z/12)%2],p.border,1.3);
+ }
+ for(const o of [...r.course.things].reverse()){
+  if(o.z<r.progress-1||o.z>r.progress+139||r.used.has(o.id))continue;
+  const [x,y,q]=project(r,skyObjectX(o,t),o.z);
+  if(o.kind==='ball'){
+   const R=o.radius*48*q;
+   circle(c,x,y-R,R,'#b2204c');circle(c,x-R*.11,y-R*1.13,R*.83,'#f04357');
+   circle(c,x-R*.36,y-R*1.46,R*.17,'#ffb2ac');
   }
+  if(o.kind==='coin'){circle(c,x,y-48*q,21*q,'#ffe365');text(c,'★',x,y-40*q,25*q,'#895a15');}
+  if(o.kind==='boost')text(c,'10× SPEED',x,y,Math.max(18,45*q),'#14395e');
+  if(o.kind==='bar'||o.kind==='gate'||o.kind==='spikes'){
+   c.fillStyle='#e4417b';c.fillRect(x-o.half*50*q,y-o.height*58*q,o.half*100*q,o.height*58*q);
+  }
+  if(o.kind==='gap')text(c,'JUMP',x,y-14,Math.max(14,31*q),'#2b195a');
  }
-}
-function obstacle(c,o,t){
- const z=o.z-run.progress;if(z< -6||z>164||o.used)return;
- const [x,y,q]=project(o.x,z),size=Math.max(3,65*q);
- if(o.kind==='coin'){
-  const wave=Math.sin(t*5+o.spin)*6*q;
-  circle(c,x,y-45*q+wave,size*.27,'#fff3aa');
-  circle(c,x,y-45*q+wave,size*.19,'#ffbf3c');
-  text(c,'★',x,y-38*q+wave,Math.max(8,24*q),'#fff');
- } else if(o.kind==='boost'){
-  const a=project(o.x-.35,z-3),b=project(o.x+.35,z-3),d=project(o.x+.35,z+7),e=project(o.x-.35,z+7);
-  poly(c,[a.slice(0,2),b.slice(0,2),d.slice(0,2),e.slice(0,2)],'#29f4ef','#fff',Math.max(1,2*q));
-  text(c,'⚡',x,y-5*q,Math.max(9,35*q),'#095375');
- } else if(o.kind==='gap'){
-  const a=project(-1.4,z-3),b=project(1.4,z-3),d=project(1.4,z+10),e=project(-1.4,z+10);
-  poly(c,[a.slice(0,2),b.slice(0,2),d.slice(0,2),e.slice(0,2)],'#12142d');
-  text(c,'JUMP!',WIDTH/2,(a[1]+e[1])/2,Math.max(12,34*q),'#fff0a2');
- } else if(o.kind==='spikes'){
-  for(let k=-1;k<=1;k++){const cx=x+k*size*.36;poly(c,[[cx-size*.19,y],[cx,y-size*.65],[cx+size*.19,y]],'#ff4d83','#fff6cc',Math.max(1,q*2));}
- } else if(o.kind==='bar'){
-  poly(c,[[x-size*.58,y],[x-size*.58,y-size*.70],[x+size*.58,y-size*.7],[x+size*.58,y]],'#fa615b','#652e61',Math.max(1,2*q));
-  text(c,'HOP',x,y-size*.3,Math.max(10,19*q),'#fff');
- } else if(o.kind==='gate'){
-  const s=size*.85;
-  c.strokeStyle='#9744b5';c.lineWidth=Math.max(2,6*q);c.beginPath();c.moveTo(x-s,y);c.lineTo(x-s,y-s*1.3);c.lineTo(x+s,y-s*1.3);c.lineTo(x+s,y);c.stroke();
-  poly(c,[[x-s,y-s*.95],[x+s,y-s*.95],[x+s,y-s*.7],[x-s,y-s*.7]],'#ffea62');
- }
-}
-function rider(c,t){
- const b=run.board,x=WIDTH/2+run.x*95,y=HEIGHT-86-run.height*83,slant=run.vx*.026;
- c.save();c.translate(x,y);c.rotate(slant);
- c.globalAlpha=Math.max(.38,run.invuln>0?.55:1);
- c.fillStyle='#302b58aa';c.beginPath();c.ellipse(0,82+run.height*69,43,10,0,0,6.28);c.fill();
- c.strokeStyle=b.trail;c.lineWidth=7;c.beginPath();c.moveTo(-27,43);c.lineTo(26,43);c.stroke();
- poly(c,[[-37,27],[35,27],[45,37],[23,43],[-34,40]],b.color,'#22254b',4);
- for(const ax of [-24,24])circle(c,ax,45,6,'#29314b');
- c.lineCap='round';c.lineWidth=12;c.strokeStyle='#463b6a';
- c.beginPath();c.moveTo(-12,8);c.lineTo(-17,30);c.moveTo(13,8);c.lineTo(18,30);c.stroke();
- poly(c,[[-17,-51],[16,-51],[22,10],[-20,11]],'#506ad7','#24285a',4);
- c.strokeStyle='#f7be93';c.lineWidth=10;c.beginPath();c.moveTo(-16,-43);c.lineTo(-28,-14);c.moveTo(17,-42);c.lineTo(28,-16);c.stroke();
- circle(c,0,-73,24,'#efb68d');circle(c,-7,-73,2.9,'#182244');circle(c,8,-73,2.9,'#182244');
- poly(c,[[-28,-85],[-18,-112],[5,-122],[25,-107],[25,-86]],'#fc699a','#b83f7b',3);
- circle(c,0,-103,6,'#ffe06c');c.restore();
+ const x=WIDTH/2+r.x*32,y=HEIGHT-74-(r.y-skyTrack(r.course,r.progress).y)*61;
+ poly(c,[[x-49,y+9],[x+49,y+9],[x+42,y+20],[x-37,y+20]],r.board.color,'#293052',4);
+ poly(c,[[x-15,y-48],[x+15,y-48],[x+20,y+10],[x-20,y+10]],'#40389b','#202851',4);
+ circle(c,x,y-66,23,'#ef5191');
+ text(c,'Compatibility graphics',WIDTH-16,HEIGHT-12,16,'#182345','right');
 }
 function draw(){
  const canvas=$('skyboard-canvas');if(!canvas)return;
  const c=canvas.getContext('2d');if(!c)return;
- const r=run,p=r?.theme||palette(Math.min(30,stage())),t=r?.elapsed||0;
- sky(c,p,t);
- if(r){
-  road(c);
-  for(const o of r.course.things.filter(o=>o.z-r.progress>-6&&o.z-r.progress<164).sort((a,b)=>b.z-a.z))obstacle(c,o,t);
-  const [a,b]=project(-1.44,r.course.length-r.progress),[finishRightX]=project(1.44,r.course.length-r.progress);
-  if(r.course.length-r.progress<160){
-   c.strokeStyle='#252540';c.lineWidth=9;c.beginPath();c.moveTo(a,b-65*(1/(1+Math.max(0,r.course.length-r.progress)*.043)));c.lineTo(finishRightX,b-65*(1/(1+Math.max(0,r.course.length-r.progress)*.043)));c.stroke();
-   text(c,'FINISH',WIDTH/2,b-23,Math.max(14,37/(1+Math.max(0,r.course.length-r.progress)*.043)),'#262046');
-  }
-  rider(c,t);
-  const d=Math.round(100*r.progress/r.course.length);
-  $('skyboard-live-stage').textContent=String(r.stage).padStart(2,'0')+' / 30';
-  $('skyboard-live-distance').textContent=d+'%';
-  $('skyboard-live-lives').textContent='♥'.repeat(r.lives)+'♡'.repeat(3-r.lives);
-  $('skyboard-live-coins').textContent='★ '+r.coins;
- }else{
-  c.fillStyle='#28214e77';c.fillRect(205,160,550,185);
-  text(c,'EMMA’S SKYBOARD SPRINT',WIDTH/2,222,43,'#fff5ba');
-  text(c,'30 COLORFUL STAGES · SIX DREAM WORLDS',WIDTH/2,270,22,'#fff');
-  text(c,'JUMP · DRIFT · BOOST · WIN',WIDTH/2,309,23,'#a6fff0');
+ const n=Math.min(30,stage());
+ if(!run&&!active()&&!open)return;
+ if(!run&&(preview?.stage!==n||preview?.board.id!==selectedBoard)){
+  preview=Object.assign(createSkyRide(buildSkyCourse(n,196930),boardType().id),{
+    stage:n,board:boardType(),theme:palette(n),progress:70
+  });
+  preview.y=skyTrack(preview.course,preview.progress).y;
  }
+ const r=run||preview;
+ if(!compatibility){
+  try{
+   if(!scene)scene=createSkyScene(WIDTH,HEIGHT);
+   scene.draw(c,r,r.theme,r.board,run&&ghostPosition(r));
+   canvas.dataset.renderer='webgl';
+  }catch(e){
+   compatibility=true;scene?.dispose();scene=null;
+   console.info('Skyboard compatibility graphics enabled.',e.message);
+  }
+ }
+ if(compatibility){drawCompatibility(c,r);canvas.dataset.renderer='compatibility';}
+ if(!run)return;
+ canvas.dataset.raceState=r.hurt>0?'hit':r.boost>0?'boost':r.recovery>0?'checkpoint':r.done?'finish':'ride';
+ canvas.dataset.distance=r.progress.toFixed(3);
+ canvas.dataset.multiplier=(r.speed/r.normal).toFixed(3);
+ canvas.dataset.ballHits=String(r.ballHits);
+ const alert=$('skyboard-speed');
+ const callout=r.countdown>0?(r.countdown>.94?'READY':'SET'):
+  r.hurt>0?'RED BALL · RECOVER':r.boost>0?(r.boost<.135?'10× SPEED! · ENDING':'10× SPEED!'):
+  r.recovery>0?'CHECKPOINT':r.tick<33?'GO!':'';
+ if(alert.textContent!==callout)alert.textContent=callout;
+ alert.hidden=!callout;
+ alert.dataset.mode=r.hurt>0?'hit':'boost';
+ $('skyboard-live-stage').textContent=String(r.stage).padStart(2,'0')+' / 30';
+ $('skyboard-live-distance').textContent=Math.round(100*r.progress/r.course.length)+'%';
+ $('skyboard-live-lives').textContent='♥'.repeat(r.lives)+'♡'.repeat(3-r.lives);
+ $('skyboard-live-coins').textContent='★ '+r.coins;
 }
 function frame(ts){
  request=0;if(!run||run.done)return;
- const dt=last?Math.min(.04,(ts-last)/1000):0;last=ts;
- if(active()&&!document.hidden)tick(dt);
- draw();if(run&&!run.done)request=requestAnimationFrame(frame);
+ const delta=last?Math.min(.12,(ts-last)/1000):0;last=ts;
+ if(active()&&!document.hidden&&!run.paused){
+  if(run.countdown>0)run.countdown=Math.max(0,run.countdown-delta);
+  else accumulator+=delta;
+  while(accumulator>=SKY_DT&&!run.done){accumulator-=SKY_DT;tick();}
+ }
+ draw();
+ if(run&&!run.done)request=requestAnimationFrame(frame);
 }
 function onKeyDown(e){
  if(!active()||!run||run.done||e.target?.closest?.('input,textarea,select,[contenteditable]'))return;
- if(['ArrowLeft','ArrowRight','ArrowUp','Space','KeyA','KeyD','KeyW','ShiftLeft','ShiftRight'].includes(e.code))e.preventDefault();
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space','KeyA','KeyD','KeyW','ShiftLeft','ShiftRight'].includes(e.code))e.preventDefault();
  if(['ArrowLeft','KeyA'].includes(e.code))held.add('left');
  if(['ArrowRight','KeyD'].includes(e.code))held.add('right');
  if(['ShiftLeft','ShiftRight'].includes(e.code))held.add('drift');
+ if(e.code==='ArrowDown')held.add('brake');
+ if(e.code==='Escape'&&!e.repeat)pause();
  if(['ArrowUp','Space','KeyW'].includes(e.code)&&!e.repeat)jump();
 }
 function onKeyUp(e){
  if(['ArrowLeft','KeyA'].includes(e.code))held.delete('left');
  if(['ArrowRight','KeyD'].includes(e.code))held.delete('right');
  if(['ShiftLeft','ShiftRight'].includes(e.code))held.delete('drift');
+ if(e.code==='ArrowDown')held.delete('brake');
 }
 function syncArcade(){
  if(!root?.isConnected)return;
@@ -419,7 +416,19 @@ async function verify(){
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
  if(error||member?.status!=='approved'){reset();root?.remove();root=null;user=null;open=false;return;}
  if(user!==id){reset();root?.remove();root=null;user=id;profile=null;awards=[];leaders=[];open=false;
-  try{selectedBoard=localStorage.getItem('skyboard-board-'+id)||'sunny';}catch{selectedBoard='sunny';}}
+  riderLook=null;
+  try{
+   selectedBoard=localStorage.getItem('skyboard-board-'+id)||'sunny';
+   shareReplay=localStorage.getItem('skyboard-share-'+id)==='yes';
+  }catch{selectedBoard='sunny';shareReplay=false;}
+  const {data:avatars}=await client.rpc('community_avatar_projections',{p_members:[id]});
+  const recipe=avatars?.find?.(row=>row.user_id===id)?.avatar_display;
+  if(recipe){
+   const tone=(part)=>AVATAR_OPTIONS[part].find(([key])=>key===recipe[part])?.[2];
+   riderLook={shirt:tone('shirt'),skin:tone('skin'),hair:tone('hair'),body:recipe.body,garment:recipe.garment,
+    trail:({turquoise:'#a7fcfa',burntorange:'#ffe281',maroon:'#ffa4a7',teal:'#9afafa',navy:'#bac2ff'})[recipe.shirt]};
+  }
+ }
  if(!root?.isConnected){build();await refresh();}
  syncArcade();
 }
@@ -435,7 +444,8 @@ async function boot(){
   new MutationObserver(schedule).observe(host,{attributes:true,attributeFilter:['hidden']});
   new MutationObserver(syncArcade).observe(document.body,{attributes:true,attributeFilter:['class','data-arcade-game','data-arcade-scene']});
   client.auth.onAuthStateChange(schedule);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause(true);else schedule();});
+  window.addEventListener('blur',()=>pause(true));
   window.addEventListener('keydown',onKeyDown);window.addEventListener('keyup',onKeyUp);
   schedule();
  }catch(e){console.warn('Skyboard Sprint unavailable:',e);}

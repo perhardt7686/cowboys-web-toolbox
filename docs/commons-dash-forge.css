@@ -386,3 +386,36 @@ body.community-page #dash-forge-root .dash-builder-actions .dash-playtest-now{
  body.community-page #dash-forge-root #dash-creator-preview{max-height:45dvh!important}
  body.community-page #dash-forge-root .dash-builder-preview{overflow:visible}
 }
+body.community-page #dash-forge-inside :is(.dash-builder-view,.dash-tool-groups){
+ display:flex;flex-wrap:wrap;gap:7px;margin:8px 0;
+}
+body.community-page #dash-forge-inside .dash-tool-groups button{flex:1 1 auto}
+body.community-page #dash-forge-inside :is(.dash-tool-groups,.dash-builder-view) button[aria-pressed=true]{
+ background:#ffe194;color:#231b3d;border-color:#fff6ba
+}
+body.community-page #dash-forge-inside .dash-palette button{
+ display:inline-flex;align-items:center;gap:7px;color:#f9f2ff;border-color:var(--brush,#8d7caf);
+}
+body.community-page #dash-forge-inside .dash-palette button span{color:var(--brush,#e3daee);font-size:1.24em}
+body.community-page #dash-forge-inside .dash-palette button[aria-pressed=true] span{color:#35264c}
+body.community-page #dash-forge-inside .dash-cell.tile-selected{outline:2px solid #ffdf8e;outline-offset:-2px}
+body.community-page #dash-forge-inside .dash-inspector{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border:1px solid #8a75bc;border-radius:12px;
+ color:#fff;margin:9px 0;padding:10px;background:#252246;min-inline-size:0
+}
+body.community-page #dash-forge-inside .dash-inspector legend{font:850 .85rem system-ui;color:#ffde93;padding:0 5px}
+body.community-page #dash-forge-inside .dash-inspector label{min-width:0;display:grid;gap:4px;font:800 .76rem system-ui}
+body.community-page #dash-forge-inside .dash-inspector select{
+ min-height:44px;min-width:0;background:#f8edff;color:#211e3d;border:1px solid #b89edb;border-radius:6px;
+ font:750 1rem system-ui;padding:5px;
+}
+body.community-page #dash-forge-inside .dash-inspector>div{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:7px}
+body.community-page #dash-forge-inside .dash-playing-head{flex-wrap:wrap;gap:5px}
+body.community-page #dash-forge-inside .dash-playing-head button{min-height:44px}
+@media(max-width:540px){
+ body.community-page #dash-forge-inside .dash-inspector{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.community-page #dash-forge-inside .dash-playing-head>div{flex:1 1 47%}
+ body.community-page #dash-forge-inside .dash-playing-head button{padding:5px 8px}
+ body.community-page #dash-forge-inside .dash-editor-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+ body.community-page #dash-forge-inside .dash-cell{min-height:44px}
+}
