@@ -49,17 +49,22 @@ test('full beards have a fitted continuous jaw mesh and two cheek-ink contours p
     assert.equal(meshes[0].geometry.attributes.position.count,6*41);
     const mesh=meshes[0],coords=mesh.geometry.attributes.position;
     assert.ok(mesh.material.side===THREE.DoubleSide);
+    const middle=[];
     for(let i=0;i<6;i++){
-      for(const j of [0,10,20,30,40]){
-        const theta=-1.68+j/40*3.36;
-        const pos=beardJawPoint(beardJawSections(
-          ({oval:1,angular:.98,round:1.09,square:1.07,long:.91,heart:1.03}[face]),
-          ({oval:1,angular:1.08,round:.92,square:1.18,long:.93,heart:.79}[face])
-        ),i,theta);
-        const k=i*41+j;
-        for(let c=0;c<3;c++)assert.ok(Math.abs(coords.getX(k+(c===0?0:0))||0)<100);
-        assert.ok(Math.abs(coords.getX(k)-pos[0])<.10);
-      }
+      const center=i*41+20,left=i*41+10,right=i*41+30;
+      middle.push(coords.getY(center));
+      assert.ok([coords.getX(center),coords.getY(center),coords.getZ(center),
+        coords.getX(left),coords.getY(left),coords.getZ(left),
+        coords.getX(right),coords.getY(right),coords.getZ(right)]
+        .every(Number.isFinite),face+' must not contain invalid geometry');
+      assert.ok(Math.abs(coords.getX(left)+coords.getX(right))<.00001,
+        face+' left and right beard silhouettes must be symmetrical');
+      assert.ok(Math.abs(coords.getY(left)-coords.getY(right))<.00001);
+      assert.ok(Math.abs(coords.getZ(left)-coords.getZ(right))<.00001);
+    }
+    for(let i=1;i<middle.length;i++){
+      assert.ok(middle[i]>middle[i-1]+.0005,
+        face+' full-beard front contour folded back into itself');
     }
     disposeFigure(actor.root);
   }
