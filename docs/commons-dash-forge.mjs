@@ -293,6 +293,7 @@ async function publishLevel(id){
 // samples, or Geometry Dash music are played or redistributed.
 function toggleSound(){
  soundOn=!soundOn;
+ try{localStorage.setItem('dash-forge-audio',soundOn?'on':'off');}catch{}
  const button=$('dash-sound');if(button){button.textContent=soundOn?'♫ SOUND ON':'♪ SOUND OFF';button.setAttribute('aria-pressed',String(soundOn));}
  if(soundOn){
   try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();
@@ -324,7 +325,7 @@ function eventJump(){
  if(pos<0||pos<=run.lastJump+3||run.pattern[pos]!=='.')return;
  run.lastJump=pos;run.jumps.push(pos);
 }
-function jump(){eventJump();}
+function jump(){if(soundOn&&audioContext?.state==='suspended')void audioContext.resume();eventJump();}
 function palette(){
  const t=THEMES.find(row=>row[0]===theme);
  return t&&Number(profile().clears)>=t[2]?t[1]:'#ffd363';
@@ -555,6 +556,7 @@ function frameStep(timestamp){
  frame=requestAnimationFrame(frameStep);
 }
 function beginDraw(l){
+ try{if(!soundOn&&localStorage.getItem('dash-forge-audio')==='on')toggleSound();}catch{}
  const overlay=$('dash-play-overlay');overlay.hidden=false;
  document.body.classList.add('dash-playing');
  $('dash-run-title').textContent=l.title;
@@ -657,6 +659,10 @@ async function boot(){
   schedule();
  }catch(e){console.warn('Dash Forge unavailable:',e);}
 }
+window.addEventListener('dashforge:audio-setting',event=>{
+ const next=Boolean(event.detail?.enabled);
+ if(next!==soundOn)toggleSound();
+});
 window.addEventListener('dashforge:creator-mode',event=>{
  if(!root?.isConnected||run)return;
  const boss=Boolean(event.detail?.boss);
