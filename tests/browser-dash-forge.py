@@ -113,6 +113,10 @@ async def run_one(browser,width,height):
   await page.locator('[data-dash-action="leave"]').click()
   assert await page.locator('#dash-pane-builder').is_visible()
   assert await page.locator('#dash-play-overlay').is_hidden()
+  # Leave the synthetic fullscreen monitor to exercise existing inline list tabs.
+  await page.evaluate("""() => {document.body.classList.remove('arcade-on');
+    document.body.dataset.arcadeGame='';document.body.dataset.arcadeScene='';
+    document.querySelector('#dash-forge-root').classList.remove('arcade-game-active');}""")
   await page.locator('#dash-forge-root [data-dash-tab="community"]').click()
   assert await page.locator('#dash-community-list .dash-level').count()==1, 'Draft visible to author'
   await page.locator('#dash-forge-root [data-dash-tab="campaign"]').click()
