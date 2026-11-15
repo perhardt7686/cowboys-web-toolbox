@@ -39,7 +39,8 @@ test('Six fixed campaign tracks are solvable and stage-gated',()=>{
   assert.ok(jumps.length>=3,'Each stage has at least three skill jumps');
  }
  assert.match(migration,/Finish the previous campaign stage to unlock this level/);
- assert.match(src,/campaign\(\)\.filter/);
+ assert.match(src,/campaign_current/);
+ assert.match(src,/chapter\(\)/);
 });
 test('Players and designers have isolated rewards verified only by privileged server replay',()=>{
  for(const fn of ['community_dash_state','community_dash_save','community_dash_publish','community_dash_start','community_dash_finish'])assert.match(migration,new RegExp('function public\\.'+fn+'\\('));
@@ -67,4 +68,28 @@ test('New tables deny direct API access; only approved members can invoke RPC',(
  assert.match(migration,/m\.user_id=auth\.uid\(\) and m\.status='approved'/);
  assert.doesNotMatch(migration,/community_mahjong_allowed/);
  assert.match(authFix,/m\.status='approved'/);
+});
+
+test('Billion-stage family campaign regenerates deterministic worlds and safeguards rewards',()=>{
+ const world=read('supabase/migrations/20261115050004_dash_forge_billion_stage_world_campaign.sql');
+ const pattern=read('supabase/migrations/20261115050005_dash_forge_world_obstacle_pattern_validation.sql');
+ assert.match(world,/p_stage not between 1 and 1000000000/);
+ assert.match(world,/community_dash_ensure_stage/);
+ assert.match(world,/v_current\+12/);
+ assert.match(world,/v_stage in v_from\.\.v_to/);
+ assert.match(world,/perform public\.community_dash_ensure_stage\(v_stage\)/);
+ assert.match(world,/v_worlds text\[\]/);
+ for(const biome of ['Neon Canopy','Clockwork Harbor','Crystal Hollow','Skyglass City','Solar Dunes','Thunder Rails',
+  'Abyssal Reef','Volcanic Foundry','Pixel Metropolis','Moonlit Gardens','Starfall Observatory','Endless Aurora'])
+   assert.ok(world.includes(biome),biome);
+ assert.match(world,/v_boss:=p_stage%25=0/);
+ assert.match(world,/v_pace:=greatest\(125,/);
+ assert.match(world,/v_expected:=\(v_sim->>'tiles'\)::int\*v_level\.pace_ms/);
+ assert.match(world,/100\+least\(300,v_level\.stage\)\*40/);
+ assert.match(pattern,/\^\[\.sbglwcpfrmodh\]\+\$/);
+ assert.match(src,/Math\.floor\(run\.elapsed\/\(run\.pace\|\|210\)\)/);
+ assert.match(src,/renderHazard/);
+ assert.match(src,/backdrop\(g,cam,ground\)/);
+ assert.match(src,/THEMES=\[/);
+ assert.match(src,/ONE BILLION NUMBERED STAGES/);
 });
