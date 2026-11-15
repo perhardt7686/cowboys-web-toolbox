@@ -808,3 +808,115 @@ body.community-page.arcade-on[data-arcade-game=drawing] #commons-art{
 body.community-page.arcade-on[data-arcade-game=drawing] #commons-drawing-root{
  max-width:100%!important;min-height:0!important
 }
+
+/* Game-native titles. Eight unique procedurally illustrated game covers. */
+body.community-page #arcade-game-title-view{
+ width:100%;height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;
+ scrollbar-width:thin;padding:clamp(3px,1vh,12px);overscroll-behavior:contain
+}
+body.community-page #arcade-game-title-view[hidden]{display:none!important}
+body.community-page .arcade-game-title-wrap{
+ display:grid;grid-template-columns:minmax(0,0.92fr) minmax(0,1.08fr);
+ min-width:0;min-height:100%;align-items:center;gap:clamp(8px,2vw,22px);
+ padding:clamp(6px,1.5vw,18px);border:2px solid #6c74a5;
+ background:radial-gradient(circle at 78% 14%,#344c7855,transparent 48%),#0e122a;
+ --game-title-accent:#ffff91
+}
+body.community-page .arcade-game-title-wrap[data-title-theme=streetrod]{--game-title-accent:#ffc78a;background:linear-gradient(128deg,#1b1620,#433025)}
+body.community-page .arcade-game-title-wrap[data-title-theme=dashforge]{--game-title-accent:#8beaff;background:linear-gradient(128deg,#11173c,#4a1c58)}
+body.community-page .arcade-game-title-wrap[data-title-theme=mahjong]{--game-title-accent:#e0d0ff;background:linear-gradient(128deg,#282043,#473562)}
+body.community-page .arcade-game-title-wrap[data-title-theme=wordle]{--game-title-accent:#ccffbb;background:linear-gradient(128deg,#132d2b,#1b4c45)}
+body.community-page .arcade-game-title-wrap[data-title-theme=wordquest]{--game-title-accent:#ffe29b;background:linear-gradient(128deg,#263144,#4d3944)}
+body.community-page .arcade-game-title-wrap[data-title-theme=plates]{--game-title-accent:#98e6ff;background:linear-gradient(128deg,#15354d,#27304c)}
+body.community-page .arcade-game-title-wrap[data-title-theme=drawing]{--game-title-accent:#ffb9db;background:linear-gradient(128deg,#362444,#4c2540)}
+body.community-page .arcade-game-title-wrap[data-title-theme=study]{--game-title-accent:#b9f3ab;background:linear-gradient(128deg,#1b352d,#1d3d45)}
+body.community-page .arcade-game-title-image{min-width:0;align-self:center;display:flex;flex-direction:column;gap:8px}
+body.community-page #arcade-game-title-art{
+ width:100%;height:auto;aspect-ratio:8/5;object-fit:contain;
+ image-rendering:pixelated;border:clamp(3px,.5vw,6px) ridge #a7abc6;
+ box-shadow:0 8px 26px #0008;background:#080a20
+}
+body.community-page .arcade-game-title-image small{
+ color:#ddd;font:800 10px/1.25 'Courier New',monospace;text-align:center;
+ letter-spacing:.06em
+}
+body.community-page .arcade-game-title-copy{
+ min-width:0;max-width:100%;display:flex;flex-direction:column;align-items:stretch;gap:clamp(5px,1vh,12px);
+}
+body.community-page .arcade-game-title-eyebrow{
+ color:var(--game-title-accent)!important;font:900 clamp(10px,1.5vw,13px)/1.3 'Courier New',monospace!important;
+ letter-spacing:.1em
+}
+body.community-page .arcade-game-title-copy h2{
+ margin:0!important;color:#fff!important;font:1000 clamp(25px,4.5vw,55px)/.98 system-ui!important;
+ text-shadow:4px 5px #0008;letter-spacing:.035em
+}
+body.community-page .arcade-game-title-copy>strong{
+ color:var(--game-title-accent)!important;font:900 clamp(13px,2.3vw,22px)/1.18 system-ui!important
+}
+body.community-page .arcade-game-title-copy>p{
+ margin:0!important;color:#f0f1fc!important;font:600 clamp(11px,1.5vw,15px)/1.4 system-ui!important
+}
+body.community-page .arcade-game-title-buttons{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(5px,1vw,9px);
+}
+body.community-page #arcade-game-title-view .arcade-game-title-buttons button{
+ display:flex;align-items:center;justify-content:center;min-width:0;min-height:47px;
+ padding:9px 6px;border:2px solid #aaa6dc;border-radius:9px;
+ background:#2a3059;color:#fff;text-align:center;cursor:pointer;
+ font:900 clamp(10px,1.3vw,14px)/1.25 system-ui!important;
+ touch-action:manipulation;box-shadow:inset 0 2px #fff1
+}
+body.community-page #arcade-game-title-view .arcade-game-title-buttons .arcade-title-start{
+ grid-column:1/-1;min-height:58px;background:var(--game-title-accent)!important;
+ border:3px solid #fff8dd!important;color:#181b30!important;
+ font-size:clamp(16px,2.2vw,23px)!important;box-shadow:0 5px 0 #11192c!important
+}
+body.community-page #arcade-game-title-view .arcade-game-title-buttons button:is(:hover,:focus-visible){
+ border-color:#fff!important;filter:brightness(1.15)
+}
+body.community-page #arcade-game-title-view .arcade-game-title-buttons button:focus-visible{
+ outline:3px solid #fcffb3;outline-offset:2px
+}
+body.community-page #arcade-game-title-view .arcade-title-how{
+ max-height:26vh;overflow-y:auto;margin:0!important;padding:11px;
+ color:#fff!important;border:1px solid var(--game-title-accent);border-radius:7px;
+ background:#080d25;font:650 clamp(11px,1.45vw,14px)/1.45 system-ui!important
+}
+body.community-page #arcade-game-title-view .arcade-title-how[hidden]{display:none!important}
+body.community-page #arcade-game-title-view .arcade-title-save-note{
+ color:#d2d3de!important;font:650 11px/1.3 system-ui!important
+}
+@media(max-width:750px){
+ body.community-page #arcade-game-title-view{padding:4px}
+ body.community-page .arcade-game-title-wrap{
+  grid-template-columns:1fr;min-height:100%;align-content:start;gap:8px;
+  padding:clamp(5px,2vw,12px)
+ }
+ body.community-page .arcade-game-title-image{
+  width:min(100%,450px);justify-self:center;gap:2px
+ }
+ body.community-page #arcade-game-title-art{
+  max-height:min(28dvh,220px);aspect-ratio:8/5
+ }
+ body.community-page .arcade-game-title-image small{display:none}
+ body.community-page .arcade-game-title-copy{gap:6px}
+ body.community-page .arcade-game-title-copy h2{font-size:clamp(25px,6vw,36px)!important}
+ body.community-page #arcade-game-title-view .arcade-game-title-buttons button{
+  min-height:42px;padding:7px 5px
+ }
+ body.community-page #arcade-game-title-view .arcade-game-title-buttons .arcade-title-start{min-height:51px}
+}
+@media(orientation:landscape) and (max-height:580px){
+ body.community-page .arcade-game-title-wrap{grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:8px;align-content:center}
+ body.community-page #arcade-game-title-art{max-height:66dvh!important}
+ body.community-page .arcade-game-title-image small{display:none}
+ body.community-page .arcade-game-title-copy{gap:4px}
+ body.community-page .arcade-game-title-copy h2{font-size:clamp(18px,3.2vw,29px)!important}
+ body.community-page .arcade-game-title-copy>strong{font-size:clamp(11px,1.5vw,16px)!important}
+ body.community-page .arcade-game-title-copy>p{font-size:10px!important}
+ body.community-page .arcade-game-title-buttons{gap:3px}
+ body.community-page #arcade-game-title-view .arcade-game-title-buttons button{min-height:29px;padding:3px 4px;font-size:10px!important}
+ body.community-page #arcade-game-title-view .arcade-game-title-buttons .arcade-title-start{min-height:36px;font-size:12px!important}
+ body.community-page #arcade-game-title-view .arcade-title-save-note{display:none}
+}
