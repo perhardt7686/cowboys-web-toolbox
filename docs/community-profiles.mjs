@@ -120,7 +120,7 @@ export function createProfileStudio(ctx){
     if(node)node.textContent=message;
   }
   async function ensureRewards(){
-    rewardModule ||= await import('./avatar-reward-studio.mjs?v=cel1');
+    rewardModule ||= await import('./avatar-reward-studio.mjs?v=cel2');
     if(!approved())return null;
     rewards ||= rewardModule.createRewardStudio({
       getLoadout:()=>avatarRecipe,setLoadout:setPreview,setStatus,playGame,rpc,checkAccess:approved,

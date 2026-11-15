@@ -23,6 +23,12 @@ async def visit(browser, width, full=False):
     await editor.get_by_role('button', name='Save outfit', exact=True).wait_for()
     await editor.get_by_role('button', name='Unlockables', exact=True).click()
     await expect(editor.get_by_text('253 rewards')).to_be_visible()
+    achievement_tab=editor.get_by_role('button',name='Achievements',exact=True)
+    assert await achievement_tab.evaluate("""node => {
+      const text=document.createRange();
+      text.selectNodeContents(node);
+      return text.getClientRects().length===1;
+    }"""), width
     for node in [editor.get_by_role('button', name='Unlockables', exact=True),
                  editor.get_by_role('searchbox', name='Search rewards')]:
         box = await node.bounding_box()
@@ -100,7 +106,9 @@ async def visit(browser, width, full=False):
         await editor.get_by_role('textbox', name='Pet name').fill('Scout')
         await editor.get_by_role('button', name='Save name').click()
         await expect(editor.get_by_role('heading', name='Scout')).to_be_visible()
+        await expect(editor.get_by_role('button',name='Save my avatar')).to_be_hidden()
         await editor.get_by_role('button', name='Take along').click()
+        await expect(editor.get_by_role('button',name='My Avatar',exact=True)).to_have_attribute('aria-pressed','true')
         await expect(editor.locator('#avatar-equipped').get_by_text('Trail Husky', exact=True)).to_be_visible()
         await editor.get_by_role('button', name='Save my avatar').click()
         await expect(editor.get_by_text('Preview saved locally for this session.')).to_be_visible()
@@ -110,6 +118,8 @@ async def visit(browser, width, full=False):
         await pet_picker.select_option('trail-husky')
         await expect(editor.get_by_role('heading', name='Scout')).to_be_visible()
         await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
+        await portrait.scroll_into_view_if_needed()
+        await expect(portrait).to_be_in_viewport(ratio=.8)
         assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth') <= 2
         art = await page.evaluate("""async()=>{
           const {CATALOG}=await import('/avatar-reward-catalog.mjs?v=cel1');

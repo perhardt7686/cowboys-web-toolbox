@@ -120,8 +120,8 @@ body.community-page .reward-browsing .family-character-intro h3{font-size:1.05re
 body.community-page .reward-browsing .family-character-intro [data-avatar-random],
 body.community-page .reward-browsing .family-character-intro [data-avatar-undo]{display:none}
 
-body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden])){grid-template-columns:minmax(0,1fr)}
-body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden])) .studio-preview{display:none}
+body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden]) [data-avatar-method-panel=character]:not([hidden])){grid-template-columns:minmax(0,1fr)}
+body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden]) [data-avatar-method-panel=character]:not([hidden])) .studio-preview{display:none}
 body.community-page .avatar-feature-group{
   min-width:0;border:1px solid #c3a189;border-radius:12px;background:#f3e5ce;
 }
@@ -196,4 +196,29 @@ body.community-page .avatar-pet-actions button:disabled{opacity:.62;cursor:defau
   body.community-page .avatar-reward-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
   body.community-page .avatar-prize-stage,body.community-page .avatar-pet-card{grid-template-columns:minmax(0,1fr)}
   body.community-page .avatar-pet-portrait{width:min(100%,220px);justify-self:center}
+}
+
+body.community-page .profile-studio .studio-tabs{
+  background:#eee2f1!important;
+}
+body.community-page .profile-studio .studio-tabs button[aria-selected=false]{
+  background:#fff9ee!important;color:#45294f!important;
+}
+body.community-page .profile-studio .avatar-reward-tabs button{
+  overflow-wrap:normal;
+}
+body.community-page .family-character-editor[data-reward-view=pets] :is(.family-character-top,#avatar-equipped){
+  display:none;
+}
+body.community-page .family-character-editor[data-reward-view=pets] .avatar-reward-pane{
+  grid-column:1/-1;margin-top:0;
+}
+body.community-page .profile-studio:has([data-profile-pane=avatar]:not([hidden]) [data-avatar-method-panel=character]:not([hidden]) [data-reward-view=pets]) .profile-save-area{
+  display:none;
+}
+@media(max-width:440px){
+  body.community-page .profile-studio .avatar-reward-tabs button{
+    padding:6px 4px;font-size:clamp(.84rem,3.75vw,1rem)!important;
+  }
+  body.community-page .avatar-pet-card .avatar-pet-portrait{width:min(100%,176px)}
 }

@@ -80,6 +80,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     selected=item.id;
     const owned=have(item.id),pet=pets.get(item.id);
     const focus=document.activeElement?.dataset.petAction;
+    const focusSelect=root.contains(document.activeElement)&&document.activeElement?.tagName==='SELECT';
     const selection=el('select');
     selection.setAttribute('aria-label','Choose a pet');
     for(const [title,items] of [['Earned pets',earned],['Pets to win',waiting]]){
@@ -166,6 +167,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     if(activity==='pet'||activity==='play'||activity==='trick')
       stop=playCel(canvas,p=>drawPetPortrait(canvas,item,activity,p),reduceMotion);
     if(focus)root.querySelector('[data-pet-action="'+focus+'"]')?.focus({preventScroll:true});
+    else if(focusSelect)selection.focus({preventScroll:true});
   }
 
   return {
