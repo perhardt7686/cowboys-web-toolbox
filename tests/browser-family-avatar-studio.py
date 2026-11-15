@@ -33,6 +33,7 @@ async def main():
                 canvas=page.locator('#family-avatar-canvas')
                 await expect(canvas).to_be_visible()
                 before=await canvas.evaluate('(el)=>el.toDataURL("image/png")')
+                await page.locator('summary').filter(has_text='Hair & facial hair').click()
                 await page.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]').click()
                 after=await canvas.evaluate('(el)=>el.toDataURL("image/png")')
                 assert before!=after,(width,'changing hair did not redraw character')
