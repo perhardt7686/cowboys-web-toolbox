@@ -21,7 +21,7 @@ test('simple profile settings preserve advanced saved fields and send editable a
  assert.match(s,/character=replaceAvatar&&avatarMethod==='character'/);
  assert.match(s,/\.upload\(path,blob/);
  assert.match(client,/avatar_recipe/);assert.match(server,/avatar_recipe/);
- assert.match(read('docs/community.html'),/family-avatar-studio\.css\?v=cel2/);
+ assert.match(read('docs/community.html'),/family-avatar-studio\.css\?v=toon3/);
 });
 test('photo and icon preferences stay private and Hot Rod is untouched',()=>{
  const nav=read('docs/unified-nav.js'),studio=read('docs/community-profiles.mjs');
