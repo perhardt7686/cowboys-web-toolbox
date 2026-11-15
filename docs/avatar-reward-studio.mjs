@@ -1,6 +1,6 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=studio3';
-import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=studio3';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=finish5';
+import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=finish5';
 
 import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
 import {createPetStudio} from './avatar-studio-pets.mjs?v=studio3';
