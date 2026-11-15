@@ -1,0 +1,129 @@
+/* Kid-friendly Mahjong: bright, distinct tile faces PLUS matching codes.
+   Color is never the only signal. Movement is limited to interactions. */
+body.community-page .mahjong-tile.mahjong-kids-tile{
+ background:linear-gradient(155deg,#ffffff80 0%,transparent 38%,#1713250b 100%),var(--tile-face)!important;
+ color:var(--tile-ink)!important;
+ border-top:2px solid #fff8f0!important;
+ border-left:2px solid #fff8ed!important;
+ border-right:clamp(3px,calc(var(--mahjong-size,36px)*.085),6px) solid var(--tile-edge)!important;
+ border-bottom:clamp(3px,calc(var(--mahjong-size,36px)*.095),7px) solid var(--tile-edge)!important;
+ border-radius:clamp(6px,calc(var(--mahjong-size,36px)*.15),12px);
+ box-shadow:inset 1px 1px 2px #fffa,inset -2px -2px 4px #16162a25,
+  1px 3px 0 #0e3049,2px 7px 8px #001b2c8c;
+ transition:filter .15s ease,box-shadow .15s ease,transform .18s ease;
+ transform:translateZ(0);overflow:hidden;-webkit-tap-highlight-color:transparent;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile::before{
+ content:"";position:absolute;inset:3px 3px 5px;border:1px solid #37264133;
+ border-radius:5px;box-shadow:inset 0 1px 0 #fffa;pointer-events:none;z-index:0;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile::after{
+ content:"";position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;
+ background:linear-gradient(110deg,transparent 15%,#fff0 30%,#fff9 49%,transparent 70%);
+ transform:translateX(-130%) skewX(-17deg);
+}
+body.community-page .mahjong-tile.mahjong-kids-tile .mahjong-glyph{
+ position:relative;z-index:1;display:grid;place-items:center;
+ color:var(--tile-ink)!important;
+ font-family:Georgia,'Times New Roman','Apple Color Emoji','Segoe UI Emoji',serif;
+ font-size:clamp(17px,calc(var(--mahjong-size,36px)*.63),48px);
+ text-shadow:0 1px 0 #fff9,0 2px 2px #15202c35;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile .mahjong-mini{
+ position:absolute;z-index:3;top:1px;right:2px;display:grid;place-items:center;
+ width:clamp(10px,calc(var(--mahjong-size,36px)*.29),22px);
+ height:clamp(10px,calc(var(--mahjong-size,36px)*.29),22px);
+ border-radius:50%;
+ font:900 clamp(9px,calc(var(--mahjong-size,36px)*.24),15px)/1 system-ui,sans-serif;
+ text-shadow:none;border:1px solid #fff9;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-variant-sun .mahjong-mini{
+ background:#ffcf4a;color:#5a3408;border-color:#a66b13;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-variant-flower .mahjong-mini{
+ background:#316cc9;color:#fff;border-color:#16468d;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile .mahjong-match-code{
+ position:absolute;z-index:3;bottom:1px;left:1px;
+ min-width:clamp(14px,calc(var(--mahjong-size,36px)*.48),33px);
+ border-radius:4px 5px 2px 3px;background:#261d35;color:#fff;
+ font:900 clamp(8px,calc(var(--mahjong-size,36px)*.20),14px)/1.1 system-ui,sans-serif;
+ letter-spacing:0;text-shadow:none;text-align:center;padding:1px 2px;box-shadow:0 1px 1px #0003;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-blocked{
+ filter:grayscale(.52) brightness(.82);opacity:.91;cursor:not-allowed;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-blocked::after{
+ opacity:.66;transform:none;
+ background:repeating-linear-gradient(135deg,#0d17331d 0 2px,transparent 2px 7px);
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-free:hover{
+ filter:brightness(1.08) saturate(1.05);
+ box-shadow:inset 1px 1px 2px #fff9,1px 3px 0 #0e3049,0 0 0 2px #ffdc8d,0 6px 14px #032b3780;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-free:active{
+ transform:translateY(-3px) scale(1.04);
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-selected{
+ filter:brightness(1.1) saturate(1.12);outline:3px solid #ffe575!important;outline-offset:2px;
+ z-index:410!important;
+ box-shadow:0 0 0 5px #ffcc5580,0 0 17px #ffed95aa,0 5px 8px #0b3344;
+ animation:mahjong-kid-pop .37s cubic-bezier(.2,1.4,.4,1) both!important;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-selected::after{
+ opacity:.8;animation:mahjong-kid-glint .7s ease-out both;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-hinted{
+ filter:brightness(1.1);outline:3px solid #64ffdf!important;outline-offset:2px;
+ z-index:405!important;
+ box-shadow:0 0 0 5px #52eccd75,0 0 16px #7ffff7bd,0 5px 9px #092632;
+ animation:mahjong-kid-hint 1.15s ease-in-out 2!important;
+}
+body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-hinted::after{
+ opacity:.82;animation:mahjong-kid-glint .9s ease-in-out 2;
+}
+body.community-page .mahjong-pair-celebration{
+ position:absolute;z-index:520;pointer-events:none;white-space:nowrap;padding:7px 10px;
+ border:2px solid #e7b53f;border-radius:12px;background:#fff2b9;color:#3d2852;
+ box-shadow:0 5px 16px #0007;font:900 14px/1.1 system-ui,sans-serif;
+ animation:mahjong-kid-match .75s ease-out forwards;
+}
+@keyframes mahjong-kid-pop{
+ 0%{transform:translateY(0) scale(.96)}
+ 48%{transform:translateY(-6px) scale(1.08)}
+ 100%{transform:translateY(-2px) scale(1.015)}
+}
+@keyframes mahjong-kid-glint{
+ 0%{transform:translateX(-140%) skewX(-17deg);opacity:0}
+ 27%{opacity:.75}
+ 100%{transform:translateX(140%) skewX(-17deg);opacity:0}
+}
+@keyframes mahjong-kid-hint{
+ 0%,100%{transform:translateY(0)}
+ 50%{transform:translateY(-4px)}
+}
+@keyframes mahjong-kid-match{
+ 0%{opacity:0;transform:translate(-50%,-20%) scale(.65)}
+ 24%{opacity:1;transform:translate(-50%,-85%) scale(1.05)}
+ 100%{opacity:0;transform:translate(-50%,-160%) scale(1.12)}
+}
+body.community-page .mahjong-game-zone{position:relative}
+body.community-page .mahjong-tile.mahjong-kids-tile:focus-visible{
+ outline:4px solid #f9d860!important;outline-offset:2px;
+}
+@media(max-width:430px){
+ body.community-page .mahjong-tile.mahjong-kids-tile .mahjong-match-code{
+  font-size:clamp(8px,calc(var(--mahjong-size,36px)*.22),12px);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .mahjong-tile.mahjong-kids-tile,
+ body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-selected,
+ body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-hinted,
+ body.community-page .mahjong-tile.mahjong-kids-tile::after,
+ body.community-page .mahjong-pair-celebration{
+  transition:none!important;animation:none!important;
+ }
+ body.community-page .mahjong-tile.mahjong-kids-tile.mahjong-selected{transform:none!important}
+ body.community-page .mahjong-pair-celebration{display:none!important}
+}
