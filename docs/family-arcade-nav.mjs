@@ -10,7 +10,7 @@ const labels = {
   study: {cards: 'Study cards', awards: 'Milestones', sources: 'Study resources'}
 };
 const instructions = {
-  dashforge: 'Tap the screen or JUMP to leap over blocks, spikes and gaps. Clear six campaign stages to unlock rewards. In Level Studio, draw a level, save a draft, beat your own playtest, and publish it. Designer points come only from the first other member’s validated active time to solve that level. Likes, views, drafts and your own wins pay no creator awards.',
+  dashforge: 'Tap the screen or JUMP to leap over blocks, spikes and gaps. Advance through one billion shared stages. Every 25th stage has the same three-phase boss for every family member. In Level Studio, draw a level, save a draft, beat your own playtest, and publish it. Designer points come only from the first other member’s validated active time to solve that level. Likes, views, drafts and your own wins pay no creator awards.',
   mahjong: 'Match tiles with the same picture and corner mark. A playable tile is uncovered and has an open left or right side. Zoom in, then swipe to pan. Fit board brings the full layout back into view. Campaign stages unlock as you qualify.',
   wordle: 'Guess five-letter words as a team. Green means the correct position and earns 12 personal points. Gold means the letter belongs elsewhere and earns 5. A solve adds a bonus and awards contributing players 35 team-victory points each. You each get nine valid guesses per day; everyone shares every guess and saved green-letter position. The shared word resets at midnight Eastern.',
   wordquest: 'Use the clue to solve today’s five-letter word together. Valid guesses score 5 points, with bonus points for solving. Everyone who contributes gets a team win when the team solves. Open Level, XP and achievements to see your progress. The puzzle resets at midnight Eastern.',
@@ -171,6 +171,7 @@ export function makeArcadeNav({leave, view, settings}) {
     if (!selected || header.hidden) return;
     const text = id => (get(id)?.textContent || '').trim();
     const values = {
+      dashforge: [text('dash-forge-summary').slice(0,45),text('dash-live-progress')],
       mahjong: [text('mahjong-run-title').replace(/ · Combo .+$/, ''), text('mahjong-remaining')],
       wordle: [...(get('letter-lock-statline')?.children || [])].slice(1, 4).map(item => {
         const [label, value] = [...item.children].map(child => child.textContent);
@@ -181,7 +182,7 @@ export function makeArcadeNav({leave, view, settings}) {
       plates: [current === 'vote' ? text('family-plate-queue-label') : text('plate-top-score')],
       drawing: [get('art-toolbox')?.querySelector('[aria-pressed=true]')?.textContent?.trim(), get('art-zoom')?.selectedOptions[0]?.textContent],
       study: [text('vdacs-study-summary')]
-    }[selected].filter(value => value && value !== '—');
+    }[selected]||[]).filter(value => value && value !== '—');
     const key = values.join('|');
     if (key !== lastStats) {
       stats.replaceChildren(...values.map(value => el('span', '', value)));
