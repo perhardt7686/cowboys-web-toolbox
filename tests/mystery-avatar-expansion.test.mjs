@@ -11,7 +11,7 @@ test('36 original collectibles include 12 real adoptable pets plus gadgets, scen
  const counts={};for(const item of MYSTERY_EXTRAS)counts[item.slot]=(counts[item.slot]||0)+1;
  assert.deepEqual(counts,{companion:12,prop:12,background:6,effect:6});
  assert.equal(new Set(MYSTERY_EXTRAS.map(v=>v.id)).size,36);
- assert.equal(CATALOG.length,289);
+ assert.equal(CATALOG.length,310);
  for(const item of MYSTERY_EXTRAS){
   assert.equal(typeof item.draw,'function');
   assert.equal(BY_ID.get(item.id)?.achievement_id,item.achievement_id);
