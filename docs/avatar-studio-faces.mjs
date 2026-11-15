@@ -328,7 +328,7 @@ export function addGlasses(head,kind,metal,single=false,fit=1){
   const angular=['square','retro-square','cat-eye','visor'].includes(kind);
   const height=kind==='aviator'?1.02:kind==='oval'?.70:.86;
   for(const s of (single?[1]:[-1,1])){
-    const piece=group(frameRoot,s*.105,.010,.225);
+    const piece=group(frameRoot,s*.105,.010,.209);
     piece.rotation.y=s*.22;
     if(angular){
       stroke(piece,frame,[[-.071,-.036,0],[.068,-.038,0],[.070,.041,0],[-.070,.042,0],[-.071,-.036,0]],.0075);
@@ -337,9 +337,9 @@ export function addGlasses(head,kind,metal,single=false,fit=1){
       band(piece,frame,0,0,0,.061,.006,1.16,height);
       oval(piece,lens,0,0,0,.065,.060*height,.007);
     }
-    join(frameRoot,frame,[s*.17,.020,.224],[s*.239,.037,.004],.0058);
+    join(frameRoot,frame,[s*.17,.020,.210],[s*.239,.037,.004],.0058);
   }
-  if(!single)stroke(frameRoot,frame,[[-.035,.020,.236],[0,.031,.254],[.035,.020,.236]],.006);
+  if(!single)stroke(frameRoot,frame,[[-.035,.020,.221],[0,.031,.239],[.035,.020,.221]],.006);
 }
 
 export function controlVisor(head,pigment){
