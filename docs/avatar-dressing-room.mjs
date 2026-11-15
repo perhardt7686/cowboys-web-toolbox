@@ -1,11 +1,11 @@
 import {THREE,attach,color,disposeFigure,group,hash,picture,shade,surface} from './avatar-studio-geometry.mjs?v=studio3';
-import {buildAvatar} from './avatar-studio-character.mjs?v=studio3';
+import {buildAvatar} from './avatar-studio-character.mjs?v=finish5';
 import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
-import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=ink4';
-import {normalizeLoadout} from './avatar-reward-render.mjs?v=studio3';
+import {buildCompanion,heldItem,poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=finish5';
+import {normalizeLoadout} from './avatar-reward-render.mjs?v=finish5';
 import {renderSoftwareRoom} from './avatar-studio-software.mjs?v=studio3';
 import {createInkLayer,drawInkedRoom} from './avatar-studio-ink.mjs?v=studio3';
-import {poseStudioAction} from './avatar-studio-actions.mjs?v=ink4';
+import {poseStudioAction} from './avatar-studio-actions.mjs?v=finish5';
 import {paintMysteryBackdrop} from './avatar-mystery-backdrops.mjs?v=ink4';
 
 const PALETTES={

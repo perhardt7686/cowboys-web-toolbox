@@ -1,9 +1,9 @@
 import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=studio3';
 import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=studio3';
-import {BY_ID} from './avatar-reward-catalog.mjs?v=studio3';
+import {BY_ID} from './avatar-reward-catalog.mjs?v=finish5';
 import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
-import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=studio3';
-import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=studio3';
+import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=finish5';
+import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=finish5';
 
 const BODY={
   detective:{height:1.045,width:.85},
@@ -369,6 +369,7 @@ export function buildAvatar(recipe){
   sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',specter,
     jawTune:Number(outfits.jaw)||0,eyeSpacing:Number(outfits.eye_spacing)||0,
     styleReward:cosmetics.hair,eyeReward:cosmetics.eyes});
+  const gearFit={round:1.08,square:1.07,long:.92,heart:1.015,angular:.99,oval:1}[recipe.face]||1;
   const gear=cosmetics.eyewear;
   if(gear){
     if(gear.tags?.includes('patch')){
@@ -376,9 +377,9 @@ export function buildAvatar(recipe){
       stroke(head,surface(dark),[[-.221,.030,.005],[-.088,.055,.194],[.152,.014,.230],[.228,.059,-.004]],.009,20);
     }else{
       const kind=gear.id.includes('visor')||gear.id.includes('pixel')?'visor':gear.id.includes('heart')?'cat-eye':'round';
-      addGlasses(head,kind,rewardPigment(gear),gear.id.includes('monocle'));
+      addGlasses(head,kind,rewardPigment(gear),gear.id.includes('monocle'),gearFit);
     }
-  }else if(!mechanical)addGlasses(head,recipe.glasses==='none'&&recipe.accessory==='glasses'?'round':recipe.glasses,'#6b4948');
+  }else if(!mechanical)addGlasses(head,recipe.glasses==='none'&&recipe.accessory==='glasses'?'round':recipe.glasses,'#6b4948',false,gearFit);
   const headwear=cosmetics.hat||recipe.hat;
   const hat=studioHat(head,headwear,recipe.accessory);
   const visor=cosmetics.bodypart?.id==='carnival-visor-plate'?controlVisor(head,rewardPigment(cosmetics.bodypart)):null;

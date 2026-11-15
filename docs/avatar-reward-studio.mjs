@@ -1,6 +1,6 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=studio3';
-import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=studio3';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=finish5';
+import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=finish5';
 
 import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
 import {createPetStudio} from './avatar-studio-pets.mjs?v=studio3';
@@ -8,7 +8,7 @@ import {createPetStudio} from './avatar-studio-pets.mjs?v=studio3';
 import {fitsBody} from './avatar-full-body.mjs?v=studio3';
 import {mountTurntable} from './avatar-turntable-controls.mjs?v=studio3';
 import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v=studio3';
-import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=ink4';
+import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=finish5';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
