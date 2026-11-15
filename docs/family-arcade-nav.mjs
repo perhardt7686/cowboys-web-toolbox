@@ -1,6 +1,8 @@
 import {button, el} from './family-board-core.mjs?v=family3';
 
 const labels = {
+  fleet:{play:'Defend the starlanes',trophies:'Trophy cabinet',leaders:'Family high scores'},
+  maze:{play:'Explore Mystery Maze',trophies:'Trophy cabinet',leaders:'Family high scores'},
   dashforge: {campaign:'Family campaign',community:'Created family levels',builder:'Level Studio',awards:'Achievements and skins',leaders:'Family leaderboards'},
   mahjong: {play: 'Playing board', levels: 'Campaign levels', scores: 'Leaderboard', personal: 'My scores', badges: 'Achievements', history: 'Game history'},
   wordle: {play: 'Today’s puzzle', scores: 'Leaderboard', awards: 'Achievements', history: 'Game history'},
@@ -10,6 +12,8 @@ const labels = {
   study: {cards: 'Study cards', awards: 'Milestones', sources: 'Study resources'}
 };
 const instructions = {
+  fleet:'Move left or right; hold FIRE or Space to shoot the alien swarms. Every fifth commander is worth extra points. Trophies require server-verified scores.',
+  maze:'Navigate with direction buttons or arrow keys, collect clue lights, and evade the wisps. Special orbs give temporary protection. Trophies require verified scores.',
   dashforge: 'Tap the screen or JUMP to leap over blocks, spikes and gaps. Advance through one billion shared stages. Every 25th stage has the same three-phase boss for every family member. In Level Studio, draw a level, save a draft, beat your own playtest, and publish it. Designer points come only from the first other member’s validated active time to solve that level. Likes, views, drafts and your own wins pay no creator awards.',
   mahjong: 'Match tiles with the same picture and corner mark. A playable tile is uncovered and has an open left or right side. Zoom in, then swipe to pan. Fit board brings the full layout back into view. Campaign stages unlock as you qualify.',
   wordle: 'Guess five-letter words as a team. Green means the correct position and earns 12 personal points. Gold means the letter belongs elsewhere and earns 5. A solve adds a bonus and awards contributing players 35 team-victory points each. You each get nine valid guesses per day; everyone shares every guess and saved green-letter position. The shared word resets at midnight Eastern.',
@@ -22,6 +26,8 @@ const get = id => document.getElementById(id);
 const sceneAction = (label, scene, scope) => ({label, scene, scope});
 const clickAction = (label, target, scene) => ({label, target, scene});
 const actions = {
+  fleet:[sceneAction('Play Star Squadron','play'),sceneAction('Trophy cabinet','trophies'),sceneAction('Family high scores','leaders')],
+  maze:[sceneAction('Play Mystery Maze','play'),sceneAction('Trophy cabinet','trophies'),sceneAction('Family high scores','leaders')],
   dashforge: [sceneAction('Campaign stages','campaign'),sceneAction('Family-made levels','community'),
     sceneAction('Build a new level','builder'),sceneAction('Achievements and cube skins','awards'),
     sceneAction('Family leaderboards','leaders')],
