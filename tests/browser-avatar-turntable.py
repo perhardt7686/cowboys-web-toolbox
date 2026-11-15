@@ -103,7 +103,7 @@ async def verify(browser, phone=False):
     await edit.locator('[data-studio-part="hair"]').click()
     await edit.locator('[data-avatar-feature=beard][data-avatar-value=beard]').click()
     await edit.locator('[data-studio-part="looks"]').click()
-    await edit.locator('[data-studio-panel=looks]').get_by_text('Fine tune',exact=True).click()
+    await edit.locator('[data-studio-panel=looks] summary').filter(has_text='Fine tune').click()
     height = edit.locator('[data-studio-sculpt="height"]')
     await height.press('ArrowRight')
     await expect(height).to_have_value('1')

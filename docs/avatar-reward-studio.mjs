@@ -80,7 +80,7 @@ export function makeAvatarShowcase(open){
   const root=el('details','family-panel avatar-reward-showcase');
   root.open=preference('reward-showcase')!=='closed';
   root.addEventListener('toggle',()=>preference('reward-showcase',root.open?'open':'closed'));
-  const summary=el('summary','','Awesome things to unlock');
+  const summary=el('summary','','Avatar rewards');
   const items=el('div','avatar-showcase-items');
   let rendered=false;
   const render=()=>{

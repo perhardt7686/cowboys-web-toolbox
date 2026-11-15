@@ -34,7 +34,10 @@ function paintedTexture(theme){
   if(paintedScenes.has(theme))return paintedScenes.get(theme);
   const canvas=document.createElement('canvas');canvas.width=canvas.height=512;
   const context=canvas.getContext('2d');
-  paintMysteryBackdrop(context,theme,{width:512,height:512});
+  context.fillStyle='#392b42';context.fillRect(0,0,512,512);
+  context.save();context.scale(2/3,2/3);
+  paintMysteryBackdrop(context,theme,{opacity:.94});
+  context.restore();
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   const image=new Image();
   image.onload=()=>{
@@ -119,22 +122,24 @@ function initialize(){
     key.position.set(-3.2,5.2,4.2);scene.add(key);
     const rim=new THREE.DirectionalLight('#c9d8f5',.44);
     rim.position.set(.6,3.2,-3.3);scene.add(rim);
-    const base=group(scene);
+    const base=group(scene),stand=group(base),contact=group(base);
     const ballast=surface('#4b4355',{roughness:1,metalness:0});
     const deck=surface('#858098',{roughness:1,metalness:0});
     const alloy=surface('#5a5369',{roughness:1,metalness:0});
     const skirting=surface('#40394b',{roughness:1,metalness:0});
-    attach(base,new THREE.CylinderGeometry(1.246,1.289,.119,96),ballast,0,-.105,0);
-    attach(base,new THREE.CylinderGeometry(1.245,1.247,.027,96),alloy,0,-.053,0);
-    attach(base,new THREE.CylinderGeometry(1.216,1.243,.043,96),deck,0,-.022,0);
-    attach(base,new THREE.CylinderGeometry(1.224,1.237,.018,96),skirting,0,-.156,0);
+    attach(stand,new THREE.CylinderGeometry(1.246,1.289,.119,96),ballast,0,-.105,0);
+    attach(stand,new THREE.CylinderGeometry(1.245,1.247,.027,96),alloy,0,-.053,0);
+    attach(stand,new THREE.CylinderGeometry(1.216,1.243,.043,96),deck,0,-.022,0);
+    attach(stand,new THREE.CylinderGeometry(1.224,1.237,.018,96),skirting,0,-.156,0);
     const shadow=shadowLayer();
-    const spot=picture(base,shadow,0,.005,.075,1.84,1.07);spot.rotation.x=-Math.PI/2;
-    const petSpot=picture(base,shadow,.897,.009,.235,.62,.52);petSpot.rotation.x=-Math.PI/2;
-    const floor=picture(base,shadow,0,-.169,.09,3.85,2.77);floor.rotation.x=-Math.PI/2;
+    const spot=picture(stand,shadow,0,.005,.075,1.84,1.07);spot.rotation.x=-Math.PI/2;
+    const petSpot=picture(stand,shadow,.897,.009,.235,.62,.52);petSpot.rotation.x=-Math.PI/2;
+    const floor=picture(stand,shadow,0,-.169,.09,3.85,2.77);floor.rotation.x=-Math.PI/2;
+    const footShadow=picture(contact,shadow,0,.001,.02,1.29,.65);footShadow.rotation.x=-Math.PI/2;
+    const companionShadow=picture(contact,shadow,0,.001,0,.59,.47);companionShadow.rotation.x=-Math.PI/2;
     const aura=new THREE.PointLight('#ffd383',0,2.4,1.55);scene.add(aura);
     const ink=renderer?createInkLayer():null;
-    runtime={renderer,scene,camera,base,deck,alloy,petSpot,aura,ink};
+    runtime={renderer,scene,camera,base,stand,contact,companionShadow,deck,alloy,petSpot,aura,ink};
   }catch{runtime=null;}
   return runtime;
 }
@@ -178,7 +183,7 @@ function cameraFor(camera,w,h,{x=0,y=1.48,height=3.51,zoom=1,anglePitch=.13}={})
   camera.updateMatrixWorld();
 }
 
-function draw(canvas,state,viewOptions,background,surfaceColor,platform=true){
+function draw(canvas,state,viewOptions,background,surfaceColor,platform=true,grounded=false){
   const active=initialize();
   if(!active)return false;
   const screen=canvas.getContext('2d');
@@ -187,8 +192,15 @@ function draw(canvas,state,viewOptions,background,surfaceColor,platform=true){
   const hardware=Boolean(renderer&&!renderer.getContext().isContextLost());
   setView(active,state);
   active.scene.background=background;
-  active.base.visible=platform;
+  active.base.visible=platform||grounded;
+  active.stand.visible=platform;
+  active.contact.visible=grounded;
   active.petSpot.visible=Boolean(state.actor.pet);
+  active.companionShadow.visible=Boolean(state.actor.pet);
+  if(grounded&&state.actor.pet){
+    const pet=state.actor.pet.root.getWorldPosition(new THREE.Vector3());
+    active.companionShadow.position.set(pet.x,.003,pet.z);
+  }
   active.deck.color.set(surfaceColor);
   active.alloy.color.copy(shade(surfaceColor,.77));
   const {width,height}=canvas;
@@ -227,8 +239,11 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   const aspect=canvas.width/canvas.height;
   // Fit the entire assembled cast, including long props and different size heads.
   const {min,max}=state.bounds;
-  const extent=(Math.max(Math.abs(min.x),Math.abs(max.x))+.13)*2;
-  const bodyHeight=Math.max(3.04,max.y-min.y+.44,extent/Math.max(.62,aspect));
+  const width=Math.max(Math.abs(min.x),Math.abs(max.x));
+  const depth=Math.max(Math.abs(min.z),Math.abs(max.z));
+  const actionMargin=actor.props.some(held=>held.item.art==='telescope')?.19:0;
+  const extent=(Math.hypot(width,depth)+.13+actionMargin)*2;
+  const bodyHeight=Math.max(3.04,max.y-min.y+.44,extent/aspect);
   const scale=actor.figure.scale.y;
   const full={x:(actor.pet?.root.position.x||0)*.14-(view.x||0)/145,
     y:(max.y+min.y)*.5+.015+(view.y||0)/160,height:bodyHeight,zoom:cameraZoom,anglePitch:.081};
@@ -241,7 +256,7 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   const palette=paletteFor(recipe,backgroundItem);
   const theme=backgroundItem?.scene||(!backgroundItem&&setByColor[recipe.background]);
   const background=theme?paintedTexture(theme):clothBackground(palette,backgroundItem?.id||recipe.background);
-  return draw(canvas,state,frame==='portrait'?crop:full,background,palette[1],frame!=='portrait'&&!theme);
+  return draw(canvas,state,frame==='portrait'?crop:full,background,palette[1],frame!=='portrait'&&!theme,frame!=='portrait'&&Boolean(theme));
 }
 
 export function paintRoomPet(canvas,item,view={},activity){

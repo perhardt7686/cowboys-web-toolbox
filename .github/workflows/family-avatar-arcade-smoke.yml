@@ -48,13 +48,13 @@ jobs:
       - name: Verify avatar, pets, collectible artwork and arcade on phone
         run: |
           python -m http.server 8765 --directory docs >/tmp/family-arcade-http.log 2>&1 &
-          python tests/browser-avatar-turntable.py
-          python tests/browser-avatar-cartoon.py
-          python tests/browser-avatar-rewards.py
-          python tests/browser-family-avatar-studio.py
-          python tests/browser-pet-trading.py
-          python tests/browser-arcade-shell.py
-          python tests/browser-arcade-titles.py
+          status=0
+          for test in avatar-turntable avatar-cartoon avatar-rewards family-avatar-studio pet-trading arcade-shell arcade-titles; do
+            echo "::group::${test}"
+            python "tests/browser-${test}.py" || status=1
+            echo "::endgroup::"
+          done
+          exit "${status}"
       - name: Keep synthetic mobile acceptance screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
