@@ -1,6 +1,6 @@
 import {button,el} from './family-board-core.mjs?v=family3';
 import {petBehavior} from './avatar-prize-actions.mjs?v=arcade5';
-import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=arcade5';
+import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=arcade6';
 import {createPetTradeUI} from './avatar-pet-trading.mjs?v=toon3';
 
 const BOND_MAX=12;
