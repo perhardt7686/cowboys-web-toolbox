@@ -8,6 +8,7 @@ const config=window.COWBOY_COMMUNITY_CONFIG;
 const $=id=>document.getElementById(id);
 const games=[
  {id:'streetrod',root:'streetrod-root',toggle:'sr-toggle',name:'Street r0d',tag:'1963 MOTOR SHOP',symbol:'▣',scenes:[['garage','GARAGE'],['tune','TUNE'],['paper','CLASSIFIEDS'],['parts','PARTS'],['diner','DRIVE-IN'],['drive','ROAD'],['calendar','CALENDAR'],['junior','JUNIOR']]},
+ {id:'dashforge',root:'dash-forge-root',toggle:'dash-forge-toggle',name:'Dash Forge',tag:'GEOMETRY-DASH STYLE · FAMILY BUILDER',symbol:'◆',scenes:[['campaign','CAMPAIGN'],['community','FAMILY LEVELS'],['builder','BUILD'],['awards','AWARDS'],['leaders','SCORES']]},
  {id:'mahjong',root:'mahjong-root',toggle:'mahjong-toggle',name:'Mahjong',tag:'MYSTERY ROAD',symbol:'◇',scenes:[['play','PLAY'],['levels','LEVELS'],['scores','SCORES'],['personal','MY SCORES'],['badges','AWARDS'],['history','HISTORY']]},
  {id:'wordle',root:'letter-lock-root',toggle:'letter-lock-toggle',name:'w0rdle',tag:'CO-OP WORD CIPHER',symbol:'▤',scenes:[['play','PLAY'],['scores','SCORES'],['awards','AWARDS'],['history','HISTORY']]},
  {id:'wordquest',root:'word-game-root',toggle:'word-game-toggle',name:'Word Quest',tag:'DAILY TEAM PUZZLE',symbol:'▥',scenes:[['play','PLAY'],['scores','LEADERBOARD'],['progress','PROGRESS'],['history','HISTORY']]},
