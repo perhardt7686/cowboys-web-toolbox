@@ -18,8 +18,13 @@ for(let index=0;index<bevelPosition.count;index++){
 bevel.computeVertexNormals();
 const shared=new Set([sphere,plane,bevel]);
 
+const celRamp=new THREE.DataTexture(new Uint8Array([19,73,150,238]),4,1,THREE.RedFormat);
+celRamp.magFilter=celRamp.minFilter=THREE.NearestFilter;
+celRamp.needsUpdate=true;
+
 export function surface(pigment,properties={}){
-  return new THREE.MeshStandardMaterial({color:pigment,roughness:.77,...properties});
+  const {roughness,metalness,...finish}=properties;
+  return new THREE.MeshToonMaterial({color:pigment,gradientMap:celRamp,...finish});
 }
 
 export function group(parent,x=0,y=0,z=0){

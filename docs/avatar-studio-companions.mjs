@@ -1,4 +1,5 @@
-import {THREE,attach,band,box,color,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio2';
+import {THREE,attach,band,box,color,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
+import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
 
 const collection=['#b76e61','#63968f','#9686b4','#d3aa67','#647ca8','#b880a0','#93a56f','#b77652','#6499ab','#b395c7'];
 const brass='#d4ab6a',iron='#3a3d50',ink='#272838',silver='#a5b8c1';
@@ -253,6 +254,7 @@ function critterEyes(head,cream,dark,kind){
   const paint=surface('#e0a46b',{emissive:'#ecab6d',emissiveIntensity:.12});
   for(const side of [-1,1]){
     const x=side*(kind==='bird'?.084:.071);
+    oval(head,dark,x,.022,.125,.052,.049,.027);
     oval(head,cream,x,.022,.126,.046,.046,.032);
     oval(head,kind==='winged'?paint:dark,x-side*.012,.018,.153,.023,.028,.014);
     oval(head,cream,x-side*.018,.029,.166,.008,.010,.004);
@@ -266,7 +268,15 @@ export function buildCompanion(item){
     black=surface('#413548'),bronzeMat=surface(brass,{metalness:.63,roughness:.46});
   const stage=group(null);
   const animal=group(stage),head=group(animal);
-  const tails=[],wings=[];
+  const tails=[],wings=[],ears=[];
+  let antenna=null,spark=null,steam=null,perch=0;
+  if(id==='bell-tower-gargoyle'){
+    perch=.104;
+    const stone=surface('#777787'),edge=surface('#aaa5a0');
+    attach(stage,new THREE.CylinderGeometry(.208,.231,.088,8),stone,0,.046,.05);
+    attach(stage,new THREE.CylinderGeometry(.212,.212,.025,8),edge,0,.090,.05);
+    stroke(stage,black,[[-.14,.098,.145],[-.079,.099,.112],[-.025,.100,.119],[.021,.098,.168]],.004);
+  }
   if(species==='phantom'){
     const sheen=surface(pigment,{roughness:.35,emissive:pigment,emissiveIntensity:.22});
     shell(animal,sheen,[[.10,.005,.028,.095],[.14,.168,.132],[.225,.185,.126],
@@ -293,7 +303,13 @@ export function buildCompanion(item){
       oval(animal,bronzeMat,s*.239,.113,.036,.056,.049,.052);
     }
     join(head,bronzeMat,[0,.095,-.024],[.052,.206,-.030],.012,.010);
-    oval(head,signal,.052,.213,-.030,.028,.028,.026);
+    antenna=oval(head,signal,.052,.213,-.030,.028,.028,.026);
+    if(id==='wind-up-gremlin'){
+      spark=attach(head,new THREE.OctahedronGeometry(.026),
+        new THREE.MeshBasicMaterial({color:'#f4d575',transparent:true,depthWrite:false,opacity:0}),
+        .065,.264,-.031);
+      spark.visible=false;
+    }
     const key=group(animal,0,.225,-.185);
     box(key,bronzeMat,0,0,-.030,.051,.051,.091);
     band(key,bronzeMat,.050,0,-.087,.050,.013);
@@ -331,10 +347,12 @@ export function buildCompanion(item){
     if(!flier&&mammal){
       const long=id.includes('hound')||id.includes('bunny');
       for(const s of [-1,1]){
-        const y=long?.158:.129;
-        const ear=oval(head,shellMat,s*.111,y,-.046,.054,long?.118:.087,.034);
-        ear.rotation.z=s*(long?.30:.37);
-        oval(head,cream,s*.117,y+.002,-.023,.029,long?.083:.052,.020).rotation.z=ear.rotation.z;
+        const droop=id==='fog-hound';
+        const ear=group(head,s*.111,long?.140:.121,-.046);
+        ear.rotation.z=s*(droop?.51:long?.30:.37);
+        oval(ear,shellMat,0,droop?-.076:.022,0,.052,droop?.147:long?.118:.087,.037);
+        oval(ear,cream,0,droop?-.075:.024,.024,.029,droop?.109:long?.083:.052,.020);
+        ears.push({ear,roll:ear.rotation.z});
       }
     }
     if(reptile)for(const s of [-1,1]){
@@ -347,6 +365,17 @@ export function buildCompanion(item){
     if(!bird){
       oval(head,black,0,-.039,.203,.045,.026,.034);
       stroke(head,black,[[-.044,-.083,.188],[0,-.093,.205],[.044,-.080,.190]],.005);
+    }
+    if(id==='fog-hound'){
+      for(const side of [-1,1]){
+        stroke(head,black,[[side*.044,.071,.154],[side*.074,.084,.158],[side*.108,.065,.136]],.007);
+        join(head,cream,[side*.057,-.055,.159],[side*.039,-.062,.225],.031,.019);
+      }
+      const layer=group(stage);
+      const paint=new THREE.MeshBasicMaterial({color:'#c4e9dd',transparent:true,depthWrite:false,opacity:0});
+      const curls=Array.from({length:4},(_,i)=>stroke(layer,paint,
+        [[-.045,.00,-.03],[-.013,.013,.011],[.039,.003,.022],[.026,-.004,.070]],.010+i*.001));
+      steam={layer,paint,curls};
     }
     if(!bird){
       const tail=group(animal,0,bodyHeight-.028,-.267);
@@ -367,19 +396,54 @@ export function buildCompanion(item){
       medallion(animal,bronzeMat,0,bodyHeight-.084,.237,.034,.012,6);
     }
   }
-  return {root:stage,animal,head,tails,wings,species,item};
+  animal.position.y=perch;
+  return {root:stage,animal,head,tails,wings,ears,antenna,spark,steam,perch,species,item};
 }
 
 export function poseCompanion(pet,time,motion){
   if(!pet)return;
-  const p=motion?motion.progress:0;
-  const varies=motion?Math.sin(p*Math.PI):0;
-  const trick=motion?.action==='trick';
-  pet.animal.position.y=(pet.species==='phantom'?.025:0)+varies*(trick?.24:.10);
-  pet.head.rotation.set(motion?.action==='pet'?.22*varies:-.11*varies,Math.sin(time*2.3)*.06*varies,-.19*varies);
-  for(const [i,w] of pet.wings.entries())w.rotation.y=(i===0?1:-1)*(.17+varies*Math.cos(p*19)*.68);
-  for(const t of pet.tails)t.rotation.y=varies*Math.sin(p*16)*.52;
-  if(pet.species==='automaton')pet.tails[0].rotation.z=p*6.28;
+  const p=motion?.progress??0,amount=motion?Math.sin(p*Math.PI):0;
+  const action=motion?.action||'play';
+  const trick=action==='trick',gesture=action==='pet';
+  const move=petBehavior(pet.item,trick?'trick':gesture?'pet':'play').move;
+  const seek=action==='sniff'||action==='scan';
+  const target=motion?.target;
+  const aim=target?Math.atan2(target.x,target.z-pet.head.position.z):0;
+  const lean=Math.max(-1.34,Math.min(1.34,aim))*amount;
+  const bounce=move==='hop'?Math.sin(p*Math.PI)**2:amount;
+  const activeHeight=action==='scan'?.072:gesture||seek?0:trick?.23:.10;
+  const wingPose=pet.perch?1.16-bounce*.95:.17+amount*Math.cos(p*19)*.60;
+  pet.animal.position.set(Math.sin(lean)*.081,pet.perch+(pet.species==='phantom'?.022:0)+bounce*activeHeight,
+    move==='glide'&&!seek?amount*.12:0);
+  pet.animal.rotation.z=move==='wobble'?Math.sin(p*13)*amount*.16:0;
+  pet.head.rotation.set((gesture||action==='sniff'?.26:-.10)*amount,
+    lean+(seek?0:Math.sin(time*2.3)*.07*amount),-.15*amount);
+  for(const [i,w] of pet.wings.entries())w.rotation.y=(i===0?-1:1)*wingPose;
+  for(const {ear,roll} of pet.ears)ear.rotation.z=roll+Math.sign(roll)*amount*.16;
+  for(const t of pet.tails)t.rotation.y=amount*Math.sin(p*16)*.52;
+  if(pet.species==='automaton'){
+    pet.tails[0].rotation.z=seek||trick?p*Math.PI*4:amount*.41;
+    pet.antenna.material.emissiveIntensity=.43+(seek||trick?amount*1.6:0);
+    pet.antenna.scale.set(.028*(1+amount*.26),.028*(1+amount*.26),.026*(1+amount*.26));
+  }
+  if(pet.spark){
+    pet.spark.visible=(seek||trick)&&amount>.05;
+    pet.spark.material.opacity=amount*.91;
+    pet.spark.rotation.z=p*7.2;
+    pet.spark.scale.set(.8+amount,.7+amount*1.9,.7);
+  }
+  if(pet.steam){
+    const {layer,paint,curls}=pet.steam;
+    layer.visible=Boolean(motion&&!gesture&&amount>.015);
+    paint.opacity=amount*.63;
+    layer.position.set(Math.sin(lean)*.25,.061,Math.cos(lean)*.29);
+    layer.rotation.y=lean;
+    for(const [i,curl] of curls.entries()){
+      const drift=(p+i*.067);
+      curl.position.set(Math.sin(i*3.2+p*6)*.033,.008+i*.011,.052*i+drift*.14);
+      curl.scale.setScalar(.86+drift*.35);
+    }
+  }
 }
 
 export function makeAura(parent,item){

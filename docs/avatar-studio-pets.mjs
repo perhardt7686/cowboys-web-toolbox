@@ -1,10 +1,10 @@
 import {button,el} from './family-board-core.mjs?v=family3';
 import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
-import {playCel} from './avatar-reward-render.mjs?v=studio2';
+import {playCel} from './avatar-reward-render.mjs?v=studio3';
 import {createPetTradeUI} from './avatar-pet-trading.mjs?v=toon3';
 
-import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio2';
-import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=studio2';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
+import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=studio3';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;

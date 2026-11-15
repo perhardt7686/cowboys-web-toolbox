@@ -1,4 +1,4 @@
-import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=turn1';
+import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=studio3';
 /* The Commons · family word quest and drawing studio, members only. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {getAvatarPhoto} from './family-avatar-cache.mjs?v=stable1';

@@ -1,8 +1,8 @@
-import {AVATAR_OPTIONS,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=studio2';
-import {normalizeBody,projectTurn} from './avatar-full-body.mjs?v=studio2';
+import {AVATAR_OPTIONS,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=studio3';
+import {normalizeBody,projectTurn} from './avatar-full-body.mjs?v=studio3';
 import {drawTurnaround} from './avatar-turnaround.mjs?v=turn1';
 import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=turn1';
-import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=turn1';
+import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=studio3';
 import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
 import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=turn1';
 

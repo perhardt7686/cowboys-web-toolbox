@@ -196,6 +196,7 @@ const wearables=[
 ].map(([id,name,slot,achievement_id,cut,color,families])=>({
   id,name,slot,achievement_id,cut,color,families,tags:['wardrobe',cut,...(families||[])],
   action:id==='phantom-cloak'?['breeze','Unfurl cloak','The hem swirls into a phantom shape.','ice']:
+    id==='carnival-visor-plate'?['scan','Sweep the visor','The lenses open and sweep a beam across the floor.','mint']:
     ['polish','Show the detail','Light sweeps across the fitted detail.','gold']
 }));
 
@@ -216,7 +217,7 @@ const held=[
   ['spectral-case-sword','Spectral Case Sword','prop','dash-first-boss',spectralSword,
     ['spark','Draw the light','The blade traces an inked arc of light.','mint']],
   ['museum-lantern','Museum Lantern','offhand','quest-first-clue',museumLantern,
-    ['lamp','Light the lantern','The lantern lights the ground around you.','gold']],
+    ['lamp','Light the lantern','The lantern lights the coat and floor. The Fog Hound follows the light.','gold']],
   ['antenna-scanner','Antenna Scanner','offhand','fleet-first-flight',scanner,
     ['scan','Run the scanner','The scanner sweeps a beam across the scene.','ice']]
 ].map(([id,name,slot,achievement_id,stageDraw,action])=>({

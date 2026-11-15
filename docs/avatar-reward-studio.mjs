@@ -1,14 +1,14 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=turn1';
-import {avatarSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=studio2';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=studio3';
+import {avatarSnapshot as fallbackSnapshot, normalizeLoadout, playCel, renderLoadout} from './avatar-reward-render.mjs?v=studio3';
 
 import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=studio2';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=studio3';
 
-import {fitsBody} from './avatar-full-body.mjs?v=studio2';
-import {mountTurntable} from './avatar-turntable-controls.mjs?v=studio2';
-import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio2';
-import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPrize} from './avatar-studio-preview.mjs?v=studio2';
+import {fitsBody} from './avatar-full-body.mjs?v=studio3';
+import {mountTurntable} from './avatar-turntable-controls.mjs?v=studio3';
+import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v=studio3';
+import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=studio3';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
@@ -18,9 +18,11 @@ const num=value=>Number(value||0).toLocaleString();
 const row=(...children)=>{const n=el('div','avatar-reward-row');n.append(...children);return n;};
 const text=label=>el('p','avatar-reward-copy',label);
 const asButton=(label,run,kind='')=>{const n=button(label,run);n.className=kind?'avatar-reward-button '+kind:'avatar-reward-button';return n;};
+const fitLabel=item=>item.families?.length?'Fits '+item.families.join(' or ')+' bodies':'Fits all bodies';
 
 export const rewardById=id=>BY_ID.get(id);
-export {avatarSnapshot,normalizeLoadout};
+export {normalizeLoadout};
+export const avatarSnapshot=(recipe,size)=>studioPortrait(recipe,size)||fallbackSnapshot(recipe,size);
 
 export function rewardRatio(achievement) {
   if(!achievement?.requirements?.length)return 0;
@@ -35,12 +37,31 @@ function meter(value,max=1,label='Progress'){
   return node;
 }
 
-function thumbnail(item,size=96){
+let thumbnailObserver;
+const thumbnails=new WeakMap();
+function paintThumbnail(node,item){
+  studioPrize(node,item);
+  releaseStudioArt(node);
+}
+
+function thumbnail(item,size=96,{lazy=false,recipe=null}={}){
   const node=el('canvas','avatar-reward-thumbnail');
   node.width=node.height=size;
   node.setAttribute('aria-hidden','true');
-  studioPrize(node,item);
-  releaseStudioArt(node);
+  if(lazy&&typeof IntersectionObserver!=='undefined'){
+    thumbnailObserver||=new IntersectionObserver(entries=>{
+      for(const {target,isIntersecting} of entries){
+        if(!isIntersecting)continue;
+        const next=thumbnails.get(target);
+        if(next&&target.isConnected)paintThumbnail(target,next);
+        thumbnails.delete(target);
+        thumbnailObserver.unobserve(target);
+      }
+    },{rootMargin:'90px'});
+    thumbnails.set(node,item);
+    thumbnailObserver.observe(node);
+  }else if(recipe)studioPrize(node,item,undefined,recipe);
+  else paintThumbnail(node,item);
   return node;
 }
 
@@ -120,6 +141,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   let slot='all',filter='all',game='all',sort='catalog',limit=PAGE,detail=null,loading=false,loadError='';
   let pending=null,frame=0,lastFrame=0,stopDemo=()=>{},stopPreview=()=>{},turntable=null;
   let privateControls=null,layoutWatch=null,viewEvents=null;
+  let stagedLook=null,stageNote=null;
   const pendingAcks=new Set();
 
   function getData(){return data;}
@@ -207,6 +229,8 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function paintPreview(){
     if(!contains()||!turntable)return;
     stopPreview();cancelAnimationFrame(frame);
+    stagedLook=null;
+    if(stageNote){stageNote.hidden=true;stageNote.replaceChildren();}
     turntable.draw();
     const draft=normalizeLoadout(getLoadout());
     const animate=Object.values(draft.cosmetics).some(id=>BY_ID.get(id)?.animated)&&!document.hidden&&
@@ -231,6 +255,29 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     cancelAnimationFrame(frame);turntable.stop();stopPreview();
     stopPreview=playCel(turntable.canvas,progress=>turntable.draw(0,{id:item.id,progress}),reduceAnimation);
     setStatus(prizeAction(item).description);
+  }
+
+  function showCollection(collection){
+    if(!turntable||!stageNote)return;
+    stopPreview();cancelAnimationFrame(frame);turntable.stop();
+    stagedLook=normalizeLoadout(SHOWROOM_LOOKS[collection.look]);
+    for(const id of collection.pieces){
+      const item=BY_ID.get(id);
+      if(fitsBody(stagedLook,item))stagedLook.cosmetics[item.slot]=id;
+    }
+    const action=BY_ID.get(collection.action),cue=prizeAction(action);
+    const caption=el('span','',collection.label+' preview');
+    const play=asButton(cue.label,()=>{
+      turntable.stop();stopPreview();
+      stopPreview=playCel(turntable.canvas,p=>turntable.draw(0,{id:action.id,progress:p}),reduceAnimation);
+      setStatus(cue.description);
+    },'studio-text-button');
+    const dismiss=asButton('My character',()=>paintPreview(),'studio-text-button');
+    stageNote.replaceChildren(caption,play,dismiss);
+    stageNote.hidden=false;
+    turntable.canvas.closest('.avatar-turntable').querySelector('[data-turn=reset]').click();
+    stageNote.closest('.studio-stage').scrollIntoView({block:'nearest'});
+    play.focus({preventScroll:true});
   }
 
   function drawEquipped(){
@@ -324,13 +371,12 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       detail=item.id;renderResults();focusDetail();
     },'avatar-item-open');
     open.setAttribute('aria-label','See '+item.name);
-    open.append(thumbnail(item),el('strong','',item.name));
+    open.append(thumbnail(item,96,{lazy:true}),el('strong','',item.name));
     const status=el('span','avatar-reward-tag',RARITIES[item.tier]+' · '+(have(item.id)?'Unlocked':'Locked'));
-    const aim=el('small','avatar-reward-aim',achievement?.name||GAME_LABELS[item.group]);
-    const tryButton=asButton('Try it on',()=>tryOn(item));
-    tryButton.setAttribute('aria-label','Try on '+item.name);
+    const aim=el('small','avatar-reward-aim',(achievement?.name||GAME_LABELS[item.group])+' · '+fitLabel(item));
+    const tryButton=asButton(have(item.id)?'Equip':'Try it on',()=>tryOn(item));
+    tryButton.setAttribute('aria-label',(have(item.id)?'Equip ':'Try on ')+item.name);
     tryButton.disabled=!fitsBody(getLoadout(),item);
-    if(tryButton.disabled)aim.textContent+=' · Fits '+item.families.join(' or ');
     card.dataset.rewardItem=item.id;
     card.dataset.owned=String(have(item.id));
     card.append(open,status,aim,meter(rewardRatio(achievement),1,item.name+' progress'),tryButton);
@@ -382,19 +428,22 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     const header=row(asButton('Back to collection',()=>{detail=null;renderResults();}),el('span','avatar-reward-tag',
       RARITIES[item.tier]+' · '+(have(item.id)?'Unlocked':'Locked')));
     const stage=el('div','avatar-prize-stage');
-    const art=thumbnail(item,224);
+    const recipe=normalizeLoadout(getLoadout());
+    const fit=fitsBody(recipe,item);
+    if(fit)recipe.cosmetics[item.slot]=item.id;
+    const preview=fit?recipe:null;
+    const art=thumbnail(item,224,{recipe:preview});
     art.classList.add('avatar-prize-art');
     const content=el('div','avatar-prize-copy');
     const action=prizeAction(item);
     const state=el('p','avatar-prize-caption',action.description);
     const handle=item.slot==='companion'?()=>setSection('pets',item.id):()=>{
       stopDemo();
-      stopDemo=playCel(art,progress=>studioPrize(art,item,progress),reduceAnimation);
+      stopDemo=playCel(art,progress=>studioPrize(art,item,progress,preview),reduceAnimation);
     };
-    const fit=fitsBody(getLoadout(),item);
-    const trial=asButton('Try it on',()=>tryOn(item));trial.disabled=!fit;
+    const trial=asButton(have(item.id)?'Equip':'Try it on',()=>tryOn(item));trial.disabled=!fit;
     content.append(title,state,row(asButton(action.label,handle,'primary'),trial));
-    if(!fit)content.append(text('Fits '+item.families.join(' or ')+' bodies.'));
+    content.append(text(fitLabel(item)+'.'));
     stage.append(art,content);
     card.append(header,stage);
     if(achievement)card.append(el('h4','',achievement.name));
@@ -450,7 +499,11 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
   function renderResults(){
     if(!results)return;
     stopDemo();
-    results.querySelectorAll('canvas').forEach(releaseStudioArt);
+    for(const canvas of results.querySelectorAll('canvas')){
+      thumbnailObserver?.unobserve(canvas);
+      thumbnails.delete(canvas);
+      releaseStudioArt(canvas);
+    }
     results.replaceChildren();
     const selected=detail&&BY_ID.get(detail);
     if(section==='collection'&&selected){
@@ -459,6 +512,24 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     }else if(section==='collection'){
       filters.hidden=false;
       results.append(overview());
+      if(!query&&slot==='all'&&game==='all'){
+        const looks=el('section','avatar-matching-looks');
+        looks.append(el('h4','','Matching looks'));
+        for(const collection of STUDIO_COLLECTIONS){
+          const look=el('article','avatar-matching-look');
+          const preview=asButton(collection.label,()=>showCollection(collection));
+          preview.setAttribute('aria-label','Preview '+collection.label+' look');
+          const pieces=el('div','avatar-matching-pieces');
+          for(const id of collection.pieces){
+            const item=BY_ID.get(id);
+            const open=asButton(item.name,()=>{detail=id;renderResults();focusDetail();});
+            pieces.append(open);
+          }
+          look.append(preview,pieces);
+          looks.append(look);
+        }
+        results.append(looks);
+      }
       let items=catalog().filter(matches);
       if(sort==='name')items=items.sort((a,b)=>a.name.localeCompare(b.name));
       if(sort==='closest')items=items.sort((a,b)=>rewardRatio(current(b.achievement_id))-rewardRatio(current(a.achievement_id)));
@@ -510,6 +581,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     layoutWatch?.disconnect();layoutWatch=null;
     viewEvents?.abort();viewEvents=null;
     if(turntable){releaseStudioArt(turntable.canvas);turntable.destroy();turntable=null;}
+    stagedLook=null;stageNote=null;
   }
 
   function choosePart(part){
@@ -527,6 +599,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     const stage=editor.querySelector('[data-avatar-turntable]');
     const canvas=stage.querySelector('canvas');
     const frame=canvas.parentElement;
+    stageNote=el('div','avatar-stage-preview-note');
+    stageNote.hidden=true;stageNote.setAttribute('role','status');
+    stage.after(stageNote);
     viewEvents=new AbortController();
     editor.addEventListener('click',event=>{
       const toggle=event.target.closest('[data-studio-part]');
@@ -536,7 +611,8 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       else stage.querySelector('[data-turn="body"]').click();
     },{signal:viewEvents.signal});
     turntable=mountTurntable(stage,(camera,t,activity)=>
-      studioCharacter(canvas,getLoadout(),camera,t,activity),reduceAnimation,(x,y,view)=>{
+      studioCharacter(canvas,stagedLook||getLoadout(),camera,t,activity),reduceAnimation,(x,y,view)=>{
+        if(stagedLook)return;
         const part=pickStudioPart(canvas,x,y)||
           (canvas.dataset.renderer!=='3d'&&x>.20&&x<.79&&y>.13&&y<.71?(y<.34?'face':'clothes'):null);
         if(!part)return;
@@ -581,8 +657,13 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
     void refresh();
   }
 
-  function restore(next){setSection(next.section,next.detail);}
-  function stateForReturn(){return {section,detail};}
+  function restore(next){
+    if(next.collection){
+      ({query,slot,filter,game,sort,limit}=next.collection);
+    }
+    setSection(next.section,next.detail);
+  }
+  function stateForReturn(){return {section,detail,collection:{query,slot,filter,game,sort,limit}};}
   function clear(){
     epoch+=1;
     pending=null;loading=false;loadError='';data=null;achievements.clear();owned.clear();pendingAcks.clear();

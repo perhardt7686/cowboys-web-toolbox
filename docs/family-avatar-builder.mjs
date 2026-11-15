@@ -1,7 +1,7 @@
 /* Family Avatar Studio: original, fully local character art.
    No external images, tracking, accounts, or third-party avatar service. */
-import {FULL_BODY_OPTIONS,SCULPT_LABELS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=studio2';
-import {turntableHTML} from './avatar-turntable-controls.mjs?v=studio2';
+import {FULL_BODY_OPTIONS,SCULPT_LABELS,WARDROBE_LABELS,normalizeBody} from './avatar-full-body.mjs?v=studio3';
+import {turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
 import {paintPortrait} from './avatar-cel-portrait.mjs?v=toon3';
 
 export const AVATAR_OPTIONS = Object.freeze({

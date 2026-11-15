@@ -77,7 +77,7 @@ async def visit(browser, width, full=False):
         await editor.get_by_role('button', name='Remove Dragon Crown').click()
         await editor.get_by_role('button', name='Back to collection').click()
         await editor.get_by_role('searchbox').fill('Giant Taco Hat')
-        await editor.get_by_role('button', name='Try on Giant Taco Hat').click()
+        await editor.get_by_role('button', name='Equip Giant Taco Hat').click()
         await editor.get_by_role('button', name='Save my avatar').click()
         await expect(editor.get_by_text('Preview saved locally for this session.')).to_be_visible()
         await page.locator('#content-dialog').evaluate('n=>n.close()')

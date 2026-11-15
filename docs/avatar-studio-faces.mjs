@@ -1,4 +1,4 @@
-import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio2';
+import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
 
 const HEAD_SHAPES={
   oval:[1,1,1], angular:[.98,1.065,1.08], round:[1.09,.94,.92],
@@ -14,7 +14,7 @@ const HAIR_FORM={
 function makeScalp(head,hair,shine,style,key){
   if(style==='none')return;
   const curly=style==='curls';
-  const radius=style==='crop'?1.014:curly?1.095:1.052;
+  const radius=style==='crop'?1.022:curly?1.095:1.076;
   const mesh=shell(head,hair,Array.from({length:14},(_,i)=>{
     const phi=.005+i*.16;
     return [phi,.237,.212,0,-.008];
@@ -57,6 +57,8 @@ function makeScalp(head,hair,shine,style,key){
       lock.rotation.y=.12-i*.105;
     }
     stroke(head,shine,[[-.16,.195,.184],[-.091,.239,.161],[.031,.256,.134],[.106,.227,.132]],.008);
+    const crease=surface(shade(hair.color,.45));
+    stroke(head,crease,[[-.145,.183,.212],[-.108,.209,.218],[-.075,.230,.205],[-.061,.241,.180]],.0035);
   }
   if(['flow','bob','braids','locks'].includes(style)){
     for(const side of [-1,1]){
@@ -105,9 +107,9 @@ function browsAndEyes(head,v,palette,w,spacing){
   const ivory=surface('#fff6e9',{roughness:.39});
   const glass=surface(palette.eye,{roughness:.29});
   const glint=surface('#fffdeb',{roughness:.24});
-  const pupil=surface('#262037');
-  const brow=surface(shade(palette.hair,.64));
-  const rim=surface(shade(palette.skin,.43));
+  const pupil=surface('#241725');
+  const brow=surface(shade(palette.hair,.49));
+  const rim=surface(shade(palette.skin,.31));
   const lid=surface(shade(palette.skin,.83));
   const eyeWidth=v.eye_shape==='round'?.059:v.eye_shape==='almond'?.066:.061;
   const eyeHeight={wide:.036,round:.039,almond:.026,sleepy:.019,dramatic:.024,classic:.031}[v.eye_shape];
@@ -123,10 +125,11 @@ function browsAndEyes(head,v,palette,w,spacing){
       const h=eyeHeight*open;
       oval(face,lid,0,-.003,-.004,eyeWidth+.005,h+.008,.028);
       oval(face,ivory,0,0,.001,eyeWidth,h,.023);
-      oval(face,glass,-.007,0,.021,.022,h*.83,.009);
-      oval(face,pupil,-.008,0,.028,.0105,h*.58,.004);
+      oval(face,glass,-.007,0,.021,.020,h*.80,.009);
+      oval(face,pupil,-.008,0,.028,.009,h*.55,.004);
       oval(face,glint,-.014,.009,.032,.0045,.005,.002);
-      stroke(face,rim,[[-eyeWidth,0,.010],[-eyeWidth*.48,h*.92,.018],[eyeWidth*.42,h,.019],[eyeWidth,.003,.011]],.0048);
+      stroke(face,rim,[[-eyeWidth,0,.014],[-eyeWidth*.48,h*.92,.022],[eyeWidth*.42,h,.022],[eyeWidth,.003,.014]],.0061);
+      stroke(face,lid,[[-eyeWidth*.73,-.012,.020],[0,-h*.91,.015],[eyeWidth*.68,-.010,.017]],.0032);
       if(v.eye_shape==='dramatic')stroke(face,rim,[[.023,.014,.023],[.048,.022,.013],[.066,.032,.010]],.0048);
     }
     const lineHeight=v.brows==='straight'?.004:v.brows==='arching'?.021:.011;
@@ -135,31 +138,37 @@ function browsAndEyes(head,v,palette,w,spacing){
 }
 
 function noseAndMouth(head,v,tone,palette){
-  const noseHeight={straight:.080,pointed:.069,swoop:.055,button:.055,freckled:.054}[v.nose];
-  const tip=surface(shade(palette.skin,v.nose==='freckled'?.88:1.035),{roughness:.66});
-  oval(head,tone,0,-.028,.179,.058,noseHeight,.046);
-  oval(head,tip,0,-.075,.220,v.nose==='pointed'?.037:.047,.027,v.nose==='pointed'?.050:.041)
-    .rotation.x=v.nose==='swoop'?.54:.13;
-  for(const s of [-1,1])oval(head,tone,s*.030,-.092,.206,.021,.015,.026);
-  const dark=surface(shade(palette.skin,.49)),lip=surface(shade(palette.skin,.72));
+  const bridge={straight:.057,pointed:.041,swoop:.030,button:.020,freckled:.026}[v.nose];
+  const length=v.nose==='pointed'?.276:v.nose==='swoop'?.258:.249;
+  const width=v.nose==='button'?.047:.039;
+  shell(head,tone,[
+    [-.101,.012,.005,0,.186],[-.094,width*.79,.030,0,.212],
+    [-.079,width,(length-.199)*.50,.002,(length+.199)*.50],
+    [-.053,width*.83,.028,0,length-.057],
+    [-.017,width*.72,.021,0,.177],[bridge,.012,.008,0,.165]
+  ],{segments:26});
+  const noseInk=surface(shade(palette.skin,.48));
+  stroke(head,noseInk,[[.022,-.066,length-.009],[.026,-.084,length-.012],[.012,-.094,.237]],.0034);
+  const dark=surface(shade(palette.skin,.29)),lip=surface(shade(palette.skin,.73));
   const lightLip=surface(shade(palette.skin,1.06));
   const grin=['grin','laugh'].includes(v.expression);
   const corner={smile:.012,grin:.018,smirk:.019,calm:0,determined:-.011,curious:.005,wink:.010,laugh:.02}[v.expression];
-  const left=[-.068,-.152+corner,.181],right=[.068,-.152+(v.expression==='smirk'?-.004:corner),.181];
+  const left=[-.068,-.152+corner,.173],right=[.068,-.152+(v.expression==='smirk'?-.004:corner),.173];
   if(grin){
     oval(head,dark,0,-.154,.185,.066,v.expression==='laugh'?.029:.021,.013);
     oval(head,surface('#fff2de'),0,-.148,.197,.050,.011,.004);
   }else{
-    stroke(head,lip,[left,[-.028,-.150,.199],[0,-.155,.207],[.028,-.152,.197],right],.008);
-    stroke(head,dark,[left,[0,-.157,.214],right],.0035);
+    stroke(head,lip,[left,[-.028,-.150,.181],[0,-.155,.190],[.028,-.152,.181],right],.006);
+    stroke(head,dark,[left,[0,-.155,.196],right],.0037);
   }
-  stroke(head,lightLip,[[-.029,-.177,.186],[0,-.179,.202],[.029,-.177,.186]],.0043);
+  stroke(head,lightLip,[[-.029,-.177,.176],[0,-.178,.182],[.029,-.177,.176]],.003);
 }
 
 function introduceBeard(head,v,palette,w,jaw){
   if(v.beard==='none')return;
   const hair=surface(shade(palette.hair,v.beard==='stubble'?1.24:.81));
   const light=surface(shade(palette.hair,1.18));
+  const edge=surface(shade(palette.hair,.48));
   if(v.beard==='moustache'||v.beard==='beard'){
     for(const s of [-1,1]){
       const lip=oval(head,hair,s*.032,-.119,.202,.050,.016,.016);
@@ -191,8 +200,12 @@ function introduceBeard(head,v,palette,w,jaw){
     return [x,y+side*i*.014-(i===5?.061*Math.max(0,Math.cos(a))**3:0),z];
   }});
   chin.material.side=THREE.DoubleSide;
-  for(const s of [-1,1])stroke(head,light,[[s*.191,-.080,.111],[s*.166,-.164,.146],
-    [s*.115,-.230,.161],[s*.025,-.264,.165]],.006);
+  for(const s of [-1,1]){
+    stroke(head,edge,[[s*.199*w,-.062,.115],[s*.174*w,-.136,.149],
+      [s*.117*jaw*w,-.173,.170],[s*.065*jaw*w,-.193,.195]],.0047);
+    stroke(head,light,[[s*.188*w,-.094,.116],[s*.161*w,-.176,.151],
+      [s*.115*jaw*w,-.233,.167],[s*.035*jaw*w,-.265,.165]],.005);
+  }
 }
 
 function faceReward(head,item,pigment,width,spacing){
@@ -247,6 +260,31 @@ export function addGlasses(head,kind,metal,single=false){
   if(!single)stroke(head,frame,[[-.035,.020,.236],[0,.031,.254],[.035,.020,.236]],.006);
 }
 
+export function controlVisor(head,pigment){
+  const plate=group(head,0,.042,.226);
+  const enamel=surface(pigment),rim=surface('#332f42'),trim=surface('#deb16a');
+  const signal=surface('#a2e0cb',{emissive:'#6be6c2',emissiveIntensity:.34});
+  box(plate,rim,0,0,0,.402,.169,.087);
+  box(plate,enamel,0,0,.027,.371,.139,.055);
+  box(plate,rim,0,-.002,.057,.264,.094,.023);
+  const shutters=[];
+  for(const side of [-1,1]){
+    oval(plate,signal,side*.072,-.001,.076,.049,.027,.010);
+    medallion(plate,trim,side*.161,.011,.068,.014,.013,6);
+    const cover=group(plate,side*.071,.044,.067);
+    box(cover,enamel,0,-.014,.011,.112,.039,.028);
+    shutters.push(cover);
+  }
+  const emitter=group(plate,.071,-.001,.088);
+  const geometry=new THREE.ConeGeometry(.117,1,20,1,true);
+  geometry.rotateX(-Math.PI/2);
+  geometry.translate(0,0,.5);
+  const beam=attach(emitter,geometry,new THREE.MeshBasicMaterial({color:'#a4f5cf',opacity:0,
+    transparent:true,depthWrite:false,side:THREE.DoubleSide}));
+  beam.visible=false;
+  return {signal,emitter,beam,shutters};
+}
+
 export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=false,specter=false,jawTune=0,eyeSpacing=0,styleReward,eyeReward}={}){
   if(mechanical||armor){
     const alloy=surface(shade(palette.cloth,.88),{metalness:.58,roughness:.39});
@@ -262,9 +300,15 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
         [.163,.205,.182],[.244,.147,.143],[.276,.005,.007]],{segments:38});
       const crest=oval(head,edge,.024,.273,.009,.060,.141,.140);
       crest.rotation.x=-.17;
+      const shadow=surface(shade(edge.color,.49));
+      for(const s of [-1,1]){
+        join(head,shadow,[s*.164,.136,-.037],[s*.242,.205,-.038],.052,.039,7);
+        join(head,edge,[s*.229,.187,-.041],[s*.314,.326,-.078],.043,.004,7);
+      }
     }else{
       box(head,alloy,0,0,0,.435*width,.38,.377);
       box(head,edge,0,.163,0,.408,.052,.344);
+      box(head,edge,.015,-.139,.154,.312,.073,.082);
     }
     box(head,screen,0,.038,.183,.375,.137,.062);
     for(const s of [-1,1]){
@@ -287,12 +331,13 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
   const shadeSkin=surface(shade(palette.skin,.80));
   const shape=(HEAD_SHAPES[v.face]||HEAD_SHAPES.oval).slice();
   shape[2]*=1+jawTune*.069;
-  const [w,,jaw]=shape;
+  const [w,h,jaw]=shape;
   skinMesh(head,tone,shape);
   for(const s of [-1,1]){
     const ear=oval(head,tone,s*.221*w,-.041,0,specter?.074:.044,specter?.076:.061,.033);
     ear.rotation.z=s*(specter?-.71:-.23);
     oval(head,shadeSkin,s*(.223*w+(specter?.023:.004)),-.041,.025,.019,.031,.011).rotation.z=s*-.32;
+    stroke(head,shadeSkin,[[s*.166*w,-.103,.130],[s*.145*w,-.129,.146],[s*.124*w,-.138,.155]],.0042);
     if(v.accessory==='earrings')band(head,surface('#e8bc76',{metalness:.72}),s*.231*w,-.090,.026,.023,.006,.80,1.21);
   }
   browsAndEyes(head,v,palette,w,eyeSpacing);
@@ -311,7 +356,9 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
   const hair=surface(shadeHair),shine=surface(shade(shadeHair,1.19),{roughness:.56});
   const style=styleReward?.tags?.includes('norse')?'braids':styleReward?.id.includes('curls')?'curls':
     styleReward?.id.includes('spike')||styleReward?.id.includes('flam')?'quiff':HAIR_FORM[v.style];
-  makeScalp(head,hair,shine,style,v.style);
+  const scalp=group(head);
+  scalp.scale.set(w,h,1);
+  makeScalp(scalp,hair,shine,style,v.style);
   if(v.accessory==='headphones'){
     const velvet=surface('#39304b'),metal=surface('#b495bc',{metalness:.62});
     stroke(head,metal,[[-.238,.018,-.014],[-.198,.210,-.025],[0,.298,-.039],[.198,.210,-.025],[.238,.018,-.014]],.018,20);

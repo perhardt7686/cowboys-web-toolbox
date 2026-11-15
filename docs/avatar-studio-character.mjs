@@ -1,17 +1,17 @@
-import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=studio2';
-import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=studio2';
-import {BY_ID} from './avatar-reward-catalog.mjs?v=turn1';
-import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio2';
-import {addGlasses,sculptFace} from './avatar-studio-faces.mjs?v=studio2';
-import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=studio2';
+import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=studio3';
+import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=studio3';
+import {BY_ID} from './avatar-reward-catalog.mjs?v=studio3';
+import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=studio3';
+import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=studio3';
+import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=studio3';
 
 const BODY={
   detective:{height:1.045,width:.85},
   mechanic:{height:1.012,width:1.18},
   sleuth:{height:.931,width:.89},
   specter:{height:1.048,width:.87},
-  armor:{height:1.050,width:1.17},
-  automaton:{height:1.008,width:1.05},
+  armor:{height:1.062,width:1.20},
+  automaton:{height:.940,width:1.105},
   scout:{height:.914,width:.89}
 };
 const avColor=(field,key)=>AVATAR_OPTIONS[field].find(([id])=>id===key)?.[2];
@@ -20,6 +20,7 @@ const dark='#292b39';
 function pants(figure,style,pigment,body,shoes,wardrobe){
   const [fabric,seam,lining]=[surface(pigment),surface(shade(pigment,.68)),surface(shade(pigment,1.37))];
   const metallic=surface('#a6a9b5',{metalness:.66,roughness:.46});
+  const hinges=surface('#383441');
   const dress=['dress','pleats'].includes(style);
   const hem=dress?(style==='dress'?.685:.820):0;
   const hip=body.width*.186;
@@ -30,8 +31,11 @@ function pants(figure,style,pigment,body,shoes,wardrobe){
       join(figure,metallic,[x,.202,z],[x*.95,.656,z*.55],.074,.088);
       join(figure,metallic,[x*.95,.656,z*.55],[x,1.102,0],.103,.117);
       medallion(figure,lining,x*.95,.63,z*.55+.075,.076,.045);
+      medallion(figure,hinges,x*.95,.63,z*.55+.103,.050,.029,10);
+      medallion(figure,metallic,x*.95,.63,z*.55+.122,.026,.013,6);
       oval(figure,metallic,x,1.090,0,.109,.107,.103);
       box(figure,fabric,x*.96,.437,z*.8+.038,.125,.19,.12);
+      for(let i=0;i<3;i++)box(figure,hinges,x*.96,.391+i*.043,z*.8+.103,.085,.010,.014);
     }else{
       const layers=[
         [.184,flare,flare*.91,x*1.14,z],
@@ -79,6 +83,7 @@ function shoe(parent,style,pigment,x,z,side){
     const trim=style==='highboots'?.390:.244;
     shell(shoe,stitching,[[trim-.018,.100,.104],[trim,.099,.104]],{segments:26});
     stroke(shoe,stitching,[[-.04,.135,.161],[-.045,.189,.111],[-.023,trim-.035,.109]],.004);
+    stroke(shoe,rubber,[[-.048,.128,-.084],[-.053,.184,-.104],[0,.196,-.108],[.054,.175,-.100]],.0042);
   }
   if(style==='maryjanes')box(shoe,stitching,0,.189,.044,.183,.021,.046);
   if(style==='sneakers'||style==='boots')for(let i=0;i<4;i++)
@@ -94,6 +99,7 @@ function torso(parent,v,wardrobe,palette,body){
   const welt=surface(shade(material.color,.62));
   const light=surface(shade(material.color,1.30));
   const warm=surface('#c99f63',{metalness:.58,roughness:.56});
+  let capeParts=null;
   const sections=[
     [1.132,.254,.148], [1.172,.309,.170], [1.251,.317,.179],
     [1.358,.293,.171],[1.479,.310,.181],[1.590,.333,.185],
@@ -118,6 +124,17 @@ function torso(parent,v,wardrobe,palette,body){
         oval(parent,warm,side*.237*w,1.863,.154,.021,.022,.013);
       }
       medallion(parent,warm,.064,1.759,.278,.058,.023,6);
+      for(const side of [-1,1]){
+        const pauldron=box(parent,metal,side*.350*w,1.895,.008,.238,.163,.321);
+        pauldron.rotation.z=side*.24;
+        join(parent,light,[side*.390*w,1.953,-.058],[side*.507*w,2.080,-.095],.071,.003,6);
+      }
+    }else{
+      const paint=surface('#ead481');
+      for(const side of [-1,1]){
+        box(parent,paint,side*.256*w,1.445,.210,.095,.024,.016).rotation.z=side*.43;
+        box(parent,welt,side*.256*w,1.427,.215,.103,.014,.020).rotation.z=side*.43;
+      }
     }
   }else if(wardrobe.top==='striped'){
     for(const index of [2,4,6,8]){
@@ -157,15 +174,16 @@ function torso(parent,v,wardrobe,palette,body){
     const bottom=lower[wardrobe.outer];
     const cape=wardrobe.outer==='cape';
     const starts=cape?1.25:.39,ends=Math.PI*2-starts;
-    shell(parent,coat,[
-      [bottom,.414*w,.254,0,-.027],[bottom+.060,.402*w,.225],
+    const panel=cape?group(parent):parent;
+    const cloth=shell(panel,coat,[
+      [bottom,(cape?.495:.414)*w,.265,0,-.027],[bottom+.060,(cape?.469:.402)*w,.228],
       [1.164,.347*w,.208],[1.310,.332*w,.195],
       [1.545,.356*w,.201],[1.738,.406*w,.219],[1.901,.421*w,.198],
       [1.984,.387*w,.184],[2.079,.137,.151]
     ].filter((row,index,array)=>index===0||row[0]>array[index-1][0]),
     {start:starts,end:ends,segments:40,warp([x,y,z],a,i){
       const pleat=(1-i/10)*(cape?.030:.012)*Math.sin(a*5);
-      return [x+pleat*Math.sin(a),y+(cape?.025*Math.sin(a):0),z+pleat*Math.cos(a)];
+      return [x+pleat*Math.sin(a),y+(cape?.031*Math.sin(a*3)*(1-i/10):0),z+pleat*Math.cos(a)];
     }});
     coat.side=THREE.DoubleSide;
     if(!cape)for(const s of [-1,1]){
@@ -177,7 +195,16 @@ function torso(parent,v,wardrobe,palette,body){
       for(const y of [1.19,1.45,1.57])oval(parent,warm,s*.190*w,y,.203,.011,.011,.008);
     }
     const seam=surface(shade(coat.color,1.34));
-    stroke(parent,seam,[[0,1.967,-.191],[0,1.699,-.219],[0,1.331,-.205],[0,bottom+.032,-.232]],.006);
+    const piping=stroke(panel,seam,[[0,1.967,-.191],[0,1.699,-.219],[0,1.331,-.205],[0,bottom+.032,-.249]],.006);
+    if(cape){
+      const clasp=surface('#d5a263');
+      for(const side of [-1,1])medallion(parent,clasp,side*.155*w,1.962,.163,.043,.021,10);
+      stroke(parent,clasp,[[-.151*w,1.962,.182],[0,1.919,.204],[.151*w,1.962,.182]],.009,16);
+      capeParts=[cloth,piping].map(mesh=>{
+        const position=mesh.geometry.attributes.position;
+        return {mesh,position,idle:position.array.slice()};
+      });
+    }
   }
   if(wardrobe.bottoms==='overalls'){
     const denim=surface('#4d6775'),stitch=surface('#b5a286');
@@ -236,7 +263,7 @@ function torso(parent,v,wardrobe,palette,body){
     medallion(parent,warm,-.206*w,1.781,.236,.040,.019);
     medallion(parent,light,-.206*w,1.781,.252,.022,.008,7);
   }
-  return {coat,material,warm};
+  return {coat,material,warm,capeParts};
 }
 
 function arm(parent,side,v,body,wardrobe,palette,materials,item){
@@ -248,6 +275,11 @@ function arm(parent,side,v,body,wardrobe,palette,materials,item){
     hand[1]=1.969;hand[2]=.169;
   }else if(item){
     hand[0]+=side*.020;hand[1]=1.398;hand[2]=.256;
+  }else if(wardrobe.mechanical){
+    elbow[0]+=side*.028;
+    hand[0]+=side*.024;
+    hand[1]+=.049;
+    hand[2]+=.047;
   }
   const covered=wardrobe.outer!=='none'&&wardrobe.outer!=='cape';
   const fabric=covered?materials.coat:materials.material;
@@ -258,24 +290,38 @@ function arm(parent,side,v,body,wardrobe,palette,materials,item){
   const metal=surface('#8e9da7',{metalness:.56,roughness:.47});
   const sleeveEnd=short?
     [point[0]*.37+elbow[0]*.63,point[1]*.37+elbow[1]*.63,elbow[2]]:elbow;
-  oval(parent,fabric,point[0],point[1]-.027,point[2],.109,.126,.110);
-  join(parent,fabric,point,sleeveEnd,.104,.081);
-  oval(parent,short?skin:mechanical?metal:fabric,...elbow,.078,.083,.080);
+  const offset=(to,from)=>to.map((value,index)=>value-from[index]);
+  const origin=[0,0,0];
+  const shoulder=group(parent,...point);
+  const hinge=group(shoulder,...offset(elbow,point));
+  oval(shoulder,fabric,0,-.027,0,.109,.126,.110);
+  join(shoulder,fabric,origin,offset(sleeveEnd,point),.104,.081);
+  oval(hinge,short?skin:mechanical?metal:fabric,0,0,0,.078,.083,.080);
+  if(mechanical){
+    medallion(hinge,surface('#39343b'),0,0,.078,.048,.014,10);
+    medallion(hinge,surface('#b7c4c7'),0,0,.090,.025,.015,6);
+  }
   const forearm=short?skin:mechanical?metal:fabric;
-  if(short)join(parent,skin,sleeveEnd,elbow,.079,.072);
-  const cuff=hand.map((n,index)=>n*.87+elbow[index]*.13);
-  join(parent,forearm,elbow,cuff,.082,.062);
-  if(!short)join(parent,surface(shade(fabric.color,.72)),cuff,hand,.069,.064);
-  const palm=group(parent,...hand);
-  palm.rotation.x=item?.slot==='offhand'?-.22:v.pose==='wave'&&side===1?-2.65:.16;
+  if(short)join(shoulder,skin,offset(sleeveEnd,point),offset(elbow,point),.079,.072);
+  const wristAt=offset(hand,elbow);
+  const cuff=wristAt.map(value=>value*.87);
+  join(hinge,forearm,origin,cuff,.082,.062);
+  if(!short)join(hinge,surface(shade(fabric.color,.57)),cuff,wristAt,.069,.064);
+  const palm=group(hinge,...wristAt);
+  palm.rotation.x=item?.slot==='offhand'?-.14:v.pose==='wave'&&side===1?-2.65:.16;
   palm.rotation.z=side*(item?-.20:.049);
   oval(palm,mechanical?metal:wrist,0,-.040,.012,.065,.078,.048);
+  const fingers=[];
   for(let i=0;i<4;i++){
-    const finger=oval(palm,wrist,-.039+i*.023,item?-.077:-.101+(i===0?.019:0),item?.045:.011,.014,.044,.016);
-    finger.rotation.x=item?-.73:.044;
+    const finger=oval(palm,wrist,-.039+i*.023,item?-.077:-.101+(i===0?.019:0),item?.052:.011,.015,.043,.017);
+    finger.rotation.x=item?-.78:.044;
+    fingers.push(finger);
   }
   oval(palm,wrist,-side*.050,-.046,.044,.024,.045,.019).rotation.z=side*.38;
-  return item?heldItem(parent,item,hand,side):null;
+  const prop=item?heldItem(palm,item,undefined,side):null;
+  if(prop)prop.root.position.set(0,item.id.includes('lantern')?-.088:-.052,.066);
+  return {shoulder,hinge,palm,fingers,side,prop,
+    wristRest:palm.rotation.x,rollRest:palm.rotation.z,fingerRest:item?-.78:.044};
 }
 
 export function buildAvatar(recipe){
@@ -335,11 +381,13 @@ export function buildAvatar(recipe){
   }else if(!mechanical)addGlasses(head,recipe.glasses==='none'&&recipe.accessory==='glasses'?'round':recipe.glasses,'#6b4948');
   const headwear=cosmetics.hat||recipe.hat;
   const hat=studioHat(head,headwear,recipe.accessory);
-  const props=[arm(figure,-1,recipe,body,wardrobe,palette,materials,cosmetics.prop),
-    arm(figure,1,recipe,body,wardrobe,palette,materials,cosmetics.offhand)].filter(Boolean);
+  const visor=cosmetics.bodypart?.id==='carnival-visor-plate'?controlVisor(head,rewardPigment(cosmetics.bodypart)):null;
+  const arms=[arm(figure,-1,recipe,body,wardrobe,palette,materials,cosmetics.prop),
+    arm(figure,1,recipe,body,wardrobe,palette,materials,cosmetics.offhand)];
+  const props=arms.flatMap(arm=>arm.prop?[arm.prop]:[]);
   const pet=cosmetics.companion&&buildCompanion(cosmetics.companion);
   if(pet){pet.root.position.set(.897,0,.242);root.add(pet.root);}
   const aura=cosmetics.effect&&makeAura(figure,cosmetics.effect);
-  return {root,figure,head,pet,aura,props,hat,cosmetics};
+  return {root,figure,head,pet,aura,arms,props,hat,visor,cosmetics,capeParts:materials.capeParts};
 }
 

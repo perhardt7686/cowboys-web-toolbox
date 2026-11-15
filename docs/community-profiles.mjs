@@ -2,13 +2,13 @@ import {escapeHTML as esc,initials,renderBody,displayName,safeHttps,canPost} fro
 import {DETAIL_DEFAULTS,forumBody} from './forum-core.mjs?v=powers1';
 import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProfile,profileCompletion} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=stable1';
-import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=studio2';
-import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=turn1';
+import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=studio3';
+import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=studio3';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=return3';
 
-import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=studio2';
-import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio2';
-import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio2';
+import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=studio3';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio3';
+import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=studio3';
 
 export function createProfileStudio(ctx){
   const cache=new Map(),images=new Map(),characterURLs=new Map();
@@ -141,7 +141,7 @@ export function createProfileStudio(ctx){
     if(node)node.textContent=message;
   }
   async function ensureRewards(){
-    rewardModule ||= await import('./avatar-reward-studio.mjs?v=studio2');
+    rewardModule ||= await import('./avatar-reward-studio.mjs?v=studio3');
     if(!approved())return null;
     rewards ||= rewardModule.createRewardStudio({
       getLoadout:()=>avatarRecipe,setLoadout:setPreview,setStatus,playGame,rpc,checkAccess:approved,
@@ -167,6 +167,7 @@ export function createProfileStudio(ctx){
       const form=document.getElementById('profile-studio-form');
       if(!form||!valid()||!rewards)return;
       if(!form.querySelector('.avatar-reward-tabs'))rewards.mount(form,{nextSection:options.section||'avatar',item:options.item||null});
+      if(options.rewardState)rewards.restore(options.rewardState);
       else if(options.section||options.item)rewards.restore({section:options.section,detail:options.item});
       refresh();
       if(options.equip&&options.item){
@@ -186,7 +187,7 @@ export function createProfileStudio(ctx){
     const restore=()=>{
       stopTrip=null;
       if(account!==ctx.state.member?.user_id||!approved())return;
-      void show('avatar',{resume:true,section:returnTo.section,item:returnTo.detail});
+      void show('avatar',{resume:true,section:returnTo.section,item:returnTo.detail,rewardState:returnTo});
     };
     stopWait?.();
     stopWait=rewardModule.openRewardGame(game,target=>{
@@ -448,7 +449,7 @@ export function createProfileStudio(ctx){
     panel?.addEventListener('toggle',async ()=>{
       if(!panel.open){memberView?.stop();return;}
       if(memberView){memberView.draw();return;}
-      const {studioCharacter,prepareStudioRenderer,releaseStudioArt}=await import('./avatar-studio-preview.mjs?v=studio2');
+      const {studioCharacter,prepareStudioRenderer,releaseStudioArt}=await import('./avatar-studio-preview.mjs?v=studio3');
       if(!panel.isConnected||!panel.open||!dialog.open||!canPost(ctx.state.member)||memberView)return;
       const stage=panel.querySelector('[data-avatar-turntable]');
       const canvas=stage.querySelector('canvas');

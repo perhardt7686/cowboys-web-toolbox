@@ -14,6 +14,7 @@ on:
       - 'docs/community-profiles.mjs'
       - 'tests/browser-avatar-rewards.py'
       - 'tests/browser-avatar-turntable.py'
+      - 'tests/browser-avatar-cartoon.py'
       - 'tests/browser-family-avatar-studio.py'
       - 'tests/browser-pet-trading.py'
       - 'tests/browser-arcade-shell.py'
@@ -48,6 +49,7 @@ jobs:
         run: |
           python -m http.server 8765 --directory docs >/tmp/family-arcade-http.log 2>&1 &
           python tests/browser-avatar-turntable.py
+          python tests/browser-avatar-cartoon.py
           python tests/browser-avatar-rewards.py
           python tests/browser-family-avatar-studio.py
           python tests/browser-pet-trading.py
@@ -61,6 +63,8 @@ jobs:
           path: |
             reports/avatar-turntable-iphone.png
             reports/avatar-studio-desktop.png
+            reports/avatar-cartoon-iphone.png
+            reports/avatar-cartoon-interaction.webm
             reports/avatar-rewards-*.png
             reports/family-avatar-studio-*.png
             reports/family-pet-trade-*.png

@@ -18,10 +18,11 @@ export async function cacheAvatarCharacter(member,recipe) {
   const epoch=generation;
   record.promise=(async()=>{
     try {
-      draws||=import('./avatar-reward-render.mjs?v=turn1').catch(error=>{draws=null;throw error;});
-      const {avatarSnapshot}=await draws;
+      draws||=import('./avatar-studio-preview.mjs?v=studio3').catch(error=>{draws=null;throw error;});
+      const {prepareStudioRenderer,studioPortrait,avatarSnapshot}=await draws;
+      await prepareStudioRenderer();
       if(epoch!==generation||entries.get(key)!==record)return null;
-      return avatarSnapshot(recipe);
+      return studioPortrait(recipe,96)||avatarSnapshot(recipe,96);
     }catch{
       if(entries.get(key)===record)entries.delete(key);
       return null;
