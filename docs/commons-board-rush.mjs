@@ -167,8 +167,10 @@ async function refresh(){
 }
 function reset(){
  if(request){cancelAnimationFrame(request);request=0;}
- held.clear();last=0;run=null;$('skyboard-next').hidden=true;$('skyboard-start').disabled=false;
- $('skyboard-pause').textContent='PAUSE';$('skyboard-message').hidden=false;
+ held.clear();last=0;run=null;
+ const next=$('skyboard-next'),startButton=$('skyboard-start'),pauseButton=$('skyboard-pause'),message=$('skyboard-message');
+ if(next)next.hidden=true;if(startButton)startButton.disabled=false;
+ if(pauseButton)pauseButton.textContent='PAUSE';if(message)message.hidden=false;
 }
 async function start(retry=false){
  if(busy||!user||host.hidden)return;
