@@ -57,5 +57,10 @@ export function studioLook(canvas,id){
   return drawn;
 }
 
-export function pickStudioPart(canvas,x,y){return active?.hitStudioAvatar(canvas,x,y);}
+export function pickStudioPart(canvas,x,y){
+  // Raycast only the visible 3D scene. When comparing painted 2D artwork,
+  // let the editor use its 2D face/body hit regions instead of stale 3D hits.
+  if(canvas?.dataset?.renderer==='2d')return null;
+  return active?.hitStudioAvatar(canvas,x,y);
+}
 export function releaseStudioArt(canvas){active?.releaseStudioView(canvas);}
