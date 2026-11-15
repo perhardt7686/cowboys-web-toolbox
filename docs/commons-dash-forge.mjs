@@ -5,10 +5,12 @@ const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const board=document.getElementById('conversations');
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const TICK=210,TILE=40,W=960,H=360;
+const TILE=40,W=960,H=360;
 const TABS=[['campaign','Campaign'],['community','Member Levels'],['builder','Level Studio'],['awards','Awards'],['leaders','Leaders']];
-const PAINTS=[['.','Clear'],['s','Spike'],['b','Block'],['g','Gap']];
-const THEMES=[['amber','#ffd363',0],['cyan','#6ee9fb',2],['coral','#ff749c',4],['aurora','#96ffb3',6]];
+const PAINTS=[['.','Clear'],['s','Spike'],['b','Block'],['g','Gap'],['l','Laser'],['w','Saw'],['c','Crystal'],['p','Pillar'],['f','Flames'],['r','Ring'],['m','Mushroom'],['o','Mine'],['d','Drone'],['h','Hammer']];
+const THEMES=[['amber','#ffd363',0],['cyan','#6ee9fb',2],['coral','#ff749c',4],['aurora','#96ffb3',6],
+ ['sapphire','#7d94ff',10],['ember','#ff995c',20],['lotus','#df92ff',30],['sunbeam','#fff58a',50],
+ ['arcade','#67ffc8',75],['starlight','#ebdefc',100],['obsidian','#a8aac1',200],['legend','#fff',500]];
 let client=null,user=null,root=null,inside=null,state=null,scene='campaign',busy=false,open=false,run=null,frame=0,brush='s';
 let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48)},theme='amber',refreshTimer=null,booted=false;
 const num=n=>Number(n||0).toLocaleString('en-US');
@@ -18,7 +20,8 @@ const levels=()=>state?.levels||[];
 const personal=id=>(state?.progress||[]).find(p=>Number(p.level_id)===Number(id));
 const me=()=>state?.user_id||user;
 const campaign=()=>levels().filter(l=>l.kind==='campaign').sort((a,b)=>a.stage-b.stage);
-function unlocked(l){return l.kind!=='campaign'||l.stage===1||campaign().filter(c=>c.stage===l.stage-1).some(c=>personal(c.id)?.clears>0);}
+const chapter=()=>Math.max(1,Math.min(1000000000,Number(state?.campaign_current||1)));
+function unlocked(l){return l.kind!=='campaign'||l.stage<=chapter()||l.stage===1;}
 function setStatus(text,error=false){const el=$('dash-status');if(el){el.textContent=String(text);el.dataset.error=String(error);}}
 function bestText(l){const mine=personal(l.id);return mine?'Best '+niceMs(mine.best_ms):'Not cleared';}
 function selected(){return levels().find(l=>Number(l.id)===Number(run?.level_id));}
@@ -28,18 +31,18 @@ function renderMenu(){
   '<span>Creator time awards <b>'+num(p.designer_points)+'</b></span>'+
   '<span>Verified clears <b>'+num(p.clears)+'</b></span>';
  const headline=$('dash-forge-summary');if(headline)headline.textContent=
-  'Campaign '+campaign().filter(l=>personal(l.id)?.clears>0).length+'/6 · '+
+  'Stage '+num(chapter())+' / 1,000,000,000 · '+
   num(p.player_points)+' runner pts · '+num(p.designer_points)+' maker pts';
 }
 function listLevel(l){
  const owner=l.creator&&l.creator===me(),isDraft=l.kind==='member'&&!l.published;
  const lock=!unlocked(l),badge=l.designer_award?'<span class="dash-reward">♛ '+esc(l.designer_award)+'</span>':'';
  return '<article class="dash-level" data-level-id="'+Number(l.id)+'">'+
-  '<div class="dash-level-number">'+(l.kind==='campaign'?'0'+l.stage:(isDraft?'D':'★'))+'</div>'+
+  '<div class="dash-level-number">'+(l.kind==='campaign'?(l.boss?'♛':num(l.stage)):(isDraft?'D':'★'))+'</div>'+
   '<div class="dash-level-copy"><strong>'+esc(l.title)+'</strong>'+
-  '<small>'+esc(l.kind==='campaign'?'Chapter '+l.stage+' · '+l.pattern.length+' tiles':
+  '<small>'+esc(l.kind==='campaign'?(l.world||'Origin Circuit')+' · Chapter '+num(l.stage)+' · '+l.pattern.length+' tiles · '+Math.round(1000/Number(l.pace_ms||210)*10)/10+' tiles/s':
    (owner?'Your level':('By '+l.creator_name))+' · '+l.pattern.length+' tiles')+
-  ' · Difficulty '+l.difficulty+'</small>'+
+  ' · Difficulty '+l.difficulty+'</small>'+(l.boss?'<span class="dash-draft-tag">WORLD TRIAL · BOSS STAGE</span>':'')+(l.stage===chapter()?'<span class="dash-current-tag">YOUR CURRENT STAGE</span>':'')+
   '<small>'+esc(bestText(l))+' · '+num(l.verified_solves)+' member solves</small>'+badge+
   (isDraft?'<span class="dash-draft-tag">DRAFT · BEAT IT TO PUBLISH</span>':'')+
   '</div><div class="dash-level-actions">'+
@@ -125,7 +128,7 @@ function build(){
     '" type="button">'+name+'</button>').join('')+'</nav>'+
   '<section class="dash-pane" id="dash-pane-campaign"><div class="dash-pane-title"><h3>Six-stage family campaign</h3>'+
     '<p>Everyone races the same six stages. Clear each chapter to unlock the next.</p></div>'+
-    '<div id="dash-campaign-list" class="dash-level-list"></div></section>'+
+    '<div class="dash-forever-counter">◆ ONE BILLION UNIQUE STAGES · 12 ROTATING WORLDS · A WORLD TRIAL EVERY 25 STAGES · NEW TRACKS APPEAR AS YOU ADVANCE ◆</div><div id="dash-campaign-list" class="dash-level-list"></div></section>'+
   '<section class="dash-pane" id="dash-pane-community" hidden><div class="dash-pane-title"><h3>Levels made by the family</h3>'+
     '<p>Creator awards pay only when another member genuinely beats the published level, scaled by active solve time.</p></div>'+
     '<div id="dash-community-list" class="dash-level-list"></div></section>'+
