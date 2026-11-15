@@ -1,0 +1,111 @@
+/* Star Squadron + Mystery Maze: two original family arcade games.
+   Touch controls are large, safe-area aware, and usable at 320px. */
+body.community-page .retro-game-root{min-width:0;max-width:100%;margin:12px 0;}
+body.community-page .retro-game-root .retro-entry{
+ display:flex;align-items:center;gap:13px;width:100%;min-height:80px;text-align:left;
+ padding:13px;border:2px solid #bd99ce;border-radius:16px;
+ background:linear-gradient(125deg,#293451,#59346b);color:#fff4d9;cursor:pointer;
+ box-shadow:0 5px 17px #170b3159;
+}
+body.community-page .retro-entry-icon{font-size:32px;flex:0 0 42px;text-align:center}
+body.community-page .retro-entry-copy{flex:1;min-width:0;display:grid;gap:4px}
+body.community-page .retro-entry-copy strong{font:900 20px/1.12 system-ui;color:#fff1c4}
+body.community-page .retro-entry-copy small{font-size:13px;color:#e8d5f5;line-height:1.4}
+body.community-page .retro-entry-arrow{font-size:20px}
+body.community-page .retro-inside{
+ display:grid;gap:10px;padding:13px;margin-top:9px;border:2px solid #b7a0da;border-radius:18px;
+ background:linear-gradient(153deg,#211c43,#121632);color:#f9f0d3;max-width:100%;min-width:0
+}
+body.community-page .retro-inside[hidden],body.community-page .retro-panel-view[hidden],
+body.community-page .retro-live[hidden]{display:none!important}
+body.community-page .retro-head{display:grid;gap:4px;text-align:center}
+body.community-page .retro-head h2{margin:0;font:950 clamp(20px,4vw,29px)/1.1 monospace;color:#ffe5a2}
+body.community-page .retro-head p{margin:0;color:#e4d9f1;font:650 clamp(12px,2.6vw,15px)/1.38 system-ui}
+body.community-page .retro-statbar{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+body.community-page .retro-stat{
+ padding:7px 10px;border:1px solid #6e8baf;border-radius:11px;background:#26365a;
+ font:800 clamp(11px,2.6vw,14px)/1.2 monospace;color:#c9f7ee
+}
+body.community-page .retro-display{display:block;min-width:0;}
+body.community-page .retro-live{
+ display:grid;justify-items:center;gap:7px;max-width:100%;
+}
+body.community-page .retro-canvas{
+ display:block;aspect-ratio:1;max-width:100%;width:min(100%,540px);
+ height:auto;max-height:46dvh;object-fit:contain;
+ border:3px solid #aa7dc4;border-radius:12px;background:#0a0c25;
+ image-rendering:pixelated;box-shadow:0 5px 20px #0008
+}
+body.community-page .retro-live-readout{
+ color:#fce5a8;font:900 clamp(12px,2.6vw,16px)/1.4 monospace;text-align:center;
+ overflow-wrap:anywhere
+}
+body.community-page .retro-controls{
+ display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+ width:100%;max-width:520px;
+}
+body.community-page .retro-button{
+ min-height:46px;padding:8px 13px;border-radius:10px;border:2px solid #c3b6ec;
+ background:#40386b;color:#fff4da;cursor:pointer;
+ font:800 14px/1.25 system-ui;
+}
+body.community-page .retro-button:focus-visible{
+ outline:3px solid #9df8ec;outline-offset:3px
+}
+body.community-page .retro-controls .retro-control{
+ flex:1 1 95px;min-width:0;min-height:56px;
+ color:#241637;border-color:#d8b37d;background:linear-gradient(130deg,#f8e3af,#d8b9eb);
+ touch-action:none;user-select:none;-webkit-user-select:none;
+}
+body.community-page .retro-control:active{background:#a6f1e7;transform:translateY(2px)}
+body.community-page .retro-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+body.community-page .retro-actions .retro-begin{
+ background:#a8e7c7;color:#173b37;border-color:#c7f4df
+}
+body.community-page .retro-actions .retro-end{background:#56394d;border-color:#ad91a8}
+body.community-page .retro-button:disabled{opacity:.6;cursor:not-allowed}
+body.community-page .retro-status{
+ text-align:center;color:#fce7d4;font:700 13px/1.5 system-ui;
+ min-height:18px;margin:0;padding:5px
+}
+body.community-page .retro-status[data-kind="success"]{color:#acffd8}
+body.community-page .retro-status[data-kind="error"]{color:#ffd5b6}
+body.community-page .retro-trophies{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+ gap:10px;
+}
+body.community-page .retro-trophy{
+ display:grid;justify-items:center;gap:6px;min-height:105px;text-align:center;
+ border:2px solid #a68db5;border-radius:14px;padding:13px;
+ background:linear-gradient(148deg,#514067,#26213e);
+}
+body.community-page .retro-trophy.is-locked{filter:saturate(.45);opacity:.72}
+body.community-page .retro-trophy.is-earned{border-color:#e5c27d}
+body.community-page .retro-trophy-gem{font:900 32px/1 serif;color:#fbd58e}
+body.community-page .retro-trophy strong{color:#fff1cf}
+body.community-page .retro-trophy small{color:#eee0ef}
+body.community-page .retro-leaders{display:grid;gap:9px}
+body.community-page .retro-leader{
+ display:flex;justify-content:space-between;gap:10px;
+ border:1px solid #9b8eb5;border-radius:11px;
+ padding:11px 13px;background:#312a50;
+}
+body.community-page .retro-leader strong{color:#f4e8ca}
+body.community-page .retro-leader span{color:#a6f4db;font-weight:900}
+@media(max-width:430px){
+ body.community-page .retro-inside{padding:8px;gap:7px;margin-top:5px}
+ body.community-page .retro-entry-copy strong{font-size:18px}
+ body.community-page .retro-head h2{font-size:19px}
+ body.community-page .retro-canvas{width:min(100%,350px);max-height:min(44dvh,360px)}
+ body.community-page .retro-controls{gap:6px}
+ body.community-page .retro-controls .retro-control{flex-basis:70px;min-height:50px;font-size:12px;padding:8px 7px}
+ body.community-page .retro-trophies{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:360px){
+ body.community-page .retro-canvas{max-height:39dvh}
+ body.community-page .retro-controls .retro-control{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .retro-control:active{transform:none}
+ body.community-page .retro-button{transition:none!important;animation:none!important}
+}
