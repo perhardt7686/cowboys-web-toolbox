@@ -1,10 +1,13 @@
-import {STAGE_WIDTH as W,STAGE_HEIGHT as H,projectTurn,wrapAngle} from './avatar-full-body.mjs?v=turn1';
+import {STAGE_WIDTH as W,STAGE_HEIGHT as H,projectTurn,wrapAngle} from './avatar-full-body.mjs?v=studio2';
 
 export function turntableHTML({editor=false}={}){
   return '<div class="avatar-turntable" data-avatar-turntable>'+
     '<div class="avatar-turntable-frame"><canvas class="avatar-turntable-canvas" '+
     (editor?'id="family-avatar-canvas" ':'')+
     'width="'+(W*2)+'" height="'+(H*2)+'" tabindex="0" role="img" aria-label="Full-body preview. Drag to rotate or zoom in to pan."></canvas></div>'+
+    (editor?'<div class="studio-camera-presets" role="group" aria-label="Camera presets">'+
+      '<button type="button" data-turn="body" aria-pressed="true">Full body</button>'+
+      '<button type="button" data-turn="face" aria-pressed="false">Face</button></div>':'')+
     '<div class="avatar-turntable-controls" role="group" aria-label="Turntable view">'+
     '<button type="button" data-turn="left" aria-label="Rotate left">‹</button>'+
     '<output class="avatar-view-angle" data-view-angle aria-live="polite">Front</output>'+
@@ -17,12 +20,13 @@ export function turntableHTML({editor=false}={}){
     '</div></div>';
 }
 
-export function mountTurntable(root,paint,preferReducedMotion=()=>false){
+export function mountTurntable(root,paint,preferReducedMotion=()=>false,selectPart){
   const canvas=root.querySelector('canvas');
   const label=root.querySelector('[data-view-angle]');
   const spin=root.querySelector('[data-turn=spin]');
   const minus=root.querySelector('[data-turn=less]');
   const plus=root.querySelector('[data-turn=more]');
+  const presets=root.querySelector('.studio-camera-presets');
   const media=window.matchMedia('(prefers-reduced-motion: reduce)');
   const reduced=()=>media.matches||preferReducedMotion();
   const camera={angle:0,zoom:1,x:0,y:0};
@@ -35,6 +39,8 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false){
     spin.disabled=reduced();
     minus.disabled=camera.zoom<=1;
     plus.disabled=camera.zoom>=2.45;
+    for(const button of presets?.children||[])
+      button.setAttribute('aria-pressed',String(button.dataset.turn===(camera.zoom>=2?'face':'body')));
     const direction=projectTurn(camera.angle).name;
     if(label.textContent!==direction)label.textContent=direction;
     canvas.dataset.angle=String(Math.round(camera.angle));
@@ -87,6 +93,11 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false){
     else if(old===1)camera.y=74;
     draw();
   }
+  function face(){
+    stop();
+    camera.x=0;camera.y=166;camera.zoom=2.45;
+    draw();
+  }
 
   root.addEventListener('click',event=>{
     const action=event.target.closest('[data-turn]')?.dataset.turn;
@@ -99,6 +110,7 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false){
       frame=requestAnimationFrame(animate);return;
     }
     stop();
+    if(action==='face'){face();return;}
     if(action==='reset')camera.angle=0;
     setZoom(action==='more'?camera.zoom+.35:action==='less'?camera.zoom-.35:1);
   },{signal});
@@ -132,7 +144,7 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false){
       if(camera.zoom===1&&Math.abs(dy)>Math.abs(dx)){pointer=null;return;}
       pointer.drag=true;canvas.setPointerCapture(event.pointerId);
     }
-    if(camera.zoom>1){
+    if(camera.zoom>1&&(event.shiftKey||Math.abs(dy)>Math.abs(dx))){
       const factor=W/(canvas.clientWidth*camera.zoom);
       camera.x=Math.max(-141,Math.min(141,pointer.panX+dx*factor));
       camera.y=Math.max(-155,Math.min(176,pointer.panY+dy*factor));
@@ -144,12 +156,17 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false){
   },{signal});
   const released=event=>{
     if(pointer?.id!==event.pointerId)return;
+    const tap=event.type==='pointerup'&&!pointer.drag&&Math.hypot(event.clientX-pointer.x,event.clientY-pointer.y)<8;
     pointer=null;draw();
+    if(tap&&selectPart){
+      const box=canvas.getBoundingClientRect();
+      selectPart((event.clientX-box.left)/box.width,(event.clientY-box.top)/box.height,camera);
+    }
   };
   canvas.addEventListener('pointerup',released,{signal});
   canvas.addEventListener('pointercancel',released,{signal});
   canvas.addEventListener('lostpointercapture',released,{signal});
   media.addEventListener('change',()=>{if(reduced())stop();if(visible())draw();},{signal});
   draw();
-  return {canvas,draw,stop,destroy(){stop();controller.abort();}};
+  return {canvas,draw,stop,face,destroy(){stop();controller.abort();}};
 }

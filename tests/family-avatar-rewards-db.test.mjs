@@ -83,6 +83,8 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await refused(equip({...first,extra:'invalid'}), '22023');
   await refused(equip({...first,full_body:{model:'made-up'}}),'22023');
   await refused(equip({...first,full_body:{model:'detective',footwear:52}}),'22023');
+  await refused(equip({...first,full_body:{model:'detective',height:'19'}}),'22023');
+  await refused(equip({...first,full_body:{model:'detective',jaw:1}}),'22023');
   await refused(equip({...first,full_body:['armor']}),'22023');
   assert.equal((await equip(first)).revision,1);
   assert.equal((await equip(first)).revision,1);
@@ -170,7 +172,7 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   assert.equal((await petState())[0].name,'Scout');
   assert.equal((await petState())[0].bond,7);
   assert.ok((await state()).earned.some(i=>i.id==='trail-husky'));
-  const newlyOwned=normalizeLoadout({full_body:{model:'sleuth',bottoms:'dress',footwear:'boots'},
+  const newlyOwned=normalizeLoadout({full_body:{model:'sleuth',bottoms:'dress',footwear:'boots',height:'2',jaw:'-1',eye_spacing:'1'},
     cosmetics:{companion:'trail-husky'}});
   assert.ok((await equip(newlyOwned)).active);
   assert.deepEqual((await outfit('Full-body draft',newlyOwned))[0].recipe,newlyOwned);

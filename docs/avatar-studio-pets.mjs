@@ -1,9 +1,10 @@
 import {button,el} from './family-board-core.mjs?v=family3';
 import {petBehavior} from './avatar-prize-actions.mjs?v=turn1';
-import {drawPetPortrait,playCel} from './avatar-reward-render.mjs?v=turn1';
+import {playCel} from './avatar-reward-render.mjs?v=studio2';
 import {createPetTradeUI} from './avatar-pet-trading.mjs?v=toon3';
 
-import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=turn1';
+import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=studio2';
+import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=studio2';
 
 const BOND_MAX=12;
 const TRICK_BOND=6;
@@ -74,6 +75,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
 
   function render(activity=null){
     if(!root||!isOpen())return;
+    root.querySelectorAll('canvas').forEach(releaseStudioArt);
     stop();inspection?.destroy();inspection=null;
     const chosen=catalog().filter(item=>item.slot==='companion');
     const known=unlocksKnown();
@@ -158,11 +160,11 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     // building a bond require the server-verified reward.
     if(!owned&&known){
       details.append(actionButton('Preview pet',()=>{
-        stop();stop=playCel(canvas,p=>drawPetPortrait(canvas,item,'play',p),reduceMotion);
+        stop();stop=playCel(canvas,p=>studioPet(canvas,item,'play',p),reduceMotion);
         status.textContent=petBehavior(item,'play').caption;
       }));
     }
-    if(item.creature){
+    {
       const closeUp=el('details','avatar-pet-inspection');
       closeUp.append(el('summary','','Inspect pet'));
       closeUp.insertAdjacentHTML('beforeend',turntableHTML());
@@ -170,7 +172,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
         if(!closeUp.open){inspection?.stop();return;}
         if(inspection){inspection.draw();return;}
         const stage=closeUp.querySelector('[data-avatar-turntable]');
-        inspection=mountTurntable(stage,(camera)=>drawPetPortrait(stage.querySelector('canvas'),item,null,0,camera),reduceMotion);
+        inspection=mountTurntable(stage,(camera)=>studioPet(stage.querySelector('canvas'),item,null,0,camera),reduceMotion);
       });
       details.append(closeUp);
     }
@@ -180,10 +182,13 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
     const tradeHost=el('div','avatar-pet-trade-host');
     root.replaceChildren(tab,card,tradeHost);
     trading.mount(tradeHost,pets,selected);
-    drawPetPortrait(canvas,item);
+    studioPet(canvas,item);
+    void prepareStudioRenderer().then(renderer=>{
+      if(renderer&&isOpen()&&canvas.isConnected&&!activity)studioPet(canvas,item);
+    });
     if(message)status.textContent=message;
     if(activity==='pet'||activity==='play'||activity==='trick')
-      stop=playCel(canvas,p=>drawPetPortrait(canvas,item,activity,p),reduceMotion);
+      stop=playCel(canvas,p=>studioPet(canvas,item,activity,p),reduceMotion);
     if(focus)root.querySelector('[data-pet-action="'+focus+'"]')?.focus({preventScroll:true});
     else if(focusSelect)selection.focus({preventScroll:true});
   }
@@ -197,6 +202,7 @@ export function createPetStudio({rpc,catalog,have,unlocksKnown,checkError,openRe
       render();
     },
     clear(){
+      root?.querySelectorAll('canvas').forEach(releaseStudioArt);
       stop();inspection?.destroy();inspection=null;epoch++;trading.clear();root=null;selected='';state='idle';pets.clear();pending=false;message='';
     }
   };
