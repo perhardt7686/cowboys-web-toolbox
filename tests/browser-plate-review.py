@@ -99,6 +99,7 @@ async def run(browser, width):
     try:
         await page.goto(URL, wait_until='domcontentloaded')
         await page.locator('#plate-game-open').click()
+        await page.locator('#arcade-game-title-view [data-arcade-action="title-start"]').click()
         await page.get_by_role('button', name='Review Plates', exact=True).click()
         card=page.locator('.plate-card.arcade-current-card')
         await check_guess(card, PENDING_GUESS, 'NITEOWL · Virginia', '.plate-preview')

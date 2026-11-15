@@ -16,7 +16,7 @@ async def fingerprints(canvas):
 async def verify(browser, phone=False):
     page = await browser.new_page(
         viewport={'width': 390, 'height': 844} if phone else {'width': 1280, 'height': 900},
-        has_touch=phone, reduced_motion='reduce' if phone else 'no-preference',
+        is_mobile=phone, has_touch=phone, reduced_motion='reduce' if phone else 'no-preference',
     )
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
@@ -85,10 +85,21 @@ async def verify(browser, phone=False):
     face_group = edit.get_by_text('Hair & facial hair', exact=True)
     await face_group.click()
     await edit.locator('[data-avatar-feature=beard][data-avatar-value=beard]').click()
+    await edit.get_by_role('button', name='Pets', exact=True).click()
+    await edit.get_by_role('combobox', name='Choose a pet').select_option('trail-husky')
+    await edit.get_by_role('button', name='Adopt', exact=True).click()
+    await edit.get_by_role('button', name='Take along').click()
+    await expect(edit.locator('#avatar-equipped').get_by_text('Trail Husky', exact=True)).to_be_visible()
+    await edit.get_by_role('textbox', name='Outfit name').fill('Moonlight Patrol')
+    await edit.get_by_role('button', name='Save outfit', exact=True).click()
+    saved_look = edit.get_by_role('button', name='Moonlight Patrol', exact=True)
+    await expect(saved_look).to_be_visible()
     await form.get_by_role('button', name='Save my avatar').click()
     await expect(form.get_by_text('Preview saved locally for this session.')).to_be_visible()
     await page.locator('#content-dialog').evaluate('dialog => dialog.close()')
     await page.locator('#family-avatar-quick').click()
+    await wardrobe('model', 'specter').click()
+    await saved_look.click()
     await expect(wardrobe('model', 'mechanic')).to_have_attribute('aria-pressed', 'true')
     await expect(wardrobe('outerwear', 'trench')).to_have_attribute('aria-pressed', 'true')
     await expect(wardrobe('footwear', 'highboots')).to_have_attribute('aria-pressed', 'true')
@@ -104,7 +115,15 @@ async def verify(browser, phone=False):
     await prize.get_by_role('button', name='Try on Spectral Case Sword').click()
     await expect(edit.get_by_text('Spectral Case Sword · Preview only')).to_be_visible()
     await prize.get_by_role('button', name='See Spectral Case Sword').click()
-    await expect(edit.get_by_role('button', name='Play Dash Forge to unlock')).to_be_visible()
+    await page.evaluate('''() => {
+      const root=document.createElement('section');root.id='dash-forge-root';
+      root.innerHTML='<button id="dash-forge-toggle" type="button">Sample Dash Forge</button>';
+      document.querySelector('#conversations .community-main').append(root);
+    }''')
+    await edit.get_by_role('button', name='Play Dash Forge to unlock').click()
+    await expect(page.locator('#arcade-game-title-view')).to_contain_text('DASH FORGE')
+    await page.get_by_role('button', name='Back to Avatar Studio', exact=True).click()
+    await expect(edit.get_by_role('heading', name='Spectral Case Sword')).to_be_visible()
     await edit.get_by_role('button', name='Draw the light').click()
     await edit.get_by_role('button', name='My Avatar', exact=True).click()
     await turn.get_by_role('button', name='Rotate right').click()
