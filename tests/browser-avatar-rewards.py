@@ -28,7 +28,7 @@ async def visit(browser, width, full=False):
     before = await canvas.evaluate('n=>n.toDataURL()')
     await editor.get_by_role('button', name='Save outfit', exact=True).wait_for()
     await editor.get_by_role('button', name='Unlockables', exact=True).click()
-    await expect(editor.get_by_text('289 rewards')).to_be_visible()
+    await expect(editor.get_by_text('310 rewards')).to_be_visible()
     achievement_tab=editor.get_by_role('button',name='Achievements',exact=True)
     assert await achievement_tab.evaluate("""node => {
       const text=document.createRange();
@@ -146,7 +146,7 @@ async def visit(browser, width, full=False):
           }
           return [seen.size,unchanged,inert];
         }""")
-        assert art == [289, [], []], art
+        assert art == [310, [], []], art
     assert not errors, (width, errors)
     (ROOT/'reports').mkdir(exist_ok=True)
     if width in (390,1280):
