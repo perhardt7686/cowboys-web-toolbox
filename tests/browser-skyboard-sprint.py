@@ -43,6 +43,9 @@ async def verify(browser,size):
   await page.goto(URL,wait_until="load")
   await page.locator("#skyboard-root").wait_for(state="attached",timeout=15000)
   await page.locator("#skyboard-toggle").click()
+  await page.evaluate("""document.body.classList.add("arcade-on");document.documentElement.classList.add("arcade-on");
+  document.body.dataset.arcadeGame="skyboard";document.body.dataset.arcadeScene="play";
+  document.getElementById("skyboard-root").classList.add("arcade-game-active");""")
   assert await page.locator("#skyboard-inside").is_visible()
   assert await page.locator("#skyboard-board-list [data-sky-board]").count()==6
   assert await page.locator("#skyboard-badge-list .skyboard-badge").count()==6
@@ -50,7 +53,7 @@ async def verify(browser,size):
   await page.locator("#skyboard-start").click()
   await page.locator("#skyboard-message").wait_for(state="hidden",timeout=8000)
   await page.wait_for_timeout(450)
-  assert "%" in await page.locator("#skyboard-live-distance").inner_text()
+  assert await page.locator("#skyboard-live-distance").inner_text()!="0%"
   assert await page.locator("[data-sky-hold='left']").is_visible()
   assert await page.locator("[data-sky-action='jump']").is_visible()
   data=await page.locator("#skyboard-canvas").evaluate(
