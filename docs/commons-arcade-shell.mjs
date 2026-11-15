@@ -2,6 +2,7 @@
    Presentation only. Existing member-only games retain their events, state,
    RPCs, authentication, scores, and original DOM nodes. */
 import {makeArcadeNav} from './family-arcade-nav.mjs?v=family4';
+import {titleProfiles,titleMarkup,drawGameTitle} from './commons-arcade-titles.mjs?v=titles1';
 
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
@@ -73,7 +74,7 @@ function build(){
   menu=document.createElement('section');menu.id='arcade-shell';menu.hidden=true;
   menu.setAttribute('role','dialog');menu.setAttribute('aria-modal','true');
   menu.setAttribute('aria-label','Cowboy Commons Arcade');
-  menu.innerHTML='<div class="arcade-computer"><section id="arcade-menu-view"><canvas id="arcade-title-art" width="320" height="200" role="img" aria-label="Original pixel art: a vintage red car in the arcade garage"></canvas><div class="arcade-menu-intro"><span>MS-DOS INSPIRED · MEMBERS ONLY</span><h2>SELECT YOUR GAME</h2><p>Every location is one scene. Progress remains saved by its original game.</p></div><div id="arcade-program-grid"></div><div class="arcade-menu-bottom"><button type="button" data-arcade-action="options">F2 · SETTINGS</button><button type="button" data-arcade-action="exit">EXIT TO COMMONS</button></div></section><section id="arcade-options-view" hidden><h2>DISPLAY SETUP</h2><p>These settings adjust only the Arcade screen, not your game saves.</p><div id="arcade-options-form"></div><button type="button" data-arcade-action="options-back">RETURN TO GAME / MENU</button></section><p class="arcade-menu-status" id="arcade-menu-status" role="status" aria-live="polite"></p></div>';
+  menu.innerHTML='<div class="arcade-computer"><section id="arcade-menu-view"><canvas id="arcade-title-art" width="320" height="200" role="img" aria-label="Original pixel art: a vintage red car in the arcade garage"></canvas><div class="arcade-menu-intro"><span>MS-DOS INSPIRED · MEMBERS ONLY</span><h2>SELECT YOUR GAME</h2><p>Every location is one scene. Progress remains saved by its original game.</p></div><div id="arcade-program-grid"></div><div class="arcade-menu-bottom"><button type="button" data-arcade-action="options">F2 · SETTINGS</button><button type="button" data-arcade-action="exit">EXIT TO COMMONS</button></div></section><section id="arcade-game-title-view" hidden aria-label="Game title screen"></section><section id="arcade-options-view" hidden><h2 id="arcade-display-title">DISPLAY SETUP</h2><p>These settings adjust only the Arcade screen, not your game saves.</p><div id="arcade-options-form"></div><button type="button" data-arcade-action="options-back">RETURN TO GAME / MENU</button></section><p class="arcade-menu-status" id="arcade-menu-status" role="status" aria-live="polite"></p></div>';
   document.body.append(menu);
   menu.addEventListener('click',onMenuClick);
   hud=document.createElement('header');hud.id='arcade-hud';hud.hidden=true;
@@ -130,6 +131,7 @@ function closeArcade(){
  document.body.dataset.arcadeGame='';
  document.body.dataset.arcadeScene='';
  menu.hidden=true;hud.hidden=true;familyNav?.hide();setGameFocus(null);
+ if($('arcade-game-title-view'))$('arcade-game-title-view').hidden=true;
  const drawer=$('art-drawer');if(drawer)drawer.hidden=true;
  const controls=$('art-tools-toggle');if(controls){controls.setAttribute('aria-expanded','false');controls.textContent='Tools and layers';}
  document.body.classList.remove('arcade-on');
@@ -193,11 +195,22 @@ function launch(id){
  lastFocus=document.activeElement;savedScroll=window.scrollY;
  document.body.classList.add('arcade-on');
  document.documentElement.classList.add('arcade-on');
- active=g.id;scene=g.scenes[0][0];mode='game';plateIndex=0;plateKey=null;plateScope='pending';
+ active=g.id;scene=g.scenes[0][0];mode='title';plateIndex=0;plateKey=null;plateScope='pending';
  document.body.dataset.arcadeGame=active;
  document.body.dataset.arcadeScene=scene;
- menu.hidden=true;
+ waiting=false;hud.hidden=true;familyNav?.hide();
+ for(const other of games)$(other.root)?.classList.remove('arcade-game-active');
+ menu.hidden=false;
  $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=true;
+ const view=$('arcade-game-title-view');view.hidden=false;view.innerHTML=titleMarkup(g.id);
+ drawGameTitle(view.querySelector('canvas'),g.id,settings?.motion==='reduce');
+ view.querySelector('[data-arcade-action="title-start"]')?.focus({preventScroll:true});
+}
+function enterGame(destination){
+ const g=game(active);if(!g||mode!=='title'||!available(g))return;
+ if(destination&&!g.scenes.some(([id])=>id===destination))return;
+ scene=destination||g.scenes[0][0];document.body.dataset.arcadeScene=scene;
+ mode='game';menu.hidden=true;$('arcade-game-title-view').hidden=true;
  hud.hidden=active!=='streetrod';
  hud.querySelector('#arcade-hud-title').textContent=g.name.toUpperCase()+' / '+g.tag;
  waiting=true;makeVisible(g);setGameFocus(active);renderTabs();sync();
@@ -344,7 +357,11 @@ function paging(delta){
 function showOptions(){
  if(!menu||!document.body.classList.contains('arcade-on'))return;
  returnMode=mode;mode='options';menu.hidden=false;
- $('arcade-menu-view').hidden=true;$('arcade-options-view').hidden=false;hud.hidden=true;familyNav?.hide();
+ $('arcade-menu-view').hidden=true;
+ if($('arcade-game-title-view'))$('arcade-game-title-view').hidden=true;
+ $('arcade-options-view').hidden=false;hud.hidden=true;familyNav?.hide();
+ const heading=$('arcade-display-title');if(heading)heading.textContent=active&&titleProfiles[active]?
+  titleProfiles[active].name+' · SETTINGS':'ARCADE DISPLAY SETUP';
  for(const g of games)$(g.root)?.classList.remove('arcade-game-active');
  const options=$('arcade-options-form');
  const choices=[
@@ -366,10 +383,14 @@ function backOptions(){
  $('arcade-options-view').hidden=true;
  if(returnMode==='game'&&active){
   mode='game';menu.hidden=true;hud.hidden=active!=='streetrod';makeVisible(game(active));renderTabs();sync();
+ }else if(returnMode==='title'&&active){
+  mode='title';menu.hidden=false;$('arcade-game-title-view').hidden=false;
+  hud.hidden=true;familyNav?.hide();
+  drawGameTitle($('arcade-game-title-art'),active,settings.motion==='reduce');
  }else{closeArcade();}
 }
 function onMenuClick(e){
- const target=e.target.closest('[data-arcade-game], [data-arcade-scene], [data-arcade-action]');
+ const target=e.target.closest('[data-arcade-game], [data-arcade-scene], [data-arcade-action], [data-arcade-title-scene]');
  if(!target||target.disabled)return;
  if(target.dataset.arcadeGame){
   if(mode!=='menu'||$('arcade-menu-view')?.hidden)return;
@@ -379,8 +400,24 @@ function onMenuClick(e){
   if(mode!=='game')return;
   view(target.dataset.arcadeScene);return;
  }
+ if(target.dataset.arcadeTitleScene){
+  if(mode!=='title')return;
+  enterGame(target.dataset.arcadeTitleScene);return;
+ }
  if(mode==='options'&&target.dataset.arcadeAction!=='options-back')return;
+ if(mode==='title'&&!String(target.dataset.arcadeAction||'').startsWith('title-')&&target.dataset.arcadeAction!=='options')return;
  switch(target.dataset.arcadeAction){
+  case 'title-start':enterGame();break;
+  case 'title-builder':enterGame('builder');window.dispatchEvent(new CustomEvent('dashforge:creator-mode',{detail:{boss:false}}));break;
+  case 'title-boss-builder':enterGame('builder');window.dispatchEvent(new CustomEvent('dashforge:creator-mode',{detail:{boss:true}}));break;
+  case 'title-help':{
+   const help=$('arcade-title-how');if(!help)return;
+   help.hidden=!help.hidden;
+   target.setAttribute('aria-expanded',String(!help.hidden));
+   break;
+  }
+  case 'title-settings':showOptions();break;
+  case 'title-back':closeArcade();break;
   case 'home':closeArcade();break;
   case 'exit':closeArcade();break;
   case 'options':showOptions();break;
