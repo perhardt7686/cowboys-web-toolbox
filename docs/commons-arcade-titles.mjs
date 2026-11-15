@@ -2,6 +2,22 @@
  * Procedural canvas illustrations only, no external media or copied sprites.
  * The existing games and RPCs remain the source of truth after pressing Start. */
 export const titleProfiles={
+ fleet:{
+  eyebrow:'STAR SQUADRON · FAMILY ARCADE',
+  name:'STAR SQUADRON',tag:'One pilot against an alien swarm.',
+  subtitle:'Slide between lanes, fire at the swooping ships, and survive the next wave.',
+  help:'Move left and right with the big touch buttons or arrows. Hold FIRE or press Space to shoot. Hit the swooping swarm before it reaches your ship. Five-wave commanders are worth extra points. Trophies and family rankings only count after server verification.',
+  first:'DEFEND THE STARLANES',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
+  accent:'#91f4e7',scene:'fleet'
+ },
+ maze:{
+  eyebrow:'MYSTERY MAZE · FAMILY ARCADE',
+  name:'MYSTERY MAZE',tag:'Follow the clues. Escape the wisps.',
+  subtitle:'Explore an original twisting labyrinth and collect clue lights while evading wandering ghosts.',
+  help:'Use the large directional buttons or arrow keys to explore. Every new tile earns a clue. Power orbs let you pass a ghost safely for a little while. Earn trophies from verified scores and challenge the family leaderboard.',
+  first:'ENTER THE LABYRINTH',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
+  accent:'#f5d487',scene:'maze'
+ },
  streetrod:{
   eyebrow:'1963 · BUILD THE MACHINE · RACE THE ROAD',
   name:'STREET R0D',tag:'A summer of rust, racing and midnight repairs.',
@@ -110,6 +126,31 @@ export function drawGameTitle(canvas,id,reducedMotion=false){
   C(257,66,6,'#fff');C(281,66,6,'#fff');
   c.save();c.translate(74,126);c.rotate(-.24);R(-23,-23,46,46,'#80ecff');R(-13,-13,26,26,'#17204c');R(-9,-6,6,7,'#80ecff');R(4,-6,6,7,'#80ecff');c.restore();
   T('STAGE 25 · BOSS FIGHT',24,30,12,'#fff29d');
+ }else if(id==='fleet'){
+  R(0,160,320,40,'#161b39');
+  for(let i=0;i<11;i++){const x=18+i*28,y=22+(i%3)*14;
+   R(x,y,16,4,i%5===0?'#ff9ac9':'#8cebd7');R(x-5,y+4,26,6,'#7e77c9');
+   R(x-9,y+9,8,7,'#8cebd7');R(x+17,y+9,8,7,'#8cebd7');
+   R(x+3,y+14,4,4,'#e8bd8d');R(x+11,y+14,4,4,'#e8bd8d');}
+  c.beginPath();c.moveTo(160,112);c.lineTo(187,157);c.lineTo(166,149);
+  c.lineTo(160,163);c.lineTo(154,149);c.lineTo(133,157);c.closePath();
+  c.fillStyle='#aaf5e0';c.fill();c.strokeStyle='#f8cd84';c.lineWidth=4;c.stroke();
+  R(156,126,9,13,'#435d91');
+  L(160,101,160,61,'#fff6ba',4);
+  T('STAR SQUADRON',94,189,15,'#fce5b7');
+ }else if(id==='maze'){
+  R(18,16,284,169,'#16152e');
+  for(let y=0;y<9;y++)for(let x=0;x<15;x++){
+    const wall=y===0||y===8||x===0||x===14||(x%4===0&&y%3===0);
+    const xx=20+x*18,yy=20+y*18;
+    if(wall){R(xx,yy,16,16,'#52488f');R(xx+2,yy+2,12,3,'#9986d2');}
+    else C(xx+8,yy+8,2,'#ffe3a2');
+  }
+  C(85,110,13,'#f6cb7d');C(82,107,3,'#332549');C(91,107,3,'#332549');
+  for(const [x,y,color] of [[207,76,'#ef8db0'],[226,128,'#98ece4'],[147,90,'#cfaaed']]){
+    R(x-9,y-11,18,21,color);C(x-4,y-3,2,'#30264b');C(x+4,y-3,2,'#30264b');
+  }
+  T('THE CLUES ARE EVERYWHERE',53,195,13,'#fce2a7');
  }else if(id==='mahjong'){
   for(let i=0;i<12;i++){const x=20+(i%4)*72,y=25+Math.floor(i/4)*52;
    R(x+5,y+7,57,40,'#7e72c9');R(x,y,57,40,'#f5eadd');
