@@ -4,7 +4,7 @@ import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProf
 import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=stable1';
 import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,drawFamilyAvatar,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=toon3';
 import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=cel1';
-import {watchRewardGame} from './avatar-reward-session.mjs?v=reward1';
+import {watchRewardGame} from './avatar-reward-session.mjs?v=return3';
 
 export function createProfileStudio(ctx){
   const cache=new Map(),images=new Map(),characterURLs=new Map();

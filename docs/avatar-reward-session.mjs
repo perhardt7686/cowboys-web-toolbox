@@ -1,7 +1,13 @@
 const activeGame=()=>{
   const hotRod=document.querySelector('.hot-rod-monitor[open]');
   if(hotRod)return hotRod.querySelector('.hot-rod-top-actions button:last-child');
-  if(document.body.classList.contains('arcade-on'))return document.querySelector('#family-game-header:not([hidden]) .family-game-back');
+  if(document.body.classList.contains('arcade-on')){
+    // Every family game now has its own retro title screen. Returning to the
+    // Avatar Studio must work BEFORE the member presses Start as well.
+    const title=document.querySelector('#arcade-game-title-view:not([hidden]) [data-arcade-action="title-back"]');
+    if(title)return title;
+    return document.querySelector('#family-game-header:not([hidden]) .family-game-back');
+  }
   return null;
 };
 
