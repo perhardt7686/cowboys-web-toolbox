@@ -301,7 +301,7 @@ function introduceBeard(head,v,palette,w,jaw){
     warp(point,angle,index){return beardJawPoint(rings,index,angle);}
   });
   chin.material.side=THREE.DoubleSide;
-  chin.userData.studioPart='fitted-beard';
+  chin.userData.studioBeard='shell';
   for(const s of [-1,1]){
     // Keep detail below the cheek transition: longer contours reached bare skin
     // in front view. These short ink paths follow the jaw surface at 90 degrees.
@@ -311,8 +311,8 @@ function introduceBeard(head,v,palette,w,jaw){
       .map(([ring,angle])=>beardJawPoint(rings,ring,s*angle,.006));
     const outline=stroke(head,edge,outer,.0034,20);
     const shine=stroke(head,light,inner,.0029,20);
-    outline.userData.studioPart='fitted-beard-ink';
-    shine.userData.studioPart='fitted-beard-ink';
+    outline.userData.studioBeard='ink';
+    shine.userData.studioBeard='ink';
   }
 }
 
