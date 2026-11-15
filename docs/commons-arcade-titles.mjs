@@ -71,6 +71,7 @@ export function titleMarkup(id){
   (id==='dashforge'?'<button type="button" data-arcade-action="title-builder">✎ LEVEL CREATOR</button>'+
     '<button type="button" data-arcade-action="title-boss-builder">♛ BOSS CREATOR</button>':'')+
   p.secondary.map(([scene,label])=>'<button type="button" data-arcade-title-scene="'+safe(scene)+'">'+safe(label)+'</button>').join('')+
+  (id==='dashforge'?'<button type="button" data-arcade-action="title-sound" aria-pressed="false">♪ SOUND SETTINGS</button>':'')+
   '<button type="button" data-arcade-action="title-help">? HOW TO PLAY</button>'+
   '<button type="button" data-arcade-action="title-settings">⚙ SETTINGS</button>'+
   '<button type="button" data-arcade-action="title-back">← ALL GAMES</button>'+
