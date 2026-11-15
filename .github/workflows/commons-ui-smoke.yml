@@ -21,6 +21,8 @@ on:
       - 'tests/browser-streetrod-ega.py'
       - 'tests/browser-arcade-shell.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-arcade-titles.mjs'
+      - 'tests/browser-arcade-titles.py'
       - 'docs/commons-dash-forge.mjs'
       - 'docs/commons-dash-forge.css'
       - 'tests/browser-dash-forge.py'
@@ -56,6 +58,8 @@ on:
       - 'docs/hot-rod*'
       - 'tests/browser-hot-rod.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-arcade-titles.mjs'
+      - 'tests/browser-arcade-titles.py'
       - 'docs/commons-dash-forge.mjs'
       - 'docs/commons-dash-forge.css'
       - 'tests/browser-dash-forge.py'
@@ -90,6 +94,7 @@ jobs:
           python tests/browser-plate-review.py
           python tests/browser-streetrod-ega.py
           python tests/browser-arcade-shell.py
+          python tests/browser-arcade-titles.py
           python tests/browser-streetrod-scenes.py
           python tests/browser-streetrod-reborn.py
           python tests/browser-hot-rod.py
@@ -109,6 +114,7 @@ jobs:
             reports/avatar-rewards-*.png
             reports/streetrod-ega-iphone-sample.png
             reports/arcade-one-screen-iphone-sample.png
+            reports/arcade-dash-title-tablet.png
             reports/streetrod-room-garage-mobile.png
             reports/streetrod-reborn-iphone.png
             reports/hot-rod-*.png
