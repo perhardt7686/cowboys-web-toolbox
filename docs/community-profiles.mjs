@@ -3,7 +3,7 @@ import {DETAIL_DEFAULTS,forumBody} from './forum-core.mjs?v=powers1';
 import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProfile,profileCompletion} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=stable1';
 import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,drawFamilyAvatar,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=toon3';
-import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=cel1';
+import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=arcade6';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=return3';
 
 export function createProfileStudio(ctx){
@@ -120,7 +120,7 @@ export function createProfileStudio(ctx){
     if(node)node.textContent=message;
   }
   async function ensureRewards(){
-    rewardModule ||= await import('./avatar-reward-studio.mjs?v=arcade5');
+    rewardModule ||= await import('./avatar-reward-studio.mjs?v=arcade6');
     if(!approved())return null;
     rewards ||= rewardModule.createRewardStudio({
       getLoadout:()=>avatarRecipe,setLoadout:setPreview,setStatus,playGame,rpc,checkAccess:approved,
