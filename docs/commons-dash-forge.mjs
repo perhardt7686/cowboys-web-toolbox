@@ -24,6 +24,17 @@ const THEMES=[['amber','#ffd363',0],['cyan','#6ee9fb',2],['coral','#ff749c',4],[
 let client=null,user=null,root=null,inside=null,state=null,scene='campaign',busy=false,open=false,run=null,frame=0,brush='s';
 let soundOn=false,audioContext=null,lastBeat=-1;
 let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none'},theme='amber',refreshTimer=null,booted=false;
+const EDITOR_SPAN=24;
+let editorPage=0,undoHistory=[],redoHistory=[],draftDirty=true,runFromBuilder=false,creatorTestOutcome='';
+const PAINT_GLYPHS={'.':'·',s:'▲',b:'■',g:'▽',l:'ϟ',w:'✺',c:'◆',p:'▮',f:'♨',r:'◎',m:'♣',o:'◉',d:'▣',h:'⚒'};
+const PAINT_COLORS={'.':'#a3f0c5',s:'#ff7296',b:'#ffb36b',g:'#6acbff',l:'#d39dff',w:'#ffe086',c:'#a3eaff',p:'#b7a6ff',f:'#ffa460',r:'#92ffdf',m:'#ecbaff',o:'#ff8cbc',d:'#86eeff',h:'#ecbc8c'};
+function draftSnapshot(){return {pattern:draft.pattern};}
+function saveUndo(){undoHistory.push(draftSnapshot());if(undoHistory.length>50)undoHistory.shift();redoHistory.length=0;draftDirty=true;creatorTestOutcome='';}
+function travelHistory(direction){const from=direction==='undo'?undoHistory:redoHistory,to=direction==='undo'?redoHistory:undoHistory;
+ if(!from.length)return;to.push(draftSnapshot());const past=from.pop();draft.pattern=past.pattern;draftDirty=true;creatorTestOutcome='';renderBuilder();}
+function editTile(index,newBrush){const i=Number(index),a=[...draft.pattern];if(!Number.isInteger(i)||i<4||i>=a.length-4||a[i]===newBrush)return;
+ saveUndo();a[i]=newBrush;draft.pattern=a.join('');renderBuilder();}
+
 const num=n=>Number(n||0).toLocaleString('en-US');
 const niceMs=ms=>(Math.max(0,Number(ms||0))/1000).toFixed(1)+'s';
 const profile=()=>state?.mine||{clears:0,player_points:0,designer_points:0,published:0};
@@ -95,55 +106,86 @@ function renderLeaders(){
 }
 function renderBuilder(){
  const grid=$('dash-editor-grid');if(!grid)return;
- const text=$('dash-title'),diff=$('dash-difficulty'),length=$('dash-length');
+ const title=$('dash-title'),diff=$('dash-difficulty'),length=$('dash-length');
  const world=$('dash-world'),boss=$('dash-boss-style');
  if(world)world.value=draft.world||'Maker Studio';
  if(boss)boss.value=draft.bossStyle||'none';
  if($('dash-phase-guide'))$('dash-phase-guide').hidden=draft.bossStyle==='none';
- if(document.activeElement!==text)text.value=draft.title;
+ if(document.activeElement!==title)title.value=draft.title;
  if(document.activeElement!==diff)diff.value=String(draft.difficulty);
  length.value=String(draft.pattern.length);
+ const pages=Math.ceil(draft.pattern.length/EDITOR_SPAN);
+ editorPage=Math.max(0,Math.min(pages-1,editorPage));
+ const first=editorPage*EDITOR_SPAN,end=Math.min(first+EDITOR_SPAN,draft.pattern.length);
  grid.style.setProperty('--dash-cols','12');
- grid.innerHTML=[...draft.pattern].map((cell,i)=>{
-  const fixed=i<4||i>=draft.pattern.length-4;
+ grid.innerHTML=[...draft.pattern.slice(first,end)].map((cell,j)=>{
+  const i=first+j,fixed=i<4||i>=draft.pattern.length-4;
   const label=PAINTS.find(([key])=>key===cell)?.[1]||'Hazard';
-  const glyph={'.':'·',s:'▲',b:'■',g:'∇',l:'ϟ',w:'✺',c:'◆',p:'▮',f:'♨',r:'◎',m:'♣',o:'◉',d:'▣',h:'⚒'}[cell]||'·';
   const type=label.toLowerCase().replace(/[^a-z]+/g,'-');
   return '<button type="button" class="dash-cell type-'+type+
    '" data-dash-cell="'+i+'" '+(fixed?'disabled':'')+
-   ' aria-label="Tile '+(i+1)+' '+(cell==='.'?'empty':label.toLowerCase())+'">'+glyph+'</button>';
+   ' aria-label="Tile '+(i+1)+', '+(cell==='.'?'safe empty':label.toLowerCase())+(fixed?', locked start or finish':'')+
+   '" title="Tile '+(i+1)+' · '+esc(label)+'"><small>'+String(i+1).padStart(2,'0')+'</small><strong>'+
+   PAINT_GLYPHS[cell]+'</strong></button>';
  }).join('');
- $('dash-builder-help').textContent=(draft.id?'Draft #'+draft.id:'New draft')+
-  ' · '+(draft.bossStyle==='none'?'STANDARD TRACK':'BOSS ARENA')+
-  ' · '+draft.world+' · Beat this exact version before publication.';
+ const count=[...draft.pattern].filter(x=>x!=='.').length;
+ const range=$('dash-editor-range');if(range)range.textContent='TILES '+(first+1)+'–'+end+' OF '+draft.pattern.length+' · '+count+' obstacles';
+ const badge=$('dash-editor-save-state');if(badge)badge.textContent=draftDirty?'● UNSAVED CHANGES':'✓ DRAFT SAVED';
+ const brushInfo=$('dash-brush-info');if(brushInfo)brushInfo.textContent='Selected: '+(PAINTS.find(([key])=>key===brush)?.[1]||'Clear')+
+  ' · Tap a numbered square to '+(brush==='.'?'erase it.':'place it.');
+ const pageButtons=$('dash-page-buttons');
+ if(pageButtons)pageButtons.innerHTML=Array.from({length:pages},(_,i)=>{
+  const start=i*EDITOR_SPAN+1,stop=Math.min(draft.pattern.length,(i+1)*EDITOR_SPAN);
+  return '<button type="button" data-dash-page="'+i+'" aria-current="'+(i===editorPage?'page':'false')+
+   '">'+start+'–'+stop+'</button>';
+ }).join('');
+ const overview=$('dash-editor-overview');
+ if(overview)overview.innerHTML=[...draft.pattern].map((cell,i)=>{
+  const color=PAINT_COLORS[cell]||'#eee';
+  return '<span class="dash-overview-tile'+(i>=first&&i<end?' in-view':'')+
+   '" style="--dash-overview-color:'+color+'" title="Tile '+(i+1)+': '+
+   esc(PAINTS.find(([key])=>key===cell)?.[1]||'Unknown')+'"></span>';
+ }).join('');
+ if($('dash-editor-prev'))$('dash-editor-prev').disabled=editorPage===0;
+ if($('dash-editor-next'))$('dash-editor-next').disabled=editorPage>=pages-1;
+ if($('dash-undo'))$('dash-undo').disabled=!undoHistory.length;
+ if($('dash-redo'))$('dash-redo').disabled=!redoHistory.length;
+ const helper=$('dash-builder-help');if(helper)helper.textContent=
+  (draft.id?'Your editable draft #'+draft.id:'New unsaved level')+' · '+draft.world+
+  ' · '+(draft.bossStyle==='none'?'standard course':'three-phase boss arena')+
+  '. '+(creatorTestOutcome||'Choose a tile, see the real game view above, then press Save & Playtest. Beat this version before publishing.');
  const brushes=root?.querySelectorAll('[data-dash-brush]')||[];
- brushes.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.dashBrush===brush)));
+ brushes.forEach(b=>{
+  b.setAttribute('aria-pressed',String(b.dataset.dashBrush===brush));
+  const key=b.dataset.dashBrush,bName=PAINTS.find(([ch])=>ch===key)?.[1]||key;
+  b.setAttribute('aria-label','Paint '+bName);
+  b.title='Paint '+bName;
+ });
  renderCreatorPreview();
 }
 function renderCreatorPreview(){
  const canvas=$('dash-creator-preview');if(!canvas)return;
  const g=canvas.getContext('2d');if(!g)return;
- const scheme=WORLDS[draft.world]||WORLDS['Maker Studio'];
- const [top,bot,accent]=scheme;
- const sky=g.createLinearGradient(0,0,0,145);sky.addColorStop(0,top);sky.addColorStop(1,bot);
- g.fillStyle=sky;g.fillRect(0,0,600,145);
- for(let x=0;x<600;x+=30){g.strokeStyle=accent+'66';g.beginPath();g.moveTo(x,0);g.lineTo(x,145);g.stroke();}
- g.fillStyle=accent;g.fillRect(0,113,600,3);
- for(let i=0;i<Math.min(draft.pattern.length,30);i++){
-  const ch=draft.pattern[i],x=i*20;
-  if(ch==='.'){continue;}
-  g.fillStyle=ch==='s'||ch==='f'?'#ff849d':ch==='c'?'#d3fbff':'#ffda8d';
-  if(ch==='s'||ch==='c'){g.beginPath();g.moveTo(x+1,113);g.lineTo(x+10,86);g.lineTo(x+19,113);g.fill();}
-  else if(ch==='g'){g.fillStyle=top;g.fillRect(x,113,20,32);}
-  else g.fillRect(x+3,83,14,30);
+ const first=editorPage*EDITOR_SPAN,cam=first*TILE,ground=284;
+ const preview={pattern:draft.pattern,world:draft.world,elapsed:0,stage:null,
+  boss:draft.bossStyle!=='none',bossStyle:draft.bossStyle,
+  bossName:BOSS_FORMS.find(([id])=>id===draft.bossStyle)?.[1]||'CUSTOM GUARDIAN'};
+ const accent=backdrop(g,cam,ground,preview);
+ for(let i=first;i<Math.min(draft.pattern.length,first+EDITOR_SPAN);i++){
+  renderHazard(g,draft.pattern[i],(i-first)*TILE,ground,0,accent);
+  g.save();g.fillStyle='#ffffffb8';g.font='bold 13px system-ui';
+  g.fillText(String(i+1),((i-first)*TILE)+5,ground+22);g.restore();
  }
- if(draft.bossStyle!=='none'){
-  g.fillStyle=accent;g.globalAlpha=.8;g.beginPath();g.arc(520,62,42,0,Math.PI*2);g.fill();
-  g.globalAlpha=1;g.fillStyle=top;g.beginPath();g.arc(520,62,29,0,Math.PI*2);g.fill();
-  g.fillStyle='#fff';g.fillRect(510,54,7,9);g.fillRect(529,54,7,9);
-  g.fillStyle='#ffe9a5';g.font='bold 13px monospace';g.fillText('BOSS',493,122);
- }
- g.fillStyle='#fff';g.font='bold 12px monospace';g.fillText(draft.world.toUpperCase(),11,20);
+ if(preview.boss)drawBoss(g,first+Math.min(5,EDITOR_SPAN-1),0,preview);
+ const x=67,y=ground-39;
+ g.fillStyle='#ffe58b';g.shadowColor='#ffee9e';g.shadowBlur=15;
+ g.fillRect(x,y,34,34);g.shadowBlur=0;g.strokeStyle='#1a2449';g.lineWidth=4;g.strokeRect(x+3,y+3,28,28);
+ g.fillStyle='#122145';g.fillRect(x+8,y+11,5,5);g.fillRect(x+21,y+11,5,5);
+ g.fillStyle='#11162fcb';g.fillRect(0,0,W,42);
+ g.fillStyle='#fff';g.font='bold 21px system-ui';
+ g.fillText(draft.world.toUpperCase()+' · TILE '+(first+1)+'–'+Math.min(first+EDITOR_SPAN,draft.pattern.length),13,29);
+ const legend=$('dash-preview-explanation');
+ if(legend)legend.textContent='This uses the game’s real scenery and obstacle drawings. Colored objects are hazards to jump over; blank tiles are safe. View the next section to see the rest of your track.';
 }
 function renderAll(){renderMenu();renderLists();renderAwards();renderLeaders();renderBuilder();}
 function choosePane(next){
