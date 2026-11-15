@@ -92,4 +92,8 @@ test('Billion-stage family campaign regenerates deterministic worlds and safegua
  assert.match(src,/backdrop\(g,cam,ground\)/);
  assert.match(src,/THEMES=\[/);
  assert.match(src,/ONE BILLION NUMBERED STAGES/);
+ assert.match(src,/function originalBeat\(/);
+ assert.match(src,/id=\\"dash-sound\\"|id="dash-sound"/);
+ assert.match(src,/THUNDER|Thunder Rails/);
+ assert.match(src,/renderHazard\(g,run\.pattern\[i\]/);
 });
