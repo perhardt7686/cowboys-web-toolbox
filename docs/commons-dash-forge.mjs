@@ -1,9 +1,11 @@
 /* Dash Forge · Original member-only rhythm-platformer. No Geometry Dash assets,
  * music or proprietary levels. Server owns timing validation, achievements and awards. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {DASH_DT,DASH_CEILING,DASH_MODES,DASH_TOOLS,dashCanTransform,dashCanRotate,createDashCourse,createDashRun,stepDash} from './dash-physics.mjs';
-import {DASH_PALETTES,drawDashObject,drawDashPlayer} from './dash-art.mjs';
+import {DASH_DT,DASH_CEILING,DASH_MODES,DASH_TOOLS,dashCanTransform,dashCanRotate,dashBeatAt,dashGateActive,dashObjects,createDashCourse,createDashRun,stepDash} from './dash-physics.mjs?v=courses2';
+import {DASH_PALETTES,drawDashObject,drawDashPlayer} from './dash-art.mjs?v=courses2';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
+import {DASH_COURSE_EDITION,DASH_CUES,DASH_OVERHEAD,DASH_SECTIONS,dashSection,dashCampaignPlan} from './dash-campaign.mjs';
+import {DASH_SONGS,campaignSong,playDashNote} from './dash-soundtracks.mjs';
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const board=document.getElementById('conversations');
 const $=id=>document.getElementById(id);
@@ -26,11 +28,11 @@ const THEMES=[['amber','#ffd363',0],['cyan','#6ee9fb',2],['coral','#ff749c',4],[
  ['arcade','#67ffc8',75],['starlight','#ebdefc',100],['obsidian','#a8aac1',200],['legend','#fff',500]];
 let client=null,user=null,root=null,inside=null,state=null,scene='campaign',busy=false,open=false,run=null,frame=0,brush='s';
 let soundOn=false,audioContext=null,lastBeat=-1;
-let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[]},theme='amber',refreshTimer=null,booted=false;
-const EDITOR_SPAN=24;
+let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[],song:'pulse'},theme='amber',refreshTimer=null,booted=false;
+const EDITOR_SPAN=24,EDIT_LENGTHS=[24,32,40,48,56,64,72,80,88];
 let editorPage=0,undoHistory=[],redoHistory=[],draftDirty=true,runFromBuilder=false,creatorTestOutcome='';
 const PAINT_GLYPHS={'.':'·',s:'▲',b:'■',g:'▽',l:'ϟ',w:'✺',c:'◆',p:'▮',f:'♨',r:'◎',m:'♣',o:'◉',d:'▣',h:'⚒',
- C:'▣',S:'◀',B:'●',U:'◉',W:'⌁',R:'▦',P:'✳',V:'⬢',I:'⇅',F:'»',L:'‹',E:'=',J:'⤒',O:'◯',M:'↕',K:'⚑',D:'◇',T:'✦'};
+ C:'▣',S:'◀',B:'●',U:'◉',W:'⌁',R:'▦',P:'✳',V:'⬢',I:'⇅',F:'»',L:'‹',E:'=',J:'⤒',O:'◯',M:'↕',K:'⚑',D:'◇',T:'✦',H:'▥',A:'⤊',N:'‹‹',Q:'✦'};
 const PAINT_COLORS={'.':'#a3f0c5',s:'#ff7296',b:'#ffb36b',g:'#6acbff',l:'#d39dff',w:'#ffe086',c:'#a3eaff',p:'#b7a6ff',
  f:'#ffa460',r:'#92ffdf',m:'#ecbaff',o:'#ff8cbc',d:'#86eeff',h:'#ecbc8c',...DASH_PALETTES};
 const PAINT_GROUPS=[
@@ -39,8 +41,8 @@ const PAINT_GROUPS=[
  ['Portals & events',Object.entries(DASH_TOOLS)]
 ];
 const dataKey=()=>user?'dash-forge-draft-v2-'+user:null;
-const defaultDraft=(title='My First Dash')=>({id:null,title,difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[]});
-let tileSelected=4,zoom=1,clipboard=null,pickTool='paint',paintGroup='Hazards',drag=null,autoTimer=0;
+const defaultDraft=(title='My First Dash')=>({id:null,title,difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[],song:'pulse'});
+let tileSelected=4,zoom=1,zoomStart=null,clipboard=null,pickTool='paint',paintGroup='Hazards',editLayer='track',drag=null,autoTimer=0;
 let inputHeld=false,inputTapped=false,lastRun=null,draftLoadedFor=null;
 function editableTile(index){return Number.isInteger(index)&&index>=4&&index<draft.pattern.length-4;}
 function draftSnapshot(){return structuredClone(draft);}
@@ -76,22 +78,37 @@ function travelHistory(direction){
  to.push(draftSnapshot());const old=draft.id;draft=from.pop();draft.id=old;
  markDirty();renderBuilder();
 }
-function detailAt(index){return draft.layout.find(item=>item[0]===index)?.slice(1)||[0,2,0,0];}
+function detailAt(index){
+ const saved=draft.layout.find(item=>item[0]===index);
+ return saved?[...saved.slice(1,5),saved[5]??'.',saved[6]??'.']:[0,2,0,0,'.','.'];
+}
+function tokenAt(index,layer=editLayer){
+ const detail=detailAt(index);
+ return layer==='above'?detail[4]:layer==='cue'?detail[5]:draft.pattern[index];
+}
 function setDetail(index,value){
  draft.layout=draft.layout.filter(item=>item[0]!==index);
- if(value.some((n,i)=>n!==[0,2,0,0][i]))draft.layout.push([index,...value]);
+ const hasLayers=value[4]!=='.'||value[5]!=='.';
+ if(hasLayers||value.slice(0,4).some((n,i)=>n!==[0,2,0,0][i]))
+  draft.layout.push([index,...(hasLayers?value:value.slice(0,4))]);
  draft.layout.sort((a,b)=>a[0]-b[0]);
 }
 function writeTile(index,newToken,detail=detailAt(index)){
- const pattern=draft.pattern,object=dashCanTransform(newToken)?[...detail]:[0,2,0,detail[3]];
+ const pattern=draft.pattern,object=dashCanTransform(newToken)?[...detail]:[0,2,0,...detail.slice(3)];
  if(!dashCanRotate(newToken))object[2]=0;
  draft.pattern=pattern.slice(0,index)+newToken+pattern.slice(index+1);setDetail(index,object);
 }
 function editTile(index,newBrush){
  const i=Number(index);if(!editableTile(i))return;
  tileSelected=i;editorPage=Math.floor(i/EDITOR_SPAN);
- const previous=draft.pattern[i];
- if(newBrush!==null&&previous!==newBrush){saveUndo();writeTile(i,newBrush);}
+ const previous=tokenAt(i);
+ if(newBrush!==null&&previous!==newBrush){
+  saveUndo();
+  if(editLayer==='track')writeTile(i,newBrush);
+  else{
+   const detail=detailAt(i);detail[editLayer==='above'?4:5]=newBrush;setDetail(i,detail);
+  }
+ }
  else scheduleDraft();
  renderBuilder();
 }
@@ -104,13 +121,13 @@ function useSelection(action){
  if(action==='paste'&&!clipboard)return;
  saveUndo();
  if(action==='paste')writeTile(tileSelected,clipboard.token,clipboard.detail);
- if(action==='erase')writeTile(tileSelected,'.',[0,2,0,0]);
+ if(action==='erase')writeTile(tileSelected,'.',[0,2,0,0,'.','.']);
  renderBuilder();
 }
 function moveTile(source,target){
  if(!editableTile(source)||!editableTile(target)||source===target)return;
  const token=draft.pattern[source],detail=detailAt(source);
- if(token==='.'&&!detail[3])return;
+ if(token==='.'&&!detail[3]&&detail[4]==='.'&&detail[5]==='.')return;
  saveUndo();
  const destination=draft.pattern[target],destinationDetail=detailAt(target);
  writeTile(target,token,detail);writeTile(source,destination,destinationDetail);
@@ -120,9 +137,12 @@ function paintPalette(){
  const section=$('dash-palette');if(!section)return;
  for(const button of root.querySelectorAll('[data-dash-group]'))
   button.setAttribute('aria-pressed',String(button.dataset.dashGroup===paintGroup));
- const tools=PAINT_GROUPS.find(([name])=>name===paintGroup)?.[1]||[];
- if(section.dataset.group===paintGroup)return;
- section.dataset.group=paintGroup;
+ const base=PAINT_GROUPS.find(([name])=>name===paintGroup)?.[1]||[];
+ const tools=editLayer==='track'?base:PAINTS.filter(([key])=>
+  (editLayer==='above'?DASH_OVERHEAD+'.':DASH_CUES+'.').includes(key));
+ const group=editLayer+':'+paintGroup;
+ if(section.dataset.group===group)return;
+ section.dataset.group=group;
  section.innerHTML=tools.map(([key,label])=>'<button draggable="true" type="button" data-dash-brush="'+key+
   '" style="--brush:'+PAINT_COLORS[key]+'"><span aria-hidden="true">'+PAINT_GLYPHS[key]+'</span>'+label+'</button>').join('');
 }
@@ -149,6 +169,8 @@ function renderMenu(){
 }
 function listLevel(l){
  const owner=l.creator&&l.creator===me(),isDraft=l.kind==='member'&&!l.published;
+ const plan=l.kind==='campaign'?dashCampaignPlan(l.stage,l.pattern.length,l.boss,l.boss_style):null;
+ const modules=plan?.sections.map(section=>section.label).filter((value,i,list)=>list.indexOf(value)===i).slice(0,3)||[];
  const lock=!unlocked(l),badge=l.designer_award?'<span class="dash-reward">♛ '+esc(l.designer_award)+'</span>':'';
  return '<article class="dash-level" data-level-id="'+Number(l.id)+'">'+
   '<div class="dash-level-number">'+(l.kind==='campaign'?(l.boss?'♛':l.stage>999?'∞':num(l.stage)):(isDraft?'D':'★'))+'</div>'+
@@ -156,6 +178,7 @@ function listLevel(l){
   '<small>'+esc(l.kind==='campaign'?(l.world||'Origin Circuit')+' · Chapter '+num(l.stage)+' · '+l.pattern.length+' tiles · '+Math.round(1000/Number(l.pace_ms||210)*10)/10+' tiles/s':
    (owner?'Your level':('By '+l.creator_name))+' · '+l.pattern.length+' tiles')+
   ' · Difficulty '+l.difficulty+'</small>'+(l.boss?'<span class="dash-draft-tag">♛ '+esc(l.boss_name||'BOSS ARENA')+' · 3 PHASES</span>':'')+(l.stage===chapter()?'<span class="dash-current-tag">YOUR CURRENT STAGE</span>':'')+
+  (modules.length?'<small class="dash-stage-modules">'+esc(modules.join(' · '))+'</small>':'')+
   '<small>'+esc(bestText(l))+' · '+num(l.verified_solves)+' member solves</small>'+badge+
   (isDraft?'<span class="dash-draft-tag">DRAFT · BEAT IT TO PUBLISH</span>':'')+
   '</div><div class="dash-level-actions">'+
@@ -197,8 +220,12 @@ function renderLeaders(){
 }
 function renderBuilder(){
  const grid=$('dash-editor-grid');if(!grid)return;
+ for(const item of root.querySelectorAll('[data-dash-layer]'))
+  item.setAttribute('aria-pressed',String(item.dataset.dashLayer===editLayer));
+ $('dash-tool-groups').hidden=editLayer!=='track';
  const title=$('dash-title'),diff=$('dash-difficulty'),length=$('dash-length');
- const world=$('dash-world'),boss=$('dash-boss-style');
+ const world=$('dash-world'),boss=$('dash-boss-style'),song=$('dash-song');
+ if(song)song.value=draft.song||'pulse';
  if(world)world.value=draft.world||'Maker Studio';
  if(boss)boss.value=draft.bossStyle||'none';
  if($('dash-phase-guide'))$('dash-phase-guide').hidden=draft.bossStyle==='none';
@@ -211,6 +238,7 @@ function renderBuilder(){
  grid.style.setProperty('--dash-cols','12');
  grid.innerHTML=[...draft.pattern.slice(first,end)].map((cell,j)=>{
   const i=first+j,fixed=i<4||i>=draft.pattern.length-4;
+  cell=tokenAt(i);
   const label=PAINTS.find(([key])=>key===cell)?.[1]||'Hazard';
   const type=label.toLowerCase().replace(/[^a-z]+/g,'-');
   return '<button type="button" draggable="'+(!fixed&&cell!=='.')+'" class="dash-cell type-'+type+
@@ -226,10 +254,10 @@ function renderBuilder(){
  const detail=detailAt(tileSelected);
  for(const [id,i] of [['dash-tile-lane',0],['dash-tile-scale',1],['dash-tile-flip',2],['dash-tile-decor',3]]){
   const control=$(id);if(!control)continue;
-  control.value=String(detail[i]);control.disabled=i===2?!dashCanRotate(draft.pattern[tileSelected]):i!==3&&!dashCanTransform(draft.pattern[tileSelected]);
+  control.value=String(detail[i]);control.disabled=i!==3&&(editLayer!=='track'||(i===2?!dashCanRotate(tokenAt(tileSelected)):!dashCanTransform(tokenAt(tileSelected))));
  }
  const selectedTile=$('dash-selected-tile');
- if(selectedTile)selectedTile.textContent='Tile '+(tileSelected+1)+' · '+(PAINTS.find(([key])=>key===draft.pattern[tileSelected])?.[1]||'Clear');
+ if(selectedTile)selectedTile.textContent='Tile '+(tileSelected+1)+' · '+(PAINTS.find(([key])=>key===tokenAt(tileSelected))?.[1]||'Clear');
  const selectToggle=$('dash-selection-mode');
  if(selectToggle){selectToggle.setAttribute('aria-pressed',String(pickTool==='select'));selectToggle.textContent=pickTool==='select'?'Selecting tiles':'Select a tile';}
  const zoomLabel=$('dash-zoom-label');if(zoomLabel)zoomLabel.textContent=zoom===1?'Fit section':'200%';
@@ -268,13 +296,14 @@ function renderBuilder(){
 }
 function previewWindow(){
  const span=EDITOR_SPAN/zoom,base=editorPage*EDITOR_SPAN;
- const start=zoom===1?base:Math.max(base,Math.min(base+EDITOR_SPAN-span,tileSelected-5));
+ const start=zoom===1?base:Math.max(base,Math.min(base+EDITOR_SPAN-span,zoomStart??tileSelected-5));
  return {start,span,size:TILE*zoom};
 }
 function renderCreatorPreview(){
  const canvas=$('dash-creator-preview');if(!canvas)return;
  const g=canvas.getContext('2d');if(!g)return;
  const {start,span,size}=previewWindow(),cam=start*size,ground=284;
+ canvas.dataset.startTile=String(start);canvas.dataset.visibleTiles=String(span);
  const preview={pattern:draft.pattern,world:draft.world,elapsed:0,stage:null,
   boss:draft.bossStyle!=='none',bossStyle:draft.bossStyle,
   bossName:BOSS_FORMS.find(([id])=>id===draft.bossStyle)?.[1]||'CUSTOM GUARDIAN'};
@@ -284,7 +313,8 @@ function renderCreatorPreview(){
  for(let i=start;i<Math.min(draft.pattern.length,start+span);i++){
   const x=(i-start)*size;
   g.fillStyle=i%2?'#17123635':'#0e123260';g.fillRect(x,45,size,ground-45);
-  drawDashObject(g,course,course.cells[i],cam,ground,size,0,{selected:i===tileSelected,verticalScale:TILE});
+  for(const object of dashObjects(course.cells[i]))
+   drawDashObject(g,course,object,cam,ground,size,0,{selected:i===tileSelected,verticalScale:TILE});
   g.fillStyle='#ffffffdf';g.font='bold '+(zoom===1?14:19)+'px system-ui';
   g.fillText(String(i+1),x+5,ground+23);
  }
@@ -327,16 +357,22 @@ function build(){
     '<p>Creator awards pay only when another member genuinely beats the published level, scaled by active solve time.</p></div>'+
     '<div id="dash-community-list" class="dash-level-list"></div></section>'+
   '<section class="dash-pane" id="dash-pane-builder" hidden><div class="dash-pane-title"><h3>Level Studio</h3>'+
-    '<p>Build with numbered tiles, see exactly how each obstacle looks in the game, then press Save &amp; Playtest. Keep improving until you can beat it!</p></div>'+
+    '<p>Place objects on the numbered track. Save &amp; Playtest runs the same layout you see here.</p></div>'+
    '<div class="dash-builder-form"><label>Title<input id="dash-title" maxlength="58" pattern="[A-Za-z0-9 ]+" value="My First Dash"></label>'+
    '<label>Difficulty<select id="dash-difficulty">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'">'+n+'</option>').join('')+'</select></label>'+
-   '<label>Tiles<select id="dash-length">'+[24,32,40,48,56,64,72,80,88].map(n=>'<option value="'+n+'"'+(n===48?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
+   '<label>Tiles<select id="dash-length">'+EDIT_LENGTHS.map(n=>'<option value="'+n+'"'+(n===48?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
    '<label>World / Scenery<select id="dash-world">'+CREATOR_WORLDS.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')+'</select></label>'+
+   '<label>Song<select id="dash-song">'+Object.entries(DASH_SONGS).map(([key,item])=>'<option value="'+key+'">'+esc(item.title)+'</option>').join('')+'</select></label>'+
    '<label>Boss Arena<select id="dash-boss-style">'+BOSS_FORMS.map(([key,name])=>'<option value="'+key+'">'+esc(name)+'</option>').join('')+'</select></label></div>'+
    '<div class="dash-builder-preview"><div class="dash-preview-label"><strong>1 · SEE YOUR LEVEL IN THE REAL GAME</strong><span id="dash-editor-save-state" aria-live="polite">● UNSAVED CHANGES</span></div><canvas id="dash-creator-preview" width="960" height="360" role="img" aria-label="Full-sized actual game view of currently selected track section with scenery, hazards and boss"></canvas>'+
    '<small id="dash-preview-explanation">This preview shows actual level scenery and obstacle drawings.</small></div>'+
    '<div class="dash-builder-view"><button type="button" id="dash-selection-mode" data-dash-action="select" aria-pressed="false">Select a tile</button><button type="button" data-dash-action="zoom"><span id="dash-zoom-label">Fit section</span></button><button type="button" data-dash-action="practice">Practice from selected tile</button></div>'+
-   '<div class="dash-tool-groups" role="group" aria-label="Tool palettes">'+PAINT_GROUPS.map(([name])=>'<button type="button" data-dash-group="'+name+'">'+name+'</button>').join('')+'</div>'+
+   '<div class="dash-section-tools"><label>Course section<select id="dash-blueprint"><option value="">Choose a section</option>'+
+   DASH_SECTIONS.map(item=>'<option value="'+item.id+'">'+esc(item.label)+'</option>').join('')+'</select></label>'+
+   '<button type="button" data-dash-action="blueprint">Insert at selected tile</button><button type="button" data-dash-action="song-preview">Preview song</button></div>'+
+   '<div class="dash-layer-bar" role="group" aria-label="Edit layer"><button type="button" data-dash-layer="track" aria-pressed="true">Track</button>'+
+   '<button type="button" data-dash-layer="above">Ceiling</button><button type="button" data-dash-layer="cue">Triggers</button></div>'+
+   '<div class="dash-tool-groups" id="dash-tool-groups" role="group" aria-label="Tool palettes">'+PAINT_GROUPS.map(([name])=>'<button type="button" data-dash-group="'+name+'">'+name+'</button>').join('')+'</div>'+
    '<div class="dash-palette" id="dash-palette" role="group" aria-label="Level tile brushes"></div>'+
    '<p id="dash-brush-info" class="dash-brush-info" aria-live="polite"></p>'+ 
     '<div id="dash-phase-guide" class="dash-phase-guide" hidden aria-label="Three boss attack phases"><span>PHASE I · OPENING</span><span>PHASE II · ESCALATION</span><span>PHASE III · FINAL ATTACK</span></div>'+
@@ -376,10 +412,7 @@ function build(){
  },{passive:false});
  $('dash-creator-preview').addEventListener('click',event=>{
   if(busy||run)return;
-  const rect=event.currentTarget.getBoundingClientRect();if(!rect.width)return;
-  const {start,span}=previewWindow();
-  const tile=start+Math.floor((event.clientX-rect.left)/rect.width*span);
-  editTile(tile,pickTool==='select'?null:brush);
+  editTile(previewTile(event.currentTarget,event.clientX),pickTool==='select'?null:brush);
  });
  for(const type of ['pointerup','pointercancel','lostpointercapture'])root.addEventListener(type,()=>{inputHeld=false;});
  root.addEventListener('dragstart',event=>{
@@ -394,7 +427,7 @@ function build(){
   if(!cell&&!canvas)return;
   event.preventDefault();
   let target=Number(cell?.dataset.dashCell);
-  if(canvas){const rect=canvas.getBoundingClientRect(),{start,span}=previewWindow();target=start+Math.floor((event.clientX-rect.left)/rect.width*span);}
+  if(canvas)target=previewTile(canvas,event.clientX);
   if(drag.tile!==undefined)moveTile(drag.tile,target);else editTile(target,drag.token);
   drag=null;
  });
@@ -410,7 +443,7 @@ function build(){
  for(const id of ['dash-title','dash-difficulty']){
   $(id).addEventListener('change',()=>{draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);markDirty();renderBuilder();});
  }
- for(const [id,field] of [['dash-world','world'],['dash-boss-style','bossStyle']]){
+ for(const [id,field] of [['dash-world','world'],['dash-boss-style','bossStyle'],['dash-song','song']]){
   $(id).addEventListener('change',event=>{draft[field]=event.target.value;markDirty();renderBuilder();});
  }
  $('dash-length').addEventListener('change',e=>{
@@ -435,16 +468,44 @@ async function refresh(quiet=false){
    if(!quiet)setStatus('Family campaign and rewards loaded from the game server.');}
  catch(e){setStatus('Saved game unavailable: '+e.message,true);}
 }
+function previewTile(canvas,clientX){
+ const rect=canvas.getBoundingClientRect(),{start,span}=previewWindow();
+ const innerWidth=rect.width-2*canvas.clientLeft,innerHeight=rect.height-2*canvas.clientTop;
+ const width=Math.min(innerWidth,innerHeight*canvas.width/canvas.height);
+ if(width<=0)return -1;
+ const left=rect.left+canvas.clientLeft+(innerWidth-width)/2;
+ const x=(clientX-left)/width;
+ return x>=0&&x<1?start+Math.floor(x*span):-1;
+}
+function insertSection(){
+ const section=dashSection($('dash-blueprint').value);
+ if(!section||!editableTile(tileSelected))return;
+ const from=tileSelected,all=[...draft.pattern],lastLayer=draft.layout.at(-1)?.[0]??0;
+ const last=Math.max(lastLayer,all.findLastIndex(token=>token!=='.'));
+ const required=Math.max(draft.pattern.length,from+section.length+4,last>=from?last+section.length+5:0);
+ const length=EDIT_LENGTHS.find(size=>size>=required);
+ if(!length){setStatus('Choose an earlier tile or clear space to insert '+section.label+'.',true);return;}
+ saveUndo();
+ draft.pattern=(draft.pattern.slice(0,from)+'.'.repeat(section.length)+draft.pattern.slice(from)).slice(0,length).padEnd(length,'.');
+ draft.layout=draft.layout.map(([tile,...settings])=>[tile>=from?tile+section.length:tile,...settings]).filter(item=>editableTile(item[0]));
+ for(const [offset,token,above='.',cue='.',scale=2] of section.items)
+  writeTile(from+offset,token,[0,scale,0,0,above,cue]);
+ renderBuilder();
+ setStatus(section.label+' inserted at tiles '+(from+1)+'–'+(from+section.length)+'.');
+}
 function onClick(event){
- const target=event.target.closest('[data-dash-group],[data-dash-tab],[data-dash-play],[data-dash-edit],[data-dash-publish],[data-dash-action],[data-dash-brush],[data-dash-cell],[data-dash-page],[data-dash-theme]');
+ const target=event.target.closest('[data-dash-layer],[data-dash-group],[data-dash-tab],[data-dash-play],[data-dash-edit],[data-dash-publish],[data-dash-action],[data-dash-brush],[data-dash-cell],[data-dash-page],[data-dash-theme]');
  if(!target||target.disabled||busy)return;
  const d=target.dataset;
+ if(d.dashLayer){
+  editLayer=d.dashLayer;pickTool='paint';brush=editLayer==='cue'?'C':'s';renderBuilder();return;
+ }
  if(d.dashGroup){paintGroup=d.dashGroup;renderBuilder();return;}
  if(d.dashTab){choosePane(d.dashTab);return;}
  if(d.dashPlay){runFromBuilder=false;void startLevel(Number(d.dashPlay));return;}
  if(d.dashEdit){const l=levels().find(x=>Number(x.id)===Number(d.dashEdit));if(l){
    draft={id:l.id,title:l.title,difficulty:l.difficulty,pattern:l.pattern,
-    world:l.world||'Maker Studio',bossStyle:l.boss_style||'none',layout:l.layout||[]};
+    world:l.world||'Maker Studio',bossStyle:l.boss_style||'none',layout:l.layout||[],song:l.soundtrack||'pulse'};
    tileSelected=4;editorPage=0;undoHistory=[];redoHistory=[];draftDirty=false;creatorTestOutcome='';storeDraft();choosePane('builder');}return;}
  if(d.dashPublish){void publishLevel(Number(d.dashPublish));return;}
  if(d.dashBrush!==undefined){brush=d.dashBrush;pickTool='paint';renderBuilder();return;}
@@ -455,7 +516,9 @@ function onClick(event){
  switch(d.dashAction){
   case 'new':draft=defaultDraft('My New Dash');tileSelected=4;editorPage=0;undoHistory=[];redoHistory=[];markDirty();renderBuilder();break;
   case 'select':pickTool=pickTool==='select'?'paint':'select';renderBuilder();break;
-  case 'zoom':zoom=zoom===1?2:1;renderBuilder();break;
+  case 'zoom':zoom=zoom===1?2:1;zoomStart=zoom===2?tileSelected-5:null;renderBuilder();break;
+  case 'blueprint':insertSection();break;
+  case 'song-preview':void previewSong();break;
   case 'copy':case 'paste':case 'erase':useSelection(d.dashAction);break;
   case 'practice':startPractice();break;
   case 'retry':void retryTrack();break;
@@ -477,8 +540,8 @@ async function saveDraft(){
  busy=true;setStatus('Saving your exact editable level so the playtest matches your changes…');
  try{
   draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);
-  const saved=await call('community_dash_save_layout',{p_title:draft.title,p_difficulty:draft.difficulty,
-   p_pattern:draft.pattern,p_level_id:draft.id,p_world:draft.world,p_boss_style:draft.bossStyle,p_layout:draft.layout});
+  const saved=await call('community_dash_save_v3',{p_title:draft.title,p_difficulty:draft.difficulty,
+   p_pattern:draft.pattern,p_level_id:draft.id,p_world:draft.world,p_boss_style:draft.bossStyle,p_layout:draft.layout,p_song:draft.song||'pulse'});
   draft.id=saved.id;draftDirty=false;storeDraft();
   await refresh(true);
   setStatus('Saved this exact version. Playtest it before publishing.');renderBuilder();
@@ -500,8 +563,6 @@ async function publishLevel(id){
  }catch(e){setStatus(e.message,true);}finally{busy=false;}
 }
 
-// Original pentatonic melody, composed procedurally. No copyrighted songs,
-// samples, or Geometry Dash music are played or redistributed.
 function toggleSound(){
  soundOn=!soundOn;
  try{localStorage.setItem('dash-forge-audio',soundOn?'on':'off');}catch{}
@@ -511,24 +572,21 @@ function toggleSound(){
    if(audioContext.state==='suspended')void audioContext.resume();}catch{soundOn=false;if(button)button.textContent='♪ SOUND OFF';}
  }else if(audioContext?.state==='running')void audioContext.suspend();
 }
+async function previewSong(){
+ try{
+  audioContext??=new (window.AudioContext||window.webkitAudioContext)();
+  await audioContext.resume();
+  const at=audioContext.currentTime+.04,key=draft.song||'pulse';
+  for(let i=0;i<8;i++)playDashNote(audioContext,key,i,at+i*.28,.28);
+  setStatus('Playing '+DASH_SONGS[key].title+'.');
+ }catch{setStatus('Audio preview is unavailable on this device.',true);}
+}
 function originalBeat(){
  if(!soundOn||!run||!audioContext||audioContext.state!=='running')return;
- const beat=Math.floor(run.physics.x/2);
- if(beat===lastBeat)return;lastBeat=beat;
- const world=Object.keys(WORLDS).indexOf(run.world);
- const scale=[0,3,5,7,10,12,15,17],tone=scale[(beat+Math.max(0,world)*2)%scale.length];
- const hz=110*Math.pow(2,(tone+(run.boss?5:0))/12);
- try{
-  const at=audioContext.currentTime;
-  const osc=audioContext.createOscillator(),volume=audioContext.createGain();
-  osc.type=world%3===0?'triangle':world%3===1?'sine':'square';
-  osc.frequency.setValueAtTime(hz,at);
-  volume.gain.setValueAtTime(0.0001,at);
-  volume.gain.exponentialRampToValueAtTime(0.027,at+0.012);
-  volume.gain.exponentialRampToValueAtTime(0.0001,at+0.13);
-  osc.connect(volume);volume.connect(audioContext.destination);
-  osc.start(at);osc.stop(at+0.14);
- }catch{/* Muted or unavailable audio must never stop gameplay. */}
+ const beat=Math.floor(dashBeatAt(run.physics));
+ if(beat===lastBeat)return;
+ lastBeat=beat;
+ playDashNote(audioContext,run.song||'pulse',beat,audioContext.currentTime,run.pace*2/1000);
 }
 function jump(){
  if(soundOn&&audioContext?.state==='suspended')void audioContext.resume();
@@ -679,13 +737,20 @@ function draw(){
  if(!run)return;
  const canvas=$('dash-canvas'),g=canvas?.getContext('2d');if(!g)return;
  const r=run.physics,pos=Math.min(run.pattern.length,r.x),cam=Math.max(0,pos*TILE-5*TILE);
- const ground=284,accent=backdrop(g,cam,ground),t=r.elapsed;
+ const ground=284,baseAccent=backdrop(g,cam,ground),t=r.elapsed;
+ const accent=['', '#ffbd89','#6ff9db','#cdacff'][r.lightCue]||baseAccent;
+ if(r.lightCue){
+  const tint=g.createLinearGradient(0,0,0,ground);
+  tint.addColorStop(0,accent+'50');tint.addColorStop(1,accent+'00');
+  g.fillStyle=tint;g.fillRect(0,0,W,ground);
+ }
  const ceiling=ground-DASH_CEILING*TILE;
  g.strokeStyle=accent+'66';g.lineWidth=2;g.strokeRect(0,ceiling,W,2);
  drawBoss(g,pos,t);
  for(let i=Math.max(0,Math.floor(cam/TILE)-1);i<Math.min(run.pattern.length,Math.ceil((cam+W)/TILE)+1);i++){
   const cell=r.course.cells[i];
-  drawDashObject(g,r.course,cell,cam,ground,TILE,t,{disabled:cell.token==='l'&&r.x<r.laserOff||r.used.has(i)});
+  for(const object of dashObjects(cell))
+   drawDashObject(g,r.course,object,cam,ground,TILE,t,{disabled:!dashGateActive(r,object)||r.used.has(i)});
  }
  const x=pos*TILE-cam,y=ground-r.y*TILE;
  const rotates=['S','W','U','V'].includes(r.mode)?Math.max(-.43,Math.min(.43,-r.vy*.054)):
@@ -704,7 +769,7 @@ function draw(){
  g.fillText((run.world||'MAKER STUDIO').toUpperCase()+' · '+DASH_MODES[r.mode].toUpperCase(),13,31);
  if(r.tick%15<4){g.fillStyle=accent+'26';g.fillRect(0,H-11,W,11);}
  if(run.practice){g.fillStyle='#ffe692';g.font='bold 17px system-ui';g.fillText('PRACTICE',W/2-34,33);}
- canvas.dataset.mode=DASH_MODES[r.mode];canvas.dataset.tile=String(Math.floor(r.x));canvas.dataset.y=r.y.toFixed(3);
+ canvas.dataset.light=String(r.lightCue);canvas.dataset.mode=DASH_MODES[r.mode];canvas.dataset.tile=String(Math.floor(r.x));canvas.dataset.y=r.y.toFixed(3);
  canvas.dataset.gravity=String(r.gravity);canvas.dataset.speed=String(r.speed);
 }
 function frameStep(timestamp){
@@ -753,9 +818,9 @@ function startPractice(again=null){
  if(run||busy)return;
  runFromBuilder=true;
  const item=again?.item||{title:draft.title||'New draft',pattern:draft.pattern,layout:draft.layout,
-  world:draft.world,boss:draft.bossStyle!=='none',bossStyle:draft.bossStyle,
+  song:draft.song||'pulse',world:draft.world,boss:draft.bossStyle!=='none',bossStyle:draft.bossStyle,
   bossName:BOSS_FORMS.find(([id])=>id===draft.bossStyle)?.[1],pace:210};
- const course=createDashCourse(item.pattern,item.pace,{boss:item.boss,bossStyle:item.bossStyle,layout:item.layout});
+ const course=createDashCourse(item.pattern,item.pace,{boss:item.boss,bossStyle:item.bossStyle,layout:item.layout,edition:DASH_COURSE_EDITION});
  const tile=again?.checkpoint??tileSelected;
  run={...item,practice:true,item,physics:createDashRun(course,{tile,practice:true})};beginDraw(item);
 }
@@ -764,12 +829,13 @@ async function startLevel(id){
  busy=true;setStatus('Requesting a verified member run…');
  try{
   const item=levels().find(l=>Number(l.id)===id);if(!item)throw Error('Level is not available.');
-  const result=await call('community_dash_start_v2',{p_level_id:id});
+  const result=await call('community_dash_start_v3',{p_level_id:id});
   const pace=Number(result.pace_ms||210),boss=Boolean(result.boss||item.boss);
   const bossStyle=result.boss_style||item.boss_style||'none';
-  const course=createDashCourse(result.pattern,pace,{boss,bossStyle,layout:result.layout||item.layout||[],stage:item.stage||0});
+  const course=createDashCourse(result.pattern,pace,{boss,bossStyle,layout:result.layout||item.layout||[],stage:item.stage||0,edition:Number(result.edition||1)});
   run={id:result.run_id,level_id:id,pattern:result.pattern,title:result.title,
-   pace,world:result.world||item.world||'Maker Studio',stage:item.stage||null,boss,bossStyle,
+   pace,song:item.stage?campaignSong(item.stage):(result.soundtrack||item.soundtrack||'pulse'),
+   world:result.world||item.world||'Maker Studio',stage:item.stage||null,boss,bossStyle,
    bossName:result.boss_name||item.boss_name||'FAMILY BOSS ARENA',physics:createDashRun(course)};
   beginDraw(item);
   setStatus('Run started. The server independently checks your control replay.');

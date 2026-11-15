@@ -53,7 +53,7 @@ test('Arcade shell opens title before touching existing saved game controllers',
  assert.match(shell,/data-arcade-action/);
  assert.match(shell,/case 'title-boss-builder'/);
  assert.match(shell,/case 'title-start'/);
- assert.match(html,/commons-arcade-shell\.mjs\?v=arcade5/);
+ assert.match(html,/commons-arcade-shell\.mjs\?v=arcade6/);
  assert.match(html,/commons-arcade-shell\.css\?v=titles3/);
  assert.match(html,/commons-dash-forge\.mjs\?v=[\w-]+"/);
  assert.match(styles,/#arcade-game-title-view/);
@@ -86,7 +86,7 @@ test('Boss Creator makes truly editable boss scenes, validated by server not by 
  assert.match(dash,/id="dash-boss-style"/);
  assert.match(dash,/id="dash-creator-preview"/);
  assert.match(dash,/id="dash-phase-guide"/);
- assert.match(dash,/community_dash_save_layout/);
+ assert.match(dash,/community_dash_save_v3/);
  assert.match(dash,/p_boss_style:draft\.bossStyle/);
  assert.match(dash,/dashforge:creator-mode/);
  assert.match(dash,/function drawBoss/);

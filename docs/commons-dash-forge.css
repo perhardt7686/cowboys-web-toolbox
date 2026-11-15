@@ -423,3 +423,15 @@ body.community-page #dash-forge-inside .dash-playing-head button{min-height:44px
 body.community-page.dash-playing:not(.arcade-on) #dash-play-overlay{
  position:fixed;inset:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);z-index:2147481900;
 }
+body.community-page #dash-forge-inside .dash-section-tools,
+body.community-page #dash-forge-inside .dash-layer-bar{
+ display:flex;flex-wrap:wrap;align-items:end;gap:7px;margin:8px 0
+}
+body.community-page #dash-forge-inside .dash-section-tools label{display:grid;gap:4px;min-width:0;flex:1 1 145px;font-size:.77rem;font-weight:780}
+body.community-page #dash-forge-inside #dash-blueprint{
+ width:100%;min-height:44px;border:1px solid #9c8cce;border-radius:7px;background:#fbf3ff;color:#251d3a;font:750 1rem system-ui;padding:5px
+}
+body.community-page #dash-forge-inside .dash-layer-bar button{flex:1 1 80px}
+body.community-page #dash-forge-inside .dash-layer-bar button[aria-pressed=true]{background:#ffde91;color:#241d42;border-color:#fff1c0}
+body.community-page #dash-forge-inside .dash-stage-modules{color:#a4f4ed;font-weight:800}
+body.community-page #dash-forge-inside .dash-creator-preview{box-shadow:0 5px 18px #050c213d}

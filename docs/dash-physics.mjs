@@ -1,17 +1,18 @@
+import {DASH_COURSE_EDITION,DASH_OVERHEAD,DASH_CUES,dashCampaignPlan} from './dash-campaign.mjs';
 // The renderer, the level editor and the replay verifier use these world coordinates.
 export const DASH_HZ=120,DASH_DT=1/DASH_HZ,DASH_MAX_TICKS=14400,DASH_CEILING=4.65;
-export const DASH_PATTERN=/^[.sbglwcpfrmodhCSBUWRPVIFLEJOMKDT]+$/;
+export const DASH_PATTERN=/^[.sbglwcpfrmodhCSBUWRPVIFLEJOMKDTHANQ]+$/;
 export const DASH_MODES={C:'Cube',S:'Ship',B:'Ball',U:'UFO',W:'Wave',R:'Robot',P:'Spider',V:'Swing'};
 export const DASH_TOOLS={I:'Flip gravity',F:'Fast portal',L:'Slow portal',E:'Normal speed',J:'Jump pad',
-  O:'Jump orb',M:'Moving platform',K:'Checkpoint',D:'Scenery',T:'Laser switch'};
-const jaws=new Set(['s','w','c','l','p','f','r','m','o','d','h','b']);
+  O:'Jump orb',M:'Moving platform',K:'Checkpoint',D:'Scenery',T:'Laser switch',H:'Beat gate',A:'Spring pad',N:'Brake strip',Q:'Light cue'};
+const jaws=new Set(['s','w','c','l','p','f','r','m','o','d','h','b','H']);
 const transformable=new Set([...jaws,'D','M','O']);
 const clamp=(n,lo,hi)=>Math.min(hi,Math.max(lo,n));
 const phaseAt=(length,at)=>Math.min(2,Math.floor(Math.max(0,at)/Math.max(1,length)*3));
 const bodySizes={C:[.31,.34],S:[.41,.23],B:[.32,.32],U:[.34,.25],W:[.25,.25],R:[.31,.39],P:[.32,.26],V:[.29,.30]};
 const boosts={F:1.32,L:.76,E:1};
 const startsInAir=new Set(['S','U','W','V']);
-const designs={s:[.41,1.02],b:[.45,1.08],l:[.33,1.2],w:[.39,1.02],c:[.36,1.29],p:[.31,1.29],
+const designs={s:[.41,1.02],b:[.45,1.08],l:[.33,1.2],w:[.39,1.02],c:[.36,1.29],p:[.31,1.29],H:[.36,1.39],
   f:[.35,1.16],r:[.35,.98],m:[.39,1.06],o:[.33,.91],d:[.30,.74],h:[.36,1.19]};
 export const dashCanTransform=token=>transformable.has(token);
 export const dashCanRotate=token=>['s','c','f'].includes(token);
@@ -20,7 +21,10 @@ export function validateDashLayout(pattern,layout=[]){
   if(!Array.isArray(layout)||layout.length>pattern.length)throw Error('Invalid level layout.');
   let previous=-1;
   for(const item of layout){
-    if(!Array.isArray(item)||item.length!==5||!item.every(Number.isInteger)||
+    const [above,cue]=Array.isArray(item)&&item.length===7?item.slice(5):['.','.'];
+    if(!Array.isArray(item)||![5,7].includes(item.length)||!item.slice(0,5).every(Number.isInteger)||
+      typeof above!=='string'||above.length!==1||!(DASH_OVERHEAD+'.').includes(above)||
+      typeof cue!=='string'||cue.length!==1||!(DASH_CUES+'.').includes(cue)||
       item[0]<=previous||item[0]<4||item[0]>=pattern.length-4||
       (!transformable.has(pattern[item[0]])&&(item[1]!==0||item[2]!==2||item[3]!==0))||
       (item[3]!==0&&!dashCanRotate(pattern[item[0]]))||
@@ -31,24 +35,30 @@ export function validateDashLayout(pattern,layout=[]){
   return layout;
 }
 
-export function createDashCourse(pattern,pace=210,{boss=false,bossStyle='none',layout=[],stage=0}={}){
+export function createDashCourse(pattern,pace=210,{boss=false,bossStyle='none',layout=[],stage=0,edition=1}={}){
   if(typeof pattern!=='string'||pattern.length<24||pattern.length>90||!DASH_PATTERN.test(pattern)||
     !pattern.startsWith('....')||!pattern.endsWith('....')||
     !Number.isInteger(pace)||pace<100||pace>400)throw Error('Invalid Dash Forge track.');
   validateDashLayout(pattern,layout);
+  const advanced=edition===DASH_COURSE_EDITION;
+  const plan=advanced?dashCampaignPlan(stage,pattern.length,boss,bossStyle):null;
+  if(plan){pattern=plan.pattern;layout=plan.layout;}
   const settings=new Map(layout.map(([tile,...detail])=>[tile,detail]));
   const cells=[...pattern].map((token,index)=>{
-    const [lane,scale,flip,decor]=settings.get(index)||[0,2,0,0];
-    return {token,index,x:index+.5,lane,scale:[0,.77,1,1.22][scale],flip:Boolean(flip),decor};
+    const [lane,scale,flip,decor,above='.',cue='.']=settings.get(index)||[0,2,0,0];
+    const cell={token,index,x:index+.5,lane,scale:[0,.77,1,1.22][scale],flip:Boolean(flip),decor};
+    if(above!=='.')cell.above={token:above,index,x:cell.x,lane:3,scale:.87,flip:false,layer:'above'};
+    if(cue!=='.')cell.cue={token:cue,index,x:cell.x,lane:0,scale:1,flip:false,layer:'cue'};
+    return cell;
   });
-  if(stage>=8&&stage%3!==0){
+  if(!advanced&&stage>=8&&stage%3!==0){
     const modes=['S','B','U','W','R','P','V'];
     const mode=modes[Math.floor((stage-8)/2)%modes.length];
     const entry=cells.find((cell)=>cell.index>=6&&cell.index<pattern.length-10&&
       cells.slice(cell.index-1,cell.index+5).every(item=>item.token==='.'));
     if(entry){entry.token=mode;cells[entry.index+3].token='C';}
   }
-  if(boss){
+  if(boss&&!plan){
     const attacks=['d','h','l'];
     const styleOffset=[...bossStyle].reduce((n,c)=>n+c.charCodeAt(0),0)%attacks.length;
     for(let phase=0;phase<3;phase++){
@@ -59,7 +69,18 @@ export function createDashCourse(pattern,pace=210,{boss=false,bossStyle='none',l
       if(free){free.token=attacks[(styleOffset+phase)%attacks.length];free.attack=true;}
     }
   }
-  return {cells,pattern,pace,boss,bossStyle};
+  return {cells,pattern,pace,boss,bossStyle,edition,sections:plan?.sections||[]};
+}
+export function dashObjects(cell){
+  return [cell,cell.above,cell.cue].filter(Boolean);
+}
+export const dashBeatAt=state=>state.elapsed*500/state.course.pace;
+export function dashGateActive(state,cell){
+  if(cell.token!=='l'&&cell.token!=='H')return true;
+  if(state.x<state.laserOff)return false;
+  if(cell.token==='l')return true;
+  const beat=dashBeatAt(state);
+  return beat%4>=1.55;
 }
 
 export function dashShape(course,cell,elapsed){
@@ -81,10 +102,10 @@ export function createDashRun(course,{tile=0,practice=false}={}){
   const start=clamp(Math.floor(tile),0,course.pattern.length-1),x=start+.10;
   const state={course,x,y:bodySizes.C[1],vy:0,mode:'C',gravity:1,speed:1,tick:0,elapsed:0,
     pressed:false,supported:true,jumpTicks:0,done:false,won:false,deathTile:null,
-    event:'',checkpoint:start,laserOff:0,practice,immuneUntil:start?42:0,used:new Set()};
+    event:'',checkpoint:start,laserOff:0,slowUntil:0,previousSpeed:1,lightCue:0,practice,immuneUntil:start?42:0,used:new Set()};
   for(let i=0;i<start;i++){
-    const cell=course.cells[i];
-    if(cell.token in DASH_MODES||cell.token in boosts||cell.token==='I')enter(state,cell);
+    for(const cell of dashObjects(course.cells[i]))
+      if(cell.token in DASH_MODES||cell.token in boosts||cell.token==='I')enter(state,cell);
   }
   state.y=startsInAir.has(state.mode)?DASH_CEILING*.50:state.gravity>0?bodySizes[state.mode][1]:DASH_CEILING-bodySizes[state.mode][1];
   state.supported=!startsInAir.has(state.mode);
@@ -96,12 +117,21 @@ function enter(s,cell){
   if(token in DASH_MODES){
     if(token!==s.mode){
       s.mode=token;s.vy=0;s.jumpTicks=0;s.event='mode';
-      if(startsInAir.has(token)){s.y=clamp(s.y,1.05,DASH_CEILING-1.05);s.supported=false;}
+      if(startsInAir.has(token)){
+        const wave=token==='W'&&s.course.edition===DASH_COURSE_EDITION;
+        s.y=wave?clamp(s.y,1.94,2.70):clamp(s.y,1.05,DASH_CEILING-1.05);
+        s.supported=false;
+      }
     }
   }else if(token==='I'){s.gravity*=-1;s.supported=false;s.event='gravity';}
-  else if(token in boosts){s.speed=boosts[token];s.event='speed';}
-  else if(token==='J'&&s.supported){
-    s.supported=false;s.vy=s.gravity*17.5;s.event='pad';
+  else if(token in boosts){s.speed=boosts[token];s.slowUntil=0;s.event='speed';}
+  else if((token==='J'||token==='A')&&s.supported){
+    s.supported=false;s.vy=s.gravity*(token==='A'?20.1:17.5);s.event='pad';
+  }else if(token==='N'){
+    if(!s.slowUntil)s.previousSpeed=s.speed;
+    s.speed=.62;s.slowUntil=cell.index+4;s.event='speed';
+  }else if(token==='Q'){
+    s.lightCue=(s.lightCue+1)%4;s.event='light';
   }else if(token==='K'&&s.practice){
     s.checkpoint=cell.index+1;s.event='checkpoint';
   }else if(token==='T'){
@@ -143,7 +173,7 @@ function control(s,hold,tap,dt){
 }
 
 function collide(s,cell,shape,oldY,halfW,halfH){
-  if(cell.token==='l'&&s.x<s.laserOff)return false;
+  if(!dashGateActive(s,cell))return false;
   const left=s.x-halfW,right=s.x+halfW,bottom=s.y-halfH,top=s.y+halfH;
   if(right<=shape.x-shape.half||left>=shape.x+shape.half)return false;
   if(cell.token==='M'||cell.token==='b'){
@@ -170,11 +200,13 @@ export function stepDash(s,mask=0){
   const hold=Boolean(mask&1),tap=Boolean(mask&2)||(hold&&!s.pressed);
   s.pressed=hold;
   const path=s.course,from=s.x;
+  if(s.slowUntil&&s.x>=s.slowUntil){s.speed=s.previousSpeed;s.slowUntil=0;}
   s.x+=1000/path.pace*s.speed*DASH_DT;
   const center=path.cells[Math.floor(s.x)];
-  if(center&&from<center.x&&s.x>=center.x)enter(s,center);
-  let [halfW,halfH]=bodySizes[s.mode];
-  const near=path.cells.slice(Math.max(0,Math.floor(s.x)-1),Math.ceil(s.x)+1);
+  if(center&&from<center.x&&s.x>=center.x)
+    for(const object of dashObjects(center))enter(s,object);
+  const [halfW,halfH]=bodySizes[s.mode];
+  const near=path.cells.slice(Math.max(0,Math.floor(s.x)-1),Math.ceil(s.x)+1).flatMap(dashObjects);
   let orb=false;
   if(tap){
     for(const cell of near){

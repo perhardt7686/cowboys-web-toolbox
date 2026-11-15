@@ -21,8 +21,8 @@ export const createClient=()=>({
   if(name==='community_avatar_projections')return {data:[{user_id:id,avatar_display:{skin:'tan',shirt:'teal',hair:'red',garment:'denim'}}],error:null};
   if(name==='community_boardride_state')return {data:{
    mine:{user_id:id,stage:1,points:0,coins:0,clears:0,runs:0},badges:[],leaders:[]},error:null};
-  if(name==='community_boardride_start_v2')return {data:{
-   run_id:'11111111-1111-4111-9111-111111111111',seed:555,stage:1,board:args.p_board,
+  if(name==='community_boardride_start_v3')return {data:{
+   run_id:'11111111-1111-4111-9111-111111111111',seed:212561^196930,stage:1,board:args.p_board,edition:2,
    ghost:{name:'QA ghost',frames:[[12,142,0,50],[24,284,0,50]],time_ms:10000}},error:null};
   return {data:null,error:{message:'Unexpected request '+name}}
  }
@@ -31,7 +31,7 @@ const fetchOriginal=window.fetch.bind(window);
 window.fetch=async (url,options)=>{
   if(!String(url).endsWith('/functions/v1/family-arcade'))return fetchOriginal(url,options);
   const {replaySky}=await import(new URL('/skyboard-physics.mjs',window.location.origin).href);
-  const body=JSON.parse(options.body),result=replaySky(1,555,'sunny',body.trace);
+  const body=JSON.parse(options.body),result=replaySky(1,212561^196930,'sunny',body.trace,{edition:2});
   window.replayChecked={...result,game:body.game,token:options.headers.Authorization};
   return Response.json({...result,saved:result.won,points:240,new_badges:['first','ball-survivor']});
 };"""
@@ -54,6 +54,14 @@ async def verify(browser,size,full_race=False):
   assert await page.locator("#skyboard-board-list [data-sky-board]").count()==6
   assert await page.locator("#skyboard-badge-list .skyboard-badge").count()==8
   assert not await page.locator("[data-sky-board='star']").is_enabled()
+  assert await page.locator("#skyboard-world").inner_text()=="Cloudline Cruise"
+  await page.locator("#skyboard-courses summary").click()
+  assert await page.locator("#skyboard-course-map button").count()==30
+  assert await page.locator('[data-sky-practice="2"]').is_disabled()
+  await page.locator('[data-sky-practice="shuffle"]').click()
+  assert "PRACTICE" in await page.locator("#skyboard-start").inner_text()
+  await page.locator("#skyboard-courses summary").click()
+  await page.locator('[data-sky-practice="clear"]').click()
   await page.locator("#skyboard-start").click()
   canvas=page.locator("#skyboard-canvas")
   await page.wait_for_function("Number(document.querySelector('#skyboard-canvas').dataset.distance)>2",timeout=14000)

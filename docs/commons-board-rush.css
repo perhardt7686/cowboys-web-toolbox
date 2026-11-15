@@ -132,3 +132,36 @@ body.community-page #skyboard-root .skyboard-speed{
 }
 body.community-page #skyboard-root .skyboard-speed[data-mode=hit]{background:#85223f;border-color:#ffc4bb;color:#fff9f0;box-shadow:0 4px 0 #412348}
 body.community-page #skyboard-root #skyboard-ghost[aria-pressed=true]{border-color:#98f3e9;color:#b4fff2}
+body.community-page #skyboard-root .skyboard-progress{
+ position:absolute;left:0;right:0;bottom:0;height:4px;background:#1732479c;pointer-events:none
+}
+body.community-page #skyboard-root .skyboard-progress span{display:block;width:0;height:100%;background:#ffe5a7}
+body.community-page #skyboard-root .skyboard-viewport{
+ border-color:#9ad9d8;background:#a2ccca;box-shadow:0 6px 0 #131a37,0 0 25px #66b2c633
+}
+body.community-page #skyboard-root .skyboard-game-head strong{color:#fff2d0}
+body.community-page #skyboard-root .skyboard-courses{
+ border:1px solid #817fa8;border-radius:10px;background:#222448;margin:12px 0 3px;padding:0 10px
+}
+body.community-page #skyboard-root .skyboard-courses summary{
+ min-height:44px;display:flex;align-items:center;gap:7px;padding:7px 4px;cursor:pointer;font-weight:850
+}
+body.community-page #skyboard-root .skyboard-courses summary::before{content:'▸';color:#b4f2df}
+body.community-page #skyboard-root .skyboard-courses[open] summary::before{content:'▾'}
+body.community-page #skyboard-root .skyboard-map-actions{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
+body.community-page #skyboard-root #skyboard-course-map{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:9px;max-height:47dvh;overflow:auto
+}
+body.community-page #skyboard-root #skyboard-course-map section{padding:7px;border:1px solid #6d7296;border-radius:9px}
+body.community-page #skyboard-root #skyboard-course-map h4{margin:0 0 6px;font-size:.89rem;color:#ffe9b8}
+body.community-page #skyboard-root #skyboard-course-map ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+body.community-page #skyboard-root .skyboard-courses button{
+ min-height:43px;background:#313560;color:#fff;border:1px solid #8ba7bb;border-radius:7px;padding:5px 8px
+}
+body.community-page #skyboard-root #skyboard-course-map button{
+ display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;width:100%;text-align:left
+}
+body.community-page #skyboard-root #skyboard-course-map button>span{color:#c8ebd8;font-variant-numeric:tabular-nums}
+@media(max-width:520px) and (orientation:portrait){
+ body.community-page #skyboard-root canvas{aspect-ratio:1.52;object-fit:cover}
+}

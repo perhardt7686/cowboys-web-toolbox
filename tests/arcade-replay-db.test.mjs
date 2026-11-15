@@ -3,7 +3,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {test} from 'node:test';
 import {PGlite} from '@electric-sql/pglite';
 import {replayDash} from '../docs/dash-physics.mjs';
-import {replaySky} from '../docs/skyboard-physics.mjs';
+import {replaySky,buildSkyCourse,createSkyRide,stepSky} from '../docs/skyboard-physics.mjs';
 
 const author='11111111-1111-4111-9111-111111111111',solver='22222222-2222-4222-9222-222222222222',
   pending='33333333-3333-4333-9333-333333333333';
@@ -92,7 +92,19 @@ test('real PostgreSQL roles preserve old rows, verify exact drafts and privately
     async function openSky(id,share){return member(id,()=>one("select community_boardride_start_v2('sunny',$1)",[share]));}
     async function verifySky(id,active){
       const input=await service(()=>one("select community_arcade_replay_input($1,'skyboard',$2)",[id,active.run_id]));
-      const result=replaySky(input.stage,input.seed,input.board,[],{sample:input.sample});
+      const trace=[];
+      if(input.edition===2){
+        const ride=createSkyRide(buildSkyCourse(input.stage,input.seed,input.edition),input.board);
+        while(!ride.done){
+          const gap=ride.course.things.find(o=>o.kind==='gap'&&o.z+o.span*.5>ride.progress);
+          const edge=gap?gap.z-gap.span*.5-ride.progress:Infinity;
+          const target=ride.speed>30?Math.min(9,ride.speed*.12):3.8;
+          const mask=ride.grounded&&edge>0&&edge<target&&!(ride.mask&4)?4:0;
+          if(ride.mask!==mask)trace.push([ride.tick,mask]);
+          stepSky(ride,mask);
+        }
+      }
+      const result=replaySky(input.stage,input.seed,input.board,trace,{sample:input.sample,edition:input.edition});
       assert.ok(result.won);
       await query("update community_boardride_runs set started_at=now()-interval '32 seconds' where id=$1",[active.run_id]);
       return service(()=>one('select community_boardride_commit_v2($1,$2,$3)',[id,active.run_id,JSON.stringify(result)]));
@@ -114,5 +126,55 @@ test('real PostgreSQL roles preserve old rows, verify exact drafts and privately
     await member(author,()=>one('select community_boardride_unshare_replays()'));
     assert.equal((await openSky(solver,false)).ghost,null);
     assert.equal(await one('select count(*)::int from community_boardride_runs where status=$1',['finished']),3);
+
+    // Upgrade while both games have open edition-one replays.
+    const previousDash=await open(author),previousSky=await openSky(solver,false);
+    const expansion=readdirSync(root).find(file=>file.endsWith('_family_arcade_course_expansion.sql'));
+    await db.exec(readFileSync(new URL(expansion,root),'utf8'));
+    assert.ok((await verifyDash(author,previousDash)).won);
+    assert.ok((await verifySky(solver,previousSky)).saved);
+    assert.equal(await one('select soundtrack from community_dash_levels where id=$1',[draft.id]),'pulse');
+
+    const createLayers=(layout,song='circuit',id=null)=>member(author,()=>one(
+      'select community_dash_save_v3($1,$2,2,$3,$4,$5,$6,$7)',
+      ['Three layer course','....A...N...............',id,'Maker Studio','none',JSON.stringify(layout),song]
+    ));
+    const layered=[[12,0,2,0,1,'s','Q']];
+    await assert.rejects(createLayers(layered,'unknown'),/soundtrack/);
+    await assert.rejects(createLayers([[12,0,2,0,1,'g','Q']]),/invalid tile transform/i);
+    const newDraft=await createLayers(layered);
+    await assert.rejects(member(author,()=>one('select community_dash_start_v2($1)',[newDraft.id])),/refresh/i);
+    await assert.rejects(member(solver,()=>one('select community_dash_start_v3($1)',[newDraft.id])),/unavailable/i);
+    await assert.rejects(member(pending,()=>one("select community_boardride_start_v3('sunny',false)")),/approved/i);
+    const v3Dash=()=>member(author,()=>one('select community_dash_start_v3($1)',[newDraft.id]));
+    const expandedRun=await v3Dash();
+    assert.deepEqual(expandedRun.layout,layered);
+    assert.equal(expandedRun.edition,2);
+    assert.equal(expandedRun.soundtrack,'circuit');
+    const snapshot=await service(()=>one("select community_arcade_replay_input($1,'dash',$2)",[author,expandedRun.run_id]));
+    assert.equal(snapshot.rules.edition,expandedRun.edition);
+    assert.deepEqual(snapshot.rules.layout,layered);
+    assert.ok((await verifyDash(author,expandedRun)).won);
+    await createLayers(layered,'tide',newDraft.id);
+    await assert.rejects(member(author,()=>one('select community_dash_publish($1)',[newDraft.id])),/exact draft/);
+    const updated=await member(author,()=>one('select community_dash_state()'));
+    assert.equal(updated.levels.find(level=>level.id===newDraft.id).soundtrack,'tide');
+    assert.ok((await verifyDash(author,await v3Dash())).won);
+    assert.equal((await member(author,()=>one('select community_dash_publish($1)',[newDraft.id]))).status,'published');
+
+    const v3Sky=(id,share)=>member(id,()=>one("select community_boardride_start_v3('sunny',$1)",[share]));
+    const expandedSky=await v3Sky(author,true);
+    assert.equal(expandedSky.stage,3);
+    assert.equal(expandedSky.edition,2);
+    assert.ok((await verifySky(author,expandedSky)).saved);
+    assert.equal((await openSky(solver,false)).ghost,null,'Edition-one readers keep their original track');
+    const shared=await v3Sky(solver,false);
+    assert.equal(shared.ghost.name,'QA Author');
+    assert.equal(shared.edition,2);
+    const skySnapshot=await service(()=>one("select community_arcade_replay_input($1,'skyboard',$2)",[solver,shared.run_id]));
+    assert.equal(skySnapshot.edition,shared.edition);
+    await member(author,()=>one('select community_boardride_unshare_replays()'));
+    assert.equal((await v3Sky(solver,false)).ghost,null);
+
   }finally{await db.close();}
 });

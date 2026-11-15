@@ -2,7 +2,7 @@
    Presentation only. Existing member-only games retain their events, state,
    RPCs, authentication, scores, and original DOM nodes. */
 import {makeArcadeNav} from './family-arcade-nav.mjs?v=retro4';
-import {titleProfiles,titleMarkup,drawGameTitle} from './commons-arcade-titles.mjs?v=arcade5';
+import {titleProfiles,titleMarkup,drawGameTitle} from './commons-arcade-titles.mjs?v=arcade6';
 
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
