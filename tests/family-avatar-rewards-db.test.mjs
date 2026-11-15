@@ -119,7 +119,9 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   await refused(petAction('lantern-raccoon','adopt'));
   await refused(petAction('trail-husky','pet',1),'22023');
   const adopted=await petAction('trail-husky','adopt');
-  assert.deepEqual(adopted,{cosmetic_id:'trail-husky',name:'Trail Husky',bond:0,revision:1});
+  assert.equal(typeof adopted.acquired_at,'string');
+  assert.deepEqual({cosmetic_id:adopted.cosmetic_id,name:adopted.name,bond:adopted.bond,revision:adopted.revision},
+    {cosmetic_id:'trail-husky',name:'Trail Husky',bond:0,revision:1});
   assert.deepEqual(await petAction('trail-husky','adopt'),adopted);
   await refused(petAction('trail-husky','trick',1),'22023');
   assert.equal((await petAction('trail-husky','pet',1)).bond,1);
