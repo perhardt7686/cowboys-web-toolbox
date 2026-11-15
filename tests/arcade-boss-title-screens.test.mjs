@@ -14,11 +14,11 @@ const bossSQL=read('supabase/migrations/20261115053001_dash_forge_shared_boss_ar
 const revisionSQL=read('supabase/migrations/20261115053002_dash_forge_boss_creator_exact_revision_playtest.sql');
 const ascensionSQL=read('supabase/migrations/20261115053003_dash_forge_unique_ascended_boss_identities.sql');
 
-test('Eight family games have distinct functional starting menus, not one reused mockup',()=>{
- const expected=['streetrod','dashforge','mahjong','wordle','wordquest','plates','drawing','study'];
+test('Ten family games have distinct functional starting menus, not one reused mockup',()=>{
+ const expected=['fleet','maze','streetrod','dashforge','mahjong','wordle','wordquest','plates','drawing','study'];
  assert.deepEqual(Object.keys(titleProfiles),expected);
- assert.equal(new Set(expected.map(id=>titleProfiles[id].name)).size,8);
- assert.equal(new Set(expected.map(id=>titleProfiles[id].scene)).size,8);
+ assert.equal(new Set(expected.map(id=>titleProfiles[id].name)).size,10);
+ assert.equal(new Set(expected.map(id=>titleProfiles[id].scene)).size,10);
  for(const id of expected){
   const markup=titleMarkup(id);
   assert.match(markup,/data-arcade-action="title-start"/);
@@ -53,7 +53,7 @@ test('Arcade shell opens title before touching existing saved game controllers',
  assert.match(shell,/data-arcade-action/);
  assert.match(shell,/case 'title-boss-builder'/);
  assert.match(shell,/case 'title-start'/);
- assert.match(html,/commons-arcade-shell\.mjs\?v=titles3/);
+ assert.match(html,/commons-arcade-shell\.mjs\?v=retro4/);
  assert.match(html,/commons-arcade-shell\.css\?v=titles3/);
  assert.match(html,/commons-dash-forge\.mjs\?v=boss3/);
  assert.match(styles,/#arcade-game-title-view/);
