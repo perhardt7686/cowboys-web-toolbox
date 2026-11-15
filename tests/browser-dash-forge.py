@@ -98,6 +98,10 @@ async def run_one(browser,width,height):
   assert 'Volcanic Foundry' in await page.locator('#dash-builder-help').inner_text()
   assert await page.evaluate("window.__dashMock.calls.some(x=>x.name==='community_dash_save_world' && x.args.p_world==='Volcanic Foundry' && x.args.p_boss_style==='volcanic')")
   await page.wait_for_function("document.querySelector('#dash-editor-save-state')?.textContent.includes('DRAFT SAVED')",timeout=10000)
+  # The family arcade owns the fullscreen active-game state before any real playtest.
+  await page.evaluate("""() => {document.body.classList.add('arcade-on');
+    document.body.dataset.arcadeGame='dashforge';document.body.dataset.arcadeScene='builder';
+    document.querySelector('#dash-forge-root').classList.add('arcade-game-active');}""")
   # A one-tap playtest saves current edits first, starts the exact draft and returns to editor.
   await page.locator('#dash-editor-grid [data-dash-cell="10"]').click()
   await page.locator('[data-dash-action="test"]').click()
