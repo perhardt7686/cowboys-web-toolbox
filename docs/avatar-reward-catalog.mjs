@@ -1,5 +1,5 @@
-import {WEARABLES} from './avatar-cosmetic-wearables.mjs';
-import {WORLDS} from './avatar-cosmetic-worlds.mjs';
+import {WEARABLES} from './avatar-cosmetic-wearables.mjs?v=cel1';
+import {WORLDS} from './avatar-cosmetic-worlds.mjs?v=cel1';
 
 export const GAME_LABELS=Object.freeze({
   mahjong:'Mahjong',wordle:'w0rdle',wordquest:'Word Quest',plates:'License Plates',hotrod:'Hot Rod',
@@ -15,14 +15,15 @@ export const GROUPS=Object.freeze({
   family:['family-first-word','family-quest-crew','family-friendly-run','family-two-word-games','family-puzzle-party','family-garage-rivals','family-all-star-crew']
 });
 export const SLOT_LABELS=Object.freeze({hat:'Hats',eyewear:'Glasses & masks',hair:'Hair',eyes:'Eyes & face',
-  prop:'Props',companion:'Companions',background:'Backgrounds',effect:'Effects'});
+  prop:'Props',companion:'Pets',background:'Backgrounds',effect:'Effects'});
 export const RARITIES=Object.freeze({starter:'Starter',bronze:'Bronze',silver:'Silver',gold:'Gold',legendary:'Legendary',family:'Family Special'});
 const special={
   'dragon-crown':'mahjong-ten-stages','giant-taco-hat':'mahjong-first-board','rubber-chicken-helmet':'quest-first-clue',
   'viking-battle-helmet':'hotrod-first-drag','golden-crocodile-crown':'family-all-star-crew',
   'aurora-crown':'cross-arcade-legend','rainbow-lightning-hair':'wordle-first-clue','galaxy-eyes':'wordle-score-75',
   'floating-crocodile':'family-first-word','mini-dragon':'quest-xp-50','galaxy-portal':'cross-track-and-tiles',
-  'victory-wings':'hotrod-classic-crown','rainbow-flames':'plates-three-approvals','celestial-armor':'hotrod-mystery-trophy'
+  'victory-wings':'hotrod-classic-crown','rainbow-flames':'plates-three-approvals','celestial-armor':'hotrod-mystery-trophy',
+  'trail-husky':'quest-first-clue','lantern-raccoon':'hotrod-first-drag'
 };
 const routes=Object.entries(GROUPS);
 const tierNames=['starter','starter','bronze','bronze','silver','gold','legendary'];

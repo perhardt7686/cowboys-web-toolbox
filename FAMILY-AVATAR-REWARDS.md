@@ -1,6 +1,8 @@
 # Family Avatar Studio
 
-From the Family Message Board, use the avatar beside the menu or open a reward under **Awesome things to unlock**. **My Avatar** includes 98 free choices, undo and reset, and six outfit slots. **Unlockables** previews all 251 original cosmetics and lets you filter by type, status, rarity and game. **Achievements** displays the exact requirements and verified progress. Try-ons only affect the studio preview. Save a design to use it as your avatar. The original portrait and legacy character assets stay in storage when you save a new character.
+From the Family Message Board, use the avatar beside the menu or open a reward under **Awesome things to unlock**. **My Avatar** includes 98 free choices, undo and reset, and six outfit slots. **Unlockables** previews all 253 original rewards and lets you filter by type, status, rarity and game. **Achievements** displays the exact requirements and verified progress. Try-ons only affect the studio preview. Save a design to use it as your avatar. The original portrait and legacy character assets stay in storage when you save a new character.
+
+Use a prize’s action in Unlockables or **Activate** beside an item on your character. In **Pets**, preview a locked pet or adopt one you’ve earned. Playing and petting raise the bond. At bond six, the pet learns its trick. The board saves your pet’s name and bond to your account. **Take along** adds the pet to your avatar preview.
 
 | Type | Reward designs |
 | --- | ---: |
@@ -9,7 +11,7 @@ From the Family Message Board, use the avatar beside the menu or open a reward u
 | Hair | 41 |
 | Eyes and face | 30 |
 | Props | 28 |
-| Companions | 27 |
+| Pets | 29 |
 | Backgrounds | 25 |
 | Effects | 15 |
 

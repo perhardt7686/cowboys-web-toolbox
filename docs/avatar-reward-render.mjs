@@ -1,51 +1,165 @@
-import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=reward1';
-import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=reward1';
+import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=cel1';
+import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=cel1';
+import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
+import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=cel1';
 
 export const COSMETIC_SLOTS=Object.freeze(Object.keys(SLOT_LABELS));
 const thumbnails=new WeakSet();
+const cels=new Map();
+let motionCel,detailCel,detailStamp;
 
 export function normalizeLoadout(value) {
   const cosmetics={};
   for(const slot of COSMETIC_SLOTS) {
     const id=value?.cosmetics?.[slot];
-    if (typeof id==='string' && BY_ID.get(id)?.slot===slot) cosmetics[slot]=id;
+    if(typeof id==='string'&&BY_ID.get(id)?.slot===slot)cosmetics[slot]=id;
   }
   return {...normalizeAvatarRecipe(value),cosmetics};
 }
 
-export function renderLoadout(canvas, value, t=0) {
-  const loadout=normalizeLoadout(value),overlays={};
-  for(const item of Object.values(loadout.cosmetics).map(id=>BY_ID.get(id))) {
-    const target=item.slot==='effect'&&item.behind?'behind':item.slot;
-    overlays[target]=item.draw;
-  }
-  drawFamilyAvatar(canvas, loadout, overlays, t);
+function newCel(size=256) {
+  const canvas=document.createElement('canvas');
+  canvas.width=canvas.height=size;
+  return canvas;
 }
 
-export function paintThumbnail(canvas, item) {
-  if (!canvas || !item || thumbnails.has(canvas)) return;
-  const ctx=canvas.getContext('2d');
-  if (!ctx) return;
-  const size=canvas.width,scale=size/256,kind=item.slot;
-  let scaleUp=1,x=128,y=128;
-  if(kind==='hat'){scaleUp=1.2;y=53;}
-  else if(kind==='eyewear'||kind==='eyes'){scaleUp=1.25;y=125;}
-  else if(kind==='hair'){scaleUp=1.08;y=88;}
-  else if(kind==='prop'||kind==='companion'){scaleUp=1.85;x=kind==='prop'?47:207;y=191;}
-  ctx.clearRect(0,0,size,size);
-  const gradient=ctx.createLinearGradient(0,0,size,size);
-  gradient.addColorStop(0,'#211532');gradient.addColorStop(1,'#573064');
-  ctx.fillStyle=gradient;ctx.fillRect(0,0,size,size);
-  ctx.save();ctx.translate(size/2,size/2);ctx.scale(scale*scaleUp,scale*scaleUp);ctx.translate(-x,-y);
-  item.draw(ctx,0);
-  ctx.restore();
+function finishedCel(item,t,detailed) {
+  if(detailed&&detailStamp===item.id&&!t)return detailCel;
+  if(!detailed&&!t&&cels.has(item.id))return cels.get(item.id);
+  const cel=detailed?(detailCel||=newCel(640)):t?(motionCel||=newCel()):newCel();
+  const c=cel.getContext('2d');
+  const scale=cel.width/256;
+  c.setTransform(scale,0,0,scale,0,0);
+  c.clearRect(0,0,256,256);
+  item.draw(c,t);
+  const [x,y,w,h]=bounds[item.slot];
+  const lighting=c.createLinearGradient(x-w*.45,y-h,x+w*.4,y+h);
+  lighting.addColorStop(0,'#fff1c355');
+  lighting.addColorStop(.37,'#ffeead18');
+  lighting.addColorStop(.54,'#d3774200');
+  lighting.addColorStop(.57,'#3e1b2c17');
+  lighting.addColorStop(1,'#31182f64');
+  c.save();
+  c.globalCompositeOperation='source-atop';
+  c.fillStyle=lighting;
+  c.fillRect(0,0,256,256);
+  c.restore();
+  if(detailed)detailStamp=t?null:item.id;
+  else if(!t){
+    if(cels.size>=64)cels.delete(cels.keys().next().value);
+    cels.set(item.id,cel);
+  }
+  return cel;
+}
+
+function paintPrize(c,item,t=0,activity,detailed=false) {
+  const [x,y,w,h]=bounds[item.slot];
+  const spec=activity&&(item.slot==='companion'?petBehavior(item,activity.action):prizeAction(item));
+  const progress=activity?.progress;
+  c.save();
+  if(spec&&item.slot!=='background'&&item.slot!=='effect'){
+    const width=item.slot==='hair'?74:Math.min(76,w*1.46);
+    paintAura(c,x,y,width,spec.accent,.45+.38*Math.sin(Math.PI*progress));
+  }
+  if(spec)prizeMotion(c,item,spec,progress);
+  const activeTime=spec?progress*3:0;
+  const cel=finishedCel(item,item.animated?t+activeTime:0,detailed);
+  if(item.slot!=='background'&&item.slot!=='effect'&&item.slot!=='eyes'){
+    c.shadowColor='#2e192840';
+    c.shadowOffsetY=2;
+    c.shadowBlur=2.5;
+  }
+  c.drawImage(cel,0,0,256,256);
+  c.restore();
+  if(spec)paintReaction(c,item,spec,progress);
+}
+
+export function renderLoadout(canvas, value, t=0, activity=null) {
+  const loadout=normalizeLoadout(value),overlays={};
+  for(const id of Object.values(loadout.cosmetics)) {
+    const item=BY_ID.get(id);
+    const target=item.slot==='effect'&&item.behind?'behind':item.slot;
+    const active=activity?.id===id?activity:null;
+    overlays[target]=ctx=>paintPrize(ctx,item,t,active);
+  }
+  drawFamilyAvatar(canvas,loadout,overlays,t);
+}
+
+function displayFrame(canvas,item,activity=null) {
+  const c=canvas.getContext('2d');
+  if(!c)return;
+  const [x,y]=bounds[item.slot];
+  let scale=1;
+  if(item.slot==='hat')scale=1.26;
+  else if(item.slot==='eyewear'||item.slot==='eyes')scale=1.35;
+  else if(item.slot==='hair')scale=1.12;
+  else if(item.slot==='prop'||item.slot==='companion')scale=2.47;
+  c.save();
+  c.scale(canvas.width/256,canvas.height/256);
+  c.clearRect(0,0,256,256);
+  const [light,shadow]={
+    starter:['#635262','#2d2339'],bronze:['#744e43','#422e39'],silver:['#44636a','#26373f'],
+    gold:['#7a5944','#3e2d39'],legendary:['#573f64','#25233d'],family:['#4d675b','#2b393e']
+  }[item.tier];
+  const scene=c.createLinearGradient(0,0,220,256);
+  scene.addColorStop(0,light);
+  scene.addColorStop(1,shadow);
+  c.fillStyle=scene;
+  c.fillRect(0,0,256,256);
+  oval(c,127,115,107,90,'#f5d8a724','#efc79860',1.45,-.23);
+  oval(c,130,115,96,79,'#f3cf9114','#ffd29842',1,-.23);
+  oval(c,126,210,73,10,'#21182342');
+  path(c,[12,224],[[95,193,184,202,244,218],[256,256],[0,256]],'#211c34',null);
+  for (const [dx,dy,r] of [[23,34,5],[228,51,5],[48,208,3],[219,183,3]])glint(c,dx,dy,r,'#e9c18a');
+  c.translate(128,128);
+  c.scale(scale,scale);
+  c.translate(-x,-y);
+  paintPrize(c,item,0,activity,canvas.width>=150&&scale>1.2);
+  c.restore();
+}
+
+export function paintThumbnail(canvas,item) {
+  if(!canvas||!item||thumbnails.has(canvas))return;
+  displayFrame(canvas,item);
   thumbnails.add(canvas);
 }
 
+export function paintPrizeDemo(canvas,item,progress) {
+  displayFrame(canvas,item,{progress});
+}
+
+export function drawPetPortrait(canvas,item,action,progress=0) {
+  const c=canvas.getContext('2d');
+  c.save();
+  c.scale(canvas.width/256,canvas.height/256);
+  c.clearRect(0,0,256,256);
+  paintScene(c,item.tier==='legendary'?'night':item.tier==='family'?'mint':'sunset');
+  c.translate(122,137);c.scale(2.32,2.32);c.translate(-209,-192);
+  paintPrize(c,item,0,action?{action,progress}:null,true);
+  c.restore();
+}
+
 export function avatarSnapshot(value, size=128) {
-  if (!value || typeof value!=='object') return null;
+  if(!value||typeof value!=='object')return null;
   const canvas=document.createElement('canvas');
   canvas.width=canvas.height=size;
   renderLoadout(canvas,value,0);
   return canvas.toDataURL('image/png');
+}
+
+export function playCel(canvas,paint,reduceMotion) {
+  if(reduceMotion()||window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    paint(.43);
+    return ()=>{};
+  }
+  let started=null, frame=0;
+  const tick=now=>{
+    if(!canvas.isConnected||!canvas.getClientRects().length||document.hidden)return;
+    started??=now;
+    const progress=Math.min(1,(now-started)/1150);
+    paint(progress);
+    if(progress<1)frame=requestAnimationFrame(tick);
+  };
+  frame=requestAnimationFrame(tick);
+  return ()=>cancelAnimationFrame(frame);
 }
