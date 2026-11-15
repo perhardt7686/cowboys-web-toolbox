@@ -17,8 +17,10 @@ SUPABASE_STUB="""const uid='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const levels=[
  ...[
  ['First Flight',34],['Prism Parade',43],['Neon Labyrinth',52],
- ['Lightning Alley',58],['Crystal Pulse',65],['The Last Leap',75]
- ].map(([title,n],i)=>({id:i+1,title,kind:'campaign',stage:i+1,difficulty:i+1,
+ ['Lightning Alley',58],['Crystal Pulse',65],['The Last Leap',75],
+  ['Neon Canopy 7',81],['Neon Canopy 8',55],['Neon Canopy 9',72],['Neon Canopy 10',89]
+ ].map(([title,n],i)=>({id:i+1,title,kind:'campaign',stage:i+1,difficulty:Math.min(6,i+1),
+  world:i<6?'Origin Circuit':'Neon Canopy',pace_ms:i<6?210:205,boss:false,
  pattern:'.'.repeat(6)+'s'+'.'.repeat(n-7),published:true,creator:null,verified_solves:0}))
 ];
 const mock=window.__dashMock={calls:[],levels,progress:[],awards:[]};
@@ -31,6 +33,7 @@ export function createClient(){
    mock.calls.push({name,args});
    if(name==='community_dash_state')return {data:{
     user_id:uid,levels,progress:mock.progress,awards:mock.awards,leaders:[],
+    campaign_current:1,campaign_max:1000000000,
     mine:{player_points:0,designer_points:0,clears:0,published:0}},error:null};
    if(name==='community_dash_save'){
     const id=args.p_level_id||100;
@@ -64,7 +67,9 @@ async def run_one(browser,width,height):
   assert await page.locator('#dash-forge-toggle').is_visible()
   await page.locator('#dash-forge-toggle').click()
   await page.locator('#dash-campaign-list .dash-level').first.wait_for(timeout=12000)
-  assert await page.locator('#dash-campaign-list .dash-level').count()==6, 'Six shared campaign levels'
+  assert await page.locator('#dash-campaign-list .dash-level').count()==10, 'Expanded on-demand campaign window'
+  assert await page.locator('#dash-campaign-list').get_by_text('Neon Canopy',exact=False).count()>=1
+  assert 'ONE BILLION NUMBERED STAGES' in await page.locator('.dash-forever-counter').inner_text()
   assert await page.locator('[data-dash-play="2"]').is_disabled(), 'Next campaign stage locked'
   await page.locator('#dash-forge-root [data-dash-tab="builder"]').click()
   await page.locator('#dash-editor-grid [data-dash-cell="9"]').click()
@@ -88,6 +93,8 @@ async def run_one(browser,width,height):
   assert box['height']>145,('Game collapsed vertically',height,box)
   await page.locator('#dash-jump').tap()
   assert await page.locator('#dash-jump').is_visible()
+  assert await page.locator('#dash-sound').is_visible()
+  assert 'SOUND OFF' in await page.locator('#dash-sound').inner_text()
   if width==820:
    (ROOT/'reports').mkdir(parents=True,exist_ok=True)
    await page.screenshot(path=str(ROOT/'reports'/'dash-forge-tablet.png'))
