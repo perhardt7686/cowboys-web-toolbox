@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {titleProfiles,titleMarkup,drawGameTitle} from '../docs/commons-arcade-titles.mjs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const shell=read('docs/commons-arcade-shell.mjs');
+const nav=read('docs/family-arcade-nav.mjs');
 const dash=read('docs/commons-dash-forge.mjs');
 const html=read('docs/community.html');
 const styles=read('docs/commons-arcade-shell.css');
@@ -40,6 +41,10 @@ test('Arcade shell opens title before touching existing saved game controllers',
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',
    fileURLToPath(new URL('../'+path,import.meta.url))]));
  assert.match(shell,/mode='title'/);
+ assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',
+  fileURLToPath(new URL('../docs/family-arcade-nav.mjs',import.meta.url))]));
+ assert.match(nav,/dashforge: \[text\('dash-forge-summary'\)/);
+ assert.match(nav,/\}\[selected\]\|\|\[\]\)\.filter/);
  assert.match(shell,/function enterGame\(destination\)/);
  assert.match(shell,/const view=\$\('arcade-game-title-view'\)/);
  assert.match(shell,/titleMarkup\(g\.id\)/);
