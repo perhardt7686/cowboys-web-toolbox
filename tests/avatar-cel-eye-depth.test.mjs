@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {THREE,disposeFigure} from '../docs/avatar-studio-geometry.mjs';
 import {buildAvatar} from '../docs/avatar-studio-character.mjs';
+import {addGlasses} from '../docs/avatar-studio-faces.mjs';
 import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
 import {SHOWROOM_LOOKS} from '../docs/avatar-showroom-presets.mjs';
 
@@ -35,6 +36,24 @@ test('human studio eyes follow the head with thin cel layers across body shapes 
         if(expression!=='wink')assert.ok(visibleLayers>=5);
       }
       disposeFigure(actor.root);
+    }
+  }
+});
+
+test('glasses and monocles mount close to the new fitted eye plane',()=>{
+  for(const kind of ['round','square','retro-square','cat-eye','aviator','oval']){
+    for(const single of [false,true]){
+      const head=new THREE.Group();
+      addGlasses(head,kind,'#574e54',single,1);
+      const frame=head.children.find(node=>node.userData.studioPart==='gear');
+      assert.ok(frame,`${kind}: expected a wearable glasses root`);
+      const lenses=frame.children.filter(node=>node.isGroup&&Math.abs(node.position.x)>.05);
+      assert.equal(lenses.length,single?1:2);
+      for(const lens of lenses){
+        assert.ok(lens.position.z>=.205&&lens.position.z<=.212,
+          `${kind}: lens needs to sit just ahead of its iris, not float in front of the face`);
+      }
+      disposeFigure(head);
     }
   }
 });
