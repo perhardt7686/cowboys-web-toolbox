@@ -110,8 +110,15 @@ for(const word of ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM']){
 <script type="module" src="/community-board-accessibility.mjs"></script>
 </body></html>"""
 
+async def open_game(page, selector):
+ await page.locator(selector).click()
+ assert await page.locator('#arcade-game-title-view').is_visible(), 'Every game opens at its title'
+ assert await page.locator('#arcade-game-title-art').is_visible()
+ assert await page.locator('#arcade-game-title-view [data-arcade-action="title-start"]').is_visible()
+ await page.locator('#arcade-game-title-view [data-arcade-action="title-start"]').click()
+
 async def check_one(page, id, root):
- await page.locator(id).click()
+ await open_game(page,id)
  assert await page.locator("body").get_attribute("data-arcade-game")==root
  assert await page.evaluate("document.body.classList.contains('arcade-on')")
  assert await page.evaluate("getComputedStyle(document.body).overflow")=="hidden"
@@ -171,11 +178,11 @@ async def run_device(browser,width,height):
     "#plate-game-open","#sr-toggle","#vdacs-study-toggle","#drawing-studio-toggle"]:
    assert await page.locator(selector).is_visible(),selector
   await check_one(page,"#mahjong-toggle","mahjong")
-  await page.locator("#mahjong-toggle").click()
+  await open_game(page,"#mahjong-toggle")
   assert await page.locator("#mahjong-board-wrap").evaluate("el=>getComputedStyle(el).overflow==='hidden'"),"Board must never scroll"
   assert await page.locator(".mahjong-game-zone .mahjong-actions").evaluate("el=>getComputedStyle(el).gridTemplateColumns.split(' ').length===5"),"Mahjong actions must be in one row"
   await page.get_by_role("button",name="Back to games").click()
-  await page.locator("#mahjong-toggle").click()
+  await open_game(page,"#mahjong-toggle")
   await page.get_by_role("button",name="Open game menu").click()
   await page.get_by_role("button",name="Current level").click()
   assert await page.locator("body").get_attribute("data-arcade-scene")=="levels"
@@ -191,7 +198,7 @@ async def run_device(browser,width,height):
   await check_one(page,"#letter-lock-toggle","wordle")
   await check_one(page,"#word-game-toggle","wordquest")
   await check_one(page,"#plate-game-open","plates")
-  await page.locator('#plate-game-open').click()
+  await open_game(page,"#plate-game-open")
   await page.get_by_role("button",name="Review Plates",exact=True).click()
   assert await page.locator(".arcade-current-card").count()==1
   await page.locator('#family-plate-queue [data-arcade-action="next"]').click()
@@ -200,7 +207,7 @@ async def run_device(browser,width,height):
   assert await page.locator("body").get_attribute("data-arcade-scene")=="history"
   assert await page.locator("#plate-gallery").is_visible(),"Saved photo gallery must show"
   await page.get_by_role("button",name="Back to games").click()
-  await page.locator('#sr-toggle').click()
+  await open_game(page,"#sr-toggle")
   for _ in range(4):await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
   assert await page.locator('#ss-tabs [data-ss-tab="diner"]').get_attribute("aria-pressed")=="true"
   for _ in range(3):await page.locator('#arcade-hud [data-arcade-action="scene-next"]').click()
@@ -208,7 +215,7 @@ async def run_device(browser,width,height):
   await page.locator('#arcade-hud [data-arcade-action="exit"]').click()
   await check_one(page,"#vdacs-study-toggle","study")
   await check_one(page,"#drawing-studio-toggle","drawing")
-  await page.locator("#drawing-studio-toggle").click()
+  await open_game(page,"#drawing-studio-toggle")
   assert await page.locator("#drawing-studio-inside").evaluate("el=>!el.hidden")
   assert await page.locator("#commons-drawing-root canvas").count()==1,"Original canvas must survive fullscreen navigation"
   assert await page.locator("#art-viewport").is_visible(),"Actual canvas viewport is visible"
@@ -218,7 +225,7 @@ async def run_device(browser,width,height):
   await page.locator("#art-tools-toggle").click()
   assert await page.locator("#art-drawer").is_hidden(),"Advanced tools can close"
   await page.get_by_role("button",name="Back to games").click()
-  await page.locator("#letter-lock-toggle").click()
+  await open_game(page,"#letter-lock-toggle")
   if height>=650:
    panel=await page.locator(".letter-lock-panel").bounding_box()
    keyboard=await page.locator("#letter-lock-keyboard").bounding_box()
