@@ -50,7 +50,7 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false,selectPa
     canvas.dataset.angle=String(Math.round(camera.angle));
     canvas.dataset.zoom=String(camera.zoom);
     celButton?.setAttribute('aria-pressed',String(camera.artStyle==='cel'));
-    canvas.setAttribute('aria-label',camera.artStyle==='cel'?
+    if(celButton)canvas.setAttribute('aria-label',camera.artStyle==='cel'?
       'Layered 2D cartoon preview. Drag to rotate or zoom in to pan.':
       'Full-body 3D preview. Drag to rotate or zoom in to pan.');
     paint(camera,time,activity);
