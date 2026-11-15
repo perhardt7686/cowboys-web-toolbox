@@ -1,0 +1,65 @@
+name: Arcade boss and title-screen acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-arcade-shell.css'
+      - 'docs/commons-arcade-titles.mjs'
+      - 'docs/commons-dash-forge.mjs'
+      - 'docs/commons-dash-forge.css'
+      - 'tests/arcade-boss-title-screens.test.mjs'
+      - 'tests/dash-forge.test.mjs'
+      - 'tests/browser-arcade-titles.py'
+      - 'tests/browser-dash-forge.py'
+      - 'tests/browser-arcade-shell.py'
+      - 'supabase/migrations/202611150530*.sql'
+      - '.github/workflows/arcade-boss-and-title-acceptance.yml'
+  pull_request:
+    paths:
+      - 'docs/commons-arcade-*'
+      - 'docs/commons-dash-forge.*'
+      - 'tests/arcade-boss-title-screens.test.mjs'
+      - 'tests/dash-forge.test.mjs'
+      - 'tests/browser-arcade-titles.py'
+      - 'tests/browser-dash-forge.py'
+      - 'tests/browser-arcade-shell.py'
+      - '.github/workflows/arcade-boss-and-title-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-and-tablet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Verify canonical boss rules and all eight titles
+        run: |
+          node --test tests/arcade-boss-title-screens.test.mjs tests/dash-forge.test.mjs
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install Chromium test environment
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify tablet graphics, creator, boss title, and game navigation
+        run: |
+          python -m http.server 8765 --directory docs >/tmp/arcade-titles-http.log 2>&1 &
+          python tests/browser-arcade-titles.py
+          python tests/browser-dash-forge.py
+          python tests/browser-arcade-shell.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: arcade-boss-and-titles-qa
+          path: |
+            reports/arcade-dash-title-tablet.png
+            reports/dash-forge-tablet.png
+            reports/arcade-one-screen-iphone-sample.png
+          if-no-files-found: ignore
+          retention-days: 7
