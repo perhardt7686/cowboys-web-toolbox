@@ -53,7 +53,7 @@ function listLevel(l){
   '<div class="dash-level-copy"><strong>'+esc(l.title)+'</strong>'+
   '<small>'+esc(l.kind==='campaign'?(l.world||'Origin Circuit')+' · Chapter '+num(l.stage)+' · '+l.pattern.length+' tiles · '+Math.round(1000/Number(l.pace_ms||210)*10)/10+' tiles/s':
    (owner?'Your level':('By '+l.creator_name))+' · '+l.pattern.length+' tiles')+
-  ' · Difficulty '+l.difficulty+'</small>'+(l.boss?'<span class="dash-draft-tag">WORLD TRIAL · BOSS STAGE</span>':'')+(l.stage===chapter()?'<span class="dash-current-tag">YOUR CURRENT STAGE</span>':'')+
+  ' · Difficulty '+l.difficulty+'</small>'+(l.boss?'<span class="dash-draft-tag">♛ '+esc(l.boss_name||'BOSS ARENA')+' · 3 PHASES</span>':'')+(l.stage===chapter()?'<span class="dash-current-tag">YOUR CURRENT STAGE</span>':'')+
   '<small>'+esc(bestText(l))+' · '+num(l.verified_solves)+' member solves</small>'+badge+
   (isDraft?'<span class="dash-draft-tag">DRAFT · BEAT IT TO PUBLISH</span>':'')+
   '</div><div class="dash-level-actions">'+
@@ -435,11 +435,90 @@ function renderHazard(g,ch,x,y,t,accent){
  }
  g.restore();
 }
+
+// Boss visuals follow the server-stored boss style and attack tiles. Rendering
+// does not decide collisions: the same server-validated pattern controls all
+// members' outcomes at the same chapter.
+const BOSS_COLORS={
+ canopy:'#81ffaf',clockwork:'#ffcd78',crystal:'#a7d8ff',
+ skyglass:'#80f0ff',solar:'#ffd17e',thunder:'#76caff',
+ reef:'#69ffeb',volcanic:'#ff9866',pixel:'#ef8fff',
+ garden:'#ffa5de',starfall:'#ffffff',aurora:'#baff9c'
+};
+function drawBoss(g,pos,t){
+ if(!run?.boss)return;
+ const style=run.bossStyle||'canopy',color=BOSS_COLORS[style]||'#ffdc8a';
+ const phase=Math.min(3,Math.floor(pos/run.pattern.length*3)+1);
+ const x=835+Math.sin(t*1.5)*9,y=112+Math.sin(t*2+phase)*6;
+ const strength=Math.max(0,1-pos/run.pattern.length);
+ // The target's stability bar is synchronized to actual level progress.
+ g.save();g.globalAlpha=.95;
+ g.fillStyle='#0a0d24';g.fillRect(608,46,330,33);
+ g.strokeStyle=color;g.lineWidth=2;g.strokeRect(608,46,330,33);
+ g.fillStyle=color;g.fillRect(615,67,316*strength,6);
+ g.fillStyle='#fff';g.font='bold 15px monospace';
+ g.fillText((run.bossName||'WORLD GUARDIAN').toUpperCase().slice(0,28),617,62);
+ g.font='bold 12px monospace';g.fillText('PHASE '+phase+' / 3',810,62);
+ // Attack telegraph is cosmetic. Its target is a real hazard tile from the
+ // canonical saved track, never a client-only invisible trap.
+ let next=-1;
+ for(let i=Math.floor(pos)+1;i<Math.min(run.pattern.length,Math.floor(pos)+16);i++){
+  if(run.pattern[i]!=='.'){next=i;break;}
+ }
+ if(next>=0){
+  const camera=Math.max(0,pos*TILE-5*TILE);
+  const hazardX=next*TILE-camera+20;
+  if(hazardX>=80&&hazardX<=760){
+   g.strokeStyle=color;g.globalAlpha=.23+.11*Math.sin(t*7);
+   g.lineWidth=3;g.beginPath();g.moveTo(x-25,y+20);
+   g.quadraticCurveTo((x+hazardX)/2,y-65,hazardX,235);g.stroke();
+   g.globalAlpha=.95;
+  }
+ }
+ // Every archetype has a separate silhouette. Stages in a later rotation
+ // retain their style but receive different deterministic attack sequences.
+ g.translate(x,y);g.rotate(Math.sin(t*1.8)*.055);
+ g.shadowColor=color;g.shadowBlur=27;g.fillStyle=color;
+ if(['canopy','garden'].includes(style)){
+  for(let i=0;i<10;i++){const a=i*Math.PI/5+t*.09;
+   g.beginPath();g.ellipse(Math.cos(a)*53,Math.sin(a)*53,24,11,a,0,Math.PI*2);g.fill();}
+ }else if(['clockwork','pixel'].includes(style)){
+  for(let i=0;i<12;i++){const a=i*Math.PI/6+t*.14;g.save();g.rotate(a);
+   g.fillRect(39,-9,29,18);g.restore();}
+ }else if(['solar','reef'].includes(style)){
+  for(let i=0;i<7;i++){let a=i*Math.PI*2/7+t*.13;
+   g.lineWidth=11;g.strokeStyle=color;g.beginPath();g.moveTo(Math.cos(a)*23,Math.sin(a)*23);
+   g.quadraticCurveTo(Math.cos(a+.7)*88,Math.sin(a+.7)*77,Math.cos(a)*81,Math.sin(a)*72);g.stroke();}
+ }else if(['thunder','skyglass'].includes(style)){
+  for(let i=0;i<6;i++){const a=i*Math.PI/3+t*.1;g.save();g.rotate(a);
+   g.beginPath();g.moveTo(19,0);g.lineTo(78,-19);g.lineTo(61,17);g.closePath();g.fill();g.restore();}
+ }else if(['crystal','volcanic'].includes(style)){
+  for(let i=0;i<9;i++){const a=i*Math.PI*2/9+t*.12;g.save();g.rotate(a);
+   g.beginPath();g.moveTo(19,0);g.lineTo(58,-16);g.lineTo(88,0);g.lineTo(58,16);g.closePath();g.fill();g.restore();}
+ }else{
+  for(let i=0;i<8;i++){const a=i*Math.PI/4+t*.1;g.save();g.rotate(a);
+   g.beginPath();g.arc(61,0,11,0,Math.PI*2);g.fill();g.restore();}
+ }
+ g.shadowBlur=15;g.fillStyle='#121b38';g.beginPath();g.arc(0,0,43,0,Math.PI*2);g.fill();
+ g.lineWidth=5;g.strokeStyle=color;g.beginPath();g.arc(0,0,43,0,Math.PI*2);g.stroke();
+ if(['crystal','aurora','starfall'].includes(style)){
+  g.fillStyle=color;g.beginPath();g.moveTo(0,-33);g.lineTo(27,0);g.lineTo(0,33);g.lineTo(-27,0);g.closePath();g.fill();
+  g.fillStyle='#0c1838';g.fillRect(-12,-2,24,6);
+ }else if(['pixel','clockwork'].includes(style)){
+  g.fillStyle=color;g.fillRect(-29,-24,58,48);g.fillStyle='#142040';
+  g.fillRect(-18,-13,13,10);g.fillRect(6,-13,13,10);g.fillRect(-12,9,24,5);
+ }else{
+  g.fillStyle=color;g.beginPath();g.arc(-13,-5,8,0,Math.PI*2);g.arc(13,-5,8,0,Math.PI*2);g.fill();
+  g.strokeStyle=color;g.lineWidth=5;g.beginPath();g.arc(0,7,17,.16*Math.PI,.82*Math.PI);g.stroke();
+ }
+ g.restore();
+}
 function draw(){
  if(!run)return;
  const canvas=$('dash-canvas'),g=canvas?.getContext('2d');if(!g)return;
  const pos=Math.min(run.pattern.length,run.elapsed/(run.pace||210)),cam=Math.max(0,pos*TILE-5*TILE);
  const ground=284,accent=backdrop(g,cam,ground),t=run.elapsed/1000;
+ drawBoss(g,pos,t);
  for(let i=Math.max(0,Math.floor(cam/TILE));i<Math.min(run.pattern.length,Math.ceil((cam+W)/TILE)+1);i++){
   renderHazard(g,run.pattern[i],Math.round(i*TILE-cam),ground,t,accent);
  }
@@ -454,7 +533,7 @@ function draw(){
  g.fillStyle=accent;g.fillRect(0,0,W*Math.min(1,pos/run.pattern.length),5);
  g.font='bold 13px system-ui';g.fillStyle='#fff';
  g.fillText((run.world||'MAKER STUDIO').toUpperCase()+' · STAGE '+(run.stage||'CUSTOM'),13,31);
- if(run.boss){g.fillStyle='#ffe692';g.font='bold 17px system-ui';g.fillText('WORLD TRIAL · HOLD YOUR NERVE',W/2-144,33);}
+ if(run.boss){g.fillStyle='#ffe692';g.font='bold 17px system-ui';g.fillText('BOSS '+(run.stage?Math.floor(run.stage/25):'CREATOR')+' · '+(run.bossName||'FAMILY BOSS ARENA'),W/2-175,33);}
 }
 
 function frameStep(timestamp){
@@ -491,7 +570,9 @@ async function startLevel(id){
   const result=await call('community_dash_start',{p_level_id:id});
   run={id:result.run_id,level_id:id,pattern:result.pattern,title:result.title,
    pace:Number(result.pace_ms||210),world:result.world||item.world||'Maker Studio',
-   stage:item.stage||null,boss:Boolean(result.boss||item.boss)};
+   stage:item.stage||null,boss:Boolean(result.boss||item.boss),
+    bossStyle:result.boss_style||item.boss_style||'none',
+    bossName:result.boss_name||item.boss_name||'FAMILY BOSS ARENA'};
   beginDraw(item);
   setStatus('Run started. Your jump trace will be independently checked by the server.');
  }catch(e){setStatus(e.message,true);}finally{busy=false;}
