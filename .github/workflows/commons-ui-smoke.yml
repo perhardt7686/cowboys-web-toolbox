@@ -40,6 +40,9 @@ on:
       - 'docs/commons-board-compact.mjs'
       - 'docs/commons-plates.mjs'
       - 'docs/commons-mahjong.mjs'
+      - 'docs/mahjong-kids-palette.mjs'
+      - 'docs/mahjong-kids-colors.css'
+      - 'tests/browser-mahjong-kids.py'
       - 'docs/community-coco.mjs'
       - 'docs/commons-streetrod-ega.mjs'
       - 'docs/commons-streetrod-ega.css'
@@ -75,6 +78,7 @@ jobs:
           python tests/browser-commons-contrast.py
           python tests/browser-shared-navigation.py
           python tests/browser-family-avatar-studio.py
+          python tests/browser-mahjong-kids.py
           python tests/browser-avatar-rewards.py
           python tests/browser-family-board.py
           python tests/browser-plate-review.py
@@ -94,6 +98,7 @@ jobs:
             reports/shared-nav-commons-mobile.png
             reports/family-avatar-studio-375.png
             reports/family-avatar-studio-390.png
+            reports/mahjong-kid-colors-*.png
             reports/avatar-rewards-*.png
             reports/streetrod-ega-iphone-sample.png
             reports/arcade-one-screen-iphone-sample.png
