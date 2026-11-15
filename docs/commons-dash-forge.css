@@ -167,3 +167,44 @@ body.community-page.arcade-on[data-arcade-game=dashforge] .dash-playing-head{min
  body.community-page #dash-forge-inside .dash-cell{min-height:22px}
 }
 @media(prefers-reduced-motion:reduce){body.community-page #dash-forge-root *,body.community-page #dash-forge-root *::before{animation:none!important;transition:none!important}}
+
+/* Campaign infinity treatment and independently drawn neon-world accents. */
+body.community-page #dash-forge-root .dash-forever-counter{
+ margin:5px 0 13px;padding:10px 12px;border:1px solid #80e8fa;border-radius:10px;
+ background:linear-gradient(105deg,#1a3f58,#382653 70%,#262450);
+ color:#eafffe;box-shadow:inset 0 0 16px #62baf537;
+ font:850 clamp(11px,1.65vw,14px)/1.45 system-ui;letter-spacing:.035em
+}
+body.community-page #dash-forge-root .dash-current-tag{
+ display:inline-flex;align-self:start;margin-top:1px;border-radius:7px;
+ padding:5px 7px;background:#175c53;color:#b8ffeb;
+ font:900 10px/1.2 system-ui
+}
+body.community-page #dash-forge-root .dash-level-number{
+ background:linear-gradient(145deg,#5744a3,#233f7d);
+ min-width:0;word-break:break-word;font-size:clamp(13px,1.65vw,18px);
+}
+body.community-page #dash-forge-root .dash-level[data-level-id]:has(.dash-current-tag){
+ border-color:#77e7e0;background:linear-gradient(110deg,#193d52,#2b2756);
+ box-shadow:0 0 16px #2dccc041;
+}
+body.community-page #dash-forge-root .dash-cell.type-laser,
+body.community-page #dash-forge-root .dash-cell.type-ring,
+body.community-page #dash-forge-root .dash-cell.type-mine{background:#55337b;color:#ffe0fe}
+body.community-page #dash-forge-root .dash-cell.type-saw,
+body.community-page #dash-forge-root .dash-cell.type-drone,
+body.community-page #dash-forge-root .dash-cell.type-hammer{background:#62523d;color:#ffefb9}
+body.community-page #dash-forge-root .dash-cell.type-crystal,
+body.community-page #dash-forge-root .dash-cell.type-pillar{background:#245773;color:#cff8ff}
+body.community-page #dash-forge-root .dash-cell.type-flames,
+body.community-page #dash-forge-root .dash-cell.type-mushroom{background:#6e374d;color:#ffc3d3}
+body.community-page #dash-forge-root .dash-palette button{
+ min-width:80px;flex:0 1 auto;font-size:clamp(11px,1.3vw,14px)
+}
+body.community-page #dash-forge-root .dash-palette{
+ overflow-y:auto;max-height:112px;scrollbar-width:thin;padding:2px;
+}
+@media(max-width:600px){
+ body.community-page #dash-forge-root .dash-palette button{min-width:calc(25% - 7px);padding:6px 3px}
+ body.community-page #dash-forge-root .dash-forever-counter{font-size:10px;padding:7px}
+}
