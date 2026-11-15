@@ -16,8 +16,8 @@ test('independent swarming shooter and mystery maze rules are deterministic',()=
  const maze=retroReplay('maze',2,'RRDDLLUU');
  assert.ok(maze.score>0);
  assert.ok(maze.dots>=3);
- assert.throws(()=>retroReplay('maze',1,'F'),'Invalid action');
- assert.throws(()=>retroReplay('fleet',1,'F'.repeat(241)),'Invalid arcade controls');
+ assert.throws(()=>retroReplay('maze',1,'F'),/Invalid action/);
+ assert.throws(()=>retroReplay('fleet',1,'F'.repeat(241)),/Invalid arcade controls/);
 });
 test('all maze clue cells are reachable without invented teleports',()=>{
  const seen=new Set(['1,1']),queue=[[1,1]];
