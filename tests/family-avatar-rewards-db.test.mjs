@@ -37,6 +37,11 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   const petAction=(id,action,revision=null,name=null)=>result(
     'select public.community_avatar_pet_action($1,$2,$3,$4) as value',[id,action,revision,name]);
   const show=async(...ids)=>(await sql('select * from public.community_avatar_projections($1::uuid[])',[ids])).rows;
+  const tradeState=()=>result('select public.community_avatar_pet_trade_state() as value');
+  const tradeOffer=(to,pet,request=null,rev=null)=>result(
+    'select public.community_avatar_pet_trade_offer($1,$2,$3,$4) as value',[to,pet,request,rev]);
+  const tradeAction=(id,action)=>result(
+    'select public.community_avatar_pet_trade_action($1,$2) as value',[id,action]);
   const refused=(promise,code='42501')=>assert.rejects(promise,error=>error.code===code);
   const get=(state,id)=>state.achievements.find(item=>item.id===id);
 
@@ -145,6 +150,31 @@ test('approved family avatars derive rewards and restrict persistence and sharin
   assert.equal(inactive.active,false);
   assert.deepEqual(inactive.loadout,earnedLook);
   assert.deepEqual(await show(member),[]);
+
+  // A family gift needs an actual offer and the recipient's approval.
+  // The pet moves exactly once, retaining its name/bond; the earning
+  // achievement remains with its original player.
+  const offering=await tradeOffer(other,'trail-husky',null,named.revision);
+  assert.equal(offering.status,'pending');
+  assert.equal((await tradeState()).offers[0].direction,'outgoing');
+  await refused(tradeAction(offering.id,'accept'));
+  await switchRole(other);
+  assert.equal((await tradeState()).offers[0].direction,'incoming');
+  assert.equal((await petState()).length,0);
+  const received=await tradeAction(offering.id,'accept');
+  assert.equal(received.status,'accepted');
+  assert.equal((await petState())[0].name,'Scout');
+  assert.equal((await petState())[0].bond,7);
+  assert.ok((await state()).earned.some(i=>i.id==='trail-husky'));
+  const newlyOwned=normalizeLoadout({cosmetics:{companion:'trail-husky'}});
+  assert.ok((await equip(newlyOwned)).active);
+  await refused(tradeAction(offering.id,'accept'),'22023');
+  await switchRole(member);
+  assert.equal((await petState()).length,0);
+  await refused(petAction('trail-husky','adopt'));
+  assert.equal((await state()).earned.some(i=>i.id==='trail-husky'),false);
+  assert.ok(get(await state(),'quest-first-clue').earned_at);
+
   await switchRole(null,'system');
   const profile=(await sql('select avatar_mode,avatar_path,published from public.community_profiles where user_id=$1',[member])).rows[0];
   assert.deepEqual(profile,{avatar_mode:'photo',avatar_path:member+'/avatar.png',published:true});
