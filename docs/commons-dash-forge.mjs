@@ -38,7 +38,7 @@ function listLevel(l){
  const owner=l.creator&&l.creator===me(),isDraft=l.kind==='member'&&!l.published;
  const lock=!unlocked(l),badge=l.designer_award?'<span class="dash-reward">♛ '+esc(l.designer_award)+'</span>':'';
  return '<article class="dash-level" data-level-id="'+Number(l.id)+'">'+
-  '<div class="dash-level-number">'+(l.kind==='campaign'?(l.boss?'♛':num(l.stage)):(isDraft?'D':'★'))+'</div>'+
+  '<div class="dash-level-number">'+(l.kind==='campaign'?(l.boss?'♛':l.stage>999?'∞':num(l.stage)):(isDraft?'D':'★'))+'</div>'+
   '<div class="dash-level-copy"><strong>'+esc(l.title)+'</strong>'+
   '<small>'+esc(l.kind==='campaign'?(l.world||'Origin Circuit')+' · Chapter '+num(l.stage)+' · '+l.pattern.length+' tiles · '+Math.round(1000/Number(l.pace_ms||210)*10)/10+' tiles/s':
    (owner?'Your level':('By '+l.creator_name))+' · '+l.pattern.length+' tiles')+
