@@ -99,6 +99,7 @@ function renderBuilder(){
  const world=$('dash-world'),boss=$('dash-boss-style');
  if(world)world.value=draft.world||'Maker Studio';
  if(boss)boss.value=draft.bossStyle||'none';
+ if($('dash-phase-guide'))$('dash-phase-guide').hidden=draft.bossStyle==='none';
  if(document.activeElement!==text)text.value=draft.title;
  if(document.activeElement!==diff)diff.value=String(draft.difficulty);
  length.value=String(draft.pattern.length);
@@ -188,7 +189,8 @@ function build(){
    '<div class="dash-builder-preview"><canvas id="dash-creator-preview" width="600" height="145" role="img" aria-label="Live preview of your chosen world, obstacles and boss"></canvas>'+
    '<small>PREVIEW · YOUR ORIGINAL WORLD · BOSS & HAZARD DESIGN</small></div>'+
    '<div class="dash-palette" role="group" aria-label="Level tile brushes">'+PAINTS.map(([k,name])=>'<button type="button" data-dash-brush="'+k+'">'+name+'</button>').join('')+'</div>'+
-   '<div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a tile to place a spike, block, gap or safe floor"></div>'+
+   '<div id="dash-phase-guide" class="dash-phase-guide" hidden aria-label="Three boss attack phases"><span>PHASE I · OPENING</span><span>PHASE II · ESCALATION</span><span>PHASE III · FINAL ATTACK</span></div>'+
+   '<div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a tile to place hazards in the world or boss arena"></div>'+
    '<p id="dash-builder-help" class="dash-note"></p><div class="dash-builder-actions"><button type="button" data-dash-action="new">New draft</button>'+
    '<button type="button" data-dash-action="save">Save draft</button><button type="button" data-dash-action="test">Playtest</button>'+
    '<button type="button" data-dash-action="publish">Publish solved level</button></div>'+
