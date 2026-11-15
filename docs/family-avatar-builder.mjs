@@ -14,16 +14,20 @@ export const AVATAR_OPTIONS = Object.freeze({
   beard:[['none','Clean shaven'],['stubble','Stubble'],['beard','Full beard'],['moustache','Moustache'],['goatee','Goatee']],
   expression:[['smile','Smile'],['grin','Grin'],['calm','Calm'],['wink','Wink'],['curious','Curious']],
   pose:[['center','Portrait'],['tilt','Head tilt'],['wave','Wave']],
+  face:[['oval','Classic oval'],['angular','Daring angular'],['round','Cheerful round'],['square','Sturdy square'],['long','Sleuth long'],['heart','Playful heart']],
+  nose:[['button','Button nose'],['straight','Straight'],['swoop','Swoop'],['pointed','Sharp'],['freckled','Rosy nose']],
+  cheeks:[['plain','Natural'],['rosy','Rosy cheeks'],['dimples','Dimples'],['freckles','Freckles']],
+  garment:[['collared','Retro collared shirt'],['striped','Striped tee'],['cardigan','Comfy cardigan'],['sweater','Chunky sweater'],['denim','Denim jacket'],['vest','Explorer vest'],['turtleneck','Mystery turtleneck']],
   hat:[['none','No hat'],['cap','Ball cap'],['beanie','Beanie'],['western','Western hat'],['beret','Beret']],
   glasses:[['none','No glasses'],['round','Round frames'],['square','Square frames'],['oval','Oval frames']]
 });
 export const DEFAULT_AVATAR_RECIPE = Object.freeze({
   skin:'sand',hair:'brown',style:'wavy',eyes:'brown',shirt:'violet',background:'lavender',accessory:'none',
-  brows:'soft',beard:'none',expression:'smile',pose:'center',hat:'none',glasses:'none'
+  brows:'soft',beard:'none',expression:'smile',pose:'center',face:'oval',nose:'button',cheeks:'plain',garment:'collared',hat:'none',glasses:'none'
 });
 export const AVATAR_LABELS = Object.freeze({
   skin:'Skin tone',hair:'Hair color',style:'Hairstyle',eyes:'Eye color',shirt:'Outfit',background:'Background',
-  accessory:'Accessories',brows:'Brows',beard:'Facial hair',expression:'Expression',pose:'Pose',hat:'Basic hats',glasses:'Basic glasses'
+  accessory:'Accessories',face:'Face shape',nose:'Nose',cheeks:'Cheeks',garment:'Retro outfit',brows:'Brows',beard:'Facial hair',expression:'Expression',pose:'Pose',hat:'Basic hats',glasses:'Basic glasses'
 });
 export const FREE_OPTION_COUNT = Object.values(AVATAR_OPTIONS).reduce((total, values) => total + values.length, 0);
 export function normalizeAvatarRecipe(value) {
@@ -61,8 +65,8 @@ export function drawFamilyAvatar(canvas, value, overlays = {}, t = 0) {
 export function makeAvatarStudioHTML(recipe) {
   const v=normalizeAvatarRecipe(recipe);
   const groups=[
-    ['Face & hair',['skin','style','hair','eyes','brows','beard','expression']],
-    ['Wardrobe',['shirt','hat','glasses','accessory']],
+    ['Face & hair',['skin','style','hair','eyes','face','nose','cheeks','brows','beard','expression']],
+    ['Wardrobe',['shirt','garment','hat','glasses','accessory']],
     ['Scene & pose',['background','pose']]
   ];
   const renderGroup=key=>'<fieldset class="family-avatar-field"><legend>'+AVATAR_LABELS[key]+'</legend><div class="family-avatar-picks">'+
