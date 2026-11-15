@@ -1,9 +1,9 @@
 import {button, el, preference} from './family-board-core.mjs?v=family3';
-import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=mystery2';
-import {normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=toon3';
+import {BY_ID, CATALOG, GAME_LABELS, RARITIES, SHOWCASE, SLOT_LABELS} from './avatar-reward-catalog.mjs?v=arcade5';
+import {normalizeLoadout, paintThumbnail, paintPrizeDemo, playCel, renderLoadout} from './avatar-reward-render.mjs?v=arcade5';
 
-import {prizeAction} from './avatar-prize-actions.mjs?v=mystery2';
-import {createPetStudio} from './avatar-studio-pets.mjs?v=toon3';
+import {prizeAction} from './avatar-prize-actions.mjs?v=arcade5';
+import {createPetStudio} from './avatar-studio-pets.mjs?v=arcade5';
 
 const PAGE=18;
 const labels=Object.entries(GAME_LABELS);
