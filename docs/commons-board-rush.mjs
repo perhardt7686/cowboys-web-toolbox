@@ -365,9 +365,9 @@ function draw(){
  if(r){
   road(c);
   for(const o of r.course.things.filter(o=>o.z-r.progress>-6&&o.z-r.progress<164).sort((a,b)=>b.z-a.z))obstacle(c,o,t);
-  const [a,b]=project(-1.44,r.course.length-r.progress),[d]=project(1.44,r.course.length-r.progress);
+  const [a,b]=project(-1.44,r.course.length-r.progress),[finishRightX]=project(1.44,r.course.length-r.progress);
   if(r.course.length-r.progress<160){
-   c.strokeStyle='#252540';c.lineWidth=9;c.beginPath();c.moveTo(a,b-65*(1/(1+Math.max(0,r.course.length-r.progress)*.043)));c.lineTo(d,b-65*(1/(1+Math.max(0,r.course.length-r.progress)*.043)));c.stroke();
+   c.strokeStyle='#252540';c.lineWidth=9;c.beginPath();c.moveTo(a,b-65*(1/(1+Math.max(0,r.course.length-r.progress)*.043)));c.lineTo(finishRightX,b-65*(1/(1+Math.max(0,r.course.length-r.progress)*.043)));c.stroke();
    text(c,'FINISH',WIDTH/2,b-23,Math.max(14,37/(1+Math.max(0,r.course.length-r.progress)*.043)),'#262046');
   }
   rider(c,t);
