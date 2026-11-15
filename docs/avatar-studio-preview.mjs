@@ -1,9 +1,9 @@
-import {drawPetPortrait,paintPrizeDemo,paintThumbnail,renderLoadout} from './avatar-reward-render.mjs?v=studio3';
+import {drawPetPortrait,paintPrizeDemo,paintThumbnail,renderLoadout} from './avatar-reward-render.mjs?v=finish5';
 
 // Load the local rendering engine only when a member opens a character view.
 let active=null,loading=null;
 export function prepareStudioRenderer(){
-  loading ||= import('./avatar-dressing-room.mjs?v=ink4').then(renderer=>active=renderer).catch(()=>null);
+  loading ||= import('./avatar-dressing-room.mjs?v=finish5').then(renderer=>active=renderer).catch(()=>null);
   return loading;
 }
 

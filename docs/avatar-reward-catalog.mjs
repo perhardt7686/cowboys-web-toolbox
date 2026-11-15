@@ -1,7 +1,7 @@
 import {WEARABLES} from './avatar-cosmetic-wearables.mjs?v=cel1';
 import {WORLDS} from './avatar-cosmetic-worlds.mjs?v=cel1';
 import {MYSTERY_EXTRAS} from './avatar-mystery-extras.mjs?v=mystery2';
-import {TURNAROUND_REWARDS} from './avatar-turnaround-rewards.mjs?v=studio3';
+import {TURNAROUND_REWARDS} from './avatar-turnaround-rewards.mjs?v=finish5';
 import {ARCADE_REWARDS} from './avatar-arcade-rewards.mjs?v=arcade6';
 
 export const GAME_LABELS=Object.freeze({

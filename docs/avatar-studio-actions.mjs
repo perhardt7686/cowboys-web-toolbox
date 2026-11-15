@@ -1,5 +1,5 @@
 import {THREE,attach,disposeFigure,group,shade} from './avatar-studio-geometry.mjs?v=studio3';
-import {poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=ink4';
+import {poseCompanion,rewardPigment} from './avatar-studio-companions.mjs?v=finish5';
 import {prizeAction} from './avatar-prize-actions.mjs?v=turn1';
 
 const radius=new THREE.Vector3(),rayEnd=new THREE.Vector3(),lensAt=new THREE.Vector3();

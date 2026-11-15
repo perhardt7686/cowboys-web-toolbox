@@ -36,6 +36,39 @@ window.fetch=async (url,options)=>{
   return Response.json({...result,saved:result.won,points:240,new_badges:['first','ball-survivor']});
 };"""
 
+async def capture_worlds(page):
+ color_count=await page.evaluate("""async()=>{
+  const [{createSkyScene},{buildSkyCourse,createSkyRide,skyTrack},{SKY_COLORS}]=await Promise.all([
+   import('/skyboard-scene.mjs?v=courses2'),import('/skyboard-physics.mjs?v=courses2'),import('/skyboard-courses.mjs')
+  ]);
+  const sheet=document.createElement('canvas');sheet.width=960;sheet.height=420;sheet.id='sky-course-sheet';
+  sheet.style.cssText='display:block;width:100%;height:auto;position:fixed;inset:0;z-index:999999999';
+  document.body.append(sheet);
+  const g=sheet.getContext('2d'),view=document.createElement('canvas');
+  view.width=320;view.height=180;
+  const scene=createSkyScene(320,180),board={id:'sunny',color:'#ffb95b',trail:'#ffed8a'};
+  const sample=new Set();
+  for(let i=0;i<SKY_COLORS.length;i++){
+   const stage=1+i*5,course=buildSkyCourse(stage,stage*212561^196930,2),ride=createSkyRide(course);
+   ride.progress=17;ride.y=skyTrack(course,17).y;
+   const context=view.getContext('2d');
+   scene.draw(context,ride,SKY_COLORS[i],board,null);
+   sample.add(Array.from(context.getImageData(230,13,1,1).data).join(','));
+   const x=i%3*320,y=Math.floor(i/3)*210;
+   g.drawImage(view,x,y);
+   g.fillStyle='#18233e';g.fillRect(x,y+180,320,30);
+   g.font='600 14px system-ui';g.fillStyle='#fff4dc';
+   g.fillText(course.info.world,x+10,y+200);
+  }
+  return sample.size;
+ }""")
+ assert color_count>=5, 'Scenery render should visibly separate the six worlds'
+ # Export the canvas at native resolution rather than scaling to the test phone.
+ png=await page.locator('#sky-course-sheet').evaluate("canvas=>canvas.toDataURL('image/png')")
+ from base64 import b64decode
+ (ROOT/'reports'/'skyboard-course-worlds.png').write_bytes(b64decode(png.partition(',')[2]))
+ await page.locator('#sky-course-sheet').evaluate('canvas=>canvas.remove()')
+
 async def verify(browser,size,full_race=False):
  width,height=size
  page=await browser.new_page(viewport={"width":width,"height":height},device_scale_factor=1,has_touch=True)
@@ -88,6 +121,7 @@ async def verify(browser,size,full_race=False):
    await page.wait_for_function("window.replayChecked?.won&&window.replayChecked.ball_hits>0",timeout=45000)
    assert await page.evaluate("window.replayChecked.token==='Bearer test-token'")
    await page.locator("#skyboard-message").get_by_text("STAGE 1 CLEAR!").wait_for(timeout=10000)
+   await capture_worlds(page)
   else:
    await page.locator("[data-sky-scene='boards']").click()
    assert await page.locator("#skyboard-boards").is_visible()

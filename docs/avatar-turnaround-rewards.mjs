@@ -1,5 +1,6 @@
 import {INK,PAPER,glint,oval,path,tint} from './avatar-cel-art.mjs?v=cel1';
 import {paintAura} from './avatar-prize-actions.mjs?v=turn1';
+import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=finish5';
 
 function spectralSword(c,{angle,progress}){
   c.save();c.rotate(-angle.depth*.43 + (progress==null?0:Math.sin(Math.PI*2*progress)*.57));
@@ -195,6 +196,7 @@ const wearables=[
   ['moorland-heartplate','Moorland Heartplate','bodypart','maze-explorer','plate','#765066',['monster']]
 ].map(([id,name,slot,achievement_id,cut,color,families])=>({
   id,name,slot,achievement_id,cut,color,families,tags:['wardrobe',cut,...(families||[])],
+  draw(c){drawWardrobeReward(c,{id,slot,cut,color});},
   action:id==='phantom-cloak'?['breeze','Unfurl cloak','The hem swirls into a phantom shape.','ice']:
     id==='carnival-visor-plate'?['scan','Sweep the visor','The lenses open and sweep a beam across the floor.','mint']:
     ['polish','Show the detail','Light sweeps across the fitted detail.','gold']

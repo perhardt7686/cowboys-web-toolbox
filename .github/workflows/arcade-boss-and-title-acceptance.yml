@@ -86,6 +86,7 @@ jobs:
             reports/dash-forge-tablet.png
             reports/dash-forge-creator-tablet.png
             reports/skyboard-sprint-iphone.png
+            reports/skyboard-course-worlds.png
             reports/arcade-one-screen-iphone-sample.png
           if-no-files-found: ignore
           retention-days: 7

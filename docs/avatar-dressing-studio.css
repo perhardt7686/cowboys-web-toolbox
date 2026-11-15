@@ -359,3 +359,93 @@ body.community-page .avatar-dressing-studio .avatar-turntable-canvas{
     transform:none!important;
   }
 }
+
+/* Avatar Studio finishing pass: no surprise clipping, thumbnail parity or enormous banners. */
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration{
+  grid-template-columns:56px minmax(0,1fr);
+  gap:6px 10px;
+  padding:7px 10px;
+  margin:5px 0 8px;
+  border:2px solid #b88b43;
+  background:#f7e9c4;
+}
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration .avatar-reward-thumbnail{
+  width:56px;
+  height:56px;
+}
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration h3{
+  font-size:.94rem;
+  line-height:1.14;
+}
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration p{
+  font-size:.78rem;
+  line-height:1.2;
+}
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration .avatar-reward-row{
+  grid-column:1/-1;
+  display:flex;
+  gap:6px;
+}
+body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration .avatar-reward-row button{
+  min-height:36px;
+  padding:5px 8px;
+  font-size:.78rem;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-card [data-reward-more],
+body.community-page .avatar-dressing-studio .avatar-reward-card .avatar-reward-button{
+  touch-action:manipulation;
+}
+body.community-page .avatar-dressing-studio .studio-stage-title .avatar-preview-actions button{
+  white-space:nowrap;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-tag{
+  display:inline-flex;
+  align-items:center;
+  min-height:23px;
+  line-height:1.25;
+  border:1px solid #cab9ce;
+  background:#e9e1f1;
+  color:#3b2c4f;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-card[data-owned="true"]{
+  border-color:#777b63;
+  background:#eff0e4;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-card[data-owned="false"]{
+  background:#f8f5ef;
+}
+body.community-page .avatar-dressing-studio .avatar-reward-card button:disabled{
+  cursor:not-allowed;
+  opacity:.65;
+}
+@media(min-width:731px) and (max-height:960px){
+  body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{
+    height:clamp(290px,40dvh,400px);
+  }
+}
+@media(max-width:730px){
+  body.community-page .avatar-dressing-studio .studio-stage-title h3{
+    font-size:.98rem!important;
+  }
+  body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration{
+    margin:3px 0 5px;
+    padding:5px 7px;
+    grid-template-columns:42px minmax(0,1fr);
+  }
+  body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration .avatar-reward-thumbnail{
+    height:42px;
+    width:42px;
+  }
+  body.community-page .profile-studio:has([data-profile-pane="avatar"]:not([hidden])) .avatar-celebration .avatar-reward-row button{
+    flex:1 1 100px;
+    min-height:38px;
+  }
+  body.community-page .avatar-dressing-studio .studio-stage .avatar-turntable-frame{
+    height:clamp(270px,40dvh,445px);
+  }
+}
+@media(max-width:380px){
+  body.community-page .avatar-dressing-studio .avatar-turntable-controls button{
+    font-size:.72rem!important;
+  }
+}

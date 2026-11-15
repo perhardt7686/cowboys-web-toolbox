@@ -2,7 +2,7 @@ import {AVATAR_OPTIONS,normalizeAvatarRecipe} from './family-avatar-builder.mjs?
 import {normalizeBody,projectTurn} from './avatar-full-body.mjs?v=studio3';
 import {drawTurnaround} from './avatar-turnaround.mjs?v=turn1';
 import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=turn1';
-import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=studio3';
+import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=finish5';
 import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
 import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=turn1';
 
@@ -98,9 +98,42 @@ function displayFitted(c,item,activity){
     activity&&{id:item.id,progress:activity.progress}, {angle,crop:{x:216,...cropAt[item.slot]}});
 }
 
+function displayWardrobeIcon(canvas,item,activity){
+  const c=canvas.getContext('2d');
+  if(!c)return;
+  const scale=canvas.width/256;
+  c.save();
+  c.setTransform(scale,0,0,canvas.height/256,0,0);
+  c.clearRect(0,0,256,256);
+  const backdrop=c.createLinearGradient(0,0,235,256);
+  backdrop.addColorStop(0,'#f5eddd');
+  backdrop.addColorStop(.6,'#e4d8d2');
+  backdrop.addColorStop(1,'#b5a9b9');
+  c.fillStyle=backdrop;c.fillRect(0,0,256,256);
+  oval(c,128,111,112,97,'#fff8e3a8','#624f7135',1.8);
+  path(c,[0,228],[[60,209,121,213,161,220],[205,223,234,211,256,215],
+    [256,256],[0,256]],'#564b6599',null);
+  c.save();
+  item.draw(c);
+  c.restore();
+  // In the small collection view the action highlights the item's actual shape.
+  const glow=activity?.progress==null?0:Math.sin(Math.PI*activity.progress);
+  if(glow>0){
+    c.globalAlpha=.64*glow;
+    glint(c,193,44,10+glow*4,'#fff7ce');
+    glint(c,65,83,6+glow*3,'#f0cd8e');
+    c.globalAlpha=1;
+  }
+  c.restore();
+}
+
 function displayFrame(canvas,item,activity=null) {
   if(item.creature){
     drawPetPortrait(canvas,item,activity?'trick':null,activity?.progress);
+    return;
+  }
+  if(!bounds[item.slot]&&typeof item.draw==='function'&&canvas.width<180){
+    displayWardrobeIcon(canvas,item,activity);
     return;
   }
   if(item.stageDraw||!bounds[item.slot]){

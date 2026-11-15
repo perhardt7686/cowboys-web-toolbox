@@ -107,4 +107,3 @@ export const SKY_COLORS=[
   {sky:['#286a76','#bfe9cf'],road:['#c5985d','#a48660'],border:'#82cfa1',accent:'#355e57',env:'forest',
     horizon:'#efce95',walls:['#2f5c62','#78a971','#b5ce89','#4a8371']}
 ];
-

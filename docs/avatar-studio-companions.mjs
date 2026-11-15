@@ -105,6 +105,57 @@ export function studioHat(head,hat,accessory){
       oval(root,tip,side*.220,.512,-.019,.041,.042,.037);
     }
   }
+  // Reward headwear gets a readable silhouette, not only a new hat pigment.
+  if(/viking|norse|horned/.test(id)){
+    const horn=surface('#e6d6ac'),base=surface('#615368');
+    for(const side of [-1,1]){
+      oval(root,base,side*.211,.340,.003,.066,.066,.082);
+      const points=[[side*.209,.367,.008],[side*.281,.390,.006],
+        [side*.350,.432,-.015],[side*.390,.510,-.029]];
+      for(let i=0;i<points.length-1;i++)
+        join(root,horn,points[i],points[i+1],.044-i*.009,.036-i*.009,16);
+      oval(root,horn,...points.at(-1),.009,.018,.011);
+    }
+  }
+  if(id.includes('rubber-chicken')){
+    const feather=surface('#e9b76b'),comb=surface('#c86c69'),beak=surface('#d98d4d');
+    const neck=group(root,.154,.375,.029);
+    oval(neck,feather,0,.091,0,.075,.152,.067).rotation.z=-.22;
+    oval(neck,feather,.025,.222,.015,.077,.079,.065);
+    for(let i=0;i<3;i++)oval(neck,comb,-.015+i*.025,.292+i%2*.008,.011,.025,.034,.018);
+    oval(neck,beak,.093,.205,.044,.065,.027,.045);
+    oval(neck,surface('#272535'),.045,.235,.071,.008,.012,.006);
+  }
+  if(/dragon|monster|gargoyle/.test(id)&&!id.includes('crown')){
+    const ridge=surface(shade(pigment,1.36));
+    for(const side of [-1,1]){
+      join(root,ridge,[side*.170,.332,-.011],[side*.270,.429,-.047],.054,.005,12);
+      oval(root,ridge,side*.232,.364,.061,.048,.025,.030);
+    }
+  }
+  if(/space|moon|orbit|galaxy|saturn|cosmic/.test(id)){
+    const orbit=surface('#ddc18a'),sparkle=surface('#93c8cd');
+    const ring=band(root,orbit,0,.370,.004,.213,.012,1.20,.37);
+    ring.rotation.z=-.25;
+    medallion(root,sparkle,.054,.376,.159,.034,.012,6);
+    for(const x of [-.126,.136])oval(root,sparkle,x,.384,.138,.013,.014,.010);
+  }
+  if(/flor|rose|flower|petal|garden/.test(id)){
+    const flower=surface('#cf8d91'),center=surface('#ebc278');
+    for(let i=0;i<6;i++){
+      const a=i*Math.PI/3;
+      const bud=oval(root,flower,.106+.040*Math.cos(a),.343+.040*Math.sin(a),.183,
+        .031,.032,.015);
+      bud.rotation.z=a;
+    }
+    oval(root,center,.106,.343,.206,.021,.020,.014);
+  }
+  if(/robot|cyber|circuit|clockwork/.test(id)){
+    const signal=surface('#a3e1d2',{emissive:'#78b9a4',emissiveIntensity:.25});
+    const metal=surface('#9c9fac');
+    stroke(root,metal,[[-.164,.296,.178],[-.096,.355,.193],[.066,.357,.202]],.010);
+    for(const x of [-.136,.060])oval(root,signal,x,.358,.207,.019,.014,.010);
+  }
   return root;
 }
 
@@ -386,6 +437,44 @@ export function buildCompanion(item){
       tails.push(tail);
     }
     if(reptile&&id.includes('turtle'))oval(animal,cream,0,.286,-.123,.177,.154,.225);
+    // Distinctive species acting marks carry through to thumbnail scale.
+    if(id.includes('raccoon')){
+      const mask=surface(shade(pigment,.53));
+      for(const side of [-1,1]){
+        oval(head,mask,side*.074,.023,.138,.067,.064,.035);
+        oval(head,cream,side*.074,.033,.169,.026,.029,.012);
+        oval(head,black,side*.069,.033,.184,.014,.016,.008);
+      }
+      for(let i=0;i<3;i++)oval(animal,mask,.061,.243,-.284-i*.042,.031,.025,.021);
+    }
+    if(id.includes('fox')){
+      const snow=surface('#f4dfc6');
+      for(const side of [-1,1]){
+        const ear=oval(head,shellMat,side*.115,.150,-.037,.052,.084,.038);
+        ear.rotation.z=side*-.24;
+        oval(head,snow,side*.113,.148,-.001,.023,.047,.012).rotation.z=side*-.24;
+      }
+      oval(head,snow,0,-.073,.141,.072,.036,.032);
+    }
+    if(id.includes('gargoyle')){
+      const stone=surface('#b3b4b6'),dark=surface('#4e5462');
+      for(const side of [-1,1]){
+        join(head,stone,[side*.124,.093,-.025],[side*.186,.214,-.089],.050,.005,14);
+        stroke(head,dark,[[side*.026,.067,.155],[side*.072,.084,.159],
+          [side*.115,.064,.132]],.008,12);
+      }
+      oval(head,stone,0,-.106,.108,.074,.029,.045);
+    }
+    if(id.includes('husky')||id.includes('hound')){
+      for(const side of [-1,1])
+        stroke(head,cream,[[side*.032,.081,.158],[side*.081,.106,.128],
+          [side*.117,.067,.087]],.017,14);
+    }
+    if(id.includes('axolotl')){
+      for(const side of [-1,1])for(let j=0;j<3;j++)
+        oval(head,cream,side*(.160+j*.011),.066+j*.045,-.028-j*.013,.021,.029,.015);
+    }
+  
     if(id.includes('raccoon')||id.includes('ferret')){
       for(const s of [-1,1])stroke(head,surface(shade(pigment,.63)),
         [[s*.097,-.004,.116],[s*.141,.056,.064],[s*.155,.040,.007]],.024);
