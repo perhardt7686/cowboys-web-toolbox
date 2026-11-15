@@ -9,12 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 URL = 'http://127.0.0.1:8765/community.html?preview=1&role=member'
 
 
-async def visit(browser, width, full=False):
+async def visit(browser, width, full=False, large_text=False):
     page = await browser.new_page(viewport={'width': width, 'height': 850}, reduced_motion='reduce',
                                   has_touch=width < 800)
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     await page.goto(URL, wait_until='domcontentloaded')
+    if large_text:
+        await page.evaluate("document.documentElement.style.fontSize='20px'")
     await page.locator('#family-avatar-quick').click()
     editor = page.locator('#profile-studio-form')
     nav = editor.get_by_role('navigation', name='Avatar Studio sections')
@@ -164,7 +166,7 @@ async def visit(browser, width, full=False):
           return [seen.size,unchanged,inert];
         }""")
         assert art == [336, [], []], art
-        # Capture and pixel-check all eighteen previously missing garment icons.
+        # Capture and pixel-check all 26 workshop rewards from the production renderer.
         wardrobe_sheet = await page.evaluate("""async()=>{
           const {NEW_STUDIO_REWARDS:items}=await import('/avatar-collection-edition.mjs');
           const {paintRoomPrize,releaseStudioView}=await import('/avatar-dressing-room.mjs?v=workshop1');
@@ -224,7 +226,7 @@ async def visit(browser, width, full=False):
     if width in (390,1280):
         await page.screenshot(path=str(ROOT/'reports'/f'avatar-rewards-{width}.png'),animations='disabled')
     await page.close()
-    print(f'Avatar rewards PASS at {width}px')
+    print(f'Avatar rewards PASS in {browser.browser_type.name} at {width}px, large text={large_text}')
 
 
 async def main():
@@ -234,6 +236,7 @@ async def main():
             await visit(browser, width, full=width == 390)
         await browser.close()
         safari = await p.webkit.launch()
+        await visit(safari,375,large_text=True)
         await visit(safari,390,full=True)
         await safari.close()
 
