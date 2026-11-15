@@ -261,6 +261,12 @@ function build(){
  root.addEventListener('pointerdown',event=>{
   if(event.target.closest('#dash-canvas')){event.preventDefault();jump();}
  },{passive:false});
+ $('dash-creator-preview').addEventListener('click',event=>{
+  if(busy||run)return;
+  const rect=event.currentTarget.getBoundingClientRect();if(!rect.width)return;
+  const tile=editorPage*EDITOR_SPAN+Math.floor((event.clientX-rect.left)/rect.width*EDITOR_SPAN);
+  editTile(tile,brush);
+ });
  $('dash-jump').addEventListener('pointerdown',event=>{event.preventDefault();jump();},{passive:false});
  $('dash-jump').addEventListener('click',event=>{if(event.detail===0)jump();});
  for(const id of ['dash-title','dash-difficulty']){
@@ -293,7 +299,7 @@ function onClick(event){
  if(!target||target.disabled||busy)return;
  const d=target.dataset;
  if(d.dashTab){choosePane(d.dashTab);return;}
- if(d.dashPlay){void startLevel(Number(d.dashPlay));return;}
+ if(d.dashPlay){runFromBuilder=false;void startLevel(Number(d.dashPlay));return;}
  if(d.dashEdit){const l=levels().find(x=>Number(x.id)===Number(d.dashEdit));if(l){
    draft={id:l.id,title:l.title,difficulty:l.difficulty,pattern:l.pattern,
     world:l.world||'Maker Studio',bossStyle:l.boss_style||'none'};editorPage=0;undoHistory=[];redoHistory=[];draftDirty=false;creatorTestOutcome='';choosePane('builder');}return;}
@@ -312,9 +318,6 @@ function onClick(event){
    case 'page-next':editorPage=Math.min(Math.ceil(draft.pattern.length/EDITOR_SPAN)-1,editorPage+1);renderBuilder();break;
    case 'undo':travelHistory('undo');break;
    case 'redo':travelHistory('redo');break;
-   /* Previous test route kept below only as historical note. */
-   /*
-    */
   case 'publish':if(!draft.id||draftDirty)setStatus('Save and successfully playtest this exact draft before publishing.',true);
     else void publishLevel(Number(draft.id));break;
   case 'sound':toggleSound();break;
@@ -620,6 +623,7 @@ function beginDraw(l){
  const overlay=$('dash-play-overlay');overlay.hidden=false;
  document.body.classList.add('dash-playing');
  $('dash-run-title').textContent=l.title;
+ const returnButton=root?.querySelector('[data-dash-action="leave"]');if(returnButton)returnButton.textContent=runFromBuilder?'← BACK TO LEVEL CREATOR':'Leave track';
  $('dash-live-status').textContent='Tap the canvas or JUMP. Space and ↑ work on keyboards.';
  $('dash-live-progress').textContent='0%';
  $('dash-run-message').hidden=true;
@@ -655,23 +659,29 @@ async function finishRun(visualWin){
   $('dash-run-message').textContent=message+' · '+niceMs(result.elapsed_ms);
   $('dash-live-status').textContent=winner?'Great run. Verified achievement and leaderboard updated.':
      'Collision at tile '+(Number(result.death_tile)+1)+'. Keep practicing.';
+  if(runFromBuilder)creatorTestOutcome=winner?
+   '✓ You beat this exact saved version. Ready to publish!':
+   'Keep editing: this playtest did not clear tile '+(Number(result.death_tile)+1)+'. Try changing the hazards and test again.';
   await refresh(true);
  }catch(e){
   $('dash-run-message').hidden=false;$('dash-run-message').textContent='RUN NOT VERIFIED';
   $('dash-live-status').textContent='Server could not validate this attempt: '+e.message;
+  if(runFromBuilder)creatorTestOutcome='Playtest could not be verified. Your draft is still saved. Try again.';
  }finally{
   run=null;$('dash-jump').disabled=false;
   $('dash-live-progress').textContent=visualWin?'FINISHED':'RETRY';
   $('dash-play-overlay').dataset.finished='true';
-  setStatus('Use Leave track to return to the family arcade.');
+  setStatus(runFromBuilder?'Use Back to Level Creator to keep editing or publish after a verified win.':'Use Leave track to return to the family arcade.');
  }
 }
 async function leaveRun(){
+ const returnToCreator=runFromBuilder;runFromBuilder=false;
  cancelAnimationFrame(frame);
  run=null;$('dash-play-overlay').hidden=true;
  $('dash-play-overlay').dataset.finished='false';
  document.body.classList.remove('dash-playing');
  await refresh(true);
+ if(returnToCreator){choosePane('builder');setStatus(creatorTestOutcome||'Back in the creator. Change obstacles and Save & Playtest again.');}
 }
 function onKeys(e){
  if(!root||!open||!root.isConnected||board.hidden||!run||run.finishing||e.repeat)return;
@@ -687,7 +697,7 @@ function syncArcade(){
   if(TABS.some(([id])=>id===s)&&!run)choosePane(s);
  }else if(run){
   // Safe teardown: no synthetic success is sent when family exits the game.
-  cancelAnimationFrame(frame);run=null;$('dash-play-overlay').hidden=true;document.body.classList.remove('dash-playing');
+  cancelAnimationFrame(frame);run=null;runFromBuilder=false;$('dash-play-overlay').hidden=true;document.body.classList.remove('dash-playing');
  }
 }
 async function boot(){
