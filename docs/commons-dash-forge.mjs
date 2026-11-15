@@ -8,12 +8,22 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const TILE=40,W=960,H=360;
 const TABS=[['campaign','Campaign'],['community','Member Levels'],['builder','Level Studio'],['awards','Awards'],['leaders','Leaders']];
 const PAINTS=[['.','Clear'],['s','Spike'],['b','Block'],['g','Gap'],['l','Laser'],['w','Saw'],['c','Crystal'],['p','Pillar'],['f','Flames'],['r','Ring'],['m','Mushroom'],['o','Mine'],['d','Drone'],['h','Hammer']];
+const CREATOR_WORLDS=['Maker Studio','Origin Circuit','Neon Canopy','Clockwork Harbor',
+ 'Crystal Hollow','Skyglass City','Solar Dunes','Thunder Rails','Abyssal Reef',
+ 'Volcanic Foundry','Pixel Metropolis','Moonlit Gardens','Starfall Observatory','Endless Aurora'];
+const BOSS_FORMS=[['none','No boss · Standard level'],['canopy','Thorn Monarch'],
+ ['clockwork','Chrono Colossus'],['crystal','Prism Serpent'],
+ ['skyglass','Skybreaker Sentinel'],['solar','Solar Sandwyrm'],
+ ['thunder','Volt Leviathan'],['reef','Abyssal Lantern'],
+ ['volcanic','Magma Titan'],['pixel','Glitch Sovereign'],
+ ['garden','Moonbloom Guardian'],['starfall','Astral Devourer'],
+ ['aurora','Aurora Warden']];
 const THEMES=[['amber','#ffd363',0],['cyan','#6ee9fb',2],['coral','#ff749c',4],['aurora','#96ffb3',6],
  ['sapphire','#7d94ff',10],['ember','#ff995c',20],['lotus','#df92ff',30],['sunbeam','#fff58a',50],
  ['arcade','#67ffc8',75],['starlight','#ebdefc',100],['obsidian','#a8aac1',200],['legend','#fff',500]];
 let client=null,user=null,root=null,inside=null,state=null,scene='campaign',busy=false,open=false,run=null,frame=0,brush='s';
 let soundOn=false,audioContext=null,lastBeat=-1;
-let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48)},theme='amber',refreshTimer=null,booted=false;
+let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none'},theme='amber',refreshTimer=null,booted=false;
 const num=n=>Number(n||0).toLocaleString('en-US');
 const niceMs=ms=>(Math.max(0,Number(ms||0))/1000).toFixed(1)+'s';
 const profile=()=>state?.mine||{clears:0,player_points:0,designer_points:0,published:0};
@@ -86,6 +96,9 @@ function renderLeaders(){
 function renderBuilder(){
  const grid=$('dash-editor-grid');if(!grid)return;
  const text=$('dash-title'),diff=$('dash-difficulty'),length=$('dash-length');
+ const world=$('dash-world'),boss=$('dash-boss-style');
+ if(world)world.value=draft.world||'Maker Studio';
+ if(boss)boss.value=draft.bossStyle||'none';
  if(document.activeElement!==text)text.value=draft.title;
  if(document.activeElement!==diff)diff.value=String(draft.difficulty);
  length.value=String(draft.pattern.length);
@@ -99,7 +112,37 @@ function renderBuilder(){
    '" data-dash-cell="'+i+'" '+(fixed?'disabled':'')+
    ' aria-label="Tile '+(i+1)+' '+(cell==='.'?'empty':label.toLowerCase())+'">'+glyph+'</button>';
  }).join('');
- $('dash-builder-help').textContent=draft.id?'Draft #'+draft.id+' · edits require another successful playtest':'New level · safe first and last four tiles';
+ $('dash-builder-help').textContent=(draft.id?'Draft #'+draft.id:'New draft')+
+  ' · '+(draft.bossStyle==='none'?'STANDARD TRACK':'BOSS ARENA')+
+  ' · '+draft.world+' · Beat this exact version before publication.';
+ const brushes=root?.querySelectorAll('[data-dash-brush]')||[];
+ brushes.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.dashBrush===brush)));
+ renderCreatorPreview();
+}
+function renderCreatorPreview(){
+ const canvas=$('dash-creator-preview');if(!canvas)return;
+ const g=canvas.getContext('2d');if(!g)return;
+ const scheme=WORLDS[draft.world]||WORLDS['Maker Studio'];
+ const [top,bot,accent]=scheme;
+ const sky=g.createLinearGradient(0,0,0,145);sky.addColorStop(0,top);sky.addColorStop(1,bot);
+ g.fillStyle=sky;g.fillRect(0,0,600,145);
+ for(let x=0;x<600;x+=30){g.strokeStyle=accent+'66';g.beginPath();g.moveTo(x,0);g.lineTo(x,145);g.stroke();}
+ g.fillStyle=accent;g.fillRect(0,113,600,3);
+ for(let i=0;i<Math.min(draft.pattern.length,30);i++){
+  const ch=draft.pattern[i],x=i*20;
+  if(ch==='.'){continue;}
+  g.fillStyle=ch==='s'||ch==='f'?'#ff849d':ch==='c'?'#d3fbff':'#ffda8d';
+  if(ch==='s'||ch==='c'){g.beginPath();g.moveTo(x+1,113);g.lineTo(x+10,86);g.lineTo(x+19,113);g.fill();}
+  else if(ch==='g'){g.fillStyle=top;g.fillRect(x,113,20,32);}
+  else g.fillRect(x+3,83,14,30);
+ }
+ if(draft.bossStyle!=='none'){
+  g.fillStyle=accent;g.globalAlpha=.8;g.beginPath();g.arc(520,62,42,0,Math.PI*2);g.fill();
+  g.globalAlpha=1;g.fillStyle=top;g.beginPath();g.arc(520,62,29,0,Math.PI*2);g.fill();
+  g.fillStyle='#fff';g.fillRect(510,54,7,9);g.fillRect(529,54,7,9);
+  g.fillStyle='#ffe9a5';g.font='bold 13px monospace';g.fillText('BOSS',493,122);
+ }
+ g.fillStyle='#fff';g.font='bold 12px monospace';g.fillText(draft.world.toUpperCase(),11,20);
 }
 function renderAll(){renderMenu();renderLists();renderAwards();renderLeaders();renderBuilder();}
 function choosePane(next){
@@ -139,7 +182,11 @@ function build(){
     '<p>Draw the track tile by tile. Save a draft, complete a playtest, then publish it for the family.</p></div>'+
    '<div class="dash-builder-form"><label>Title<input id="dash-title" maxlength="58" pattern="[A-Za-z0-9 ]+" value="My First Dash"></label>'+
    '<label>Difficulty<select id="dash-difficulty">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'">'+n+'</option>').join('')+'</select></label>'+
-   '<label>Tiles<select id="dash-length">'+[24,32,40,48,56,64,72,80,88].map(n=>'<option value="'+n+'"'+(n===48?' selected':'')+'>'+n+'</option>').join('')+'</select></label></div>'+
+   '<label>Tiles<select id="dash-length">'+[24,32,40,48,56,64,72,80,88].map(n=>'<option value="'+n+'"'+(n===48?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
+   '<label>World / Scenery<select id="dash-world">'+CREATOR_WORLDS.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')+'</select></label>'+
+   '<label>Boss Arena<select id="dash-boss-style">'+BOSS_FORMS.map(([key,name])=>'<option value="'+key+'">'+esc(name)+'</option>').join('')+'</select></label></div>'+
+   '<div class="dash-builder-preview"><canvas id="dash-creator-preview" width="600" height="145" role="img" aria-label="Live preview of your chosen world, obstacles and boss"></canvas>'+
+   '<small>PREVIEW · YOUR ORIGINAL WORLD · BOSS & HAZARD DESIGN</small></div>'+
    '<div class="dash-palette" role="group" aria-label="Level tile brushes">'+PAINTS.map(([k,name])=>'<button type="button" data-dash-brush="'+k+'">'+name+'</button>').join('')+'</div>'+
    '<div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a tile to place a spike, block, gap or safe floor"></div>'+
    '<p id="dash-builder-help" class="dash-note"></p><div class="dash-builder-actions"><button type="button" data-dash-action="new">New draft</button>'+
@@ -174,6 +221,9 @@ function build(){
  for(const id of ['dash-title','dash-difficulty']){
   $(id).addEventListener('change',()=>{draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);});
  }
+ for(const [id,field] of [['dash-world','world'],['dash-boss-style','bossStyle']]){
+  $(id).addEventListener('change',event=>{draft[field]=event.target.value;renderBuilder();});
+ }
  $('dash-length').addEventListener('change',e=>{
   const n=Number(e.target.value),a=[...draft.pattern];draft.pattern=a.slice(0,n).join('').padEnd(n,'.');
   draft.pattern='....'+draft.pattern.slice(4,-4)+'....';renderBuilder();
@@ -200,14 +250,16 @@ function onClick(event){
  if(d.dashTab){choosePane(d.dashTab);return;}
  if(d.dashPlay){void startLevel(Number(d.dashPlay));return;}
  if(d.dashEdit){const l=levels().find(x=>Number(x.id)===Number(d.dashEdit));if(l){
-   draft={id:l.id,title:l.title,difficulty:l.difficulty,pattern:l.pattern};choosePane('builder');}return;}
+   draft={id:l.id,title:l.title,difficulty:l.difficulty,pattern:l.pattern,
+    world:l.world||'Maker Studio',bossStyle:l.boss_style||'none'};choosePane('builder');}return;}
  if(d.dashPublish){void publishLevel(Number(d.dashPublish));return;}
  if(d.dashBrush!==undefined){brush=d.dashBrush;root.querySelectorAll('[data-dash-brush]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.dashBrush===brush));return;}
  if(d.dashCell!==undefined){const i=Number(d.dashCell),a=[...draft.pattern];if(i>=4&&i<a.length-4){a[i]=brush;draft.pattern=a.join('');renderBuilder();}return;}
  if(d.dashTheme){const t=THEMES.find(row=>row[0]===d.dashTheme);if(t&&profile().clears>=t[2]){
   theme=t[0];try{localStorage.setItem('dash-forge-theme',theme);}catch{}renderAwards();}return;}
  switch(d.dashAction){
-  case 'new':draft={id:null,title:'My New Dash',difficulty:2,pattern:'.'.repeat(48)};renderBuilder();break;
+  case 'new':draft={id:null,title:'My New Dash',difficulty:2,pattern:'.'.repeat(48),
+     world:'Maker Studio',bossStyle:'none'};renderBuilder();break;
   case 'save':void saveDraft();break;
   case 'test':if(!draft.id)setStatus('Save a draft first, then playtest it.',true);
     else void startLevel(Number(draft.id));break;
@@ -221,8 +273,8 @@ async function saveDraft(){
  if(busy||run)return;busy=true;setStatus('Saving your editable level draft…');
  try{
   draft.title=$('dash-title').value.trim();draft.difficulty=Number($('dash-difficulty').value);
-  const saved=await call('community_dash_save',{p_title:draft.title,p_difficulty:draft.difficulty,
-   p_pattern:draft.pattern,p_level_id:draft.id});
+  const saved=await call('community_dash_save_world',{p_title:draft.title,p_difficulty:draft.difficulty,
+   p_pattern:draft.pattern,p_level_id:draft.id,p_world:draft.world,p_boss_style:draft.bossStyle});
   draft.id=saved.id;
   await refresh(true);setStatus('Draft saved. Beat this version in Playtest before publishing.');renderBuilder();
  }catch(e){setStatus(e.message,true);}finally{busy=false;}
@@ -522,4 +574,14 @@ async function boot(){
   schedule();
  }catch(e){console.warn('Dash Forge unavailable:',e);}
 }
+window.addEventListener('dashforge:creator-mode',event=>{
+ if(!root?.isConnected||run)return;
+ const boss=Boolean(event.detail?.boss);
+ draft={id:null,title:boss?'My First Boss Arena':'My New Level',difficulty:boss?6:2,
+  pattern:'.'.repeat(boss?88:48),world:boss?'Neon Canopy':'Maker Studio',
+  bossStyle:boss?'canopy':'none'};
+ scene='builder';choosePane('builder');
+ setStatus(boss?'Boss Creator: choose a world, boss form, and attack tiles. Playtest to publish.':
+  'Level Creator: choose your scenery and place obstacles. Playtest to publish.');
+});
 void boot();
