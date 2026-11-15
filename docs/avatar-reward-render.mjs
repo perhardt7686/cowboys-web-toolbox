@@ -1,7 +1,7 @@
-import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=cel1';
-import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=cel1';
+import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=mystery2';
+import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=mystery2';
 import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
-import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=cel1';
+import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=mystery2';
 
 export const COSMETIC_SLOTS=Object.freeze(Object.keys(SLOT_LABELS));
 const thumbnails=new WeakSet();
