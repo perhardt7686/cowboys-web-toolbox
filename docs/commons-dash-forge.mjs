@@ -222,19 +222,20 @@ function build(){
     '<p>Creator awards pay only when another member genuinely beats the published level, scaled by active solve time.</p></div>'+
     '<div id="dash-community-list" class="dash-level-list"></div></section>'+
   '<section class="dash-pane" id="dash-pane-builder" hidden><div class="dash-pane-title"><h3>Level Studio</h3>'+
-    '<p>Draw the track tile by tile. Save a draft, complete a playtest, then publish it for the family.</p></div>'+
+    '<p>Build with numbered tiles, see exactly how each obstacle looks in the game, then press Save &amp; Playtest. Keep improving until you can beat it!</p></div>'+
    '<div class="dash-builder-form"><label>Title<input id="dash-title" maxlength="58" pattern="[A-Za-z0-9 ]+" value="My First Dash"></label>'+
    '<label>Difficulty<select id="dash-difficulty">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'">'+n+'</option>').join('')+'</select></label>'+
    '<label>Tiles<select id="dash-length">'+[24,32,40,48,56,64,72,80,88].map(n=>'<option value="'+n+'"'+(n===48?' selected':'')+'>'+n+'</option>').join('')+'</select></label>'+
    '<label>World / Scenery<select id="dash-world">'+CREATOR_WORLDS.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')+'</select></label>'+
    '<label>Boss Arena<select id="dash-boss-style">'+BOSS_FORMS.map(([key,name])=>'<option value="'+key+'">'+esc(name)+'</option>').join('')+'</select></label></div>'+
-   '<div class="dash-builder-preview"><canvas id="dash-creator-preview" width="600" height="145" role="img" aria-label="Live preview of your chosen world, obstacles and boss"></canvas>'+
-   '<small>PREVIEW · YOUR ORIGINAL WORLD · BOSS & HAZARD DESIGN</small></div>'+
-   '<div class="dash-palette" role="group" aria-label="Level tile brushes">'+PAINTS.map(([k,name])=>'<button type="button" data-dash-brush="'+k+'">'+name+'</button>').join('')+'</div>'+
-   '<div id="dash-phase-guide" class="dash-phase-guide" hidden aria-label="Three boss attack phases"><span>PHASE I · OPENING</span><span>PHASE II · ESCALATION</span><span>PHASE III · FINAL ATTACK</span></div>'+
-   '<div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a tile to place hazards in the world or boss arena"></div>'+
-   '<p id="dash-builder-help" class="dash-note"></p><div class="dash-builder-actions"><button type="button" data-dash-action="new">New draft</button>'+
-   '<button type="button" data-dash-action="save">Save draft</button><button type="button" data-dash-action="test">Playtest</button>'+
+   '<div class="dash-builder-preview"><div class="dash-preview-label"><strong>1 · SEE YOUR LEVEL IN THE REAL GAME</strong><span id="dash-editor-save-state" aria-live="polite">● UNSAVED CHANGES</span></div><canvas id="dash-creator-preview" width="960" height="360" role="img" aria-label="Full-sized actual game view of currently selected track section with scenery, hazards and boss"></canvas>'+
+   '<small id="dash-preview-explanation">This preview shows actual level scenery and obstacle drawings.</small></div>'+
+   '<div class="dash-editor-walkthrough"><span><b>1</b> BUILD</span><span><b>2</b> PREVIEW</span><span><b>3</b> PLAYTEST</span><span><b>4</b> PUBLISH</span></div><h4 class="dash-tools-label">2 · CHOOSE AN OBSTACLE TO PLACE</h4><div class="dash-palette" role="group" aria-label="Level tile brushes">'+PAINTS.map(([k,name])=>'<button type="button" data-dash-brush="'+k+'"><span aria-hidden="true">'+PAINT_GLYPHS[k]+'</span>'+name+'</button>').join('')+'</div>'+
+   '<p id="dash-brush-info" class="dash-brush-info" aria-live="polite"></p>'+ 
+    '<div id="dash-phase-guide" class="dash-phase-guide" hidden aria-label="Three boss attack phases"><span>PHASE I · OPENING</span><span>PHASE II · ESCALATION</span><span>PHASE III · FINAL ATTACK</span></div>'+
+   '<div class="dash-editor-tools"><h4>3 · EDIT THE NUMBERED TILES</h4><strong id="dash-editor-range">TILES 1–24 OF 48</strong></div><div class="dash-editor-utilities"><button type="button" id="dash-editor-prev" data-dash-action="page-prev">◀ Previous tiles</button><button type="button" id="dash-undo" data-dash-action="undo" disabled>↶ Undo</button><button type="button" id="dash-redo" data-dash-action="redo" disabled>↷ Redo</button><button type="button" id="dash-editor-next" data-dash-action="page-next">Next tiles ▶</button></div><div id="dash-page-buttons" class="dash-page-buttons" role="group" aria-label="Jump to another track section"></div><div id="dash-editor-grid" class="dash-editor-grid" role="group" aria-label="Tap a numbered tile to paint that obstacle; first and last four tiles are always safe"></div><div class="dash-editor-overview-wrap"><strong>WHOLE LEVEL AT A GLANCE</strong><div id="dash-editor-overview" class="dash-editor-overview" aria-label="Miniature map of all tiles; highlighted tiles are the selected section"></div></div>'+
+   '<p id="dash-builder-help" class="dash-note"></p><h4 class="dash-tools-label">4 · SAVE, TRY IT, THEN SHARE</h4><div class="dash-builder-actions"><button type="button" data-dash-action="new">New draft</button>'+
+   '<button type="button" data-dash-action="save">Save draft</button><button type="button" data-dash-action="test" class="dash-playtest-now">▶ SAVE &amp; PLAYTEST</button>'+
    '<button type="button" data-dash-action="publish">Publish solved level</button></div>'+
    '<p class="dash-note">A creator never earns a designer award for self-testing. The first other member’s server-validated time to victory determines its one-time design award.</p></section>'+
   '<section class="dash-pane" id="dash-pane-awards" hidden><div class="dash-pane-title"><h3>Trophies & unlockables</h3>'+
