@@ -159,9 +159,9 @@ function browsAndEyes(head,v,palette,w,spacing){
     const asymmetry=expression.mouth==='curious'&&side===1?.012:0;
     const sleepy=expression.eyes==='sleepy';
     if(expression.wink&&side===1){
-      stroke(eye,faceInk,[[-.053,-.004,.021],[-.016,-.014,.035],
-        [.022,-.012,.038],[.051,.003,.018]],.0073,16);
-      stroke(eye,skin,[[-.049,-.027,.011],[0,-.027,.031],[.045,-.023,.009]],.0045,12);
+      stroke(eye,faceInk,[[-.053,-.004,.012],[-.016,-.014,.021],
+        [.022,-.012,.024],[.051,.003,.012]],.0073,16);
+      stroke(eye,skin,[[-.049,-.027,.009],[0,-.027,.019],[.045,-.023,.008]],.0045,12);
     }else{
       const ew=expression.width*.92,eh=expression.height*expression.squint*.87;
       // A pronounced ink lid gives facial expressions definition at thumbnail scale.
