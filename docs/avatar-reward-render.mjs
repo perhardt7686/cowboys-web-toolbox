@@ -1,4 +1,4 @@
-import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=mystery2';
+import {drawFamilyAvatar,normalizeAvatarRecipe} from './family-avatar-builder.mjs?v=toon3';
 import {BY_ID,SLOT_LABELS} from './avatar-reward-catalog.mjs?v=mystery2';
 import {glint,oval,paintScene,path} from './avatar-cel-art.mjs?v=cel1';
 import {bounds,paintAura,paintReaction,petBehavior,prizeAction,prizeMotion} from './avatar-prize-actions.mjs?v=mystery2';
