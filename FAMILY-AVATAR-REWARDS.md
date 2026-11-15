@@ -1,6 +1,6 @@
 # Family Avatar Studio
 
-From the Family Message Board, tap the avatar beside the menu. **My Avatar** opens a dressing room with seven free human, monster, and robot looks. Select a face or outfit on the stage, or choose a category in the editor. The height, shoulder width, jaw, and eye spacing controls save with the look. Drag to rotate, use the arrows to step, and use **Face**, **Fit**, and **Reset view** to inspect the character. When WebGL is unavailable, the illustrated turntable remains available.
+From the Family Message Board, tap the avatar beside the menu. **My Avatar** opens a dressing room with seven free human, monster, and robot looks. Select a face or outfit on the stage, or choose a category in the editor. The height, shoulder width, jaw, and eye spacing controls save with the look. Drag to rotate, use the arrows to step, and use **Face**, **Fit**, and **Reset view** to inspect the character. The stage can render the same 3D characters and rewards using Canvas when WebGL is unavailable.
 
 The **Unlockables** collection has 336 game rewards including 51 pets. Filter by slot or game, try an item on, and use its action in the preview. **Play to Unlock** opens the game listed for that achievement. Save a look to use it on the board or store it in one of six outfit slots. Shared family profiles offer **Inspect full avatar** when the member shares a character.
 

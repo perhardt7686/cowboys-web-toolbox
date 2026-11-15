@@ -282,7 +282,7 @@ export function paintRoomPet(canvas,item,view={},activity){
   const main=rewardPigment(item);
   const palette=['#c8bbca','#8c8ca4','#565672'].map((hex,i)=>color(hex).lerp(color(main),.15+i*.08).getStyle());
   return draw(canvas,state,{x:-(view.x||0)/700,y:.320+(view.y||0)/600,
-    height:Math.max(.922,.752/(canvas.width/canvas.height)),zoom:view.zoom||1,anglePitch:.049},
+    height:Math.max(.952,.91/(canvas.width/canvas.height)),zoom:view.zoom||1,anglePitch:.049},
   clothBackground(palette,item.id),palette[1],false);
 }
 

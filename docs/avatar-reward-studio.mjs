@@ -54,14 +54,24 @@ export function makeAvatarShowcase(open){
   const render=()=>{
     if(!root.open||rendered)return;
     rendered=true;
+    const pictures=[];
     for(const id of SHOWCASE){
       const item=BY_ID.get(id);
       if(!item)continue;
       const card=asButton('',()=>open(id),'avatar-showcase-card');
       card.setAttribute('aria-label','See '+item.name);
-      card.append(thumbnail(item,64),el('span','',item.name));
+      const art=thumbnail(item,86);
+      pictures.push({art,item});
+      card.append(art,el('span','',item.name));
       items.append(card);
     }
+    void prepareStudioRenderer().then(renderer=>{
+      if(!renderer||!root.isConnected)return;
+      for(const {art,item} of pictures){
+        studioPrize(art,item);
+        releaseStudioArt(art);
+      }
+    });
   };
   root.append(summary,items);
   root.addEventListener('toggle',render);
