@@ -12,6 +12,7 @@ const THEMES=[['amber','#ffd363',0],['cyan','#6ee9fb',2],['coral','#ff749c',4],[
  ['sapphire','#7d94ff',10],['ember','#ff995c',20],['lotus','#df92ff',30],['sunbeam','#fff58a',50],
  ['arcade','#67ffc8',75],['starlight','#ebdefc',100],['obsidian','#a8aac1',200],['legend','#fff',500]];
 let client=null,user=null,root=null,inside=null,state=null,scene='campaign',busy=false,open=false,run=null,frame=0,brush='s';
+let soundOn=false,audioContext=null,lastBeat=-1;
 let draft={id:null,title:'My First Dash',difficulty:2,pattern:'.'.repeat(48)},theme='amber',refreshTimer=null,booted=false;
 const num=n=>Number(n||0).toLocaleString('en-US');
 const niceMs=ms=>(Math.max(0,Number(ms||0))/1000).toFixed(1)+'s';
@@ -152,7 +153,7 @@ function build(){
   '<div id="dash-status" class="dash-status" role="status" aria-live="polite">Loading your family arcade…</div>'+
   '<div id="dash-play-overlay" class="dash-play-overlay" hidden>'+
     '<header class="dash-playing-head"><div><small>NOW PLAYING</small><strong id="dash-run-title">Loading…</strong></div>'+
-      '<strong id="dash-live-progress">0%</strong><button type="button" data-dash-action="leave">Leave track</button></header>'+
+      '<strong id="dash-live-progress">0%</strong><button type="button" id="dash-sound" data-dash-action="sound" aria-pressed="false">♪ SOUND OFF</button><button type="button" data-dash-action="leave">Leave track</button></header>'+
     '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" role="img" aria-label="Running level. Tap Jump to vault over obstacles."></canvas>'+
      '<div class="dash-run-overlay" id="dash-run-message" hidden></div></div>'+
     '<footer class="dash-game-controls"><div><small>ONE TAP TO JUMP</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
@@ -212,6 +213,7 @@ function onClick(event){
     else void startLevel(Number(draft.id));break;
   case 'publish':if(!draft.id)setStatus('Save and beat your draft before publishing.',true);
     else void publishLevel(Number(draft.id));break;
+  case 'sound':toggleSound();break;
   case 'leave':void leaveRun();break;
  }
 }
@@ -231,6 +233,36 @@ async function publishLevel(id){
   await refresh(true);setStatus(data.status==='published'?'Published to the family level list. No maker award until another member beats it.':'Publication pending.');
   choosePane('community');
  }catch(e){setStatus(e.message,true);}finally{busy=false;}
+}
+
+// Original pentatonic melody, composed procedurally. No copyrighted songs,
+// samples, or Geometry Dash music are played or redistributed.
+function toggleSound(){
+ soundOn=!soundOn;
+ const button=$('dash-sound');if(button){button.textContent=soundOn?'♫ SOUND ON':'♪ SOUND OFF';button.setAttribute('aria-pressed',String(soundOn));}
+ if(soundOn){
+  try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();
+   if(audioContext.state==='suspended')void audioContext.resume();}catch{soundOn=false;if(button)button.textContent='♪ SOUND OFF';}
+ }else if(audioContext?.state==='running')void audioContext.suspend();
+}
+function originalBeat(){
+ if(!soundOn||!run||!audioContext||audioContext.state!=='running')return;
+ const beat=Math.floor(run.elapsed/((run.pace||210)*2));
+ if(beat===lastBeat)return;lastBeat=beat;
+ const world=Object.keys(WORLDS).indexOf(run.world);
+ const scale=[0,3,5,7,10,12,15,17],tone=scale[(beat+Math.max(0,world)*2)%scale.length];
+ const hz=110*Math.pow(2,(tone+(run.boss?5:0))/12);
+ try{
+  const at=audioContext.currentTime;
+  const osc=audioContext.createOscillator(),volume=audioContext.createGain();
+  osc.type=world%3===0?'triangle':world%3===1?'sine':'square';
+  osc.frequency.setValueAtTime(hz,at);
+  volume.gain.setValueAtTime(0.0001,at);
+  volume.gain.exponentialRampToValueAtTime(0.027,at+0.012);
+  volume.gain.exponentialRampToValueAtTime(0.0001,at+0.13);
+  osc.connect(volume);volume.connect(audioContext.destination);
+  osc.start(at);osc.stop(at+0.14);
+ }catch{/* Muted or unavailable audio must never stop gameplay. */}
 }
 function eventJump(){
  if(!run||run.finishing)return;
@@ -377,6 +409,7 @@ function frameStep(timestamp){
  if(!run||run.finishing)return;
  if(run.lastFrame===null)run.lastFrame=timestamp;
  run.elapsed+=Math.min(80,Math.max(0,timestamp-run.lastFrame));run.lastFrame=timestamp;
+ originalBeat();
  let end=null;
  const cursor=Math.min(run.pattern.length,Math.floor(run.elapsed/(run.pace||210)));
  while(run.checked<cursor){
@@ -395,7 +428,7 @@ function beginDraw(l){
  $('dash-live-status').textContent='Tap the canvas or JUMP. Space and ↑ work on keyboards.';
  $('dash-live-progress').textContent='0%';
  $('dash-run-message').hidden=true;
- run.lastFrame=null;run.elapsed=0;run.checked=0;run.lastJump=-5;run.jumps=[];run.finishing=false;
+ run.lastFrame=null;run.elapsed=0;run.checked=0;run.lastJump=-5;run.jumps=[];run.finishing=false;lastBeat=-1;
  frame=requestAnimationFrame(frameStep);
 }
 async function startLevel(id){
