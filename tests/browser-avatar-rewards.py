@@ -126,6 +126,17 @@ async def visit(browser, width, full=False, large_text=False):
         await editor.get_by_role('button',name='Show trick').click()
         await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
         await editor.get_by_text('Rename pet',exact=True).click()
+        await editor.get_by_role('textbox',name='Pet name').fill('Wick the Explorer')
+        # Switching to a locked species must not discard the unsaved name
+        # or silently send a rename to the server.
+        await pet_picker.select_option('studio-observatory-moth')
+        await expect(editor.get_by_text('Game reward · Locked')).to_be_visible()
+        await pet_picker.select_option('studio-attic-ghost')
+        await expect(editor.get_by_role('textbox',name='Pet name')).to_have_value('Wick the Explorer')
+        await expect(editor.get_by_role('heading',name='Wick the Attic Ghost')).to_be_visible()
+        # A second redraw from a permitted pet action also preserves the draft.
+        await editor.get_by_role('button',name='Play',exact=True).click()
+        await expect(editor.get_by_role('textbox',name='Pet name')).to_have_value('Wick the Explorer')
         await editor.get_by_role('textbox',name='Pet name').fill('Wick')
         await editor.get_by_role('button',name='Save name').click()
         await expect(editor.get_by_role('heading',name='Wick',exact=True)).to_be_visible()
@@ -139,7 +150,7 @@ async def visit(browser, width, full=False, large_text=False):
         await nav.get_by_role('button',name='Companions',exact=True).click()
         await pet_picker.select_option('studio-attic-ghost')
         await expect(editor.get_by_role('heading',name='Wick',exact=True)).to_be_visible()
-        await expect(editor.get_by_text('Bond 7 / 12')).to_be_visible()
+        await expect(editor.get_by_text('Bond 9 / 12')).to_be_visible()
         await editor.locator('.studio-profile-settings summary').click()
         await editor.get_by_role('button',name='Use a photo',exact=True).click()
         await expect(editor.locator('#profile-photo')).to_be_visible()
