@@ -130,7 +130,15 @@ function facePlanes(head,v,palette,w,h,jaw,specter){
   const ink=surface(shade(palette.skin,.48));
   for(const side of [-1,1]){
     // Flat color blocks tuck behind the eyes and outline the cheek and jaw.
-    const cheek=oval(head,shadow,side*.158*w,-.092*h,.128,.037,.068,.020);
+    // Expressions change the mass of each cheek, not merely the mouth decal.
+    // Stay inside the fitted face plane; no separate free-floating smile lines.
+    const cheekLift=v.expression==='grin'?.023:
+      v.expression==='smile'?.010:
+      v.expression==='smirk'&&side===1?.025:0;
+    const cheekWide=v.expression==='grin'?1.22:
+      v.expression==='smirk'&&side===1?1.12:1;
+    const cheek=oval(head,shadow,side*.158*w,-.092*h+cheekLift,.128,
+      .037*cheekWide,.068*cheekWide,.020);
     cheek.rotation.z=side*-.22;
     const highlight=oval(head,light,side*.111*w,.104*h,.159,.039,.013,.007);
     highlight.rotation.z=-side*.32;
@@ -225,20 +233,37 @@ function noseAndMouth(head,v,tone,palette){
   const tooth=surface('#fff0dc'),tongue=surface('#c8787e');
   const smile=expression.mouth;
   const l=expression.lift;
-  const left=[-.071,-.151+l,.167],right=[.070,-.151+(smile==='smirk'?-.009:l),.167];
   if(smile==='grin'||smile==='laugh'){
-    oval(head,mouthInk,0,-.154,.172,.068,smile==='laugh'?.041:.027,.017);
-    oval(head,tooth,0,-.142,.186,.056,.011,.007);
-    if(smile==='laugh')oval(head,tongue,0,-.181,.187,.037,.009,.007);
-    for(const side of [-1,1])stroke(head,mouthInk,[[side*.063,-.132,.173],
-      [side*.074,-.149,.164]],.0042,10);
+    const grin=smile==='grin';
+    // A broad bright tooth shape survives a 48px crop; laughter stays taller.
+    oval(head,mouthInk,0,-.154,.173,grin?.087:.070,grin?.038:.044,.016);
+    oval(head,tooth,0,-.142,.188,grin?.073:.055,.014,.007);
+    if(!grin)oval(head,tongue,0,-.185,.189,.040,.011,.007);
+    for(const side of [-1,1]){
+      stroke(head,mouthInk,[[side*(grin?.083:.067),-.131,.171],
+        [side*(grin?.093:.078),-.151,.161]],.0046,12);
+    }
+  }else if(smile==='smirk'){
+    // One rising corner and one compressed cheek give the smirk its own
+    // silhouette, instead of another symmetric tiny smile.
+    stroke(head,mouthInk,[[-.066,-.164,.174],[-.028,-.170,.188],
+      [.017,-.161,.189],[.053,-.143,.177],[.081,-.119,.156]],.0068,24);
+    stroke(head,lip,[[.057,-.137,.172],[.077,-.143,.152]],.0043,9);
+  }else if(smile==='smile'){
+    // A closed warm smile; deliberately NO tooth fill like the wide grin.
+    stroke(head,mouthInk,[[-.068,-.135,.162],[-.041,-.158,.180],
+      [0,-.169,.192],[.042,-.158,.180],[.069,-.135,.161]],.0065,24);
+    for(const side of [-1,1])
+      stroke(head,lip,[[side*.071,-.135,.162],
+        [side*.080,-.145,.147]],.0038,9);
   }else if(smile==='determined'){
     stroke(head,mouthInk,[[-.067,-.159,.168],[-.019,-.166,.191],
       [.026,-.166,.191],[.069,-.160,.165]],.007,18);
     stroke(head,lip,[[-.048,-.177,.164],[0,-.181,.182],
       [.047,-.177,.164]],.004,14);
   }else{
-    const middle=smile==='curious'?-.159:smile==='smirk'?-.150:-.158;
+    const left=[-.071,-.151+l,.167],right=[.070,-.151+l,.167];
+    const middle=smile==='curious'?-.159:-.158;
     stroke(head,mouthInk,[left,[-.030,middle,.183],
       [0,middle-.002,.194],[.034,middle,.184],right],.0057,19);
     if(smile!=='calm')for(const side of [-1,1]){
