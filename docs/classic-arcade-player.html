@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.emulatorjs.org 'wasm-unsafe-eval'; connect-src https://cdn.emulatorjs.org blob: data:; img-src 'self' blob: data: https://cdn.emulatorjs.org; media-src blob: data:; style-src 'self' 'unsafe-inline' https://cdn.emulatorjs.org; font-src https://cdn.emulatorjs.org data:; worker-src blob:; child-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Private Classic Arcade Player</title>
+<style>
+html,body{margin:0;min-height:100%;background:#050b19;color:#fff;font:700 13px/1.5 system-ui}
+#state{padding:8px;text-align:center;color:#ffeba3}
+#game{position:relative;width:100%;min-height:250px;aspect-ratio:4/3;overflow:hidden}
+#game canvas{max-width:100%!important}
+</style></head>
+<body><div id="state" role="status">Ready for private game media.</div><div id="game"></div>
+<script type="module" src="classic-arcade-player.mjs?v=loader1"></script></body></html>
