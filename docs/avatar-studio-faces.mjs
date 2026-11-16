@@ -3,7 +3,7 @@ import {expressionActing,traceCuriousMouth} from './avatar-expression-acting.mjs
 
 const HEAD_SHAPES={
   oval:[1,1,1], angular:[.98,1.065,1.08], round:[1.09,.94,.92],
-  square:[1.07,.98,1.18], long:[.91,1.13,.93], heart:[1.03,.98,.79]
+  square:[1.07,.98,1.18], long:[.97,1.055,.98], heart:[1.03,.98,.79]
 };
 const HAIR_FORM={
   short:'sweep',wavy:'sweep',curly:'curls',long:'flow',spiky:'quiff',bald:'none',
