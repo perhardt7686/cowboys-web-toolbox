@@ -104,6 +104,16 @@ async def run_one(browser,width,height):
   await page.select_option('#dash-tile-lane','3')
   await page.select_option('#dash-tile-scale','3')
   await page.select_option('#dash-tile-decor','2')
+  # A dressed hazard must keep its scenery and dimensions when dragged.
+  if width==820:
+   await page.locator('[data-dash-cell="9"]').drag_to(page.locator('[data-dash-cell="10"]'))
+   assert 'Spike' in await page.locator('[data-dash-cell="10"]').get_attribute('title')
+   assert await page.locator('#dash-tile-lane').input_value()=='3'
+   assert await page.locator('#dash-tile-scale').input_value()=='3'
+   assert await page.locator('#dash-tile-decor').input_value()=='2', 'scenery detached during tile drag'
+   await page.locator('#dash-undo').click()
+   await page.locator('[data-dash-cell="9"]').click()
+   assert await page.locator('#dash-tile-decor').input_value()=='2', 'Undo did not restore obstacle scenery'
   await page.locator('[data-dash-group="Movement"]').click()
   await page.locator('[data-dash-brush="S"]').click()
   await page.locator('[data-dash-cell="13"]').click()
