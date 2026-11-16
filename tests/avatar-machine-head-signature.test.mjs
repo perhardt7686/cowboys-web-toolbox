@@ -43,3 +43,27 @@ test('human and armored head profiles remain unchanged by robot-only signature w
     disposeFigure(actor.root);
   }
 });
+
+test('a fitted cap retracts roof aerials but keeps robot identity and equipment selection',()=>{
+  for(const name of ['automaton','radio','scout']){
+    const bounds=[];
+    for(const hat of ['none','cap']){
+      const recipe={...SHOWROOM_LOOKS[name],hat,cosmetics:{}};
+      const actor=buildAvatar(normalizeLoadout(recipe));
+      let signature;
+      actor.figure.traverse(node=>{
+        if(node.userData.studioMachineSignature)signature=node;
+      });
+      assert.ok(signature,name+' signature missing with '+hat);
+      assert.equal(signature.userData.studioPart,undefined);
+      actor.root.updateMatrixWorld(true);
+      const box=new THREE.Box3().setFromObject(signature);
+      assert.ok(!box.isEmpty());
+      bounds.push(box);
+      if(hat==='cap')assert.ok(actor.hat,'cap preview needs a real mounted hat');
+      disposeFigure(actor.root);
+    }
+    assert.ok(bounds[1].max.y<bounds[0].max.y-.018,
+      name+' antenna should retract below a fitted cap, not pierce it');
+  }
+});
