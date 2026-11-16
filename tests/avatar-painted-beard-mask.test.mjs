@@ -42,8 +42,11 @@ test('all six full-beard faces have one uninterrupted cel-painted mask with no f
       for(let i=0;i<6;i++){
         const row=i*41+j,y=p.getY(row);
         assert.ok(Number.isFinite(y));
-        if(previous>=0)assert.ok(y>previous+.001,
-          'jaw-mask rings crossed at face '+face+' angle index '+j);
+        // The old mouth-adjacent section was only 0.008 units clear at
+        // the frontal angle. That collapsed to a hairline at icon size.
+        if(previous>=0)assert.ok(y>previous+.012,
+          'jaw-mask painted sections crowd or cross at face '+face+
+          ', expression '+expression+', angle index '+j+', row '+i);
         previous=y;
       }
     }
