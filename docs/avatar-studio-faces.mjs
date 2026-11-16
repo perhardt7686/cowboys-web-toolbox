@@ -302,21 +302,45 @@ function introduceBeard(head,v,palette,w,jaw){
     stroke(head,light,[[-.025,-.211,.192],[-.010,-.238,.194],[.010,-.252,.177]],.003);
     return;
   }
-  const chin=shell(head,hair,[
-    [-.286,.07,.070,0,.049],[-.278,.123*jaw*w,.112,0,.050],
-    [-.249,.151*jaw*w,.139,0,.041],[-.218,.174*jaw*w,.148,0,.033],
-    [-.179,.194*jaw*w,.158,0,.028],[-.135,.210*w,.172,0,.018]
-  ], {start:-1.68,end:1.68,segments:30,warp([x,y,z],a,i){
-    const side=Math.pow(Math.abs(Math.sin(a)),2.3);
-    return [x,y+side*i*.014-(i===5?.061*Math.max(0,Math.cos(a))**3:0),z];
-  }});
-  chin.material.side=THREE.DoubleSide;
-  for(const s of [-1,1]){
-    stroke(head,edge,[[s*.199*w,-.062,.115],[s*.174*w,-.136,.149],
-      [s*.117*jaw*w,-.173,.170],[s*.065*jaw*w,-.193,.195]],.0047);
-    stroke(head,light,[[s*.188*w,-.094,.116],[s*.161*w,-.176,.151],
-      [s*.115*jaw*w,-.233,.167],[s*.035*jaw*w,-.265,.165]],.005);
+  // One face-fitted cel mask replaces two detached cheek contour tubes.
+  // Its ink, light and shadow are all per-vertex paint on the SAME mesh,
+  // so the color cannot float forward or intersect the cheeks in profile.
+  const rings=[
+    [-.300,.070,.070,0,.049],[-.285,.123*jaw*w,.112,0,.050],
+    [-.261,.151*jaw*w,.139,0,.041],[-.230,.174*jaw*w,.148,0,.033],
+    [-.203,.194*jaw*w,.158,0,.028],[-.134,.210*w,.172,0,.018]
+  ];
+  const segments=40,start=-1.68,end=1.68;
+  const paint=surface('#ffffff',{vertexColors:true,side:THREE.DoubleSide});
+  const chin=shell(head,paint,rings,{start,end,segments,
+    warp([x,y,z],a,i){
+      const side=Math.pow(Math.abs(Math.sin(a)),2.3);
+      // Keep the mouth notch below the widest grin without folding this
+      // upper ring across the previous jaw ring.
+      return [x,y+side*i*.014-(i===5?
+        .061*Math.pow(Math.max(0,Math.cos(a)),3):0),z];
+    }
+  });
+  const ink=shade(palette.hair,.48),base=shade(palette.hair,.91);
+  const lightPaint=shade(palette.hair,1.18),lower=shade(palette.hair,.73);
+  const pixels=[];
+  for(let i=0;i<rings.length;i++){
+    for(let j=0;j<=segments;j++){
+      const a=start+(end-start)*j/segments;
+      const rim=Math.min(1,Math.max(0,(Math.abs(a)-1.33)/.35));
+      const beneath=Math.max(0,(3-i)/3)*.24;
+      const leftBrush=Math.exp(-Math.pow((a+.49)/.35,2))*
+        Math.max(0,1-Math.abs(i-2.5)/3)*.31;
+      const pigment=base.clone().lerp(lower,beneath).lerp(ink,rim*.82);
+      pigment.lerp(lightPaint,leftBrush*(1-rim));
+      pixels.push(pigment.r,pigment.g,pigment.b);
+    }
   }
+  chin.geometry.setAttribute('color',new THREE.Float32BufferAttribute(pixels,3));
+  chin.userData.studioBeardMask=true;
+  chin.userData.studioBeardPaint='fitted-cel-mask';
+  // No extra cheek strokes, overlay shells, or selection IDs: touching the
+  // mask still acts on the face and never steals a gear editor selection.
 }
 
 function faceReward(head,item,pigment,width,spacing){
