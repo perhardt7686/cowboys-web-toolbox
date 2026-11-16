@@ -1,4 +1,5 @@
 import {INK,PAPER,oval,path,tint,glint} from './avatar-cel-art.mjs?v=workshop1';
+import {expressionActing} from './avatar-expression-acting.mjs';
 
 const warm='#936755';
 const hairCuts={
@@ -93,19 +94,38 @@ function eyebrow(c,x,y,v,offset){
 }
 
 function eye(c,x,y,iris,v,width=10,face=0){
-  const lift={classic:5,round:8,almond:4,wide:7,sleepy:2,dramatic:5.5}[v.eye_shape]||5;
-  const determined=v.expression==='determined';
-  eyebrow(c,x,y-10,v,determined?4:0);
+  const mood=expressionActing(v.expression);
+  const side=face>0?1:0;
+  const base={classic:5,round:8,almond:4,wide:7,sleepy:2,dramatic:5.5}[v.eye_shape]||5;
+  const lift=Math.max(1.9,base*mood.eyes[side]);
+  eyebrow(c,x,y-10+mood.brows[side],v,mood.browEnd[side]);
   if(v.expression==='wink'&&face===1){
     path(c,[x-width,y+1],[[x,y-4,x+width,y]],null,INK,2.3);
+    path(c,[x-width+2,y+4],[[x,y+6,x+width-2,y+3]],null,tint(iris,INK,.65),1.25);
+    return;
+  }
+  if(v.expression==='laugh'){
+    // Fully inked crescent eye, not a scaled-down spherical pupil.
+    path(c,[x-width,y+1],[[x-3,y-lift-3,x+5,y-lift-3,x+width,y]],null,INK,2.65);
+    path(c,[x-width+2,y+3],[[x-2,y+lift*.38,x+4,y+lift*.38,x+width-2,y+1]],null,tint(iris,INK,.6),1.3);
     return;
   }
   path(c,[x-width,y+1],[[x-4,y-lift-2,x+2,y-lift-4,x+width,y-1],
-    [x+3,y+lift,x-4,y+lift+1,x-width,y+1]],PAPER,INK,1.65);
-  const offset=width*.23+face*.45;
-  oval(c,x+offset,y-.5,Math.min(width*.44,3.5),Math.min(lift*.79,4.85),iris,INK,.85);
-  oval(c,x+offset+.5,y-.45,Math.min(width*.27,2.35),Math.min(lift*.66,3.8),INK);
-  if(lift>3)oval(c,x+offset-.73,y-2.45,.76,.77,PAPER);
+    [x+3,y+lift,x-4,y+lift+1,x-width,y+1]],PAPER,INK,1.7);
+  const offset=width*.23+face*.45+mood.gaze[side]*.72;
+  const pupilX=Math.min(x+width-3,Math.max(x-width+3,x+offset));
+  oval(c,pupilX,y-.5,Math.min(width*.44,3.5),Math.min(lift*.79,4.85),iris,INK,.85);
+  oval(c,pupilX+.5,y-.45,Math.min(width*.27,2.35),Math.min(lift*.66,3.8),INK);
+  if(lift>3)oval(c,pupilX-.73,y-2.45,.76,.77,PAPER);
+  if(v.expression==='calm'||v.eye_shape==='sleepy'){
+    // Upper lid and warm cheek-shadow carry the relaxed expression.
+    path(c,[x-width,y-4],[[x-3,y-lift*.35,x+5,y-lift*.52,x+width,y-4]],
+      tint(iris,PAPER,.05),INK,2);
+  }
+  if(v.expression==='determined'){
+    path(c,[x-width+1,y+lift*.91],[[x,y+lift*.61,x+width-1,y+lift*.91]],
+      null,INK,1.8);
+  }
 }
 
 function facialHair(c,v,x,y,jaw,end,hair,skin,profile){
