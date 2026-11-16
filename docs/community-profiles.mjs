@@ -2,7 +2,7 @@ import {escapeHTML as esc,initials,renderBody,displayName,safeHttps,canPost} fro
 import {DETAIL_DEFAULTS,forumBody} from './forum-core.mjs?v=powers1';
 import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProfile,profileCompletion} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=workshop1';
-import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=workshop1';
+import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=history1';
 import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=workshop1';
 
