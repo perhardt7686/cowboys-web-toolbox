@@ -47,14 +47,14 @@ test('Star Squadron launches, responds to controls and deterministically replays
 });
 
 test('Mystery Maze moves to reachable cells and deterministically replays',()=>{
-  const start=initialRetro('maze',1);
+  const start=initialRetro('maze',8);
   assert.equal(start.x,1);
   assert.equal(start.y,1);
   const next=retroStep(start,'R');
   assert.equal(next.x,2);
   assert.equal(next.y,1);
   assert.equal(next.dots,1);
-  assert.deepEqual(retroReplay('maze',1,'R'),next);
+  assert.deepEqual(retroReplay('maze',8,'R'),next);
   const width=RETRO_MAZE[0].length;
   assert.ok(RETRO_MAZE.every(row=>row.length===width));
   const walkable=RETRO_MAZE.join('').replace(/#/g,'').length;
