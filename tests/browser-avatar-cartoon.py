@@ -421,9 +421,34 @@ async def review_angles(browser):
       }
       if(Object.values(robotThumbs).some(frames=>frames.length!==4))
         throw Error('Missing 3D and 2D robot thumbnails');
+      // Compatibility: standard headwear must not vanish or leave cut-off
+      // robot antennas in either renderer at profile and front viewpoints.
+      const robotHats=makeCanvas(1080,750),hc=robotHats.getContext('2d');
+      hc.fillStyle='#f7efdf';hc.fillRect(0,0,1080,750);
+      hc.fillStyle='#35273f';hc.font='bold 21px system-ui';
+      hc.fillText('Robot headwear compatibility · fitted cap · 3D / cel',16,27);
+      for(const [j,[label]] of robotViews.entries())hc.fillText(label,120+j*235,54);
+      for(const [i,model] of robotModels.entries()){
+        const recipe={...SHOWROOM_LOOKS[model],hat:'cap',
+          cosmetics:{},pose:'center',glasses:'none'};
+        const y=71+i*221;
+        hc.fillStyle='#35273f';hc.font='bold 16px system-ui';
+        hc.fillText(model.toUpperCase(),5,y+81);
+        for(const [j,[label,angle,isCel]] of robotViews.entries()){
+          const target=isCel?celTile:faceTile;
+          const h=figureAt(recipe,angle);
+          const cam=isCel?{angle,crop:{x:h.head.x,
+            y:h.head.y+39*h.design.scale,size:177}}:
+            {angle,zoom:2.40,y:166};
+          if(isCel)renderLoadout(target,recipe,0,null,cam);
+          else if(!paintRoomAvatar(target,recipe,cam,0,null,'body'))
+            throw Error('Robot cap test missing '+model+'/'+label);
+          hc.drawImage(target,120+j*235,y,194,194);
+        }
+      }
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
@@ -431,7 +456,8 @@ async def review_angles(browser):
                            'avatar-workshop-beard-mouth-compatibility.png',
                            'avatar-workshop-turn-direction.png',
                            'avatar-workshop-expression-continuity.png',
-                           'avatar-workshop-robot-silhouettes.png'], sheets['images']):
+                           'avatar-workshop-robot-silhouettes.png',
+                           'avatar-workshop-robot-hat-fit.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()
