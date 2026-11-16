@@ -406,8 +406,11 @@ function build(){
       '<strong id="dash-live-progress">0%</strong><button type="button" id="dash-sound" data-dash-action="sound" aria-pressed="false">♪ SOUND OFF</button><button type="button" id="dash-retry-live" data-dash-action="retry" hidden>Retry</button><button type="button" id="dash-practice-retry" data-dash-action="practice-retry" hidden>Checkpoint</button><button type="button" data-dash-action="leave">Leave track</button></header>'+
     '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" tabindex="0" role="img" aria-label="Running level. Press Space or Up to control your character."></canvas>'+
      '<div class="dash-run-overlay" id="dash-run-message" hidden></div></div>'+
-    '<footer class="dash-game-controls"><div><small id="dash-control-mode">Cube</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
-    '<button type="button" id="dash-jump" aria-label="Jump">↗ JUMP</button></footer>'+
+    '<footer class="dash-game-controls arcade-control-deck" aria-label="Dash Forge arcade controls">'+
+    '<div class="arcade-control-info"><strong>PLAYER 1 · ARCADE CONTROLS</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
+    '<div class="arcade-action-cluster"><div class="arcade-key-station">'+
+    '<button type="button" id="dash-jump" class="arcade-button-a" aria-label="Arcade A, jump" aria-describedby="dash-action-label"><span class="arcade-button-face">A</span><span class="arcade-button-symbol" aria-hidden="true">↗</span></button>'+
+    '<span id="dash-action-label" class="arcade-button-caption">JUMP</span><small class="arcade-keyboard-hint">SPACE / ↑ · HOLD</small></div></div></footer>'+
   '</div></div>';
  const sibling=$('streetrod-root');
  if(sibling?.parentElement===main)sibling.after(root);else main.prepend(root);
@@ -806,7 +809,10 @@ function updateControls(){
  const mode=run.physics.mode;
  $('dash-control-mode').textContent=DASH_MODES[mode];
  $('dash-live-status').textContent=MODE_HELP[mode]+(run.practice?' Practice only.':'');
- $('dash-jump').textContent=mode==='S'||mode==='W'?'▲ THRUST':mode==='B'||mode==='V'?'⇅ FLIP':mode==='P'?'⇅ TELEPORT':'↗ JUMP';
+ const action=mode==='S'||mode==='W'?'THRUST':mode==='B'||mode==='V'?'FLIP':mode==='P'?'TELEPORT':'JUMP';
+  $('dash-action-label').textContent=action;
+  $('dash-jump').setAttribute('aria-label','Arcade A, '+action.toLowerCase());
+  $('dash-jump').querySelector('.arcade-button-symbol').textContent=action==='JUMP'?'↗':action==='THRUST'?'▲':'⇅';
 }
 function beginDraw(l){
  try{if(!soundOn&&localStorage.getItem('dash-forge-audio')==='on')toggleSound();}catch{}
