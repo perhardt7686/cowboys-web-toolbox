@@ -42,7 +42,7 @@ test('server-side matching remains in control and codes are announced to users',
  assert.match(m,/community_mahjong_pair/);
  assert.match(m,/\.then\(result=>\{if\(result\)celebratePair\(point\);\}\)/);
  assert.match(h,/mahjong-kids-colors\.css\?v=kid7/);
- assert.match(h,/commons-mahjong\.mjs\?v=kid7/);
+ assert.match(h,/commons-mahjong\.mjs\?v=keyboard1/);
 });
 test('motion follows interactions only and honors reduced-motion settings',()=>{
  const c=read('docs/mahjong-kids-colors.css');
