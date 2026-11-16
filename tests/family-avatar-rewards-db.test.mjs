@@ -237,6 +237,9 @@ test('approved family avatars derive rewards and restrict persistence and sharin
 
   assert.equal(get(await state(),'studio-refit').earned_at,null);
   await switchRole(null,'system');
+  // The production daily-word guard requires a real dictionary entry.
+  // This synthetic award fixture previously referenced an absent word_id.
+  await sql("insert into public.community_word_bank(id,answer,clue,difficulty) values(1,'ALPHA','Fixture-only clue','easy')");
   await sql("insert into public.community_word_days(game_date,word_id) values('2026-11-14',1)");
   await sql(`insert into public.community_word_guesses(game_date,user_id,guess,feedback,points)
     values('2026-11-14',$1,'CLUES',array['correct','present','absent','absent','absent'],5)`,[other]);
