@@ -1,18 +1,28 @@
 import {INK,PAPER,path,oval} from './avatar-cel-art.mjs?v=workshop1';
 
-function eye(c,x,y,color='#6f563a'){
+function eye(c,x,y,color='#6f563a',closed=false){
+  if(closed){
+    path(c,[x-3,y+.5],[[x,y+3,x+4,y+.2]],null,INK,2.2);
+    return;
+  }
   oval(c,x,y,4,5,PAPER,INK,1.4,-.13);
   oval(c,x+1,y+.1,2.35,3.5,color);
   oval(c,x+1.5,y+.1,1.3,2.3,INK);
   oval(c,x+.2,y-1.6,.8,.8,'#fff8e3');
 }
 
-function trailHusky(c) {
+function trailHusky(c,t=0) {
+  // A husky's tail wags in a broad arc; the body remains rooted on the cel.
+  const wag=Math.sin(t*3.2)*.19;
+  const blink=Math.sin(t*4.15)>.96;
   const gray='#776769',shadow='#53444d',fur='#dacdb7';
   oval(c,-1,28,28,5,'#29182745');
+  c.save();
+  c.translate(-16,12);c.rotate(wag);c.translate(16,-12);
   path(c,[-16,12],[[-31,13,-36,4,-31,-6],[-32,-17,-18,-21,-16,-15],
     [-24,-10,-19,-4,-13,-1],[-5,5,-8,12,-16,12]],gray);
   path(c,[-29,-9],[[-32,-17,-21,-19,-16,-15],[-21,-13,-22,-8,-23,-5]],PAPER,null);
+  c.restore();
   path(c,[-19,14],[[-22,-5,9,-9,20,8],[25,14,24,21,19,26],[22,30,7,31,3,26],
     [-3,32,-16,31,-17,27],[-16,24,-18,19,-19,14]],fur);
   path(c,[-17,16],[[-6,22,7,26,18,22],[17,26,18,28,19,28],[4,32,5,27,2,26],
@@ -26,7 +36,10 @@ function trailHusky(c) {
     [8,-16,14,-21,24,-16],[26,-12,30,-11,30,-7],[26,3,24,8,20,10],
     [17,15,12,15,8,13],[3,16,-2,10,-5,12],[-9,7,-15,10,-17,4],[-23,1,-26,-5,-25,-10]],PAPER,null);
   path(c,[-12,-16],[[1,-19,8,-17,12,-22],[9,-13,4,-7,3,-7],[-3,-8,-6,-15,-12,-16]],shadow,null);
-  eye(c,-11,-9,'#548d98');eye(c,17,-10,'#548d98');
+  eye(c,-11,-9,'#548d98',blink);eye(c,17,-10,'#548d98',blink);
+  // Ear creases and cheek tufts make the expression readable at 48 px.
+  path(c,[-18,-25],[[-17,-30,-15,-30,-13,-25]],null,'#55404b',1.45);
+  path(c,[22,-24],[[25,-28,27,-27,27,-23]],null,'#55404b',1.45);
   path(c,[-1,0],[[1,-4,12,-4,14,-1],[13,3,5,6,3,3],[-1,2,-1,0]],INK);
   path(c,[0,7],[[10,11,16,7,20,4],[18,14,7,18,0,7]],'#733642',INK,1.2);
   path(c,[6,11],[[10,9,14,10,14,13],[14,18,7,19,6,11]],'#e69082',null);
@@ -35,7 +48,10 @@ function trailHusky(c) {
   oval(c,12,24,3.6,3.6,'#eec777',INK,1.2);
 }
 
-function lanternRaccoon(c) {
+function lanternRaccoon(c,t=0) {
+  // The raccoon holds the handle steady while the lantern gently swings.
+  const swing=Math.sin(t*2.35)*.14;
+  const blink=Math.sin(t*3.9+1.2)>.97;
   const ash='#918078',shade='#513e49',glow='#e49651';
   oval(c,0,28,28,5,'#29182745');
   path(c,[-7,22],[[-23,32,-32,25,-33,13],[-34,3,-30,-7,-26,-6],[-20,-3,-26,8,-20,13],
@@ -53,19 +69,26 @@ function lanternRaccoon(c) {
   path(c,[-22,-12],[[-14,-22,-4,-18,1,-10],[8,-17,18,-21,28,-13],
     [29,-3,24,3,19,3],[11,0,7,0,3,-2],[-5,3,-16,4,-20,-1],[-24,-3,-23,-9,-22,-12]],shade,null);
   path(c,[-13,1],[[-5,-3,-1,-2,3,-4],[9,-4,9,-1,21,2],[19,11,11,14,2,12],[-4,12,-12,8,-13,1]],PAPER,null);
-  eye(c,-10,-9,'#8e6635');eye(c,17,-10,'#8e6635');
+  eye(c,-10,-9,'#8e6635',blink);eye(c,17,-10,'#8e6635',blink);
+  path(c,[-17,-14],[[-13,-17,-9,-17,-6,-14]],null,'#352c38',1.7);
+  path(c,[10,-14],[[15,-18,19,-17,22,-13]],null,'#352c38',1.7);
   oval(c,4,-1,4.6,2.8,INK);
   path(c,[4,2],[[4,6,9,7,14,3]],null,INK,1.5);
   path(c,[16,15],[[23,12,27,6,29,5],[32,4,36,8,33,11],[28,19,24,23,19,22]],shade,INK,1.8);
+  c.save();
+  c.translate(29,11);c.rotate(swing);c.translate(-29,-11);
+  // Soft, painted warm spill: a changing glow without strong flashes.
+  oval(c,32,20,17,20,'#f4b75524',null); 
   path(c,[29,11],[[24,2,37,-1,37,10]],null,INK,1.8);
   path(c,[26,13],[[39,13],[40,26],[25,26]],'#ffe5a0',INK,1.8);
   path(c,[28,13],[[36,13],[36,25],[28,25]],glow,null);
   path(c,[31,17],[[33,15,36,20,33,22],[30,22,29,20,31,17]],'#fff7bd',null);
   path(c,[24,12],[[40,12],[41,15],[24,15]],'#8a5740',INK,1.5);
   path(c,[24,25],[[41,25],[41,28],[24,28]],'#8a5740',INK,1.5);
+  c.restore();
 }
 
 export const PET_ART = Object.freeze([
-  ['trail-husky','Trail Husky',trailHusky],
-  ['lantern-raccoon','Lantern Raccoon',lanternRaccoon]
+  ['trail-husky','Trail Husky',trailHusky,true],
+  ['lantern-raccoon','Lantern Raccoon',lanternRaccoon,true]
 ]);
