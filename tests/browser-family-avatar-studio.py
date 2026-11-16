@@ -52,9 +52,10 @@ async def main():
                 await redo.click()
                 await expect(page.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]')).to_have_attribute('aria-pressed','true')
                 # Keyboard shortcuts must work on action controls but not edit text fields.
-                await redo.focus()
+                await undo.focus()
                 await page.keyboard.press('Control+z')
                 await expect(redo).to_be_enabled()
+                await redo.focus()
                 await page.keyboard.press('Control+y')
                 await expect(page.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]')).to_have_attribute('aria-pressed','true')
                 # Undo then choose a different color: the abandoned future must be discarded.
