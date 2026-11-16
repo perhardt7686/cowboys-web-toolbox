@@ -1,5 +1,5 @@
 import {INK,PAPER,oval,path,tint,glint} from './avatar-cel-art.mjs?v=workshop1';
-import {expressionActing} from './avatar-expression-acting.mjs';
+import {expressionActing,traceCuriousMouth} from './avatar-expression-acting.mjs?v=curious1';
 
 const warm='#936755';
 const hairCuts={
@@ -68,13 +68,19 @@ function planes(c,hair,skin,frame,recipe){
   c.restore();
 }
 
+function curiousMouth(c,x,y,rx,ry){
+  c.beginPath();
+  traceCuriousMouth(c,x,y,rx,ry);
+  c.fillStyle='#4d2937';
+  c.fill();
+}
+
 function lips(c,x,y,v,skin){
   const expression=v.expression;
   const shade=tint(skin,warm,.7);
   const ink='#3b2935';
   if(expression==='curious'){
-    oval(c,x+2,y+4,4.5,6,'#542b32',INK,1.65,-.18);
-    path(c,[x+1,y+7],[[x+5,y+6]],null,'#d87768',1.25);
+    curiousMouth(c,x+2,y+2,8.3,5.5);
   }else if(expression==='grin'||expression==='laugh'){
     const laugh=expression==='laugh',span=laugh?19:22,depth=laugh?19:15;
     path(c,[x-span,y-2],[[x-9,y+4,x+12,y+4,x+span,y-3],
@@ -227,7 +233,9 @@ function profileFace(c,v,skin,hair,iris,frame){
   const mouthY=tipY+13;
   facialHair(c,v,width-10,mouthY,jaw,end,hair,skin,true);
   if(frame.view.across>-.23){
-    eye(c,width-14,31,iris,v,7.5,turn);
+    // The right-facing profile exposes the face's left-side drawing, and vice
+    // versa. Use that eye's actual acting pose before mirroring the canvas.
+    eye(c,width-14,31,iris,v,7.5,-turn);
     const x=width-15;
     if(v.expression==='grin'||v.expression==='laugh'){
       const laugh=v.expression==='laugh',depth=laugh?11:8;
@@ -243,7 +251,7 @@ function profileFace(c,v,skin,hair,iris,frame){
     }else if(v.expression==='smile'||v.expression==='wink'){
       path(c,[x-8,mouthY-3],[[x+1,mouthY+8,x+12,mouthY-3]],
         null,INK,2.4);
-    }else if(v.expression==='curious')oval(c,x+5,mouthY+2,3,4,'#673a40',INK,1.2);
+    }else if(v.expression==='curious')curiousMouth(c,x+6,mouthY+1,5.6,4.1);
     else path(c,[x-5,mouthY+1],[[x+3,mouthY+3,x+9,mouthY]],null,INK,1.8);
     if(v.cheeks==='rosy'||v.cheeks==='freckles')
       oval(c,width-15,49,6,2.4,tint(skin,'#d46557',.4),null,1,-.2);

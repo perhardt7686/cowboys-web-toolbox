@@ -212,6 +212,47 @@ async def review_angles(browser):
       }
       if(direction[0].some((center,i)=>center-direction[1][i]<3))
         throw Error('3D and layered cel turn in different directions: '+JSON.stringify(direction));
+      const continuity=makeCanvas(435,690),ac=continuity.getContext('2d');
+      ac.fillStyle='#f7efdf';ac.fillRect(0,0,continuity.width,continuity.height);
+      ac.fillStyle='#34283d';ac.font='bold 18px system-ui';
+      ac.fillText('Curious and Wink across both previews',16,26);
+      ac.font='14px system-ui';ac.fillText('3D',16,48);ac.fillText('Layered cel',218,48);
+      const subject={...SHOWROOM_LOOKS.detective,style:'short',background:'night',glasses:'none',pose:'center'};
+      const winkPaper=[];
+      for(const [row,[expression,angle]] of [['curious',0],['wink',90],['wink',270]].entries()){
+        const recipe={...subject,expression};
+        if(!paintRoomAvatar(turnTile,recipe,{angle},0,null,'portrait'))throw Error('No expression frame');
+        if(expression==='curious'){
+          // An open, filled mouth spans several rows. The previous closed
+          // 3D smile only covered a few rows in this same face crop.
+          const data=turnTile.getContext('2d').getImageData(80,110,39,29).data;
+          let filledRows=0;
+          for(let y=0;y<29;y++){
+            let count=0;
+            for(let x=0;x<39;x++){
+              const offset=(y*39+x)*4;
+              const r=data[offset],g=data[offset+1],b=data[offset+2];
+              if(r>g+10&&b>g+3&&r<130&&g<80)count++;
+            }
+            if(count>=4)filledRows++;
+          }
+          if(filledRows<6)throw Error('Curious reads as a closed 3D smile: '+filledRows+' dark rows');
+        }
+        ac.drawImage(turnTile,16,56+row*205);
+        const frame=figureAt(recipe,angle);
+        renderLoadout(turnTile,recipe,0,null,{angle,crop:{
+          x:frame.head.x,y:frame.head.y+frame.design.scale*42,size:154}});
+        if(expression==='wink'){
+          const data=turnTile.getContext('2d').getImageData(angle===90?106:59,76,36,24).data;
+          let total=0;
+          for(let offset=0;offset<data.length;offset+=4)
+            if(data[offset]>208&&data[offset+1]>182&&data[offset+2]>145)total++;
+          winkPaper.push(total);
+        }
+        ac.drawImage(turnTile,218,56+row*205);
+      }
+      if(winkPaper[0]<=winkPaper[1]+12)
+        throw Error('Layered cel closes the wrong profile eye: '+winkPaper.join(' / '));
       // Original model sheet: identical recipe/camera in both pipelines.
       // This is a visual review artifact, not just a "canvas is nonblank" check.
       const moods=['smile','grin','calm','wink','curious','smirk','laugh','determined'];
@@ -341,13 +382,14 @@ async def review_angles(browser):
       }
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
                            'avatar-workshop-mouth-legibility.png','avatar-workshop-beard-masks.png',
                            'avatar-workshop-beard-mouth-compatibility.png',
-                           'avatar-workshop-turn-direction.png'], sheets['images']):
+                           'avatar-workshop-turn-direction.png',
+                           'avatar-workshop-expression-continuity.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()

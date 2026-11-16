@@ -114,3 +114,9 @@ This is an art direction reference and implementation record, **not** a substitu
 
 - At the same three-quarter or profile angle, the 3D character faced the opposite way from the layered-cel drawing. The turntable's angle label and zoom were correct, but switching modes reversed the visible pose.
 - Avatar and companion 3D stages now use the same rotation direction as the layered artwork. The browser test checks the visible cheek position on right and left turns and saves `avatar-workshop-turn-direction.png` for review.
+
+## Curious and Wink across both previews | November 15, 2026
+
+- Curious showed a closed smile in 3D and a rounded gasp in layered cel. Both modes now share a slightly parted mouth contour. The 3D contour follows the same cross-sections as the head surface, and the raised brow follows the cel's left-to-right pose.
+- Layered cel closed the opposite eye in profile because it used the turn direction as the visible eye's side. The right and left profiles now use the eye that is actually visible from that direction.
+- The browser test measures the open mouth in a 3D close-up and checks the visible open/closed eye at both profile angles. Its comparison is `avatar-workshop-expression-continuity.png`.

@@ -1,5 +1,5 @@
 import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
-import {expressionActing} from './avatar-expression-acting.mjs';
+import {expressionActing,traceCuriousMouth} from './avatar-expression-acting.mjs?v=curious1';
 
 const HEAD_SHAPES={
   oval:[1,1,1], angular:[.98,1.065,1.08], round:[1.09,.94,.92],
@@ -88,20 +88,33 @@ function makeScalp(head,hair,shine,style,key){
   }
 }
 
-function skinMesh(parent,tone,shape){
+function faceRings(shape){
   const [w,h,jaw]=shape;
-  return shell(parent,tone,[
+  return [
     [-.278*h,.037,.065,0,.033],[-.262*h,.116*jaw*w,.104,0,.044],
     [-.207*h,.159*jaw*w,.141,0,.027],[-.155*h,.188*jaw*w,.163,0,.016],
     [-.08*h,.218*w,.181],[-.015*h,.229*w,.191],
     [.051*h,.229*w,.192],[.12*h,.224*w,.186],
     [.186*h,.197*w,.156,0,-.008],[.242*h,.136*w,.109,0,-.012],
     [.276*h,.065*w,.06,0,-.019],[.29*h,.001,.001,0,-.026]
-  ],{segments:48,warp([x,y,z],angle){
-    const cheek=Math.exp(-(((y+.073)/.04)**2))*.014*Math.max(0,Math.cos(angle*2-.10));
-    const orbit=Math.exp(-(((y-.010)/.036)**2))*.012*Math.max(0,Math.sin(Math.abs(angle)*3));
-    return [x,y,z+Math.max(0,Math.cos(angle))*(cheek-orbit)];
-  }});
+  ];
+}
+
+function skinRelief(y,angle){
+  const cheek=Math.exp(-(((y+.073)/.04)**2))*.014*Math.max(0,Math.cos(angle*2-.10));
+  const orbit=Math.exp(-(((y-.010)/.036)**2))*.012*Math.max(0,Math.sin(Math.abs(angle)*3));
+  return Math.max(0,Math.cos(angle))*(cheek-orbit);
+}
+
+function skinDepth(x,y,rings){
+  const upper=rings.findIndex(([height])=>height>=y);
+  const low=rings[upper-1],high=rings[upper];
+  const ratio=(y-low[0])/(high[0]-low[0]);
+  const radius=THREE.MathUtils.lerp(low[1],high[1],ratio);
+  const angle=Math.asin(x/radius);
+  const depth=THREE.MathUtils.lerp(low[2],high[2],ratio);
+  const center=THREE.MathUtils.lerp(low[4]??0,high[4]??0,ratio);
+  return center+depth*Math.cos(angle)+skinRelief(y,angle);
 }
 
 // Expression decisions are pure: the same saved recipe always gives the same face.
@@ -167,7 +180,7 @@ function browsAndEyes(head,v,palette,w,spacing){
     const eye=group(head,x,.014,.173);
     eye.userData.studioEye=true; // Testable fitted cel layer, not a floating spherical eyeball.
     eye.rotation.y=side*.225;
-    const asymmetry=expression.mouth==='curious'&&side===1?.012:0;
+    const browLift=expression.mouth==='curious'?-acting.brows[index]*.0038:0;
     const sleepy=expression.eyes==='sleepy';
     if(expression.wink&&side===1){
       stroke(eye,faceInk,[[-.053,-.004,.012],[-.016,-.014,.021],
@@ -202,7 +215,7 @@ function browsAndEyes(head,v,palette,w,spacing){
         [0,-eh*1.06,.013],[ew*.62,-eh*.89,.008]],.0035);
     }
     const brows=expression.brow+(v.brows==='arching'?.013:0)+acting.brows[index]*.0025;
-    const height=.071+asymmetry+(v.brows==='bold'?.004:0);
+    const height=.071+browLift+(v.brows==='bold'?.004:0);
     const pitch=expression.mouth==='determined'?-side*.024:side*brows*.5+acting.browEnd[index]*.0016;
     stroke(eye,brow,[[-.061,height+pitch*.8,-.003],
       [-.023,height+.010+pitch,.016],[.034,height+brows*.5-pitch,.010],
@@ -210,7 +223,7 @@ function browsAndEyes(head,v,palette,w,spacing){
   }
 }
 
-function noseAndMouth(head,v,tone,palette){
+function noseAndMouth(head,v,tone,palette,rings){
   const expression=cartoonFaceExpression(v);
   const bridge={straight:.054,pointed:.041,swoop:.032,button:.019,freckled:.028}[v.nose]??.042;
   const length=v.nose==='pointed'?.287:v.nose==='swoop'?.266:.253;
@@ -261,15 +274,24 @@ function noseAndMouth(head,v,tone,palette){
       [.026,-.166,.191],[.069,-.160,.165]],.007,18);
     stroke(head,lip,[[-.048,-.177,.164],[0,-.181,.182],
       [.047,-.177,.164]],.004,14);
+  }else if(smile==='curious'){
+    const outline=new THREE.Shape();
+    traceCuriousMouth(outline,.005,-.159,.047,-.030);
+    const mouth=new THREE.ShapeGeometry(outline,12);
+    const positions=mouth.getAttribute('position');
+    for(let i=0;i<positions.count;i++){
+      const x=positions.getX(i),y=positions.getY(i);
+      // A thin inked shape follows this model's jaw. The clearance covers
+      // the triangles across the curved face while keeping it against the lip.
+      positions.setZ(i,skinDepth(x,y,rings)+.006);
+    }
+    mouth.computeVertexNormals();
+    attach(head,mouth,mouthInk);
   }else{
     const left=[-.071,-.151+l,.167],right=[.070,-.151+l,.167];
-    const middle=smile==='curious'?-.159:-.158;
+    const middle=-.158;
     stroke(head,mouthInk,[left,[-.030,middle,.183],
       [0,middle-.002,.194],[.034,middle,.184],right],.0057,19);
-    if(smile!=='calm')for(const side of [-1,1]){
-      stroke(head,lip,[[side*.070,-.151+l,.165],
-        [side*.078,-.158+l,.159]],.0044,9);
-    }
   }
   stroke(head,lip,[[-.036,-.195,.150],[0,-.202,.166],
     [.036,-.195,.150]],.0037,14);
@@ -474,7 +496,10 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
   const shape=(HEAD_SHAPES[v.face]||HEAD_SHAPES.oval).slice();
   shape[2]*=1+jawTune*.069;
   const [w,h,jaw]=shape;
-  skinMesh(head,tone,shape);
+  const rings=faceRings(shape);
+  shell(head,tone,rings,{segments:48,warp([x,y,z],angle){
+    return [x,y,z+skinRelief(y,angle)];
+  }});
   facePlanes(head,v,palette,w,h,jaw,specter);
   for(const s of [-1,1]){
     const ear=oval(head,tone,s*.221*w,-.041,0,specter?.074:.044,specter?.076:.061,.033);
@@ -484,7 +509,7 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
     if(v.accessory==='earrings')band(head,surface('#e8bc76',{metalness:.72}),s*.231*w,-.090,.026,.023,.006,.80,1.21);
   }
   browsAndEyes(head,v,palette,w,eyeSpacing);
-  noseAndMouth(head,v,tone,palette);
+  noseAndMouth(head,v,tone,palette,rings);
   introduceBeard(head,v,palette,w,jaw);
   if(eyeReward)faceReward(head,eyeReward,palette.eye,w,eyeSpacing);
   if(['freckles','rosy','dimples'].includes(v.cheeks)||v.accessory==='freckles'){
