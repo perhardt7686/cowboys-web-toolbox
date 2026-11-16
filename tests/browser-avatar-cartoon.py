@@ -179,6 +179,39 @@ async def review_angles(browser):
           profile.drawImage(portrait,157+column*302,48+row*205,204,204);
         }
       }
+      // The camera toggle must preserve the side of the face in both renderers.
+      const turning=makeCanvas(435,482),tc=turning.getContext('2d');
+      tc.fillStyle='#f7efdf';tc.fillRect(0,0,turning.width,turning.height);
+      const turnSample={...SHOWROOM_LOOKS.detective,background:'ocean',hair:'black',style:'short',
+        beard:'none',glasses:'none',hat:'none',skin:'tan',nose:'pointed',pose:'center',shirt:'teal'};
+      const turnTile=makeCanvas(200,200),direction=[];
+      tc.fillStyle='#34283d';tc.font='bold 18px system-ui';
+      tc.fillText('Same turns in 3D and layered cel',16,26);
+      tc.font='14px system-ui';tc.fillText('3D',16,48);tc.fillText('Layered cel',218,48);
+      for(const [row,angle] of [45,315].entries()){
+        const head=figureAt(turnSample,angle);
+        const centers=[];
+        for(const [column,isCel] of [false,true].entries()){
+          if(isCel)renderLoadout(turnTile,turnSample,0,null,{angle,crop:{
+            x:head.head.x,y:head.head.y+41*head.design.scale,size:175}});
+          else if(!paintRoomAvatar(turnTile,turnSample,{angle},0,null,'portrait'))
+            throw Error('No 3D turn sample');
+          // Warm cheek pixels in the center band track the turn; the cool
+          // scenery, dark hair and teal wardrobe sit outside this color range.
+          const {data}=turnTile.getContext('2d').getImageData(44,58,112,80);
+          let sum=0,count=0;
+          for(let pixel=0;pixel<data.length;pixel+=4){
+            const r=data[pixel],g=data[pixel+1],b=data[pixel+2];
+            if(g>68&&r>g+18&&g>b+12){sum+=(pixel/4)%112;count++;}
+          }
+          if(count<100)throw Error('Could not measure cheek position at '+angle);
+          centers.push(sum/count);
+          tc.drawImage(turnTile,16+column*202,56+row*205);
+        }
+        direction.push(centers);
+      }
+      if(direction[0].some((center,i)=>center-direction[1][i]<3))
+        throw Error('3D and layered cel turn in different directions: '+JSON.stringify(direction));
       // Original model sheet: identical recipe/camera in both pipelines.
       // This is a visual review artifact, not just a "canvas is nonblank" check.
       const moods=['smile','grin','calm','wink','curious','smirk','laugh','determined'];
@@ -307,13 +340,14 @@ async def review_angles(browser):
         }
       }
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
-      for(const canvas of [tile,shadows,portrait,faceTile,beardTarget])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
                            'avatar-workshop-mouth-legibility.png','avatar-workshop-beard-masks.png',
-                           'avatar-workshop-beard-mouth-compatibility.png'], sheets['images']):
+                           'avatar-workshop-beard-mouth-compatibility.png',
+                           'avatar-workshop-turn-direction.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()

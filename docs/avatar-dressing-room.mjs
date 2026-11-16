@@ -230,7 +230,8 @@ export function paintRoomAvatar(canvas,value,view={},time=0,motion=null,frame='b
   const signature=JSON.stringify(recipe);
   const state=viewFor(canvas,'avatar',signature,()=>buildAvatar(recipe));
   const actor=state.actor;
-  actor.root.rotation.y=-(view.angle||0)*Math.PI/180;
+  // Match the screen direction of projectTurn in the layered cel renderer.
+  actor.root.rotation.y=(view.angle||0)*Math.PI/180;
   actor.root.updateMatrixWorld(true);
   const cameraZoom=view.zoom||1;
   const aspect=canvas.width/canvas.height;
@@ -260,7 +261,7 @@ export function paintRoomPet(canvas,item,view={},activity){
   const active=initialize();
   if(!active)return false;
   const state=viewFor(canvas,'companion',item.id,()=>buildCompanion(item));
-  state.actor.root.rotation.y=-(view.angle??18)*Math.PI/180;
+  state.actor.root.rotation.y=(view.angle??18)*Math.PI/180;
   poseCompanion(state.actor,activity?.progress||0,activity);
   active.aura.intensity=0;
   const main=rewardPigment(item);
