@@ -46,6 +46,27 @@ async def verify(browser, phone=False):
     await turn.get_by_role('button', name='Zoom in').click()
     await expect(canvas).to_have_attribute('data-zoom', '1.35')
     assert await fingerprints(canvas) != before_zoom
+    # Same person, camera angle and zoom, different original render pipelines.
+    # The setting is preview-only and never mutates the saved avatar recipe.
+    cel = turn.get_by_role('button', name='Layered 2D')
+    before_compare = await fingerprints(canvas)
+    await expect(cel).to_have_attribute('aria-pressed', 'false')
+    await cel.click()
+    await expect(cel).to_have_attribute('aria-pressed', 'true')
+    await expect(canvas).to_have_attribute('data-renderer', '2d')
+    await expect(canvas).to_have_attribute('data-preview-style', 'cel')
+    await expect(canvas).to_have_attribute('data-angle', '315')
+    await expect(canvas).to_have_attribute('data-zoom', '1.35')
+    layered = await fingerprints(canvas)
+    assert layered != before_compare
+    (ROOT / 'reports').mkdir(exist_ok=True)
+    await canvas.screenshot(path=str(ROOT / 'reports' / ('avatar-workshop-cel-iphone.png' if phone else 'avatar-workshop-cel-desktop.png')))
+    await cel.click()
+    await expect(cel).to_have_attribute('aria-pressed', 'false')
+    await expect(canvas).to_have_attribute('data-renderer', '3d')
+    await expect(canvas).to_have_attribute('data-preview-style', '3d')
+    await expect(canvas).to_have_attribute('data-angle', '315')
+    assert await fingerprints(canvas) != layered, 'Returning to 3D restores the original rendering path'
     await expect(canvas).to_have_attribute('data-angle', '315')
     await turn.get_by_role('button', name='Fit', exact=True).click()
     await expect(canvas).to_have_attribute('data-zoom', '1')

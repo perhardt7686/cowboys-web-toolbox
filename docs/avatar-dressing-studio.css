@@ -533,6 +533,11 @@ body.community-page .avatar-dressing-studio .studio-camera-sheet{
   box-shadow:0 6px 20px #130c24b0;
 }
 body.community-page .avatar-dressing-studio .studio-camera-sheet button[data-turn=reset]{font-size:.75rem!important;}
+body.community-page .avatar-dressing-studio .studio-camera-sheet button[data-turn=cel]{
+  grid-column:1/-1;min-height:44px;
+  white-space:normal;font-size:.81rem!important;
+}
+
 body.community-page .avatar-dressing-studio .avatar-reward-tabs{background:#eadfcf;padding:4px;}
 body.community-page .avatar-dressing-studio .avatar-reward-tabs button{color:#4b3453;padding-inline:2px;}
 body.community-page .avatar-dressing-studio .avatar-reward-tabs button[aria-pressed=true]{
