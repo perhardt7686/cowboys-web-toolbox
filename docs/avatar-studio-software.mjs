@@ -14,6 +14,12 @@ const normal=new THREE.Vector3();
 const point=new THREE.Vector3(),toLight=new THREE.Vector3(),lampAt=new THREE.Vector3();
 const palettes=new WeakMap();
 
+function lightingStep(material,step){
+  const level=step/STEPS*1.44;
+  if(!material.isMeshToonMaterial)return level;
+  return level<.72?.64:level<.91?.87:level<1.13?1.07:1.31;
+}
+
 function tones(material){
   const intensity=material.emissiveIntensity||0;
   const key=material.color.getHexString()+':'+intensity;
@@ -21,9 +27,7 @@ function tones(material){
   if(old?.key===key)return old.values;
   const values=new Uint8Array((STEPS+1)*3);
   for(let l=0;l<=STEPS;l++){
-    const level=l/STEPS*1.44;
-    const light=material.isMeshToonMaterial?
-      (level<.72?.64:level<.91?.87:level<1.13?1.07:1.31):level;
+    const light=lightingStep(material,l);
     for(const [i,c] of ['r','g','b'].entries())
       values[l*3+i]=linearToSrgb(material.color[c]*light+(material.emissive?.[c]||0)*intensity*.30);
   }
@@ -31,7 +35,25 @@ function tones(material){
   return values;
 }
 
-function triangle(buffer,depth,w,h,vertices,a,b,c,color,opacity,coverage,ink=0){
+function meshShading(material,geometry){
+  const color=material.vertexColors&&geometry.getAttribute('color');
+  if(!color)return {palette:tones(material)};
+
+  // Three.js stores vertex pigments in linear color space. Apply the material
+  // tint here and interpolate before converting the lit pixel to sRGB.
+  const pigment=new Float32Array(color.count*3);
+  for(let i=0;i<color.count;i++){
+    pigment[i*3]=color.getX(i)*material.color.r;
+    pigment[i*3+1]=color.getY(i)*material.color.g;
+    pigment[i*3+2]=color.getZ(i)*material.color.b;
+  }
+  const levels=Float32Array.from({length:STEPS+1},(_,step)=>lightingStep(material,step));
+  const intensity=(material.emissiveIntensity||0)*.30;
+  const glow=['r','g','b'].map(channel=>(material.emissive?.[channel]||0)*intensity);
+  return {pigment,levels,glow};
+}
+
+function triangle(buffer,depth,w,h,vertices,a,b,c,shading,opacity,coverage,ink=0){
   const ax=vertices[a],ay=vertices[a+1],az=vertices[a+2],al=vertices[a+3];
   const bx=vertices[b],by=vertices[b+1],bz=vertices[b+2],bl=vertices[b+3];
   const cx=vertices[c],cy=vertices[c+1],cz=vertices[c+2],cl=vertices[c+3];
@@ -42,6 +64,9 @@ function triangle(buffer,depth,w,h,vertices,a,b,c,color,opacity,coverage,ink=0){
   if(Math.abs(area)<.035)return;
   const ua=(by-cy)/area,ub=(cy-ay)/area;
   const va=(cx-bx)/area,vb=(ax-cx)/area;
+  const {palette,pigment,levels,glow}=shading;
+  const pa=a/4*3,pb=b/4*3,pc=c/4*3;
+  const translucent=opacity<1;
   for(let y=top;y<=bottom;y++){
     const height=y+.5-cy;
     let s=ua*(left+.5-cx)+va*height,t=ub*(left+.5-cx)+vb*height;
@@ -50,15 +75,27 @@ function triangle(buffer,depth,w,h,vertices,a,b,c,color,opacity,coverage,ink=0){
       if(s<0||t<0||u<0)continue;
       const z=s*az+t*bz+u*cz;
       if(z>depth[i])continue;
-      const level=Math.min(STEPS,Math.max(0,Math.round(s*al+t*bl+u*cl)))*3;
+      const level=Math.min(STEPS,Math.max(0,Math.round(s*al+t*bl+u*cl)));
       const k=i*4;
-      if(opacity<1){
+      if(pigment){
+        const light=levels[level];
+        for(let channel=0;channel<3;channel++){
+          const mixed=s*pigment[pa+channel]+t*pigment[pb+channel]+u*pigment[pc+channel];
+          const value=linearToSrgb(mixed*light+glow[channel]);
+          buffer[k+channel]=translucent?buffer[k+channel]*(1-opacity)+value*opacity:value;
+        }
+      }else if(translucent){
         for(let channel=0;channel<3;channel++)
-          buffer[k+channel]=buffer[k+channel]*(1-opacity)+color[level+channel]*opacity;
+          buffer[k+channel]=buffer[k+channel]*(1-opacity)+palette[level*3+channel]*opacity;
       }else{
+        const offset=level*3;
+        buffer[k]=palette[offset];
+        buffer[k+1]=palette[offset+1];
+        buffer[k+2]=palette[offset+2];
+      }
+      if(!translucent){
         depth[i]=z;
         coverage[i]=ink;
-        buffer[k]=color[level];buffer[k+1]=color[level+1];buffer[k+2]=color[level+2];
       }
     }
   }
@@ -131,20 +168,20 @@ export function renderSoftwareRoom(canvas,scene,camera,root,light){
     if(!geometry.attributes.position||!geometry.attributes.normal)return;
     const vertices=sample(node,w,h,light);
     const input=geometry.index?.array;
-    const material=node.material,colors=tones(material);
+    const material=node.material,shading=meshShading(material,geometry);
     const ink=inkMeshes.has(node)?1:0;
     for(let t=0;t<(input?.length||vertices.length/4);t+=3){
       const a=(input?input[t]:t)*4,b=(input?input[t+1]:t+1)*4,c=(input?input[t+2]:t+2)*4;
       const front=(vertices[b]-vertices[a])*(vertices[c+1]-vertices[a+1])-
         (vertices[b+1]-vertices[a+1])*(vertices[c]-vertices[a])<0;
       if(!front&&material.side!==THREE.DoubleSide)continue;
-      if(material.opacity<1)transparent.push([vertices[a+2]+vertices[b+2]+vertices[c+2],vertices,a,b,c,colors,material.opacity]);
-      else triangle(buffer,z,w,h,vertices,a,b,c,colors,1,coverage,ink);
+      if(material.opacity<1)transparent.push([vertices[a+2]+vertices[b+2]+vertices[c+2],vertices,a,b,c,shading,material.opacity]);
+      else triangle(buffer,z,w,h,vertices,a,b,c,shading,1,coverage,ink);
     }
   });
   inkSilhouette(buffer,coverage,w,h);
   transparent.sort((a,b)=>b[0]-a[0]);
-  for(const [,vertices,a,b,c,colors,alpha] of transparent)
-    triangle(buffer,z,w,h,vertices,a,b,c,colors,alpha,coverage);
+  for(const [,vertices,a,b,c,shading,alpha] of transparent)
+    triangle(buffer,z,w,h,vertices,a,b,c,shading,alpha,coverage);
   ctx.putImageData(image,0,0);
 }

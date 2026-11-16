@@ -103,3 +103,9 @@ This is an art direction reference and implementation record, **not** a substitu
 - **3D release tests:** `tests/avatar-painted-beard-mask.test.mjs` tests six supported human face shapes, smile/grin/smirk, vertex color completeness, six ordered rings, no `studioPart` selection hijack, and preservation of stubble, goatee, moustache and clean-shaven variants.
 - **Visual proof:** the browser contact sheet `avatar-workshop-beard-masks.png` must display six faces × three turns with 3D/2D comparisons. The second sheet `avatar-workshop-beard-mouth-compatibility.png` compares a bearded smile, broad toothy grin and one-sided smirk at front, 45° and profile to detect lip occlusion. Compare directly against both the successful released beard from PR #36 and the rejected PR #37. Judge the *connected silhouette* and lip/cheek transitions, not just the presence of dark geometry.
 - **Publication boundary:** After PR #40 passed CI and visual review and was squash-merged, the painted beard change was re-applied to a fresh branch from the exact released `main` commit. The earlier stacked PR #41 is superseded by the clean release PR #42. Do not affect any family saves, reward IDs, pet rights or Supabase data.
+
+## Beard colors when WebGL is unavailable | November 15, 2026
+
+- The beard mask uses a white base material tinted by vertex colors. The software renderer skipped those colors and drew the whole mask in light gray, even when the selected hair color was brown or auburn.
+- The software renderer now blends adjacent vertex pigments in linear color space before applying cel lighting and converting to sRGB. The same jaw contour, mouth opening and beard color selection apply in both rendering modes.
+- The regression test checks tinting and interpolation on the software renderer. The browser test disables WebGL and samples the painted jaw on brown, auburn and silver beards. Its comparison is saved as `avatar-workshop-software-beards.png`.

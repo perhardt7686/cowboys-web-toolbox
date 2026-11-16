@@ -329,8 +329,30 @@ async def software_preview(chromium):
     await form.locator('.avatar-stage-preview-note').get_by_role('button', name='Sweep the visor').click()
     await expect(canvas).to_have_attribute('data-studio-reaction', 'scan')
     assert before != await pixels(canvas)
+    beards = await page.evaluate("""async () => {
+      const {paintRoomAvatar,releaseStudioView}=await import('/avatar-dressing-room.mjs?v=workshop1');
+      const {SHOWROOM_LOOKS}=await import('/avatar-showroom-presets.mjs?v=workshop1');
+      const portrait=Object.assign(document.createElement('canvas'),{width:200,height:200});
+      const sheet=Object.assign(document.createElement('canvas'),{width:600,height:200});
+      const ctx=sheet.getContext('2d');
+      const jaw=[];
+      for(const [index,hair] of ['brown','auburn','silver'].entries()){
+        const recipe={...SHOWROOM_LOOKS.mechanic,hat:'none',hair};
+        if(!paintRoomAvatar(portrait,recipe,{angle:0},0,null,'portrait')||portrait.dataset.backend!=='canvas')
+          throw Error('Portrait did not use the software renderer');
+        // This point sits inside the synthetic actor's jaw mask, below the lips.
+        jaw.push([...portrait.getContext('2d').getImageData(100,139,1,1).data].slice(0,3));
+        ctx.drawImage(portrait,index*200,0);
+      }
+      releaseStudioView(portrait);
+      return {jaw,art:sheet.toDataURL('image/png').split(',')[1]};
+    }""")
+    brown, auburn, silver = beards['jaw']
+    assert brown[0] > brown[1] > brown[2] and auburn[0] > brown[0] + 25, beards['jaw']
+    assert silver[2] > silver[0] and silver[0] > auburn[0], beards['jaw']
+    (REPORTS/'avatar-workshop-software-beards.png').write_bytes(base64.b64decode(beards['art']))
     await browser.close()
-    print('Canvas fallback preserves the visual interaction PASS')
+    print('Canvas fallback preserves the visual interaction and painted beard colors PASS')
 
 
 async def main():
