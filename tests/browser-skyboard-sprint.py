@@ -8,6 +8,7 @@ ROOT=Path(__file__).resolve().parents[1]
 URL="http://127.0.0.1:8765/__skyboard__/community.html"
 HTML="""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-board-rush.css">
+<link rel="stylesheet" href="/family-arcade-controls.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true,supabaseUrl:'https://demo.supabase.co',publishableKey:'test'};</script>
 </head><body class="community-page" style="margin:0;background:#171334;--arcade-top:0px;--arcade-bottom:0px">
 <section id="conversations"><div class="community-main"><div id="dash-forge-root"></div></div></section>
@@ -101,6 +102,15 @@ async def verify(browser,size,full_race=False):
   assert "Asynchronous ghost" in await page.locator("#skyboard-status").inner_text()
   assert await page.locator("[data-sky-hold='left']").is_visible()
   assert await page.locator("[data-sky-action='jump']").is_visible()
+  for action,caption in [('jump','JUMP'),('drift','DRIFT'),('brake','BRAKE')]:
+   button=page.locator("[data-sky-action='jump']" if action=='jump' else f"[data-sky-hold='{action}']")
+   label=page.locator(f"#skyboard-{action}-label")
+   assert await label.inner_text()==caption
+   b=await button.bounding_box()
+   c=await label.bounding_box()
+   assert b and c and c['y']>=b['y']+b['height']-3,(action,'Caption must appear below arcade button')
+  assert await page.locator('#skyboard-steer-label').inner_text()=='JOYSTICK · STEER'
+  assert await page.locator('.skyboard-touch .arcade-key-station').count()==3
   assert await canvas.evaluate("c=>c.getContext('2d').getImageData(480,270,1,1).data[3]===255")
   assert await page.evaluate("document.documentElement.scrollWidth<=innerWidth+1"),size
   if full_race:
