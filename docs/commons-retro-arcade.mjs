@@ -5,6 +5,7 @@
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps1';
+import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const GAMES=[
@@ -16,6 +17,7 @@ const GAMES=[
 let client,user=null,mounted=false,overview={mine:[],trophies:[],leaders:[]};
 let current=null,actions='',ticker=null,working=false,activeScene='play',gameMode='';
 const input=createRetroInput();
+const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
 const $=id=>document.getElementById(id);
 const letters={
@@ -154,7 +156,7 @@ function toggleGame(id){
  const game=GAMES.find(g=>g.id===id),root=$(game?.root);
  if(!root)return;
  const inside=root.querySelector('.retro-inside'),shown=inside.hidden;
- if(!shown&&current?.game===id)abandon();
+ if(!shown&&(current?.game===id||lifecycle.pendingGame()===id))abandon();
  inside.hidden=!shown;
  root.querySelector('.retro-entry').setAttribute('aria-expanded',String(shown));
  if(shown){gameMode=id;activeScene='play';renderScene(id,'play');void refresh();}
@@ -170,7 +172,7 @@ function syncArcade(){
    root.querySelector('.retro-entry').setAttribute('aria-expanded','true');
    gameMode=g.id;
    renderScene(g.id,document.body.dataset.arcadeScene||'play');
-  }else if(arcade&&current?.game===g.id){
+  }else if(arcade&&(current?.game===g.id||lifecycle.pendingGame()===g.id)){
    abandon();
   }
  }
@@ -182,7 +184,7 @@ function renderScene(id,scene){
  root.querySelector('.retro-live').hidden=page!=='play';
  root.querySelector('.retro-trophies').hidden=page!=='trophies';
  root.querySelector('.retro-leaders').hidden=page!=='leaders';
- if(page!=='play'&&current?.game===id)abandon();
+ if(page!=='play'&&(current?.game===id||lifecycle.pendingGame()===id))abandon();
  if(page!=='play')void refresh();
 }
 function actionForTick(game){return input.action(game);}
@@ -200,52 +202,82 @@ function tick(){
 async function start(id){
  if(working||!user)return;
  if(current)abandon();
- working=true;gameMode=id;status('Starting a verified family round…');
+ const root=$(GAMES.find(g=>g.id===id)?.root);
+ if(!root||root.querySelector('.retro-inside')?.hidden)return;
+ const ticket=lifecycle.begin(id),owner=user;
+ working=true;gameMode=id;
+ root.querySelector('.retro-begin').disabled=true;
+ // Leaving is allowed while a server start is pending.
+ root.querySelector('.retro-end').disabled=false;
+ status('Starting a verified family round…');
  try{
   const received=await rpc('community_retro_start',{p_game:id});
+  // A delayed server response cannot resurrect a left/hidden/signed-out game.
+  if(!lifecycle.matches(ticket))return;
+  const visible=mounted&&user===owner&&!board.hidden&&root.isConnected&&
+   !root.querySelector('.retro-inside')?.hidden&&!root.querySelector('.retro-live')?.hidden&&
+   (!document.body.classList.contains('arcade-on')||document.body.dataset.arcadeGame===id);
+  if(!visible){abandon();return;}
   if(received.game!==id||!received.run_id)throw new Error('Unexpected game session');
   runId=received.run_id;current=initialRetro(id,received.seed);
   actions='';input.reset();confirmed='';
-  const root=$(GAMES.find(g=>g.id===id).root);
-  root.querySelector('.retro-begin').disabled=true;
-  root.querySelector('.retro-end').disabled=false;
   renderGame(current);
   status('Round underway. Score stays unverified until the server checks your full run.');
   ticker=document.hidden?null:setInterval(tick,RETRO_GAME_RULES[id].interval);
- }catch(error){status(error.message,'error');}
- finally{working=false;}
+ }catch(error){
+  if(lifecycle.matches(ticket))status(error.message,'error');
+ }finally{
+  if(lifecycle.matches(ticket)){
+   lifecycle.clearPending(ticket);working=false;
+   if(!current){
+    root.querySelector('.retro-begin').disabled=false;
+    root.querySelector('.retro-end').disabled=true;
+   }
+  }
+ }
 }
 function abandon(){
+ const couldStillVerify=Boolean(working&&current?.done&&runId);
+ lifecycle.invalidate();
  stopTimer();current=null;actions='';runId=null;working=false;
  for(const g of GAMES){
   const root=$(g.root);if(!root)continue;
   root.querySelector('.retro-begin').disabled=false;
   root.querySelector('.retro-end').disabled=true;
  }
- if(gameMode)status('Round left. No points or trophies were claimed.');
+ if(gameMode)status(couldStillVerify?
+  'Round closed. A completed run may still finish server verification; check your scores later.':
+  'Round left. No new score or trophy was claimed in this view.');
 }
 async function finish(){
  if(!runId||working||!current)return;
+ const ticket=lifecycle.current();
  working=true;
  const snapshot=current,id=runId,trace=actions;
  status('Replaying your moves on the server. Do not close the game yet.');
  try{
   const result=await rpc('community_retro_finish',{p_run_id:id,p_actions:trace});
+  if(!lifecycle.matches(ticket))return;
   if(Number(result.score)!==Number(snapshot.score)||
      Number(result.lives)!==Number(snapshot.lives))
     throw new Error('The local preview differs from verified gameplay. No score has been claimed in this view.');
   confirmed='SERVER VERIFIED · '+Number(result.score).toLocaleString()+' pts';
   status(confirmed+' · '+(result.trophies||[]).join(', '),'success');
   await refresh();
-  window.dispatchEvent(new Event('family-arcade-achievements-updated'));
+  if(lifecycle.matches(ticket))
+   window.dispatchEvent(new Event('family-arcade-achievements-updated'));
  }catch(error){
-  status('RUN NOT VERIFIED · '+(error.message||'Please try another round.'),'error');
+  if(lifecycle.matches(ticket))
+   status('RUN NOT VERIFIED · '+(error.message||'Please try another round.'),'error');
  }finally{
-  working=false;runId=null;current=null;actions='';
-  for(const g of GAMES){
-   const root=$(g.root);if(!root)continue;
-   root.querySelector('.retro-begin').disabled=false;
-   root.querySelector('.retro-end').disabled=true;
+  // Never clear a newer round started while an earlier finish was in flight.
+  if(lifecycle.matches(ticket)){
+   working=false;runId=null;current=null;actions='';
+   for(const g of GAMES){
+    const root=$(g.root);if(!root)continue;
+    root.querySelector('.retro-begin').disabled=false;
+    root.querySelector('.retro-end').disabled=true;
+   }
   }
  }
 }
