@@ -60,7 +60,7 @@ export function makeCalendar({rpc}) {
     control.dataset.calendarView = key;
     modes.append(control);
   }
-  body.append(toolbar, timeZone, modes, heading, editor, status, gridHint, list, footer);
+  body.append(toolbar, timeZone, modes, heading, editor, status, grid, gridHint, list, footer);
   panel.append(body);
 
   function range() {
