@@ -142,13 +142,28 @@ export function paintMysteryExpression(c,v,iris,skin){
  }
  path(c,[132,128],[[135,129,138,128]],null,light(skin),2);
  if(v.expression==='smirk'){
-   path(c,[111,156],[[126,167,146,161,159,149]],null,ink,3.1);
-   path(c,[138,166],[[148,164,156,155]],null,shadow,1.9);
+   path(c,[109,165],[[124,169,140,165,163,144]],null,ink,3.25);
+   path(c,[156,149],[[163,144,169,145]],null,shadow,1.9);
+   path(c,[149,169],[[159,163,163,157]],null,shadow,1.3);
  }else if(v.expression==='laugh'){
    path(c,[110,151],[[129,159,149,154,163,149],[164,181,140,193,127,188],
      [115,182,111,166,110,151]],'#712f43',ink,2.9);
    path(c,[115,153],[[136,162,152,151,159,153],[149,168,128,167,115,153]],cream,null);
    oval(c,140,179,14,6,'#d97e7a',null,1,-.1);
+ }else if(v.expression==='grin'){
+   // Wide toothy shape and lifted cheek creases remain legible as a 48px icon.
+   path(c,[101,152],[[119,161,144,157,167,150],
+     [172,165,150,184,131,186],[112,183,102,169,101,152]],
+     '#72343c',ink,2.9);
+   path(c,[108,154],[[130,165,149,156,163,154],
+     [159,165,134,171,110,163]],cream,null);
+   path(c,[94,146],[[97,158,102,160]],null,shadow,2);
+   path(c,[165,144],[[170,153,171,158]],null,shadow,2);
+ }else if(v.expression==='smile'||v.expression==='wink'){
+   // Closed upturned lip without the teeth of grin.
+   path(c,[112,150],[[117,164,145,171,158,148]],null,ink,3.25);
+   path(c,[107,148],[[109,157,112,159]],null,shadow,1.5);
+   path(c,[158,148],[[162,154,163,158]],null,shadow,1.5);
  }else if(v.expression==='determined'){
    path(c,[111,157],[[129,156,143,155,155,152]],null,ink,3.3);
    path(c,[127,167],[[141,166,150,163]],null,shadow,1.5);
@@ -158,12 +173,7 @@ export function paintMysteryExpression(c,v,iris,skin){
  }else if(v.expression==='calm'){
    path(c,[113,160],[[129,164,146,159,155,155]],null,shadow,2.8);
  }else{
-   const grin=v.expression==='grin';
-   path(c,[grin?104:112,153],[[129,162,145,155,grin?162:154,150],
-     [157,grin?181:170,134,grin?188:177,grin?104:112,153]],'#72343c',ink,2.6);
-   path(c,[grin?110:116,154],[[131,160,147,154,grin?158:151,153],
-     [147,165,128,169,grin?110:116,154]],cream,null);
-   if(grin)path(c,[131,180],[[140,181,151,174]],null,'#b96b71',2.3);
+   path(c,[112,158],[[129,163,145,158,155,154]],null,ink,2.2);
  }
  // Distinctive asymmetrical cel ink and cheek marks, unobtrusive at 64px.
  if(v.expression==='curious'||v.expression==='smirk'){
