@@ -86,6 +86,23 @@ async def run_size(browser,width,height):
  await page.route(URL,lambda route:route.fulfill(status=200,content_type="text/html",body=HTML))
  try:
   await page.goto(URL,wait_until="load")
+  # Exercise the real browser-imported input buffer: a touch shorter than one
+  # simulation step, followed by a keyboard/assistive click. No member login.
+  tap_result=await page.evaluate("""async () => {
+    const {createRetroInput}=await import('/retro-arcade-input.mjs?v=taps1');
+    const pad=createRetroInput();
+    const fire=document.createElement('button');
+    fire.addEventListener('pointerdown',()=>pad.press('fleet','F'));
+    fire.addEventListener('pointerup',()=>pad.release('F'));
+    fire.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1}));
+    fire.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1}));
+    const first=pad.action('fleet'),second=pad.action('fleet');
+    const right=document.createElement('button');
+    right.addEventListener('click',e=>{if(e.detail===0)pad.tap('fleet','R')});
+    right.click();
+    return [first,second,pad.action('fleet'),pad.action('fleet')];
+  }""")
+  assert tap_result==["F","N","R","N"],("Retro touch buffer or keyboard click failed",tap_result)
   await page.locator("#arcade-program-grid").wait_for(state="attached",timeout=15000)
   covers=[]
   for game,toggle,title in ROOTS:

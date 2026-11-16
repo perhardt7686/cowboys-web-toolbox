@@ -4,6 +4,7 @@
  */
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {createRetroInput} from './retro-arcade-input.mjs?v=taps1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const GAMES=[
@@ -14,7 +15,8 @@ const GAMES=[
 ];
 let client,user=null,mounted=false,overview={mine:[],trophies:[],leaders:[]};
 let current=null,actions='',ticker=null,working=false,activeScene='play',gameMode='';
-let direction='N',held=new Set(),liveAction='N',confirmed='',runId=null,renderTimer=null;
+const input=createRetroInput();
+let confirmed='',runId=null,renderTimer=null;
 const $=id=>document.getElementById(id);
 const letters={
  ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R',ArrowUp:'U',KeyW:'U',ArrowDown:'D',KeyS:'D',
@@ -27,7 +29,7 @@ function el(name,cls,content){
  if(content!==undefined)node.textContent=String(content);
  return node;
 }
-function stopTimer(){if(ticker!==null){clearInterval(ticker);ticker=null;}held.clear();}
+function stopTimer(){if(ticker!==null){clearInterval(ticker);ticker=null;}input.reset();}
 function add(parent,...children){parent.append(...children);return parent;}
 function richButton(label,callback,cls=''){
  const b=el('button','retro-button '+cls,label);b.type='button';
@@ -115,18 +117,23 @@ function makeGame(game){
  for(const [code,label] of game.id==='fleet'?
  [['L','◀ LEFT'],['F','FIRE ✦'],['R','RIGHT ▶']]:
  [['U','▲ UP'],['L','◀ LEFT'],['D','▼ DOWN'],['R','RIGHT ▶']]){
-  const control=richButton(label,()=>{},'retro-control');
+  const control=richButton(label,event=>{
+   // Keyboard/assistive-technology button activation emits detail=0.
+   // Pointer taps are queued on pointerdown to avoid double actions.
+   if(event.detail===0&&current?.game===game.id)input.tap(game.id,code);
+  },'retro-control');
   control.dataset.control=code;
   control.setAttribute('aria-label',label);
   control.style.touchAction='none';
   control.addEventListener('pointerdown',e=>{
    if(!current||current.game!==game.id)return;
    e.preventDefault();
-   control.setPointerCapture?.(e.pointerId);held.add(code);
-   if(game.id==='maze')direction=code;
+   control.setPointerCapture?.(e.pointerId);input.press(game.id,code);
   });
-  for(const name of ['pointerup','pointercancel','lostpointercapture','pointerleave'])
-   control.addEventListener(name,()=>held.delete(code));
+  for(const name of ['pointerup','lostpointercapture'])
+   control.addEventListener(name,()=>input.release(code));
+  for(const name of ['pointercancel','pointerleave'])
+   control.addEventListener(name,()=>input.cancel(code));
   controls.append(control);
  }
  const begin=richButton('Start verified round',()=>void start(game.id),'retro-begin');
@@ -178,13 +185,7 @@ function renderScene(id,scene){
  if(page!=='play'&&current?.game===id)abandon();
  if(page!=='play')void refresh();
 }
-function actionForTick(game){
- if(game==='maze')return direction;
- const l=held.has('L'),r=held.has('R'),f=held.has('F');
- if(l&&!r)return f?'A':'L';
- if(r&&!l)return f?'D':'R';
- return f?'F':'N';
-}
+function actionForTick(game){return input.action(game);}
 function tick(){
  if(!current||working)return;
  const action=actionForTick(current.game);
@@ -204,13 +205,13 @@ async function start(id){
   const received=await rpc('community_retro_start',{p_game:id});
   if(received.game!==id||!received.run_id)throw new Error('Unexpected game session');
   runId=received.run_id;current=initialRetro(id,received.seed);
-  actions='';direction='N';held.clear();confirmed='';
+  actions='';input.reset();confirmed='';
   const root=$(GAMES.find(g=>g.id===id).root);
   root.querySelector('.retro-begin').disabled=true;
   root.querySelector('.retro-end').disabled=false;
   renderGame(current);
   status('Round underway. Score stays unverified until the server checks your full run.');
-  ticker=setInterval(tick,RETRO_GAME_RULES[id].interval);
+  ticker=document.hidden?null:setInterval(tick,RETRO_GAME_RULES[id].interval);
  }catch(error){status(error.message,'error');}
  finally{working=false;}
 }
@@ -335,11 +336,10 @@ function onKeyDown(event){
  const code=letters[event.code];if(!code)return;
  if(current.game==='maze'&&code==='F')return;
  if(current.game==='fleet'&&['U','D'].includes(code))return;
- event.preventDefault();held.add(code);
- if(current.game==='maze')direction=code;
+ event.preventDefault();input.press(current.game,code);
 }
 function onKeyUp(event){
- const code=letters[event.code];if(code)held.delete(code);
+ const code=letters[event.code];if(code)input.release(code);
 }
 async function verify(){
  if(!cfg?.enabled||!board)return;
@@ -380,10 +380,19 @@ async function boot(){
   new MutationObserver(syncArcade).observe(document.body,
    {attributes:true,attributeFilter:['class','data-arcade-game','data-arcade-scene']});
   document.addEventListener('visibilitychange',()=>{
-   if(document.hidden)held.clear();
-   else schedule();
+   if(document.hidden){
+    input.clearHeld();
+    if(current&&ticker!==null){clearInterval(ticker);ticker=null;
+     status('Round paused while the page is hidden.');}
+   }else{
+    if(current&&!current.done&&!working&&ticker===null){
+     ticker=setInterval(tick,RETRO_GAME_RULES[current.game].interval);
+     status('Round resumed. Keep playing!');
+    }
+    schedule();
+   }
   });
-  window.addEventListener('blur',()=>held.clear());
+  window.addEventListener('blur',()=>input.clearHeld());
   client.auth.onAuthStateChange(schedule);
   window.addEventListener('keydown',onKeyDown);
   window.addEventListener('keyup',onKeyUp);
