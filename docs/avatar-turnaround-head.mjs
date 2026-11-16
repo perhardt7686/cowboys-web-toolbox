@@ -120,7 +120,7 @@ function eye(c,x,y,iris,v,width=10,face=0){
   if(v.expression==='calm'||v.eye_shape==='sleepy'){
     // Upper lid and warm cheek-shadow carry the relaxed expression.
     path(c,[x-width,y-4],[[x-3,y-lift*.35,x+5,y-lift*.52,x+width,y-4]],
-      tint(iris,PAPER,.05),INK,2);
+      null,INK,2);
   }
   if(v.expression==='determined'){
     path(c,[x-width+1,y+lift*.91],[[x,y+lift*.61,x+width-1,y+lift*.91]],
