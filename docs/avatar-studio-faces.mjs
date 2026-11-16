@@ -1,4 +1,5 @@
 import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
+import {expressionActing} from './avatar-expression-acting.mjs';
 
 const HEAD_SHAPES={
   oval:[1,1,1], angular:[.98,1.065,1.08], round:[1.09,.94,.92],
@@ -151,7 +152,9 @@ function browsAndEyes(head,v,palette,w,spacing){
   const shadow=surface(shade(palette.skin,.67));
   const skin=surface(palette.skin);
   const expression=cartoonFaceExpression(v);
+  const acting=expressionActing(v.expression);
   for(const side of [-1,1]){
+    const index=side===1?1:0;
     const x=side*(.100+spacing*.010)*w;
     const eye=group(head,x,.014,.173);
     eye.userData.studioEye=true; // Testable fitted cel layer, not a floating spherical eyeball.
@@ -162,12 +165,16 @@ function browsAndEyes(head,v,palette,w,spacing){
       stroke(eye,faceInk,[[-.053,-.004,.012],[-.016,-.014,.021],
         [.022,-.012,.024],[.051,.003,.012]],.0073,16);
       stroke(eye,skin,[[-.049,-.027,.009],[0,-.027,.019],[.045,-.023,.008]],.0045,12);
+    }else if(v.expression==='laugh'){
+      // Genuine inked laugh crescents; no tiny round marbles at thumbnail size.
+      stroke(eye,faceInk,[[-.057,.002,.010],[-.025,.032,.019],[.020,.030,.019],[.055,.001,.010]],.0084,20);
+      stroke(eye,shadow,[[-.050,-.010,.010],[-.004,-.014,.022],[.047,-.007,.010]],.0035,14);
     }else{
-      const ew=expression.width*.92,eh=expression.height*expression.squint*.87;
+      const ew=expression.width*.92,eh=expression.height*acting.eyes[index]*.87;
       // A pronounced ink lid gives facial expressions definition at thumbnail scale.
       oval(eye,faceInk,0,-.002,.001,ew+.008,eh+.010,.008);
       oval(eye,ivory,0,0,.009,ew,eh,.005);
-      const look=expression.pupil*(side===1?1:.55);
+      const look=expression.pupil*(side===1?1:.55)+acting.gaze[index]*.0017;
       oval(eye,eyeColor,look-.006,-.004,.016,.022,eh*.75,.004);
       oval(eye,pupil,look-.008,-.004,.021,.013,eh*.58,.003);
       oval(eye,glint,look-.017,.012,.025,.007,.007,.002);
@@ -186,9 +193,9 @@ function browsAndEyes(head,v,palette,w,spacing){
       stroke(eye,shadow,[[-ew*.64,-eh*.94,.008],
         [0,-eh*1.06,.013],[ew*.62,-eh*.89,.008]],.0035);
     }
-    const brows=expression.brow+(v.brows==='arching'?.013:0);
+    const brows=expression.brow+(v.brows==='arching'?.013:0)+acting.brows[index]*.0025;
     const height=.071+asymmetry+(v.brows==='bold'?.004:0);
-    const pitch=expression.mouth==='determined'?-side*.024:side*brows*.5;
+    const pitch=expression.mouth==='determined'?-side*.024:side*brows*.5+acting.browEnd[index]*.0016;
     stroke(eye,brow,[[-.061,height+pitch*.8,-.003],
       [-.023,height+.010+pitch,.016],[.034,height+brows*.5-pitch,.010],
       [.062,height-.008-pitch*.7,-.007]],v.brows==='bold'?.012:.0094,20);
