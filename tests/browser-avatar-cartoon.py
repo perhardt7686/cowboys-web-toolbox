@@ -198,7 +198,8 @@ async def review_angles(browser):
         ec.fillText(mood.toUpperCase(),8,y+94);
         for(const [j,angle,isCel] of columns.entries()){
           const target=isCel?celTile:faceTile;
-          const camera={angle,zoom:2.45,y:166};
+          const camera=isCel?{angle,crop:{x:216,y:218,size:180}}:
+            {angle,zoom:2.45,y:166};
           if(isCel)renderLoadout(target,recipe,0,null,camera);
           else if(!paintRoomAvatar(target,recipe,camera,0,null,'body'))throw Error('No 3D art '+mood);
           if(angle===0){
