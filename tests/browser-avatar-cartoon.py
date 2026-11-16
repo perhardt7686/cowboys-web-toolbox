@@ -197,7 +197,7 @@ async def review_angles(browser):
         const y=82+i*210;
         ec.font='bold 15px system-ui';ec.fillStyle='#30243a';
         ec.fillText(mood.toUpperCase(),8,y+94);
-        for(const [j,angle,isCel] of columns.entries()){
+        for(const [j,[label,angle,isCel]] of columns.entries()){
           const target=isCel?celTile:faceTile;
           const head=figureAt(recipe,angle);
           const camera=isCel?{angle,crop:{x:head.head.x,
