@@ -35,4 +35,6 @@ test('the member-facing rules explain independent game words without losing shar
   assert.match(ui,/Teammates share guesses and clues within each game/);
   assert.doesNotMatch(ui,/same five-letter answer in Daily Word Quest and w0rdle/i);
   assert.doesNotMatch(ui,/SAME answer as Daily Word Quest/);
+  assert.match(read('docs/community.html'),/commons-letter-lock\.mjs\?v=independent1/,
+    'fresh client module version prevents stale same-answer instructions');
 });
