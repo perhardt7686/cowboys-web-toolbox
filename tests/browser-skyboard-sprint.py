@@ -101,6 +101,15 @@ async def verify(browser,size,full_race=False):
   assert "Asynchronous ghost" in await page.locator("#skyboard-status").inner_text()
   assert await page.locator("[data-sky-hold='left']").is_visible()
   assert await page.locator("[data-sky-action='jump']").is_visible()
+  for action,caption in [('jump','JUMP'),('drift','DRIFT'),('brake','BRAKE')]:
+   button=page.locator("[data-sky-action='jump']" if action=='jump' else f"[data-sky-hold='{action}']")
+   label=page.locator(f"#skyboard-{action}-label")
+   assert await label.inner_text()==caption
+   b=await button.bounding_box()
+   c=await label.bounding_box()
+   assert b and c and c['y']>=b['y']+b['height']-3,(action,'Caption must appear below arcade button')
+  assert await page.locator('#skyboard-steer-label').inner_text()=='JOYSTICK · STEER'
+  assert await page.locator('.skyboard-touch .arcade-key-station').count()==3
   assert await canvas.evaluate("c=>c.getContext('2d').getImageData(480,270,1,1).data[3]===255")
   assert await page.evaluate("document.documentElement.scrollWidth<=innerWidth+1"),size
   if full_race:
