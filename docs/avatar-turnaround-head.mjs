@@ -331,7 +331,8 @@ function machineHead(c,v,frame,color,faceLight,hood){
   const metal=tint(color,'#a2aebe',.42);
   const edge=tint(metal,'#272c42',.58);
   const bright=tint(metal,'#f1dfb5',.6);
-  if(model==='scout'){
+  const headCovered=Boolean(v.cosmetics?.hat||(v.hat&&v.hat!=='none')||v.accessory==='crown');
+  if(model==='scout'&&!headCovered){
     path(c,[-8,-18],[[-8,-39]],null,INK,4);
     oval(c,-8,-42,6,6,'#d5a45a',INK,2);
   }
@@ -352,21 +353,28 @@ function machineHead(c,v,frame,color,faceLight,hood){
       path(c,[side*37,12],[[side*49,2,side*61,12,side*61,28],
         [side*64,46,side*51,54,side*39,45]],metal,INK,2.6);
       oval(c,side*55,29,4.6,10.3,edge,INK,1.65);
-      path(c,[side*20,-7],[[side*31,-25,side*45,-35]],null,edge,4);
-      oval(c,side*46,-35,5,5,bright,INK,1.5);
+      if(!headCovered){
+        path(c,[side*20,-7],[[side*31,-25,side*45,-35]],null,edge,4);
+        oval(c,side*46,-35,5,5,bright,INK,1.5);
+      }
     }
   }else if(model==='scout'){
-    for(const side of [-1,1]){
-      path(c,[side*23,-12],[[side*31,-27,side*48,-33,side*49,-17],
-        [side*46,-7,side*32,-6,side*23,-12]],metal,INK,2.4);
-      oval(c,side*43,-21,5.2,5.2,bright,INK,1.7);
-    }
+    if(!headCovered){
+      for(const side of [-1,1]){
+        path(c,[side*23,-12],[[side*31,-27,side*48,-33,side*49,-17],
+          [side*46,-7,side*32,-6,side*23,-12]],metal,INK,2.4);
+        oval(c,side*43,-21,5.2,5.2,bright,INK,1.7);
+      }
+    }else for(const side of [-1,1])
+      oval(c,side*41,47,4,6,bright,INK,1.5);
     path(c,[-22,68],[[0,73,19,72,24,67]],null,edge,2.2);
   }else if(model==='automaton'){
-    path(c,[-30,-11],[[-29,-25,-19,-27,-10,-27],[5,-32,19,-26,31,-13]],
-      metal,INK,2.7);
-    oval(c,0,-24,7.5,6.5,edge,INK,1.7);
-    oval(c,0,-25,3.6,3.6,bright);
+    if(!headCovered){
+      path(c,[-30,-11],[[-29,-25,-19,-27,-10,-27],[5,-32,19,-26,31,-13]],
+        metal,INK,2.7);
+      oval(c,0,-24,7.5,6.5,edge,INK,1.7);
+      oval(c,0,-25,3.6,3.6,bright);
+    }else oval(c,0,15,7,4.5,bright,INK,1.4);
     for(const side of [-1,1])oval(c,side*29,-7,3.6,3.6,edge,INK,1.2);
   }
   for(const side of [-1,1]) oval(c,side*38+view.depth*3,33,6.5,13,edge,INK,2.1);
