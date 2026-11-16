@@ -221,10 +221,10 @@ async def review_angles(browser):
       sc.fillText('Smile / grin / smirk · 48px and 64px',18,30);
       const smallTypes=[['3D 48',false,48],['Cel 48',true,48],
         ['3D 64',false,64],['Cel 64',true,64]];
-      const samples={};
+      const smallFingerprints={};
       for(const [j,[label,isCel,size]] of smallTypes.entries()){
         sc.fillText(label,115+j*120,62);
-        samples[label]=new Set();
+        smallFingerprints[label]=new Set();
         for(const [i,mood] of ['smile','grin','smirk'].entries()){
           const recipe={...SHOWROOM_LOOKS.detective,beard:'none',
             glasses:'none',hat:'none',style:'short',expression:mood};
@@ -240,13 +240,13 @@ async def review_angles(browser):
           // Copy at exact pixel size: canvas resampling, then view as a phone icon.
           const thumbnail=makeCanvas(size,size);
           thumbnail.getContext('2d').drawImage(target,0,0,size,size);
-          samples[label].add(thumbnail.toDataURL('image/png'));
+          smallFingerprints[label].add(thumbnail.toDataURL('image/png'));
           sc.drawImage(thumbnail,x,y,size,size);
           sc.font='bold 14px system-ui';sc.fillStyle='#34283d';
           if(j===0)sc.fillText(mood,9,y+size*.65);
         }
       }
-      for(const [label,views] of Object.entries(samples))
+      for(const [label,views] of Object.entries(smallFingerprints))
         if(views.size!==3)throw Error('Small icon face shapes repeated: '+label);
       // Contact sheet of six fitted jaw masks in three directions, side by
       // side against existing direction-specific 2D facial hair. Synthetic only.
