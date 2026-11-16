@@ -130,8 +130,10 @@ function moveTile(source,target){
  const from=detailAt(source),to=detailAt(target);
  if(editLayer==='track'){
   const token=draft.pattern[source],destination=draft.pattern[target];
-  writeTile(target,token,[...from.slice(0,3),...to.slice(3)]);
-  writeTile(source,destination,[...to.slice(0,3),...from.slice(3)]);
+  // Keep object lane, size, facing and scenery together during drag.
+  // Above/Cue layers intentionally remain associated with track positions.
+  writeTile(target,token,[...from.slice(0,4),...to.slice(4)]);
+  writeTile(source,destination,[...to.slice(0,4),...from.slice(4)]);
  }else{
   const layer=editLayer==='above'?4:5;
   [from[layer],to[layer]]=[to[layer],from[layer]];
