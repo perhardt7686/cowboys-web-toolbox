@@ -9,7 +9,7 @@ const hairCuts={
   flip:[24,37,1],pompadour:[34,2,0],afro:[32,21,3],fringe:[19,5,0],feathered:[28,27,4]
 };
 const faceShapes={
-  oval:[32,20,78],round:[35,26,73],long:[30,16,88],
+  oval:[32,20,78],round:[35,26,73],long:[32,22,82],
   angular:[33,13,82],square:[35,30,78],heart:[33,15,73]
 };
 const noseLengths={button:12,straight:16,swoop:15,pointed:20,freckled:12};
