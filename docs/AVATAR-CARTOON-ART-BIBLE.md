@@ -109,3 +109,8 @@ This is an art direction reference and implementation record, **not** a substitu
 - The beard mask uses a white base material tinted by vertex colors. The software renderer skipped those colors and drew the whole mask in light gray, even when the selected hair color was brown or auburn.
 - The software renderer now blends adjacent vertex pigments in linear color space before applying cel lighting and converting to sRGB. The same jaw contour, mouth opening and beard color selection apply in both rendering modes.
 - The regression test checks tinting and interpolation on the software renderer. The browser test disables WebGL and samples the painted jaw on brown, auburn and silver beards. Its comparison is saved as `avatar-workshop-software-beards.png`.
+
+## Matching turn direction in 3D and layered cel | November 15, 2026
+
+- At the same three-quarter or profile angle, the 3D character faced the opposite way from the layered-cel drawing. The turntable's angle label and zoom were correct, but switching modes reversed the visible pose.
+- Avatar and companion 3D stages now use the same rotation direction as the layered artwork. The browser test checks the visible cheek position on right and left turns and saves `avatar-workshop-turn-direction.png` for review.
