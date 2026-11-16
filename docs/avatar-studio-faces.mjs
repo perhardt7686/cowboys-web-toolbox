@@ -330,7 +330,9 @@ function introduceBeard(head,v,palette,w,jaw){
   const rings=[
     [-.300,.070,.070,0,.049],[-.285,.123*jaw*w,.112,0,.050],
     [-.261,.151*jaw*w,.139,0,.041],[-.230,.174*jaw*w,.148,0,.033],
-    [-.203,.194*jaw*w,.158,0,.028],[-.134,.210*w,.172,0,.018]
+    // A wider mouth-to-chin transition keeps the painted lip rim from
+    // collapsing into the next section at small portrait sizes.
+    [-.215,.194*jaw*w,.158,0,.028],[-.134,.210*w,.172,0,.018]
   ];
   const segments=40,start=-1.68,end=1.68;
   const paint=surface('#ffffff',{vertexColors:true,side:THREE.DoubleSide});
