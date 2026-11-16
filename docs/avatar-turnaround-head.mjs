@@ -70,22 +70,42 @@ function planes(c,hair,skin,frame,recipe){
 
 function lips(c,x,y,v,skin){
   const expression=v.expression;
-  const asleep=expression==='determined'||expression==='calm';
-  const lift=expression==='smirk'?5:expression==='grin'||expression==='laugh'?0:2;
-  const width=expression==='grin'||expression==='laugh'?31:24;
+  const shade=tint(skin,warm,.7);
+  const ink='#3b2935';
   if(expression==='curious'){
     oval(c,x+2,y+4,4.5,6,'#542b32',INK,1.65,-.18);
     path(c,[x+1,y+7],[[x+5,y+6]],null,'#d87768',1.25);
-  }else if(asleep||expression==='smirk'){
-    path(c,[x-width/2,y+lift],[[x-4,y+2,x+7,y+3,x+width/2,y-1]],
+  }else if(expression==='grin'||expression==='laugh'){
+    const laugh=expression==='laugh',span=laugh?19:22,depth=laugh?19:15;
+    path(c,[x-span,y-2],[[x-9,y+4,x+12,y+4,x+span,y-3],
+      [x+span-1,y+depth-2,x+7,y+depth+5,x,y+depth+5],
+      [x-13,y+depth+3,x-span+2,y+9,x-span,y-2]],
+      '#63323e',ink,2.35);
+    // Solid pale tooth strip reads as 'grin' even at 48 CSS px.
+    path(c,[x-span+4,y],[[x-5,y+6,x+9,y+6,x+span-4,y],
+      [x+span-7,y+6,x-8,y+11,x-span+4,y]],PAPER,null);
+    if(laugh)oval(c,x+2,y+depth+1,6,2.6,'#ca7a79',null);
+    for(const side of [-1,1])
+      path(c,[x+side*(span+1),y-2],[[x+side*(span+5),y+3]],
+        null,shade,1.5);
+  }else if(expression==='smirk'){
+    // Asymmetric mouth and one cheek crease, rather than a miniature smile.
+    path(c,[x-14,y+6],[[x-5,y+10,x+5,y+5,x+17,y-8]],
+      null,ink,2.75);
+    path(c,[x+13,y-5],[[x+21,y-7,x+22,y-1]],null,shade,1.55);
+  }else if(expression==='smile'||expression==='wink'){
+    // A closed smile, distinct from an open toothy grin.
+    path(c,[x-15,y-3],[[x-9,y+6,x+7,y+10,x+15,y-4]],
+      null,ink,2.5);
+    for(const side of [-1,1])
+      path(c,[x+side*15,y-2],[[x+side*19,y+2]],null,shade,1.4);
+  }else if(expression==='determined'||expression==='calm'){
+    path(c,[x-12,y+2],[[x-4,y+4,x+7,y+3,x+12,y-1]],
       null,INK,expression==='determined'?2.4:2.05);
   }else{
-    const open=expression==='laugh'?13:expression==='grin'?8:5;
-    path(c,[x-width/2,y],[[x-3,y+5,x+9,y+5,x+width/2,y-2],
-      [x+11,y+open,x,y+open+3,x-width/2,y]],'#6f3940',INK,1.7);
-    path(c,[x-width*.3,y+1],[[x+1,y+6,x+width*.32,y+1]],null,PAPER,2.8);
+    path(c,[x-12,y+2],[[x-4,y+4,x+7,y+3,x+12,y-1]],null,INK,2.05);
   }
-  if(v.cheeks==='dimples')path(c,[x+width*.62,y-1],[[x+width*.68,y-1,x+width*.6,y+4]],null,tint(skin,warm,.7),1.4);
+  if(v.cheeks==='dimples')path(c,[x+18,y-1],[[x+20,y+3]],null,shade,1.4);
 }
 
 function eyebrow(c,x,y,v,offset){
@@ -209,11 +229,20 @@ function profileFace(c,v,skin,hair,iris,frame){
   if(frame.view.across>-.23){
     eye(c,width-14,31,iris,v,7.5,turn);
     const x=width-15;
-    if(v.expression==='grin'||v.expression==='laugh'||v.expression==='smile'){
-      const depth=v.expression==='laugh'?8:v.expression==='grin'?5:3;
-      path(c,[x-6,mouthY],[[x+2,mouthY+3,x+10,mouthY-2],
-        [x+7,mouthY+depth,x-2,mouthY+depth,x-6,mouthY]],'#6f3940',INK,1.6);
-      path(c,[x-2,mouthY+1],[[x+3,mouthY+2,x+7,mouthY]],null,PAPER,1.95);
+    if(v.expression==='grin'||v.expression==='laugh'){
+      const laugh=v.expression==='laugh',depth=laugh?11:8;
+      path(c,[x-10,mouthY-1],[[x+2,mouthY+4,x+13,mouthY-3],
+        [x+9,mouthY+depth+2,x-2,mouthY+depth+4,x-10,mouthY-1]],
+        '#6f3940',INK,2);
+      path(c,[x-7,mouthY+1],[[x+3,mouthY+4,x+9,mouthY+1],
+        [x+6,mouthY+6,x-4,mouthY+7,x-7,mouthY+1]],PAPER,null);
+    }else if(v.expression==='smirk'){
+      path(c,[x-7,mouthY+5],[[x+2,mouthY+6,x+13,mouthY-6]],
+        null,INK,2.5);
+      path(c,[x+11,mouthY-7],[[x+15,mouthY-6]],null,shadow,1.6);
+    }else if(v.expression==='smile'||v.expression==='wink'){
+      path(c,[x-8,mouthY-3],[[x+1,mouthY+8,x+12,mouthY-3]],
+        null,INK,2.4);
     }else if(v.expression==='curious')oval(c,x+5,mouthY+2,3,4,'#673a40',INK,1.2);
     else path(c,[x-5,mouthY+1],[[x+3,mouthY+3,x+9,mouthY]],null,INK,1.8);
     if(v.cheeks==='rosy'||v.cheeks==='freckles')
