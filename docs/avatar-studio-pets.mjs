@@ -17,6 +17,9 @@ const actionButton=(label,action,kind='')=>{
 
 export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKnown,checkError,openReward,tryOn,isOpen,reduceMotion,onInventoryChange}) {
   let root,selected='',state='idle',pets=new Map(),pending=false,message='',epoch=0,stop=()=>{},inspection=null;
+  // Keep typed names in the editor only until Save name succeeds. Never
+  // confuse a local draft with the server's authoritative pet name.
+  const renameDrafts=new Map();
   const trading=createPetTradeUI({rpc,catalog:tradeCatalog,onChanged:()=>{refresh();onInventoryChange?.();},isOpen});
   function showPet(id) {
     selected=id||selected;
@@ -29,6 +32,7 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
     void rpc('community_avatar_pet_state').then(result=>{
       if(version!==epoch)return;
       pets=new Map(result.map(pet=>[pet.cosmetic_id,pet]));
+      for(const id of renameDrafts.keys())if(!pets.has(id))renameDrafts.delete(id);
       state='ready';
     }).catch(()=>{
       if(version===epoch)state='failed';
@@ -52,7 +56,12 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
       pets.set(item.id,updated);
       if(selected!==item.id)return;
       if(action==='adopt')message=updated.name+' is home.';
-      else if(action==='rename')message='Name saved.';
+      else if(action==='rename'){
+        renameDrafts.delete(item.id);
+        const editor=root?.querySelector('[data-pet-name-input]');
+        if(editor?.dataset.petNameInput===item.id)editor.value=updated.name;
+        message='Name saved.';
+      }
       else {
         message=petBehavior(item,action).caption;
         if(pet.bond<TRICK_BOND&&updated.bond>=TRICK_BOND)
@@ -76,6 +85,16 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
 
   function render(activity=null){
     if(!root||!isOpen())return;
+    // A pet action, inventory refresh or species switch rebuilds this panel.
+    // Capture any unsaved field first, including its keyboard selection.
+    const priorName=root.querySelector('[data-pet-name-input]');
+    const nameId=priorName?.dataset.petNameInput;
+    const wasEditing=priorName===document.activeElement;
+    const nameSelection=wasEditing?[priorName.selectionStart,priorName.selectionEnd]:null;
+    if(nameId){
+      if(priorName.value!==pets.get(nameId)?.name)renameDrafts.set(nameId,priorName.value);
+      else renameDrafts.delete(nameId);
+    }
     root.querySelectorAll('canvas').forEach(releaseStudioArt);
     stop();inspection?.destroy();inspection=null;
     const chosen=catalog().filter(item=>item.slot==='companion');
@@ -142,7 +161,13 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
         commands.append(control);
       }
       const newName=el('input');
-      newName.type='text';newName.value=pet.name;newName.maxLength=30;newName.setAttribute('aria-label','Pet name');
+      newName.type='text';newName.value=renameDrafts.get(item.id)??pet.name;
+      newName.maxLength=30;newName.setAttribute('aria-label','Pet name');
+      newName.dataset.petNameInput=item.id;
+      newName.addEventListener('input',()=>{
+        if(newName.value===pet.name)renameDrafts.delete(item.id);
+        else renameDrafts.set(item.id,newName.value);
+      });
       const rename=actionButton('Save name',()=>{
         const name=newName.value.trim();
         if(name)void act(item,'rename',name);
@@ -152,7 +177,7 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
       const naming=el('details','avatar-pet-name');
       const nameRow=el('div','avatar-pet-name-form');
       nameRow.append(newName,rename);naming.append(el('summary','','Rename pet'),nameRow);
-      if(focus==='rename')naming.open=true;
+      if(focus==='rename'||(wasEditing&&nameId===item.id)||renameDrafts.has(item.id))naming.open=true;
       details.append(el('span','avatar-pet-bond','Bond '+pet.bond+' / '+BOND_MAX),bar,commands,
         el('p','avatar-reward-copy',pet.bond>=TRICK_BOND?petBehavior(item,'trick').label+' learned':'Learn a trick at bond '+TRICK_BOND+'.'),
         actionButton('Take along',()=>tryOn(item)),naming);
@@ -190,7 +215,12 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
     if(message)status.textContent=message;
     if(activity==='pet'||activity==='play'||activity==='trick')
       stop=playCel(canvas,p=>studioPet(canvas,item,activity,p),reduceMotion);
-    if(focus)root.querySelector('[data-pet-action="'+focus+'"]')?.focus({preventScroll:true});
+    if(wasEditing&&nameId===item.id){
+      const editor=root.querySelector('[data-pet-name-input]');
+      editor?.focus({preventScroll:true});
+      if(editor&&nameSelection.every(Number.isInteger))
+        editor.setSelectionRange(...nameSelection);
+    }else if(focus)root.querySelector('[data-pet-action="'+focus+'"]')?.focus({preventScroll:true});
     else if(focusSelect)selection.focus({preventScroll:true});
   }
 
@@ -204,7 +234,7 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
     },
     clear(){
       root?.querySelectorAll('canvas').forEach(releaseStudioArt);
-      stop();inspection?.destroy();inspection=null;epoch++;trading.clear();root=null;selected='';state='idle';pets.clear();pending=false;message='';
+      stop();inspection?.destroy();inspection=null;epoch++;trading.clear();root=null;selected='';state='idle';pets.clear();renameDrafts.clear();pending=false;message='';
     }
   };
 }
