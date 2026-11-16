@@ -2,7 +2,7 @@ import {escapeHTML as esc,initials,renderBody,displayName,safeHttps,canPost} fro
 import {DETAIL_DEFAULTS,forumBody} from './forum-core.mjs?v=powers1';
 import {PROFILE_ICONS,PROFILE_FIELDS,PROFILE_DEFAULTS,AVATAR_BUCKET,validateProfile,profileCompletion} from './profile-core.mjs?v=powers1';
 import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar-cache.mjs?v=workshop1';
-import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=workshop1';
+import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=history1';
 import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=workshop1';
 
@@ -16,7 +16,7 @@ export function createProfileStudio(ctx){
   const copy=value=>JSON.parse(JSON.stringify(value));
   let bitmap=null,draft=null,photoChanged=false,selectedTab='profile',avatarRecipe=null,avatarMethod='photo';
   let rewards=null,rewardModule=null,ownerId=null,previewRPC=null,avatarChanged=false,savedRecipe=null;
-  let undo=[],revision=0,editorSession=0,stopTrip=null,stopWait=null,chosenPhoto=null,previewImage='',activeCelebration=null;
+  let undo=[],redo=[],revision=0,editorSession=0,stopTrip=null,stopWait=null,chosenPhoto=null,previewImage='',activeCelebration=null;
   let warmTimer=0,memberView=null,sculpting=null;
   const portrait=p=>p?.avatar_display&&characterURLs.get(p?.user_id);
   const icon=p=>PROFILE_ICONS.find(i=>i.id===p?.avatar_icon)?.symbol||'◈';
@@ -90,6 +90,8 @@ export function createProfileStudio(ctx){
     }
     const undoButton=form.querySelector('[data-avatar-undo]');
     if(undoButton)undoButton.disabled=undo.length===0;
+    const redoButton=form.querySelector('[data-avatar-redo]');
+    if(redoButton)redoButton.disabled=redo.length===0;
     const completion=document.getElementById('profile-completion');
     if(completion)completion.textContent=profileCompletion(draft)+'% of your story';
     const progress=document.getElementById('profile-meter');
@@ -132,14 +134,28 @@ export function createProfileStudio(ctx){
       ...normalizeAvatarRecipe(value),...(value?.full_body?{full_body:normalizeBody(value)}:{})
     };
   }
+  function remember(stack,recipe){
+    stack.push(copy(toLoadout(recipe)));
+    if(stack.length>40)stack.shift();
+  }
+  function moveAvatarHistory(direction){
+    const from=direction==='redo'?redo:undo;
+    if(!from.length)return false;
+    remember(direction==='redo'?undo:redo,avatarRecipe);
+    avatarRecipe=from.pop();avatarMethod='character';avatarChanged=true;sculpting=null;
+    refresh();rewards?.drawEquipped();
+    setStatus(direction==='redo'?'Avatar change redone. Preview only until you save.':
+      'Avatar change undone. Preview only until you save.');
+    return true;
+  }
   function setPreview(value,record=true){
-    if(record){
-      undo.push(toLoadout(avatarRecipe));
-      if(undo.length>40)undo.shift();
-    }
-    avatarRecipe=toLoadout(value);avatarMethod='character';avatarChanged=true;
-    refresh();
-    rewards?.drawEquipped();
+    const next=toLoadout(value);
+    if(JSON.stringify(next)===JSON.stringify(toLoadout(avatarRecipe)))return;
+    if(record)remember(undo,avatarRecipe);
+    // A fresh edit after Undo starts a new history branch, even while dragging a slider.
+    redo=[];
+    avatarRecipe=next;avatarMethod='character';avatarChanged=true;
+    refresh();rewards?.drawEquipped();
   }
   function setStatus(message){
     const node=document.getElementById('avatar-preview-status');
@@ -252,7 +268,7 @@ export function createProfileStudio(ctx){
       avatarMethod=draft.avatar_display||(!state?.revision&&draft.avatar_mode==='photo'&&draft.details.avatar_recipe)
         ?'character':draft.avatar_mode==='photo'?'photo':'initials';
       if(selectedTab==='avatar'&&!options.keepMethod)avatarMethod='character';
-      avatarChanged=false;photoChanged=false;undo=[];
+      avatarChanged=false;photoChanged=false;undo=[];redo=[];
       chosenPhoto=draft.avatar_mode==='photo'&&!draft.details.avatar_recipe?draft.avatar_path:null;
       bitmap?.close?.();bitmap=null;
     }
@@ -420,7 +436,7 @@ export function createProfileStudio(ctx){
       characterURLs.delete(id);
       cache.set(id,profile);
       draft=getOwn();photoChanged=false;avatarChanged=false;
-      undo=[];
+      undo=[];redo=[];
       status.classList.add('success');
       status.textContent=ctx.isPreview?'Preview saved locally for this session.':'Your changes are saved.';
       await imageURLs([draft]);
@@ -522,8 +538,9 @@ export function createProfileStudio(ctx){
       }else if(b.hasAttribute('data-avatar-random')){
         setPreview({...randomAvatarRecipe(),full_body:avatarRecipe.full_body,cosmetics:avatarRecipe.cosmetics});
       }else if(b.hasAttribute('data-avatar-undo')){
-        avatarRecipe=undo.pop()||avatarRecipe;
-        refresh();rewards?.drawEquipped();setStatus('Previous preview restored.');
+        moveAvatarHistory('undo');
+      }else if(b.hasAttribute('data-avatar-redo')){
+        moveAvatarHistory('redo');
       }else if(b.hasAttribute('data-avatar-reset')){
         setPreview(savedRecipe||DEFAULT_AVATAR_RECIPE);
         setStatus('Restored your saved character.');
@@ -537,6 +554,19 @@ export function createProfileStudio(ctx){
     }catch(error){ctx.toast(error.message);}
   });
   document.addEventListener('keydown',e=>{
+    // Leave native text undo alone. Shortcuts apply only while editing a character.
+    if((e.ctrlKey||e.metaKey)&&!e.altKey&&selectedTab==='avatar'&&avatarMethod==='character'&&
+      document.getElementById('content-dialog')?.open&&e.target.closest('#content-dialog')&&
+      !e.target.closest('input,textarea,select,[contenteditable]')){
+      const key=e.key.toLowerCase();
+      const direction=key==='z'&&!e.shiftKey?'undo':
+        (key==='y'||key==='z'&&e.shiftKey)?'redo':null;
+      if(direction){
+        e.preventDefault();
+        moveAvatarHistory(direction);
+        return;
+      }
+    }
     const settings=e.target.closest('.studio-profile-settings[open]');
     if(e.key==='Escape'&&settings){
       e.preventDefault();
@@ -581,7 +611,7 @@ export function createProfileStudio(ctx){
     memberView?.destroy();memberView=null;
     ++editorSession;clearTimeout(warmTimer);stopTrip?.();stopWait?.();stopTrip=stopWait=null;
     ownerId=null;revision=0;previewRPC=null;chosenPhoto=null;draft=null;avatarRecipe=savedRecipe=null;
-    previewImage='';undo=[];rewards?.clear();
+    previewImage='';undo=[];redo=[];rewards?.clear();
     activeCelebration?.remove();activeCelebration=null;
     bitmap?.close?.();bitmap=null;
     cache.clear();images.clear();characterURLs.clear();clearAvatarPhotos();clearAvatarCharacters();

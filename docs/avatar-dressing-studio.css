@@ -659,3 +659,33 @@ body.community-page .studio-workspace-dialog .profile-studio .avatar-dressing-st
     font-size:clamp(.71rem,3.23vw,.84rem)!important;
   }
 }
+
+/* Reversible editing: keep Undo, Redo and Restore readable without clipping on phones. */
+body.community-page .avatar-dressing-studio .avatar-preview-actions [data-avatar-redo]:disabled,
+body.community-page .avatar-dressing-studio .avatar-preview-actions [data-avatar-undo]:disabled {
+  opacity:.58;
+  cursor:not-allowed;
+}
+@media(max-width:500px){
+  body.community-page .avatar-dressing-studio .studio-stage-title{
+    flex-wrap:wrap;
+    align-items:flex-start;
+  }
+  body.community-page .avatar-dressing-studio .studio-stage-title h3{
+    flex:1 1 90px;
+    min-width:0;
+  }
+  body.community-page .avatar-dressing-studio .avatar-preview-actions{
+    display:flex;
+    flex:1 1 auto;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    gap:4px;
+  }
+  body.community-page .avatar-dressing-studio .avatar-preview-actions .studio-text-button{
+    min-height:44px;
+    padding:6px 8px;
+    white-space:normal;
+    line-height:1.2;
+  }
+}

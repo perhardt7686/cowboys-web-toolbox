@@ -113,7 +113,8 @@ export function makeAvatarStudioHTML(recipe) {
     '<div class="family-character-top studio-stage">'+
       '<div class="studio-stage-title"><h3 id="family-character-title">Dressing room</h3>'+
       '<div class="avatar-preview-actions" role="group" aria-label="Edit history">'+
-      '<button type="button" class="studio-text-button" data-avatar-undo>Undo</button>'+
+      '<button type="button" class="studio-text-button" data-avatar-undo title="Undo last avatar change" aria-label="Undo last avatar change">Undo</button>'+
+      '<button type="button" class="studio-text-button" data-avatar-redo title="Redo the last undone change" aria-label="Redo avatar change">Redo</button>'+
       '<button type="button" class="studio-text-button" data-avatar-reset>Restore saved</button></div></div>'+
       turntableHTML({editor:true})+
       '<p id="avatar-preview-status" class="studio-preview-message" role="status"></p>'+
