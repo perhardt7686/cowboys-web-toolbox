@@ -5,6 +5,32 @@
 -- Both games still share clues and guesses within their own team game.
 
 
+-- Baseline prerequisite for clean PGlite/replay databases; matches the live Quest picker.
+CREATE OR REPLACE FUNCTION public.community_word_pick(p_day date)
+ RETURNS integer
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'pg_catalog', 'public'
+AS $function$
+with chosen as (
+  select case
+    when mod(abs(hashtext(p_day::text || '/tier/3')::bigint),100)<22 then 'easy'
+    when mod(abs(hashtext(p_day::text || '/tier/3')::bigint),100)<52 then 'medium'
+    when mod(abs(hashtext(p_day::text || '/tier/3')::bigint),100)<84 then 'hard'
+    else 'nightmare' end as tier
+)
+select coalesce(
+  (select b.id from public.community_word_bank b cross join chosen c
+   where b.difficulty=c.tier and not exists (
+      select 1 from public.community_word_days d
+      where d.game_date >= p_day-30 and d.game_date<p_day and d.word_id=b.id)
+   order by md5(p_day::text || b.answer || '/cowboy-quest-v3') limit 1),
+  (select b.id from public.community_word_bank b cross join chosen c
+   where b.difficulty=c.tier
+   order by md5(p_day::text || b.answer || '/cowboy-quest-v3') limit 1)
+)
+$function$;
+
 CREATE OR REPLACE FUNCTION public.community_wordle_pick(p_day date)
  RETURNS integer
  LANGUAGE sql
