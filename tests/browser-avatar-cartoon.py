@@ -313,7 +313,7 @@ async def review_angles(browser):
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
                            'avatar-workshop-mouth-legibility.png','avatar-workshop-beard-masks.png',
-                           'avatar-beard-mouth-compatibility.png'], sheets['images']):
+                           'avatar-workshop-beard-mouth-compatibility.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()
