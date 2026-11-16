@@ -10,6 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 URL='http://127.0.0.1:8765/__dash_forge_smoke__.html'
 HTML="""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-dash-forge.css">
+<link rel="stylesheet" href="/family-arcade-controls.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true,supabaseUrl:'https://mock.supabase.co',publishableKey:'test-publishable'}</script>
 <script type="module" src="/commons-dash-forge.mjs"></script>
 </head><body class="community-page"><section id="conversations"><div class="community-main"></div></section></body></html>"""
