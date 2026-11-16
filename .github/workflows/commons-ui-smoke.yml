@@ -45,6 +45,7 @@ on:
       - 'docs/commons-board-compact.mjs'
       - 'docs/commons-plates.mjs'
       - 'docs/commons-mahjong.mjs'
+      - 'docs/mahjong-moves.mjs'
       - 'docs/mahjong-kids-palette.mjs'
       - 'docs/mahjong-kids-colors.css'
       - 'tests/browser-mahjong-kids.py'
@@ -55,6 +56,8 @@ on:
   pull_request:
     paths:
       - 'docs/family-*'
+      - 'docs/commons-mahjong.mjs'
+      - 'docs/mahjong-moves.mjs'
       - 'docs/hot-rod*'
       - 'tests/browser-hot-rod.py'
       - 'docs/commons-arcade-shell.mjs'
