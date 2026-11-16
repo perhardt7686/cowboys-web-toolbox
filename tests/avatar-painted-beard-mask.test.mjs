@@ -4,6 +4,7 @@ import {THREE,disposeFigure} from '../docs/avatar-studio-geometry.mjs';
 import {buildAvatar} from '../docs/avatar-studio-character.mjs';
 import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
 import {SHOWROOM_LOOKS} from '../docs/avatar-showroom-presets.mjs';
+import {renderSoftwareRoom} from '../docs/avatar-studio-software.mjs';
 
 const faces=['oval','round','square','heart','long','angular'];
 function fittedMask(recipe){
@@ -56,4 +57,37 @@ test('other facial hair styles preserve the original, non-full-beard constructio
     assert.equal(masks.length,0,beard+' must not get a full beard overlay');
     disposeFigure(actor.root);
   }
+});
+
+test('the canvas fallback interpolates mesh pigments and honors the material tint',()=>{
+  const width=64,height=64;
+  const data=new Uint8ClampedArray(width*height*4);
+  const context={fillRect(){},getImageData:()=>({data}),putImageData(){}};
+  const canvas={width,height,getContext:()=>context};
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);
+  camera.position.z=3;
+  camera.updateMatrixWorld();
+  const light=new THREE.PointLight('#fff',0);
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute('position',new THREE.Float32BufferAttribute([-.85,-.7,0,.85,-.7,0,0,.85,0],3));
+  geometry.setAttribute('color',new THREE.Float32BufferAttribute([1,0,0,0,1,0,0,0,1],3));
+  geometry.computeVertexNormals();
+  const material=new THREE.MeshBasicMaterial({color:0x80ffff,vertexColors:true});
+  const mesh=new THREE.Mesh(geometry,material);
+  scene.add(mesh);
+  const pixel=(x,y)=>Array.from(data.slice((y*width+x)*4,(y*width+x)*4+3));
+
+  renderSoftwareRoom(canvas,scene,camera,mesh,light);
+  const left=pixel(14,47),right=pixel(48,47),top=pixel(32,12),center=pixel(32,32);
+  assert.ok(left[0]>left[1]&&left[0]>left[2],`left corner should be red: ${left}`);
+  assert.ok(right[1]>right[0]&&right[1]>right[2],`right corner should be green: ${right}`);
+  assert.ok(top[2]>top[0]&&top[2]>top[1],`top corner should be blue: ${top}`);
+  assert.ok(center.every(channel=>channel>20),`center should mix all three colors: ${center}`);
+  assert.ok(left[0]<right[1],`red pigment should be dimmed by the material tint: ${left} / ${right}`);
+
+  material.vertexColors=false;
+  renderSoftwareRoom(canvas,scene,camera,mesh,light);
+  assert.deepEqual(pixel(14,47),pixel(48,47),'plain materials keep the uniform lighting path');
+  disposeFigure(mesh);
 });
