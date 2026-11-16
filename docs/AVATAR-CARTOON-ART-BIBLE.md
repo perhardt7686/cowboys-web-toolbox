@@ -120,3 +120,12 @@ This is an art direction reference and implementation record, **not** a substitu
 - Curious showed a closed smile in 3D and a rounded gasp in layered cel. Both modes now share a slightly parted mouth contour. The 3D contour follows the same cross-sections as the head surface, and the raised brow follows the cel's left-to-right pose.
 - Layered cel closed the opposite eye in profile because it used the turn direction as the visible eye's side. The right and left profiles now use the eye that is actually visible from that direction.
 - The browser test measures the open mouth in a 3D close-up and checks the visible open/closed eye at both profile angles. Its comparison is `avatar-workshop-expression-continuity.png`.
+
+## Painted beard transition cleanup | November 16, 2026
+
+- **Observed:** The single vertex-painted beard mask compressed its final two jaw rows to 0.008 model units at the front mouth notch. At small portrait sizes, the transition could become a hairline even though the geometry did not technically intersect.
+- **Scoped repair:** Move only the second-highest beard row down by 0.012 units, leaving the mouth notch, colored mask, six head families, legacy beard option IDs and other facial hair untouched.
+- **Verification gate:** The existing 6-face × 3-expression × 41-angle ring test now demands a minimum 0.012-unit space. Inspect `avatar-workshop-beard-masks.png` and `avatar-workshop-beard-mouth-compatibility.png` from the member preview for lip visibility and smooth chin shape. These snapshots are test evidence, **not owner art approval**.
+- **Branch hygiene:** PR #37 contains an obsolete floating cheek-stroke treatment and conflicts with later vertex-painted face work. Do not merge that PR onto current main as-is. Retain it only as historical evidence of the original complaint; improvements must preserve the single fitted painted mask.
+- **Next ranked art work:** (1) face/expression silhouette quality at 48/64 px with Cowboy's feedback, (2) extreme body/wardrobe socket fitting across every view, and (3) non-generic pet motion matched to species and accessories. All must preserve historical recipes, rewards, ownership and protected family data.
+- **Release gate:** This note documents PR #51 work in progress; final merge/deployment and real signed-in acceptance must be established from GitHub Actions and an authorized session, not asserted from this document.
