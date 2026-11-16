@@ -49,7 +49,7 @@ jobs:
         run: |
           python -m http.server 8765 --directory docs >/tmp/family-arcade-http.log 2>&1 &
           status=0
-          for test in avatar-turntable avatar-cartoon avatar-rewards family-avatar-studio pet-trading arcade-shell arcade-titles; do
+          for test in avatar-turntable avatar-cartoon avatar-rewards avatar-pet-acting family-avatar-studio pet-trading arcade-shell arcade-titles; do
             echo "::group::${test}"
             python "tests/browser-${test}.py" || status=1
             echo "::endgroup::"
@@ -67,6 +67,7 @@ jobs:
             reports/avatar-cartoon-interaction.webm
             reports/avatar-workshop-*.png
             reports/avatar-rewards-*.png
+            reports/avatar-pet-original-acting-*.png
             reports/avatar-wardrobe-audit.png
             reports/avatar-face-silhouettes.png
             reports/family-avatar-studio-*.png
