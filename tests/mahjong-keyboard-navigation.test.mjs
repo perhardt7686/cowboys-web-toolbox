@@ -26,6 +26,10 @@ test('Mahjong arrow keys land on nearest free tile and skip blocked ones',()=>{
 test('finished or layered-over tiles are excluded without changing match rules',()=>{
   const tiles=puzzle();
   tiles[2].gone=true;
+  // A removed neighbor can free a tile, so navigate to that tile first.
+  assert.equal(isTileFree(tiles,tiles[1]),true);
+  assert.equal(adjacentMahjongTile(tiles,1,'ArrowRight')?.id,2);
+  tiles[1].gone=true;
   assert.equal(adjacentMahjongTile(tiles,1,'ArrowRight')?.id,6);
   const over={id:7,x:0,y:0,z:1,s:4,gone:false};
   tiles.push(over);
