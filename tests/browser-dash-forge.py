@@ -201,7 +201,7 @@ async def run_one(browser,width,height):
   await page.locator('[data-dash-layer="cue"]').click()
   assert 'Light cue' in await page.locator('[data-dash-cell="11"]').get_attribute('title')
   await page.locator('#dash-forge-root [data-dash-tab="campaign"]').click()
-  # Synthetic arcade mode uses the actual fixed tablet frame and no altered game controls.
+  # Synthetic arcade mode uses the actual fixed tablet frame with labeled control deck.
   await page.evaluate("""() => { document.body.classList.add('arcade-on');
     document.body.dataset.arcadeGame='dashforge';document.body.dataset.arcadeScene='campaign';
     document.querySelector('#dash-forge-root').classList.add('arcade-game-active'); }""")
@@ -213,6 +213,11 @@ async def run_one(browser,width,height):
   assert box and box['x']>=-2 and box['x']+box['width']<=width+3, ('Horizontal overflow',width,box)
   assert box['height']>145,('Game collapsed vertically',height,box)
   await page.locator('#dash-jump').tap()
+  assert await page.locator('#dash-action-label').inner_text() in ('JUMP','THRUST','FLIP','TELEPORT')
+  assert await page.locator('#dash-jump').get_attribute('aria-describedby')=='dash-action-label'
+  button_box=await page.locator('#dash-jump').bounding_box()
+  caption_box=await page.locator('#dash-action-label').bounding_box()
+  assert button_box and caption_box and caption_box['y']>=button_box['y']+button_box['height']-3, 'Dash arcade caption must appear below A button'
   assert await page.locator('#dash-jump').is_visible()
   assert await page.locator('#dash-sound').is_visible()
   assert 'SOUND OFF' in await page.locator('#dash-sound').inner_text()
