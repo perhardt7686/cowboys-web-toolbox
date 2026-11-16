@@ -6,7 +6,7 @@ function recordedCel(draw,time){
   const commands=[];
   let stack=0;
   const ctx={};
-  for(const name of ['beginPath','moveTo','lineTo','quadraticCurveTo',
+  for(const name of ['beginPath','closePath','moveTo','lineTo','quadraticCurveTo',
     'bezierCurveTo','ellipse','fill','stroke','translate','rotate']){
     ctx[name]=(...args)=>commands.push([name,...args]);
   }
