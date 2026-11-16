@@ -60,6 +60,14 @@ const client={
 sync.onmessage=event=>{rows=event.data;handler?.({new:{topic:'fridge'}});};
 window.fixtureReject=()=>{pendingError=true;};
 window.fixtureHoldCalendar=()=>{calendarDelay=new Promise(resolve=>{window.fixtureReleaseCalendar=resolve;});};
+window.fixtureAddTodayCalendarEvent=()=>{
+  const key=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',
+    year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const start=new Date(key+'T13:00:00Z'),end=new Date(key+'T14:00:00Z');
+  events.push({id:'fixture-calendar-badge',title:'Sample family reminder',
+    start:start.toISOString(),end:end.toISOString(),all_day:false,
+    source:'board',category:'plans',editable:true,updated_at:today});
+};
 window.fixtureLogout=()=>{document.querySelector('#conversations').hidden=true;app.setAccess(null,null);};
 if(me!=='Visitor'){document.querySelector('#conversations').hidden=false;app.setAccess(client,{user_id:me,status:'approved'});}
 </script></body></html>"""
@@ -107,6 +115,22 @@ async def layout(page, width):
     await expect(page.locator('.family-date-grid button')).to_have_count(7)
     await page.locator('.family-date-grid button').first.click()
     await expect(page.locator('.family-date-grid button').first).to_have_attribute('aria-pressed', 'true')
+    # One Tab stop per date grid. Arrow and Home/End navigate and retain focus.
+    first_day = page.locator('.family-date-grid button').first
+    await expect(first_day).to_have_attribute('tabindex', '0')
+    await first_day.press('ArrowRight')
+    await expect(page.locator('.family-date-grid button').nth(1)).to_be_focused()
+    await expect(page.locator('.family-date-grid button').nth(1)).to_have_attribute('aria-pressed', 'true')
+    await expect(page.locator('.family-date-grid button').first).to_have_attribute('tabindex', '-1')
+    await page.keyboard.press('Home')
+    await expect(first_day).to_be_focused()
+    await page.keyboard.press('End')
+    await expect(page.locator('.family-date-grid button').last).to_be_focused()
+    await page.keyboard.press('Home')
+    await expect(first_day).to_be_focused()
+    hint = page.locator('.family-date-grid-hint')
+    await expect(hint).to_be_visible()
+    assert 'arrow keys' in (await hint.inner_text()).lower()
     await page.evaluate('fixtureHoldCalendar()')
     await page.get_by_role('button', name='Next week').click()
     next_week_day = page.locator('.family-date-grid button').first
@@ -118,6 +142,16 @@ async def layout(page, width):
     await page.get_by_role('button', name='Today', exact=True).click()
     await page.get_by_role('button', name='Month', exact=True).click()
     await expect(page.locator('.family-date-grid button[aria-current=date]')).to_have_attribute('aria-pressed', 'true')
+    await page.evaluate('fixtureAddTodayCalendarEvent()')
+    await page.locator('#family-calendar').get_by_role('button', name='Refresh').click()
+    today_cell=page.locator('.family-date-grid button[aria-current=date]')
+    await expect(today_cell.locator('.family-date-count')).to_have_text('1')
+    assert await today_cell.locator('.family-date-count').get_attribute('aria-hidden')=='true'
+    badge_size=await today_cell.locator('.family-date-count').evaluate(
+      'el=>parseFloat(getComputedStyle(el).fontSize)')
+    assert badge_size>=13,(width,'date count is too small',badge_size)
+    cell_height=await today_cell.evaluate('el=>el.getBoundingClientRect().height')
+    assert cell_height>=44,(width,'date too hard to tap',cell_height)
     overflow = await page.evaluate('document.documentElement.scrollWidth - innerWidth')
     assert overflow <= 2, (width, overflow)
 
