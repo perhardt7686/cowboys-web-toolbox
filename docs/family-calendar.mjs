@@ -17,6 +17,8 @@ export function makeCalendar({rpc}) {
   const modes = el('div', 'family-controls family-calendar-modes');
   const status = statusLine('Open the calendar to load events.');
   const grid = el('div', 'family-date-grid');
+  const gridHint = el('p', 'family-date-grid-hint',
+    'Choose a day for its events. Keyboard: arrow keys move by day or week.');
   const list = el('div', 'family-event-list');
   const footer = el('p', 'family-status');
   const editor = el('div', 'family-editor');
@@ -28,6 +30,24 @@ export function makeCalendar({rpc}) {
   let events = [], loadedRange = '', request = 0, active = true, needsRefresh = true;
   let editing = false, saving = false;
   const expanded = new Set();
+  // Date buttons are a single keyboard group, not 31 separate Tab stops.
+  grid.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey || grid.hidden) return;
+    const tile = event.target.closest('button[data-calendar-date]');
+    if (!tile || !grid.contains(tile)) return;
+    const date = tile.dataset.calendarDate;
+    let next;
+    if (event.key === 'ArrowLeft') next = addDays(date, -1);
+    else if (event.key === 'ArrowRight') next = addDays(date, 1);
+    else if (event.key === 'ArrowUp') next = addDays(date, -7);
+    else if (event.key === 'ArrowDown') next = addDays(date, 7);
+    else if (event.key === 'Home') next = startOfWeek(date);
+    else if (event.key === 'End') next = addDays(startOfWeek(date), 6);
+    if (!next) return;
+    event.preventDefault();
+    openDate(next);
+    grid.querySelector(`[data-calendar-date="${next}"]`)?.focus({preventScroll: true});
+  });
   const go = delta => openDate(view === 'week' ? addDays(selected, delta * 7) : shiftMonth(selected, delta));
   const previous = button('‹', () => go(-1), {'aria-label': 'Previous period'});
   const next = button('›', () => go(1), {'aria-label': 'Next period'});
@@ -40,7 +60,7 @@ export function makeCalendar({rpc}) {
     control.dataset.calendarView = key;
     modes.append(control);
   }
-  body.append(toolbar, timeZone, modes, heading, editor, status, grid, list, footer);
+  body.append(toolbar, timeZone, modes, heading, editor, status, gridHint, list, footer);
   panel.append(body);
 
   function range() {
@@ -67,6 +87,7 @@ export function makeCalendar({rpc}) {
     add.disabled = saving;
     for (const control of modes.children) control.setAttribute('aria-pressed', String(control.dataset.calendarView === view));
     grid.hidden = view === 'agenda';
+    gridHint.hidden = view === 'agenda';
     grid.classList.toggle('family-date-grid-week', view === 'week');
     const focusedDate = grid.contains(document.activeElement) ? document.activeElement.dataset.calendarDate : null;
     grid.replaceChildren();
@@ -84,8 +105,13 @@ export function makeCalendar({rpc}) {
         }, {'aria-pressed': String(date === selected),
           'aria-label': dayFormat.format(dateFromKey(date)) + (matches ? ', ' + matches + ' events' : '')});
         control.dataset.calendarDate = date;
+        control.tabIndex = date === selected ? 0 : -1;
         if (date === today()) control.setAttribute('aria-current', 'date');
-        if (matches) control.append(el('small', 'family-date-count', String(matches)));
+        if (matches) {
+          const badge = el('small', 'family-date-count', String(matches));
+          badge.setAttribute('aria-hidden', 'true');
+          control.append(badge);
+        }
         grid.append(control);
       }
     }
