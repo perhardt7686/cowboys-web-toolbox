@@ -33,7 +33,11 @@ test('human studio eyes follow the head with thin cel layers across body shapes 
         assert.ok(!layerBounds.isEmpty(),`${look} / ${expression}: eye has ink geometry`);
         assert.ok(layerBounds.max.z<=.037,
           `${look} / ${expression}: eye ink projects ${layerBounds.max.z} from its socket`);
-        if(expression!=='wink')assert.ok(visibleLayers>=5);
+        if(expression==='laugh'){
+          assert.equal(visibleLayers,0,'laugh uses a clean two-stroke cel crescent instead of a globe');
+          assert.ok(eye.children.filter(node=>node.isMesh).length>=2,
+            'laugh crescent should preserve both upper ink and a shaded lower lid');
+        }else if(expression!=='wink')assert.ok(visibleLayers>=5);
       }
       disposeFigure(actor.root);
     }

@@ -2,6 +2,7 @@
    hair silhouettes, groovy clothes, and oversized original eyewear.
    All original Canvas art. No licensed characters or tracing. */
 import {INK,PAPER,tint,path,oval,glint} from './avatar-cel-art.mjs?v=workshop1';
+import {expressionActing} from './avatar-expression-acting.mjs';
 const shade=c=>tint(c,'#372735',.52);
 const light=c=>tint(c,'#ffe7bf',.38);
 function line(c,p,width=3,color=INK){
@@ -86,28 +87,35 @@ export function paintMysteryExpression(c,v,iris,skin){
    wide:[18,12,0],sleepy:[15,7,3],dramatic:[17,12,0]
  };
  const [rx,ry,drop]=eyeTypes[v.eye_shape]||eyeTypes.classic;
+ const acting=expressionActing(v.expression);
  const brow=v.brows||'soft';
  const slant=brow==='arching'?7:brow==='bold'?3:brow==='straight'?0:4;
  const width=brow==='bold'?4.8:3.2;
- const curious=v.expression==='curious'||v.expression==='determined';
- const leftY=97-(curious?6:0),rightY=95+(v.expression==='smirk'?4:0);
- path(c,[84,leftY+7],[[93,leftY-3,106,leftY-2,115,leftY+5-slant]],null,ink,width);
- path(c,[143,rightY+7],[[155,rightY-4,169,rightY-2,172,rightY+4+slant]],null,ink,width);
- const eye=(cx,cy,rw,rh,wink=false)=>{
+ const leftY=97+acting.brows[0],rightY=95+acting.brows[1];
+ path(c,[84,leftY+7],[[93,leftY-3,106,leftY-2,115,leftY+5-slant+acting.browEnd[0]]],null,ink,width);
+ path(c,[143,rightY+7],[[155,rightY-4,169,rightY-2,172,rightY+4+slant+acting.browEnd[1]]],null,ink,width);
+ const eye=(cx,cy,rw,rh,wink=false,side=0)=>{
    if(wink){
      path(c,[cx-rw,cy+2],[[cx-rw*.2,cy-rh*.75,cx+rw*.45,cy-rh*.5,cx+rw,cy+1]],null,ink,3.4);
      path(c,[cx-rw+4,cy+6],[[cx-rw*.1,cy+8,cx+rw*.45,cy+6,cx+rw-3,cy+3]],null,shadow,1.4);
      return;
    }
+   if(v.expression==='laugh'){
+     // Joyful ink crescents read cleanly at 48px in feed portraits.
+     path(c,[cx-rw,cy+1],[[cx-rw*.3,cy-rh*.85,cx+rw*.45,cy-rh*.8,cx+rw,cy]],null,ink,3);
+     path(c,[cx-rw+3,cy+5],[[cx,cy+rh*.27,cx+rw-3,cy+4]],null,shadow,1.5);
+     return;
+   }
    // Human-shaped, offset eyes and broad top lids mimic ink-and-paint animation.
-   const top=cy-rh,bot=cy+rh*.73;
+   const opened=Math.max(2.5,rh*acting.eyes[side]);
+   const top=cy-opened,bot=cy+opened*.73;
    path(c,[cx-rw,cy],[[cx-rw*.65,top-2,cx+rw*.35,top-3,cx+rw,cy-1],
      [cx+rw*.7,bot+2,cx-rw*.48,bot+2,cx-rw,cy]],cream,ink,2.9);
-   const irisX=cx+(v.eye_shape==='sleepy'?4:2.5),irisY=cy+drop*.2;
-   oval(c,irisX,irisY,rw*.38,Math.max(4.4,rh*.64),iris,ink,1.5,.11);
-   oval(c,irisX+1,irisY,Math.max(2.2,rw*.19),Math.max(3,rh*.4),'#261c30');
+   const irisX=cx+(v.eye_shape==='sleepy'?4:2.5)+acting.gaze[side]*.85,irisY=cy+drop*.2;
+   oval(c,irisX,irisY,rw*.38,Math.max(2.8,opened*.64),iris,ink,1.5,.11);
+   oval(c,irisX+1,irisY,Math.max(2.2,rw*.19),Math.max(2.5,opened*.4),'#261c30');
    oval(c,irisX-1.6,irisY-3.3,Math.max(1.4,rw*.11),Math.max(1.4,rh*.11),cream);
-   if(v.eye_shape==='sleepy'){
+   if(v.eye_shape==='sleepy'||v.expression==='calm'){
      path(c,[cx-rw,cy-5],[[cx-rw*.3,cy-rh*.3,cx+rw*.4,cy-rh*.5,cx+rw,cy-5]],skin,ink,3);
    }
    if(v.eye_shape==='dramatic'){
@@ -119,8 +127,8 @@ export function paintMysteryExpression(c,v,iris,skin){
    if(v.eye_shape==='wide')path(c,[cx-rw+3,cy+rh+2],
        [[cx,cy+rh+6,cx+rw-2,cy+rh+1]],null,shadow,1.5);
  };
- eye(99,120,rx,ry);
- eye(156,118,rx-1,ry-.4,v.expression==='wink');
+ eye(99,120,rx,ry,false,0);
+ eye(156,118,rx-1,ry-.4,v.expression==='wink',1);
  const nose=v.nose||'button';
  if(nose==='pointed'){
    path(c,[136,118],[[134,128,148,134],[143,139],[129,137]],null,shadow,2.6);
