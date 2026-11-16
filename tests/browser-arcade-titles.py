@@ -103,6 +103,18 @@ async def run_size(browser,width,height):
     return [first,second,pad.action('fleet'),pad.action('fleet')];
   }""")
   assert tap_result==["F","N","R","N"],("Retro touch buffer or keyboard click failed",tap_result)
+  # Exercise the actual browser-imported async cancellation guard, without
+  # creating a real member session or calling production score RPCs.
+  late_reply=await page.evaluate("""async () => {
+    const {createRetroLifecycle}=await import('/retro-arcade-lifecycle.mjs?v=guard1');
+    const guard=createRetroLifecycle();
+    const old=guard.begin('fleet');
+    guard.invalidate(); // Back to Games before network response.
+    const newer=guard.begin('maze');
+    const oldAccepted=await Promise.resolve().then(()=>guard.matches(old));
+    return [oldAccepted,guard.matches(newer),guard.pendingGame()];
+  }""")
+  assert late_reply==[False,True,"maze"],("Canceled arcade start was accepted",late_reply)
   await page.locator("#arcade-program-grid").wait_for(state="attached",timeout=15000)
   covers=[]
   for game,toggle,title in ROOTS:
