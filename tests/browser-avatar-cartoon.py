@@ -178,11 +178,40 @@ async def review_angles(browser):
           profile.drawImage(portrait,157+column*302,48+row*205,204,204);
         }
       }
-      for(const canvas of [tile,shadows,portrait])releaseStudioView(canvas);
-      return [sheet,comparison,close].map(node=>node.toDataURL('image/png').split(',')[1]);
+      // Original model sheet: identical recipe/camera in both pipelines.
+      // This is a visual review artifact, not just a "canvas is nonblank" check.
+      const moods=['smile','grin','calm','wink','curious','smirk','laugh','determined'];
+      const expressions=makeCanvas(864,1770),ec=expressions.getContext('2d');
+      ec.fillStyle='#f7efdf';ec.fillRect(0,0,864,1770);
+      ec.fillStyle='#30243a';ec.font='bold 23px system-ui';
+      ec.fillText('Original faces · 3D and layered-cel · eight expressions',20,30);
+      const columns=[['3D front',0,false],['Cel front',0,true],
+        ['3D profile',90,false],['Cel profile',90,true]];
+      const faceTile=makeCanvas(220,250),celTile=makeCanvas(220,250);
+      const fingerprints={three:new Set(),cel:new Set()};
+      for(let k=0;k<columns.length;k++)ec.fillText(columns[k][0],135+k*181,65);
+      for(const [i,mood] of moods.entries()){
+        const recipe={...SHOWROOM_LOOKS.detective,beard:'none',glasses:'none',
+          expression:mood,hat:'none',style:'short'};
+        const y=82+i*210;
+        ec.font='bold 15px system-ui';ec.fillStyle='#30243a';
+        ec.fillText(mood.toUpperCase(),8,y+94);
+        for(const [j,angle,isCel] of columns.entries()){
+          const target=isCel?celTile:faceTile;
+          const camera={angle,zoom:2.45,y:166};
+          if(isCel)renderLoadout(target,recipe,0,null,camera);
+          else if(!paintRoomAvatar(target,recipe,camera,0,null,'body'))throw Error('No 3D art '+mood);
+          if(angle===0)fingerprints[isCel?'cel':'three'].add(target.toDataURL('image/png'));
+          ec.drawImage(target,129+j*181,y,176,177);
+        }
+      }
+      if(fingerprints.three.size!==moods.length||fingerprints.cel.size!==moods.length)
+        throw Error('The facial expression model sheet contains repeated views');
+      for(const canvas of [tile,shadows,portrait,faceTile])releaseStudioView(canvas);
+      return [sheet,comparison,close,expressions].map(node=>node.toDataURL('image/png').split(',')[1]);
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
-                           'avatar-workshop-face-angles.png'], sheets):
+                           'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png'], sheets):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     await page.close()
 
