@@ -283,17 +283,25 @@ function expression(c,v,iris,skin) {
   }
   path(c,[135,131],[[139,133,138,135]],null,warmLight(skin),1.4);
   const paleLip=tint(skin,'#d88970',.36);
-  if(v.expression==='grin'||v.expression==='smile'||v.expression==='wink'){
-    const broad=v.expression==='grin';
-    const start=broad?104:113,end=broad?160:151;
-    path(c,[start,154],[[120,161,141,156,end,149],[156,broad?177:169,129,broad?184:175,start,154]],
-      '#6c3036',INK,2);
-    path(c,[start+6,157],[[130,161,144,154,end-4,153],[148,161,127,170,start+6,157]],PAPER,null);
-    path(c,[128,178],[[137,180,146,174]],null,paleLip,2);
-  } else if(v.expression==='curious') {
+  if(v.expression==='grin'){
+    path(c,[100,152],[[120,161,147,155,167,149],
+      [172,166,151,185,132,185],[111,183,102,168,100,152]],
+      '#6c3036',INK,2.65);
+    path(c,[108,155],[[132,163,149,156,164,153],
+      [158,166,130,171,108,162]],PAPER,null);
+    path(c,[92,146],[[95,155,101,160]],null,paleLip,2);
+    path(c,[167,143],[[173,152,172,159]],null,paleLip,2);
+  }else if(v.expression==='smile'||v.expression==='wink'){
+    path(c,[112,150],[[117,166,147,169,158,148]],null,INK,3);
+    path(c,[108,149],[[111,158,113,159]],null,paleLip,1.7);
+    path(c,[158,148],[[162,153,164,159]],null,paleLip,1.7);
+  }else if(v.expression==='smirk'){
+    path(c,[109,164],[[121,169,141,164,163,145]],null,INK,3.1);
+    path(c,[155,148],[[164,145,168,149]],null,paleLip,1.9);
+  }else if(v.expression==='curious'){
     oval(c,138,159,7,9,'#793e45',INK,2,-.2);
     path(c,[134,164],[[140,162,145,163]],null,'#d97c71',2);
-  } else {
+  }else{
     path(c,[112,160],[[128,165,143,157,149,156]],null,shade,2.3);
   }
 }
