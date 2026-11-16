@@ -29,6 +29,10 @@ test('laugh eyes read as expressive crescents; calm is relaxed; curious and smir
   assert.ok(expressionActing('calm').eyes.every(x=>x<.80));
   assert.ok(expressionActing('curious').brows[0]<expressionActing('curious').brows[1]-3);
   assert.notEqual(expressionActing('smirk').eyes[0],expressionActing('smirk').eyes[1]);
+  assert.ok(expressionActing('grin').brows.every(y=>y<=-5),
+    'a big grin lifts both brows visibly at icon scale');
+  assert.ok(expressionActing('smirk').brows[1]-expressionActing('smirk').brows[0]>=10,
+    'a smirk has a deliberately asymmetrical eyebrow silhouette');
   assert.equal(expressionActing('wink').eyes[1],0);
   assert.ok(expressionActing('determined').browEnd[0]>0);
   assert.ok(expressionActing('determined').browEnd[1]<0);
