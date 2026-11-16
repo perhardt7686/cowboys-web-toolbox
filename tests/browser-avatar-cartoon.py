@@ -248,13 +248,44 @@ async def review_angles(browser):
       }
       for(const [label,views] of Object.entries(smallFingerprints))
         if(views.size!==3)throw Error('Small icon face shapes repeated: '+label);
+      // Contact sheet of six fitted jaw masks in three directions, side by
+      // side against existing direction-specific 2D facial hair. Synthetic only.
+      const beardSheet=makeCanvas(1040,1270),bc=beardSheet.getContext('2d');
+      bc.fillStyle='#f7efdf';bc.fillRect(0,0,1040,1270);
+      bc.fillStyle='#34283d';bc.font='bold 22px system-ui';
+      bc.fillText('Painted beard mask · six head shapes · 3D / 2D × 0° 45° 90°',18,28);
+      const beardFaces=['oval','round','square','heart','long','angular'];
+      const beardAngles=[0,45,90], beardTarget=makeCanvas(200,200);
+      for(const [i,face] of beardFaces.entries()){
+        const y=59+i*198;
+        bc.fillStyle='#34283d';bc.font='bold 16px system-ui';
+        bc.fillText(face.toUpperCase(),6,y+62);
+        for(const [k,angle] of beardAngles.entries()){
+          const recipe={...SHOWROOM_LOOKS.mechanic,face,beard:'beard',
+            hat:'none',glasses:'none',expression:'smile'};
+          const head=figureAt(recipe,angle);
+          for(const [j,isCel] of [false,true].entries()){
+            const camera=isCel?{angle,crop:{x:head.head.x,
+              y:head.head.y+41*head.design.scale,size:175}}:
+              {angle,zoom:2.3,y:166};
+            if(isCel)renderLoadout(beardTarget,recipe,0,null,camera);
+            else if(!paintRoomAvatar(beardTarget,recipe,camera,0,null,'body'))
+              throw Error('Beard actor unavailable: '+face+' / '+angle);
+            const x=118+k*300+j*149;
+            bc.drawImage(beardTarget,x,y,144,163);
+          }
+          bc.font='13px system-ui';
+          bc.fillText('3D',118+k*300,y+180);
+          bc.fillText('2D',118+k*300+149,y+180);
+        }
+      }
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
-      for(const canvas of [tile,shadows,portrait,faceTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      for(const canvas of [tile,shadows,portrait,faceTile,beardTarget])releaseStudioView(canvas);
+      return {images:[sheet,comparison,close,expressions,small,beardSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
-                           'avatar-workshop-mouth-legibility.png'], sheets['images']):
+                           'avatar-workshop-mouth-legibility.png','avatar-workshop-beard-masks.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()
