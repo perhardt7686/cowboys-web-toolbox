@@ -286,7 +286,8 @@ function bag(c,f,style,tone){
 
 export function paintFigure(c,f,v,colors,clothes,hold){
   const {view,limbs,model}=f;
-  const skin=model==='specter'?tint(colors.skin,'#79a285',.71):colors.skin;
+  const skin=model==='specter'?tint(colors.skin,'#79a285',.71):
+    model==='marsh'?tint(colors.skin,'#598e61',.74):colors.skin;
   const rear=view.across<-.33;
   const outer=clothes.outerwear;
   const coat=outer==='raincoat'||outer==='trench';
