@@ -113,6 +113,7 @@ async def review_angles(browser):
       const {paintRoomAvatar,paintRoomPet,releaseStudioView}=await import('/avatar-dressing-room.mjs?v=workshop1');
       const {renderLoadout,drawPetPortrait}=await import('/avatar-reward-render.mjs?v=workshop1');
       const {SHOWROOM_LOOKS}=await import('/avatar-showroom-presets.mjs?v=workshop1');
+      const {figureAt}=await import('/avatar-turnaround-figure.mjs?v=workshop1');
       const {BY_ID}=await import('/avatar-reward-catalog.mjs?v=workshop1');
       const samples=[
         ['Astronomer', {...SHOWROOM_LOOKS.mechanic,cosmetics:{prop:'studio-observatory-telescope',
@@ -198,7 +199,9 @@ async def review_angles(browser):
         ec.fillText(mood.toUpperCase(),8,y+94);
         for(const [j,angle,isCel] of columns.entries()){
           const target=isCel?celTile:faceTile;
-          const camera=isCel?{angle,crop:{x:216,y:218,size:180}}:
+          const head=figureAt(recipe,angle);
+          const camera=isCel?{angle,crop:{x:head.head.x,
+            y:head.head.y+41*head.design.scale,size:180}}:
             {angle,zoom:2.45,y:166};
           if(isCel)renderLoadout(target,recipe,0,null,camera);
           else if(!paintRoomAvatar(target,recipe,camera,0,null,'body'))throw Error('No 3D art '+mood);
