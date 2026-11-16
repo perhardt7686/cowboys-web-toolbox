@@ -17,8 +17,9 @@ test('each word game selects a different daily bank answer, even in fallback pat
 test('both w0rdle entry paths select their own answer and preserve started rounds',()=>{
   const picks=sql.match(/values\(v_day,public\.community_wordle_pick\(v_day\)\)/g)||[];
   assert.equal(picks.length,2,'wordle state and submit must each use independent selector');
-  const conflicts=sql.match(/on conflict\(game_date\) do nothing;/g)||[];
-  assert.equal(conflicts.length,2,'never rewrite an existing puzzle under recorded guesses');
+  const safeWordleWrites=sql.match(/insert into public\.community_wordle_days\(game_date,word_id\)\s+values\(v_day,public\.community_wordle_pick\(v_day\)\)\s+on conflict\(game_date\) do nothing;/g)||[];
+  assert.equal(safeWordleWrites.length,2,
+    'both wordle entry paths must never rewrite an existing puzzle under recorded guesses');
   assert.doesNotMatch(sql,/select game_date,word_id from public\.community_word_days where game_date=v_day/i);
 });
 
