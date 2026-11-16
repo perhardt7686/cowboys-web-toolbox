@@ -188,7 +188,7 @@ async def review_angles(browser):
       const columns=[['3D front',0,false],['Cel front',0,true],
         ['3D profile',90,false],['Cel profile',90,true]];
       const faceTile=makeCanvas(220,250),celTile=makeCanvas(220,250);
-      const fingerprints={three:new Set(),cel:new Set()};
+      const fingerprints={three:new Map(),cel:new Map()},duplicates={three:[],cel:[]};
       for(let k=0;k<columns.length;k++)ec.fillText(columns[k][0],135+k*181,65);
       for(const [i,mood] of moods.entries()){
         const recipe={...SHOWROOM_LOOKS.detective,beard:'none',glasses:'none',
@@ -201,18 +201,23 @@ async def review_angles(browser):
           const camera={angle,zoom:2.45,y:166};
           if(isCel)renderLoadout(target,recipe,0,null,camera);
           else if(!paintRoomAvatar(target,recipe,camera,0,null,'body'))throw Error('No 3D art '+mood);
-          if(angle===0)fingerprints[isCel?'cel':'three'].add(target.toDataURL('image/png'));
+          if(angle===0){
+            const kind=isCel?'cel':'three',fingerprint=target.toDataURL('image/png');
+            const match=fingerprints[kind].get(fingerprint);
+            if(match)duplicates[kind].push(match+' = '+mood);
+            else fingerprints[kind].set(fingerprint,mood);
+          }
           ec.drawImage(target,129+j*181,y,176,177);
         }
       }
-      if(fingerprints.three.size!==moods.length||fingerprints.cel.size!==moods.length)
-        throw Error('The facial expression model sheet contains repeated views');
+      const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile])releaseStudioView(canvas);
-      return [sheet,comparison,close,expressions].map(node=>node.toDataURL('image/png').split(',')[1]);
+      return {images:[sheet,comparison,close,expressions].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
-                           'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png'], sheets):
+                           'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
+    assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()
 
 
