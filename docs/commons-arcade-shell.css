@@ -920,3 +920,81 @@ body.community-page #arcade-game-title-view .arcade-title-save-note{
  body.community-page #arcade-game-title-view .arcade-game-title-buttons .arcade-title-start{min-height:36px;font-size:12px!important}
  body.community-page #arcade-game-title-view .arcade-title-save-note{display:none}
 }
+
+
+/* RETRO FULLSCREEN PLAY SURFACE — Star Squadron and Mystery Maze.
+   Both native roots were omitted from the arcade shell's fullscreen selector,
+   leaving their playable screens stranded in the locked-scrolling Commons.
+   Preserve their original DOM, event handlers and server-verified scoring. */
+body.community-page.arcade-ready:not(.arcade-on) :is(
+ #star-squadron-root,#mystery-maze-root
+){display:block!important}
+body.community-page.arcade-ready:not(.arcade-on) :is(
+ #star-squadron-root,#mystery-maze-root
+) .retro-inside{display:none!important}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+):not(.arcade-game-active){display:none!important}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active{
+ position:fixed!important;inset:var(--arcade-top) 0 var(--arcade-bottom) 0!important;
+ z-index:2147481900!important;display:block!important;
+ width:100vw!important;max-width:100vw!important;min-width:0!important;
+ height:calc(100dvh - var(--arcade-top) - var(--arcade-bottom))!important;
+ max-height:none!important;margin:0!important;
+ padding:5px clamp(6px,1.8vw,16px)!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:#080d25!important;color:#fff!important;overflow:hidden!important;
+}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active > .retro-entry{display:none!important}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active > .retro-inside:not([hidden]){
+ display:flex!important;flex-direction:column;gap:7px;
+ width:100%!important;height:100%!important;min-height:0!important;
+ max-height:100%!important;margin:0!important;padding:7px!important;
+ overflow:hidden!important;box-sizing:border-box;
+}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-head,
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-statbar{flex:0 0 auto}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-display{
+ flex:1 1 auto;min-height:0!important;width:100%!important;
+ overflow-y:auto!important;overflow-x:hidden!important;
+ overscroll-behavior:contain;
+}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-live:not([hidden]){
+ display:flex!important;flex-direction:column;align-items:center;
+ justify-content:flex-start;gap:7px;min-height:100%;
+}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-canvas{
+ width:auto!important;height:auto!important;aspect-ratio:1;
+ max-width:min(100%,470px)!important;max-height:min(45dvh,470px)!important;
+ object-fit:contain;flex:0 1 auto;min-height:0;
+}
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-controls,
+body.community-page.arcade-on :is(
+ #star-squadron-root,#mystery-maze-root
+).arcade-game-active .retro-actions{flex:0 0 auto}
+@media (orientation:landscape) and (max-height:580px){
+ body.community-page.arcade-on :is(
+  #star-squadron-root,#mystery-maze-root
+ ).arcade-game-active .retro-head p{display:none!important}
+ body.community-page.arcade-on :is(
+  #star-squadron-root,#mystery-maze-root
+ ).arcade-game-active .retro-canvas{max-height:40dvh!important}
+}
