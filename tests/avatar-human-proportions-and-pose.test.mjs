@@ -4,6 +4,8 @@ import {THREE,disposeFigure} from '../docs/avatar-studio-geometry.mjs';
 import {buildAvatar} from '../docs/avatar-studio-character.mjs';
 import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
 import {figureAt} from '../docs/avatar-turnaround-figure.mjs';
+import {paintHead} from '../docs/avatar-turnaround-head.mjs';
+import {tint} from '../docs/avatar-cel-art.mjs';
 import {SHOWROOM_LOOKS} from '../docs/avatar-showroom-presets.mjs';
 
 const copy=recipe=>structuredClone(recipe);
@@ -70,4 +72,31 @@ test('robot and armor poses never inherit the human relaxed-arm adjustment',()=>
       }
     }
   }
+});
+
+
+test('Marsh Watchkeeper cel preserves green skin and fin-ear silhouette at front, side and back',()=>{
+  const colors={skin:'#d5a16a',hair:'#543a2c',eyes:'#ad8e47',shirt:'#526a45'};
+  const green=tint(colors.skin,'#598e61',.74);
+  const canvas=()=>{
+    const fills=[],strokes=[];
+    const c={fills,strokes,
+      save(){},restore(){},translate(){},rotate(){},scale(){},
+      beginPath(){},moveTo(){},lineTo(){},quadraticCurveTo(){},
+      bezierCurveTo(){},ellipse(){},closePath(){},clip(){},
+      fill(){fills.push(this.fillStyle);},stroke(){strokes.push(this.strokeStyle);}
+    };
+    return c;
+  };
+  for(const angle of [0,90,180]){
+    const recipe=structuredClone(SHOWROOM_LOOKS.marsh);
+    const c=canvas();
+    paintHead(c,figureAt(recipe,angle),recipe,colors,()=>true);
+    assert.ok(c.fills.includes(green),'Marsh face keeps the creature-green palette at '+angle);
+    assert.ok(c.fills.includes('#668a52'),'leaf-like fin ears remain visible at '+angle);
+    assert.ok(c.strokes.includes('#375b50'),'Marsh fin grooves survive '+angle);
+  }
+  const detective=canvas(),normal=structuredClone(SHOWROOM_LOOKS.detective);
+  paintHead(detective,figureAt(normal,0),normal,colors,()=>true);
+  assert.ok(!detective.fills.includes('#668a52'),'human faces must not inherit monster fins');
 });
