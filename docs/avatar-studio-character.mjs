@@ -376,6 +376,7 @@ export function buildAvatar(recipe){
   if(model==='armor')head.rotation.z=-.10;
   if(recipe.pose==='tilt')head.rotation.z=-.14;
   sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',radio:model==='radio',marsh:model==='marsh',specter,
+    headCovered:Boolean(cosmetics.hat||(recipe.hat&&recipe.hat!=='none')||recipe.accessory==='crown'),
     jawTune:Number(outfits.jaw)||0,eyeSpacing:Number(outfits.eye_spacing)||0,
     styleReward:cosmetics.hair,eyeReward:cosmetics.eyes});
   const gearFit={round:1.08,square:1.07,long:.92,heart:1.015,angular:.99,oval:1}[recipe.face]||1;

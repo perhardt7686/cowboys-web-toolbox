@@ -447,7 +447,7 @@ export function controlVisor(head,pigment){
   return {signal,emitter,beam,shutters};
 }
 
-export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=false,radio=false,marsh=false,specter=false,jawTune=0,eyeSpacing=0,styleReward,eyeReward}={}){
+export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=false,radio=false,marsh=false,specter=false,headCovered=false,jawTune=0,eyeSpacing=0,styleReward,eyeReward}={}){
   if(mechanical||armor){
     const alloy=surface(shade(palette.cloth,.88),{metalness:.58,roughness:.39});
     const edge=surface(armor?'#d5ac6d':'#c7d7d6',{metalness:.68,roughness:.34});
@@ -486,8 +486,51 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
     box(head,screen,0,.017,-.197,.273,.164,.037);
     for(let i=0;i<4;i++)box(head,edge,-.070+i*.046,.012,-.223,.015,.10,.021);
     if(!armor){
-      join(head,edge,[.091,.167,-.035],[.146,.316,-.044],.012,.008);
-      oval(head,signal,.146,.316,-.044,.025,.022,.025);
+      // Different original machine silhouettes, not a visor recolored three ways.
+      // Attached to the head, with no saved recipe or equipment slot changes.
+      const signature=group(head);
+      signature.userData.studioMachineSignature=radio?'radio':scout?'scout':'automaton';
+      if(radio){
+        // Wide tuning wings and twin aerials identify the radio courier in shadow.
+        for(const side of [-1,1]){
+          box(signature,edge,side*.303,.069,-.014,.102,.152,.121);
+          box(signature,screen,side*.354,.072,.012,.028,.096,.057);
+          oval(signature,signal,side*.352,.087,.045,.014,.017,.009);
+          if(!headCovered){
+            join(signature,edge,[side*.165,.184,-.021],
+              [side*.294,.305,-.035],.018,.013,9);
+            oval(signature,edge,side*.299,.307,-.031,.033,.026,.025);
+          }
+        }
+      }else if(scout){
+        // Offset survey scopes break the circular helmet's otherwise plain outline.
+        for(const side of [-1,1]){
+          if(!headCovered){
+            join(signature,edge,[side*.156,.158,-.058],
+              [side*.293,.287,-.059],.045,.026,9);
+            oval(signature,alloy,side*.298,.302,-.056,.043,.043,.037);
+            oval(signature,signal,side*.301,.303,-.009,.018,.018,.011);
+          }else{
+            // Hat-safe side survey lights stay below the brim.
+            oval(signature,edge,side*.242,-.043,-.010,.032,.040,.038);
+            oval(signature,signal,side*.266,-.043,.018,.011,.018,.008);
+          }
+        }
+        box(signature,edge,0,-.144,.174,.230,.037,.025);
+      }else{
+        // Low pressure-gauge roof and separated bolts for the boardwalk automaton.
+        if(!headCovered){
+          box(signature,edge,0,.223,-.021,.325,.050,.226);
+          oval(signature,screen,0,.248,.107,.075,.054,.024);
+          oval(signature,signal,0,.254,.133,.029,.031,.009);
+        }else{
+          // Gauge face remains visible below a cap, with no roof poking through.
+          oval(signature,edge,0,.136,.193,.060,.035,.013);
+          oval(signature,signal,0,.137,.207,.019,.018,.006);
+        }
+        for(const side of [-1,1])
+          oval(signature,edge,side*.174,.207,.052,.025,.027,.022);
+      }
     }
     if(eyeReward)faceReward(head,eyeReward,palette.eye,1,eyeSpacing);
     return;
