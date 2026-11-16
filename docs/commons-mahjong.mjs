@@ -1,6 +1,6 @@
 /* Mystery Machine Mahjong for approved Commons members. Server validates every move. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {isTileFree,countLegalPairs} from './mahjong-moves.mjs?v=legalpair1';
+import {isTileFree,countLegalPairs,adjacentMahjongTile} from './mahjong-moves.mjs?v=keyboard1';
 import {visualForTile} from './mahjong-kids-palette.mjs?v=kid7';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
@@ -58,7 +58,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     <div class="commons-score-tile is-personal"><span class="commons-score-label">YOUR BEST RUN</span><strong id="mahjong-ribbon-mine">…</strong><small>Personal completed game record</small></div>
     <div class="commons-score-tile is-live"><span class="commons-score-label">CURRENT RUN</span><strong id="mahjong-ribbon-current">…</strong><small id="mahjong-ribbon-current-note">No game in progress</small></div>
    </section>
-   <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match the same picture and two-letter code, plus the same sun or flower corner. Gray striped tiles are blocked. Tap a tile to see it pop, or use Hint to find a glowing pair.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
+   <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match the same picture and two-letter code, plus the same sun or flower corner. Gray striped tiles are blocked. Tap a tile, or use arrow keys and Enter on a keyboard. Hint reveals a glowing pair.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
    <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p><details id="mahjong-level-browser"><summary id="mahjong-browse-level">Browse campaign levels</summary><form id="mahjong-level-form"><label>Level <input name="level" type="number" required min="1" max="1000" value="1"></label><button type="submit">See level rules</button></form><p id="mahjong-lookup-result" role="status">Campaign stages unlock in order.</p></details></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
    <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span><strong id="mahjong-remaining" class="mahjong-remaining" aria-live="polite"></strong></div><p id="mahjong-no-moves" class="mahjong-no-moves" aria-live="polite" role="status" hidden></p><div class="mahjong-view-tools" role="group" aria-label="Mahjong board view controls"><button type="button" id="mahjong-fit-button" aria-label="Fit entire board on screen">Fit board</button><button type="button" id="mahjong-zoom-out" aria-label="Zoom out">−</button><strong id="mahjong-zoom-label" aria-live="polite">100%</strong><button type="button" id="mahjong-zoom-in" aria-label="Zoom in">+</button></div><p class="mahjong-pan-help" id="mahjong-view-hint">Every tile visible. Zoom in for a closer look.</p><div id="mahjong-board-wrap" class="mahjong-board-wrap"><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div><div id="mahjong-pause-screen" class="mahjong-pause-screen" hidden><div class="mahjong-pause-card"><span class="mahjong-pause-symbol" aria-hidden="true">⏸</span><strong>Game paused</strong><p>Your tiles, matches, and score are saved to your Commons account.</p><button type="button" id="mahjong-overlay-resume">▶ Resume game</button></div></div></div>
@@ -113,6 +113,18 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   $('mahjong-zoom-in').addEventListener('click',()=>changeBoardZoom(boardZoomIndex+1));
   $('mahjong-profile-open').addEventListener('click',()=>{if(userId){const el=document.createElement('button');el.dataset.memberProfile=userId;el.hidden=true;document.body.append(el);el.click();el.remove();}});
   if('ResizeObserver' in window){resize=new ResizeObserver(()=>renderBoard());resize.observe($('mahjong-board-wrap'));}
+  const boardView=$('mahjong-board');
+  boardView.addEventListener('keydown',event=>{
+    if(busy||!state?.run||state.run.paused||!/^Arrow(Left|Right|Up|Down)$/.test(event.key))return;
+    const current=event.target.closest('button[data-mahjong-id]');
+    if(!current||!boardView.contains(current))return;
+    event.preventDefault();
+    const next=adjacentMahjongTile(state.run.tiles||[],current.dataset.mahjongId,event.key);
+    if(!next)return;
+    const target=boardView.querySelector('[data-mahjong-id="'+next.id+'"]');
+    if(!target)return;
+    current.tabIndex=-1;target.tabIndex=0;target.focus();
+  });
   const watcher=new MutationObserver(()=>{if($('mahjong-root'))locate();else watcher.disconnect()});watcher.observe(main,{childList:true});
  }
  function boardTile(t,w){
@@ -172,8 +184,24 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const zIn=$('mahjong-zoom-in');if(zIn)zIn.disabled=boardZoomIndex===boardZoomLevels.length-1;
   const zOut=$('mahjong-zoom-out');if(zOut)zOut.disabled=boardZoomIndex===0;
   const hint=$('mahjong-view-hint');if(hint)hint.textContent=boardZoomIndex===0?'Entire board visible. Use + for a closer look.':'Zoomed in. Swipe the board to explore, or tap Fit board.';
+  const previous=el.contains(document.activeElement)?
+    document.activeElement.closest('button[data-mahjong-id]'):null;
+  const previousId=previous?.dataset.mahjongId||null;
+  const free=(runState.tiles||[]).filter(canPlay);
+  const preferred=free.find(t=>String(t.id)===String(previousId))||
+    free.find(t=>String(t.id)===String(selected))||free[0];
+  const activeId=preferred?String(preferred.id):null;
   const frag=document.createDocumentFragment();
-  for(const t of runState.tiles||[]){if(t.gone)continue;frag.append(boardTile(t,size));}el.replaceChildren(frag);
+  for(const t of runState.tiles||[]){
+    if(t.gone)continue;
+    const tile=boardTile(t,size);
+    tile.tabIndex=canPlay(t)&&String(t.id)===activeId?0:-1;
+    frag.append(tile);
+  }
+  el.replaceChildren(frag);
+  // Redrawing after a match must not abandon keyboard and screen-reader users.
+  if(previous&&activeId)
+    el.querySelector('[data-mahjong-id="'+activeId+'"]')?.focus({preventScroll:true});
  }
  function tap(t){if(busy||!state?.run||state.run.paused)return;if(!canPlay(t)){setStatus('That tile is blocked. Choose one with an open side and nothing on top.');return;}
   if(selected===t.id){selected=null;highlight=[];renderBoard();return;}
