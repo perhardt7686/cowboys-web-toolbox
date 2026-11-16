@@ -207,7 +207,7 @@ function profileFace(c,v,skin,hair,iris,frame){
   const mouthY=tipY+13;
   facialHair(c,v,width-10,mouthY,jaw,end,hair,skin,true);
   if(frame.view.across>-.23){
-    eye(c,width-14,31,iris,v,7.5,0);
+    eye(c,width-14,31,iris,v,7.5,turn);
     const x=width-15;
     if(v.expression==='grin'||v.expression==='laugh'||v.expression==='smile'){
       const depth=v.expression==='laugh'?8:v.expression==='grin'?5:3;
