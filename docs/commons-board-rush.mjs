@@ -60,11 +60,19 @@ function build(){
  '<div id="skyboard-speed" class="skyboard-speed" hidden></div>'+
  '<div class="skyboard-progress" aria-hidden="true"><span id="skyboard-progress-fill"></span></div>'+
  '<div id="skyboard-message" class="skyboard-message"><strong>READY TO RIDE?</strong><p>Pick a board and press Start Stage.</p></div></div>'+
- '<div class="skyboard-touch" aria-label="Game touch controls"><button data-sky-hold="left" type="button" aria-label="Steer left">◀ LEFT</button>'+
- '<button data-sky-hold="brake" type="button" aria-label="Brake">BRAKE</button>'+
- '<button data-sky-hold="drift" type="button" aria-label="Drift around turns">↝ DRIFT</button>'+
- '<button data-sky-action="jump" type="button" class="skyboard-jump" aria-label="Jump">▲ JUMP</button>'+
- '<button data-sky-hold="right" type="button" aria-label="Steer right">RIGHT ▶</button></div>'+
+ '<div class="skyboard-touch arcade-control-deck" role="group" aria-label="Skyboard arcade controls">'+
+ '<div class="arcade-stick-station"><div class="arcade-stick-pair">'+
+ '<button data-sky-hold="left" type="button" aria-label="Joystick left" aria-describedby="skyboard-steer-label">◀</button>'+
+ '<span class="arcade-stick-knob" aria-hidden="true">●</span>'+
+ '<button data-sky-hold="right" type="button" aria-label="Joystick right" aria-describedby="skyboard-steer-label">▶</button></div>'+
+ '<span id="skyboard-steer-label" class="arcade-button-caption">JOYSTICK · STEER</span><small class="arcade-keyboard-hint">← / → or A / D</small></div>'+
+ '<div class="arcade-action-cluster">'+
+ '<div class="arcade-key-station"><button data-sky-action="jump" type="button" class="skyboard-jump arcade-button-a" aria-label="Arcade A, jump" aria-describedby="skyboard-jump-label"><span>A</span></button>'+
+ '<span id="skyboard-jump-label" class="arcade-button-caption">JUMP</span><small class="arcade-keyboard-hint">SPACE</small></div>'+
+ '<div class="arcade-key-station"><button data-sky-hold="drift" type="button" class="arcade-button-b" aria-label="Arcade B, hold to drift" aria-describedby="skyboard-drift-label"><span>B</span></button>'+
+ '<span id="skyboard-drift-label" class="arcade-button-caption">DRIFT</span><small class="arcade-keyboard-hint">SHIFT</small></div>'+
+ '<div class="arcade-key-station"><button data-sky-hold="brake" type="button" class="arcade-button-c" aria-label="Arcade C, hold to brake" aria-describedby="skyboard-brake-label"><span>C</span></button>'+
+ '<span id="skyboard-brake-label" class="arcade-button-caption">BRAKE</span><small class="arcade-keyboard-hint">↓</small></div></div></div>'+
  '<div class="skyboard-help">Steer with ← →, jump with Space, drift with Shift and brake with ↓. A gamepad uses the stick, A to jump, X to drift and B to brake.</div>'+
  '<div class="skyboard-round-actions"><button type="button" id="skyboard-pause">PAUSE</button>'+
  '<button type="button" id="skyboard-retry">RETRY STAGE</button><button type="button" id="skyboard-ghost" aria-pressed="true">Family ghost on</button><button type="button" id="skyboard-share" aria-pressed="false">Share my ghost</button><button type="button" id="skyboard-next" hidden>NEXT STAGE ▶</button></div>'+
