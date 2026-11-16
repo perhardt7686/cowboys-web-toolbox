@@ -23,7 +23,7 @@ ROOTS=[
  ("study","vdacs-study-toggle","7A STUDY CARDS")
 ]
 HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="/commons-arcade-shell.css">
+<link rel="stylesheet" href="/commons-arcade-shell.css">\n<link rel="stylesheet" href="/commons-retro-arcade.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true}</script></head><body class="community-page" style="margin:0;background:#15152e">
 <section id="conversations"><div class="community-main" style="min-height:1800px">
 <section id="streetrod-root"><button id="sr-toggle" aria-expanded="false">Street Rod</button>
@@ -31,8 +31,30 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <section id="dash-forge-root"><button id="dash-forge-toggle" aria-expanded="false">Dash Forge</button>
 <div id="dash-forge-inside" hidden><section id="dash-pane-builder"><h3>Level Studio</h3></section></div></section>
 <section id="skyboard-root"><button id="skyboard-toggle" aria-expanded="false">Skyboard Sprint</button><div id="skyboard-inside" hidden>Race</div></section>
-<section id="star-squadron-root"><button id="star-squadron-toggle" aria-expanded="false">Star Squadron</button><div id="star-squadron-inside" hidden>Swarm</div></section>
-<section id="mystery-maze-root"><button id="mystery-maze-toggle" aria-expanded="false">Mystery Maze</button><div id="mystery-maze-inside" hidden>Clues</div></section>
+<section id="star-squadron-root" class="retro-game-root"><button class="retro-entry" id="star-squadron-toggle" aria-expanded="false">Star Squadron</button>
+<div id="star-squadron-inside" class="retro-inside" hidden>
+<header class="retro-head"><h2>Star Squadron</h2><p>Playable original family arcade stage.</p></header>
+<div class="retro-statbar"><span class="retro-stat">BEST 0</span></div>
+<div class="retro-display"><div class="retro-live">
+<canvas class="retro-canvas" width="540" height="540" aria-label="Star Squadron live gameplay"></canvas>
+<div class="retro-live-readout">SCORE 0 · LIVES 3</div>
+<div class="retro-controls"><button class="retro-button retro-control" data-control="L">MOVE</button><button class="retro-button retro-control" data-control="F">ACTION</button></div>
+<div class="retro-actions"><button class="retro-button retro-begin">Start round</button><button class="retro-button retro-end">Leave round</button></div>
+<p class="retro-status">Ready for an approved family round.</p></div>
+<div class="retro-trophies retro-panel-view" hidden>Trophies</div>
+<div class="retro-leaders retro-panel-view" hidden>Family scores</div></div></div></section>
+<section id="mystery-maze-root" class="retro-game-root"><button class="retro-entry" id="mystery-maze-toggle" aria-expanded="false">Mystery Maze</button>
+<div id="mystery-maze-inside" class="retro-inside" hidden>
+<header class="retro-head"><h2>Mystery Maze</h2><p>Playable original family arcade stage.</p></header>
+<div class="retro-statbar"><span class="retro-stat">BEST 0</span></div>
+<div class="retro-display"><div class="retro-live">
+<canvas class="retro-canvas" width="540" height="540" aria-label="Mystery Maze live gameplay"></canvas>
+<div class="retro-live-readout">SCORE 0 · LIVES 3</div>
+<div class="retro-controls"><button class="retro-button retro-control" data-control="R">MOVE</button><button class="retro-button retro-control" data-control="F">ACTION</button></div>
+<div class="retro-actions"><button class="retro-button retro-begin">Start round</button><button class="retro-button retro-end">Leave round</button></div>
+<p class="retro-status">Ready for an approved family round.</p></div>
+<div class="retro-trophies retro-panel-view" hidden>Trophies</div>
+<div class="retro-leaders retro-panel-view" hidden>Family scores</div></div></div></section>
 <section id="mahjong-root"><button id="mahjong-toggle" aria-expanded="false">Mahjong</button><div id="mahjong-inside" hidden>Tiles</div></section>
 <section id="letter-lock-root"><button id="letter-lock-toggle" aria-expanded="false">w0rdle</button><div id="letter-lock-content" hidden>Letters</div></section>
 <section id="word-game-root"><button id="word-game-toggle" aria-expanded="false">Word Quest</button><div id="word-game-inside" hidden>Words</div></section>
@@ -102,6 +124,24 @@ async def run_size(browser,width,height):
     'vdacs-study-root' if game=="study" else game+"-root")).evaluate(
      "e=>e.classList.contains('arcade-game-active')"),(game,"Start did not activate game")
    assert await page.locator("#arcade-game-title-view").is_hidden(),("Title obscures gameplay",game)
+   if game in ("fleet","maze"):
+    root_id="star-squadron" if game=="fleet" else "mystery-maze"
+    stage=page.locator("#"+root_id+"-root")
+    assert await stage.is_visible(),(game,"The gameplay root is invisible despite an active title")
+    assert await stage.evaluate("el=>getComputedStyle(el).position")=="fixed",(game,"Game did not enter fullscreen")
+    rect=await stage.bounding_box()
+    assert rect and rect["y"]>=0 and rect["height"]>90 and rect["y"]+rect["height"]<=height+2,(game,rect,width,height)
+    assert await stage.locator(".retro-entry").is_hidden(),(game,"Duplicate inline launcher obscures stage")
+    canvas=stage.locator(".retro-canvas")
+    assert await canvas.is_visible(),(game,"Gameplay canvas hidden")
+    assert await canvas.evaluate("el=>el.width>0&&el.height>0"),(game,"Canvas has zero resolution")
+    display=stage.locator(".retro-display")
+    assert await display.evaluate("el=>getComputedStyle(el).overflowY==='auto'"),(game,"Long stage must scroll inside fullscreen")
+    control=stage.locator(".retro-control").first
+    await control.scroll_into_view_if_needed()
+    assert await control.is_visible(),(game,"Touch controls inaccessible")
+    await control.click(timeout=3000)
+    assert await stage.locator(".retro-live-readout").is_visible(),(game,"Score and lives must remain visible")
    await page.keyboard.press("Escape")
    assert not await page.evaluate("document.body.classList.contains('arcade-on')"),(game,"Can't exit")
   assert len(set(covers))==11,"Every game must have unique original artwork"
