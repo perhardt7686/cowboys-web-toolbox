@@ -3,11 +3,11 @@
 // Values are expressed in 2D cel pixels; 3D applies proportional conversions.
 const ACTING=Object.freeze({
   smile:       {brows:[0,0],      eyes:[1,1],     gaze:[0,0],   browEnd:[0,0]},
-  grin:        {brows:[-2,-2],    eyes:[.88,.88], gaze:[0,0],   browEnd:[-1,1]},
+  grin:        {brows:[-5,-5],    eyes:[.88,.88], gaze:[0,0],   browEnd:[-3,3]},
   calm:        {brows:[2,2],      eyes:[.67,.67], gaze:[0,0],   browEnd:[0,0]},
   wink:        {brows:[-2,-1],    eyes:[1,0],     gaze:[-1,0],  browEnd:[0,1]},
   curious:     {brows:[-7,1],     eyes:[1.12,.96],gaze:[2,2],   browEnd:[-3,2]},
-  smirk:       {brows:[-2,4],     eyes:[.88,.65],gaze:[2,2],   browEnd:[-1,3]},
+  smirk:       {brows:[-4,7],     eyes:[.88,.65],gaze:[2,2],   browEnd:[-2,6]},
   laugh:       {brows:[-3,-3],    eyes:[.50,.50],gaze:[0,0],   browEnd:[-2,2]},
   determined:  {brows:[3,3],      eyes:[.70,.70],gaze:[-1,-1], browEnd:[5,-5]}
 });
