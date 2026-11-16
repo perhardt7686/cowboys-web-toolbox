@@ -214,12 +214,47 @@ async def review_angles(browser):
           ec.drawImage(target,129+j*181,y,176,177);
         }
       }
+      // The actual small UI sizes, not enlarged artwork, are the art-direction gate.
+      const small=makeCanvas(600,440),sc=small.getContext('2d');
+      sc.fillStyle='#f7efdf';sc.fillRect(0,0,600,440);
+      sc.fillStyle='#34283d';sc.font='bold 20px system-ui';
+      sc.fillText('Smile / grin / smirk · 48px and 64px',18,30);
+      const smallTypes=[['3D 48',false,48],['Cel 48',true,48],
+        ['3D 64',false,64],['Cel 64',true,64]];
+      const samples={};
+      for(const [j,[label,isCel,size]] of smallTypes.entries()){
+        sc.fillText(label,115+j*120,62);
+        samples[label]=new Set();
+        for(const [i,mood] of ['smile','grin','smirk'].entries()){
+          const recipe={...SHOWROOM_LOOKS.detective,beard:'none',
+            glasses:'none',hat:'none',style:'short',expression:mood};
+          const target=isCel?celTile:faceTile;
+          const head=figureAt(recipe,0);
+          const camera=isCel?{angle:0,crop:{x:head.head.x,
+            y:head.head.y+41*head.design.scale,size:180}}:
+            {angle:0,zoom:2.45,y:166};
+          if(isCel)renderLoadout(target,recipe,0,null,camera);
+          else if(!paintRoomAvatar(target,recipe,camera,0,null,'body'))
+            throw Error('No small avatar for '+mood);
+          const x=123+j*120,y=95+i*109;
+          // Copy at exact pixel size: canvas resampling, then view as a phone icon.
+          const thumbnail=makeCanvas(size,size);
+          thumbnail.getContext('2d').drawImage(target,0,0,size,size);
+          samples[label].add(thumbnail.toDataURL('image/png'));
+          sc.drawImage(thumbnail,x,y,size,size);
+          sc.font='bold 14px system-ui';sc.fillStyle='#34283d';
+          if(j===0)sc.fillText(mood,9,y+size*.65);
+        }
+      }
+      for(const [label,views] of Object.entries(samples))
+        if(views.size!==3)throw Error('Small icon face shapes repeated: '+label);
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      return {images:[sheet,comparison,close,expressions,small].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
-                           'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png'], sheets['images']):
+                           'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
+                           'avatar-workshop-mouth-legibility.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()
