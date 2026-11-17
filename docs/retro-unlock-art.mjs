@@ -22,7 +22,13 @@ export function drawFleetWake(c,look,s,x,y){
 }
 export function drawFleetGear(c,look,s,x,y){
  c.save();c.translate(x,y);
- if(look==='signal'){
+ if(look==='rookie'){
+  for(const side of [-1,1]){
+   c.strokeStyle='#ffefb6';c.lineWidth=4;
+   c.beginPath();c.moveTo(side*8,-4);c.lineTo(side*22,10);c.stroke();
+   c.beginPath();c.moveTo(side*13,-10);c.lineTo(side*26,3);c.stroke();
+  }
+ }else if(look==='signal'){
   c.fillStyle='#e9f9ff';
   for(const side of [-1,1]){
    c.fillRect(side*20-3,0,6,8);
@@ -63,7 +69,15 @@ export function drawMazeFootprints(c,look,s,tile){
 }
 export function drawMazeGear(c,look,s,x,y){
  c.save();
- if(look==='lantern'){
+ if(look==='notebook'){
+  c.save();c.translate(x+20,y+8);c.rotate(-.12);
+  c.fillStyle='#edd3a0';c.fillRect(-9,-11,18,23);
+  c.strokeStyle='#62416a';c.lineWidth=2;c.strokeRect(-9,-11,18,23);
+  c.fillStyle='#6e9cdb';c.fillRect(-8,-11,4,23);
+  c.strokeStyle='#99816a';c.lineWidth=1;
+  for(let j=-4;j<=6;j+=5){c.beginPath();c.moveTo(-1,j);c.lineTo(6,j);c.stroke();}
+  c.restore();
+ }else if(look==='lantern'){
   const cx=x+20,cy=y+6;
   const glow=c.createRadialGradient(cx,cy,3,cx,cy,29);
   glow.addColorStop(0,'rgba(255,247,161,.45)');
