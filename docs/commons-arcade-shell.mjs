@@ -62,20 +62,24 @@ function build(){
   document.addEventListener('keydown',onKeyDown,true);
   const observer=new MutationObserver(()=>{
    if(board.hidden&&document.body.classList.contains('arcade-on'))closeArcade();
+   if(mode==='menu')renderMenu();
    if(waiting){clearTimeout(frameTimer);frameTimer=setTimeout(sync,70);}
   });
   observer.observe(board,{attributes:true,attributeFilter:['hidden'],subtree:true,childList:true});
  }
+ renderMenu();
  document.body.classList.add('arcade-ready');
 }
 function renderMenu(){
  const grid=$('arcade-program-grid');if(!grid)return;
+ const availability=games.map(g=>available(g)?'1':'0').join('');
+ if(grid.dataset.availability===availability&&grid.children.length===games.length)return;
  grid.innerHTML=games.map((g,i)=>{
   const ready=available(g);
   return '<button type="button" data-arcade-game="'+g.id+'" '+(ready?'':'disabled')+'><span class="arcade-program-number">0'+(i+1)+'</span><span class="arcade-program-mark">'+g.symbol+'</span><span class="arcade-program-name"><strong>'+escapeHTML(g.name)+'</strong><small>'+escapeHTML(g.tag)+'</small></span><span class="arcade-program-state">'+(ready?'ENTER ▶':'SIGN IN')+'</span></button>';
  }).join('');
+ grid.dataset.availability=availability;
 }
-function openMenu(){closeArcade();}
 
 function setGameFocus(gameId){
  for(const node of backgroundControls)node.inert=false;
