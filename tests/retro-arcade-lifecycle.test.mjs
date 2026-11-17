@@ -67,5 +67,5 @@ test('retro UI invalidates hidden, abandoned and superseded async rounds',()=>{
  assert.match(src,/root\.isConnected/);
  assert.match(src,/lifecycle\.current\(\)/);
  assert.match(src,/A completed run may still finish server verification/);
- assert.match(html,/commons-retro-arcade\.mjs\?v=retro7/);
+ assert.match(html,/commons-retro-arcade\.mjs\?v=retro8/);
 });
