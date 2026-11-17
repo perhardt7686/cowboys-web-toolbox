@@ -69,3 +69,19 @@ test('retro UI invalidates hidden, abandoned and superseded async rounds',()=>{
  assert.match(src,/A completed run may still finish server verification/);
  assert.match(html,/commons-retro-arcade\.mjs\?v=retro9/);
 });
+
+test('pending member authorization is invalidated by board hide or account switch',()=>{
+ const src=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+ const verification=src.slice(src.indexOf('async function verify(){'),src.indexOf('async function boot(){'));
+ assert.match(verification,/const verification=\+\+verifyEpoch;/);
+ assert.equal((verification.match(/if\(verification!==verifyEpoch\|\|board.hidden\)return;/g)||[]).length,2,
+  'Both session and member-approval awaits must reject stale or hidden results');
+ assert.match(src,/new MutationObserver\(\(\)=>\{\s*verifyEpoch\+\+;/,
+  'Board visibility changes must invalidate in-flight member checks');
+ assert.match(src,/client\.auth\.onAuthStateChange\(\(event,session\)=>\{\s*verifyEpoch\+\+;/,
+  'Auth changes must invalidate in-flight member checks immediately');
+ assert.match(src,/event==='SIGNED_OUT'\|\|\(user&&session\?\.user\?\.id!==user\)/,
+  'Account switch and sign-out must clear member data before the delayed recheck');
+ assert.match(src,/epoch===scoreReadEpoch\)status\(error\.message,'error'\)/,
+  'A superseded scoreboard read must not display a stale error');
+});
