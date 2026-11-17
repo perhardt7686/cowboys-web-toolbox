@@ -24,6 +24,7 @@ ROOTS=[
 ]
 HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-arcade-shell.css">\n<link rel="stylesheet" href="/commons-retro-arcade.css">
+<link rel="stylesheet" href="/commons-family-fun.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true}</script></head><body class="community-page" style="margin:0;background:#15152e">
 <section id="conversations"><div class="community-main" style="min-height:1800px">
 <section id="streetrod-root"><button id="sr-toggle" aria-expanded="false">Street Rod</button>
@@ -116,6 +117,24 @@ async def run_size(browser,width,height):
   }""")
   assert late_reply==[False,True,"maze"],("Canceled arcade start was accepted",late_reply)
   await page.locator("#arcade-program-grid").wait_for(state="attached",timeout=15000)
+  await page.locator("#arcade-family-fun").wait_for(timeout=15000)
+  assert await page.locator(".family-fun-scoreboard").count()==2, "Marquee must exist on board and arcade menu"
+  assert await page.locator("#arcade-family-fun .family-fun-tab").count()==2, "Only original family games may remain"
+  assert "FAMILY FUN" in await page.locator("#arcade-family-fun").inner_text()
+  await page.evaluate("""() => window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{
+    leaders:{fleet:[{name:'Synthetic Pilot',best:420}],maze:[]},
+    trophies:{fleet:['first-run','gold'],maze:[]}
+  }}))""")
+  assert "420" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
+  assert "VERIFIED" in await page.locator("#arcade-family-fun").inner_text()
+  await page.locator("#arcade-family-fun [data-family-fun-game=maze]").click()
+  assert "NO SCORES YET" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
+  await page.locator("#arcade-family-fun [data-family-fun-game=fleet]").click()
+  if width==390:
+   (ROOT/"reports").mkdir(exist_ok=True,parents=True)
+   await page.screenshot(path=str(ROOT/"reports"/"family-fun-original-390.png"),animations="disabled")
+  await page.evaluate("window.dispatchEvent(new Event('family-retro-scoreboard-clear'))")
+  assert "SIGN IN" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
   covers=[]
   for game,toggle,title in ROOTS:
    await page.locator("#"+toggle).click()
