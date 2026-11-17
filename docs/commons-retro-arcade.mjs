@@ -21,7 +21,7 @@ let current=null,actions='',ticker=null,working=false,activeScene='play',gameMod
 const input=createRetroInput();
 const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
-let requestedLooks={fleet:'patrol',maze:'scout'},scoreReadEpoch=0;
+let requestedLooks={fleet:'patrol',maze:'scout'},scoreReadEpoch=0,verifyEpoch=0;
 const $=id=>document.getElementById(id);
 const letters={
  ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R',ArrowUp:'U',KeyW:'U',ArrowDown:'D',KeyS:'D',
@@ -125,7 +125,7 @@ async function refresh(){
   overview=result;
   for(const g of GAMES)paintScores(g.id);
   shareVerifiedScores();
- }catch(error){if(mounted&&user===owner)status(error.message,'error');}
+ }catch(error){if(mounted&&user===owner&&!board.hidden&&epoch===scoreReadEpoch)status(error.message,'error');}
 }
 function statsByGame(id){
  return overview.mine?.find(p=>p.game===id)||{game:id,runs:0,best:0,points:0,clears:0};
@@ -453,14 +453,17 @@ function onKeyUp(event){
  const code=letters[event.code];if(code)input.release(code);
 }
 async function verify(){
+ const verification=++verifyEpoch;
  if(!cfg?.enabled||!board)return;
  if(board.hidden){
   if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;user=null;clearSharedScores();}
   return;
  }
  const {data:{session}}=await client.auth.getSession();
+ if(verification!==verifyEpoch||board.hidden)return;
  const id=session?.user?.id;if(!id){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
+ if(verification!==verifyEpoch||board.hidden)return;
  if(error||member?.status!=='approved'){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  if(mounted&&user===id)return;
  if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();clearSharedScores();}
@@ -487,7 +490,15 @@ async function boot(){
    if(queued)return;queued=true;
    setTimeout(()=>{queued=false;void verify().catch(console.warn);},180);
   };
-  new MutationObserver(schedule).observe(board,{attributes:true,attributeFilter:['hidden']});
+  new MutationObserver(()=>{
+   verifyEpoch++;
+   // Hide immediately: an in-flight approval request must not remount a board.
+   if(board.hidden){
+    if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}
+    user=null;clearSharedScores();
+   }
+   schedule();
+  }).observe(board,{attributes:true,attributeFilter:['hidden']});
   new MutationObserver(syncArcade).observe(document.body,
    {attributes:true,attributeFilter:['class','data-arcade-game','data-arcade-scene']});
   document.addEventListener('visibilitychange',()=>{
@@ -504,7 +515,15 @@ async function boot(){
    }
   });
   window.addEventListener('blur',()=>input.clearHeld());
-  client.auth.onAuthStateChange(schedule);
+  client.auth.onAuthStateChange((event,session)=>{
+   verifyEpoch++;
+   // Sign-out/account-switch tears down family data before the delayed recheck.
+   if(event==='SIGNED_OUT'||(user&&session?.user?.id!==user)){
+    if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}
+    user=null;clearSharedScores();
+   }
+   schedule();
+  });
   window.addEventListener('family-retro-equip-request',event=>{
    const detail=event.detail;
    if(detail?.game&&detail?.id)equipLook(detail.game,detail.id);

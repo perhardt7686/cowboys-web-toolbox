@@ -22,6 +22,7 @@ on:
       - '.github/workflows/family-avatar-arcade-smoke.yml'
   pull_request:
     paths:
+      - 'docs/commons-retro-arcade.*'
       - 'docs/avatar-*'
       - 'docs/family-avatar-*'
       - 'docs/community-profiles.mjs'

@@ -36,6 +36,7 @@ on:
       - '.github/workflows/arcade-boss-and-title-acceptance.yml'
   pull_request:
     paths:
+      - 'docs/commons-retro-arcade.*'
       - 'docs/commons-family-fun.*'
       - 'tests/retired-classics.test.mjs'
       - 'tests/browser-classic-family-fun.py'
