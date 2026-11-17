@@ -29,6 +29,7 @@ export function createFamilyBoard() {
 
   function clear() {
     membership = null;
+    window.dispatchEvent(new Event('family-unified-scoreboard-clear'));
     sessionCleanup?.();
     sessionCleanup = null;
     host.replaceChildren();
@@ -56,7 +57,7 @@ export function createFamilyBoard() {
     tools.append(fridge.panel, calendar.panel);
     tools.hidden = false;
     host.hidden = false;
-    const active = () => membership === memberId && host.contains(scoreboard) && !board.hidden;
+    const active = () => membership === memberId && host.isConnected && !host.hidden && !board.hidden;
 
     const nav = el('nav', 'family-quick-links');
     nav.setAttribute('aria-label', 'Family board sections');
@@ -93,7 +94,9 @@ export function createFamilyBoard() {
     gamesTitle.tabIndex = -1;
     const celebration = el('div');
     celebration.id = 'avatar-lobby-celebration';
-    host.append(nav, scoreboard, celebration, gamesTitle);
+    // Legacy score formatting stays detached; the only mounted scoreboard is the unified marquee.
+    // Preserve the existing verified RPC, score summaries, realtime subscription and avatars.
+    host.append(nav, celebration, gamesTitle);
     void import('./avatar-reward-studio.mjs?v=workshop1').then(({makeAvatarShowcase})=>{
       if(!active())return;
       const showcase=makeAvatarShowcase(item=>document.dispatchEvent(new CustomEvent('family-open-avatar-studio',{
@@ -102,7 +105,7 @@ export function createFamilyBoard() {
       gamesTitle.after(showcase);
     }).catch(()=>{});
     const updates = document.getElementById('family-updates');
-    if (updates) scoreboard.before(updates);
+    if (updates) nav.after(updates);
     const sidebar = board.querySelector('.community-sidebar');
     document.getElementById('family-conversations')?.after(sidebar);
 
@@ -317,6 +320,18 @@ export function createFamilyBoard() {
         }
         if (!active()) return;
         data = result;
+        // Send only approved-member, server-returned rankings to the one marquee.
+        // Other game modules own their ranking metrics; never compare mixed score units.
+        const rankGames = {};
+        for(const [key,info] of Object.entries(result.games||{})){
+          if(key==='plates'&&!result.plate_access)continue;
+          rankGames[key]={entries:(info?.entries||[]).slice(0,12).map(entry=>({
+            rank:entry.rank,name:entry.name,score:entry.score,mine:Boolean(entry.mine)
+          }))};
+        }
+        window.dispatchEvent(new CustomEvent('family-unified-scoreboard',{
+          detail:{member:memberId,games:rankGames,plateAccess:result.plate_access,asOf:result.as_of}
+        }));
         scoreTime = result.as_of;
         offline = false;
         failed = false;
@@ -334,6 +349,7 @@ export function createFamilyBoard() {
         failed = true;
         if (error?.code === '42501' || error?.code === 'PGRST301') {
           data = null;
+          window.dispatchEvent(new Event('family-unified-scoreboard-clear'));
           images.clear();portraits.clear();
           scoreTime = '';
           lastScore = '';
