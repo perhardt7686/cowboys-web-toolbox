@@ -195,7 +195,7 @@ async def run(browser, widths):
         if width == 390:
             second = await context.new_page()
             await second.goto(URL + '?id=Second%20member', wait_until='load')
-            await second.get_by_role('combobox', name='Standings by game').select_option('mahjong')
+            await second.get_by_role('combobox', name='Choose game to view family scores').select_option('mahjong')
             await expect(second.get_by_text('Second member (you)')).to_be_visible()
             await shared_flow(first, second)
             await second.goto(URL + '?id=Visitor', wait_until='load')
