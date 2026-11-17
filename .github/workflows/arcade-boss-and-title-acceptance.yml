@@ -4,6 +4,15 @@ on:
     branches: [main]
     paths:
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-family-fun.*'
+      - 'docs/commons-retro-arcade.*'
+      - 'docs/retro-game-unlockables.mjs'
+      - 'docs/retro-unlock-art.mjs'
+      - 'tests/retro-game-unlockables.test.mjs'
+      - 'docs/commons-retro-arcade.*'
+      - 'docs/retro-game-unlockables.mjs'
+      - 'docs/retro-unlock-art.mjs'
+      - 'tests/retro-game-unlockables.test.mjs'
       - 'docs/commons-arcade-shell.css'
       - 'docs/commons-arcade-titles.mjs'
       - 'docs/commons-dash-forge.mjs'
@@ -60,10 +69,10 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - name: Verify canonical boss rules and all eight titles
+      - name: Verify family original titles, boss rules, and earned cosmetics
         run: |
           npm ci
-          node --test tests/retired-classics.test.mjs tests/arcade-boss-title-screens.test.mjs tests/dash-forge.test.mjs tests/skyboard-sprint.test.mjs tests/arcade-replay-db.test.mjs
+          node --test tests/retro-game-unlockables.test.mjs tests/retired-classics.test.mjs tests/arcade-boss-title-screens.test.mjs tests/dash-forge.test.mjs tests/skyboard-sprint.test.mjs tests/arcade-replay-db.test.mjs
           npx deno check --node-modules-dir=manual supabase/functions/family-arcade/index.ts
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
