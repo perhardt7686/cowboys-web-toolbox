@@ -476,7 +476,12 @@ async function call(name,args={}){
 }
 async function refresh(quiet=false){
  if(!root||board.hidden||!user)return;
- try{const data=await call('community_dash_state');state=data;renderAll();
+ try{const owner=user;const data=await call('community_dash_state');
+   if(owner!==user||board.hidden||!root?.isConnected)return;
+   state=data;renderAll();
+   window.dispatchEvent(new CustomEvent('family-arcade-game-rankings',{detail:{member:owner,game:'dashforge',
+    entries:(data.leaders||[]).map((entry,index)=>({rank:index+1,name:entry.name,
+      score:entry.player_points,mine:entry.user_id===owner}))}}));
    if(!quiet)setStatus('Family campaign and rewards loaded from the game server.');}
  catch(e){setStatus('Saved game unavailable: '+e.message,true);}
 }
