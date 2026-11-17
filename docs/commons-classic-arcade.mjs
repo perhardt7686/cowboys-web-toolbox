@@ -135,7 +135,7 @@ async function launchFile(g,file){
  const bytes=await file.arrayBuffer();
  const frame=e('iframe','classic-frame');frame.title=g.name+' isolated emulator';
  frame.sandbox='allow-scripts allow-pointer-lock allow-downloads';frame.setAttribute('referrerpolicy','no-referrer');
- frame.src='classic-arcade-player.html';
+ frame.src=new URL('./classic-arcade-player.html',import.meta.url).href;
  const screen=roots.get(g.id).querySelector('.classic-screen');
  screen.replaceChildren(frame);
  player={game:g.id,iframe:frame,bytes,token:createToken(),user};
@@ -179,7 +179,7 @@ function renderGoals(id){
  const g=classicById(id),host=roots.get(id)?.querySelector('[data-classic-badges]');
  if(!host)return;
  host.replaceChildren();
- const best=Number(localBest[id]||0),attempts=Number(sessions[id]||0);
+ const best=Number(localBest[id]||0),attempts=Math.max(Number(sessions[id]||0),best>0?1:0);
  for(const item of classicProgress(g,best,attempts)){
   const badge=e('div','classic-badge '+(item.achieved?'is-earned':'is-locked'));
   badge.append(e('strong','',item.achieved?'✦ '+item.title:'◇ '+item.title),e('small','',item.description));
