@@ -19,6 +19,7 @@ HTML = """<!doctype html><html lang="en"><head>
 <link rel="stylesheet" href="/community.css">
 <link rel="stylesheet" href="/purple-night.css">
 <link rel="stylesheet" href="/family-board.css">
+<link rel="stylesheet" href="/commons-family-fun.css">
 <link rel="stylesheet" href="/hot-rod.css">
 </head><body class="community-page"><main>
 <section id="conversations" class="community-layout container" hidden>
@@ -31,6 +32,7 @@ HTML = """<!doctype html><html lang="en"><head>
 </div></section></main>
 <script type="module">
 import {createFamilyBoard} from '/family-board.mjs';
+import {mountFamilyFun} from '/commons-family-fun.mjs';
 import {createHotRodBoard} from '/hot-rod-board.mjs';
 import {CARS} from '/hot-rod-catalog.mjs';
 import {applyWorkshop, garageShowcase, makeCar, newCampaign, settleRace, startRace} from '/hot-rod-campaign.mjs';
@@ -39,6 +41,7 @@ import {replayRace} from '/hot-rod-racing.mjs';
 const section = document.getElementById('conversations');
 const game = createHotRodBoard();
 const board = createFamilyBoard();
+mountFamilyFun(null);
 const viewer = '00000000-0000-4000-8000-000000000001';
 const rival = '00000000-0000-4000-8000-000000000002';
 const rivalState = newCampaign();
@@ -197,8 +200,8 @@ async def access_flow(page):
     await page.evaluate("fixture.access('approved')")
     await page.evaluate("history.replaceState(null, '', location.pathname)")
     await expect(page.locator('#hot-rod-entry')).to_be_visible()
-    await expect(page.get_by_role('heading',name='Family Scoreboard')).to_be_visible()
-    assert await page.locator('#family-score-title').evaluate("""node =>
+    await expect(page.locator('#arcade-family-fun')).to_be_visible()
+    assert await page.locator('#arcade-family-fun').evaluate("""node =>
       !!(node.compareDocumentPosition(document.querySelector('#hot-rod-entry')) & Node.DOCUMENT_POSITION_FOLLOWING)
     """)
 
