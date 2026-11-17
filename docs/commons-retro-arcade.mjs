@@ -21,7 +21,7 @@ let current=null,actions='',ticker=null,working=false,activeScene='play',gameMod
 const input=createRetroInput();
 const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
-let requestedLooks={fleet:'patrol',maze:'scout'};
+let requestedLooks={fleet:'patrol',maze:'scout'},scoreReadEpoch=0;
 const $=id=>document.getElementById(id);
 const letters={
  ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R',ArrowUp:'U',KeyW:'U',ArrowDown:'D',KeyS:'D',
@@ -52,6 +52,7 @@ async function rpc(fn,args={}){
  return data;
 }
 function clearSharedScores(){
+ scoreReadEpoch++;
  overview={mine:[],trophies:[],leaders:[]};
  requestedLooks={fleet:'patrol',maze:'scout'};
  window.dispatchEvent(new Event('family-retro-scoreboard-clear'));
@@ -115,10 +116,10 @@ function shareVerifiedScores(){
 }
 async function refresh(){
  if(!user||!mounted||board.hidden)return;
- const owner=user;
+ const owner=user,epoch=++scoreReadEpoch;
  try{
   const result=await rpc('community_retro_state');
-  if(!mounted||user!==owner||board.hidden)return;
+  if(!mounted||user!==owner||board.hidden||epoch!==scoreReadEpoch)return;
   overview=result;
   for(const g of GAMES)paintScores(g.id);
   shareVerifiedScores();
@@ -459,7 +460,7 @@ async function verify(){
  const {data:{session}}=await client.auth.getSession();
  const id=session?.user?.id;if(!id){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
- if(error||member?.status!=='approved'){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;return;}
+ if(error||member?.status!=='approved'){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  if(mounted&&user===id)return;
  if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();clearSharedScores();}
  user=id;mounted=true;restoreLooks(id);
