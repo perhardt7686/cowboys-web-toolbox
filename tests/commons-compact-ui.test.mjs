@@ -72,6 +72,7 @@ test('Retired Coco family corner is not loaded and is aggressively removed if ca
  assert.match(family,/family-reading-bar/);
  assert.match(family,/community-sort-label/);
  assert.match(html,/community-board-accessibility\.mjs\?v=board-access4/);
- assert.match(html,/retired-family-corner-guard/);
- assert.match(css,/#conversations \.family-room\{display:none!important\}/);
+ assert.doesNotMatch(html,/retired-family-corner-guard/);
+ assert.doesNotMatch(css,/#conversations \.family-room\{display:none!important\}/);
+ assert.match(family,/removeLegacyCorner/);
 });
