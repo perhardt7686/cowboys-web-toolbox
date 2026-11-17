@@ -167,8 +167,8 @@ export function createFamilyBoard() {
         // Read-only adapters for the other two ranked family games. No scores are
         // fabricated or compared between incompatible metrics.
         void Promise.all([
-          client.rpc('community_dash_state').catch(()=>({error:true})),
-          client.rpc('community_boardride_state').catch(()=>({error:true}))
+          Promise.resolve().then(()=>client.rpc('community_dash_state')).catch(()=>({error:true})),
+          Promise.resolve().then(()=>client.rpc('community_boardride_state')).catch(()=>({error:true}))
         ]).then(([dash,sky])=>{
           if(!active())return;
           if(!dash.error&&Array.isArray(dash.data?.leaders)){
