@@ -46,7 +46,7 @@ function getData(game){
  if(game.source==='family'){
   if(!family)return {state:'pending',entries:[]};
   if(game.id==='plates'&&!family.plateAccess)return {state:'restricted',entries:[]};
-  const data=family.games?.[game.key];
+  const data=family.games?.[game.key||game.id];
   return data?{state:'verified',entries:data.entries,unit:game.unit}:{state:'pending',entries:[]};
  }
  if(game.source==='retro'){
