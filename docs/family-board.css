@@ -93,24 +93,24 @@ body.community-page .family-quick-label {
     padding: .25rem;
   }
 }
-body.community-page .family-panel, body.community-page .family-standings-dialog {
+body.community-page .family-panel {
   padding: .65rem .75rem; color: var(--family-ink); background: var(--family-surface);
   border: 1px solid var(--family-border); border-radius: 12px; min-width: 0;
 }
-body.community-page .family-panel :is(h2,h3,h4,p), body.community-page .family-standings-dialog :is(h2,h3,h4,p) { color: inherit; }
+body.community-page .family-panel :is(h2,h3,h4,p) { color: inherit; }
 body.community-page .family-panel button, body.community-page .family-panel select, body.community-page .family-panel input:not([type=checkbox]),
-body.community-page .family-panel textarea, body.community-page .family-standings-dialog button, body.community-page .family-controls > a {
+body.community-page .family-panel textarea, body.community-page .family-controls > a {
   min-height: 44px; box-sizing: border-box; font: inherit;
   border: 1px solid #936e9e; border-radius: 7px; color: var(--family-ink);
   background: var(--family-paper); padding: .35rem .55rem;
 }
-body.community-page .family-panel :is(button, select), body.community-page .family-standings-dialog button { cursor: pointer; }
+body.community-page .family-panel :is(button, select) { cursor: pointer; }
 body.community-page .family-panel button { font-size: .83rem; font-weight: 670; line-height: 1.2; }
-body.community-page .family-panel button[disabled], body.community-page .family-standings-dialog button[disabled] { opacity: .65; cursor: default; }
+body.community-page .family-panel button[disabled] { opacity: .65; cursor: default; }
 body.community-page .family-panel button[aria-pressed="true"], body.community-page .family-panel .family-primary {
   background: var(--family-accent); color: #fff9eb; border-color: var(--family-accent);
 }
-body.community-page :is(.family-quick-links, .family-panel, .family-standings-dialog) :is(button,select,a,input,textarea,summary):focus-visible {
+body.community-page :is(.family-quick-links, .family-panel) :is(button,select,a,input,textarea,summary):focus-visible {
   outline: 3px solid var(--family-focus); outline-offset: 2px;
 }
 body.community-page .family-quick-links a:focus-visible { outline-color: #59296d; outline-offset: 3px; }
