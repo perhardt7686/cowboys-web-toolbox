@@ -22,7 +22,10 @@ function addGameTabs(bar){
  }
 }
 export function mountFamilyFun(menu){
- const host=menu?.querySelector('#arcade-menu-view');
+ // The original DOS program menu is intentionally hidden by the native
+ // family-game launcher. Place this scoreboard on the visible Family Board.
+ const main=document.getElementById('conversations')?.querySelector('.community-main');
+ const host=main||menu?.querySelector('#arcade-menu-view');
  if(!host)return;
  if(root?.isConnected)return;
  root=el('section','family-fun-scoreboard');root.id='arcade-family-fun';
@@ -39,7 +42,8 @@ export function mountFamilyFun(menu){
  const foot=el('p','family-fun-provenance','MEMBER-REPORTED SCORES · NOT EMULATOR VERIFIED · ORIGINAL FAMILY RECORDS PRESERVED');
  const stateLine=el('p','family-fun-status');stateLine.id='family-fun-status';stateLine.setAttribute('role','status');
  root.append(heading,banner,tabs,board,rewards,foot,stateLine);
- host.insertBefore(root,host.querySelector('#arcade-program-grid'));
+ const firstGame=host.querySelector('#streetrod-root,#dash-forge-root,#skyboard-root,#mahjong-root');
+ if(firstGame)firstGame.before(root);else host.prepend(root);
  render();
  window.dispatchEvent(new Event('family-classic-request-scores'));
 }
