@@ -1,0 +1,125 @@
+/* Member-only four-system launch cabinet. All visual elements are original;
+   original copyrighted game data is never hosted. */
+body.community-page .classic-root{display:block;min-width:0;max-width:100%;margin:11px 0}
+body.community-page .classic-launch{display:flex;align-items:center;gap:13px;width:100%;min-height:79px;
+ padding:12px;border:3px solid #aeb3db;border-radius:13px;background:linear-gradient(130deg,#263459,#41306c);
+ color:#fff1c5;text-align:left;cursor:pointer;box-shadow:0 6px 18px #100b2d70}
+body.community-page .classic-launch:focus-visible{outline:3px solid #b1ffe3;outline-offset:3px}
+body.community-page .classic-launch-copy{display:grid;gap:5px;flex:1;min-width:0}
+body.community-page .classic-launch-copy strong{color:#ffdf8c;font:900 clamp(18px,4vw,23px)/1.1 system-ui}
+body.community-page .classic-launch-copy small{color:#dbf2ff;font:750 11px/1.3 system-ui;letter-spacing:.06em}
+body.community-page .classic-symbol{width:40px;flex:0 0 40px;font:900 32px monospace;text-align:center;color:#89fff0}
+body.community-page .classic-enter{font:900 12px monospace;color:#b5f9ff}
+body.community-page .classic-inside{margin-top:8px;border:3px ridge #9ca4d8;border-radius:12px;
+ padding:12px;background:linear-gradient(#141e3c,#0b1127);color:#fff;display:grid;gap:10px}
+body.community-page .classic-inside[hidden],body.community-page .classic-pane[hidden]{display:none!important}
+body.community-page .classic-head{text-align:center}
+body.community-page .classic-head h2{margin:0;color:#ffe08d;font:900 clamp(20px,4vw,28px)/1.2 monospace}
+body.community-page .classic-head p{margin:4px 0;color:#9ff4f5;font:800 12px monospace}
+body.community-page .classic-tabs{display:flex;gap:5px;flex-wrap:wrap}
+body.community-page .classic-tabs button{flex:1 1 102px;min-height:44px;padding:8px;
+ border:2px solid #a3aed2;border-radius:5px;background:#273467;color:#fff;font:800 12px system-ui}
+body.community-page .classic-tabs button[aria-current=true]{background:#fff0b7;color:#202045}
+body.community-page .classic-pane{display:grid;gap:10px;min-width:0}
+body.community-page .classic-pane h3{margin:5px 0;color:#ffe4a7}
+body.community-page .classic-pane p{margin:4px 0;line-height:1.45}
+body.community-page .classic-info,.classic-warning{color:#ffdc94;font-size:13px}
+body.community-page .classic-runner{display:grid;gap:8px}
+body.community-page .classic-file-label{display:flex;align-items:center;justify-content:center;
+ border:2px solid #f9dc94;border-radius:9px;padding:12px;background:#274664;color:#fff;
+ font:900 13px system-ui;cursor:pointer;min-height:53px}
+body.community-page .classic-file-label input{display:block;max-width:100%;margin-left:8px;color:#fff;font-size:12px}
+body.community-page .classic-file-help{color:#bfdcf5;font:600 12px/1.4 system-ui}
+body.community-page .classic-screen{display:grid;place-items:center;width:100%;min-height:150px;
+ background:#000;border:3px solid #7865a4;border-radius:10px;overflow:hidden}
+body.community-page .classic-frame{width:100%;height:min(50dvh,500px);min-height:260px;border:0;display:block;background:#000}
+body.community-page .classic-screen-idle{padding:30px 14px;color:#c8d0f5;text-align:center;font:900 15px monospace}
+body.community-page .classic-control-deck{display:flex;align-items:start;justify-content:space-around;gap:10px;
+ border:3px solid #b5b1d0;border-radius:15px;padding:10px 8px;
+ background:linear-gradient(150deg,#343863,#191c3b);box-shadow:inset 0 2px #ffffff2d,0 5px #0b1030}
+body.community-page .classic-stick,.community-page .classic-keys{display:flex;flex-wrap:wrap;
+ align-items:start;justify-content:center;gap:6px;min-width:0}
+body.community-page .classic-stick{flex:1 1 145px;max-width:210px}
+body.community-page .classic-keys{flex:2 1 150px}
+body.community-page .classic-key-station{display:grid;justify-items:center;gap:3px;
+ min-width:43px;max-width:78px;flex:1 1 43px;text-align:center}
+body.community-page .classic-key{display:grid;place-items:center;width:clamp(43px,6vw,58px);
+ height:clamp(45px,6vw,58px);border:3px solid #fff4af;border-radius:50%;
+ background:radial-gradient(circle at 30% 15%,#fce194,#ca7432);
+ color:#1a2250;font:900 20px/1 monospace;touch-action:none;user-select:none;
+ box-shadow:inset 0 2px #fff5,0 4px #0a0a20}
+body.community-page .classic-direction{border-radius:12px!important;background:linear-gradient(#708aca,#364978)!important;
+ border-color:#b0d4ff!important;color:#fff!important}
+body.community-page .classic-key:active,.community-page .classic-key.pressed{transform:translateY(3px);box-shadow:0 1px #0a0a20}
+body.community-page .classic-key:disabled{opacity:.5;cursor:not-allowed}
+body.community-page .classic-key:focus-visible,.community-page .classic-tabs button:focus-visible,
+.community-page .classic-score-form button:focus-visible{outline:3px solid #aafee7;outline-offset:3px}
+body.community-page .classic-key-caption{color:#ffe4aa;font:900 clamp(10px,1.8vw,12px)/1.2 system-ui;
+ overflow-wrap:anywhere;max-width:100%}
+body.community-page .classic-key-hint{color:#d3e2ff;font:700 10px/1.2 monospace}
+body.community-page .classic-commands{text-align:center}
+body.community-page .classic-stop,.community-page .classic-report{
+ min-height:44px;padding:10px 16px;border:2px solid #f4ce92;border-radius:7px;
+ background:#283962;color:#fff;font:850 13px system-ui}
+body.community-page .classic-status{font:750 12px/1.5 system-ui;color:#fbe2a2;overflow-wrap:anywhere}
+body.community-page .classic-badges{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px}
+body.community-page .classic-badge{display:grid;gap:5px;padding:12px;border:2px solid #635a87;
+ border-radius:9px;background:#2a2b50}
+body.community-page .classic-badge strong{color:#ffeabb}
+body.community-page .classic-badge small{color:#bed5ed}
+body.community-page .classic-badge.is-earned{border-color:#9fe4be}
+body.community-page .classic-skins{display:flex;gap:6px;flex-wrap:wrap}
+body.community-page .classic-skins h4{width:100%;margin:4px 0;color:#d6ecff}
+body.community-page .classic-skin-button{background:#445178;color:#fff;border:2px solid #aad4e8;
+ border-radius:8px;min-height:44px;padding:9px}
+body.community-page .classic-skin-button:disabled{opacity:.5}
+body.community-page .classic-skin-button[aria-pressed=true]{background:#f4d891;color:#1c2346}
+body.community-page .classic-root[data-skin=aurora] .classic-inside{border-color:#8af1dc;background:linear-gradient(#134351,#16133e)}
+body.community-page .classic-root[data-skin=gold] .classic-inside{border-color:#ffce70;background:linear-gradient(#47341b,#151329)}
+body.community-page .classic-score-form{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+body.community-page .classic-score-form input{flex:1 1 130px;min-height:44px;min-width:0;
+ padding:7px;border:2px solid #a8c0e3;background:#151a39;color:#fff;border-radius:6px}
+body.community-page .classic-score-list{display:grid;gap:5px}
+body.community-page .classic-score-row{display:flex;justify-content:space-between;gap:8px;
+ border:1px solid #6e779e;padding:9px;border-radius:6px;font-size:12px;overflow-wrap:anywhere}
+body.community-page .classic-score-row span{color:#ffdf98;text-align:right}
+body.community-page .classic-legacy{font-size:12px}
+body.community-page.classic-arcade-ready #star-squadron-root,body.community-page.classic-arcade-ready #mystery-maze-root{display:none!important}
+@media(max-width:390px){
+ body.community-page .classic-control-deck{gap:5px;padding:7px 4px}
+ body.community-page .classic-stick{flex-basis:105px}
+ body.community-page .classic-keys{flex-basis:150px}
+ body.community-page .classic-key-station{min-width:40px;flex-basis:40px}
+ body.community-page .classic-key{width:43px;height:45px}
+ body.community-page .classic-key-hint{font-size:9px}
+ body.community-page .classic-enter{font-size:10px}
+}
+@media(orientation:landscape) and (max-height:590px){
+ body.community-page .classic-frame{height:37dvh;min-height:130px}
+ body.community-page .classic-key{height:44px;width:44px}
+ body.community-page .classic-key-hint{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .classic-root *{transition:none!important;animation:none!important}
+}
+/* Each classic cabinet occupies the same single-screen monitor as other games.
+   The family navigation remains available above; games scroll within their room. */
+body.community-page.arcade-on .classic-root:not(.arcade-game-active){display:none!important}
+body.community-page.arcade-on .classic-root.arcade-game-active{
+ display:block!important;position:fixed!important;
+ inset:var(--arcade-top,98px) 0 var(--arcade-bottom,29px) 0!important;
+ z-index:2147483641!important;overflow-x:hidden!important;overflow-y:auto!important;
+ padding:8px!important;margin:0!important;box-sizing:border-box;
+ background:linear-gradient(#0b1228,#171338)!important
+}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-launch{display:none!important}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-inside:not([hidden]){
+ display:grid!important;margin:0 auto!important;max-width:1050px;min-height:min(100%,520px)
+}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-screen{min-height:160px}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-frame{height:min(48dvh,440px)}
+@media(orientation:landscape) and (max-height:580px){
+ body.community-page.arcade-on .classic-root.arcade-game-active{padding:3px!important}
+ body.community-page.arcade-on .classic-root.arcade-game-active .classic-inside{padding:4px}
+ body.community-page.arcade-on .classic-root.arcade-game-active .classic-frame{height:35dvh;min-height:100px}
+}

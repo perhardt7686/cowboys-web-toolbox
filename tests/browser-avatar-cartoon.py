@@ -70,7 +70,7 @@ async def reduce_motion_walk(browser):
     await form.get_by_role('button', name='Extend the telescope', exact=True).click()
     await expect(preview).to_have_attribute('data-studio-action', 'studio-observatory-telescope')
     assert before != await pixels(preview)
-    await expect(form.get_by_role('button', name='Play Star Squadron to unlock')).to_be_visible()
+    await expect(form.get_by_text('Legacy Star Squadron challenge archived.',exact=False)).to_be_visible()
     await form.get_by_role('button', name='Try it on', exact=True).click()
     await form.get_by_role('button', name='Save look').click()
     await expect(form.get_by_text('Remove the preview-only items before saving your avatar.')).to_be_visible()

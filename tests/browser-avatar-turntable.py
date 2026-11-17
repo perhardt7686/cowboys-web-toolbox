@@ -166,15 +166,10 @@ async def verify(browser, phone=False):
     await prize.get_by_role('button', name='Try on Brass Field Telescope').click()
     await expect(edit.locator('#avatar-preview-status')).to_contain_text('Earn it to save it')
     await prize.get_by_role('button', name='See Brass Field Telescope').click()
-    await page.evaluate('''() => {
-      if(document.getElementById('star-squadron-toggle'))return;
-      const root=document.createElement('section');root.id='star-squadron-root';
-      root.innerHTML='<button id="star-squadron-toggle" type="button">Sample Dash Forge</button>';
-      document.querySelector('#conversations .community-main').append(root);
-    }''')
-    await edit.get_by_role('button', name='Play Star Squadron to unlock').click()
-    await expect(page.locator('#arcade-game-title-view')).to_contain_text('STAR SQUADRON')
-    await page.get_by_role('button', name='Back to Avatar Studio', exact=True).click()
+    # The old Star Squadron challenge is archived. Preserve its existing
+    # ownership and tell members clearly that new progress is unavailable.
+    await expect(edit.get_by_text('Legacy Star Squadron challenge archived.',exact=False)).to_be_visible()
+    assert await edit.get_by_role('button',name='Play Star Squadron to unlock').count()==0
     await expect(edit.get_by_role('heading', name='Brass Field Telescope')).to_be_visible()
     await edit.get_by_role('button', name='Extend the telescope').click()
     await edit.get_by_role('button', name='Create', exact=True).click()

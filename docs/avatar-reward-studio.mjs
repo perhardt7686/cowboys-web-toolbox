@@ -16,7 +16,7 @@ import {NEW_STUDIO_REWARDS,STUDIO_EDITION} from './avatar-collection-edition.mjs
 const PAGE=18;
 const currentItems=new Set(NEW_STUDIO_REWARDS.map(item=>item.id));
 const labels=Object.entries(GAME_LABELS);
-const gameEntries={mahjong:'mahjong-toggle',wordle:'letter-lock-toggle',wordquest:'word-game-toggle',plates:'plate-game-open',hotrod:'hot-rod-entry',fleet:'star-squadron-toggle',maze:'mystery-maze-toggle',dashforge:'dash-forge-toggle'};
+const gameEntries={mahjong:'mahjong-toggle',wordle:'letter-lock-toggle',wordquest:'word-game-toggle',plates:'plate-game-open',hotrod:'hot-rod-entry',dashforge:'dash-forge-toggle'};
 const sections=[['avatar','Create'],['wardrobe','Wardrobe'],['pets','Companions'],['collection','Rewards']];
 const num=value=>Number(value||0).toLocaleString();
 const row=(...children)=>{const n=el('div','avatar-reward-row');n.append(...children);return n;};
@@ -376,7 +376,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       const title=el('strong','',req.label);
       n.append(title,el('span','',num(req.current)+' / '+num(req.target)),
         meter(Number(req.current),Number(req.target),req.label));
-      if(withButtons&&!achievement.earned_at&&gameEntries[req.game]&&req.current<req.target){
+      if(!achievement.earned_at&&req.current<req.target&&['fleet','maze'].includes(req.game)){
+        n.append(text('Legacy '+GAME_LABELS[req.game]+' challenge archived. Previously earned rewards stay yours; new attempts are unavailable.'));
+      }else if(withButtons&&!achievement.earned_at&&gameEntries[req.game]&&req.current<req.target){
         if(req.game==='plates'&&data?.plate_access===false)n.append(text('This path is for players in the Plate match. Choose the other path.'));
         else n.append(asButton('Play '+GAME_LABELS[req.game]+' to unlock',()=>playGame(req.game),'primary'));
       }
