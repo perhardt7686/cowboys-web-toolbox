@@ -28,6 +28,9 @@ on:
       - '.github/workflows/arcade-boss-and-title-acceptance.yml'
   pull_request:
     paths:
+      - 'docs/commons-family-fun.*'
+      - 'tests/classic-family-fun.test.mjs'
+      - 'tests/browser-classic-family-fun.py'
       - 'docs/commons-arcade-*'
       - 'docs/commons-dash-forge.*'
       - 'tests/arcade-boss-title-screens.test.mjs'

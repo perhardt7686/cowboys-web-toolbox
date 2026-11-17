@@ -77,13 +77,15 @@ test('new FAMILY FUN marquee replaces dull arcade menu artwork without losing ot
  assert.match(marqueeCSS,/#arcade-title-art\{display:none!important\}/);
  assert.match(marqueeCSS,/family-fun-scoreboard/);
  assert.match(score,/FAMILY FUN/);
+ assert.match(score,/family-fun-in-menu/);
+ assert.match(score,/arcade-family-fun/);
  assert.match(score,/ARCADE HIGH SCORES/);
- assert.match(score,/MEMBER-REPORTED SCORES/);
+ assert.match(score,/FAMILY-REPORTED/);
  assert.match(score,/aria-pressed/);
  assert.match(score,/family-classic-scores-clear/);
  assert.match(controller,/new CustomEvent\('family-classic-scores'/);
  assert.match(controller,/family-classic-scores-clear/);
- for(const id of CLASSIC_IDS)assert.ok(score.includes("games.find")&&controller.includes("g.id"),id);
+ for(const id of CLASSIC_IDS)assert.ok(score.includes("CLASSIC_TITLES.find")&&controller.includes("g.id"),id);
  assert.match(css,/\.classic-root\.arcade-game-active/);
 });
 
