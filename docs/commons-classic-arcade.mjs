@@ -214,6 +214,23 @@ async function refreshScores(){
    if(!arr.some(y=>y.user_id===x.user_id))arr.push(x);
   }
   for(const g of CLASSIC_TITLES)paintReports(g.id);
+  // Only approved members see these sanitized, clearly unverified rankings.
+  const rows={};
+  for(const g of CLASSIC_TITLES){
+   rows[g.id]=(reports.get(g.id)||[]).slice(0,5).map(item=>({
+    name:item.user_id===user?'You':(members.get(item.user_id)||'Family player'),
+    points:item.points,when:item.created_at
+   }));
+  }
+  const mine={};
+  for(const g of CLASSIC_TITLES){
+   mine[g.id]=Math.max(0,...(reports.get(g.id)||[])
+    .filter(item=>item.user_id===user).map(item=>Number(item.points)||0));
+   if(mine[g.id]>Number(localBest[g.id]||0)){
+    localBest[g.id]=mine[g.id];saveLocal('bests',localBest);renderGoals(g.id);
+   }
+  }
+  window.dispatchEvent(new CustomEvent('family-classic-scores',{detail:{rows,mine}}));
   if(!legacy.error){
    const old=legacy.data;const line=roots.get('galaga')?.querySelector('.classic-legacy-values');
    if(line){
@@ -295,6 +312,7 @@ async function verify(){
 }
 function unmount(){
  generation++;stopPlayer();user=null;mounted=false;members.clear();reports.clear();
+ window.dispatchEvent(new Event('family-classic-scores-clear'));
  for(const root of roots.values())root.remove();roots.clear();
 }
 async function boot(){
@@ -311,21 +329,27 @@ async function boot(){
   new MutationObserver(syncArcade).observe(document.body,{attributes:true,attributeFilter:['class','data-arcade-game','data-arcade-scene']});
   client.auth.onAuthStateChange(schedule);
   window.addEventListener('message',onPlayerMessage);
+  window.addEventListener('family-classic-request-scores',()=>{if(mounted&&user)void refreshScores();});
   window.addEventListener('blur',releaseAll);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});
+  // One source of truth for keyboard labels and emulator button mapping.
+  const keys=Object.freeze({
+   ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓',
+   Space:'SPACE',Enter:'ENTER',Tab:'TAB',KeyX:'X',KeyZ:'Z',
+   KeyA:'A',KeyQ:'Q',KeyW:'W'
+  });
+  const mapped=event=>classicById(player?.game)?.controls.find(
+   control=>control.key===keys[event.code]);
   window.addEventListener('keydown',event=>{
-   if(!player||board.hidden||event.repeat||event.target?.closest?.('input,textarea,select'))return;
+   if(!player||board.hidden||event.repeat||event.target?.closest?.('input,textarea,select,[contenteditable]'))return;
    if(!roots.get(player.game)?.querySelector('.classic-pane[data-classic-pane="play"]:not([hidden])'))return;
-   const g=classicById(player.game);
-   const c=g?.controls.find(c=>({ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',
-     Space:g.id==='topgear'?'accelerate':'fire',Enter:'start',Tab:'pause'}[event.code]||'')===c.id);
+   const c=mapped(event);
    if(c){event.preventDefault();press(c.index);}
   });
   window.addEventListener('keyup',event=>{
-   if(!player)return;const map={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',
-    Space:player.game==='topgear'?'accelerate':'fire',Enter:'start',Tab:'pause'};
-   const c=classicById(player.game)?.controls.find(x=>x.id===map[event.code]);
-   if(c)release(c.index,true);
+   if(!player)return;
+   const c=mapped(event);
+   if(c){event.preventDefault();release(c.index,true);}
   });
   schedule();
  }catch(error){console.warn('Classic arcade unavailable',error);}
