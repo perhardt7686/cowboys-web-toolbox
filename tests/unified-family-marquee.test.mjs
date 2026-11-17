@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 const read=name=>readFileSync(new URL('../docs/'+name,import.meta.url),'utf8');
 const marquee=read('commons-family-fun.mjs');
 const board=read('family-board.mjs');
+const boardCSS=read('family-board.css');
 const css=read('commons-family-fun.css');
 const html=read('community.html');
 const shell=read('commons-arcade-shell.mjs');
@@ -16,6 +17,7 @@ test('one marquee covers all eleven active family arcade games and renders at th
  assert.match(marquee,/target\.prepend\(root\)/);
  assert.match(marquee,/id='arcade-family-fun'|root\.id='arcade-family-fun'/);
  assert.doesNotMatch(board,/family-score-heading|family-standings-dialog|host\.append\(nav,\s*scoreboard/);
+ assert.doesNotMatch(boardCSS,/family-standings-dialog|family-score-heading/);
  assert.match(board,/new CustomEvent\('family-unified-scoreboard'/);
  assert.match(html,/commons-family-fun\.css\?v=marquee6/);
  assert.match(shell,/mountFamilyFun\(menu\)/);
