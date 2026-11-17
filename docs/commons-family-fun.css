@@ -137,3 +137,34 @@ body.community-page .family-fun-play{
 body.community-page .family-fun-play:focus-visible{
  outline:3px solid #a6ffeb;outline-offset:2px
 }
+
+/* Unified FAMILY FUN cabinet: ONE DOM node only, docked above conversations or inside arcade menu. */
+body.community-page .community-main > #arcade-family-fun{order:-50;margin:0 0 15px!important}
+body.community-page .family-fun-single .family-fun-gear{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px
+}
+body.community-page .family-fun-single .family-fun-gear-card{
+ display:grid;align-content:space-between;justify-items:start;gap:4px;
+ min-width:0;min-height:96px;padding:9px;
+ background:linear-gradient(135deg,#1f375c,#28284d);
+ border:2px solid #6a9ab3;border-radius:9px;color:#f7e9cc;
+ text-align:left;cursor:pointer;font:700 11px/1.35 system-ui
+}
+body.community-page .family-fun-gear-card strong{color:#fbe1a2;font:900 13px/1.3 system-ui}
+body.community-page .family-fun-gear-card span{color:#cce7ed}
+body.community-page .family-fun-gear-card small{color:#baf6e1;font:900 10px/1.3 monospace}
+body.community-page .family-fun-gear-card.is-equipped{
+ border-color:#f5dc88;box-shadow:inset 0 0 0 1px #f5dc8866;background:linear-gradient(135deg,#3a4773,#353050)
+}
+body.community-page .family-fun-gear-card:disabled{cursor:not-allowed;opacity:.58}
+body.community-page .family-fun-gear-card:focus-visible{outline:3px solid #a8ffed;outline-offset:2px}
+body.community-page .family-fun-single .family-fun-actions{display:flex;justify-content:center;margin-top:8px}
+@media(max-width:690px){
+ body.community-page .family-fun-single .family-fun-gear{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ body.community-page .family-fun-single .family-fun-gear-card{min-height:93px;padding:7px;font-size:10px}
+ body.community-page .family-fun-single .family-fun-gear-card strong{font-size:12px}
+}
+@media(max-width:350px){
+ body.community-page .family-fun-single .family-fun-gear{grid-template-columns:1fr}
+ body.community-page .family-fun-single .family-fun-gear-card{min-height:67px}
+}

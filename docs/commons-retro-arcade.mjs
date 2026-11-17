@@ -6,6 +6,8 @@ import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAM
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps1';
 import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
+import {retroUnlocks,canEquipRetro,resolveRetroUnlock,retroCosmeticPalette} from './retro-game-unlockables.mjs?v=gear1';
+import {drawFleetWake,drawFleetGear,drawMazeFootprints,drawMazeGear} from './retro-unlock-art.mjs?v=gear1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const GAMES=[
@@ -19,6 +21,7 @@ let current=null,actions='',ticker=null,working=false,activeScene='play',gameMod
 const input=createRetroInput();
 const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
+let requestedLooks={fleet:'patrol',maze:'scout'},scoreReadEpoch=0;
 const $=id=>document.getElementById(id);
 const letters={
  ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R',ArrowUp:'U',KeyW:'U',ArrowDown:'D',KeyS:'D',
@@ -49,8 +52,57 @@ async function rpc(fn,args={}){
  return data;
 }
 function clearSharedScores(){
+ scoreReadEpoch++;
  overview={mine:[],trophies:[],leaders:[]};
+ requestedLooks={fleet:'patrol',maze:'scout'};
  window.dispatchEvent(new Event('family-retro-scoreboard-clear'));
+}
+function earnedFor(game){
+ return (overview.trophies||[]).filter(t=>t.game===game).map(t=>t.trophy);
+}
+function activeLook(game){
+ return resolveRetroUnlock(game,requestedLooks[game],earnedFor(game));
+}
+function restoreLooks(owner){
+ requestedLooks={fleet:'patrol',maze:'scout'};
+ for(const g of GAMES){
+  try{
+   const id=localStorage.getItem('cowboy-game-gear-v1:'+owner+':'+g.id);
+   if(retroUnlocks(g.id).some(item=>item.id===id))requestedLooks[g.id]=id;
+  }catch{}
+ }
+}
+function equipLook(game,id){
+ if(!user||!mounted||board.hidden||!canEquipRetro(game,id,earnedFor(game)))return false;
+ requestedLooks[game]=id;
+ try{localStorage.setItem('cowboy-game-gear-v1:'+user+':'+game,id);}catch{}
+ paintScores(game);
+ if(current?.game===game)renderGame(current);
+ window.dispatchEvent(new CustomEvent('family-retro-gear-changed',{detail:{game,id}}));
+ return true;
+}
+function paintGear(game){
+ const parent=$(GAMES.find(g=>g.id===game)?.root)?.querySelector('.retro-trophies');
+ if(!parent)return;
+ let host=parent.querySelector('.retro-gear-panel');
+ if(!host){host=el('div','retro-gear-panel');parent.append(host);}
+ const earned=new Set(earnedFor(game)),active=activeLook(game);
+ host.replaceChildren(el('h3','',game==='fleet'?'STARSHIP HANGAR · COSMETICS':'DETECTIVE GEAR LOCKER · COSMETICS'),
+  el('p','retro-gear-note','Verified trophies unlock these game-only looks. Equip does not change physics, scoring, or lives.'));
+ const grid=el('div','retro-gear-grid');
+ for(const item of retroUnlocks(game)){
+  const unlocked=item.need===null||earned.has(item.need);
+  const card=el('button','retro-gear-item'+(active===item.id?' is-equipped':''));
+  card.type='button';card.disabled=!unlocked;
+  card.dataset.retroGear=item.id;
+  card.dataset.retroGame=game;
+  card.setAttribute('aria-pressed',String(active===item.id));
+  card.append(el('strong','',item.name),el('span','',item.description),
+   el('small','',!unlocked?'LOCKED · '+item.need.toUpperCase()+' TROPHY':active===item.id?'EQUIPPED ✓':'EQUIP · '+item.type));
+  card.addEventListener('click',()=>equipLook(game,item.id));
+  grid.append(card);
+ }
+ host.append(grid);
 }
 function shareVerifiedScores(){
  // Derived only from approved-member server-verified retro RPC responses.
@@ -62,14 +114,14 @@ function shareVerifiedScores(){
   trophies[g.id]=(overview.trophies||[]).filter(t=>t.game===g.id)
    .map(t=>String(t.trophy||'')).filter(Boolean);
  }
- window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{leaders,trophies}}));
+ window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{leaders,trophies,equipped:{fleet:activeLook('fleet'),maze:activeLook('maze')}}}));
 }
 async function refresh(){
  if(!user||!mounted||board.hidden)return;
- const owner=user;
+ const owner=user,epoch=++scoreReadEpoch;
  try{
   const result=await rpc('community_retro_state');
-  if(!mounted||user!==owner||board.hidden)return;
+  if(!mounted||user!==owner||board.hidden||epoch!==scoreReadEpoch)return;
   overview=result;
   for(const g of GAMES)paintScores(g.id);
   shareVerifiedScores();
@@ -102,6 +154,7 @@ function paintScores(id){
    return badge;
   }));
  }
+ paintGear(id);
  const leaders=root.querySelector('.retro-leaders');
  if(leaders){
   const rows=(overview.leaders||[]).filter(p=>p.game===id).sort((a,b)=>b.best-a.best).slice(0,12);
@@ -310,7 +363,7 @@ function paintReady(canvas,id){
  ctx.fillStyle='#a0f7e7';ctx.font='bold 20px monospace';
  ctx.fillText('PRESS START TO BEGIN',canvas.width/2,canvas.height*.58);
 }
-function paintFleet(canvas,s){
+function paintFleet(canvas,s,look='patrol'){
  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
  ctx.fillStyle='#070c29';ctx.fillRect(0,0,w,h);
  for(let i=0;i<98;i++){
@@ -319,12 +372,15 @@ function paintFleet(canvas,s){
   ctx.fillRect(x,y,i%3===0?2:1,i%3===0?2:1);
  }
  const bw=(w-36)/9,x=18+s.lane*bw+bw/2,y=h-72;
+ const [hull,trim,cockpit]=retroCosmeticPalette('fleet',look);
+ drawFleetWake(ctx,look,s,x,y);
  ctx.save();ctx.translate(x,y);
  ctx.beginPath();ctx.moveTo(0,-38);ctx.lineTo(27,17);ctx.lineTo(12,11);
  ctx.lineTo(0,25);ctx.lineTo(-12,11);ctx.lineTo(-27,17);ctx.closePath();
- ctx.fillStyle='#89dbdf';ctx.strokeStyle='#f6ca77';ctx.lineWidth=4;ctx.fill();ctx.stroke();
- ctx.fillStyle='#3e679a';ctx.fillRect(-8,-3,16,10);
+ ctx.fillStyle=hull;ctx.strokeStyle=trim;ctx.lineWidth=4;ctx.fill();ctx.stroke();
+ ctx.fillStyle=cockpit;ctx.fillRect(-8,-3,16,10);
  ctx.restore();
+ drawFleetGear(ctx,look,s,x,y);
  if(s.tick>0){
   const alien=alienAt(s.tick-1,s.seed);
   if(!s.destroyed.includes(alien.wave)&&alien.age<=7){
@@ -347,7 +403,7 @@ function paintFleet(canvas,s){
  if(s.events.includes('hit')){ctx.fillStyle='#fff1af';ctx.font='900 27px monospace';ctx.fillText('+ HIT!',w/2,h/2);}
  if(s.events.includes('crash')){ctx.fillStyle='#ff7189';ctx.font='900 24px monospace';ctx.fillText('HULL DAMAGE!',w/2,h/2);}
 }
-function paintMaze(canvas,s){
+function paintMaze(canvas,s,look='scout'){
  const ctx=canvas.getContext('2d');const tile=canvas.width/15;
  ctx.fillStyle='#120e2e';ctx.fillRect(0,0,canvas.width,canvas.height);
  for(let y=0;y<15;y++)for(let x=0;x<15;x++){
@@ -361,6 +417,7 @@ function paintMaze(canvas,s){
    ctx.beginPath();ctx.arc(px+tile/2,py+tile/2,cell==='o'?6:2.8,0,Math.PI*2);ctx.fill();
   }
  }
+ drawMazeFootprints(ctx,look,s,tile);
  for(const [i,g] of s.ghosts.entries()){
   const xx=(g.x+.5)*tile,yy=(g.y+.5)*tile;
   ctx.save();ctx.translate(xx,yy);ctx.rotate(Math.PI/4);
@@ -369,16 +426,18 @@ function paintMaze(canvas,s){
   ctx.fillStyle='#1a1838';ctx.beginPath();ctx.arc(xx-4,yy-2,2,0,7);ctx.arc(xx+4,yy-2,2,0,7);ctx.fill();
  }
  const xx=(s.x+.5)*tile,yy=(s.y+.5)*tile;
- ctx.fillStyle='#f4ce77';ctx.strokeStyle='#5b3c5c';ctx.lineWidth=3;
+ const [coat,outline]=retroCosmeticPalette('maze',look);
+ ctx.fillStyle=coat;ctx.strokeStyle=outline;ctx.lineWidth=3;
  ctx.beginPath();ctx.arc(xx,yy,12,0,Math.PI*2);ctx.fill();ctx.stroke();
  ctx.fillStyle='#493459';ctx.beginPath();ctx.arc(xx-4,yy-4,2.5,0,7);ctx.arc(xx+4,yy-4,2.5,0,7);ctx.fill();
  ctx.strokeStyle='#493459';ctx.beginPath();ctx.arc(xx,yy+1,5,0,Math.PI);ctx.stroke();
- ctx.fillStyle='#5b3c5c';ctx.fillRect(xx-12,yy-16,24,4);ctx.fillRect(xx-7,yy-24,14,9);
+ ctx.fillStyle=outline;ctx.fillRect(xx-12,yy-16,24,4);ctx.fillRect(xx-7,yy-24,14,9);
+ drawMazeGear(ctx,look,s,xx,yy);
 }
 function renderGame(state){
  const root=$(GAMES.find(g=>g.id===state.game).root);
  const canvas=root?.querySelector('.retro-canvas');if(!canvas)return;
- if(state.game==='fleet')paintFleet(canvas,state);else paintMaze(canvas,state);
+ if(state.game==='fleet')paintFleet(canvas,state,activeLook(state.game));else paintMaze(canvas,state,activeLook(state.game));
  const n=root.querySelector('.retro-live-readout');
  n.textContent='SCORE '+state.score+' · LIVES '+state.lives+' · '+state.tick+'/'+RETRO_GAME_RULES[state.game].steps+
    (state.game==='maze'?' · CLUES '+state.dots:'/ · SWARMS '+Math.ceil(state.tick/9));
@@ -402,10 +461,10 @@ async function verify(){
  const {data:{session}}=await client.auth.getSession();
  const id=session?.user?.id;if(!id){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
- if(error||member?.status!=='approved'){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;return;}
+ if(error||member?.status!=='approved'){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  if(mounted&&user===id)return;
  if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();clearSharedScores();}
- user=id;mounted=true;
+ user=id;mounted=true;restoreLooks(id);
  const main=board.querySelector('.community-main');if(!main){mounted=false;return;}
  const base=$('dash-forge-root'),insertion=base&&main.contains(base)?base:null;
  for(const g of GAMES){
@@ -446,6 +505,10 @@ async function boot(){
   });
   window.addEventListener('blur',()=>input.clearHeld());
   client.auth.onAuthStateChange(schedule);
+  window.addEventListener('family-retro-equip-request',event=>{
+   const detail=event.detail;
+   if(detail?.game&&detail?.id)equipLook(detail.game,detail.id);
+  });
   window.addEventListener('keydown',onKeyDown);
   window.addEventListener('keyup',onKeyUp);
   schedule();

@@ -118,17 +118,35 @@ async def run_size(browser,width,height):
   assert late_reply==[False,True,"maze"],("Canceled arcade start was accepted",late_reply)
   await page.locator("#arcade-program-grid").wait_for(state="attached",timeout=15000)
   await page.locator("#arcade-family-fun").wait_for(timeout=15000)
-  assert await page.locator(".family-fun-scoreboard").count()==2, "Marquee must exist on board and arcade menu"
+  assert await page.locator(".family-fun-scoreboard").count()==1, "There must be ONE merged scoreboard"
+  assert await page.evaluate("document.querySelector('.community-main').firstElementChild.id==='arcade-family-fun'")
+  assert await page.locator("#arcade-family-fun .family-fun-gear-card").count()==6, "Six game-specific unlockables"
+  assert await page.locator("#arcade-family-fun .family-fun-gear-card:disabled").count()==6, "No equipment may be changed before approved sign-in"
   assert await page.locator("#arcade-family-fun .family-fun-tab").count()==2, "Only original family games may remain"
   assert "FAMILY FUN" in await page.locator("#arcade-family-fun").inner_text()
   await page.evaluate("""() => window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{
     leaders:{fleet:[{name:'Synthetic Pilot',best:420}],maze:[]},
-    trophies:{fleet:['first-run','gold'],maze:[]}
+    trophies:{fleet:['first-run','gold'],maze:[]},
+    equipped:{fleet:'rookie',maze:'scout'}
   }}))""")
   assert "420" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
   assert "VERIFIED" in await page.locator("#arcade-family-fun").inner_text()
+  assert await page.locator("#arcade-family-fun .family-fun-gear-card:not([disabled])").count()==3, "Only starter, first-run, and gold cosmetic can equip"
+  assert await page.locator("#arcade-family-fun .family-fun-gear-card.is-equipped").count()==1
+  assert "Rookie Wing Stripes" in await page.locator("#arcade-family-fun").inner_text()
+  # One physical scoreboard moves between the page top and arcade cabinet.
+  await page.evaluate("""() => {
+    const menu=document.getElementById('arcade-shell');
+    const view=document.getElementById('arcade-menu-view');
+    view.hidden=false;menu.hidden=false;
+  }""")
+  await page.wait_for_function("document.querySelector('#arcade-menu-view').firstElementChild.id==='arcade-family-fun'")
+  assert await page.locator(".family-fun-scoreboard").count()==1
+  await page.evaluate("document.getElementById('arcade-shell').hidden=true")
+  await page.wait_for_function("document.querySelector('.community-main').firstElementChild.id==='arcade-family-fun'")
+
   await page.locator("#arcade-family-fun [data-family-fun-game=maze]").click()
-  assert "NO SCORES YET" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
+  assert "NO VERIFIED SCORES YET" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
   await page.locator("#arcade-family-fun [data-family-fun-game=fleet]").click()
   if width==390:
    (ROOT/"reports").mkdir(exist_ok=True,parents=True)
