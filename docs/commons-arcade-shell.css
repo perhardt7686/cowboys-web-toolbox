@@ -57,11 +57,6 @@ body.community-page #arcade-menu-view{
  grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
  grid-template-rows:auto 1fr auto;gap:10px;align-content:stretch;align-items:center
 }
-body.community-page #arcade-title-art{
- display:block;grid-column:1;grid-row:1/3;width:100%;height:auto;
- max-height:min(69dvh,590px);aspect-ratio:8/5;object-fit:contain;image-rendering:pixelated;
- border:5px ridge #aaaaaa;background:#000044
-}
 body.community-page .arcade-menu-intro{grid-column:2;grid-row:1;min-height:0}
 body.community-page .arcade-menu-intro span{display:block;color:#55ffff;font:900 .7rem/1.4 'Courier New',monospace;letter-spacing:.06em}
 body.community-page .arcade-menu-intro h2,
@@ -420,7 +415,6 @@ body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=juni
  body.community-page #arcade-hud .arcade-hud-main button{min-height:36px;padding:5px;font-size:.67rem}
  body.community-page #arcade-hud #arcade-hud-title{font-size:.68rem}
  body.community-page #arcade-menu-view{grid-template-columns:minmax(0,1fr);grid-template-rows:120px 46px minmax(0,1fr) 42px;gap:5px}
- body.community-page #arcade-title-art{grid-column:1;grid-row:1;height:120px;width:auto;max-width:100%;justify-self:center;border-width:3px}
  body.community-page .arcade-menu-intro{grid-column:1;grid-row:2;text-align:center}
  body.community-page .arcade-menu-intro h2{margin:2px!important;font-size:1.03rem}
  body.community-page .arcade-menu-intro p{display:none!important}
@@ -446,7 +440,6 @@ body.community-page.arcade-on[data-arcade-game=streetrod][data-arcade-scene=juni
 }
 @media(max-height:620px){
  body.community-page #arcade-menu-view{grid-template-rows:80px 38px minmax(0,1fr) 35px}
- body.community-page #arcade-title-art{height:80px}
  body.community-page #arcade-program-grid button{min-height:39px}
  body.community-page .arcade-menu-intro span{display:none}
  body.community-page #arcade-hud #arcade-hud-scenes{min-height:36px}
