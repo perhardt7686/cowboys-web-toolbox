@@ -39,9 +39,9 @@ test('original family arcade games remain playable, with score backend intact',(
  assert.ok(!html.includes('commons-classic-arcade.css'));
 });
 
-test('FAMILY FUN is retained but only shows approved verified original-game scores',()=>{
+test('One FAMILY FUN marquee includes every family game with verified per-title rankings',()=>{
  assert.match(fun,/FAMILY FUN/);
- assert.match(fun,/FAMILY HIGH SCORES/);
+ assert.match(fun,/ONE FAMILY ARCADE/);
  assert.match(fun,/VERIFIED RESULTS ONLY/);
  assert.match(fun,/family-fun-in-menu/);
  assert.match(fun,/family-fun-single/);
