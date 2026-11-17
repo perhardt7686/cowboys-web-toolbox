@@ -1,0 +1,116 @@
+/* FAMILY FUN: real family arcade marquee, replaces the old generic DOS menu artwork.
+   Private, responsive, no copied game screenshots, no auto-claiming verified scores. */
+body.community-page #arcade-shell .arcade-computer{min-height:0;overflow:hidden}
+body.community-page #arcade-menu-view{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ justify-content:flex-start!important;gap:8px!important;overflow-y:auto!important;
+ overscroll-behavior:contain;padding:clamp(5px,1.3vw,12px)!important;
+ scrollbar-gutter:stable;
+}
+body.community-page #arcade-title-art{display:none!important}
+body.community-page .arcade-menu-intro{order:2;flex:0 0 auto;text-align:center}
+body.community-page .arcade-menu-intro span{font-size:10px!important}
+body.community-page .arcade-menu-intro h2{font-size:clamp(13px,2.1vw,17px)!important;margin:2px 0!important}
+body.community-page .arcade-menu-intro p{display:none!important}
+body.community-page #arcade-program-grid{
+ order:3;grid-column:auto!important;grid-row:auto!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ flex:0 0 auto;align-content:start!important;gap:6px!important;width:100%;
+}
+body.community-page #arcade-program-grid button{min-height:51px!important;padding:7px!important;font-size:12px!important}
+body.community-page #arcade-program-grid .arcade-program-number{white-space:nowrap}
+body.community-page .arcade-program-state{font-size:10px!important}
+body.community-page .arcade-menu-bottom{order:4;flex:0 0 auto;margin-bottom:6px}
+body.community-page .family-fun-scoreboard{
+ order:1;flex:0 0 auto;width:100%;max-width:100%;box-sizing:border-box;
+ border:4px ridge #e5a44c;border-radius:13px;padding:clamp(7px,1.5vw,14px);
+ color:#fff;background:
+  repeating-linear-gradient(0deg,transparent,transparent 22px,#15284f33 23px,#15284f33 24px),
+  linear-gradient(140deg,#0a1632,#20284e 53%,#241c46);
+ box-shadow:inset 0 2px #fff6b12e,0 5px #040711,0 0 18px #f2b76552;
+ font-family:'Courier New',monospace;overflow:hidden;
+}
+body.community-page .family-fun-heading{text-align:center;display:grid;justify-items:center;gap:1px}
+body.community-page .family-fun-stars{color:#ffe8a0;letter-spacing:.35em;font:900 12px/1.5 monospace}
+body.community-page .family-fun-marquee{
+ margin:0!important;color:#ffe9a8!important;
+ font:1000 clamp(29px,5.8vw,61px)/1.05 system-ui!important;
+ letter-spacing:clamp(1px,.45vw,5px);text-shadow:
+  2px 2px 0 #8f3b52,4px 5px 0 #2e3465,0 0 18px #e7a83a99;
+}
+body.community-page .family-fun-subtitle{margin:1px 0 7px!important;color:#92f5ed!important;
+ font:900 clamp(9px,1.5vw,13px)/1.4 monospace;letter-spacing:.09em}
+body.community-page .family-fun-score-light{
+ display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:space-between;
+ background:linear-gradient(90deg,#4d255d,#3d396f,#303e62);border:2px solid #f4c585;
+ border-radius:8px;padding:6px 10px;box-shadow:inset 0 2px #ffffff18;
+}
+body.community-page .family-fun-score-light strong{
+ color:#ffe68e;font:1000 clamp(12px,2vw,18px)/1.3 system-ui;letter-spacing:.06em;
+}
+body.community-page .family-fun-score-light span{
+ color:#eff9ff;font:700 10px/1.3 monospace;white-space:normal
+}
+body.community-page .family-fun-tabs{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:8px 0!important
+}
+body.community-page .family-fun-tab{
+ display:grid;place-items:center;min-width:0;min-height:39px!important;
+ padding:4px!important;border:2px solid #7aaac9!important;border-radius:6px!important;
+ color:#d7f4ff!important;background:#142d4a!important;
+ font:900 clamp(10px,1.5vw,12px)/1.1 system-ui!important;white-space:normal;cursor:pointer;
+}
+body.community-page .family-fun-tab[aria-pressed=true]{
+ color:#1c2140!important;background:#ffdd84!important;border-color:#fff5b7!important;
+ box-shadow:0 2px 0 #b07856;
+}
+body.community-page .family-fun-board-heading{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+ border-bottom:2px solid #7ba7e3;padding-bottom:5px;color:#bff1f6;
+}
+body.community-page .family-fun-board-heading strong{font:900 clamp(12px,2vw,16px)/1.4 monospace}
+body.community-page .family-fun-board-heading small{font:700 10px/1.3 monospace;color:#ffe19c}
+body.community-page .family-fun-podium{display:grid;gap:3px;margin-top:4px}
+body.community-page .family-fun-row{
+ display:grid;grid-template-columns:41px minmax(0,1fr) auto auto auto;
+ gap:clamp(4px,1.5vw,11px);align-items:center;
+ border:1px solid #6785be;padding:5px 7px;
+ background:linear-gradient(90deg,#21395c,#272847);
+ font:800 clamp(10px,1.4vw,13px)/1.4 monospace;color:#e5f3ff;
+}
+body.community-page .family-fun-row.is-first{
+ border:2px solid #f8dd87;background:linear-gradient(90deg,#473e63,#3c3356)
+}
+body.community-page .family-fun-rank{color:#ffe494}
+body.community-page .family-fun-player{font-weight:900;overflow-wrap:anywhere}
+body.community-page .family-fun-points{font:1000 clamp(12px,2vw,18px)/1.1 monospace;color:#f7e7a0;font-variant-numeric:tabular-nums}
+body.community-page .family-fun-date{color:#bacde8;white-space:nowrap;font-size:10px}
+body.community-page .family-fun-tag{color:#f9c7a8;font-size:9px;white-space:nowrap}
+body.community-page .family-fun-empty{margin:0!important;padding:13px 7px!important;
+ background:#202a4a;color:#fce8a0;text-align:center;font:900 11px/1.5 monospace}
+body.community-page .family-fun-achievements{margin-top:8px;display:grid;gap:5px}
+body.community-page .family-fun-milestone-title{color:#ffdc87;font:900 12px/1.3 monospace}
+body.community-page .family-fun-milestones{display:flex;gap:5px;flex-wrap:wrap}
+body.community-page .family-fun-medal{
+ border:1px solid #63789e;border-radius:5px;padding:5px 7px;
+ background:#24294e;color:#c9d8ef;font:800 10px/1.3 monospace;overflow-wrap:anywhere;
+}
+body.community-page .family-fun-medal.earned{color:#ffe9a0;background:#3d3c54;border-color:#f0ce81}
+body.community-page .family-fun-provenance{
+ margin:8px 0 0!important;padding-top:5px;border-top:1px solid #6976a0;
+ color:#ffbba5;font:900 10px/1.4 monospace;text-align:center
+}
+body.community-page .family-fun-status{margin:4px 0 0!important;color:#b7ccdd;font:750 10px/1.4 monospace;text-align:center}
+@media(max-width:690px){
+ body.community-page #arcade-program-grid{grid-template-columns:1fr!important}
+ body.community-page .family-fun-scoreboard{padding:8px}
+ body.community-page .family-fun-row{grid-template-columns:32px minmax(0,1fr) auto;}
+ body.community-page .family-fun-row .family-fun-date,body.community-page .family-fun-row .family-fun-tag{display:none}
+ body.community-page .family-fun-score-light{justify-content:center;text-align:center}
+ body.community-page .family-fun-score-light span{font-size:9px}
+ body.community-page .family-fun-tabs{gap:3px}
+ body.community-page .family-fun-tab{min-height:42px!important;font-size:10px!important;padding:3px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .family-fun-scoreboard *{animation:none!important;transition:none!important}
+}
