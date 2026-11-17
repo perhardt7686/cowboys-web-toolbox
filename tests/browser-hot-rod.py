@@ -374,13 +374,15 @@ async def campaign_flow(page, name, *, touch):
         await expect(game.get_by_text('First drag win',exact=True)).to_be_visible()
 
     await game.get_by_role('button',name='Back to games').click()
-    await page.get_by_role('combobox',name='Standings by game').select_option('hotrod')
-    family = page.locator('.family-scoreboard')
-    mine = family.locator('li.is-mine')
+    # The single top FAMILY FUN marquee replaces the retired second scoreboard.
+    # Detailed win/loss records remain available inside Hot Rod Hall of Fame.
+    await page.get_by_role('combobox',name='Choose game to view family scores').select_option('streetrod')
+    family = page.locator('#arcade-family-fun')
+    mine = family.locator('.family-fun-podium .family-fun-row').filter(has_text='Fixture member (you)')
     await expect(mine).to_contain_text('Fixture member (you)')
-    await expect(mine).to_contain_text('0 wins · 1 losses' if touch else '1 wins · 0 losses')
+    await expect(family).to_contain_text('Server verified')
     if not touch:
-        await expect(mine).to_contain_text('13 points')
+        await expect(mine).to_contain_text('13 career points')
     game = await open_game(page)
     await page.evaluate("fixture.access('suspended')")
     await expect(game).to_have_count(0)
