@@ -19,6 +19,7 @@ on:
       - 'docs/dash-*.mjs'
       - 'docs/family-arcade-replay.mjs'
       - 'tests/browser-skyboard-sprint.py'
+      - 'tests/browser-classic-family-fun.py'
       - 'tests/skyboard-sprint.test.mjs'
       - 'tests/arcade-replay-db.test.mjs'
       - 'supabase/functions/family-arcade/**'
@@ -73,7 +74,7 @@ jobs:
         run: |
           python -m http.server 8765 --directory docs >/tmp/arcade-titles-http.log 2>&1 &
           failed=0
-          for fixture in arcade-titles dash-forge arcade-shell skyboard-sprint; do
+          for fixture in arcade-titles classic-family-fun dash-forge arcade-shell skyboard-sprint; do
             python "tests/browser-${fixture}.py" || failed=1
           done
           exit "$failed"
@@ -88,5 +89,6 @@ jobs:
             reports/skyboard-sprint-iphone.png
             reports/skyboard-course-worlds.png
             reports/arcade-one-screen-iphone-sample.png
+            reports/family-fun-arcade-390.png
           if-no-files-found: ignore
           retention-days: 7
