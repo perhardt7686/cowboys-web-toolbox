@@ -134,11 +134,13 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     const win=data.solved?'Your team solved it! Everyone who helped gets a team win.':data.finished?'Today’s attempts are finished. A new word arrives tomorrow.':'Work together: 5 letters and 12 guesses as a team.';
     byId('commons-word-finish').textContent=win+(data.answer?` Answer: ${data.answer}`:'');
     const today=Array.isArray(data.guesses)?data.guesses:[];
+    const count=byId('commons-word-guess-count');if(count)count.textContent=today.length+' / '+Number(data.max_attempts||12)+' guesses';
+    const previousTop=area.scrollTop,followLatest=area.scrollHeight-area.scrollTop-area.clientHeight<45;
     area.replaceChildren();
     if(!today.length){const p=document.createElement('p');p.className='word-rules';p.textContent='No guesses yet. Be the first explorer!';area.append(p);}
-    for(const item of today){
-      const row=document.createElement('div');row.className='word-tile-row';
-      const who=document.createElement('span');who.className='word-player';who.append(avatarOf(item.user_id,item.name),document.createTextNode(safeStr(item.name)));
+    for(const [index,item] of today.entries()){
+      const row=document.createElement('div');row.className='word-tile-row';row.setAttribute('role','listitem');
+      const who=document.createElement('span');who.className='word-player';who.append(document.createTextNode('#'+(index+1)+' · '),avatarOf(item.user_id,item.name),document.createTextNode(safeStr(item.name)));
       row.append(who);
       const word=safeStr(item.guess);
       for(let i=0;i<5;i++){
@@ -149,6 +151,8 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       }
       const points=document.createElement('strong');points.textContent=`+${Number(item.points)||0}`;points.style.marginInlineStart='auto';points.style.color='#2a564e';row.append(points);area.append(row);
     }
+    if(followLatest)area.scrollTop=area.scrollHeight;
+    else area.scrollTop=Math.min(previousTop,Math.max(0,area.scrollHeight-area.clientHeight));
     ranking.replaceChildren();
     const boardRows=Array.isArray(data.ranking)?data.ranking:[];
     if(!boardRows.length){const li=document.createElement('li');li.textContent='Scoreboard opens after the first guess.';ranking.append(li);}
@@ -205,7 +209,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       <div class="family-heading"><div><span class="family-kicker">The Commons · Cooperative game</span><h2>Daily Word Quest</h2><p>One mystery word. One team. Individual scores and a family scoreboard.</p></div><span class="family-pill" id="commons-word-day">Today’s puzzle</span></div>
       <div class="word-layout"><div class="word-panel"><p class="word-clue" id="commons-word-clue">Loading today’s clue…</p>
        <div class="word-stats"><span class="family-pill" id="commons-word-progress">0 / 12</span><span class="family-pill" id="commons-word-total">Team: 0</span><span class="family-pill" id="commons-word-my-points">Mine: 0</span><span class="family-pill" id="commons-word-history">All-time team wins: 0</span></div>
-       <div id="commons-word-moves" aria-label="Today’s team guesses"></div>
+       <section class="word-history" aria-label="Previous team guesses"><div class="word-history-head"><strong>Previous guesses</strong><span id="commons-word-guess-count">0 / 12 guesses</span></div><div id="commons-word-moves" class="word-history-list" role="list" tabindex="0" aria-label="Previous team guesses in submission order"></div></section>
        <p class="word-message" id="commons-word-finish" aria-live="polite"></p>
        <form id="commons-word-form" class="word-guess-form"><label for="commons-word-guess" class="sr-only">Your five-letter word</label><input id="commons-word-guess" aria-label="Five-letter guess" type="text" inputmode="text" minlength="5" maxlength="5" autocomplete="off" spellcheck="false" pattern="[A-Za-z]{5}" placeholder="WORD?" required><button class="family-btn" id="commons-word-submit" type="submit">Try word →</button><button type="button" class="family-btn secondary" id="commons-word-refresh">Refresh team</button></form>
        <p class="word-message" id="commons-word-message" role="status" aria-live="polite"></p>
