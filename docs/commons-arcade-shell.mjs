@@ -3,7 +3,7 @@
    RPCs, authentication, scores, and original DOM nodes. */
 import {makeArcadeNav} from './family-arcade-nav.mjs?v=retro4';
 import {titleProfiles,titleMarkup,drawGameTitle} from './commons-arcade-titles.mjs?v=arcade8';
-import {mountFamilyFun} from './commons-family-fun.mjs?v=marquee4';
+import {mountFamilyFun} from './commons-family-fun.mjs?v=marquee6';
 
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
