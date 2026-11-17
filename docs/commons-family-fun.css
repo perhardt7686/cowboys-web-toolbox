@@ -114,3 +114,13 @@ body.community-page .family-fun-status{margin:4px 0 0!important;color:#b7ccdd;fo
 @media(prefers-reduced-motion:reduce){
  body.community-page .family-fun-scoreboard *{animation:none!important;transition:none!important}
 }
+
+/* Scoreboard occupies the head of the arcade, not an old DOS splash screen. */
+body.community-page #arcade-menu-view[hidden]{display:none!important}
+body.community-page #arcade-menu-view > .family-fun-in-menu{
+ order:0;flex:0 0 auto;width:100%;max-width:100%;margin:0;
+}
+body.community-page .family-fun-scoreboard[hidden]{display:none!important}
+body.community-page .family-fun-scoreboard .family-fun-tabs button:focus-visible{
+ outline:3px solid #9ffff1!important;outline-offset:2px!important;
+}
