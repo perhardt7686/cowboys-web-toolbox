@@ -15,7 +15,7 @@ test('Skyboard ships with independently executable and accessible board source',
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',
    fileURLToPath(new URL('../'+path,import.meta.url))]));
  }
- assert.match(html,/commons-board-rush\.mjs\?v=skyboard4/);
+ assert.match(html,/commons-board-rush\.mjs\?v=skyboard6/);
  assert.match(html,/commons-board-rush\.css\?v=skyboard3/);
  assert.match(shell,/id:'skyboard',root:'skyboard-root',toggle:'skyboard-toggle'/);
  assert.match(nav,/skyboard:\[sceneAction\('Ride current stage'/);
