@@ -114,7 +114,7 @@ function shareVerifiedScores(){
   trophies[g.id]=(overview.trophies||[]).filter(t=>t.game===g.id)
    .map(t=>String(t.trophy||'')).filter(Boolean);
  }
- window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{leaders,trophies,equipped:{fleet:activeLook('fleet'),maze:activeLook('maze')}}}));
+ window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{member:user,leaders,trophies,equipped:{fleet:activeLook('fleet'),maze:activeLook('maze')}}}));
 }
 async function refresh(){
  if(!user||!mounted||board.hidden)return;

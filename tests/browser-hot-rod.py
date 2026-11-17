@@ -19,6 +19,7 @@ HTML = """<!doctype html><html lang="en"><head>
 <link rel="stylesheet" href="/community.css">
 <link rel="stylesheet" href="/purple-night.css">
 <link rel="stylesheet" href="/family-board.css">
+<link rel="stylesheet" href="/commons-family-fun.css">
 <link rel="stylesheet" href="/hot-rod.css">
 </head><body class="community-page"><main>
 <section id="conversations" class="community-layout container" hidden>
@@ -31,6 +32,7 @@ HTML = """<!doctype html><html lang="en"><head>
 </div></section></main>
 <script type="module">
 import {createFamilyBoard} from '/family-board.mjs';
+import {mountFamilyFun} from '/commons-family-fun.mjs';
 import {createHotRodBoard} from '/hot-rod-board.mjs';
 import {CARS} from '/hot-rod-catalog.mjs';
 import {applyWorkshop, garageShowcase, makeCar, newCampaign, settleRace, startRace} from '/hot-rod-campaign.mjs';
@@ -39,6 +41,7 @@ import {replayRace} from '/hot-rod-racing.mjs';
 const section = document.getElementById('conversations');
 const game = createHotRodBoard();
 const board = createFamilyBoard();
+mountFamilyFun(null);
 const viewer = '00000000-0000-4000-8000-000000000001';
 const rival = '00000000-0000-4000-8000-000000000002';
 const rivalState = newCampaign();
@@ -197,8 +200,8 @@ async def access_flow(page):
     await page.evaluate("fixture.access('approved')")
     await page.evaluate("history.replaceState(null, '', location.pathname)")
     await expect(page.locator('#hot-rod-entry')).to_be_visible()
-    await expect(page.get_by_role('heading',name='Family Scoreboard')).to_be_visible()
-    assert await page.locator('#family-score-title').evaluate("""node =>
+    await expect(page.locator('#arcade-family-fun')).to_be_visible()
+    assert await page.locator('#arcade-family-fun').evaluate("""node =>
       !!(node.compareDocumentPosition(document.querySelector('#hot-rod-entry')) & Node.DOCUMENT_POSITION_FOLLOWING)
     """)
 
@@ -371,13 +374,15 @@ async def campaign_flow(page, name, *, touch):
         await expect(game.get_by_text('First drag win',exact=True)).to_be_visible()
 
     await game.get_by_role('button',name='Back to games').click()
-    await page.get_by_role('combobox',name='Standings by game').select_option('hotrod')
-    family = page.locator('.family-scoreboard')
-    mine = family.locator('li.is-mine')
+    # The single top FAMILY FUN marquee replaces the retired second scoreboard.
+    # Detailed win/loss records remain available inside Hot Rod Hall of Fame.
+    await page.get_by_role('combobox',name='Choose game to view family scores').select_option('streetrod')
+    family = page.locator('#arcade-family-fun')
+    mine = family.locator('.family-fun-podium .family-fun-row').filter(has_text='Fixture member (you)')
     await expect(mine).to_contain_text('Fixture member (you)')
-    await expect(mine).to_contain_text('0 wins · 1 losses' if touch else '1 wins · 0 losses')
+    await expect(family).to_contain_text('Server verified')
     if not touch:
-        await expect(mine).to_contain_text('13 points')
+        await expect(mine).to_contain_text('13 career points')
     game = await open_game(page)
     await page.evaluate("fixture.access('suspended')")
     await expect(game).to_have_count(0)

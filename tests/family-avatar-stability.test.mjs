@@ -12,12 +12,11 @@ test('community profile images use stable private blob URLs rather than expiring
  assert.match(profiles,/getAvatarPhoto/);
  assert.match(profiles,/family-avatar-updated/);
 });
-test('family scoreboard hydrates photos before repaint and keeps images for the session',()=>{
+test('retired scoreboard no longer duplicates member profile image retrieval',()=>{
  const s=read('docs/family-board.mjs');
- assert.match(s,/await updatePhotos\(result\)/);
- assert.match(s,/await getAvatarPhoto\(client,path\)/);
+ assert.doesNotMatch(s,/await updatePhotos\(result\)|getAvatarPhoto\(client,path\)|onAvatarUpdated/);
+ assert.match(s,/family-unified-scoreboard/);
  assert.doesNotMatch(s,/createSignedUrls/);
- assert.match(s,/onAvatarUpdated/);
 });
 test('Word Quest prioritizes the member-chosen profile photo over stored board portraits',()=>{
  const s=read('docs/commons-family.mjs');

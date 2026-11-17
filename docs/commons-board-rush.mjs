@@ -192,11 +192,18 @@ async function rpc(name,args={}){
  if(error)throw Error(error.message||'The family game server is unavailable.');
  return data;
 }
+function shareFamilyRanks(owner){
+ window.dispatchEvent(new CustomEvent('family-arcade-game-rankings',{detail:{member:owner,game:'skyboard',
+  entries:leaders.map((entry,index)=>({rank:index+1,name:entry.name,score:entry.points,
+   mine:entry.user_id===owner}))}}));
+}
 async function refresh(){
  if(!user||!root?.isConnected||busy)return;
  try{
-  const data=await rpc('community_boardride_state');
+  const owner=user,data=await rpc('community_boardride_state');
+  if(owner!==user||host.hidden||!root?.isConnected)return;
   profile=data.mine||null;leaders=data.leaders||[];awards=data.badges||[];
+  shareFamilyRanks(owner);
   if(stage()<boardType().need)selectedBoard='sunny';
   render();
  }catch(e){status('Your saved progress could not load: '+e.message,true);}
@@ -309,8 +316,9 @@ async function finish(win){
 }
 async function refreshAfterWin(){
  try{
-  const data=await rpc('community_boardride_state');
-  profile=data.mine||profile;leaders=data.leaders||[];awards=data.badges||[];render();
+  const owner=user,data=await rpc('community_boardride_state');
+  if(owner!==user||host.hidden||!root?.isConnected)return;
+  profile=data.mine||profile;leaders=data.leaders||[];awards=data.badges||[];render();shareFamilyRanks(owner);
  }catch(e){status('Stage saved, but refreshing the family scoreboard failed.');}
 }
 function text(c,t,x,y,size,color='#fff',align='center',weight=800){

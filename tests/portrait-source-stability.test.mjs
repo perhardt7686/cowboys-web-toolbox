@@ -14,6 +14,7 @@ test('authoritative profile photo is selected, cached, and can update independen
     q=read('docs/commons-family.mjs');
  assert.match(p,/avatar_mode==='photo'/);
  assert.match(p,/getAvatarPhoto\(/);
- assert.match(f,/family-avatar-updated/);
+ assert.doesNotMatch(f,/family-score-avatar|onAvatarUpdated/);
+ assert.match(p,/family-avatar-updated/);
  assert.match(q,/next\.set\(id,url\)/);
 });
