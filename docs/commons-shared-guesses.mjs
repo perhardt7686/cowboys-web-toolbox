@@ -1,4 +1,4 @@
-/* Commons · All-members visible word guesses and shared historical ledger · November 2026.
+/* Commons · Approved-member historical word round archive · November 2026.
  * Respects Commons member approval and existing RPC authorization.
  * Existing Word Quest / w0rdle gameplay, scores and save behavior are unchanged.
  */
@@ -69,12 +69,11 @@ function ensureLedger(mode) {
   panel.dataset.mode=mode;
 
   const head=node('div','shared-word-ledger-head');
-  const title=node('strong','shared-word-ledger-title','TEAM GUESS LOG · '+spec.label);
+  const title=node('strong','shared-word-ledger-title','PAST ROUNDS · '+spec.label);
   const counter=node('span','shared-word-counter','Loading shared guesses…');
   counter.dataset.role='counter';
   head.append(title,counter);
-  const status=node('p','shared-word-help','Every teammate can review all shared guesses when this game is open. Refreshed automatically.');
-  const guesses=node('div','shared-word-current');guesses.dataset.role='current';
+  const status=node('p','shared-word-help','Today’s team guesses are in the compact Previous guesses panel above. Browse older saved rounds here.');
   const foot=node('p','shared-word-help','Only dictionary-approved five-letter words count as guesses. Invalid words cost no turns. ');
   const license=node('a','shared-word-source','Guess-list source and MIT license');
   license.href='https://github.com/tabatkins/wordle-list/blob/main/LICENSE';
@@ -91,7 +90,7 @@ function ensureLedger(mode) {
     if(archive.open && !archive.dataset.loaded)void loadHistory(panel,true);
   });
   load.addEventListener('click',()=>void loadHistory(panel,false));
-  panel.append(head,status,guesses,foot,archive);
+  panel.append(head,status,foot,archive);
   inside.append(panel);
   return panel;
 }
@@ -99,18 +98,9 @@ function ensureLedger(mode) {
 function renderCurrent(mode,data) {
   const panel=ensureLedger(mode);if(!panel || !data)return;
   const guesses=Array.isArray(data.guesses)?data.guesses:[];
-  const signature=safe(data.day)+'/'+guesses.map((x,i)=>[i,x.guess,x.user_id,x.points].join(':')).join('|');
   const counter=panel.querySelector('[data-role="counter"]');
   counter.textContent=mode==='w0rdle'?'Team '+guesses.length+' guesses · Yours '+Number(data.my_attempts||0)+' / '+Number(data.max_per_player||9)+' · '+safe(data.day||todayLocal()):guesses.length+' of '+Number(data.max_attempts||0)+' guesses · '+safe(data.day||todayLocal());
-  if(panel.dataset.signature===signature)return;
-  panel.dataset.signature=signature;
-  const area=panel.querySelector('[data-role="current"]');
-  area.replaceChildren();
-  if(!guesses.length){
-    area.append(node('p','shared-word-empty','No guesses yet. Everyone will see the first one here.'));
-  } else {
-    for(const [i,g] of guesses.entries())area.append(guessRow(g,i));
-  }
+
 }
 
 function makeRound(round) {
