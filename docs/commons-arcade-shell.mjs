@@ -2,7 +2,8 @@
    Presentation only. Existing member-only games retain their events, state,
    RPCs, authentication, scores, and original DOM nodes. */
 import {makeArcadeNav} from './family-arcade-nav.mjs?v=retro4';
-import {titleProfiles,titleMarkup,drawGameTitle} from './commons-arcade-titles.mjs?v=arcade6';
+import {titleProfiles,titleMarkup,drawGameTitle} from './commons-arcade-titles.mjs?v=arcade7';
+import {mountFamilyFun} from './commons-family-fun.mjs?v=marquee1';
 
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
@@ -79,8 +80,9 @@ function build(){
   menu=document.createElement('section');menu.id='arcade-shell';menu.hidden=true;
   menu.setAttribute('role','dialog');menu.setAttribute('aria-modal','true');
   menu.setAttribute('aria-label','Cowboy Commons Arcade');
-  menu.innerHTML='<div class="arcade-computer"><section id="arcade-menu-view"><canvas id="arcade-title-art" width="320" height="200" role="img" aria-label="Original pixel art: a vintage red car in the arcade garage"></canvas><div class="arcade-menu-intro"><span>MS-DOS INSPIRED · MEMBERS ONLY</span><h2>SELECT YOUR GAME</h2><p>Every location is one scene. Progress remains saved by its original game.</p></div><div id="arcade-program-grid"></div><div class="arcade-menu-bottom"><button type="button" data-arcade-action="options">F2 · SETTINGS</button><button type="button" data-arcade-action="exit">EXIT TO COMMONS</button></div></section><section id="arcade-game-title-view" hidden aria-label="Game title screen"></section><section id="arcade-options-view" hidden><h2 id="arcade-display-title">DISPLAY SETUP</h2><p>These settings adjust only the Arcade screen, not your game saves.</p><div id="arcade-options-form"></div><button type="button" data-arcade-action="options-back">RETURN TO GAME / MENU</button></section><p class="arcade-menu-status" id="arcade-menu-status" role="status" aria-live="polite"></p></div>';
+  menu.innerHTML='<div class="arcade-computer"><section id="arcade-menu-view"><canvas id="arcade-title-art" width="320" height="200" role="img" aria-label="Original pixel art: a vintage red car in the arcade garage"></canvas><div class="arcade-menu-intro"><span>MS-DOS INSPIRED · MEMBERS ONLY</span><h2>CHOOSE YOUR GAME CABINET</h2><p>Family fun, personal challenges, and private classic game files.</p></div><div id="arcade-program-grid"></div><div class="arcade-menu-bottom"><button type="button" data-arcade-action="options">F2 · SETTINGS</button><button type="button" data-arcade-action="exit">EXIT TO COMMONS</button></div></section><section id="arcade-game-title-view" hidden aria-label="Game title screen"></section><section id="arcade-options-view" hidden><h2 id="arcade-display-title">DISPLAY SETUP</h2><p>These settings adjust only the Arcade screen, not your game saves.</p><div id="arcade-options-form"></div><button type="button" data-arcade-action="options-back">RETURN TO GAME / MENU</button></section><p class="arcade-menu-status" id="arcade-menu-status" role="status" aria-live="polite"></p></div>';
   document.body.append(menu);
+  mountFamilyFun(menu);
   menu.addEventListener('click',onMenuClick);
   hud=document.createElement('header');hud.id='arcade-hud';hud.hidden=true;
   hud.innerHTML='<div class="arcade-hud-main"><button type="button" data-arcade-action="home" aria-label="Back to game buttons" title="Back to games">‹</button><strong id="arcade-hud-title" class="arcade-screen-reader">GAME</strong><div id="arcade-score-pills" role="status" aria-live="off"></div><div class="arcade-hud-right"><button type="button" data-arcade-action="options" aria-label="Display settings" title="Display settings">⚙</button><button type="button" data-arcade-action="exit" aria-label="Exit game" title="Exit">✕</button></div></div><div class="arcade-scene-switcher"><button type="button" data-arcade-action="scene-previous" aria-label="Previous location">‹</button><nav id="arcade-hud-scenes" aria-label="Current location"></nav><button type="button" data-arcade-action="scene-next" aria-label="Next location">›</button></div><div id="arcade-hud-paging" hidden><button type="button" data-arcade-action="previous" aria-label="Previous item">‹</button><span id="arcade-hud-pagecount"></span><button type="button" data-arcade-action="next" aria-label="Next item">›</button></div>';
@@ -99,6 +101,7 @@ function build(){
 }
 function renderMenu(){
  const grid=$('arcade-program-grid');if(!grid)return;
+ window.dispatchEvent(new Event('family-classic-menu-open'));
  grid.innerHTML=games.map((g,i)=>{
   const ready=available(g);
   return '<button type="button" data-arcade-game="'+g.id+'" '+(ready?'':'disabled')+'><span class="arcade-program-number">0'+(i+1)+'</span><span class="arcade-program-mark">'+g.symbol+'</span><span class="arcade-program-name"><strong>'+escapeHTML(g.name)+'</strong><small>'+escapeHTML(g.tag)+'</small></span><span class="arcade-program-state">'+(ready?'ENTER ▶':'SIGN IN')+'</span></button>';
