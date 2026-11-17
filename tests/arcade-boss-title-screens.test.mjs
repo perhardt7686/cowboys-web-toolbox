@@ -18,7 +18,7 @@ test('Thirteen family games have distinct functional starting menus, not one reu
  const expected=['skyboard','galaga','pacman','centipede','topgear','streetrod','dashforge','mahjong','wordle','wordquest','plates','drawing','study'];
  assert.deepEqual(Object.keys(titleProfiles),expected);
  assert.equal(new Set(expected.map(id=>titleProfiles[id].name)).size,13);
- assert.equal(new Set(expected.map(id=>titleProfiles[id].scene)).size,11);
+ assert.equal(new Set(expected.map(id=>titleProfiles[id].scene)).size,13);
  for(const id of expected){
   const markup=titleMarkup(id);
   assert.match(markup,/data-arcade-action="title-start"/);
