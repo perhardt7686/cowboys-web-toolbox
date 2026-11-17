@@ -76,7 +76,9 @@ test('new FAMILY FUN marquee replaces dull arcade menu artwork without losing ot
  assert.match(html,/commons-family-fun\.css\?v=marquee1/);
  assert.match(marqueeCSS,/#arcade-title-art\{display:none!important\}/);
  assert.match(marqueeCSS,/family-fun-scoreboard/);
- assert.match(score,/FAMILY FUN/);\n assert.match(score,/family-fun-in-menu/);\n assert.match(score,/arcade-family-fun/);
+ assert.match(score,/FAMILY FUN/);
+ assert.match(score,/family-fun-in-menu/);
+ assert.match(score,/arcade-family-fun/);
  assert.match(score,/ARCADE HIGH SCORES/);
  assert.match(score,/FAMILY-REPORTED/);
  assert.match(score,/aria-pressed/);
