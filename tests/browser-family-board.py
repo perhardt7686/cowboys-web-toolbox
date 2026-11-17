@@ -7,7 +7,7 @@ URL = 'http://127.0.0.1:8765/__family_test__/community.html'
 HTML = """<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/community.css">
 <link rel="stylesheet" href="/purple-night.css"><link rel="stylesheet" href="/commons-compact-ui.css">
-<link rel="stylesheet" href="/family-board.css"></head>
+<link rel="stylesheet" href="/family-board.css"><link rel="stylesheet" href="/commons-family-fun.css"></head>
 <body class="community-page"><main>
 <section id="conversations" class="community-layout container" hidden>
 <div id="family-overview" hidden></div><div id="family-updates"><div id="community-announcement" hidden></div></div>
@@ -16,7 +16,9 @@ HTML = """<!doctype html><html lang="en"><head><meta name="viewport" content="wi
 <div id="family-tools" hidden></div></div></section>
 </main><script type="module">
 import {createFamilyBoard} from '/family-board.mjs';
+import {mountFamilyFun} from '/commons-family-fun.mjs';
 const app = createFamilyBoard();
+mountFamilyFun(null);
 const me = new URL(location).searchParams.get('id') || 'First member';
 const today = new Date().toISOString();
 let rows = [], events = [], sequential = 0, pendingError = false, handler, calendarDelay;
@@ -75,8 +77,8 @@ if(me!=='Visitor'){document.querySelector('#conversations').hidden=false;app.set
 
 async def layout(page, width):
     await page.goto(URL, wait_until='load')
-    await expect(page.get_by_text('Live updates connected', exact=False)).to_be_visible()
-    await expect(page.get_by_role('heading', name='Family Scoreboard')).to_be_visible()
+    await expect(page.locator('#arcade-family-fun')).to_be_visible()
+    assert await page.locator('.family-scoreboard').count()==0, 'Old flat scoreboard must be removed'
     assert await page.locator('#family-games').evaluate(
         "el=>Boolean(el.compareDocumentPosition(document.getElementById('mahjong-toggle')) & Node.DOCUMENT_POSITION_FOLLOWING)"
     )
@@ -100,7 +102,7 @@ async def layout(page, width):
     await expect(shortcuts.get_by_role('link', name='Conversations', exact=True)).to_have_attribute('aria-current', 'location')
     await shortcuts.get_by_role('link', name='Fridge', exact=True).click()
     await expect(page.locator('#family-fridge')).to_have_attribute('open', '')
-    await page.get_by_role('combobox', name='Standings by game').select_option('mahjong')
+    await page.get_by_role('combobox', name='Choose game to view family scores').select_option('mahjong')
     await expect(page.get_by_text('First member (you)')).to_be_visible()
     await page.get_by_role('button', name='View All Standings').click()
     await expect(page.get_by_text('Second member', exact=True)).to_be_visible()
@@ -197,7 +199,7 @@ async def run(browser, widths):
             await expect(second.get_by_text('Second member (you)')).to_be_visible()
             await shared_flow(first, second)
             await second.goto(URL + '?id=Visitor', wait_until='load')
-            await expect(second.get_by_role('heading', name='Family Scoreboard')).to_have_count(0)
+            await expect(second.locator('#arcade-family-fun')).to_be_hidden()
         await context.close()
         print(f'{browser.browser_type.name} family board layout and controls passed at {width}px')
 
