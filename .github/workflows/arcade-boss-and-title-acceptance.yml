@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'docs/commons-games-polish.css'
+      - 'docs/community.html'
       - 'docs/commons-arcade-shell.mjs'
       - 'docs/commons-family-fun.*'
       - 'docs/commons-retro-arcade.*'
@@ -36,6 +38,8 @@ on:
       - '.github/workflows/arcade-boss-and-title-acceptance.yml'
   pull_request:
     paths:
+      - 'docs/commons-games-polish.css'
+      - 'docs/community.html'
       - 'docs/commons-retro-arcade.*'
       - 'docs/commons-family-fun.*'
       - 'tests/retired-classics.test.mjs'
