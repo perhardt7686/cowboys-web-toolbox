@@ -308,9 +308,11 @@ async function verify(){
    input.value='';
   });
  }
+ document.body.classList.add('classic-arcade-ready');
  void refreshScores();syncArcade();
 }
 function unmount(){
+ document.body.classList.remove('classic-arcade-ready');
  generation++;stopPlayer();user=null;mounted=false;members.clear();reports.clear();
  window.dispatchEvent(new Event('family-classic-scores-clear'));
  for(const root of roots.values())root.remove();roots.clear();
