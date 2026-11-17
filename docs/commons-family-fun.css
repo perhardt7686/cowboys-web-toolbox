@@ -173,3 +173,41 @@ body.community-page #arcade-program-grid .arcade-program-name strong{
   animation:none!important;transition:none!important
  }
 }
+
+/* Compact the actual board's eleven game launchers too, not only the cabinet menu.
+   Former button heights 66-93px become 44-48px; captions remain readable. */
+body.community-page:not(.arcade-on) #conversations :is(
+ #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
+ #drawing-studio-toggle,#dash-forge-toggle,#skyboard-toggle,
+ #star-squadron-toggle,#mystery-maze-toggle,#vdacs-study-toggle,
+ #sr-toggle,#hot-rod-entry){
+ box-sizing:border-box!important;min-height:48px!important;
+ padding:5px 9px!important;gap:7px!important;border-width:2px!important;
+ border-radius:8px!important;box-shadow:0 2px 0 #24163870!important;
+}
+body.community-page:not(.arcade-on) #conversations :is(
+ #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
+ #drawing-studio-toggle,#dash-forge-toggle,#skyboard-toggle,
+ #star-squadron-toggle,#mystery-maze-toggle,#vdacs-study-toggle,
+ #sr-toggle,#hot-rod-entry) strong{
+ font-size:clamp(13px,2.6vw,15px)!important;line-height:1.12!important;
+}
+body.community-page:not(.arcade-on) #conversations :is(
+ #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
+ #drawing-studio-toggle,#dash-forge-toggle,#skyboard-toggle,
+ #star-squadron-toggle,#mystery-maze-toggle,#vdacs-study-toggle,
+ #sr-toggle,#hot-rod-entry) small{
+ font-size:10px!important;line-height:1.2!important;margin:1px 0!important;
+}
+body.community-page:not(.arcade-on) #conversations :is(
+ #mahjong-toggle,#letter-lock-toggle,#word-game-toggle,#plate-game-open,
+ #drawing-studio-toggle,#dash-forge-toggle,#skyboard-toggle,
+ #star-squadron-toggle,#mystery-maze-toggle,#vdacs-study-toggle,
+ #sr-toggle,#hot-rod-entry) :is(.mahjong-entry-icon,.plate-entry-icon,.retro-entry-icon,.skyboard-entry-symbol){
+ font-size:19px!important;min-width:22px!important;flex:0 0 24px!important;padding:0!important;
+}
+body.community-page:not(.arcade-on) #conversations #skyboard-toggle b{
+ padding:4px 7px!important;font-size:11px!important;
+}
+body.community-page:not(.arcade-on) #conversations .retro-entry-copy{gap:1px!important}
+body.community-page:not(.arcade-on) #conversations .retro-entry-arrow{font-size:16px!important}
