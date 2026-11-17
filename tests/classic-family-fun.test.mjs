@@ -26,7 +26,7 @@ test('four classic-system launchers replace old active game buttons, preserving 
   assert.ok(!shell.includes(old),'Old active entry remains: '+old);
  assert.match(controller,/community_retro_state/);
  assert.match(controller,/Historic original-game records remain stored under their original IDs/);
- assert.match(css,/#star-squadron-root,body\.community-page #mystery-maze-root\{display:none!important\}/);
+ assert.match(css,/classic-arcade-ready #star-squadron-root,body\.community-page\.classic-arcade-ready #mystery-maze-root\{display:none!important\}/);
 });
 
 test('local game media is never sent to Supabase or GitHub by the game launcher',()=>{
