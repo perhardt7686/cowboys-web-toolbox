@@ -32,7 +32,7 @@ test('original family arcade games remain playable, with score backend intact',(
   assert.ok(Object.hasOwn(titleProfiles,id));
   assert.match(nav,new RegExp('  '+id+':'));
  }
- assert.match(html,/commons-retro-arcade\.mjs\?v=retro8/);
+ assert.match(html,/commons-retro-arcade\.mjs\?v=retro9/);
  assert.match(retro,/community_retro_start/);
  assert.match(retro,/community_retro_finish/);
  assert.match(retro,/community_retro_state/);
@@ -50,7 +50,7 @@ test('FAMILY FUN is retained but only shows approved verified original-game scor
  assert.match(retro,/if\(!mounted\|\|user!==owner\|\|board.hidden\)return/);
  assert.match(retro,/new CustomEvent\('family-retro-scoreboard'/);
  assert.match(retro,/clearSharedScores\(\)/);
- assert.match(html,/commons-family-fun\.css\?v=marquee2/);
+ assert.match(html,/commons-family-fun\.css\?v=marquee4/);
  assert.match(funCSS,/family-fun-scoreboard/);
  assert.match(shell,/mountFamilyFun\(menu\)/);
 });
