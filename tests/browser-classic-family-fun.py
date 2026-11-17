@@ -77,8 +77,8 @@ async def run(browser,w,h):
   assert await page.locator('#arcade-family-fun').is_visible(), 'Marquee must be on visible board'
   assert await page.locator('#arcade-family-fun .family-fun-marquee').inner_text()=='FAMILY FUN'
   assert await page.locator('#classic-galaga-root [data-classic-file]').is_disabled(), 'Unsupported MSX cassette must not claim to boot'
-  await page.locator('[data-family-fun-game=centipede]').click()
-  await page.wait_for_function("document.getElementById('family-fun-leaders').textContent.includes('1,400')",timeout=5000)
+  await page.locator('#arcade-family-fun [data-family-fun-game=centipede]').click()
+  await page.wait_for_function("document.querySelector('#arcade-family-fun .family-fun-leaders').textContent.includes('1,400')",timeout=5000)
   assert 'REPORTED' in await page.locator('#arcade-family-fun').inner_text()
   assert await page.locator('#arcade-family-fun [data-family-fun-game]').count()==4
   assert await page.locator('#classic-pacman-toggle').count()==1
