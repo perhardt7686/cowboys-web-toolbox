@@ -53,7 +53,7 @@ test('Arcade shell opens title before touching existing saved game controllers',
  assert.match(shell,/data-arcade-action/);
  assert.match(shell,/case 'title-boss-builder'/);
  assert.match(shell,/case 'title-start'/);
- assert.match(html,/commons-arcade-shell\.mjs\?v=arcade8/);
+ assert.match(html,/commons-arcade-shell\.mjs\?v=arcade9/);
  assert.match(html,/commons-arcade-shell\.css\?v=retrofix1/);
  assert.match(html,/commons-dash-forge\.mjs\?v=[\w-]+"/);
  assert.match(styles,/#arcade-game-title-view/);
