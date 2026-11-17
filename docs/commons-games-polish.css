@@ -7,7 +7,6 @@ body.community-page .community-main :is(
 body.community-page .community-main :is(
  #mahjong-toggle,#word-game-toggle,#letter-lock-toggle,#plate-game-open,#drawing-studio-toggle
 ){
- min-height:66px;
  border:1px solid #9f81b5!important;border-radius:14px!important;
  box-shadow:inset 0 1px 0 #fff2,0 7px 20px #06071535;
  transition:box-shadow .15s,border-color .15s;
@@ -25,7 +24,6 @@ body.community-page .mahjong-actions button,
 body.community-page .mahjong-view-tools button,
 body.community-page .plate-game .plate-button,
 body.community-page .letter-lock-form button,
-body.community-page .family-room .family-action,
 body.community-page #commons-word-form button{
  min-height:44px!important;font-weight:750;
 }
@@ -35,10 +33,10 @@ body.community-page :is(.mahjong-actions,.mahjong-view-tools,.letter-lock-form,.
 body.community-page :is(.mahjong-status,.letter-lock-message,.plate-game #plate-status,.word-panel #commons-word-message){
  line-height:1.55;overflow-wrap:anywhere;
 }
-body.community-page .community-main :is(.mahjong-status,.letter-lock-rules,.plate-hint,.word-rules,.family-room-note){
+body.community-page .community-main :is(.mahjong-status,.letter-lock-rules,.plate-hint,.word-rules){
  font-size:clamp(.85rem,1.3vw,.98rem)!important;line-height:1.6!important;
 }
-body.community-page .community-main :is(.mahjong-game,.word-panel,.letter-lock-panel,.plate-game,.family-room)
+body.community-page .community-main :is(.mahjong-game,.word-panel,.letter-lock-panel,.plate-game)
  :is(h2,h3,h4){text-wrap:balance;line-height:1.23;overflow-wrap:anywhere}
 body.community-page .community-main :is(.mahjong-actions button,.mahjong-view-tools button,
  .plate-button,.letter-lock-form button,#commons-word-form button,
@@ -46,7 +44,7 @@ body.community-page .community-main :is(.mahjong-actions button,.mahjong-view-to
  #mahjong-toggle):focus-visible{
  outline:3px solid #14a6b7!important;outline-offset:3px!important;
 }
-body.community-page .community-main :is(.mahjong-game,.word-panel,.letter-lock-panel,.plate-game,.family-room) p{
+body.community-page .community-main :is(.mahjong-game,.word-panel,.letter-lock-panel,.plate-game) p{
  overflow-wrap:anywhere;
 }
 body.community-page .letter-lock-game .letter-lock-guess-caption,
