@@ -164,6 +164,28 @@ export function createFamilyBoard() {
           detail:{member:memberId,games:rankGames,plateAccess:result.plate_access,asOf:result.as_of}
         }));
         paintButtonSummaries();
+        // Read-only adapters for the other two ranked family games. No scores are
+        // fabricated or compared between incompatible metrics.
+        void Promise.all([
+          client.rpc('community_dash_state').catch(()=>({error:true})),
+          client.rpc('community_boardride_state').catch(()=>({error:true}))
+        ]).then(([dash,sky])=>{
+          if(!active())return;
+          if(!dash.error&&Array.isArray(dash.data?.leaders)){
+            window.dispatchEvent(new CustomEvent('family-arcade-game-rankings',{detail:{
+              member:memberId,game:'dashforge',entries:dash.data.leaders.map((entry,index)=>({
+                rank:index+1,name:entry.name,score:entry.player_points,mine:entry.user_id===memberId
+              }))
+            }}));
+          }
+          if(!sky.error&&Array.isArray(sky.data?.leaders)){
+            window.dispatchEvent(new CustomEvent('family-arcade-game-rankings',{detail:{
+              member:memberId,game:'skyboard',entries:sky.data.leaders.map((entry,index)=>({
+                rank:index+1,name:entry.name,score:entry.points,mine:entry.user_id===memberId
+              }))
+            }}));
+          }
+        });
       } catch (error) {
         if (!active()) return;
         if (error?.code === '42501' || error?.code === 'PGRST301') {
