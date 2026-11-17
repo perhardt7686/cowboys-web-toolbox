@@ -109,3 +109,33 @@ body.community-page .retro-leader span{color:#a6f4db;font-weight:900}
  body.community-page .retro-control:active{transform:none}
  body.community-page .retro-button{transition:none!important;animation:none!important}
 }
+
+/* Star Squadron hangar and Mystery Maze detective equipment.
+ * Unlocked from authoritative existing server trophies, not score entry. */
+body.community-page .retro-gear-panel{display:grid;gap:8px;margin:12px 0 4px;
+ padding-top:10px;border-top:2px solid #787aa1;min-width:0}
+body.community-page .retro-gear-panel h3{color:#ffe3a3;margin:0;
+ font:900 clamp(14px,3vw,18px)/1.25 monospace}
+body.community-page .retro-gear-note{color:#d1e2ef;margin:0;
+ font:650 12px/1.4 system-ui}
+body.community-page .retro-gear-grid{display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+body.community-page .retro-gear-item{min-width:0;min-height:105px;
+ display:grid;gap:4px;align-content:space-between;justify-items:start;
+ border:2px solid #779db9;border-radius:9px;padding:9px;
+ background:linear-gradient(140deg,#263855,#352951);
+ text-align:left;color:#f2f1e8;cursor:pointer}
+body.community-page .retro-gear-item::before{content:"✦";color:#ffda87;font-size:20px}
+body.community-page .retro-gear-item[data-retro-game=maze]::before{content:"⌕";color:#b3eff1}
+body.community-page .retro-gear-item strong{font:900 14px/1.22 system-ui;color:#ffe9aa}
+body.community-page .retro-gear-item span{font:600 12px/1.3 system-ui;color:#e1def4}
+body.community-page .retro-gear-item small{font:900 11px/1.3 monospace;color:#a3f6db}
+body.community-page .retro-gear-item:disabled{opacity:.48;cursor:not-allowed}
+body.community-page .retro-gear-item.is-equipped{
+ border-color:#ffe6a0;box-shadow:inset 0 0 0 1px #f7e39888;
+ background:linear-gradient(140deg,#3b4265,#4a385b)}
+body.community-page .retro-gear-item:focus-visible{outline:3px solid #a4fff1;outline-offset:2px}
+@media(max-width:360px){
+ body.community-page .retro-gear-grid{grid-template-columns:1fr}
+ body.community-page .retro-gear-item{min-height:74px}
+}
