@@ -104,9 +104,9 @@ async def layout(page, width):
     await expect(page.locator('#family-fridge')).to_have_attribute('open', '')
     await page.get_by_role('combobox', name='Choose game to view family scores').select_option('mahjong')
     await expect(page.get_by_text('First member (you)')).to_be_visible()
-    await page.get_by_role('button', name='View All Standings').click()
-    await expect(page.get_by_text('Second member', exact=True)).to_be_visible()
-    await page.get_by_role('button', name='Close', exact=True).click()
+    # The single marquee shows all eligible family rows in place, no legacy modal.
+    await expect(page.locator('#arcade-family-fun .family-fun-podium').get_by_text('Second member', exact=True)).to_be_visible()
+    assert await page.locator('.family-standings-dialog').count()==0
     calendar = shortcuts.get_by_role('link', name='Calendar', exact=True)
     await calendar.click()
     await expect(calendar).to_have_attribute('aria-current', 'location')
