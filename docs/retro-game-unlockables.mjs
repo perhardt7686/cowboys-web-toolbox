@@ -5,6 +5,7 @@
 export const RETRO_UNLOCKS=Object.freeze({
  fleet:Object.freeze([
   Object.freeze({id:'patrol',name:'Patrol Interceptor',need:null,description:'Original turquoise squadron fighter.',type:'SHIP'}),
+  Object.freeze({id:'rookie',name:'Rookie Wing Stripes',need:'first-run',description:'Pilot stripes painted onto your squadron wings.',type:'WINGS'}),
   Object.freeze({id:'signal',name:'Signal Hull',need:'bronze',description:'Ice-blue fighter with twin signal lamps.',type:'SHIP'}),
   Object.freeze({id:'comet',name:'Comet Engines',need:'silver',description:'A trailing orange comet plume behind your ship.',type:'ENGINE'}),
   Object.freeze({id:'nova',name:'Nova Wings',need:'gold',description:'Extra violet energy-wing details on your fighter.',type:'WINGS'}),
@@ -12,6 +13,7 @@ export const RETRO_UNLOCKS=Object.freeze({
  ]),
  maze:Object.freeze([
   Object.freeze({id:'scout',name:'Scout Detective',need:null,description:'Original clue-hunting explorer and hat.',type:'DETECTIVE'}),
+  Object.freeze({id:'notebook',name:'Clue Notebook',need:'first-run',description:'A detective notebook carried through the maze.',type:'TOOL'}),
   Object.freeze({id:'lantern',name:'Clue Lantern',need:'bronze',description:'Glowing lantern carried through the maze.',type:'TOOL'}),
   Object.freeze({id:'footsteps',name:'Breadcrumb Trail',need:'silver',description:'Golden footprints marking recently explored tiles.',type:'TRAIL'}),
   Object.freeze({id:'compass',name:'Ghost Compass',need:'gold',description:'Animated spectral compass above the detective.',type:'TOOL'}),
@@ -30,6 +32,7 @@ export function resolveRetroUnlock(game,requested,earned=[]){
 }
 export function retroCosmeticPalette(game,look){
  if(game==='fleet')return ({
+  rookie:['#a1f3e4','#fff4a0','#467d94'],
   patrol:['#89dbdf','#f6ca77','#3e679a'],
   signal:['#91edff','#8cc5ff','#294eaa'],
   comet:['#fba98b','#ffe8a0','#9a465b'],
@@ -37,6 +40,7 @@ export function retroCosmeticPalette(game,look){
   admiral:['#ffd76f','#fff0b5','#845d28']
  })[look]||['#89dbdf','#f6ca77','#3e679a'];
  return ({
+  notebook:['#f2db99','#67456d'],
   scout:['#f4ce77','#5b3c5c'],
   lantern:['#ffe08a','#755273'],
   footsteps:['#c2f6d8','#5b3c5c'],
@@ -46,4 +50,8 @@ export function retroCosmeticPalette(game,look){
 }
 export function retroCosmeticGameOnly(game,look){
  return ids.includes(game)&&retroUnlocks(game).some(x=>x.id===look);
+}
+
+export function retroRewardForTrophy(game,trophy){
+ return retroUnlocks(game).find(item=>item.need===trophy)||null;
 }
