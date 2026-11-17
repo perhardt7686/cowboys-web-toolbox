@@ -77,15 +77,18 @@ body.community-page .art-status{font:750 13px/1.5 system-ui,sans-serif!important
 body.community-page .word-player .word-initials{width:28px;height:28px;min-width:28px;border-radius:50%;display:grid;place-items:center;background:#70427c;color:white;font:850 10px/1 system-ui,sans-serif;border:2px solid #d5a75f;}
 body.community-page .content-dialog>.thread-meta .avatar,body.community-page .content-dialog>.thread-meta .profile-avatar{min-width:60px!important;width:60px!important;height:60px!important;border:3px solid #ddad51!important;}
 
-/* Word Quest: five tiles stay on one row v2 */
-body.community-page .word-tile-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(32px,auto);gap:6px;align-items:center;min-width:0}
-body.community-page .word-tile-row>.word-player{grid-column:1/-1;min-width:0;width:auto;max-width:100%;font-size:14px;overflow-wrap:anywhere}
-body.community-page .word-tile-row>.word-tile{width:100%;max-width:48px;min-width:0;height:auto;aspect-ratio:1;font-size:clamp(16px,4vw,23px)}
-body.community-page .word-tile-row>strong{grid-column:6;grid-row:2;margin-inline-start:0!important;justify-self:end;white-space:nowrap}
-@media(max-width:440px){body.community-page .word-panel{padding:11px}body.community-page .word-tile-row{gap:4px}body.community-page .word-tile-row>.word-tile{font-size:clamp(17px,5.2vw,22px)}}
-
-
-/* Daily Word Quest v4: same full-width game button as Mystery Machine Mahjong. */
+/* Word Quest: compact sequential guess history. */
+body.community-page .word-history{min-width:0;margin:12px 0 14px;padding:8px 9px;border:1px solid #c6a98b;border-radius:13px;background:#fff8ed}
+body.community-page .word-history-head{display:flex;align-items:baseline;justify-content:space-between;gap:5px 10px;flex-wrap:wrap;margin:0 0 6px;font:800 13px/1.4 system-ui,sans-serif;color:#3d2844}
+body.community-page .word-history-head span{font:700 12px/1.4 system-ui,sans-serif;color:#56465d}
+body.community-page .word-history-list{display:grid;gap:4px;max-height:min(38dvh,260px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:2px;min-width:0}
+body.community-page .word-history-list:focus-visible{outline:3px solid #7f508c;outline-offset:2px}
+body.community-page .word-history-list .word-tile-row{display:grid;grid-template-columns:repeat(5,clamp(23px,5.2vw,27px)) minmax(28px,1fr);gap:3px 5px;align-items:center;min-width:0;border:1px solid #dbc3ad;border-radius:7px;padding:4px 6px;background:#fffefa}
+body.community-page .word-history-list .word-tile-row>.word-player{grid-column:1/-1;min-width:0;width:auto;max-width:100%;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+body.community-page .word-history-list .word-tile-row>.word-player img,body.community-page .word-history-list .word-tile-row>.word-player .word-initials{width:21px;height:21px;min-width:21px}
+body.community-page .word-history-list .word-tile-row>.word-tile{width:100%;min-width:0;height:27px;aspect-ratio:auto;border-radius:5px;font-size:14px}
+body.community-page .word-history-list .word-tile-row>strong{grid-column:6;grid-row:2;justify-self:end;white-space:nowrap;font-size:12px}
+@media(max-width:440px){body.community-page .word-panel{padding:11px}body.community-page .word-history{padding:7px 5px}body.community-page .word-history-list .word-tile-row{padding:4px}body.community-page .word-history-list .word-tile-row>.word-tile{font-size:13px}}
 body.community-page .word-entry-game{grid-column:1/-1;margin:0 0 22px;min-width:0}
 body.community-page .word-entry-game #word-game-inside{margin-top:12px}
 body.community-page .word-entry-game #word-game-inside[hidden]{display:none!important}
