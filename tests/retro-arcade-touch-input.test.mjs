@@ -61,5 +61,5 @@ test('retro mobile controls actually use the tap buffer and keyboard activation'
  assert.match(src,/function actionForTick\(game\)\{return input\.action\(game\);\}/);
  assert.match(src,/Round paused while the page is hidden/);
  assert.match(src,/Round resumed\. Keep playing/);
- assert.match(board,/commons-retro-arcade\.mjs\?v=retro7/);
+ assert.match(board,/commons-retro-arcade\.mjs\?v=retro8/);
 });
