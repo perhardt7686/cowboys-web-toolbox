@@ -41,13 +41,14 @@ test('original family arcade games remain playable, with score backend intact',(
 
 test('FAMILY FUN is retained but only shows approved verified original-game scores',()=>{
  assert.match(fun,/FAMILY FUN/);
- assert.match(fun,/VERIFIED HIGH SCORES/);
- assert.match(fun,/SCORES FROM SERVER-VERIFIED ORIGINAL GAME ROUNDS/);
+ assert.match(fun,/FAMILY HIGH SCORES/);
+ assert.match(fun,/VERIFIED RESULTS ONLY/);
  assert.match(fun,/family-fun-in-menu/);
+ assert.match(fun,/family-fun-single/);
  assert.match(fun,/arcade-family-fun/);
  assert.match(fun,/family-retro-scoreboard-clear/);
  assert.match(retro,/shareVerifiedScores\(\)/);
- assert.match(retro,/if\(!mounted\|\|user!==owner\|\|board.hidden\)return/);
+ assert.match(retro,/if\(!mounted\|\|user!==owner\|\|board.hidden\|\|epoch!==scoreReadEpoch\)return/);
  assert.match(retro,/new CustomEvent\('family-retro-scoreboard'/);
  assert.match(retro,/clearSharedScores\(\)/);
  assert.match(html,/commons-family-fun\.css\?v=marquee4/);
