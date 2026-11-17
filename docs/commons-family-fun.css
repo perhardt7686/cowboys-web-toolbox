@@ -11,12 +11,11 @@ body.community-page #arcade-menu-view{
  justify-content:flex-start!important;gap:5px!important;overflow-y:auto!important;
  overscroll-behavior:contain;padding:clamp(5px,1vw,10px)!important;
 }
-body.community-page #arcade-title-art{display:none!important}
 body.community-page .arcade-menu-intro{order:2;text-align:center;min-height:0!important}
 body.community-page .arcade-menu-intro span,body.community-page .arcade-menu-intro p{display:none!important}
 body.community-page .arcade-menu-intro h2{font:800 clamp(13px,2vw,16px)/1.2 system-ui!important;margin:2px!important}
 body.community-page .arcade-menu-bottom{order:4;margin:3px 0 6px!important;flex:0 0 auto}
-body.community-page .family-fun-scoreboard{
+body.community-page .family-fun-scoreboard.family-fun-single{
  order:1;flex:0 0 auto;box-sizing:border-box;width:100%;min-width:0;
  padding:9px 11px 8px;
  color:#f5f0f9;
