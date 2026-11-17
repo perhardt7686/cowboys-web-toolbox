@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only synthetic member UI: each of thirteen active arcade entries must have
+"""Read-only synthetic member UI: each of eleven actual arcade entries must have
 its own illustrated title screen and working Start, Help and Settings routes.
 This test uses NO real family account, paid service, or member database.
 """
@@ -13,10 +13,8 @@ ROOTS=[
  ("streetrod","sr-toggle","STREET R0D"),
  ("dashforge","dash-forge-toggle","DASH FORGE"),
  ("skyboard","skyboard-toggle","SKYBOARD SPRINT"),
- ("galaga","classic-galaga-toggle","GALAGA"),
- ("pacman","classic-pacman-toggle","PAC-MAN"),
- ("centipede","classic-centipede-toggle","CENTIPEDE"),
- ("topgear","classic-topgear-toggle","TOP GEAR"),
+ ("fleet","star-squadron-toggle","STAR SQUADRON"),
+ ("maze","mystery-maze-toggle","MYSTERY MAZE"),
  ("mahjong","mahjong-toggle","MAHJONG"),
  ("wordle","letter-lock-toggle","W0RDLE"),
  ("wordquest","word-game-toggle","WORD QUEST"),
@@ -26,8 +24,6 @@ ROOTS=[
 ]
 HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/commons-arcade-shell.css">\n<link rel="stylesheet" href="/commons-retro-arcade.css">
-<link rel="stylesheet" href="/commons-classic-arcade.css">
-<link rel="stylesheet" href="/commons-family-fun.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true}</script></head><body class="community-page" style="margin:0;background:#15152e">
 <section id="conversations"><div class="community-main" style="min-height:1800px">
 <section id="streetrod-root"><button id="sr-toggle" aria-expanded="false">Street Rod</button>
@@ -35,38 +31,30 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <section id="dash-forge-root"><button id="dash-forge-toggle" aria-expanded="false">Dash Forge</button>
 <div id="dash-forge-inside" hidden><section id="dash-pane-builder"><h3>Level Studio</h3></section></div></section>
 <section id="skyboard-root"><button id="skyboard-toggle" aria-expanded="false">Skyboard Sprint</button><div id="skyboard-inside" hidden>Race</div></section>
-<section id="classic-galaga-root" class="classic-root">
-<button class="classic-launch" id="classic-galaga-toggle" aria-expanded="false"> GALAGA </button>
-<div id="classic-galaga-inside" class="classic-inside" hidden>
-<h2>GALAGA</h2><div class="classic-control-deck"><button class="classic-key" aria-label="Arcade control">A</button></div>
-<section class="classic-pane" data-classic-pane="play"><div class="classic-screen">PRIVATE FILE REQUIRED</div></section>
-<section class="classic-pane" data-classic-pane="achievements" hidden>Goals</section>
-<section class="classic-pane" data-classic-pane="scores" hidden>Reported Scores</section>
-</div></section>
-<section id="classic-pacman-root" class="classic-root">
-<button class="classic-launch" id="classic-pacman-toggle" aria-expanded="false"> PACMAN </button>
-<div id="classic-pacman-inside" class="classic-inside" hidden>
-<h2>PACMAN</h2><div class="classic-control-deck"><button class="classic-key" aria-label="Arcade control">A</button></div>
-<section class="classic-pane" data-classic-pane="play"><div class="classic-screen">PRIVATE FILE REQUIRED</div></section>
-<section class="classic-pane" data-classic-pane="achievements" hidden>Goals</section>
-<section class="classic-pane" data-classic-pane="scores" hidden>Reported Scores</section>
-</div></section>
-<section id="classic-centipede-root" class="classic-root">
-<button class="classic-launch" id="classic-centipede-toggle" aria-expanded="false"> CENTIPEDE </button>
-<div id="classic-centipede-inside" class="classic-inside" hidden>
-<h2>CENTIPEDE</h2><div class="classic-control-deck"><button class="classic-key" aria-label="Arcade control">A</button></div>
-<section class="classic-pane" data-classic-pane="play"><div class="classic-screen">PRIVATE FILE REQUIRED</div></section>
-<section class="classic-pane" data-classic-pane="achievements" hidden>Goals</section>
-<section class="classic-pane" data-classic-pane="scores" hidden>Reported Scores</section>
-</div></section>
-<section id="classic-topgear-root" class="classic-root">
-<button class="classic-launch" id="classic-topgear-toggle" aria-expanded="false"> TOPGEAR </button>
-<div id="classic-topgear-inside" class="classic-inside" hidden>
-<h2>TOPGEAR</h2><div class="classic-control-deck"><button class="classic-key" aria-label="Arcade control">A</button></div>
-<section class="classic-pane" data-classic-pane="play"><div class="classic-screen">PRIVATE FILE REQUIRED</div></section>
-<section class="classic-pane" data-classic-pane="achievements" hidden>Goals</section>
-<section class="classic-pane" data-classic-pane="scores" hidden>Reported Scores</section>
-</div></section>
+<section id="star-squadron-root" class="retro-game-root"><button class="retro-entry" id="star-squadron-toggle" aria-expanded="false">Star Squadron</button>
+<div id="star-squadron-inside" class="retro-inside" hidden>
+<header class="retro-head"><h2>Star Squadron</h2><p>Playable original family arcade stage.</p></header>
+<div class="retro-statbar"><span class="retro-stat">BEST 0</span></div>
+<div class="retro-display"><div class="retro-live">
+<canvas class="retro-canvas" width="540" height="540" aria-label="Star Squadron live gameplay"></canvas>
+<div class="retro-live-readout">SCORE 0 · LIVES 3</div>
+<div class="retro-controls"><button class="retro-button retro-control" data-control="L">MOVE</button><button class="retro-button retro-control" data-control="F">ACTION</button></div>
+<div class="retro-actions"><button class="retro-button retro-begin">Start round</button><button class="retro-button retro-end">Leave round</button></div>
+<p class="retro-status">Ready for an approved family round.</p></div>
+<div class="retro-trophies retro-panel-view" hidden>Trophies</div>
+<div class="retro-leaders retro-panel-view" hidden>Family scores</div></div></div></section>
+<section id="mystery-maze-root" class="retro-game-root"><button class="retro-entry" id="mystery-maze-toggle" aria-expanded="false">Mystery Maze</button>
+<div id="mystery-maze-inside" class="retro-inside" hidden>
+<header class="retro-head"><h2>Mystery Maze</h2><p>Playable original family arcade stage.</p></header>
+<div class="retro-statbar"><span class="retro-stat">BEST 0</span></div>
+<div class="retro-display"><div class="retro-live">
+<canvas class="retro-canvas" width="540" height="540" aria-label="Mystery Maze live gameplay"></canvas>
+<div class="retro-live-readout">SCORE 0 · LIVES 3</div>
+<div class="retro-controls"><button class="retro-button retro-control" data-control="R">MOVE</button><button class="retro-button retro-control" data-control="F">ACTION</button></div>
+<div class="retro-actions"><button class="retro-button retro-begin">Start round</button><button class="retro-button retro-end">Leave round</button></div>
+<p class="retro-status">Ready for an approved family round.</p></div>
+<div class="retro-trophies retro-panel-view" hidden>Trophies</div>
+<div class="retro-leaders retro-panel-view" hidden>Family scores</div></div></div></section>
 <section id="mahjong-root"><button id="mahjong-toggle" aria-expanded="false">Mahjong</button><div id="mahjong-inside" hidden>Tiles</div></section>
 <section id="letter-lock-root"><button id="letter-lock-toggle" aria-expanded="false">w0rdle</button><div id="letter-lock-content" hidden>Letters</div></section>
 <section id="word-game-root"><button id="word-game-toggle" aria-expanded="false">Word Quest</button><div id="word-game-inside" hidden>Words</div></section>
@@ -81,8 +69,7 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 window.addEventListener('dashforge:creator-mode',e=>window.__creatorEvents.push(e.detail.boss));
 for(const [a,b] of [
  ['sr-toggle','sr-inside'],['dash-forge-toggle','dash-forge-inside'],['skyboard-toggle','skyboard-inside'],
- ['classic-galaga-toggle','classic-galaga-inside'],['classic-pacman-toggle','classic-pacman-inside'],
- ['classic-centipede-toggle','classic-centipede-inside'],['classic-topgear-toggle','classic-topgear-inside'],
+ ['star-squadron-toggle','star-squadron-inside'],['mystery-maze-toggle','mystery-maze-inside'],
  ['mahjong-toggle','mahjong-inside'],['letter-lock-toggle','letter-lock-content'],
  ['word-game-toggle','word-game-inside'],['plate-game-open','plate-game-content'],
  ['drawing-studio-toggle','drawing-studio-inside'],['vdacs-study-toggle','vdacs-study-inside']]){
@@ -155,28 +142,38 @@ async def run_size(browser,width,height):
     assert await page.evaluate("window.__creatorEvents.at(-1)===true")
    else:
     await cover.locator('[data-arcade-action="title-start"]').click()
-   root_id=('classic-'+game+'-root' if game in ('galaga','pacman','centipede','topgear') else
-    'streetrod-root' if game=='streetrod' else 'dash-forge-root' if game=='dashforge' else
-    'letter-lock-root' if game=='wordle' else 'word-game-root' if game=='wordquest' else
-    'plate-game-root' if game=='plates' else 'drawing-studio-game-root' if game=='drawing' else
-    'vdacs-study-root' if game=='study' else game+'-root')
-   stage=page.locator('#'+root_id)
-   assert await stage.evaluate("e=>e.classList.contains('arcade-game-active')"),(game,'Launch failed')
-   assert await page.locator('#arcade-game-title-view').is_hidden(),(game,'Title still covering stage')
-   if game in ('galaga','pacman','centipede','topgear'):
-    assert await stage.is_visible(),(game,'Classic game hidden')
-    assert await stage.evaluate('el=>getComputedStyle(el).position')=='fixed',(game,'Cabinet not fullscreen')
+   assert await page.locator("#"+('streetrod-root' if game=="streetrod" else
+    'dash-forge-root' if game=="dashforge" else
+    'star-squadron-root' if game=="fleet" else
+    'mystery-maze-root' if game=="maze" else
+    'letter-lock-root' if game=="wordle" else
+    'word-game-root' if game=="wordquest" else
+    'plate-game-root' if game=="plates" else
+    'drawing-studio-game-root' if game=="drawing" else
+    'vdacs-study-root' if game=="study" else game+"-root")).evaluate(
+     "e=>e.classList.contains('arcade-game-active')"),(game,"Start did not activate game")
+   assert await page.locator("#arcade-game-title-view").is_hidden(),("Title obscures gameplay",game)
+   if game in ("fleet","maze"):
+    root_id="star-squadron" if game=="fleet" else "mystery-maze"
+    stage=page.locator("#"+root_id+"-root")
+    assert await stage.is_visible(),(game,"The gameplay root is invisible despite an active title")
+    assert await stage.evaluate("el=>getComputedStyle(el).position")=="fixed",(game,"Game did not enter fullscreen")
     rect=await stage.bounding_box()
-    assert rect and rect['y']>=0 and rect['height']>90 and rect['y']+rect['height']<=height+2,(game,rect,width,height)
-    assert await stage.locator('.classic-launch').is_hidden(),(game,'Duplicate button covers gameplay')
-    assert await stage.locator('.classic-inside').is_visible(),(game,'Classic cabinet content missing')
-    control=stage.locator('.classic-key').first
+    assert rect and rect["y"]>=0 and rect["height"]>90 and rect["y"]+rect["height"]<=height+2,(game,rect,width,height)
+    assert await stage.locator(".retro-entry").is_hidden(),(game,"Duplicate inline launcher obscures stage")
+    canvas=stage.locator(".retro-canvas")
+    assert await canvas.is_visible(),(game,"Gameplay canvas hidden")
+    assert await canvas.evaluate("el=>el.width>0&&el.height>0"),(game,"Canvas has zero resolution")
+    display=stage.locator(".retro-display")
+    assert await display.evaluate("el=>getComputedStyle(el).overflowY==='auto'"),(game,"Long stage must scroll inside fullscreen")
+    control=stage.locator(".retro-control").first
     await control.scroll_into_view_if_needed()
-    assert await control.is_visible(),(game,'Touch controls unreachable')
+    assert await control.is_visible(),(game,"Touch controls inaccessible")
     await control.click(timeout=3000)
+    assert await stage.locator(".retro-live-readout").is_visible(),(game,"Score and lives must remain visible")
    await page.keyboard.press("Escape")
    assert not await page.evaluate("document.body.classList.contains('arcade-on')"),(game,"Can't exit")
-  assert len(set(covers))==13,"Every game must have unique original artwork"
+  assert len(set(covers))==11,"Every game must have unique original artwork"
   if width==820:
    (ROOT/"reports").mkdir(parents=True,exist_ok=True)
    await page.locator("#dash-forge-toggle").click()
@@ -185,7 +182,7 @@ async def run_size(browser,width,height):
    assert await page.evaluate("window.__creatorEvents.at(-1)===false")
    await page.keyboard.press("Escape")
   assert not errors,"JS errors: "+"; ".join(errors)
-  print("THIRTEEN unique functional game title screens PASS",width,height)
+  print("ELEVEN unique functional game title screens PASS",width,height)
  finally:await page.close()
 
 async def main():
