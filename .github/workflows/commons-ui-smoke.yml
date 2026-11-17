@@ -3,6 +3,10 @@ on:
   push:
     branches: [main]
     paths:
+      - 'docs/community-readable.css'
+      - 'docs/commons-games-polish.css'
+      - 'docs/community.html'
+      - 'tests/retired-family-corner-cleanup.test.mjs'
       - 'docs/commons-feed-legibility.css'
       - 'docs/family-*'
       - 'docs/hot-rod*'
@@ -55,6 +59,10 @@ on:
       - '.github/workflows/commons-ui-smoke.yml'
   pull_request:
     paths:
+      - 'docs/community-readable.css'
+      - 'docs/commons-games-polish.css'
+      - 'docs/community.html'
+      - 'tests/retired-family-corner-cleanup.test.mjs'
       - 'docs/family-*'
       - 'docs/commons-mahjong.mjs'
       - 'docs/mahjong-moves.mjs'
