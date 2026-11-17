@@ -154,7 +154,10 @@ async def run_size(browser,width,height):
   buttons=page.locator("#arcade-program-grid button")
   heights=await buttons.evaluate_all("items=>items.map(b=>b.getBoundingClientRect().height)")
   assert len(heights)==11 and all(43.5<=h<=45 for h in heights),("Launcher buttons should be half-height with usable touch targets",heights)
-  await page.evaluate("document.getElementById('arcade-shell').hidden=true")
+  # The marquee's PLAY button must work while docked inside the arcade menu.
+  await page.locator('#arcade-family-fun .family-fun-play').click()
+  assert await page.locator('#arcade-game-title-view').is_visible(), 'Marquee Play must launch the selected title'
+  await page.locator('[data-arcade-action="title-back"]').click()
   await page.wait_for_function("document.querySelector('#conversations').firstElementChild.id==='arcade-family-fun'")
   await page.locator("#family-fun-game-picker").select_option("maze")
   assert "No verified family results yet" in await page.locator("#arcade-family-fun").inner_text()
