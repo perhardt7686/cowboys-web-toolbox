@@ -84,8 +84,7 @@ export function createFamilyBoard() {
       })));
       gamesTitle.after(showcase);
     }).catch(()=>{});
-    const updates = document.getElementById('family-updates');
-    if (updates) nav.after(updates);
+    // Keep family announcements in their permanent DOM home across sign-out.
     const sidebar = board.querySelector('.community-sidebar');
     document.getElementById('family-conversations')?.after(sidebar);
 
