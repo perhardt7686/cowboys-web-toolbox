@@ -146,7 +146,7 @@ async def run_size(browser,width,height):
   await page.wait_for_function("document.querySelector('.community-main').firstElementChild.id==='arcade-family-fun'")
 
   await page.locator("#arcade-family-fun [data-family-fun-game=maze]").click()
-  assert "NO SCORES YET" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
+  assert "NO VERIFIED SCORES YET" in await page.locator("#arcade-family-fun .family-fun-leaders").inner_text()
   await page.locator("#arcade-family-fun [data-family-fun-game=fleet]").click()
   if width==390:
    (ROOT/"reports").mkdir(exist_ok=True,parents=True)
