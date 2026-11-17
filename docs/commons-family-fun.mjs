@@ -84,6 +84,11 @@ function build(){
  play.addEventListener('click',()=>{
   const game=FAMILY_FUN_GAMES.find(g=>g.id===selected);
   if(!game)return;
+  const cabinet=hostMenu?.querySelector('#arcade-program-grid button[data-arcade-game="'+game.id+'"]');
+  const view=hostMenu?.querySelector('#arcade-menu-view');
+  if(hostMenu&&!hostMenu.hidden&&view&&!view.hidden&&cabinet&&!cabinet.disabled){
+   cabinet.click();return;
+  }
   const launch=$(game.toggle);
   if(launch&&!launch.disabled&&!document.getElementById('conversations')?.hidden)launch.click();
  });
