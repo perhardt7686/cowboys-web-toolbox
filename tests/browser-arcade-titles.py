@@ -121,7 +121,7 @@ async def run_size(browser,width,height):
   assert await page.locator(".family-fun-scoreboard").count()==1, "There must be ONE merged scoreboard"
   assert await page.evaluate("document.querySelector('.community-main').firstElementChild.id==='arcade-family-fun'")
   assert await page.locator("#arcade-family-fun .family-fun-gear-card").count()==6, "Six game-specific unlockables"
-  assert await page.locator("#arcade-family-fun .family-fun-gear-card:disabled").count()==5, "Locked rewards cannot be equipped before verified trophies"
+  assert await page.locator("#arcade-family-fun .family-fun-gear-card:disabled").count()==6, "No equipment may be changed before approved sign-in"
   assert await page.locator("#arcade-family-fun .family-fun-tab").count()==2, "Only original family games may remain"
   assert "FAMILY FUN" in await page.locator("#arcade-family-fun").inner_text()
   await page.evaluate("""() => window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{
