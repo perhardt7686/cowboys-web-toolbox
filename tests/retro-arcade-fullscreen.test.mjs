@@ -9,8 +9,8 @@ const game=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.u
 const page=readFileSync(new URL('../docs/community.html',import.meta.url),'utf8');
 
 test('historic retro games remain archived while four new classic buttons replace live menu',()=>{
-  assert.match(page,/commons-retro-arcade\\.mjs\\?v=/);
-  assert.match(page,/commons-retro-arcade\\.css\\?v=/);
+  assert.match(page,/commons-retro-arcade\.mjs\?v=/);
+  assert.match(page,/commons-retro-arcade\.css\?v=/);
   for(const id of ['galaga','pacman','centipede','topgear'])
    assert.ok(shell.includes("id:'"+id+"',root:'classic-"+id+"-root'"),id);
   for(const id of ['fleet','maze']){
