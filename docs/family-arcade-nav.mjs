@@ -2,10 +2,8 @@ import {button, el} from './family-board-core.mjs?v=family3';
 
 const labels = {
   skyboard:{play:'Ride your current course',boards:'Choose a board',awards:'Trophy road',leaders:'Family rankings'},
-  galaga:{play:'Private MSX cassette',achievements:'Local goals',scores:'Reported family scores'},
-  pacman:{play:'Private DOS game',achievements:'Local goals',scores:'Reported family scores'},
-  centipede:{play:'Atari 2600 cartridge',achievements:'Local goals',scores:'Reported family scores'},
-  topgear:{play:'Private SNES cartridge',achievements:'Local goals',scores:'Reported family scores'},
+  fleet:{play:'Defend the starlanes',trophies:'Trophy cabinet',leaders:'Family high scores'},
+  maze:{play:'Explore Mystery Maze',trophies:'Trophy cabinet',leaders:'Family high scores'},
   dashforge: {campaign:'Family campaign',community:'Created family levels',builder:'Level Studio',awards:'Achievements and skins',leaders:'Family leaderboards'},
   mahjong: {play: 'Playing board', levels: 'Campaign levels', scores: 'Leaderboard', personal: 'My scores', badges: 'Achievements', history: 'Game history'},
   wordle: {play: 'Today’s puzzle', scores: 'Leaderboard', awards: 'Achievements', history: 'Game history'},
@@ -16,10 +14,8 @@ const labels = {
 };
 const instructions = {
   skyboard:'Steer with left and right buttons or arrow keys. Jump over gaps and bars with JUMP, Space or Up. Hold DRIFT to slide faster around curves; collect stars and boost pads. Six boards unlock across thirty colorful courses. Scores and milestone prizes save to your own approved family account.',
-  galaga:'Choose a private MSX cassette file when a verified-compatible cassette player becomes available. The old original Star Squadron high scores are archived separately. Shared scores are self-reported.',
-  pacman:'Use the directional pad or arrow keys with your authorized PC/DOS game ZIP. If the DOS emulator cannot boot the supplied edition, the game remains experimental. Shared scores are self-reported.',
-  centipede:'Load an authorized Atari 2600 cartridge, steer using joystick arrows, fire with A, and use the console select/reset buttons. Shared scores are self-reported.',
-  topgear:'Load an authorized SNES cartridge, steer with the directions, accelerate and brake with game-mapped controls. Check the real in-game mapping before racing. Shared scores are self-reported.',
+  fleet:'Move left or right; hold FIRE or Space to shoot the alien swarms. Every fifth commander is worth extra points. Trophies require server-verified scores.',
+  maze:'Navigate with direction buttons or arrow keys, collect clue lights, and evade the wisps. Special orbs give temporary protection. Trophies require verified scores.',
   dashforge: 'Tap the screen or JUMP to leap over blocks, spikes and gaps. Advance through one billion shared stages. Every 25th stage has the same three-phase boss for every family member. In Level Studio, draw a level, save a draft, beat your own playtest, and publish it. Designer points come only from the first other member’s validated active time to solve that level. Likes, views, drafts and your own wins pay no creator awards.',
   mahjong: 'Match tiles with the same picture and corner mark. A playable tile is uncovered and has an open left or right side. Zoom in, then swipe to pan. Fit board brings the full layout back into view. Campaign stages unlock as you qualify.',
   wordle: 'Guess five-letter words as a team. Green means the correct position and earns 12 personal points. Gold means the letter belongs elsewhere and earns 5. A solve adds a bonus and awards contributing players 35 team-victory points each. You each get nine valid guesses per day; everyone shares every guess and saved green-letter position. The shared word resets at midnight Eastern.',
@@ -33,10 +29,8 @@ const sceneAction = (label, scene, scope) => ({label, scene, scope});
 const clickAction = (label, target, scene) => ({label, target, scene});
 const actions = {
   skyboard:[sceneAction('Ride current stage','play'),sceneAction('Choose board','boards'),sceneAction('Milestone trophies','awards'),sceneAction('Family leaderboard','leaders')],
-  galaga:[sceneAction('Private cassette player','play'),sceneAction('Local goals','achievements'),sceneAction('Family reported scores','scores')],
-  pacman:[sceneAction('Play DOS game','play'),sceneAction('Local goals','achievements'),sceneAction('Family reported scores','scores')],
-  centipede:[sceneAction('Play Atari 2600','play'),sceneAction('Local goals','achievements'),sceneAction('Family reported scores','scores')],
-  topgear:[sceneAction('Play SNES game','play'),sceneAction('Local goals','achievements'),sceneAction('Family reported scores','scores')],
+  fleet:[sceneAction('Play Star Squadron','play'),sceneAction('Trophy cabinet','trophies'),sceneAction('Family high scores','leaders')],
+  maze:[sceneAction('Play Mystery Maze','play'),sceneAction('Trophy cabinet','trophies'),sceneAction('Family high scores','leaders')],
   dashforge: [sceneAction('Campaign stages','campaign'),sceneAction('Family-made levels','community'),
     sceneAction('Build a new level','builder'),sceneAction('Achievements and cube skins','awards'),
     sceneAction('Family leaderboards','leaders')],

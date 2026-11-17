@@ -48,12 +48,32 @@ async function rpc(fn,args={}){
  if(error)throw new Error(error.message||'Your arcade request could not be verified');
  return data;
 }
+function clearSharedScores(){
+ overview={mine:[],trophies:[],leaders:[]};
+ window.dispatchEvent(new Event('family-retro-scoreboard-clear'));
+}
+function shareVerifiedScores(){
+ // Derived only from approved-member server-verified retro RPC responses.
+ const leaders={},trophies={};
+ for(const g of GAMES){
+  leaders[g.id]=(overview.leaders||[]).filter(p=>p.game===g.id)
+   .sort((a,b)=>Number(b.best||0)-Number(a.best||0)).slice(0,5)
+   .map(p=>({name:String(p.name||'Family player').slice(0,48),best:Number(p.best||0)}));
+  trophies[g.id]=(overview.trophies||[]).filter(t=>t.game===g.id)
+   .map(t=>String(t.trophy||'')).filter(Boolean);
+ }
+ window.dispatchEvent(new CustomEvent('family-retro-scoreboard',{detail:{leaders,trophies}}));
+}
 async function refresh(){
- if(!user||!mounted)return;
+ if(!user||!mounted||board.hidden)return;
+ const owner=user;
  try{
-  overview=await rpc('community_retro_state');
+  const result=await rpc('community_retro_state');
+  if(!mounted||user!==owner||board.hidden)return;
+  overview=result;
   for(const g of GAMES)paintScores(g.id);
- }catch(error){status(error.message,'error');}
+  shareVerifiedScores();
+ }catch(error){if(mounted&&user===owner)status(error.message,'error');}
 }
 function statsByGame(id){
  return overview.mine?.find(p=>p.game===id)||{game:id,runs:0,best:0,points:0,clears:0};
@@ -376,15 +396,15 @@ function onKeyUp(event){
 async function verify(){
  if(!cfg?.enabled||!board)return;
  if(board.hidden){
-  if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;user=null;}
+  if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;user=null;clearSharedScores();}
   return;
  }
  const {data:{session}}=await client.auth.getSession();
- const id=session?.user?.id;if(!id){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;return;}
+ const id=session?.user?.id;if(!id){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;clearSharedScores();return;}
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
  if(error||member?.status!=='approved'){if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();mounted=false;}user=null;return;}
  if(mounted&&user===id)return;
- if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();}
+ if(mounted){abandon();for(const g of GAMES)$(g.root)?.remove();clearSharedScores();}
  user=id;mounted=true;
  const main=board.querySelector('.community-main');if(!main){mounted=false;return;}
  const base=$('dash-forge-root'),insertion=base&&main.contains(base)?base:null;

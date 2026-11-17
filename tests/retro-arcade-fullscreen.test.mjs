@@ -8,14 +8,11 @@ const shell=readFileSync(new URL('../docs/commons-arcade-shell.mjs',import.meta.
 const game=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
 const page=readFileSync(new URL('../docs/community.html',import.meta.url),'utf8');
 
-test('historic retro games remain archived while four new classic buttons replace live menu',()=>{
+test('both retro games are included in the shipped member board and arcade menu',()=>{
   assert.match(page,/commons-retro-arcade\.mjs\?v=/);
   assert.match(page,/commons-retro-arcade\.css\?v=/);
-  for(const id of ['galaga','pacman','centipede','topgear'])
-   assert.ok(shell.includes("id:'"+id+"',root:'classic-"+id+"-root'"),id);
-  for(const id of ['fleet','maze']){
-   assert.ok(!shell.includes("id:'"+id+"'"),id+' must retire from active buttons');
-  }
+  assert.match(shell,/id:'fleet',root:'star-squadron-root'/);
+  assert.match(shell,/id:'maze',root:'mystery-maze-root'/);
   assert.match(game,/id:'fleet',root:'star-squadron-root'/);
   assert.match(game,/id:'maze',root:'mystery-maze-root'/);
   assert.match(game,/community_retro_start/);
