@@ -131,7 +131,7 @@ function statsByGame(id){
  return overview.mine?.find(p=>p.game===id)||{game:id,runs:0,best:0,points:0,clears:0};
 }
 function paintScores(id){
- const root=$(GAMES.find(g=>g.id===id).root);if(!root;
+ const root=$(GAMES.find(g=>g.id===id).root);if(!root)return;
  const mine=statsByGame(id);
  const badges=root.querySelector('.retro-statbar');
  if(badges){
