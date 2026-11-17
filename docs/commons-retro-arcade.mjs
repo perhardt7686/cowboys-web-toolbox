@@ -82,8 +82,10 @@ function equipLook(game,id){
  return true;
 }
 function paintGear(game){
- const host=$(GAMES.find(g=>g.id===game)?.root)?.querySelector('.retro-gear-panel');
- if(!host)return;
+ const parent=$(GAMES.find(g=>g.id===game)?.root)?.querySelector('.retro-trophies');
+ if(!parent)return;
+ let host=parent.querySelector('.retro-gear-panel');
+ if(!host){host=el('div','retro-gear-panel');parent.append(host);}
  const earned=new Set(earnedFor(game)),active=activeLook(game);
  host.replaceChildren(el('h3','',game==='fleet'?'STARSHIP HANGAR · COSMETICS':'DETECTIVE GEAR LOCKER · COSMETICS'),
   el('p','retro-gear-note','Verified trophies unlock these game-only looks. Equip does not change physics, scoring, or lives.'));
@@ -129,8 +131,7 @@ function statsByGame(id){
  return overview.mine?.find(p=>p.game===id)||{game:id,runs:0,best:0,points:0,clears:0};
 }
 function paintScores(id){
- const root=$(GAMES.find(g=>g.id===id).root);if(!root)return;
- paintGear(id);
+ const root=$(GAMES.find(g=>g.id===id).root);if(!root;
  const mine=statsByGame(id);
  const badges=root.querySelector('.retro-statbar');
  if(badges){
@@ -153,6 +154,7 @@ function paintScores(id){
    return badge;
   }));
  }
+ paintGear(id);
  const leaders=root.querySelector('.retro-leaders');
  if(leaders){
   const rows=(overview.leaders||[]).filter(p=>p.game===id).sort((a,b)=>b.best-a.best).slice(0,12);
@@ -216,7 +218,6 @@ function makeGame(game){
  const buttons=add(el('div','retro-actions'),begin,end);
  live.append(canvas,info,controls,buttons,notification);
  const trophies=el('div','retro-trophies retro-panel-view');trophies.hidden=true;
- trophies.append(el('div','retro-gear-panel'));
  const leaders=el('div','retro-leaders retro-panel-view');leaders.hidden=true;
  display.append(live,trophies,leaders);
  inside.append(head,stats,display);
