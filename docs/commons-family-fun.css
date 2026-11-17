@@ -1,170 +1,175 @@
-/* FAMILY FUN: real family arcade marquee, replaces the old generic DOS menu artwork.
-   Private, responsive, no copied game screenshots, no auto-claiming verified scores. */
-body.community-page #arcade-shell .arcade-computer{min-height:0;overflow:hidden}
+/* FAMILY FUN V6: one compact original arcade marquee, all family games.
+   Rankings originate only from approved-member game server responses.
+   Keep the full game launcher at half its former vertical footprint on phones. */
+body.community-page #conversations > #arcade-family-fun{
+ grid-column:1/-1;grid-row:auto;order:-100;
+ margin:0 0 7px!important;min-width:0;max-width:100%;
+}
+body.community-page #arcade-menu-view[hidden]{display:none!important}
 body.community-page #arcade-menu-view{
  display:flex!important;flex-direction:column!important;align-items:stretch!important;
- justify-content:flex-start!important;gap:8px!important;overflow-y:auto!important;
- overscroll-behavior:contain;padding:clamp(5px,1.3vw,12px)!important;
- scrollbar-gutter:stable;
+ justify-content:flex-start!important;gap:5px!important;overflow-y:auto!important;
+ overscroll-behavior:contain;padding:clamp(5px,1vw,10px)!important;
 }
 body.community-page #arcade-title-art{display:none!important}
-body.community-page .arcade-menu-intro{order:2;flex:0 0 auto;text-align:center}
-body.community-page .arcade-menu-intro span{font-size:10px!important}
-body.community-page .arcade-menu-intro h2{font-size:clamp(13px,2.1vw,17px)!important;margin:2px 0!important}
-body.community-page .arcade-menu-intro p{display:none!important}
-body.community-page #arcade-program-grid{
- order:3;grid-column:auto!important;grid-row:auto!important;
- display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
- flex:0 0 auto;align-content:start!important;gap:6px!important;width:100%;
-}
-body.community-page #arcade-program-grid button{min-height:51px!important;padding:7px!important;font-size:12px!important}
-body.community-page #arcade-program-grid .arcade-program-number{white-space:nowrap}
-body.community-page .arcade-program-state{font-size:10px!important}
-body.community-page .arcade-menu-bottom{order:4;flex:0 0 auto;margin-bottom:6px}
+body.community-page .arcade-menu-intro{order:2;text-align:center;min-height:0!important}
+body.community-page .arcade-menu-intro span,body.community-page .arcade-menu-intro p{display:none!important}
+body.community-page .arcade-menu-intro h2{font:800 clamp(13px,2vw,16px)/1.2 system-ui!important;margin:2px!important}
+body.community-page .arcade-menu-bottom{order:4;margin:3px 0 6px!important;flex:0 0 auto}
 body.community-page .family-fun-scoreboard{
- order:1;flex:0 0 auto;width:100%;max-width:100%;box-sizing:border-box;
- border:4px ridge #e5a44c;border-radius:13px;padding:clamp(7px,1.5vw,14px);
- color:#fff;background:
-  repeating-linear-gradient(0deg,transparent,transparent 22px,#15284f33 23px,#15284f33 24px),
-  linear-gradient(140deg,#0a1632,#20284e 53%,#241c46);
- box-shadow:inset 0 2px #fff6b12e,0 5px #040711,0 0 18px #f2b76552;
- font-family:'Courier New',monospace;overflow:hidden;
+ order:1;flex:0 0 auto;box-sizing:border-box;width:100%;min-width:0;
+ padding:9px 11px 8px;
+ color:#f5f0f9;
+ background:linear-gradient(132deg,#101c31 0%,#202344 65%,#28203e 100%);
+ border:2px solid #bb935e;border-radius:11px;
+ box-shadow:inset 0 1px #ffe0a93a,0 3px 8px #07091c33;
+ font-family:system-ui,sans-serif;
 }
-body.community-page .family-fun-heading{text-align:center;display:grid;justify-items:center;gap:1px}
-body.community-page .family-fun-stars{color:#ffe8a0;letter-spacing:.35em;font:900 12px/1.5 monospace}
-body.community-page .family-fun-marquee{
- margin:0!important;color:#ffe9a8!important;
- font:1000 clamp(29px,5.8vw,61px)/1.05 system-ui!important;
- letter-spacing:clamp(1px,.45vw,5px);text-shadow:
-  2px 2px 0 #8f3b52,4px 5px 0 #2e3465,0 0 18px #e7a83a99;
+body.community-page .family-fun-scoreboard.family-fun-in-menu{margin:0!important}
+body.community-page .family-fun-heading{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+ gap:6px 12px;margin:0 0 6px;
 }
-body.community-page .family-fun-subtitle{margin:1px 0 7px!important;color:#92f5ed!important;
- font:900 clamp(9px,1.5vw,13px)/1.4 monospace;letter-spacing:.09em}
-body.community-page .family-fun-score-light{
- display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:space-between;
- background:linear-gradient(90deg,#4d255d,#3d396f,#303e62);border:2px solid #f4c585;
- border-radius:8px;padding:6px 10px;box-shadow:inset 0 2px #ffffff18;
+body.community-page .family-fun-brand{display:flex;align-items:center;flex-wrap:wrap;gap:5px 9px;min-width:0}
+body.community-page .family-fun-cabinet-sign{
+ color:#ffe3a2;font:950 clamp(15px,2.8vw,22px)/1.15 system-ui,sans-serif;
+ letter-spacing:.03em;text-shadow:1px 2px 0 #744357;
 }
-body.community-page .family-fun-score-light strong{
- color:#ffe68e;font:1000 clamp(12px,2vw,18px)/1.3 system-ui;letter-spacing:.06em;
+body.community-page .family-fun-subtitle{color:#addddf;font:750 10px/1.3 system-ui;letter-spacing:.035em}
+body.community-page .family-fun-controls{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 190px;justify-content:flex-end}
+body.community-page .family-fun-picker{
+ min-width:0;max-width:230px;width:100%;min-height:44px;padding:5px 8px;
+ border:1px solid #93b7c2;border-radius:7px;background:#172c45;color:#fff9e8;
+ font:750 13px/1.2 system-ui;
 }
-body.community-page .family-fun-score-light span{
- color:#eff9ff;font:700 10px/1.3 monospace;white-space:normal
+body.community-page .family-fun-home{
+ min-height:44px;padding:5px 9px;background:#344867;color:#fff5db;border:1px solid #9ab2ce;
+ border-radius:7px;font:750 12px/1.2 system-ui;cursor:pointer;white-space:nowrap
 }
-body.community-page .family-fun-tabs{
- display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0!important
+body.community-page .family-fun-home[hidden],body.community-page .family-fun-play[hidden]{display:none!important}
+body.community-page .family-fun-content{min-width:0}
+body.community-page .family-fun-intro{font:650 11px/1.35 system-ui;color:#d6dced;margin:0 0 4px!important}
+body.community-page .family-fun-all-games{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;
+ max-height:170px;overflow:auto;overscroll-behavior:contain;
+ padding:2px 3px 3px 1px;scrollbar-width:thin;
 }
-body.community-page .family-fun-tab{
- display:grid;place-items:center;min-width:0;min-height:39px!important;
- padding:4px!important;border:2px solid #7aaac9!important;border-radius:6px!important;
- color:#d7f4ff!important;background:#142d4a!important;
- font:900 clamp(10px,1.5vw,12px)/1.1 system-ui!important;white-space:normal;cursor:pointer;
+body.community-page .family-fun-game-chip{
+ display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+ min-width:0;min-height:44px;padding:5px 8px;gap:2px;
+ border:1px solid #5d819c;border-radius:6px;background:#233852;color:#fff2d9;
+ text-align:left;cursor:pointer;
 }
-body.community-page .family-fun-tab[aria-pressed=true]{
- color:#1c2140!important;background:#ffdd84!important;border-color:#fff5b7!important;
- box-shadow:0 2px 0 #b07856;
+body.community-page .family-fun-game-chip strong{
+ display:block;width:100%;font:850 12px/1.1 system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-body.community-page .family-fun-board-heading{
- display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
- border-bottom:2px solid #7ba7e3;padding-bottom:5px;color:#bff1f6;
+body.community-page .family-fun-game-chip span{
+ display:block;width:100%;font:650 10px/1.15 system-ui;color:#bcdde0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-body.community-page .family-fun-board-heading strong{font:900 clamp(12px,2vw,16px)/1.4 monospace}
-body.community-page .family-fun-board-heading small{font:700 10px/1.3 monospace;color:#ffe19c}
-body.community-page .family-fun-podium{display:grid;gap:3px;margin-top:4px}
+body.community-page .family-fun-game-chip:is(:hover,:focus-visible){border-color:#ffdf94;background:#36456a}
+body.community-page .family-fun-game-head{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;
+ border-bottom:1px solid #637b9b;padding-bottom:4px;
+}
+body.community-page .family-fun-game-head strong{color:#ffe5ae;font:850 15px/1.3 system-ui}
+body.community-page .family-fun-verified{color:#a8e2d5;font:750 11px/1.2 system-ui}
+body.community-page .family-fun-podium{display:grid;gap:3px;max-height:158px;overflow:auto;margin:5px 0 0!important;padding:0;list-style:none}
 body.community-page .family-fun-row{
- display:grid;grid-template-columns:41px minmax(0,1fr) auto auto auto;
- gap:clamp(4px,1.5vw,11px);align-items:center;
- border:1px solid #6785be;padding:5px 7px;
- background:linear-gradient(90deg,#21395c,#272847);
- font:800 clamp(10px,1.4vw,13px)/1.4 monospace;color:#e5f3ff;
+ display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:5px;
+ min-width:0;background:#253650;border:1px solid #475f81;border-radius:5px;
+ padding:5px 7px;min-height:34px;font:700 12px/1.2 system-ui;
 }
-body.community-page .family-fun-row.is-first{
- border:2px solid #f8dd87;background:linear-gradient(90deg,#473e63,#3c3356)
+body.community-page .family-fun-row.is-first{border-color:#d0b579;background:#39415c}
+body.community-page .family-fun-rank{color:#ffe4a3}
+body.community-page .family-fun-player{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.community-page .family-fun-points{text-align:right;color:#f7e8b7;font-weight:850;font-variant-numeric:tabular-nums}
+body.community-page .family-fun-empty{
+ margin:5px 0!important;padding:9px!important;color:#dce8e9;
+ background:#223552;border:1px solid #435b7a;border-radius:6px;
+ font:680 12px/1.4 system-ui;
 }
-body.community-page .family-fun-rank{color:#ffe494}
-body.community-page .family-fun-player{font-weight:900;overflow-wrap:anywhere}
-body.community-page .family-fun-points{font:1000 clamp(12px,2vw,18px)/1.1 monospace;color:#f7e7a0;font-variant-numeric:tabular-nums}
-body.community-page .family-fun-date{color:#bacde8;white-space:nowrap;font-size:10px}
-body.community-page .family-fun-tag{color:#f9c7a8;font-size:9px;white-space:nowrap}
-body.community-page .family-fun-empty{margin:0!important;padding:13px 7px!important;
- background:#202a4a;color:#fce8a0;text-align:center;font:900 11px/1.5 monospace}
-body.community-page .family-fun-achievements{margin-top:8px;display:grid;gap:5px}
-body.community-page .family-fun-milestone-title{color:#ffdc87;font:900 12px/1.3 monospace}
-body.community-page .family-fun-milestones{display:flex;gap:5px;flex-wrap:wrap}
+body.community-page .family-fun-rewards{
+ margin:7px 0 0;padding:3px 7px 7px;border:1px solid #5d7192;
+ border-radius:6px;background:#1c2a44;
+}
+body.community-page .family-fun-rewards summary{
+ min-height:44px;display:list-item;cursor:pointer;color:#ffe0a1;font:800 12px/44px system-ui;
+}
+body.community-page .family-fun-milestones{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
 body.community-page .family-fun-medal{
- border:1px solid #63789e;border-radius:5px;padding:5px 7px;
- background:#24294e;color:#c9d8ef;font:800 10px/1.3 monospace;overflow-wrap:anywhere;
+ padding:3px 5px;border:1px solid #61718b;border-radius:5px;
+ background:#273851;color:#d7e4ee;font:750 10px/1.3 system-ui;
 }
-body.community-page .family-fun-medal.earned{color:#ffe9a0;background:#3d3c54;border-color:#f0ce81}
-body.community-page .family-fun-provenance{
- margin:8px 0 0!important;padding-top:5px;border-top:1px solid #6976a0;
- color:#ffbba5;font:900 10px/1.4 monospace;text-align:center
+body.community-page .family-fun-medal.earned{border-color:#dfb86b;color:#ffe9af}
+body.community-page .family-fun-gear{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;
+ max-height:190px;overflow:auto;
 }
-body.community-page .family-fun-status{margin:4px 0 0!important;color:#b7ccdd;font:750 10px/1.4 monospace;text-align:center}
-@media(max-width:690px){
- body.community-page #arcade-program-grid{grid-template-columns:1fr!important}
- body.community-page .family-fun-scoreboard{padding:8px}
- body.community-page .family-fun-row{grid-template-columns:32px minmax(0,1fr) auto;}
- body.community-page .family-fun-row .family-fun-date,body.community-page .family-fun-row .family-fun-tag{display:none}
- body.community-page .family-fun-score-light{justify-content:center;text-align:center}
- body.community-page .family-fun-score-light span{font-size:9px}
- body.community-page .family-fun-tabs{gap:3px}
- body.community-page .family-fun-tab{min-height:42px!important;font-size:10px!important;padding:3px!important}
+body.community-page .family-fun-gear-card{
+ display:grid;justify-items:start;gap:2px;min-width:0;min-height:56px;padding:6px;
+ text-align:left;border:1px solid #688cac;border-radius:6px;
+ background:#2a3d5c;color:#f8f5ed;font:680 11px/1.2 system-ui;cursor:pointer;
+}
+body.community-page .family-fun-gear-card strong{color:#ffdf99}
+body.community-page .family-fun-gear-card span{color:#cee4e7}
+body.community-page .family-fun-gear-card small{color:#b4e8de;font-weight:800}
+body.community-page .family-fun-gear-card:disabled{opacity:.62;cursor:not-allowed}
+body.community-page .family-fun-gear-card.is-equipped{border-color:#f3d98c;background:#424662}
+body.community-page .family-fun-reward-hint{font:650 10px/1.3 system-ui;color:#b6cada;margin:4px 0 0!important}
+body.community-page .family-fun-footer{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;min-width:0;
+}
+body.community-page .family-fun-status{font:650 10px/1.3 system-ui;color:#c1d3dd;min-width:0}
+body.community-page .family-fun-play{
+ min-height:44px;min-width:116px;padding:6px 11px;border:1px solid #e9c579;border-radius:6px;
+ color:#18233d;background:#f0cd82;font:850 12px/1.2 system-ui;cursor:pointer;
+}
+body.community-page .family-fun-play:disabled{opacity:.5;cursor:wait}
+body.community-page .family-fun-scoreboard :is(button,select,summary):focus-visible{
+ outline:3px solid #a4f3f1!important;outline-offset:2px!important;
+}
+/* Half-size launcher footprint: 11 choices become two short columns on phones,
+   four columns on desktop while every interactive target stays >= 44px tall. */
+body.community-page #arcade-program-grid{
+ order:3!important;grid-column:auto!important;grid-row:auto!important;
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ flex:0 0 auto!important;align-content:start!important;gap:4px!important;width:100%;
+}
+body.community-page #arcade-program-grid button{
+ min-width:0!important;min-height:44px!important;height:44px!important;max-height:44px!important;
+ padding:4px 6px!important;gap:4px!important;border-width:1px!important;
+ border-radius:5px!important;box-sizing:border-box!important;
+}
+body.community-page #arcade-program-grid .arcade-program-number,
+body.community-page #arcade-program-grid .arcade-program-state,
+body.community-page #arcade-program-grid .arcade-program-name small{display:none!important}
+body.community-page #arcade-program-grid .arcade-program-mark{font-size:15px!important;min-width:18px!important}
+body.community-page #arcade-program-grid .arcade-program-name{min-width:0;display:block}
+body.community-page #arcade-program-grid .arcade-program-name strong{
+ font:800 12px/1.1 system-ui!important;white-space:normal;overflow-wrap:anywhere;
+}
+@media(max-width:800px){
+ body.community-page .family-fun-all-games,
+ body.community-page #arcade-program-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(min-width:801px) and (max-width:1080px){
+ body.community-page .family-fun-all-games,
+ body.community-page #arcade-program-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:420px){
+ body.community-page .family-fun-scoreboard{padding:7px 8px}
+ body.community-page .family-fun-heading{gap:4px}
+ body.community-page .family-fun-controls{justify-content:stretch}
+ body.community-page .family-fun-picker{max-width:none}
+ body.community-page .family-fun-row{grid-template-columns:25px minmax(0,1fr) auto;font-size:11px}
+ body.community-page .family-fun-all-games{max-height:176px}
+ body.community-page .family-fun-gear{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.community-page .family-fun-status{font-size:9px}
+ body.community-page #arcade-program-grid .arcade-program-mark{display:none!important}
+ body.community-page #arcade-program-grid .arcade-program-name strong{font-size:12px!important}
 }
 @media(prefers-reduced-motion:reduce){
- body.community-page .family-fun-scoreboard *{animation:none!important;transition:none!important}
-}
-
-/* Scoreboard occupies the head of the arcade, not an old DOS splash screen. */
-body.community-page #arcade-menu-view[hidden]{display:none!important}
-body.community-page #arcade-menu-view > .family-fun-in-menu{
- order:0;flex:0 0 auto;width:100%;max-width:100%;margin:0;
-}
-body.community-page .family-fun-scoreboard[hidden]{display:none!important}
-body.community-page .family-fun-scoreboard .family-fun-tabs button:focus-visible{
- outline:3px solid #9ffff1!important;outline-offset:2px!important;
-}
-
-/* Original-game FAMILY FUN buttons, with server-verified score provenance. */
-body.community-page .family-fun-actions{display:flex;justify-content:center;margin-top:6px}
-body.community-page .family-fun-play{
- width:min(100%,340px);min-height:46px;padding:10px 16px;
- border:2px solid #ffdea0;border-radius:9px;
- background:linear-gradient(#5368ab,#253a70);color:#fff2c3;
- font:900 clamp(12px,2vw,16px)/1.2 system-ui;
- box-shadow:0 3px 0 #0a1539;cursor:pointer
-}
-body.community-page .family-fun-play:focus-visible{
- outline:3px solid #a6ffeb;outline-offset:2px
-}
-
-/* Unified FAMILY FUN cabinet: ONE DOM node only, docked above conversations or inside arcade menu. */
-body.community-page .community-main > #arcade-family-fun{order:-50;margin:0 0 15px!important}
-body.community-page .family-fun-single .family-fun-gear{
- display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px
-}
-body.community-page .family-fun-single .family-fun-gear-card{
- display:grid;align-content:space-between;justify-items:start;gap:4px;
- min-width:0;min-height:96px;padding:9px;
- background:linear-gradient(135deg,#1f375c,#28284d);
- border:2px solid #6a9ab3;border-radius:9px;color:#f7e9cc;
- text-align:left;cursor:pointer;font:700 11px/1.35 system-ui
-}
-body.community-page .family-fun-gear-card strong{color:#fbe1a2;font:900 13px/1.3 system-ui}
-body.community-page .family-fun-gear-card span{color:#cce7ed}
-body.community-page .family-fun-gear-card small{color:#baf6e1;font:900 10px/1.3 monospace}
-body.community-page .family-fun-gear-card.is-equipped{
- border-color:#f5dc88;box-shadow:inset 0 0 0 1px #f5dc8866;background:linear-gradient(135deg,#3a4773,#353050)
-}
-body.community-page .family-fun-gear-card:disabled{cursor:not-allowed;opacity:.58}
-body.community-page .family-fun-gear-card:focus-visible{outline:3px solid #a8ffed;outline-offset:2px}
-body.community-page .family-fun-single .family-fun-actions{display:flex;justify-content:center;margin-top:8px}
-@media(max-width:690px){
- body.community-page .family-fun-single .family-fun-gear{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
- body.community-page .family-fun-single .family-fun-gear-card{min-height:93px;padding:7px;font-size:10px}
- body.community-page .family-fun-single .family-fun-gear-card strong{font-size:12px}
-}
-@media(max-width:350px){
- body.community-page .family-fun-single .family-fun-gear{grid-template-columns:1fr}
- body.community-page .family-fun-single .family-fun-gear-card{min-height:67px}
+ body.community-page .family-fun-scoreboard *,body.community-page #arcade-program-grid *{
+  animation:none!important;transition:none!important
+ }
 }
