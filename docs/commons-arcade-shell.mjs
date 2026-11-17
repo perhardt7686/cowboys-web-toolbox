@@ -36,40 +36,11 @@ function saveSettings(){
  document.body.dataset.arcadeContrast=settings.contrast;
  document.body.dataset.arcadeSize=settings.size;
  document.body.dataset.arcadeMotion=settings.motion;
- drawArt();
+
 }
 function game(id){return games.find(x=>x.id===id)}
 function available(g){return Boolean($(g.root)&&!board.hidden)}
 function pageLabels(){return game(active)?.scenes||[]}
-function drawArt(){
- const canvas=$('arcade-title-art');if(!canvas)return;
- const c=canvas.getContext('2d');if(!c)return;
- c.imageSmoothingEnabled=false;
- const ega=['#000','#0000aa','#00aa00','#00aaaa','#aa0000','#aa00aa','#aa5500','#aaaaaa','#555','#5555ff','#55ff55','#55ffff','#ff5555','#ff55ff','#ffff55','#fff'];
- const bg=settings?.contrast==='bright'?0:1,lit=settings?.contrast==='bright'?14:11;
- const rect=(x,y,w,h,p)=>{c.fillStyle=ega[p];c.fillRect(x,y,w,h)};
- const line=(x,y,xx,yy,p)=>{c.strokeStyle=ega[p];c.lineWidth=1;c.beginPath();c.moveTo(x,y);c.lineTo(xx,yy);c.stroke()};
- const type=(t,x,y,s,p)=>{c.font='bold '+s+'px monospace';c.fillStyle=ega[p];c.fillText(t,x,y)};
- rect(0,0,320,200,bg);
- for(let i=0;i<36;i++)rect((i*47+19)%319,(i*31+9)%115,1+(i%3===0?1:0),1,15);
- rect(0,109,320,91,8);
- for(let i=0;i<12;i++)line(i*32,109,(i-5)*80,199,0);
- rect(0,115,320,2,14);
- rect(0,142,320,2,6);
- rect(9,43,302,6,8);rect(12,49,296,57,7);rect(17,56,286,44,0);
- for(let i=0;i<19;i++)rect(18+i*15,58,5,36,i%2?8:6);
- rect(76,83,180,4,8);
- // Original pixel-art coupe, composed rather than copied from an earlier game.
- rect(60,124,206,21,4);rect(69,117,188,8,12);
- rect(96,101,100,18,4);rect(113,93,70,14,12);
- rect(119,95,26,13,3);rect(151,95,25,13,3);
- rect(148,95,3,15,0);rect(111,117,128,3,15);
- rect(63,137,203,3,15);rect(64,125,13,8,14);
- for(const x of [102,225]){rect(x-16,133,33,20,0);rect(x-12,136,25,14,7);rect(x-7,139,15,9,8);rect(x-2,141,5,5,15);}
- type('COWBOY COMPUTER SYSTEMS',31,24,11,14);
- type('COMMONS  ARCADE  /  1989',39,39,10,lit);
- type('SELECT A PROGRAM',85,184,10,15);
-}
 function build(){
  if(!board||!config?.enabled||!location.pathname.endsWith('community.html'))return;
  const main=board.querySelector('.community-main');
@@ -78,7 +49,7 @@ function build(){
   menu=document.createElement('section');menu.id='arcade-shell';menu.hidden=true;
   menu.setAttribute('role','dialog');menu.setAttribute('aria-modal','true');
   menu.setAttribute('aria-label','Cowboy Commons Arcade');
-  menu.innerHTML='<div class="arcade-computer"><section id="arcade-menu-view"><canvas id="arcade-title-art" width="320" height="200" role="img" aria-label="Original pixel art: a vintage red car in the arcade garage"></canvas><div class="arcade-menu-intro"><span>MS-DOS INSPIRED · MEMBERS ONLY</span><h2>CHOOSE A FAMILY GAME</h2><p>Every location is one scene. Progress remains saved by its original game.</p></div><div id="arcade-program-grid"></div><div class="arcade-menu-bottom"><button type="button" data-arcade-action="options">F2 · SETTINGS</button><button type="button" data-arcade-action="exit">EXIT TO COMMONS</button></div></section><section id="arcade-game-title-view" hidden aria-label="Game title screen"></section><section id="arcade-options-view" hidden><h2 id="arcade-display-title">DISPLAY SETUP</h2><p>These settings adjust only the Arcade screen, not your game saves.</p><div id="arcade-options-form"></div><button type="button" data-arcade-action="options-back">RETURN TO GAME / MENU</button></section><p class="arcade-menu-status" id="arcade-menu-status" role="status" aria-live="polite"></p></div>';
+  menu.innerHTML='<div class="arcade-computer"><section id="arcade-menu-view"><div class="arcade-menu-intro"><h2>CHOOSE A FAMILY GAME</h2></div><div id="arcade-program-grid"></div><div class="arcade-menu-bottom"><button type="button" data-arcade-action="options">F2 · SETTINGS</button><button type="button" data-arcade-action="exit">EXIT TO COMMONS</button></div></section><section id="arcade-game-title-view" hidden aria-label="Game title screen"></section><section id="arcade-options-view" hidden><h2 id="arcade-display-title">DISPLAY SETUP</h2><p>These settings adjust only the Arcade screen, not your game saves.</p><div id="arcade-options-form"></div><button type="button" data-arcade-action="options-back">RETURN TO GAME / MENU</button></section><p class="arcade-menu-status" id="arcade-menu-status" role="status" aria-live="polite"></p></div>';
   document.body.append(menu);
   mountFamilyFun(menu);
   menu.addEventListener('click',onMenuClick);
