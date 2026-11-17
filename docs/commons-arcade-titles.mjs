@@ -11,21 +11,33 @@ export const titleProfiles={
   first:'START RIDING',secondary:[['boards','CHOOSE BOARD'],['awards','TROPHY ROAD'],['leaders','FAMILY RANKS']],
   accent:'#a8f7ff',scene:'skyboard'
  },
- fleet:{
-  eyebrow:'STAR SQUADRON · FAMILY ARCADE',
-  name:'STAR SQUADRON',tag:'One pilot against an alien swarm.',
-  subtitle:'Slide between lanes, fire at the swooping ships, and survive the next wave.',
-  help:'Move left and right with the big touch buttons or arrows. Hold FIRE or press Space to shoot. Hit the swooping swarm before it reaches your ship. Five-wave commanders are worth extra points. Trophies and family rankings only count after server verification.',
-  first:'DEFEND THE STARLANES',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
-  accent:'#91f4e7',scene:'fleet'
+ galaga:{
+  eyebrow:'MSX CASSETTE · LOCAL MEDIA · FAMILY ARCADE',
+  name:'GALAGA',tag:'Classic space attack · load a private cassette.',
+  subtitle:'Your MSX cassette is recognized, but this edition cannot boot here until a compatible cassette core is tested.',
+  help:'This is the original MSX cassette edition, not the old Star Squadron game with a new name. Its local game loader is pending verified cassette support. Historic Star Squadron scores remain archived. Family scores submitted manually are always labeled unverified.',
+  first:'OPEN GALAGA CABINET',secondary:[['achievements','LOCAL GOALS'],['scores','FAMILY SCORES']],accent:'#8cf1da',scene:'galaga'
  },
- maze:{
-  eyebrow:'MYSTERY MAZE · FAMILY ARCADE',
-  name:'MYSTERY MAZE',tag:'Follow the clues. Escape the wisps.',
-  subtitle:'Explore an original twisting labyrinth and collect clue lights while evading wandering ghosts.',
-  help:'Use the large directional buttons or arrow keys to explore. Every new tile earns a clue. Power orbs let you pass a ghost safely for a little while. Earn trophies from verified scores and challenge the family leaderboard.',
-  first:'ENTER THE LABYRINTH',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
-  accent:'#f5d487',scene:'maze'
+ pacman:{
+  eyebrow:'IBM PC / DOS · LOCAL MEDIA · FAMILY ARCADE',
+  name:'PAC-MAN',tag:'The maze classic · private DOS edition.',
+  subtitle:'Bring an authorized local DOS game package. Navigate the maze with the directional pad.',
+  help:'Choose an authorized DOS ZIP file that contains a bootable game executable. The emulator compatibility is experimental. The original edition keeps its own gameplay. Enter a visible game score to share it as a member-reported, unverified record; no automatic trophies are claimed.',
+  first:'OPEN PAC-MAN CABINET',secondary:[['achievements','LOCAL GOALS'],['scores','FAMILY SCORES']],accent:'#f7d77d',scene:'pacman'
+ },
+ centipede:{
+  eyebrow:'ATARI 2600 · LOCAL MEDIA · FAMILY ARCADE',
+  name:'CENTIPEDE',tag:'Defend the garden · arcade joystick and fire.',
+  subtitle:'Bring an authorized Atari 2600 cartridge file and use the joystick plus FIRE button.',
+  help:'Select a private Atari 2600 BIN or A26 game file. The emulator uses a Stella-compatible core. Move using directions, hold FIRE, and use SELECT / RESET for the original console switches. This game never sends the cartridge file to the Family Board.',
+  first:'OPEN CENTIPEDE CABINET',secondary:[['achievements','LOCAL GOALS'],['scores','FAMILY SCORES']],accent:'#b7ee9b',scene:'centipede'
+ },
+ topgear:{
+  eyebrow:'SUPER NINTENDO · LOCAL MEDIA · FAMILY ARCADE',
+  name:'TOP GEAR',tag:'Race to the finish · steering, pedals and gears.',
+  subtitle:'Bring an authorized SNES cartridge file. Use the bottom arcade buttons or a controller.',
+  help:'Choose an authorized SFC/SMC file and run it in the SNES emulator. Match its controller layout in Settings, then steer, accelerate, brake and use the game options. Member-reported scores are separate from the original game saves and never labeled replay verified.',
+  first:'OPEN TOP GEAR CABINET',secondary:[['achievements','LOCAL GOALS'],['scores','FAMILY SCORES']],accent:'#ffa8ad',scene:'topgear'
  },
  streetrod:{
   eyebrow:'1963 · BUILD THE MACHINE · RACE THE ROAD',
@@ -191,31 +203,34 @@ export function drawGameTitle(canvas,id,reducedMotion=false){
    T('LEVEL STUDIO',171,185,13,'#e6e3fa');T('WORLD TRIAL / 25',13,28,12,'#fff29d');
   };
   draw(0);animateTitle(canvas,reducedMotion,draw);
- }else if(id==='fleet'){
-  R(0,160,320,40,'#161b39');
-  for(let i=0;i<11;i++){const x=18+i*28,y=22+(i%3)*14;
-   R(x,y,16,4,i%5===0?'#ff9ac9':'#8cebd7');R(x-5,y+4,26,6,'#7e77c9');
-   R(x-9,y+9,8,7,'#8cebd7');R(x+17,y+9,8,7,'#8cebd7');
-   R(x+3,y+14,4,4,'#e8bd8d');R(x+11,y+14,4,4,'#e8bd8d');}
-  c.beginPath();c.moveTo(160,112);c.lineTo(187,157);c.lineTo(166,149);
-  c.lineTo(160,163);c.lineTo(154,149);c.lineTo(133,157);c.closePath();
-  c.fillStyle='#aaf5e0';c.fill();c.strokeStyle='#f8cd84';c.lineWidth=4;c.stroke();
-  R(156,126,9,13,'#435d91');
-  L(160,101,160,61,'#fff6ba',4);
-  T('STAR SQUADRON',94,189,15,'#fce5b7');
- }else if(id==='maze'){
-  R(18,16,284,169,'#16152e');
-  for(let y=0;y<9;y++)for(let x=0;x<15;x++){
-    const wall=y===0||y===8||x===0||x===14||(x%4===0&&y%3===0);
-    const xx=20+x*18,yy=20+y*18;
-    if(wall){R(xx,yy,16,16,'#52488f');R(xx+2,yy+2,12,3,'#9986d2');}
-    else C(xx+8,yy+8,2,'#ffe3a2');
-  }
-  C(85,110,13,'#f6cb7d');C(82,107,3,'#332549');C(91,107,3,'#332549');
-  for(const [x,y,color] of [[207,76,'#ef8db0'],[226,128,'#98ece4'],[147,90,'#cfaaed']]){
-    R(x-9,y-11,18,21,color);C(x-4,y-3,2,'#30264b');C(x+4,y-3,2,'#30264b');
-  }
-  T('THE CLUES ARE EVERYWHERE',53,195,13,'#fce2a7');
+ }else if(id==='galaga'){
+  R(0,156,320,44,'#172a46');
+  for(let i=0;i<15;i++){const x=16+(i%5)*65,y=27+Math.floor(i/5)*28;
+   R(x,y,19,7,i%3?'#87eadb':'#ffb6c5');R(x+6,y+7,8,9,'#667bc0');}
+  c.beginPath();c.moveTo(160,111);c.lineTo(187,161);c.lineTo(160,149);
+  c.lineTo(134,161);c.closePath();c.fillStyle='#fff1ab';c.fill();
+  L(160,110,160,74,'#f6b68f',4);T('SPACE FORMATIONS',72,190,17,'#fff2b8');
+ }else if(id==='pacman'){
+  for(let y=0;y<6;y++)for(let x=0;x<10;x++){
+   if(x===0||y===0||x===9||y===5||(x%3===0&&y%2===0))R(25+x*28,23+y*27,25,8,'#777bea');
+   else C(35+x*28,30+y*27,2,'#ffde8a');}
+  C(95,110,19,'#fbe189');R(92,105,20,5,'#11162f');
+  for(let j=0;j<3;j++){R(205+j*28,94,16,21,['#e6a2be','#92ebee','#f6c98b'][j]);C(209+j*28,101,2,'#13254b');}
+  T('MAZE CHALLENGE',70,190,17,'#fff1b1');
+ }else if(id==='centipede'){
+  R(0,163,320,30,'#182b25');
+  for(let i=0;i<11;i++){const x=18+i*27,y=26+(i%3)*29;
+   C(x,y,10,i%3?'#c3eaa7':'#9fe8da');C(x-3,y-3,2,'#12334b');}
+  for(let i=0;i<15;i++){const x=(i*41+7)%306,y=111+(i*17)%62;
+   R(x,y,9,8,'#c7a5df');R(x+3,y-7,3,9,'#71ddb3');}
+  R(154,168,18,14,'#ffcc82');L(163,168,163,138,'#fff3bb',4);
+  T('GARDEN DEFENSE',60,190,17,'#fff1b1');
+ }else if(id==='topgear'){
+  R(0,110,320,90,'#29344e');for(let i=0;i<8;i++)L(147+i*12,111,36+i*34,198,'#e2c68a',2);
+  R(47,90,104,31,'#a63d5e');R(78,72,56,24,'#f6b7a9');R(87,74,39,18,'#8feafa');
+  for(const x of [68,134]){C(x,121,16,'#111328');C(x,121,8,'#eff0e7');}
+  R(209,56,73,55,'#2c88bb');R(218,63,54,23,'#b0f5ec');
+  T('FULL THROTTLE',64,185,19,'#ffe2aa');
  }else if(id==='mahjong'){
   for(let i=0;i<12;i++){const x=20+(i%4)*72,y=25+Math.floor(i/4)*52;
    R(x+5,y+7,57,40,'#7e72c9');R(x,y,57,40,'#f5eadd');
