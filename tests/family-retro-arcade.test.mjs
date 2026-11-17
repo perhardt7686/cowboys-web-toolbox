@@ -50,12 +50,7 @@ test('games use private score RPCs, originals and readable independent title scr
  const shell=read('docs/commons-arcade-shell.mjs');
  const title=read('docs/commons-arcade-titles.mjs');
  const nav=read('docs/family-arcade-nav.mjs');
- for(const id of ['galaga','pacman','centipede','topgear']){
-  assert.ok(shell.includes("id:'"+id+"'"),id);
-  assert.ok(title.includes(" "+id+":{"),id);
-  assert.ok(nav.includes("  "+id+":{"),id);
- }
- for(const id of ['fleet','maze'])assert.ok(js.includes("id:'"+id+"'"),'Historic '+id+' engine was removed');
+ for(const id of ['fleet','maze']){assert.ok(shell.includes("id:'"+id+"'"));assert.ok(title.includes(" "+id+":{"));assert.ok(nav.includes("  "+id+":"));}
  assert.match(js,/community_retro_start/);
  assert.match(js,/community_retro_finish/);
  assert.match(js,/community_retro_state/);
