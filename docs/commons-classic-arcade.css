@@ -102,3 +102,24 @@ body.community-page #star-squadron-root,body.community-page #mystery-maze-root{d
 @media(prefers-reduced-motion:reduce){
  body.community-page .classic-root *{transition:none!important;animation:none!important}
 }
+/* Each classic cabinet occupies the same single-screen monitor as other games.
+   The family navigation remains available above; games scroll within their room. */
+body.community-page.arcade-on .classic-root:not(.arcade-game-active){display:none!important}
+body.community-page.arcade-on .classic-root.arcade-game-active{
+ display:block!important;position:fixed!important;
+ inset:var(--arcade-top,98px) 0 var(--arcade-bottom,29px) 0!important;
+ z-index:2147483641!important;overflow-x:hidden!important;overflow-y:auto!important;
+ padding:8px!important;margin:0!important;box-sizing:border-box;
+ background:linear-gradient(#0b1228,#171338)!important
+}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-launch{display:none!important}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-inside:not([hidden]){
+ display:grid!important;margin:0 auto!important;max-width:1050px;min-height:min(100%,520px)
+}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-screen{min-height:160px}
+body.community-page.arcade-on .classic-root.arcade-game-active .classic-frame{height:min(48dvh,440px)}
+@media(orientation:landscape) and (max-height:580px){
+ body.community-page.arcade-on .classic-root.arcade-game-active{padding:3px!important}
+ body.community-page.arcade-on .classic-root.arcade-game-active .classic-inside{padding:4px}
+ body.community-page.arcade-on .classic-root.arcade-game-active .classic-frame{height:35dvh;min-height:100px}
+}
