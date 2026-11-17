@@ -1,51 +1,101 @@
-/* ONE top-mounted FAMILY FUN cabinet. Board/arcade never render duplicate boards.
- * Data is provided only by the approved-member, server-verified retro module.
- * Cosmetics are selected locally; trophies remain member-account verified.
+/* Cowboy's Family Universe | ONE compact marquee for all active family arcade games.
+ * Authenticated game modules supply their own server-verified ranking slices.
+ * Never compare incompatible score units or grant cosmetics from a client score.
  */
 import {retroUnlocks} from './retro-game-unlockables.mjs?v=gear1';
-const GAMES=Object.freeze([
- {id:'fleet',name:'Star Squadron',toggle:'star-squadron-toggle'},
- {id:'maze',name:'Mystery Maze',toggle:'mystery-maze-toggle'}
+export const FAMILY_FUN_GAMES=Object.freeze([
+ {id:'streetrod',name:'Street Rod',toggle:'sr-toggle',source:'family',key:'hotrod',unit:'career points',mark:'▣'},
+ {id:'dashforge',name:'Dash Forge',toggle:'dash-forge-toggle',source:'game',unit:'runner points',mark:'◆'},
+ {id:'skyboard',name:'Skyboard Sprint',toggle:'skyboard-toggle',source:'game',unit:'points',mark:'✦'},
+ {id:'fleet',name:'Star Squadron',toggle:'star-squadron-toggle',source:'retro',unit:'points',mark:'✶'},
+ {id:'maze',name:'Mystery Maze',toggle:'mystery-maze-toggle',source:'retro',unit:'points',mark:'◉'},
+ {id:'mahjong',name:'Mahjong',toggle:'mahjong-toggle',source:'family',unit:'best score',mark:'◇'},
+ {id:'wordle',name:'w0rdle',toggle:'letter-lock-toggle',source:'family',unit:'points',mark:'▤'},
+ {id:'wordquest',name:'Word Quest',toggle:'word-game-toggle',source:'family',unit:'points',mark:'▥'},
+ {id:'plates',name:'License Plates',toggle:'plate-game-open',source:'family',unit:'points',mark:'▧'},
+ {id:'drawing',name:'Drawing Studio',toggle:'drawing-studio-toggle',source:'personal',unit:'creative saves',mark:'▦'},
+ {id:'study',name:'7A Study Cards',toggle:'vdacs-study-toggle',source:'personal',unit:'learning progress',mark:'▨'}
 ]);
-let selected='fleet',root=null,hostMenu=null,snapshot=null;
+let selected='all',root=null,hostMenu=null,member=null;
+let family=null,retro=null,extra=Object.create(null);
+const $=id=>document.getElementById(id);
 const el=(tag,cls,txt)=>{
- const n=document.createElement(tag);if(cls)n.className=cls;
- if(txt!==undefined)n.textContent=String(txt);return n;
+ const node=document.createElement(tag);if(cls)node.className=cls;
+ if(txt!==undefined)node.textContent=String(txt);return node;
 };
+function sanitizeEntries(entries){
+ if(!Array.isArray(entries))return [];
+ return entries.slice(0,12).filter(item=>item&&typeof item==='object').map((item,index)=>({
+  rank:Number.isFinite(Number(item.rank))?Math.max(1,Number(item.rank)):index+1,
+  name:String(item.name||'Family member').slice(0,48),
+  score:Number.isFinite(Number(item.score))?Number(item.score):0,
+  mine:Boolean(item.mine)
+ }));
+}
+function freshOwner(id){
+ if(!id||typeof id!=='string')return false;
+ if(member&&member!==id){family=null;retro=null;extra=Object.create(null);}
+ member=id;return true;
+}
+function clearAll(){
+ member=null;family=null;retro=null;extra=Object.create(null);render();
+}
+function getData(game){
+ if(!member)return {state:'login',entries:[]};
+ if(game.source==='personal')return {state:'personal',entries:[]};
+ if(game.source==='family'){
+  if(!family)return {state:'pending',entries:[]};
+  if(game.id==='plates'&&!family.plateAccess)return {state:'restricted',entries:[]};
+  const data=family.games?.[game.key];
+  return data?{state:'verified',entries:data.entries,unit:game.unit}:{state:'pending',entries:[]};
+ }
+ if(game.source==='retro'){
+  if(!retro)return {state:'pending',entries:[]};
+  return {state:'verified',entries:sanitizeEntries(
+   (retro.leaders?.[game.id]||[]).map(entry=>({...entry,score:entry.best})))};
+ }
+ return extra[game.id]||{state:'pending',entries:[]};
+}
+function sourceText(state){
+ return ({login:'Sign in to view',pending:'Checking saved results',verified:'Server verified',
+  restricted:'Private game scores',personal:'Progress inside game'})[state]||'Not available';
+}
 function build(){
  root=el('section','family-fun-scoreboard family-fun-single');
  root.id='arcade-family-fun';
- root.setAttribute('aria-label','FAMILY FUN High Scores and Game Unlockables');
- const head=el('header','family-fun-heading');
- head.append(el('div','family-fun-stars','★ ✦ ★ ✧ ★'),
-  el('h2','family-fun-marquee','FAMILY FUN'),
-  el('p','family-fun-subtitle','ARCADE SCOREBOARD · TROPHIES · GAME UNLOCKABLES'));
- const banner=el('div','family-fun-score-light');
- banner.append(el('strong','','★ FAMILY HIGH SCORES ★'),
-  el('span','','ONE CABINET · TWO ORIGINAL GAMES'));
- const tabs=el('nav','family-fun-tabs');tabs.setAttribute('aria-label','Choose scoreboard game');
- for(const g of GAMES){
-  const b=el('button','family-fun-tab',g.name);b.type='button';
-  b.dataset.familyFunGame=g.id;
-  b.addEventListener('click',()=>{selected=g.id;render();});
-  tabs.append(b);
+ root.setAttribute('aria-label','FAMILY FUN unified arcade marquee and game scores');
+ const heading=el('header','family-fun-heading');
+ const badge=el('div','family-fun-brand');
+ badge.append(el('span','family-fun-cabinet-sign','★ FAMILY FUN ★'),
+  el('small','family-fun-subtitle','ONE FAMILY ARCADE · ALL GAMES'));
+ const controls=el('div','family-fun-controls');
+ const picker=el('select','family-fun-picker');picker.id='family-fun-game-picker';
+ picker.setAttribute('aria-label','Choose game to view family scores');
+ for(const game of [{id:'all',name:'All games'},...FAMILY_FUN_GAMES]){
+  const option=el('option','',game.name);option.value=game.id;picker.append(option);
  }
- const leaders=el('section','family-fun-leaders');leaders.setAttribute('aria-label','Family rankings');
- const trophies=el('section','family-fun-achievements');trophies.setAttribute('aria-label','Trophies and cosmetics');
- const actions=el('div','family-fun-actions');
- const button=el('button','family-fun-play');button.type='button';
- button.addEventListener('click',()=>document.getElementById(GAMES.find(g=>g.id===selected)?.toggle)?.click());
- actions.append(button);
- const status=el('p','family-fun-status');status.setAttribute('role','status');
- root.append(head,banner,tabs,leaders,trophies,actions,
-  el('p','family-fun-provenance','VERIFIED RESULTS ONLY · REWARDS ARE GAME-SPECIFIC · FAMILY MEMBERS ONLY'),status);
+ picker.addEventListener('change',()=>{selected=picker.value;render();});
+ const home=el('button','family-fun-home','All games');home.type='button';
+ home.addEventListener('click',()=>{selected='all';render();});
+ controls.append(picker,home);heading.append(badge,controls);
+ const content=el('div','family-fun-content');
+ const footer=el('div','family-fun-footer');
+ const play=el('button','family-fun-play','PLAY');play.type='button';
+ play.addEventListener('click',()=>{
+  const game=FAMILY_FUN_GAMES.find(g=>g.id===selected);
+  if(!game)return;
+  const launch=$(game.toggle);
+  if(launch&&!launch.disabled&&!document.getElementById('conversations')?.hidden)launch.click();
+ });
+ const status=el('span','family-fun-status');status.setAttribute('role','status');
+ footer.append(status,play);
+ root.append(heading,content,footer);
 }
 function dock(){
  if(!root)return;
- const main=document.getElementById('conversations')?.querySelector('.community-main');
- const menuView=hostMenu?.querySelector('#arcade-menu-view');
- const showMenu=Boolean(hostMenu&&!hostMenu.hidden&&menuView&&!menuView.hidden);
- const target=showMenu?menuView:main;
+ const board=$('conversations'),view=hostMenu?.querySelector('#arcade-menu-view');
+ const showMenu=Boolean(hostMenu&&!hostMenu.hidden&&view&&!view.hidden);
+ const target=showMenu?view:board;
  if(!target)return;
  if(root.parentElement!==target||target.firstElementChild!==root)target.prepend(root);
  root.classList.toggle('family-fun-in-menu',showMenu);
@@ -53,9 +103,7 @@ function dock(){
 export function mountFamilyFun(menu){
  hostMenu=menu;
  if(!root)build();
- // Only move the SINGLE scoreboard when the game-selection menu is visible.
- // Its authenticated snapshot, selection, and focusable controls are not cloned.
- if(!menu?.dataset.familyFunDockObserver){
+ if(menu&&!menu.dataset.familyFunDockObserver){
   menu.dataset.familyFunDockObserver='1';
   const observer=new MutationObserver(dock);
   observer.observe(menu,{attributes:true,attributeFilter:['hidden']});
@@ -64,66 +112,113 @@ export function mountFamilyFun(menu){
  }
  dock();render();
 }
+function renderAll(content){
+ const intro=el('p','family-fun-intro','Each title keeps its own verified score rules. Select one for standings and rewards.');
+ content.append(intro);
+ const rows=el('div','family-fun-all-games');
+ for(const game of FAMILY_FUN_GAMES){
+  const info=getData(game),leader=info.entries[0];
+  const card=el('button','family-fun-game-chip');
+  card.type='button';card.dataset.familyFunGame=game.id;
+  card.setAttribute('aria-label',game.name+', '+(leader?'leader '+leader.name+', '+Number(leader.score).toLocaleString()+' '+game.unit:sourceText(info.state)));
+  const name=el('strong','',game.mark+' '+game.name);
+  const score=el('span','',leader?leader.name+' · '+Number(leader.score).toLocaleString():sourceText(info.state));
+  card.append(name,score);
+  card.addEventListener('click',()=>{selected=game.id;render();});
+  rows.append(card);
+ }
+ content.append(rows);
+}
+function renderGame(content,game){
+ const info=getData(game);
+ const head=el('div','family-fun-game-head');
+ head.append(el('strong','',game.mark+' '+game.name),
+  el('span','family-fun-verified',sourceText(info.state)));
+ content.append(head);
+ if(info.state==='verified'&&info.entries.length){
+  const rows=el('ol','family-fun-podium');
+  for(const [index,entry] of info.entries.slice(0,5).entries()){
+   const item=el('li','family-fun-row'+(index===0?' is-first':''));
+   item.append(el('b','family-fun-rank','#'+entry.rank),
+    el('span','family-fun-player',entry.name+(entry.mine?' (you)':'')),
+    el('strong','family-fun-points',Number(entry.score).toLocaleString()+' '+game.unit));
+   rows.append(item);
+  }
+  content.append(rows);
+ }else{
+  const message=info.state==='verified'?'No verified family results yet. Be the first to play.':
+   info.state==='personal'?'This activity has no comparable family ranking. Open the game for saved progress.':
+   info.state==='restricted'?'This game has separate member permissions. No scores are exposed here.':
+   info.state==='login'?'Approved family sign-in is required.':'Rankings will appear when the game server responds.';
+  content.append(el('p','family-fun-empty',message));
+ }
+ if(game.source==='retro'&&member){
+  const details=el('details','family-fun-rewards');
+  details.append(el('summary','','Trophies & game-specific gear'));
+  const earned=new Set(retro?.trophies?.[game.id]||[]);
+  const trophies=el('div','family-fun-milestones');
+  for(const level of ['first-run','bronze','silver','gold','legendary'])
+   trophies.append(el('span','family-fun-medal'+(earned.has(level)?' earned':''),
+    (earned.has(level)?'★ ':'◇ ')+level.replace('-',' ').toUpperCase()));
+  details.append(trophies);
+  const gear=el('div','family-fun-gear');
+  for(const item of retroUnlocks(game.id)){
+   const unlocked=item.need===null||earned.has(item.need);
+   const equipped=(retro?.equipped?.[game.id]||retroUnlocks(game.id)[0]?.id)===item.id;
+   const button=el('button','family-fun-gear-card'+(equipped?' is-equipped':''));
+   button.type='button';button.disabled=!retro||!unlocked;
+   button.dataset.familyFunUnlock=item.id;button.setAttribute('aria-pressed',String(equipped));
+   button.append(el('strong','',item.name),el('span','',item.description),
+    el('small','',!retro?'CHECKING OWNERSHIP':!unlocked?'LOCKED · '+item.need.toUpperCase():
+      equipped?'EQUIPPED ✓':'EQUIP'));
+   button.addEventListener('click',()=>window.dispatchEvent(new CustomEvent('family-retro-equip-request',{
+    detail:{game:game.id,id:item.id}
+   })));
+   gear.append(button);
+  }
+  details.append(gear);content.append(details);
+ }else if(member){
+  content.append(el('p','family-fun-reward-hint','Achievements and equipment remain in their own game until their verified reward feed is linked.'));
+ }
+}
 function render(){
  if(!root)return;
- const game=GAMES.find(g=>g.id===selected)||GAMES[0];
- for(const b of root.querySelectorAll('[data-family-fun-game]'))
-  b.setAttribute('aria-pressed',String(b.dataset.familyFunGame===selected));
- const leaders=root.querySelector('.family-fun-leaders');leaders.replaceChildren();
- const title=el('div','family-fun-board-heading');
- title.append(el('strong','',game.name.toUpperCase()+' · VERIFIED FAMILY RANKINGS'),
-  el('small','','RANK / MEMBER / POINTS'));
- leaders.append(title);
- const list=snapshot?.leaders?.[game.id]||[],podium=el('div','family-fun-podium');
- if(!snapshot)podium.append(el('p','family-fun-empty','SIGN IN AS AN APPROVED MEMBER TO VIEW SCORES'));
- else if(!list.length)podium.append(el('p','family-fun-empty','NO VERIFIED SCORES YET · BE FIRST TO PLAY'));
- else for(const [i,p] of list.slice(0,5).entries()){
-  const row=el('div','family-fun-row'+(i===0?' is-first':''));
-  row.append(el('b','family-fun-rank',i===0?'★ 1':'# '+(i+1)),
-   el('span','family-fun-player',String(p.name||'Family player').slice(0,48)),
-   el('strong','family-fun-points',Number(p.best||0).toLocaleString('en-US')),
-   el('small','family-fun-tag','VERIFIED'));podium.append(row);
- }
- leaders.append(podium);
- const achievements=root.querySelector('.family-fun-achievements');achievements.replaceChildren();
- achievements.append(el('strong','family-fun-milestone-title',game.name.toUpperCase()+' · TROPHIES & UNLOCKABLES'));
- const earned=new Set(snapshot?.trophies?.[game.id]||[]);
- const strip=el('div','family-fun-milestones');
- for(const trophy of ['first-run','bronze','silver','gold','legendary']){
-  const got=earned.has(trophy);
-  strip.append(el('span','family-fun-medal'+(got?' earned':''),
-   (got?'★ ':'◇ ')+(trophy==='first-run'?'FIRST RUN':trophy.toUpperCase())));
- }
- achievements.append(strip);
- const gear=el('div','family-fun-gear');
- const equipped=snapshot?.equipped?.[game.id]||retroUnlocks(game.id)[0].id;
- for(const item of retroUnlocks(game.id)){
-  const unlocked=item.need===null||earned.has(item.need);
-  const card=el('button','family-fun-gear-card'+(equipped===item.id?' is-equipped':''));
-  card.type='button';
-  card.disabled=!snapshot||!unlocked;
-  card.dataset.familyFunUnlock=item.id;
-  card.setAttribute('aria-pressed',String(equipped===item.id));
-  card.append(el('strong','',item.name),
-   el('span','',item.description),
-   el('small','',!snapshot?'SIGN IN TO EQUIP':!unlocked?'LOCKED · '+item.need.toUpperCase()+' TROPHY':
-     equipped===item.id?'EQUIPPED ✓':'EQUIP · '+item.type));
-  card.addEventListener('click',()=>window.dispatchEvent(new CustomEvent('family-retro-equip-request',
-   {detail:{game:game.id,id:item.id}})));
-  gear.append(card);
- }
- achievements.append(gear);
- root.querySelector('.family-fun-play').textContent='PLAY '+game.name.toUpperCase();
- root.querySelector('.family-fun-status').textContent=snapshot?
-  'Verified trophies unlock these cosmetics in this game; equipped style is stored on this device.':
-  'Your family scores and unlocks appear after approved member sign-in.';
+ const picker=root.querySelector('.family-fun-picker');
+ picker.value=selected;
+ root.querySelector('.family-fun-home').hidden=selected==='all';
+ const content=root.querySelector('.family-fun-content');content.replaceChildren();
+ const game=FAMILY_FUN_GAMES.find(g=>g.id===selected);
+ if(game)renderGame(content,game);else renderAll(content);
+ const linked=FAMILY_FUN_GAMES.filter(g=>getData(g).state==='verified').length;
+ root.querySelector('.family-fun-status').textContent=member?
+  linked+' of '+FAMILY_FUN_GAMES.length+' game rankings connected · saved results only':
+  'Member-only standings · no public scores';
+ const play=root.querySelector('.family-fun-play');
+ play.hidden=!game;
+ if(game){play.textContent='PLAY '+game.name;play.disabled=!$(game.toggle);}
 }
-window.addEventListener('family-retro-scoreboard',event=>{
- const data=event.detail;if(!data?.leaders||!data?.trophies)return;
- snapshot=data;render();
+window.addEventListener('family-unified-scoreboard',event=>{
+ const d=event.detail;if(!freshOwner(d?.member)||!d?.games)return;
+ const games={};
+ for(const [key,info] of Object.entries(d.games)){
+  if(info&&typeof info==='object')games[key]={entries:sanitizeEntries(info.entries)};
+ }
+ family={games,plateAccess:Boolean(d.plateAccess),at:d.asOf||null};render();
 });
-window.addEventListener('family-retro-scoreboard-clear',()=>{snapshot=null;render();});
+window.addEventListener('family-unified-scoreboard-clear',clearAll);
+window.addEventListener('family-retro-scoreboard',event=>{
+ const d=event.detail;if(!freshOwner(d?.member)||!d?.leaders||!d?.trophies)return;
+ retro=d;render();
+});
+window.addEventListener('family-retro-scoreboard-clear',clearAll);
+window.addEventListener('family-arcade-game-rankings',event=>{
+ const d=event.detail;
+ if(!freshOwner(d?.member)||!['dashforge','skyboard'].includes(d?.game))return;
+ extra[d.game]={state:'verified',entries:sanitizeEntries(d.entries)};
+ render();
+});
 window.addEventListener('family-retro-gear-changed',event=>{
- if(!snapshot||!event.detail?.game)return;
- snapshot={...snapshot,equipped:{...snapshot.equipped,[event.detail.game]:event.detail.id}};render();
+ if(!retro||!event.detail?.game)return;
+ retro={...retro,equipped:{...retro.equipped,[event.detail.game]:event.detail.id}};
+ render();
 });
