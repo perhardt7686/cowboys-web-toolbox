@@ -14,10 +14,10 @@ const bossSQL=read('supabase/migrations/20261115053001_dash_forge_shared_boss_ar
 const revisionSQL=read('supabase/migrations/20261115053002_dash_forge_boss_creator_exact_revision_playtest.sql');
 const ascensionSQL=read('supabase/migrations/20261115053003_dash_forge_unique_ascended_boss_identities.sql');
 
-test('Eleven family games have distinct functional starting menus, not one reused mockup',()=>{
- const expected=['skyboard','fleet','maze','streetrod','dashforge','mahjong','wordle','wordquest','plates','drawing','study'];
+test('Thirteen family games have distinct functional starting menus, not one reused mockup',()=>{
+ const expected=['skyboard','galaga','pacman','centipede','topgear','streetrod','dashforge','mahjong','wordle','wordquest','plates','drawing','study'];
  assert.deepEqual(Object.keys(titleProfiles),expected);
- assert.equal(new Set(expected.map(id=>titleProfiles[id].name)).size,11);
+ assert.equal(new Set(expected.map(id=>titleProfiles[id].name)).size,13);
  assert.equal(new Set(expected.map(id=>titleProfiles[id].scene)).size,11);
  for(const id of expected){
   const markup=titleMarkup(id);
