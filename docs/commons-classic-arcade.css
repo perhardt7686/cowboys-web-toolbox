@@ -84,7 +84,7 @@ body.community-page .classic-score-row{display:flex;justify-content:space-betwee
  border:1px solid #6e779e;padding:9px;border-radius:6px;font-size:12px;overflow-wrap:anywhere}
 body.community-page .classic-score-row span{color:#ffdf98;text-align:right}
 body.community-page .classic-legacy{font-size:12px}
-body.community-page #star-squadron-root,body.community-page #mystery-maze-root{display:none!important}
+body.community-page.classic-arcade-ready #star-squadron-root,body.community-page.classic-arcade-ready #mystery-maze-root{display:none!important}
 @media(max-width:390px){
  body.community-page .classic-control-deck{gap:5px;padding:7px 4px}
  body.community-page .classic-stick{flex-basis:105px}
