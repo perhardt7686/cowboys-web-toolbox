@@ -42,7 +42,7 @@ test('original family arcade games remain playable, with score backend intact',(
 test('One FAMILY FUN marquee includes every family game with verified per-title rankings',()=>{
  assert.match(fun,/FAMILY FUN/);
  assert.match(fun,/ONE FAMILY ARCADE/);
- assert.match(fun,/VERIFIED RESULTS ONLY/);
+ assert.match(fun,/server-verified ranking slices/);
  assert.match(fun,/family-fun-in-menu/);
  assert.match(fun,/family-fun-single/);
  assert.match(fun,/arcade-family-fun/);
