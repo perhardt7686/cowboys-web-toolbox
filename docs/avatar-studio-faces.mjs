@@ -92,11 +92,11 @@ function makeScalp(head,hair,shine,style,key){
 // Original character-family signatures are deliberately distinct at 48px.
 const FACE_CONTOURS=Object.freeze({
   oval:    {brow:1,    cheek:1,    jaw:1,    chin:1},
-  angular: {brow:1.06, cheek:1.035,jaw:1.045,chin:.92},
+  angular: {brow:1.06, cheek:1.062,jaw:1.015,chin:.86},
   round:   {brow:1.095,cheek:1.095,jaw:1.105,chin:1.14},
-  square:  {brow:1.04, cheek:1.045,jaw:1.115,chin:1.24},
-  long:    {brow:.99,  cheek:.975,jaw:.905,chin:.81},
-  heart:   {brow:1.095,cheek:1.07, jaw:.935,chin:.82}
+  square:  {brow:1.052,cheek:1.045,jaw:1.135,chin:1.29},
+  long:    {brow:.99,  cheek:.955,jaw:.875,chin:.76},
+  heart:   {brow:1.110,cheek:1.08, jaw:.900,chin:.76}
 });
 export function faceSilhouetteRings(face='oval',jawTune=0){
   const [w,h,baseJaw]=HEAD_SHAPES[face]||HEAD_SHAPES.oval;
