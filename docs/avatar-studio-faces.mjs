@@ -88,14 +88,26 @@ function makeScalp(head,hair,shine,style,key){
   }
 }
 
-function faceRings(shape){
-  const [w,h,jaw]=shape;
+// Relative changes to the outer skin shell, not the eye/gear sockets.
+// Original character-family signatures are deliberately distinct at 48px.
+const FACE_CONTOURS=Object.freeze({
+  oval:    {brow:1,    cheek:1,    jaw:1,    chin:1},
+  angular: {brow:1.06, cheek:1.035,jaw:1.045,chin:.92},
+  round:   {brow:1.095,cheek:1.095,jaw:1.105,chin:1.14},
+  square:  {brow:1.04, cheek:1.045,jaw:1.115,chin:1.24},
+  long:    {brow:.99,  cheek:.975,jaw:.905,chin:.81},
+  heart:   {brow:1.095,cheek:1.07, jaw:.935,chin:.82}
+});
+export function faceSilhouetteRings(face='oval',jawTune=0){
+  const [w,h,baseJaw]=HEAD_SHAPES[face]||HEAD_SHAPES.oval;
+  const {brow,cheek,jaw,chin}=FACE_CONTOURS[face]||FACE_CONTOURS.oval;
+  const lowerJaw=baseJaw*(1+jawTune*.069)*jaw;
   return [
-    [-.278*h,.037,.065,0,.033],[-.262*h,.116*jaw*w,.104,0,.044],
-    [-.207*h,.159*jaw*w,.141,0,.027],[-.155*h,.188*jaw*w,.163,0,.016],
-    [-.08*h,.218*w,.181],[-.015*h,.229*w,.191],
-    [.051*h,.229*w,.192],[.12*h,.224*w,.186],
-    [.186*h,.197*w,.156,0,-.008],[.242*h,.136*w,.109,0,-.012],
+    [-.278*h,.037*chin,.065,0,.033],[-.262*h,.116*lowerJaw*w,.104,0,.044],
+    [-.207*h,.159*lowerJaw*w,.141,0,.027],[-.155*h,.188*lowerJaw*w,.163,0,.016],
+    [-.08*h,.218*w*cheek,.181],[-.015*h,.229*w*cheek,.191],
+    [.051*h,.229*w*brow,.192],[.12*h,.224*w*brow,.186],
+    [.186*h,.197*w*brow,.156,0,-.008],[.242*h,.136*w*brow,.109,0,-.012],
     [.276*h,.065*w,.06,0,-.019],[.29*h,.001,.001,0,-.026]
   ];
 }
@@ -541,7 +553,7 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
   const shape=(HEAD_SHAPES[v.face]||HEAD_SHAPES.oval).slice();
   shape[2]*=1+jawTune*.069;
   const [w,h,jaw]=shape;
-  const rings=faceRings(shape);
+  const rings=faceSilhouetteRings(v.face,jawTune);
   shell(head,tone,rings,{segments:48,warp([x,y,z],angle){
     return [x,y,z+skinRelief(y,angle)];
   }});
