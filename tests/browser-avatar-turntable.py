@@ -29,7 +29,7 @@ async def verify(browser, phone=False):
     await expect(canvas).to_have_attribute('data-angle', '0')
     await expect(turn.get_by_role('button', name='Rotate left')).to_be_visible()
     assert await canvas.evaluate('n => n.height >= 220 && n.width >= 230')
-    await expect(canvas).to_have_attribute('data-renderer', '3d', timeout=15000)
+    await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel', timeout=15000)
     backend = await canvas.get_attribute('data-backend')
     signatures = set()
     for angle in range(0, 360, 45):
