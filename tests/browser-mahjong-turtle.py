@@ -13,6 +13,7 @@ URL='http://127.0.0.1:8765/community.html?preview=1&role=member'
 async def install_fixture(page):
     await page.goto(URL,wait_until='domcontentloaded',timeout=30000)
     await page.evaluate("""async()=>{
+      document.body.classList.remove('arcade-ready');
       const old=document.getElementById('mahjong-root'); if(old)old.remove();
       const root=document.createElement('section'); root.id='mahjong-root'; root.className='mahjong-game';
       root.style.cssText='box-sizing:border-box;width:min(100%,950px);max-width:100%;padding:10px;margin:10px auto;background:#fffaf1;';
@@ -44,9 +45,23 @@ async def main():
     await expect(page.locator('#mahjong-root')).to_have_attribute('data-mahjong-mode','turtle')
     await expect(page.locator('.turtle-tile')).to_have_count(144)
     assert await page.locator('#turtle-remaining').inner_text()=='144 tiles remain'
-    debug=await page.evaluate("""()=>{const el=document.querySelector('#turtle-zoom-in');let n=el;const out=[];while(n&&out.length<12){const st=getComputedStyle(n);out.push({id:n.id,tag:n.tagName,cls:n.className,hidden:n.hidden,display:st.display,visibility:st.visibility,width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height});n=n.parentElement;}return out;}""")
-    print('TURTLE BUTTON DEBUG',width,debug,flush=True)
     assert await page.locator('#turtle-zoom-in').is_visible()
+    # Simulate the real family Arcade compositor. It hides all game children
+    # unless this mode's explicit CSS override exposes them.
+    await page.evaluate("""()=>{
+      document.body.classList.add('arcade-ready','arcade-on');
+      document.documentElement.classList.add('arcade-on');
+      document.body.dataset.arcadeGame='mahjong';
+      document.body.dataset.arcadeScene='play';
+      document.getElementById('mahjong-root').classList.add('arcade-game-active');
+    }""")
+    assert await page.locator('#turtle-zoom-in').is_visible(),'Turtle must be playable in real Arcade mode'
+    await page.evaluate("""()=>{
+      document.body.classList.remove('arcade-ready','arcade-on');
+      document.documentElement.classList.remove('arcade-on');
+      delete document.body.dataset.arcadeGame;delete document.body.dataset.arcadeScene;
+      document.getElementById('mahjong-root').classList.remove('arcade-game-active');
+    }""")
     assert await page.locator('#turtle-hint').is_visible()
     assert await page.locator('#turtle-board-scroll').evaluate('(el)=>el.scrollWidth>el.clientWidth'),'zoom should allow pan'
     # The default board is 144 tiles, built from all five vertical levels.
@@ -61,6 +76,7 @@ async def main():
     await expect(page.locator('#turtle-pause-screen')).to_be_visible()
     await page.reload(wait_until='domcontentloaded')
     await page.evaluate("""async()=>{
+      document.body.classList.remove('arcade-ready');
       const old=document.getElementById('mahjong-root');if(old)old.remove();
       const root=document.createElement('section');root.id='mahjong-root';root.className='mahjong-game';
       root.style.cssText='width:min(100%,950px);padding:10px;margin:10px auto;background:#fffaf1;';
