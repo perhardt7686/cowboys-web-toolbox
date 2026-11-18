@@ -17,7 +17,7 @@ test('Elliot owns the Dash Forge presentation, without renaming persistent game 
 });
 
 test('Dash Forge attempts and beat feedback are local visual-only features',()=>{
-  assert.match(dash, /id=\\"dash-attempt-count\\"/);
+  assert.match(dash, /id="dash-attempt-count"/);
   assert.match(dash, /attemptCount\+\+/);
   assert.match(dash, /e.code==='KeyR'/);
   assert.match(dash, /dashBeatAt\(r\)/);
