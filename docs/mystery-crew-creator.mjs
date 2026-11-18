@@ -1,5 +1,5 @@
 /* Mystery Crew Creator
- * New product and new visuals, intentionally independent of legacy Avatar Studio.
+ * New product and visuals, independent of the previous character creator.
  * Explicitly local-only user state; zero remote writes, no fake server awards.
  */
 const KEY='cowboy-mystery-crew-creator-v1';
