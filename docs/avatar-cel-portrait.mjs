@@ -223,7 +223,7 @@ function mysteryGarment(c,v,shirt){
    }
  }
 }
-function face(c,v,skin,hair,iris) {
+function face(c,v,skin,hair) {
   const shade=warmShade(skin);
   path(c,[70,112],[[51,100,49,118,54,135],[58,148,69,152,76,141]],skin);
   path(c,[60,119],[[67,113,70,130,65,133]],null,tint(shade,INK,.45),1.9);
@@ -256,55 +256,9 @@ function face(c,v,skin,hair,iris) {
   }
 }
 
-function expression(c,v,iris,skin) {
-  const shade=tint(warmShade(skin),INK,.47);
-  const [browY,browWidth]={soft:[100,3],straight:[103,3],bold:[99,4.8],arching:[94,3.3]}[v.brows];
-  path(c,[88,107],[[97,browY,114,103]],null,INK,browWidth);
-  path(c,[144,102],[[153,browY-4,169,100]],null,INK,browWidth);
-  const drawEye=(cx,cy,rx,ry)=>{
-    path(c,[cx-rx,cy+1],[[cx-rx*.38,cy-ry*1.4,cx+rx*.47,cy-ry*1.14,cx+rx,cy],
-      [cx+rx*.56,cy+ry*.8,cx-rx*.59,cy+ry,cx-rx,cy+1]],PAPER,INK,2);
-    oval(c,cx+3,cy-1,rx*.44,ry*.88,iris,INK,1.3,.13);
-    oval(c,cx+4,cy-1,2.65,4,'#24191e');
-    oval(c,cx+1.7,cy-3.6,1.55,1.55,'#fff8e5');
-  };
-  drawEye(101,122,13,9);
-  if(v.expression==='wink') path(c,[143,121],[[150,113,166,119]],null,INK,2.8);
-  else drawEye(155,118,12,8.4);
-  if(v.nose==='pointed'){
-    path(c,[134,116],[[134,125,143,134],[132,139],[126,135]],null,shade,2.4);
-  }else if(v.nose==='swoop'){
-    path(c,[134,114],[[140,126,145,129,140,134],[137,140,130,141]],null,shade,2.7);
-  }else if(v.nose==='straight'){
-    path(c,[135,114],[[132,127,134,132],[128,136,138,137]],null,shade,2.2);
-  }else{
-    path(c,[135,116],[[135,125,142,130,142,135],[140,139,134,141,128,138]],null,shade,2);
-    if(v.nose==='freckled')oval(c,140,136,5,2.8,'#b96f70aa',null);
-  }
-  path(c,[135,131],[[139,133,138,135]],null,warmLight(skin),1.4);
-  const paleLip=tint(skin,'#d88970',.36);
-  if(v.expression==='grin'){
-    path(c,[100,152],[[120,161,147,155,167,149],
-      [172,166,151,185,132,185],[111,183,102,168,100,152]],
-      '#6c3036',INK,2.65);
-    path(c,[108,155],[[132,163,149,156,164,153],
-      [158,166,130,171,108,162]],PAPER,null);
-    path(c,[92,146],[[95,155,101,160]],null,paleLip,2);
-    path(c,[167,143],[[173,152,172,159]],null,paleLip,2);
-  }else if(v.expression==='smile'||v.expression==='wink'){
-    path(c,[112,150],[[117,166,147,169,158,148]],null,INK,3);
-    path(c,[108,149],[[111,158,113,159]],null,paleLip,1.7);
-    path(c,[158,148],[[162,153,164,159]],null,paleLip,1.7);
-  }else if(v.expression==='smirk'){
-    path(c,[109,164],[[121,169,141,164,163,145]],null,INK,3.1);
-    path(c,[155,148],[[164,145,168,149]],null,paleLip,1.9);
-  }else if(v.expression==='curious'){
-    oval(c,138,159,7,9,'#793e45',INK,2,-.2);
-    path(c,[134,164],[[140,162,145,163]],null,'#d97c71',2);
-  }else{
-    path(c,[112,160],[[128,165,143,157,149,156]],null,shade,2.3);
-  }
-}
+// Eye, brow, nose and mouth painting lives exclusively in
+// paintMysteryExpression below. The obsolete pre-rig expression painter
+// was intentionally removed to prevent two competing face implementations.
 
 function basicHat(c,hat) {
   if(hat==='western'){
@@ -355,7 +309,7 @@ export function paintPortrait(c,v,colors,layer) {
   paintMysteryGarment(c,v,shirt);
   c.save();
   if(v.pose==='tilt'){c.translate(126,150);c.rotate(-.12);c.translate(-126,-150);}
-  face(c,v,skin,hair,eyes);
+  face(c,v,skin,hair);
   if(!layer('hair')){
     if(SPECIAL_HAIR_STYLES.includes(v.style))paintMysteryHair(c,v.style,hair);
     else frontHair(c,v.style,hair);
