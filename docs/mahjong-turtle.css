@@ -84,3 +84,37 @@ body.community-page .turtle-guide-tile small{font:650 9px/1.1 system-ui,sans-ser
 @media(max-width:720px){body.community-page .turtle-heading{align-items:flex-start}body.community-page .turtle-authentic{font-size:10px;padding:7px}body.community-page .turtle-bottom{grid-template-columns:1fr}body.community-page .turtle-face-guide{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media(max-width:410px){body.community-page .turtle-options label{flex:1 1 100%}body.community-page .turtle-options button{min-width:0}body.community-page .turtle-board-tools{gap:5px}body.community-page .turtle-board-tools button{padding:6px 8px}body.community-page .turtle-board-tools span{flex-basis:100%;text-align:center}body.community-page .turtle-hud{gap:5px;padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){body.community-page .turtle-tile{transition:none!important}body.community-page .turtle-board-scroll{scroll-behavior:auto!important}}
+
+/* Arcade's one-screen compositor hides all direct Mahjong children by default.
+ * Keep the game selector available, then show only the active game mode.
+ * Specificity intentionally exceeds commons-arcade-shell.css scene selectors. */
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-inside > .turtle-mode-tabs{
+ display:grid!important;flex:0 0 auto!important;gap:5px;margin:1px 0 5px;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-inside > .turtle-mode-tabs button{
+ min-height:44px;padding:5px 8px;font-size:12px;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-inside > .turtle-mode-tabs button small{font-size:9px;margin:2px 0 0}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-root[data-mahjong-mode="turtle"] #mahjong-inside > #mahjong-classic-root{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-height:0!important;max-height:100%!important;overflow:auto!important;
+ padding:2px 3px 12px!important;box-sizing:border-box!important;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-root[data-mahjong-mode="turtle"] #mahjong-inside > :is(.mahjong-game-zone,.mahjong-stats,.mahjong-campaign,.mahjong-history,.mahjong-bottom,.commons-score-ribbon){
+ display:none!important;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading{margin:0 0 5px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading h3{font-size:20px;margin:2px 0}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading p{display:none}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-authentic{display:none}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-modes{margin:1px 0 4px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-modes button{min-height:38px;font-size:12px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options{margin:3px 0;gap:5px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options select,
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options button{min-height:38px;height:38px;font-size:12px;padding:5px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-hud{padding:4px 6px;font-size:11px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-table{min-height:235px;padding:5px;display:flex;flex-direction:column}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-board-scroll{height:min(49dvh,470px);max-height:min(49dvh,470px);min-height:180px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions{margin:6px 0 0}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions button{min-height:42px;font-size:12px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-bottom{margin:10px 0}
