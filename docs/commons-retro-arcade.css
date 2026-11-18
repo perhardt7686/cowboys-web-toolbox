@@ -139,3 +139,44 @@ body.community-page .retro-gear-item:focus-visible{outline:3px solid #a4fff1;out
  body.community-page .retro-gear-grid{grid-template-columns:1fr}
  body.community-page .retro-gear-item{min-height:74px}
 }
+
+
+/* Four-way arcade stick for Mystery Maze. Spatial controls make short
+   buffered corner turns readable and reliable on portrait phones. */
+body.community-page .retro-controls[data-retro-game="maze"]{
+ display:grid;grid-template-columns:repeat(3,minmax(0,72px));
+ grid-template-rows:repeat(3,minmax(48px,auto));gap:4px;
+ justify-content:center;align-content:center;max-width:250px;
+}
+body.community-page .retro-controls[data-retro-game="maze"]::before{
+ content:"";grid-column:2;grid-row:2;align-self:center;justify-self:center;
+ width:30px;height:30px;border-radius:50%;
+ background:radial-gradient(circle at 30% 27%,#d1f9ec,#6099b5 60%,#394976);
+ border:3px solid #a6c9df;box-shadow:0 3px 0 #121529;
+ pointer-events:none;
+}
+body.community-page .retro-controls[data-retro-game="maze"] .retro-control{
+ min-width:48px;min-height:48px;padding:5px 3px;font-size:12px;
+ border-radius:14px;touch-action:none;
+}
+body.community-page .retro-controls[data-retro-game="maze"] [data-control="U"]{grid-column:2;grid-row:1}
+body.community-page .retro-controls[data-retro-game="maze"] [data-control="L"]{grid-column:1;grid-row:2}
+body.community-page .retro-controls[data-retro-game="maze"] [data-control="D"]{grid-column:2;grid-row:3}
+body.community-page .retro-controls[data-retro-game="maze"] [data-control="R"]{grid-column:3;grid-row:2}
+body.community-page .retro-controls[data-retro-game="fleet"]{
+ display:grid;grid-template-columns:repeat(3,minmax(74px,1fr));
+ gap:7px;max-width:360px;align-items:stretch;
+}
+body.community-page .retro-controls[data-retro-game="fleet"] [data-control="F"]{
+ border-color:#c1ffde;background:linear-gradient(145deg,#f7d08b,#ec8b8c);
+ color:#381d30;box-shadow:inset 0 3px 0 #fff8,0 3px 0 #17162c;
+}
+@media(max-width:350px){
+ body.community-page .retro-controls[data-retro-game="maze"]{
+  grid-template-columns:repeat(3,minmax(0,65px));gap:3px
+ }
+ body.community-page .retro-controls[data-retro-game="fleet"]{gap:4px}
+ body.community-page .retro-controls[data-retro-game="fleet"] .retro-control{
+  min-height:52px;padding-inline:3px;font-size:12px
+ }
+}
