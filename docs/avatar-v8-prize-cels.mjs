@@ -5,7 +5,14 @@ export const V8_ART_IDS=Object.freeze([
  'viking-battle-helmet','studio-observatory-coat','studio-observatory-telescope',
  'studio-rain-cape','studio-rain-boots','studio-workshop-visor',
  'studio-workshop-gloves','studio-tower-cape','studio-backlot-glasses',
- 'studio-backlot-flashlight','studio-rain-hound','studio-tower-gargoyle'
+ 'studio-backlot-flashlight','studio-rain-hound','studio-tower-gargoyle',
+ // Every remaining reward in the five established studio collections, plus the starter pet.
+ 'studio-observatory-pack','studio-observatory-moth','studio-observatory-scene',
+ 'studio-rain-lantern','studio-rain-scene',
+ 'studio-workshop-belt','studio-workshop-gremlin','studio-workshop-scene',
+ 'studio-tower-lantern','studio-tower-gloves','studio-tower-scene',
+ 'studio-backlot-compass','studio-backlot-jacket','studio-backlot-scene',
+ 'studio-attic-ghost'
 ]);
 const IDS=new Set(V8_ART_IDS),INK='#302b3b';
 function p(c,path,fill,stroke=INK,w=4){
@@ -93,6 +100,115 @@ export function paintV8RewardIcon(canvas,item){
       p(c,'M115 90 L130 88 123 102 Z','#e5c486');
       p(c,'M92 113 Q106 124 120 112',null,'#37475a',3);
       p(c,'M71 117 L55 140 78 138 M133 117 L152 140 129 139',null,'#4d6578',5);break;
+
+    // Collection 2: custom inkwork for every previously uncovered prize.
+    case 'studio-observatory-pack':
+      p(c,'M55 63 Q67 40 88 42 L136 51 Q149 58 149 83 L146 123 Q98 140 53 121 Z','#956e58');
+      p(c,'M67 69 Q109 80 140 69 L141 107 Q106 126 60 108 Z','#bc916d');
+      p(c,'M59 68 Q63 34 100 25 Q127 27 143 55',null,'#634f50',9);
+      p(c,'M71 88 L126 88 L114 101 81 100 Z','#ead2a5');
+      ellipse(c,99,99,5,5,'#d4b47e');break;
+    case 'studio-observatory-moth':
+      p(c,'M97 71 Q49 24 31 71 Q35 97 89 99 Z','#e9ba7b');
+      p(c,'M103 70 Q150 22 177 70 Q168 103 109 98 Z','#e8bc7c');
+      p(c,'M92 99 Q45 100 55 132 Q76 145 95 115 Z','#bb927c');
+      p(c,'M106 100 Q153 96 150 128 Q129 151 106 114 Z','#b89079');
+      ellipse(c,100,93,12,33,'#7d686b');
+      ellipse(c,64,77,14,12,'#7a8495');ellipse(c,140,76,14,12,'#798997');
+      p(c,'M95 67 Q85 41 74 42 M105 66 Q115 40 127 43',null,'#66515b',3);break;
+    case 'studio-observatory-scene':
+      p(c,'M25 136 L25 96 46 96 46 132 M169 136 L169 96 183 96 183 133',null,'#536879',7);
+      p(c,'M41 97 L160 97',null,'#c7af91',5);
+      p(c,'M65 133 L87 81 120 81 142 133 Z','#475f80');
+      p(c,'M83 81 L90 50 113 50 120 81 Z','#e0c5a3');
+      ellipse(c,103,48,32,17,'#a1b6bd');
+      ellipse(c,103,48,20,9,'#e6d2b5');
+      for(const [x,y] of [[39,29],[162,31],[59,54],[137,45]])ellipse(c,x,y,2.5,2.5,'#fff0bd',null);
+      p(c,'M20 140 L181 140',null,'#5b6882',8);break;
+    case 'studio-rain-lantern':
+      p(c,'M76 41 L126 41 138 111 63 111 Z','#b48b5a');
+      p(c,'M83 49 L121 49 125 100 74 100 Z','#f3d39b');
+      p(c,'M101 87 Q81 66 100 53 Q113 68 109 83 Z','#f4a154',null);
+      p(c,'M90 40 L90 28 Q101 16 113 28 L113 40',null,'#61545b',6);
+      p(c,'M56 112 L145 112 145 126 56 126 Z','#6f6470');
+      p(c,'M74 60 L119 60 M73 84 L124 84',null,'#99744f',2);break;
+    case 'studio-rain-scene':
+      p(c,'M20 38 L181 38 181 129 20 129 Z','#577d87');
+      p(c,'M18 73 L70 31 120 73 184 32',null,'#304e60',10);
+      p(c,'M41 133 L42 73 72 71 72 133 M119 133 L119 64 164 65 163 133',null,'#d4b48d',8);
+      p(c,'M25 146 Q106 125 183 146',null,'#88b6b1',9);
+      for(const x of [52,79,103,131,156])p(c,'M'+x+' 20 L'+(x-13)+' 51',null,'#b9d7d5',3);
+      ellipse(c,143,104,11,23,'#f0ca85',null);break;
+    case 'studio-workshop-belt':
+      p(c,'M20 77 Q98 50 181 81 L177 105 Q99 83 23 109 Z','#71525c');
+      p(c,'M80 68 L122 68 125 112 77 110 Z','#b89064');
+      p(c,'M90 77 L111 78 114 100 88 101 Z','#f2ddab');
+      ellipse(c,100,89,5,5,'#99714c');
+      for(const x of [38,55,148,167])ellipse(c,x,90,6,6,'#d2a86c');
+      p(c,'M35 96 L53 94 M146 94 L166 97',null,'#efd2a2',3);break;
+    case 'studio-workshop-gremlin':
+      p(c,'M42 76 L64 44 85 61 115 61 140 43 158 74 147 118 53 120 Z','#8aad8c');
+      p(c,'M64 47 L46 19 87 43 M136 43 L169 17 155 65 Z','#779c82');
+      ellipse(c,81,85,14,16,'#e8dfbe');ellipse(c,121,85,14,16,'#e8dfbe');
+      ellipse(c,83,87,5,8,'#314959',null);ellipse(c,120,87,5,8,'#314959',null);
+      p(c,'M86 106 Q99 117 116 105',null,'#503d48',4);
+      p(c,'M75 122 L58 141 83 135 M127 122 L143 141 118 135',null,'#60786d',5);
+      ellipse(c,102,53,12,11,'#d3a96b');break;
+    case 'studio-workshop-scene':
+      p(c,'M22 43 L177 43 182 134 21 134 Z','#ab7468');
+      p(c,'M36 61 L163 61',null,'#e2ba8c',7);
+      p(c,'M34 67 L34 130 M165 67 L165 130',null,'#694c55',6);
+      p(c,'M58 85 L92 85 92 120 58 120 Z','#dcc5a3');
+      p(c,'M114 90 L144 90 141 119 116 121 Z','#d2b48b');
+      ellipse(c,103,27,15,16,'#edd0a0');
+      p(c,'M103 43 L103 66',null,'#58545e',3);
+      for(const x of [65,88,124,151])ellipse(c,x,70,3,3,'#f1cf93',null);break;
+    case 'studio-tower-lantern':
+      p(c,'M65 48 L137 48 144 115 56 115 Z','#81728c');
+      p(c,'M81 56 L119 56 126 106 75 105 Z','#f0cda4');
+      p(c,'M90 105 Q80 74 101 60 Q120 76 110 104 Z','#e8a766',null);
+      p(c,'M73 46 Q74 21 100 21 Q128 19 129 47',null,'#6b5a72',6);
+      p(c,'M52 118 L147 118 142 128 58 128 Z','#665c78');
+      ellipse(c,100,39,5,5,'#edd9ad');break;
+    case 'studio-tower-gloves':
+      p(c,'M41 118 L41 61 Q39 37 49 40 L58 68 62 28 Q75 18 77 41 L78 70 85 40 Q98 32 99 54 L91 111 80 135 50 134 Z','#716479');
+      p(c,'M116 117 L121 56 Q124 37 133 45 L137 68 148 28 Q160 23 159 50 L165 88 162 126 147 135 120 130 Z','#826b8e');
+      p(c,'M49 110 L91 111 M122 114 L160 113',null,'#dcc09b',5);
+      for(const x of [61,72,141,154])ellipse(c,x,85,3,3,'#d2b690',null);break;
+    case 'studio-tower-scene':
+      p(c,'M28 129 L28 77 62 77 62 41 141 41 141 73 174 73 174 131 Z','#7c7993');
+      p(c,'M70 131 L70 70 127 70 127 131 Z','#bbc0b9');
+      p(c,'M84 131 L84 98 Q101 82 114 99 L114 131 Z','#4c586e');
+      p(c,'M31 72 L52 40 65 72 M141 73 L159 40 175 72',null,'#576579',7);
+      p(c,'M89 41 L89 22 112 22 112 41 Z','#d4b68f');
+      ellipse(c,102,27,8,7,'#f1d8a9');break;
+    case 'studio-backlot-compass':
+      ellipse(c,101,83,47,49,'#bc9460');
+      ellipse(c,101,83,36,37,'#ead6b2');
+      p(c,'M101 39 L112 80 101 128 91 80 Z','#555b72');
+      p(c,'M101 51 L110 82 101 80 Z','#d46d65',null);
+      p(c,'M66 84 L137 84 M101 48 L101 120',null,'#a38e79',2);
+      ellipse(c,101,83,7,7,'#675a69');
+      for(const [x,y] of [[101,30],[101,136],[48,83],[154,83]])ellipse(c,x,y,3.2,3.2,'#f5e8d1',null);break;
+    case 'studio-backlot-jacket':
+      p(c,'M69 40 L84 32 101 41 120 32 138 44 167 110 140 125 125 91 124 137 78 137 77 90 62 125 36 111 Z','#b55f5d');
+      p(c,'M83 42 L101 67 118 42 L107 137 96 137 Z','#f5e5ce');
+      p(c,'M54 72 L69 77 M133 77 L151 71',null,'#e2b394',4);
+      p(c,'M104 68 L104 128',null,'#6a4f59',3);
+      ellipse(c,110,96,3,3,'#ebc48d');ellipse(c,110,111,3,3,'#ebc48d');break;
+    case 'studio-backlot-scene':
+      p(c,'M22 48 L179 48 178 128 22 128 Z','#c78c77');
+      p(c,'M45 128 L45 83 75 83 75 128 M119 128 L119 68 161 68 161 128',null,'#e8bf98',9);
+      p(c,'M31 76 L89 40 180 73',null,'#66536c',10);
+      p(c,'M65 133 L65 95 105 95 105 134 Z','#597b80');
+      p(c,'M114 38 L143 19 170 39',null,'#d9b18a',5);
+      ellipse(c,147,33,9,9,'#fff0be',null);break;
+    case 'studio-attic-ghost':
+      p(c,'M57 116 Q42 52 95 37 Q150 36 145 111 L156 137 134 126 112 139 93 127 73 140 Z','#d7e4d9');
+      ellipse(c,82,91,10,14,'#3e5666');ellipse(c,121,91,10,14,'#3e5666');
+      ellipse(c,102,115,7,9,'#819b9e');
+      p(c,'M62 74 Q86 53 102 63 M109 62 Q128 52 144 73',null,'#f6f3db',4);
+      for(const [x,y] of [[51,40],[165,64],[35,116]])ellipse(c,x,y,4,4,'#e6e6c2',null);break;
   }
   c.restore();
   canvas.dataset.artPack='v8-ink';
