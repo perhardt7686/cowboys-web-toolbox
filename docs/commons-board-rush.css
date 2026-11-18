@@ -165,3 +165,21 @@ body.community-page #skyboard-root #skyboard-course-map button>span{color:#c8ebd
 @media(max-width:520px) and (orientation:portrait){
  body.community-page #skyboard-root canvas{aspect-ratio:1.52;object-fit:cover}
 }
+
+/* Race telemetry is visual-only. Official results still come from server-checked replays. */
+body.community-page #skyboard-root .skyboard-driving-hud{
+ position:absolute;left:10px;bottom:12px;display:flex;align-items:center;gap:6px;
+ flex-wrap:wrap;max-width:calc(100% - 20px);pointer-events:none;z-index:2;
+}
+body.community-page #skyboard-root .skyboard-driving-hud span{
+ display:inline-block;border:1px solid #d6faff;border-radius:7px;
+ background:#151e49e8;color:#fff5c5;padding:4px 7px;
+ font:900 clamp(10px,1.5vw,14px)/1.2 system-ui,sans-serif;
+ letter-spacing:.02em;text-shadow:0 1px #000b;
+}
+body.community-page #skyboard-root #skyboard-live-drive{color:#8bffe3}
+body.community-page #skyboard-root #skyboard-live-ghost{color:#c5e9ff}
+@media(max-width:680px){
+ body.community-page #skyboard-root .skyboard-driving-hud{left:5px;bottom:8px;gap:3px}
+ body.community-page #skyboard-root .skyboard-driving-hud span{font-size:9px;padding:3px 4px}
+}
