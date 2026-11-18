@@ -261,7 +261,7 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
 /* A short landscape phone must show the entire 4:3 DOS room, not just its
    bottom edge after the browser scrolls a long vertical workshop panel. */
 @media (orientation:landscape) and (max-height:550px) {
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-housing {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-housing {
     height:100%;
     min-height:0;
     overflow:hidden;
@@ -269,18 +269,18 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
     grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
     grid-template-rows:auto auto minmax(0,1fr) auto;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-header {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-header {
     grid-column:1/-1;
     grid-row:1;
     padding-block:4px;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-bank {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-bank {
     grid-column:1;
     grid-row:2;
     font-size:.78rem;
     padding-block:2px;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-screen {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-screen {
     grid-column:1;
     grid-row:3;
     align-self:center;
@@ -288,7 +288,7 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
     max-height:100%;
     margin-inline:auto;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-panel {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-panel {
     grid-column:2;
     grid-row:2 / 4;
     min-height:0;
@@ -296,10 +296,10 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
     overscroll-behavior:contain;
     padding:7px 8px;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-panel h3 {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-panel h3 {
     font-size:1rem;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-status {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-status {
     position:static;
     grid-column:1;
     grid-row:4;
@@ -307,13 +307,13 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
     padding:3px 8px;
     font-size:.78rem;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-tabs {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-tabs {
     grid-column:2;
     grid-row:4;
     padding:4px 6px;
     gap:3px;
   }
-  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-tabs button {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-tabs button {
     min-height:35px;
     padding:2px 4px;
     font-size:.75rem;
