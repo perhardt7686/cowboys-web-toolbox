@@ -5,6 +5,7 @@ import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,
 import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=workshop1';
 import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=workshop1';
 import {companionHomePosition} from './avatar-companion-fit.mjs?v=workshop1';
+import {equippedHeadwearWidth} from './avatar-equipment-fit.mjs';
 
 const BODY={
   detective:{height:1.045,width:.85},
@@ -408,6 +409,14 @@ export function buildAvatar(recipe){
   }else if(!mechanical)addGlasses(head,recipe.glasses==='none'&&recipe.accessory==='glasses'?'round':recipe.glasses,'#6b4948',false,gearFit);
   const headwear=cosmetics.hat||recipe.hat;
   const hat=studioHat(head,headwear,recipe.accessory);
+  if(hat&&!mechanical){
+    // Reward art keeps the original sculpt, but its brow fit follows each
+    // saved face profile instead of clipping through broad temples.
+    const fit=equippedHeadwearWidth(recipe.face,'hat');
+    hat.scale.x=fit;
+    hat.scale.z=1+(fit-1)*.65;
+    hat.userData.studioHeadwearFit=fit;
+  }
   const visor=(cosmetics.bodypart?.id==='carnival-visor-plate'||cosmetics.bodypart?.art==='visor')?controlVisor(head,rewardPigment(cosmetics.bodypart)):null;
   const arms=[arm(figure,-1,recipe,body,wardrobe,palette,materials,cosmetics.prop),
     arm(figure,1,recipe,body,wardrobe,palette,materials,cosmetics.offhand)];
