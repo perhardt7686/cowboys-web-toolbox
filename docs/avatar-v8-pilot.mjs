@@ -187,18 +187,6 @@ function swatches(title,key,values){
     '<button class="swatch" type="button" style="background:'+value+'" data-action="'+key+
     '" data-value="'+value+'" aria-label="'+title+' color '+(i+1)+'"'+selected(value,state[key])+'></button>').join('')+'</div></div>';
 }
-function card(item){
-  const isPet=item.slot==='companion';
-  const selectedItem=isPet?state.pet===item.id:state.equipped[item.slot]===item.id;
-  const fit=compatible(state.body,item);
-  return '<article class="reward-card'+(selectedItem?' is-selected':'')+'">'+
-    '<div class="art">'+itemArt(item)+'</div>'+
-    '<span class="mini-pill">'+safeName(item.tier)+' · Preview only</span>'+
-    '<strong>'+safeName(item.name)+'</strong>'+
-    '<small>'+safeName(isPet?'Companion':item.slot)+' · '+(fit?'Fits this character':'Different body required')+'</small>'+
-    '<button type="button" data-action="preview" data-value="'+item.id+'"'+
-    selectedItem?'': '';
-}
 function rewardCard(item){
   const isPet=item.slot==='companion';
   const chosen=isPet?state.pet===item.id:state.equipped[item.slot]===item.id;
