@@ -76,7 +76,7 @@ test('settings are member-authenticated and never replace verified control trace
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',file]));
  }
  assert.match(dash,/readControlChoice\(window\.localStorage,'dashforge',id/);
- assert.match(sky,/readControlChoice\(localStorage,'skyboard',id/);
+ assert.match(sky,/readControlChoice\(window\.localStorage,'skyboard',id/);
  assert.match(dash,/id="dash-touch-target"/);
  assert.match(sky,/id="skyboard-steering-choice"/);
  assert.match(dash,/id="dash-touch-reset"/);
