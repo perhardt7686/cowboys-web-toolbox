@@ -3,6 +3,7 @@
  * No copyrighted game assets, character likenesses, music or identical levels.
  */
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
+import {initialRetroV2,retroStepV2,RETRO_V2_RULES,fleetTargetsV2} from './retro-arcade-engine-v2.mjs?v=gameplay2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps2';
 import {retroStickDirection,retroStickOffset} from './retro-arcade-joystick.mjs?v=cabinet1';
@@ -20,6 +21,7 @@ const GAMES=[
 ];
 let client,user=null,mounted=false,overview={mine:[],trophies:[],leaders:[]};
 let current=null,actions='',ticker=null,working=false,activeScene='play',gameMode='';
+let selectedVersion={fleet:1,maze:1},v2Overview={mine:[],leaders:[]};
 const input=createRetroInput();
 const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
@@ -61,6 +63,8 @@ async function rpc(fn,args={}){
 function clearSharedScores(){
  scoreReadEpoch++;
  overview={mine:[],trophies:[],leaders:[]};
+ v2Overview={mine:[],leaders:[]};
+ selectedVersion={fleet:1,maze:1};
  requestedLooks={fleet:'patrol',maze:'scout'};
  window.dispatchEvent(new Event('family-retro-scoreboard-clear'));
 }
@@ -133,6 +137,40 @@ async function refresh(){
   for(const g of GAMES)paintScores(g.id);
   shareVerifiedScores();
  }catch(error){if(mounted&&user===owner&&!board.hidden&&epoch===scoreReadEpoch)status(error.message,'error');}
+}
+async function refreshV2(id){
+ if(!user||!mounted||board.hidden)return;
+ const owner=user;
+ try{
+  const result=await rpc('community_retro_state_v2');
+  if(!mounted||user!==owner||board.hidden)return;
+  v2Overview=result;
+  const mine=(result.mine||[]).find(p=>p.game===id);
+  const root=$(GAMES.find(g=>g.id===id)?.root);
+  const note=root?.querySelector('.retro-mode-note');
+  if(note)note.textContent='GAMEPLAY V2 · SEPARATE SCORES · BEST '+
+    Number(mine?.best||0).toLocaleString()+' · ROUNDS '+Number(mine?.runs||0);
+ }catch(error){
+  if(mounted&&user===owner&&!board.hidden&&selectedVersion[id]===2)
+    status('Gameplay V2 server not available yet. Classic V1 is still playable.','error');
+ }
+}
+function switchRetroVersion(id){
+ if(working||current||lifecycle.pendingGame())return;
+ selectedVersion[id]=selectedVersion[id]===1?2:1;
+ const ver=selectedVersion[id];
+ const root=$(GAMES.find(g=>g.id===id)?.root);
+ if(!root)return;
+ const mode=root.querySelector('.retro-mode');
+ mode.textContent=ver===2?'GAMEPLAY V2 · ACTIVE':'CLASSIC V1 · ACTIVE';
+ mode.setAttribute('aria-pressed',String(ver===2));
+ root.querySelector('.retro-begin').textContent=ver===2?'START VERIFIED V2':'Start verified round';
+ root.querySelector('.retro-mode-note').textContent=ver===2?
+   'V2 scores and rankings are separate. Classic trophies and high scores stay intact.':
+   'Classic V1 · Original family trophy road and verified scores.';
+ gameMode=id;
+ if(ver===2)void refreshV2(id);
+ else status('Classic V1 selected. Existing trophies and best scores remain available.');
 }
 function statsByGame(id){
  return overview.mine?.find(p=>p.game===id)||{game:id,runs:0,best:0,points:0,clears:0};
