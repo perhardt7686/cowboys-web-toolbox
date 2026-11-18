@@ -19,13 +19,14 @@ export function figureAt(recipe,angle,holding=[]){
     const busy=holding.includes(side);
     const hipPose=side===1&&['sleuth','detective','scout'].includes(model)&&!raised&&!busy;
     const leading=side===1?17:-8;
+    const relaxed=recipe.pose==='tilt'&&!busy&&design.family!=='robot'&&model!=='armor';
     const xy=(x,z)=>CENTER+view.at(x*side,z);
     const near=view.toward(side*design.shoulder,0);
     return {
       side,near,raised,busy,
       shoulder:{x:xy(design.shoulder-7,1),y:shoulder+8+view.arm*side*.24},
-      elbow:{x:xy(design.shoulder+(hipPose?20:5),raised?10:busy?17:5),y:raised?shoulder+63:hip-73},
-      hand:{x:xy(hipPose?design.waist+7:design.shoulder+9,raised?15:busy?25:6),y:raised?shoulder-3:busy?hip-63:hip+(hipPose?-47:3)},
+      elbow:{x:xy(design.shoulder+(hipPose?20:5)+(relaxed?(side===1?7:3):0),raised?10:busy?17:5),y:raised?shoulder+63:hip-73+(relaxed?(side===1?-8:4):0)},
+      hand:{x:xy((hipPose?design.waist+7:design.shoulder+9)+(relaxed?(side===1?11:3):0),raised?15:busy?25:6),y:raised?shoulder-3:busy?hip-63:hip+(hipPose?-47:3)+(relaxed?(side===1?-17:5):0)},
       thigh:{x:xy(design.hip*.49,2),y:hip-4},
       knee:{x:xy(design.hip*.63,leading*.4),y:hip+(487-hip)*.53},
       ankle:{x:xy(design.hip*.77,leading),y:488+(side===-1?-7:0)}
@@ -285,7 +286,8 @@ function bag(c,f,style,tone){
 
 export function paintFigure(c,f,v,colors,clothes,hold){
   const {view,limbs,model}=f;
-  const skin=model==='specter'?tint(colors.skin,'#79a285',.71):colors.skin;
+  const skin=model==='specter'?tint(colors.skin,'#79a285',.71):
+    model==='marsh'?tint(colors.skin,'#598e61',.74):colors.skin;
   const rear=view.across<-.33;
   const outer=clothes.outerwear;
   const coat=outer==='raincoat'||outer==='trench';
