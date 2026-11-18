@@ -314,12 +314,16 @@ function makeGame(game){
     stick.addEventListener(name,releaseStick);
   controls.append(stick);
  }
+ const mode=richButton('CLASSIC V1 · ACTIVE',()=>switchRetroVersion(game.id),'retro-mode');
+ mode.setAttribute('aria-pressed','false');
+ const modeNote=el('p','retro-mode-note',
+   'Classic V1 · Original family trophy road and verified scores.');
  const begin=richButton('Start verified round',()=>void start(game.id),'retro-begin');
  const end=richButton('Leave round',()=>abandon(),'retro-end');
  const notification=el('p','retro-status','Choose Start to play. Family trophies are awarded from server-verified results.');
  notification.setAttribute('role','status');
- const buttons=add(el('div','retro-actions'),begin,end);
- live.append(canvas,info,controls,buttons,notification);
+ const buttons=add(el('div','retro-actions'),mode,begin,end);
+ live.append(canvas,info,modeNote,controls,buttons,notification);
  const trophies=el('div','retro-trophies retro-panel-view');trophies.hidden=true;
  const leaders=el('div','retro-leaders retro-panel-view');leaders.hidden=true;
  display.append(live,trophies,leaders);
@@ -368,7 +372,7 @@ function tick(){
  if(!current||working)return;
  const action=actionForTick(current.game);
  actions+=action;
- try{current=retroStep(current,action);}catch(error){stopTimer();status(error.message,'error');return;}
+ try{current=current.version===2?retroStepV2(current,action):retroStep(current,action);}catch(error){stopTimer();status(error.message,'error');return;}
  renderGame(current);
  if(current.done){
   stopTimer();
@@ -380,26 +384,31 @@ async function start(id){
  if(current)abandon();
  const root=$(GAMES.find(g=>g.id===id)?.root);
  if(!root||root.querySelector('.retro-inside')?.hidden)return;
- const ticket=lifecycle.begin(id),owner=user;
+ const ticket=lifecycle.begin(id),owner=user,version=selectedVersion[id];
  working=true;gameMode=id;
  root.querySelector('.retro-begin').disabled=true;
+ root.querySelector('.retro-mode').disabled=true;
  // Leaving is allowed while a server start is pending.
  root.querySelector('.retro-end').disabled=false;
  status('Starting a verified family round…');
  try{
-  const received=await rpc('community_retro_start',{p_game:id});
+  const received=await rpc(version===2?'community_retro_start_v2':'community_retro_start',{p_game:id});
   // A delayed server response cannot resurrect a left/hidden/signed-out game.
   if(!lifecycle.matches(ticket))return;
   const visible=mounted&&user===owner&&!board.hidden&&root.isConnected&&
    !root.querySelector('.retro-inside')?.hidden&&!root.querySelector('.retro-live')?.hidden&&
    (!document.body.classList.contains('arcade-on')||document.body.dataset.arcadeGame===id);
   if(!visible){abandon();return;}
-  if(received.game!==id||!received.run_id)throw new Error('Unexpected game session');
-  runId=received.run_id;current=initialRetro(id,received.seed);
+  if(received.game!==id||!received.run_id||
+     (version===2&&received.version!==2))throw new Error('Unexpected game session version');
+  runId=received.run_id;
+  current=version===2?initialRetroV2(id,received.seed):initialRetro(id,received.seed);
   actions='';input.reset();confirmed='';
   renderGame(current);
   root.querySelector('.retro-canvas')?.focus({preventScroll:true});
-  status('Round underway. Score stays unverified until the server checks your full run.');
+  status(version===2?
+    'V2 underway. Three enemy roles and separate V2 rankings. Score needs verified V2 replay.':
+    'Round underway. Score stays unverified until the server checks your full run.');
   ticker=document.hidden?null:setInterval(tick,RETRO_GAME_RULES[id].interval);
  }catch(error){
   if(lifecycle.matches(ticket))status(error.message,'error');
@@ -408,6 +417,7 @@ async function start(id){
    lifecycle.clearPending(ticket);working=false;
    if(!current){
     root.querySelector('.retro-begin').disabled=false;
+    root.querySelector('.retro-mode').disabled=false;
     root.querySelector('.retro-end').disabled=true;
    }
   }
@@ -420,6 +430,7 @@ function abandon(){
  for(const g of GAMES){
   const root=$(g.root);if(!root)continue;
   root.querySelector('.retro-begin').disabled=false;
+  root.querySelector('.retro-mode').disabled=false;
   root.querySelector('.retro-end').disabled=true;
  }
  if(gameMode)status(couldStillVerify?
@@ -433,15 +444,18 @@ async function finish(){
  const snapshot=current,id=runId,trace=actions;
  status('Replaying your moves on the server. Do not close the game yet.');
  try{
-  const result=await rpc('community_retro_finish',{p_run_id:id,p_actions:trace});
+  const result=await rpc(snapshot.version===2?'community_retro_finish_v2':'community_retro_finish',{p_run_id:id,p_actions:trace});
   if(!lifecycle.matches(ticket))return;
   if(Number(result.score)!==Number(snapshot.score)||
      Number(result.lives)!==Number(snapshot.lives))
     throw new Error('The local preview differs from verified gameplay. No score has been claimed in this view.');
-  confirmed='SERVER VERIFIED · '+Number(result.score).toLocaleString()+' pts';
-  status(confirmed+' · '+(result.trophies||[]).join(', '),'success');
-  await refresh();
-  if(lifecycle.matches(ticket))
+  confirmed=(snapshot.version===2?'V2 SERVER VERIFIED · ':'SERVER VERIFIED · ')+
+    Number(result.score).toLocaleString()+' pts';
+  status(confirmed+(snapshot.version===2?' · separate V2 rankings':
+    ' · '+(result.trophies||[]).join(', ')),'success');
+  if(snapshot.version===2)await refreshV2(snapshot.game);
+  else await refresh();
+  if(lifecycle.matches(ticket)&&snapshot.version!==2)
    window.dispatchEvent(new Event('family-arcade-achievements-updated'));
  }catch(error){
   if(lifecycle.matches(ticket))
@@ -453,6 +467,7 @@ async function finish(){
    for(const g of GAMES){
     const root=$(g.root);if(!root)continue;
     root.querySelector('.retro-begin').disabled=false;
+    root.querySelector('.retro-mode').disabled=false;
     root.querySelector('.retro-end').disabled=true;
    }
   }
