@@ -34,6 +34,8 @@ export function enhanceMemberStudio(editor){
     fallback.textContent=classic?'V8 layout':'Classic layout';
     fallback.setAttribute('aria-pressed',String(classic));
     fallback.setAttribute('aria-label',classic?'Switch to V8 Avatar Studio layout':'Switch to classic Avatar Studio layout');
+    editor.dispatchEvent(new CustomEvent('avatar-v8-mode-changed'));
+
   });
   utilities.append(connected,fallback);
   banner.append(words,utilities);
