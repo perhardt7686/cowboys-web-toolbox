@@ -18,7 +18,7 @@ async def studio(page):
     if await award.is_visible():
         await award.click()
     canvas = form.locator('#family-avatar-canvas')
-    await expect(canvas).to_have_attribute('data-renderer', '3d', timeout=20000)
+    await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel', timeout=20000)
     await form.get_by_role('button', name='Rewards', exact=True).click()
     await form.get_by_role('heading', name='Collections').wait_for()
     return form, canvas
@@ -654,7 +654,7 @@ async def software_preview(chromium):
     browser = await chromium.launch(args=['--disable-webgl', '--disable-webgl2'])
     page = await browser.new_page(viewport={'width': 390, 'height': 844}, reduced_motion='reduce')
     form, canvas = await studio(page)
-    await expect(canvas).to_have_attribute('data-backend', 'canvas')
+    await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel')
     await form.get_by_role('button', name='Preview Midnight Carnival Workshop look').click()
     before = await pixels(canvas)
     await form.locator('.avatar-stage-preview-note').get_by_role('button', name='Sweep the visor').click()
