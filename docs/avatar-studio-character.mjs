@@ -4,6 +4,7 @@ import {BY_ID} from './avatar-reward-catalog.mjs?v=workshop1';
 import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
 import {addGlasses,controlVisor,sculptFace} from './avatar-studio-faces.mjs?v=workshop1';
 import {buildCompanion,heldItem,makeAura,rewardPigment,studioHat} from './avatar-studio-companions.mjs?v=workshop1';
+import {companionHomePosition} from './avatar-companion-fit.mjs?v=workshop1';
 
 const BODY={
   detective:{height:1.045,width:.85},
@@ -412,7 +413,16 @@ export function buildAvatar(recipe){
     arm(figure,1,recipe,body,wardrobe,palette,materials,cosmetics.offhand)];
   const props=arms.flatMap(arm=>arm.prop?[arm.prop]:[]);
   const pet=cosmetics.companion&&buildCompanion(cosmetics.companion);
-  if(pet){pet.root.position.set(.897,0,.242);pet.home=pet.root.position.clone();root.add(pet.root);}
+  if(pet){
+    // Measure the creature before it moves; broad wings and wide avatar
+    // silhouettes need a larger socket than the old fixed .897 offset.
+    const envelope=new THREE.Box3().setFromObject(pet.root);
+    const leftExtent=envelope.isEmpty()?.31:Math.max(.0,-envelope.min.x);
+    const home=companionHomePosition({bodyWidth:body.width,petLeftExtent:leftExtent});
+    pet.root.position.set(home.x,home.y,home.z);
+    pet.home=pet.root.position.clone();
+    root.add(pet.root);
+  }
   if(model==='marsh'){
     const tail=group(figure,0,1.16,-.16);
     stroke(tail,surface('#557760'),[[0,0,0],[-.09,-.20,-.29],[-.21,-.36,-.46],
