@@ -169,7 +169,7 @@ body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-pet-car
  border:1px solid #c2cdc2!important;border-radius:14px!important;background:#fffdf7!important;padding:12px;
 }
 body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-button:focus-visible,
-body.community-page .avatar-v8-pet-pick:focus-visible,
+body.community-page .avatar-v8-pet-pick:focus-visible{
  outline:3px solid #bf8d4c!important;outline-offset:2px;
 }
 @media(max-width:820px){
