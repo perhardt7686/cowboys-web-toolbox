@@ -5,7 +5,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .topbar{max-width:1280px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:23px clamp(15px,3vw,35px) 10px}
 .identity{display:flex;gap:13px;align-items:center}.identity strong{font:800 clamp(1.25rem,2vw,1.65rem)/1.2 system-ui;display:block;letter-spacing:-.02em}
 .eyebrow{display:block;font:800 .65rem/1.7 system-ui;letter-spacing:.17em;color:#a6c0c5}
-.brandmark{display:grid;place-items:center;width:43px;height:43px;border:2px solid #debd85;border-radius:14px;color:#f9ddb1;background:#2e4250;font:800 1.5rem 'Outfit'}
+.brandmark{display:grid;place-items:center;width:43px;height:43px;border:2px solid #debd85;border-radius:14px;color:#f9ddb1;background:#2e4250;font:800 1.5rem system-ui}
 .version{background:#c49a5b;color:#1c202b;padding:2px 7px;border-radius:6px;font-size:.62rem;vertical-align:middle;letter-spacing:.08em}
 .return-link{color:#f2dfc1;text-decoration:none;border:1px solid #687481;padding:10px 13px;border-radius:10px;white-space:nowrap;font-size:.86rem}
 .return-link:hover{background:#2b3e49}
@@ -17,7 +17,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .no-save::before{content:'';width:7px;height:7px;border-radius:50%;background:#f4c36e}
 .stage-card{grid-area:stage;border:1px solid #5b6d76;background:#1c2935;border-radius:23px;overflow:hidden;box-shadow:0 18px 50px #040d1840;align-self:start;position:sticky;top:10px}
 .stage-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 17px 9px}
-.stage-title{display:flex;flex-direction:column;gap:3px}.stage-title strong{font:800 1.02rem 'Outfit'}.stage-title span{font-size:.75rem;color:#b9c6c8}
+.stage-title{display:flex;flex-direction:column;gap:3px}.stage-title strong{font:800 1.02rem system-ui}.stage-title span{font-size:.75rem;color:#b9c6c8}
 .text-tools{display:flex;align-items:center;gap:6px}
 .icon-action{min-height:44px;min-width:44px;padding:5px 9px;border:1px solid #60717b;border-radius:11px;color:#e7d6c1;background:#293b46;font-weight:700}
 .icon-action:disabled{opacity:.36;cursor:not-allowed}
@@ -62,7 +62,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .reward-card .mini-pill{color:#855e31;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.035em}
 .pet-feature{border-radius:15px;background:linear-gradient(150deg,#334b56,#243a47);color:#fff0d9;padding:15px;display:grid;gap:10px}
 .pet-feature p{color:#d4dcdb;margin:0}
-.pet-feature strong{font:800 1.06rem 'Outfit'}
+.pet-feature strong{font:800 1.06rem system-ui}
 .pet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pet-actions button{border:1px solid #bdc8c0;background:#f8eedb;color:#334850;border-radius:10px;min-height:48px;font-weight:800}
 .pet-actions button:first-child{background:#efc58b;border-color:#efc58b}
