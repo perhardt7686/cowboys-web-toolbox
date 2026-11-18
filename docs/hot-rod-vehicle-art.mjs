@@ -445,6 +445,75 @@ function drawVan(sprite) {
   }
 }
 
+// Period-correct visual landmarks distinguish the car families at the 320x200
+// scale. These are independently drawn details, not extracted game sprites.
+function drawPeriodBodywork(sprite, profile, id, paint) {
+  const [dark,body,light,chrome] = paint;
+  const [rear,front] = profile.wheels;
+  // Rocker panel and lower door seam: stop at the wheel openings so every
+  // model retains its own wheelbase and outline.
+  if (front-rear>66) {
+    sprite.line(rear+19,60,front-19,60,dark);
+    sprite.line(rear+22,61,front-23,61,chrome);
+  }
+  // Separate chrome windscreen frames and roof gutters on sedans/hardtops.
+  if(profile.glass.length>1 && profile.trim!=='van'){
+    const windshield=profile.glass.at(-1);
+    const top=windshield[1]||windshield[0];
+    const foot=windshield.at(-1);
+    sprite.line(top[0]+1,top[1],foot[0]-1,foot[1]-1,chrome);
+    const roof=profile.shell.filter(([,y])=>y<24);
+    if(roof.length>2){
+      const start=roof[0],finish=roof.at(-1);
+      sprite.line(start[0]+4,start[1]+2,finish[0]-4,finish[1]+2,light);
+    }
+  }
+  // Prewar exposed hood sides, including individual cooling louvers.
+  if(['ford32','sedan32','master38','chevy40','roadster40','ford40'].includes(id)){
+    for(let x=front-41;x<=front-24;x+=5){
+      sprite.line(x,profile.waist+3,x+1,profile.waist+8,dark);
+      sprite.pixel(x+2,profile.waist+4,chrome);
+    }
+    sprite.line(front-45,profile.waist+1,front+11,profile.waist+1,light);
+  }
+  // Distinctive rear-quarter fin / chrome spear treatments of the 1950s.
+  if(['fairlane57','lancer55','fairlane55','belair55','impala58'].includes(id)){
+    sprite.trace([[6,profile.waist-4],[18,profile.waist+1],[40,profile.waist+3],[66,profile.waist+4]],chrome);
+    sprite.trace([[9,profile.waist-2],[19,profile.waist+3],[36,profile.waist+5]],dark);
+    sprite.box(8,profile.waist+5,4,2,12);
+  }
+  if(id==='fairlane57'){
+    // The 1957 Ford has high-pointed rear fins and a sweeping flank spear.
+    sprite.polygon([[4,31],[8,30],[16,35],[27,40],[14,40]],(x,y)=>x<13?light:body);
+    sprite.trace([[4,31],[8,30],[16,35],[27,40]],chrome);
+    sprite.trace([[29,44],[56,44],[87,43],[116,47]],light);
+  }
+  if(id==='vette56'||id==='vette61'){
+    // Side coves and scalloped chrome lips identify the two-seat Corvettes.
+    sprite.trace([[99,48],[111,46],[132,44],[167,44],[185,47]],chrome);
+    sprite.trace([[103,54],[116,57],[145,58],[168,54]],dark);
+    sprite.line(119,41,143,41,light);
+  }
+  if(id==='vette63'){
+    // Sting Ray's short front-fender vent cluster and long sculpted shoulder.
+    sprite.trace([[10,43],[58,39],[94,43],[138,44],[170,42],[228,41]],chrome);
+    for(const x of [151,155,159]) {
+      sprite.line(x,46,x-2,54,dark);
+      sprite.pixel(x+1,47,chrome);
+    }
+  }
+  if(id==='tbird57'||id==='roadster40'){
+    // Raised soft-top windscreen rail and low door cap of open cars.
+    sprite.trace([[121,23],[128,22],[144,35]],chrome);
+    sprite.line(72,39,115,39,light);
+  }
+  if(id==='mystery66'){
+    // The optional family finale retains its own color blocks and flower art.
+    sprite.line(13,12,163,12,chrome);
+    sprite.line(138,16,138,34,dark);
+  }
+}
+
 function drawWheel(sprite, x, r, part, whitewall, fitted) {
   const y = GROUND - r;
   const slick = part === 'tire-slick';
@@ -532,7 +601,7 @@ function drawDecal(sprite, decal, profile) {
   }
 }
 
-function vehicleSprite(profile, car, paint, frontWheel, rearWheel) {
+function vehicleSprite(profile, modelId, car, paint, frontWheel, rearWheel) {
   const sprite = new Sprite();
   const roof = points => car?.roof
     ? points.map(([x,y]) => [x,y < profile.waist-2 ? Math.round(y+(profile.waist-2-y)*0.28) : y])
@@ -558,6 +627,7 @@ function vehicleSprite(profile, car, paint, frontWheel, rearWheel) {
   for (const x of [rear,front]) drawFender(sprite,x,r,profile.fenders,paint);
   drawTrim(sprite,profile,paint);
   drawDoors(sprite,profile,paint);
+  drawPeriodBodywork(sprite,profile,modelId,paint);
   if (car?.decal && profile.trim !== 'van') drawDecal(sprite,car.decal,profile);
   for (const [x, wheel] of [[rear,rearWheel],[front,frontWheel]]) {
     drawWheel(sprite,x,r,wheel,profile.wall,Boolean(wheel));
@@ -594,7 +664,7 @@ export function paintVehicle(screen, model, car, x, y, scale) {
     car?.jack||'',front,rear].join('/');
   if (!spriteCache.has(key)) {
     if (spriteCache.size >= 80) spriteCache.delete(spriteCache.keys().next().value);
-    spriteCache.set(key,vehicleSprite(profile,car,vehiclePaint(color),front,rear));
+    spriteCache.set(key,vehicleSprite(profile,model.id,car,vehiclePaint(color),front,rear));
   }
   spriteCache.get(key).blit(screen,x,y,scale);
 }

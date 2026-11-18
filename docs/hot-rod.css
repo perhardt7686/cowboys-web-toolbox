@@ -81,7 +81,8 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
 }
 .hot-rod-screen {
   width:min(100%, 640px);
-  aspect-ratio:8 / 5;
+  /* DOS 320x200 pixels displayed on a 4:3 CRT, not a square-pixel 8:5 panel. */
+  aspect-ratio:4 / 3;
   position:relative;
   margin-inline:auto;
   overflow:hidden;
@@ -245,10 +246,10 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
 .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-canvas {
   width:min(100%, 640px);
   height:auto;
-  aspect-ratio:8 / 5;
+  aspect-ratio:4 / 3;
 }
 @supports (width:1cqw) {
-  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-canvas { width:min(100cqw, 160cqh, 640px); }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-canvas { width:min(100cqw, 133.333cqh, 640px); }
 }
 .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-status { display:none; }
 @media (max-width:700px) {
@@ -256,6 +257,69 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
   .hot-rod-panel { padding-inline:10px; }
   .hot-rod-spec { grid-template-columns:minmax(85px,1fr) minmax(0,1.8fr); }
 }
+
+/* A short landscape phone must show the entire 4:3 DOS room, not just its
+   bottom edge after the browser scrolls a long vertical workshop panel. */
+@media (orientation:landscape) and (max-height:550px) {
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-housing {
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+    align-content:stretch;
+    grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+    grid-template-rows:auto auto minmax(0,1fr) auto;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-header {
+    grid-column:1/-1;
+    grid-row:1;
+    padding-block:4px;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-bank {
+    grid-column:1;
+    grid-row:2;
+    font-size:.78rem;
+    padding-block:2px;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-screen {
+    grid-column:1;
+    grid-row:3;
+    align-self:center;
+    width:min(100%, calc(133.333dvh - 163px));
+    max-height:100%;
+    margin-inline:auto;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-panel {
+    grid-column:2;
+    grid-row:2 / 4;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    padding:7px 8px;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-panel h3 {
+    font-size:1rem;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-status {
+    position:static;
+    grid-column:1;
+    grid-row:4;
+    min-height:0;
+    padding:3px 8px;
+    font-size:.78rem;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-tabs {
+    grid-column:2;
+    grid-row:4;
+    padding:4px 6px;
+    gap:3px;
+  }
+  .hot-rod-monitor:not([data-scene="race"]) .hot-rod-tabs button {
+    min-height:35px;
+    padding:2px 4px;
+    font-size:.75rem;
+  }
+}
+
 @media (orientation:landscape) and (max-height:550px) {
   .hot-rod-monitor:has(.hot-rod-driving) { width:100%; height:100%; }
   .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-housing { grid-template-columns:minmax(0,1fr) minmax(252px,.65fr); grid-template-rows:auto minmax(0,1fr); }
@@ -287,4 +351,37 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
   min-width:3ch;
   color:#ffff55;
   font:700 1.2rem/1.2 monospace;
+}
+
+/* Portrait driving is a self-contained DOS cabinet. Keep the 4:3 picture
+   directly against the touch deck instead of centering it in a full-height
+   black grid cell with huge empty strips above and below. The modal itself
+   is vertically centered; its interior has no spare filler rows. */
+@media (orientation:portrait) and (max-width:700px) {
+  .hot-rod-monitor:has(.hot-rod-driving) {
+    height:fit-content;
+    min-height:0;
+    max-height:100dvh;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-housing {
+    height:fit-content;
+    min-height:0;
+    grid-template-rows:auto auto auto;
+    align-content:start;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-screen {
+    display:block;
+    container-type:normal;
+    height:auto;
+    aspect-ratio:4 / 3;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-canvas {
+    width:100%;
+    max-width:100%;
+    height:auto;
+    aspect-ratio:4 / 3;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-driver {
+    padding-block:6px;
+  }
 }

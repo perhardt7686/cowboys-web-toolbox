@@ -143,6 +143,14 @@ function fastener(s,x,y,tight,stage,highlight) {
   s.line(x-2,top,x+2,top,stage?6:8);
   if(!stage)s.box(x-1,top-2,3,1,4);
   if(stage&&highlight)wrench(s,x+3,y+2);
+  // The 1989 physical-wrench interaction needs a visible target on the
+  // first click too, not merely once a fastener is partly unscrewed.
+  if(highlight) {
+    s.box(x-8,y+7,16,1,14);
+    s.box(x-8,y-9,1,4,14);
+    s.box(x+7,y-9,1,4,14);
+    if(!stage)wrench(s,x+7,y-5);
+  }
 }
 function paintTiming(s,view) {
   const marker=Math.round(109-(view.timing??0)*3.1);
@@ -205,7 +213,21 @@ export function paintWorkbench(s,view) {
     }
   }
   if(bayMode==='work'){
-    if(!view.readOnly){key(s,BAY_MENU.tune,'TUNE',view.tuneAvailable);key(s,BAY_MENU.parts,'PARTS');}
+    if(!view.readOnly){
+      const total=BOLTS[slot]||0;
+      const mask=car?.bolts?.[slot]??0;
+      const secured=Array.from({length:total},(_,index)=>Boolean(mask&(1<<index))).filter(Boolean).length;
+      const focus=Number.isInteger(focusBolt) && focusBolt>=0 && focusBolt<total ? focusBolt:null;
+      let instruction=locked?'CLEAR UPPER ASSEMBLY FIRST':
+        !installed[slot]?'CHOOSE A PART FROM SHELF':
+        focus!==null?'BOLT '+(focus+1)+'   '+(turns[focus]?'ONE TURN DONE':'SELECTED'):
+        'BOLTS SECURED '+secured+' / '+total;
+      if(isWheel(slot))instruction=instruction.replace('BOLT','LUG');
+      s.frame(103,134,200,13,0,8,7);
+      s.text(instruction.slice(0,31),108,137,14);
+      key(s,BAY_MENU.tune,'TUNE',view.tuneAvailable);
+      key(s,BAY_MENU.parts,'PARTS');
+    }
     key(s,BAY_MENU.done,'DONE');
   }else{
     key(s,BAY_MENU.back,'BACK');

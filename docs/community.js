@@ -11,7 +11,7 @@ import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
 import {createFamilyBoard} from './family-board.mjs?v=marquee6';
-import {createHotRodBoard} from './hot-rod-board.mjs?v=period2';
+import {createHotRodBoard} from './hot-rod-board.mjs?v=dosfidelity1';
 
 const familyBoard = createFamilyBoard();
 const hotRodBoard = createHotRodBoard();

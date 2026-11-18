@@ -2,7 +2,7 @@
 
 [Open the approved-family game](https://perhardt7686.github.io/cowboys-web-toolbox/community.html#hot-rod) and choose **Hot Rod**. **Classic 1963** is the default campaign. **Cowboy Remix** in the main menu opens the earlier version with its own saves, rivals, achievements, and member matches.
 
-The player starts with $750 and an empty garage. Tap the newspaper for classified ads, the hood for the engine, the jack for individual wheels, the clipboard for condition and performance, and the driveway to reach Bob’s. On desktop, use the arrow keys to drive, E/Q to shift, and Shift for the clutch. Ease off the gas during shifts. Touch controls support holding gas or brake while steering or changing gears. Progress saves after confirmed actions. An unfinished race can be staged again from its saved starting line.
+The player starts with $750 and an empty garage. Tap the newspaper for classified ads, the hood for the engine, the jack for individual wheels, the clipboard for condition and performance, and the driveway to reach Bob’s. On desktop, use the arrow keys to drive and the original-style Space selector to upshift while accelerating or downshift while braking. E/Q remain optional separate shift keys, and Shift is an optional clutch. Ease off the gas during shifts to protect the transmission. Tap the nameplate in the garage to select between owned cars. Touch controls support holding gas or brake while steering or changing gears. Progress saves after confirmed actions. An unfinished race can be staged again from its saved starting line.
 
 ## Comparison with the 1989 DOS release
 
@@ -47,3 +47,30 @@ The 1989 DOS manual and screenshots are the reference for this revision. The use
 | Drive-in and cockpit | Draw the period sign, parked cars and rival replies. Attach driver calls and race offers to the canvas, and show the rival engine in a read-only panel. | Compare the roadside perspective and silver dashboard again, enlarge the wheel, and add a ticket when the verified race outcome reports a patrol stop. |
 
 The engine panel uses the existing revisioned save operations. A first wrench turn belongs to the open workshop. A completed fastener change survives reload. When the last mounting fastener is out, the part lifts automatically once its dependencies and electrical connection allow it. If that second save is interrupted, Retry or Lift off completes it from the stored state. Phone users have separate numbered targets and can perform the full procedure without the canvas hotspots.
+
+## November 18, 2026: original DOS display and controls fidelity
+
+The original 320×200 EGA art remains unchanged in pixel data, but the display now uses a 4:3 CRT-style aspect ratio (historically non-square DOS pixels), including the landscape driving cockpit. The artwork, clickable prop hotspots, and 320×200 coordinate system scale together; the racing screen is height-constrained on narrow devices. The garage nameplate now leads to the existing owned-car selector, following the original manual. The race instructions surface the already-implemented Space selector shifting and retain accessible separate keys and phone buttons. This is a **presentation and interaction-only** pass: it changes no physics, Supabase data, server replays, saves, achievements, accounts, or membership rules. The original game's exact 1989 appearance and physics have *not* been verified as identical; screenshot and physical-phone comparisons remain release checkpoints.
+
+## November 18: Fidelity Pass 1, model silhouettes and cockpit
+
+**Primary reference:** The 1989 DOS EGA version, not the Amiga layout or the 1991 Street Rod 2 VGA artwork. Compare against the [1989 manual](https://www.streetrodonline.com/wp-content/uploads/2012/09/street_rod_manual.pdf), [DOS screenshot gallery](https://www.mobygames.com/game/434/street-rod/screenshots/dos/), [DOS driving frame](https://www.mobygames.com/game/434/street-rod/screenshots/dos/10137/), and [period garage examples](https://www.drivingline.com/articles/back-to-89-before-there-was-forza-gran-turismo-there-was-street-rod/). Reference frames are not bundled, sampled as game sprites, or published to GitHub.
+
+**Implemented on the branch:**
+- All 25 period classified models plus the optional Mystery Machine retain separate independently drawn profiles, now with additional period styling: early hood louvers, chrome glass framing, rocker seams, 1950s fin treatments, Corvette cove lips and Sting Ray vents, windshield rails, and unchanged family van flower artwork.
+- The driving cockpit gains chrome instrument framing, redline tick clarity, gauge-glass reflections, steering-wheel response, analog radio/switches, and projected roadside poles.
+- The core is still native 320x200 EGA color, displayed at the intended 4:3 CRT proportions. Hotspots scale with the art.
+- Visual changes do not edit game state, driving physics, server replays, persistence, account permissions, scores, or family challenges.
+
+**Side-by-side review checkpoints:**
+
+| DOS source feature | Hot Rod target | Acceptance |
+| --- | --- | --- |
+| Broadside garage car | 26 vehicle side profiles (25 classifieds plus finale) | Recognizable roof, tail, wheelbase and whitewalls at 320x200 |
+| 1957 Fairlane's raised fin | Fairlane side profile | Rear point, chrome spear and correct body balance |
+| 1956 Corvette silver side cove | Corvette 56 | Cove, windshield and tire shape visible |
+| 1963 Corvette low roof and vents | Corvette 63 | Distinct from earlier Corvettes |
+| 1989 wheel, analog gauges and road | 320x200 cockpit | RPM, speed, gear, steering, redline and road depth legible |
+| CRT screen plus touchscreen | 4:3 canvas and normalized prop hotspots | No stretching, overflow or accidental prop activation |
+
+**Still pending:** direct human screenshot-by-screenshot acceptance, original-game handling parity, physical iPhone landscape playtest, desktop family-member playtest, and any visual cleanup revealed by browser artifacts. GitHub CI exercises Chromium/WebKit with synthetic accounts only. Run required checks before merge. **Next separate phase:** physical engine assembly interactions, then Bob's Drive-In art and rival staging.

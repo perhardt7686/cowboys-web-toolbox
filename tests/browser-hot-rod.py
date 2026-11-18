@@ -161,17 +161,33 @@ async def fit(page, game, *, driving=False):
       const canvas = dialog.querySelector('canvas');
       const grid = canvas.getBoundingClientRect();
       const dlg = dialog.getBoundingClientRect();
+      const header = dialog.querySelector('.hot-rod-header').getBoundingClientRect();
+      const driver = dialog.querySelector('.hot-rod-driver').getBoundingClientRect();
+      const portrait = innerHeight > innerWidth;
       const pads = [...dialog.querySelectorAll('[data-drive]')].map(el => {
         const r = el.getBoundingClientRect();
         return {label:el.textContent,min:r.width,height:r.height,left:r.left,
           right:r.right,top:r.top,bottom:r.bottom};
       });
       return {overflow: dialog.scrollWidth - dialog.clientWidth, width:grid.width, height:grid.height,
-        layout:document.documentElement.scrollWidth-innerWidth, dlg:dlg.toJSON(), pads, driving};
+        layout:document.documentElement.scrollWidth-innerWidth, dlg:dlg.toJSON(),
+        header:header.toJSON(), driver:driver.toJSON(), portrait,
+        bounds:grid.toJSON(), pads, driving};
     }""", driving)
     assert size['overflow'] <= 2 and size['layout'] <= 2, size
     assert size['width'] >= 180 and size['height'] >= 112, size
-    assert abs(size['width'] / size['height'] - 1.6) <= 0.035, size
+    assert abs(size['width'] / size['height'] - (4 / 3)) <= 0.035, size  # 320x200 DOS pixels displayed at 4:3
+    if not driving:  # Garage, engine bay and diner should never crop on short phones.
+        assert size['bounds']['top'] >= size['dlg']['top'] - 2, size
+        assert size['bounds']['bottom'] <= size['dlg']['bottom'] + 2, size
+    if driving and size['portrait']:
+        # No empty 170px letterbox strips inside the portrait racing modal.
+        # The 4:3 picture follows the fixed header and the two-thumb deck
+        # follows the canvas, with no fake stretched DOS pixels.
+        assert size['bounds']['top'] - size['header']['bottom'] <= 12, size
+        assert size['driver']['top'] - size['bounds']['bottom'] <= 12, size
+        assert size['dlg']['height'] <= size['header']['height'] + size['bounds']['height'] + size['driver']['height'] + 16, size
+        assert size['dlg']['top'] >= -2 and size['dlg']['bottom'] <= await page.evaluate('innerHeight') + 2, size
     if driving:
         for pad in size['pads']:
             assert pad['min'] >= 43 and pad['height'] >= 44, size
@@ -330,7 +346,7 @@ async def campaign_flow(page, name, *, touch):
     if not touch:
         # Select first at the red light with the throttle released. Catch the
         # first green frame without pausing or taking a screenshot at launch.
-        await page.keyboard.press('e')
+        await page.keyboard.press('Space')  # Original DOS selector upshifts with no brake held
         await expect(game.locator('.hot-rod-meters')).to_contain_text('GEAR 1')
     await page.wait_for_function("""() =>
       !document.querySelector('.hot-rod-meters').textContent.includes('WAIT FOR GREEN')

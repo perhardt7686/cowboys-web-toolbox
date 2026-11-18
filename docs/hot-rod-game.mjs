@@ -4,9 +4,9 @@ import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.
 import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, makeCar, matches, repairCost, roadProblem, saleValue} from './hot-rod-campaign.mjs';
 import {BOLTS, CAR_LIST, CARS, COLORS, DOLLARS, FUEL_TANK, MAKES, PART_LIST, PARTS, RIVALS,
   SLOT_NAMES, SLOTS, WAGERS, WHEELS, fullBolts, isWheel} from './hot-rod-catalog.mjs';
-import {paintScene} from './hot-rod-art.mjs?v=period2';
-import {BAY_MENU,IGNITION,SHELF_LIST,workbenchFasteners} from './hot-rod-engine-bay.mjs';
-import {DRIVE_IN_HOTSPOTS,NEWSPAPER_HOTSPOTS} from './hot-rod-period-scenes.mjs';
+import {paintScene} from './hot-rod-art.mjs?v=dosfidelity1';
+import {BAY_MENU,IGNITION,SHELF_LIST,workbenchFasteners} from './hot-rod-engine-bay.mjs?v=dosfidelity1';
+import {DRIVE_IN_HOTSPOTS,NEWSPAPER_HOTSPOTS} from './hot-rod-period-scenes.mjs?v=dosfidelity1';
 import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP} from './hot-rod-racing.mjs';
 import {connectDrivingInput} from './hot-rod-input.mjs';
 
@@ -353,6 +353,17 @@ export function makeHotRod({client, memberId, launcher}) {
   function renderGarage() {
     const car = activeCar(state), counts = state?.cars || [];
     hotspot('Hit the street',0,33,61,108, () => cruise());
+    // In the DOS original, the name strip doubles as the garage's car selector.
+    hotspot('Choose a garage car',86,16,199,14,() => {
+      const selector = consolePanel.querySelector('select');
+      if (counts.length > 1 && selector) {
+        selector.focus({preventScroll:false});
+        selector.scrollIntoView({block:'nearest'});
+      } else {
+        message = 'Get another car from the classifieds to switch garage bays.';
+        render();
+      }
+    });
     hotspot('Clock and save',133,21,38,37,() => show('clock'));
     hotspot('Wall calendar',276,38,43,39,() => show('calendar'));
     hotspot(radio ? 'Turn radio off' : 'Turn radio on',224,49,48,40,toggleRadio);
@@ -1028,7 +1039,7 @@ export function makeHotRod({client, memberId, launcher}) {
       const opponent = race.contract.rival === 'mystery' ? 'Mystery Machine' :
         RIVALS.find(person=>person.id===race.contract.rival)?.name || 'Family challenge';
       raceDetails.append(heading(opponent),copy(race.contract.kind==='drag' ? 'Quarter-mile drag' : 'Two and a half miles of winding road'),
-        copy('Wait for green. Arrow keys steer, accelerate and brake. E / Q shift. Ease off the gas or use Shift for the clutch.'),
+        copy('Wait for green. Arrows steer and control gas/brake. Original-style Space shifts up with gas or down with brake; E / Q also shift. Lift off the gas to protect the gearbox.'),
         row(action('Stage at the line',goRace,{accent:true,disabled:busy}),action('Forfeit race',()=>{showForfeit=true;renderRace();})));
     } else if (showForfeit) {
       const hasStake = !duel && !['kicks',undefined].includes(race.contract.stake);
