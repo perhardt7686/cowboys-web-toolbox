@@ -4,6 +4,7 @@ import {STAGE_WIDTH as W,STAGE_HEIGHT as H,normalizeBody,fitsBody,CENTER} from '
 import {figureAt,paintFigure} from './avatar-turnaround-figure.mjs?v=workshop1';
 import {paintHead} from './avatar-turnaround-head.mjs?v=workshop1';
 import {paintTurnaroundScene} from './avatar-turnaround-scenery.mjs?v=workshop1';
+import {equippedHeadwearWidth,celCompanionHomeX} from './avatar-equipment-fit.mjs';
 
 const dye=['#a06446','#9f535d','#51777a','#785c8b','#956745','#6f845e','#435c77','#c68f4c'];
 const scopeFor={hat:[128,56,193],hair:[128,85,188],eyewear:[128,123,168],eyes:[128,128,164],
@@ -55,12 +56,15 @@ function facingDetail(c,item,depth,front,alpha) {
   c.restore();
 }
 
-function frontalStamp(c,item,x,y,size,front,seconds,activity,depth){
+function frontalStamp(c,item,x,y,size,front,seconds,activity,depth,face){
   const [ax,ay,source]=scopeFor[item.slot];
   const scale=size/source;
   const u=Math.max(0,Math.min(1,(front+.49)/.93));
   c.save();
   c.translate(x,y);
+  // Keep the earned object's original art, but follow the saved head geometry
+  // through front/profile/rear turns instead of a one-size-fits-all stamp.
+  c.scale(equippedHeadwearWidth(face,item.slot),1);
   if(item.slot!=='eyes'&&u<1)facingDetail(c,item,depth,front,1-u);
   if(u>0){
     c.globalAlpha*=u;
@@ -95,7 +99,10 @@ function equipInHand(c,item,limb,frame,handTone,seconds,activity){
 
 function paintPet(c,item,frame,seconds,activity) {
   const q=activity?.progress??0;
-  const x=CENTER+101+frame.view.at(7,9);
+  const radius=item.art==='gargoyle'?57:item.art==='moth'?50:45;
+  const x=celCompanionHomeX({
+    chest:frame.chest,petHalfWidth:radius,turnOffset:frame.view.at(7,9)
+  });
   const y=477;
   c.save();c.translate(x,y);
   if(item.creature){
@@ -159,7 +166,7 @@ export function drawTurnaround(canvas,recipe,colors,lookup,camera={},seconds=0,a
   paintHead(c,frame,recipe,pigment,(slot,ctx,x,y,w,front)=>{
     const item=items[slot];
     if(!item)return false;
-    frontalStamp(ctx,item,x,y,w,front,seconds,activityFor(item),frame.view.depth);
+    frontalStamp(ctx,item,x,y,w,front,seconds,activityFor(item),frame.view.depth,recipe.face);
     return true;
   });
   if(items.bodypart){
