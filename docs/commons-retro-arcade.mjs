@@ -443,7 +443,11 @@ function renderGame(state){
    (state.game==='maze'?' · CLUES '+state.dots:'/ · SWARMS '+Math.ceil(state.tick/9));
 }
 function onKeyDown(event){
- if(!current||event.repeat||document.activeElement?.matches('input,textarea,select'))return;
+ // Leave Space/Enter to the focused button, form, menu or link. Arcade
+ // keyboard steering applies only when the game canvas/page has focus.
+ // Gameplay buttons already map accessible keyboard clicks through tap().
+ if(!current||event.repeat||
+   document.activeElement?.closest?.('input,textarea,select,button,a,summary,[role="button"],[contenteditable="true"]'))return;
  const code=letters[event.code];if(!code)return;
  if(current.game==='maze'&&code==='F')return;
  if(current.game==='fleet'&&['U','D'].includes(code))return;
