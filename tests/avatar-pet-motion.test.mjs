@@ -46,8 +46,9 @@ test('species have visibly different, deterministic motion grammars',()=>{
 });
 
 test('petting is calmer, scans retain gaze and idle breathes without travel',()=>{
-  const play=frame('hunter','glide',.5,'play');
-  const pet=frame('hunter','glide',.5,'pet');
+  // At .5 a double-step is at its zero crossing; sample an actual lift.
+  const play=frame('hunter','glide',.43,'play');
+  const pet=frame('hunter','glide',.43,'pet');
   assert.ok(Math.abs(pet.stride)<Math.abs(play.stride));
   assert.ok(pet.bob<play.bob);
   const ghost=petMotionFrame({species:'phantom',move:'float',time:1.5,active:false});
