@@ -8,10 +8,15 @@ const hairCuts={
   crop:[12,0,0],shaved:[5,0,0],coils:[24,4,3],ponytail:[18,43,2],shag:[23,27,4],
   flip:[24,37,1],pompadour:[34,2,0],afro:[32,21,3],fringe:[19,5,0],feathered:[28,27,4]
 };
+// Distinct original hand-inked cranium and jaw silhouettes in the flat-cel path.
+// Keep the same face IDs, mouth anchor logic and clothing/hat sockets.
 const faceShapes={
-  oval:[32,20,78],round:[35,26,73],long:[32,22,82],
-  angular:[33,13,82],square:[35,30,78],heart:[33,15,73]
+  oval:[32,20,78],round:[38,29,74],long:[30,18,86],
+  angular:[35,13,84],square:[36,33,78],heart:[36,12,77]
 };
+export function celFaceProfile(face='oval'){
+  return [...(faceShapes[face]||faceShapes.oval)];
+}
 const noseLengths={button:12,straight:16,swoop:15,pointed:20,freckled:12};
 
 function planes(c,hair,skin,frame,recipe){
