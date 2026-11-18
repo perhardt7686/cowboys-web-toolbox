@@ -56,7 +56,7 @@ test('both games parse and use source-scoped pointer capture, with immediate tou
  assert.match(sky,/if\(action==='jump'\)jump\(\)/);
  assert.match(sky,/held\.releaseSource\('thumbstick'\)/);
  assert.match(sky,/held\.releaseSource\('canvas'\)/);
- assert.match(sky,/thumbstickDirection\(axis\)/);
+ assert.match(sky,/steeringWithHysteresis\(axis,stickDirection,steeringPreset\)/);
  assert.match(sky,/pointercancel','lostpointercapture/);
  assert.doesNotMatch(sky,/pointerleave'\]\)b\.addEventListener/);
 });
