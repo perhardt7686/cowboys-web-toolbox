@@ -370,7 +370,7 @@ export function buildAvatar(recipe){
   // Shift the whole organic upper silhouette, not merely the head/hand decals.
   // Rotating the rig preserves the parent-child chain for hats, hands and held props;
   // machines retain rigid mechanical posture and the feet stay close to the floor.
-  const lean=recipe.pose==='tilt'&&!mechanical?.077:0;
+  const lean=recipe.pose==='tilt'&&!mechanical?0.077:0;
   figure.rotation.z=lean;
   figure.userData.studioActingLean=lean;
   const body={...shape,width:shape.width*(1+(Number(outfits.build)||0)*.078)};
