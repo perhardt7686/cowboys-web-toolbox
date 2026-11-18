@@ -26,10 +26,12 @@ async def verify(browser, phone=False):
     edit = form.locator('.family-character-editor')
     turn = edit.locator('.studio-stage [data-avatar-turntable]')
     canvas = turn.locator('canvas')
+    # Mounting the authorized member studio is asynchronous; wait for the
+    # V8 renderer itself before asserting its controls and initial angle.
+    await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel', timeout=18000)
     await expect(canvas).to_have_attribute('data-angle', '0')
     await expect(turn.get_by_role('button', name='Rotate left')).to_be_visible()
     assert await canvas.evaluate('n => n.getBoundingClientRect().height >= 220 && n.getBoundingClientRect().width >= 195'), 'V8 stage must remain readable at phone width'
-    await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel', timeout=15000)
     backend = await canvas.get_attribute('data-backend')
     signatures = set()
     for angle in range(0, 360, 45):
