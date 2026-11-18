@@ -31,6 +31,10 @@ async def run():
                     await page.screenshot(path=str(REPORTS / 'avatar-v8-iphone.png'), full_page=True)
                 else:
                     await page.screenshot(path=str(REPORTS / 'avatar-v8-desktop.png'), full_page=True)
+                if label == 'iphone':
+                    await expect(page.locator('.preview-peek')).to_be_visible()
+                else:
+                    await expect(page.locator('.preview-peek')).to_be_hidden()
                 # Test true interaction, not presence of static markup.
                 before = await page.locator('.art-stage svg').inner_html()
                 await page.locator('[data-action="expression"][data-value="smile"]').click()
@@ -47,6 +51,7 @@ async def run():
                 visor = page.locator('[data-action="preview"][data-value="studio-workshop-visor"]')
                 await expect(visor).to_be_enabled()
                 await visor.click()
+                await page.screenshot(path=str(REPORTS / ('avatar-v8-outfits-'+label+'.png')), full_page=True)
                 assert await visor.get_attribute('aria-pressed') == 'true'
                 await page.locator('[data-action="tab"][data-value="pets"]').click()
                 assert await page.locator('.reward-card').count() == 2
@@ -54,8 +59,10 @@ async def run():
                 assert 'Slatewing Gargoyle' in (await page.locator('.pet-feature').inner_text())
                 await page.locator('[data-action="pet-play"]').click()
                 assert await page.locator('.pet-play').count() == 1
+                await page.screenshot(path=str(REPORTS / ('avatar-v8-pets-'+label+'.png')), full_page=True)
                 await page.locator('[data-action="tab"][data-value="rewards"]').click()
                 assert await page.locator('.reward-card').count() == 12
+                await page.screenshot(path=str(REPORTS / ('avatar-v8-rewards-'+label+'.png')), full_page=True)
                 await page.locator('[data-action="filter"][data-value="companion"]').click()
                 assert await page.locator('.reward-card').count() == 2
                 await page.locator('[data-action="reset"]').click()
