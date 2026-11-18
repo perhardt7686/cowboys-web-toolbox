@@ -60,7 +60,7 @@ declare
  -- Three independently walking, maze-aware ghosts
  gx integer[]:=array[13,13,7]; gy integer[]:=array[1,13,7];
  ghost_eaten integer:=0; phase text;targetx integer;targety integer;
- i integer;j integer;k integer; cx integer;cy integer; bx integer;by integer;
+ i integer;j integer;k integer; cx integer;cy integer; bx integer;chosen_y integer;
  dist integer;bestdist integer; collision boolean; moving boolean;
 begin
  if p_game not in ('fleet','maze') or p_seed not between 0 and 96
@@ -147,7 +147,7 @@ begin
            targetx:=least(13,greatest(1,x+case when x>=7 then -4 else 4 end));
            targety:=least(13,greatest(1,y+case when y>=7 then -3 else 3 end));
          end if;
-         bx:=gx[i];by:=gy[i];
+         bx:=gx[i];chosen_y:=gy[i];
          bestdist:=case when phase='frightened' then -1 else 10000 end;
          for j in 0..3 loop
            k:=(j+(i-1)+t+p_seed)%4;
@@ -160,10 +160,10 @@ begin
            dist:=abs(cx-targetx)+abs(cy-targety);
            if (phase='frightened' and dist>bestdist)
                 or (phase<>'frightened' and dist<bestdist) then
-             bx:=cx;by:=cy;bestdist:=dist;
+             bx:=cx;chosen_y:=cy;bestdist:=dist;
            end if;
          end loop;
-         gx[i]:=bx;gy[i]:=by;
+         gx[i]:=bx;gy[i]:=chosen_y;
        end loop;
      end if;
      collision:=false;
