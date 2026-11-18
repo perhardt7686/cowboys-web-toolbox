@@ -1,5 +1,6 @@
 import {THREE,attach,band,box,color,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
 import {petBehavior} from './avatar-prize-actions.mjs?v=workshop1';
+import {petMotionFrame} from './avatar-pet-motion.mjs?v=species1';
 
 const collection=['#b76e61','#63968f','#9686b4','#d3aa67','#647ca8','#b880a0','#93a56f','#b77652','#6499ab','#b395c7'];
 const brass='#d4ab6a',iron='#3a3d50',ink='#272838',silver='#a5b8c1';
@@ -349,7 +350,7 @@ export function buildCompanion(item){
     black=surface('#413548'),bronzeMat=surface(brass,{metalness:.63,roughness:.46});
   const stage=group(null);
   const animal=group(stage),head=group(animal);
-  const tails=[],wings=[],ears=[];
+  const tails=[],wings=[],ears=[],legs=[];
   let antenna=null,spark=null,steam=null,perch=0;
   if(id==='bell-tower-gargoyle'||item.art==='gargoyle'){
     perch=.104;
@@ -435,11 +436,16 @@ export function buildCompanion(item){
         if(bird&&end===-1)continue;
         const x=s*.104,z=end*.146-.021;
         const shank=longLegs?.224:.156;
-        join(animal,shellMat,[x,.076,z],[x*.88,shank+.090,z],.037,.047);
-        oval(animal,pads,x,.056,z+.042,.060,.050,.077);
+        // Pivot at the hip/shank joint. Child coordinates reproduce the
+        // original standing paws exactly, while enabling a real gait.
+        const hipX=x*.88,hipY=shank+.090;
+        const leg=group(animal,hipX,hipY,z);
+        join(leg,shellMat,[x-hipX,.076-hipY,0],[0,0,0],.037,.047);
+        oval(leg,pads,x-hipX,.056-hipY,.042,.060,.050,.077);
         for(let toe=0;toe<2;toe++){
-          oval(animal,cream,x+(toe-.5)*.038,.026,z+.095,.016,.016,.025);
+          oval(leg,cream,x-hipX+(toe-.5)*.038,.026-hipY,.095,.016,.016,.025);
         }
+        legs.push({hinge:leg,side:s,front:end});
       }
     }else for(const s of [-1,1])oval(animal,bronzeMat,s*.089,.047,.093,.077,.038,.087);
     head.position.set(0,.408+(flier||longLegs?.043:0),.094);
@@ -541,16 +547,13 @@ export function buildCompanion(item){
     }
   }
   animal.position.y=perch;
-  return {root:stage,animal,head,tails,wings,ears,antenna,spark,steam,perch,species,item};
+  return {root:stage,animal,head,tails,wings,ears,legs,antenna,spark,steam,perch,species,item};
 }
 
 export function poseCompanion(pet,time,motion){
   if(!pet)return;
-  const p=motion?.progress??0,amount=motion?Math.sin(p*Math.PI):0;
-  // Calm species-specific life between tricks, without affecting the ownership record.
+  const p=motion?.progress??0,amount=motion?Math.sin(Math.max(0,Math.min(1,p))*Math.PI):0;
   const idle=!motion&&time>0&&Number.isFinite(time);
-  const sway=idle?Math.sin(time*(pet.species==='automaton'?1.92:.84)):0;
-  const float=idle?(pet.species==='phantom'?.022:pet.species==='automaton'?.004:.008)*sway:0;
   const action=motion?.action||'play';
   const trick=action==='trick',gesture=action==='pet';
   const move=petBehavior(pet.item,trick?'trick':gesture?'pet':'play').move;
@@ -558,17 +561,32 @@ export function poseCompanion(pet,time,motion){
   const target=motion?.target;
   const aim=target?Math.atan2(target.x,target.z-pet.head.position.z):0;
   const lean=Math.max(-1.34,Math.min(1.34,aim))*amount;
-  const bounce=move==='hop'?Math.sin(p*Math.PI)**2:amount;
-  const activeHeight=action==='scan'?.072:gesture||seek?0:trick?.23:.10;
-  const wingPose=pet.species==='moth'?(action==='perch'?.78:amount>.03?Math.sin(p*28)*.80:.22):pet.perch?1.16-bounce*.95:.17+amount*Math.cos(p*19)*.60;
-  pet.animal.position.set(Math.sin(lean)*.081,pet.perch+(pet.species==='phantom'?.022:pet.species==='moth'?-.085:0)+bounce*activeHeight+float,
-    move==='glide'&&!seek?amount*.12:0);
-  pet.animal.rotation.z=move==='wobble'?Math.sin(p*13)*amount*.16:0;
-  pet.head.rotation.set((gesture||action==='sniff'?.26:-.10)*amount+(idle?.018*Math.sin(time*.5):0),
-    lean+(seek?0:Math.sin(time*2.3)*.07*amount)+(idle?.045*Math.sin(time*.63):0),-.15*amount);
-  for(const [i,w] of pet.wings.entries())w.rotation.y=(i===0?-1:1)*(wingPose+(idle?Math.sin(time*.71)*.035:0));
-  for(const {ear,roll} of pet.ears)ear.rotation.z=roll+Math.sign(roll)*amount*.16+(idle?.023*sway:0);
-  for(const t of pet.tails)t.rotation.y=amount*Math.sin(p*16)*.52+(idle?Math.sin(time*.88)*.13:0);
+  const acting=petMotionFrame({species:pet.species,move,action,progress:p,time,
+    active:Boolean(motion)});
+  const sway=idle?Math.sin(time*(pet.species==='automaton'?1.92:.84)):0;
+  // The home socket remains untouched; body movement is local to this creature.
+  const baseline=pet.perch+(pet.species==='phantom'?.022:pet.species==='moth'?-.085:0);
+  pet.animal.position.set(Math.sin(lean)*.048+acting.side,
+    baseline+acting.bob,acting.forward);
+  pet.animal.rotation.set(acting.pitch,lean*.28+acting.yaw,acting.roll);
+  pet.head.rotation.set((gesture||seek?.26:-.10)*amount+
+      (idle?.018*Math.sin(time*.5):0)+acting.pitch*.37,
+    lean*.72+(seek?0:Math.sin(time*2.3)*.07*amount)+
+      (idle?.045*Math.sin(time*.63):0),-.15*amount);
+  // Opposing diagonal paws make quadrupeds trot; reptiles creep and penguins
+  // waddle. These hinges do not exist on floating/clockwork companions.
+  for(const leg of pet.legs)
+    leg.hinge.rotation.x=leg.side*leg.front*acting.stride;
+  const wingPose=pet.species==='moth'?(action==='perch'?.78:.22+acting.wing):
+    pet.perch?1.16-amount*.85:
+    .17+acting.wing+amount*Math.cos(p*19)*.19;
+  for(const [i,w] of pet.wings.entries())
+    w.rotation.y=(i===0?-1:1)*(wingPose+(idle?Math.sin(time*.71)*.035:0));
+  for(const {ear,roll} of pet.ears)
+    ear.rotation.z=roll+Math.sign(roll)*amount*.16+(idle?.023*sway:0);
+  for(const t of pet.tails)
+    t.rotation.y=acting.tail+amount*Math.sin(p*16)*.29+
+      (idle?Math.sin(time*.88)*.13:0);
   if(pet.species==='automaton'){
     pet.tails[0].rotation.z=seek||trick?p*Math.PI*4:amount*.41;
     pet.antenna.material.emissiveIntensity=.43+(seek||trick?amount*1.6:0)+(idle?.11*(1+sway):0);
