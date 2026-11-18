@@ -21,7 +21,7 @@ test('original detective no longer uses a compressed needle-head scale in 3D',()
   disposeFigure(actor.root);
 });
 
-test('tilt adds subtle, different left and right arm motion in 3D without altering the center pose',()=>{
+test('tilt creates distinctly asymmetric, socket-safe 3D acting without changing center pose',()=>{
   const center=make({...SHOWROOM_LOOKS.detective,pose:'center'});
   const tilted=make({...SHOWROOM_LOOKS.detective,pose:'tilt'});
   for(const actor of [center,tilted])actor.root.updateMatrixWorld(true);
@@ -29,9 +29,9 @@ test('tilt adds subtle, different left and right arm motion in 3D without alteri
     .getWorldPosition(new THREE.Vector3());
   const rightCenter=hand(center,1),rightTilt=hand(tilted,1);
   const leftCenter=hand(center,-1),leftTilt=hand(tilted,-1);
-  assert.ok(rightTilt.y>rightCenter.y+.04,
+  assert.ok(rightTilt.y>rightCenter.y+.105,
     'tilted acting should raise one relaxed hand');
-  assert.ok(leftTilt.y<leftCenter.y,
+  assert.ok(leftTilt.y<leftCenter.y-.032,
     'contrapposto drops the opposite relaxed hand');
   for(const pos of [rightTilt,leftTilt]){
     assert.ok([pos.x,pos.y,pos.z].every(Number.isFinite));
@@ -52,6 +52,8 @@ test('layered cel has compatible tilt acting through all four major angles',()=>
       const b=tilted.limbs.find(x=>x.side===side);
       assert.notDeepEqual(a.hand,b.hand,
         'tilted cel arm should not reuse the same stiff hanging position');
+      assert.ok(side===1?b.hand.y<=a.hand.y-27:b.hand.y>=a.hand.y+9,
+        'painted gesture must read at small full-body scale on both sides');
       assert.ok(Number.isFinite(b.hand.x)&&Number.isFinite(b.hand.y));
       assert.ok(b.hand.y>150&&b.hand.y<515,'keep 2D hands within stage');
     }
