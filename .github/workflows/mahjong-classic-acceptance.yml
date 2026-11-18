@@ -1,0 +1,61 @@
+name: Mahjong classic and family acceptance
+on:
+  pull_request:
+    paths:
+      - 'docs/mahjong-classic*'
+      - 'docs/commons-mahjong.mjs'
+      - 'docs/community.html'
+      - 'tests/mahjong-classic.test.mjs'
+      - 'tests/browser-mahjong-classic.py'
+      - 'tests/browser-mahjong-kids.py'
+      - '.github/workflows/mahjong-classic-acceptance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/mahjong-classic*'
+      - 'docs/commons-mahjong.mjs'
+      - 'docs/community.html'
+      - 'tests/mahjong-classic.test.mjs'
+      - 'tests/browser-mahjong-classic.py'
+      - '.github/workflows/mahjong-classic-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  logic-and-accessibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: |
+          npm ci
+          node --check docs/commons-mahjong.mjs
+          node --check docs/mahjong-classic-tiles.mjs
+          npm test
+  phone-tiles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Check classic and family tiles at iPhone widths
+        run: |
+          python -m http.server 8765 --directory docs >/tmp/mahjong-browser-http.log 2>&1 &
+          python tests/browser-mahjong-classic.py
+          python tests/browser-mahjong-kids.py
+      - name: Preserve test screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mahjong-classic-phone-review
+          path: reports/mahjong-classic-*.png
+          if-no-files-found: ignore
+          retention-days: 7
