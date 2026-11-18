@@ -352,3 +352,34 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
   color:#ffff55;
   font:700 1.2rem/1.2 monospace;
 }
+
+/* Portrait driving is a self-contained DOS cabinet. Keep the 4:3 picture
+   directly against the touch deck instead of centering it in a full-height
+   black grid cell with huge empty strips above and below. The modal itself
+   is vertically centered; its interior has no spare filler rows. */
+@media (orientation:portrait) and (max-width:700px) {
+  .hot-rod-monitor:has(.hot-rod-driving) {
+    height:auto;
+    max-height:100dvh;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-housing {
+    height:auto;
+    grid-template-rows:auto auto auto;
+    align-content:start;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-screen {
+    display:block;
+    container-type:normal;
+    height:auto;
+    aspect-ratio:4 / 3;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-canvas {
+    width:100%;
+    max-width:100%;
+    height:auto;
+    aspect-ratio:4 / 3;
+  }
+  .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-driver {
+    padding-block:6px;
+  }
+}
