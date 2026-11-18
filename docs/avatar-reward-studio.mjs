@@ -46,7 +46,7 @@ function meter(value,max=1,label='Progress'){
 let thumbnailObserver;
 const thumbnails=new WeakMap();
 function paintThumbnail(node,item){
-  if(node.closest?.('.avatar-dressing-studio[data-v8-mode="modern"]')&&
+  if(node.closest?.('.avatar-dressing-studio[data-v8-live="true"]')&&
      paintV8RewardIcon(node,item))return;
   studioPrize(node,item);
   releaseStudioArt(node);
@@ -743,7 +743,6 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       next.dataset.rewardSection=key;tabs.append(next);
     }
     editor.prepend(tabs);enhanceMemberStudio(editor);
-    editor.addEventListener('avatar-v8-mode-changed',()=>paintPreview(),{signal:viewEvents.signal});
     pane.append(filters,results);
     editor.querySelector('.studio-editor-panel').insertBefore(pane,editor.querySelector('#avatar-equipped'));
     section=nextSection;detail=item;
