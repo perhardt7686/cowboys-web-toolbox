@@ -104,3 +104,25 @@ test('Pass 1 cockpit responds to road, steering, speed and shifting without race
   assert.notEqual(image(road),base,'Road and drag scenes should differ');
   assert.equal(JSON.stringify(race),untouched,'Painting must not mutate server-replayed race state');
 });
+
+test('1989 workshop wrench and parts progress have distinct inspectable states',()=>{
+  const car=makeCar(CARS.chevy40,1);
+  const base={scene:'workbench',slot:'carb',car,bayMode:'work',cash:450};
+  const untouched=JSON.stringify(car);
+  const before=render(base);
+  assert.notEqual(render({...base,focusBolt:0,turns:{0:0}}),before,'First selected bolt is highlighted');
+  assert.notEqual(render({...base,focusBolt:0,turns:{0:1}}),before,'First wrench turn appears');
+  assert.notEqual(render({...base,locked:true}),before,'Blocked part clearly says why');
+  assert.notEqual(render({...base,car:{...car,installed:{...car.installed,carb:null}}}),before,'Empty mounting hole appears');
+  assert.equal(JSON.stringify(car),untouched,'Workshop painting cannot change saved hardware');
+});
+
+test('Bob’s Drive-In faithfully responds to driver, challenge and cash while remaining visual-only',()=>{
+  const base={scene:'diner',rival:RIVALS[0],cash:350,hours:130};
+  const before=JSON.stringify(base);
+  const picture=render(base);
+  assert.notEqual(render({...base,rival:RIVALS[1]}),picture,'Changing rivals updates diner art and dialogue');
+  assert.notEqual(render({...base,menuItems:[{label:'For kicks',selected:true},{label:'Pink slips',disabled:true}]}),picture,'Original-style offer menu appears');
+  assert.notEqual(render({...base,cash:500}),picture,'Bankroll caption reflects the save');
+  assert.equal(JSON.stringify(base),before,'Diner art cannot alter any server state');
+});
