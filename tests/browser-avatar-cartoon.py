@@ -289,17 +289,17 @@ async def review_angles(browser):
         }
       }
       // The actual small UI sizes, not enlarged artwork, are the art-direction gate.
-      const small=makeCanvas(600,440),sc=small.getContext('2d');
-      sc.fillStyle='#f7efdf';sc.fillRect(0,0,600,440);
+      const small=makeCanvas(600,995),sc=small.getContext('2d');
+      sc.fillStyle='#f7efdf';sc.fillRect(0,0,600,995);
       sc.fillStyle='#34283d';sc.font='bold 20px system-ui';
-      sc.fillText('Smile / grin / smirk · 48px and 64px',18,30);
+      sc.fillText('Eight expressions · actual 48px and 64px icons',18,30);
       const smallTypes=[['3D 48',false,48],['Cel 48',true,48],
         ['3D 64',false,64],['Cel 64',true,64]];
       const smallFingerprints={};
       for(const [j,[label,isCel,size]] of smallTypes.entries()){
         sc.fillText(label,115+j*120,62);
         smallFingerprints[label]=new Set();
-        for(const [i,mood] of ['smile','grin','smirk'].entries()){
+        for(const [i,mood] of moods.entries()){
           const recipe={...SHOWROOM_LOOKS.detective,beard:'none',
             glasses:'none',hat:'none',style:'short',expression:mood};
           const target=isCel?celTile:faceTile;
@@ -321,7 +321,7 @@ async def review_angles(browser):
         }
       }
       for(const [label,views] of Object.entries(smallFingerprints))
-        if(views.size!==3)throw Error('Small icon face shapes repeated: '+label);
+        if(views.size!==moods.length)throw Error('Small icon face shapes repeated: '+label);
       // Contact sheet of six fitted jaw masks in three directions, side by
       // side against existing direction-specific 2D facial hair. Synthetic only.
       const beardSheet=makeCanvas(1040,1270),bc=beardSheet.getContext('2d');
