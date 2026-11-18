@@ -419,5 +419,6 @@ insert into public.community_site_totals(site_id) values
 ('spelunkr'),
 ('cityrt'),
 ('myinstants'),
-('shademap')
+('shademap'),
+('blacklight')
 on conflict (site_id) do nothing;
