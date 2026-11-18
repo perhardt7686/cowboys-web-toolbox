@@ -230,8 +230,10 @@ export function createSkyScene(width,height){
       aim.set(skyTrack(course,z+11).center+state.x*.28,state.y*.30+track.y*.70+.45,-z-11);
       camera.lookAt(aim);
       // A restrained camera bank makes drift legible while leaving replay physics untouched.
-      if(!lowMotion&&Math.abs(state.lean)>.02)
-        camera.rotateZ(-state.lean*(state.mask&SKY_INPUT.drift?.05:.018));
+      if(!lowMotion&&Math.abs(state.lean)>.02){
+        const roll=(state.mask&SKY_INPUT.drift)?0.05:0.018;
+        camera.rotateZ(-state.lean*roll);
+      }
       if(camera.fov!==51+pace*9){camera.fov=51+pace*9;camera.updateProjectionMatrix();}
       renderer.render(scene,camera);
       ctx.drawImage(renderer.domElement,0,0,ctx.canvas.width,ctx.canvas.height);
