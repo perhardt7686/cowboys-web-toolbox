@@ -122,12 +122,12 @@ body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-
 body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-card progress{
  width:100%;height:9px;accent-color:#46856b;
 }
-body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-card > .avatar-reward-button{
+body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-card > .avatar-reward-button:not(.avatar-item-open){
  width:100%;min-height:46px!important;margin-top:auto!important;border-radius:10px!important;
  background:#335e5c!important;color:#fff9eb!important;border:1px solid #335e5c!important;
  font-size:.82rem!important;font-weight:850!important;
 }
-body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-card > .avatar-reward-button + .avatar-reward-button{
+body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-reward-card > .avatar-reward-button:not(.avatar-item-open) + .avatar-reward-button:not(.avatar-item-open){
  margin-top:0!important;background:#fffaf0!important;color:#355b59!important;
 }
 body.community-page .avatar-dressing-studio[data-v8-live="true"] .avatar-pet-toolbar{
