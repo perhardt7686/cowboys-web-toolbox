@@ -442,7 +442,7 @@ function dial(s,x,y,label,value,max,redline=Infinity,step=10) {
   }
   s.line(x-16,y-16,x-9,y-20,15);
   s.line(x-16,y-14,x-12,y-16,7);
-  s.pixel?.(x+15,y-12,7);
+  s.box(x+15,y-12,1,1,7);
   const a=tickAt(trunc(value,0,max));
   s.line(x,y,x+18*Math.cos(a),y+18*Math.sin(a),12);
   s.ellipse(x,y,3,3,7);s.box(x-1,y-1,2,2,15);
