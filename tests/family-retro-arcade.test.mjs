@@ -56,8 +56,8 @@ test('games use private score RPCs, originals and readable independent title scr
  assert.match(js,/community_retro_finish/);
  assert.match(js,/community_retro_state/);
  assert.match(js,/session\?\.user\?\.id/);
- assert.match(html,/commons-retro-arcade\.mjs\?v=retro10/);
- assert.match(html,/commons-retro-arcade\.css\?v=retro5/);
+ assert.match(html,/commons-retro-arcade\.mjs\?v=retro11/);
+ assert.match(html,/commons-retro-arcade\.css\?v=retro6/);
  assert.doesNotMatch(js,/arcade\.archive|pac-man\.png|galaga\.png/);
 });
 
@@ -68,7 +68,7 @@ test('Galaga-inspired formation and swooping dives align with the one verified t
   assert.equal(new Set(first.map(p=>p.row+':'+p.lane)).size,27);
   for(const tick of [1,2,4,6,8,9,10,45,101,240]){
     const ships=squadronFormation(tick,4,540);
-    assert.equal(ships.length,tick%9===0?26:26);
+    assert.equal(ships.length,alienAt(tick-1,4).age===8?27:26);
     assert.ok(ships.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));
     const dive=squadronDiver(tick,4,540);
     const authoritative=alienAt(tick-1,4);
