@@ -28,7 +28,8 @@ async def run():
                 await editor.locator('[data-studio-part="hair"]').click()
                 await editor.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]').first.click()
                 assert await canvas.evaluate('n=>n.toDataURL()')!=initial,'V8 hair color invisible'
-                await page.screenshot(path=str(REPORTS/f'v8-live-character-{label}.png'),full_page=True)
+                await page.locator('#content-dialog').evaluate('n=>n.scrollTop=0')
+                await page.locator('#content-dialog').screenshot(path=str(REPORTS/f'v8-live-character-{label}.png'),animations='disabled')
                 assert await editor.locator('.avatar-v8-classic-toggle').count()==0
                 assert await page.get_by_role('button',name='Classic layout').count()==0
                 # The existing server-backed pet inventory is still the source of truth.
@@ -38,13 +39,13 @@ async def run():
                 await expect(gallery).to_be_visible()
                 assert await gallery.locator('.avatar-v8-pet-pick').count()>=2
                 await expect(editor.get_by_role('combobox',name='Choose a pet')).to_be_visible()
-                await page.screenshot(path=str(REPORTS/f'v8-live-pets-{label}.png'),full_page=True)
+                await gallery.screenshot(path=str(REPORTS/f'v8-live-pets-{label}.png'),animations='disabled')
                 await nav.get_by_role('button',name='Rewards').click()
                 card=editor.locator('[data-reward-item="studio-observatory-telescope"]')
                 await card.scroll_into_view_if_needed()
                 await expect(card).to_be_visible()
                 await expect(card.locator('canvas.avatar-reward-thumbnail')).to_have_attribute('data-art-pack','v8-ink',timeout=18000)
-                await page.screenshot(path=str(REPORTS/f'v8-live-rewards-{label}.png'),full_page=True)
+                await card.screenshot(path=str(REPORTS/f'v8-live-rewards-{label}.png'),animations='disabled')
                 assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth')<=2,'Dialog overflow'
                 assert not errors,(label,errors)
                 print('V8 member '+label+': new character art, no classic switch, pets gallery, reward cels, layout PASS')
