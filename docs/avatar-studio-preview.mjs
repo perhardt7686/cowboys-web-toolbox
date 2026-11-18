@@ -22,7 +22,10 @@ export function studioCharacter(canvas,recipe,view,time=0,activity=null){
   // member studio. Existing earned equipment retains the proven full-fit
   // renderer until individual V8 gear illustrations pass their own tests.
   if(canvas?.closest?.('.avatar-dressing-studio[data-v8-mode="modern"]')&&
-     paintV8Character(canvas,recipe,view,time))return false;
+     paintV8Character(canvas,recipe,view,time)){
+    canvas.setAttribute('aria-label','Original V8 hand-drawn cartoon preview. Drag to rotate or zoom in to pan.');
+    return false;
+  }
   const result=active?.paintRoomAvatar(canvas,recipe,view,time,activity)||false;
   if(result){canvas.dataset.previewStyle='3d';return true;}
   renderLoadout(canvas,recipe,time,activity,view);
