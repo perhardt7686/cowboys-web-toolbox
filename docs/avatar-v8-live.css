@@ -3,6 +3,20 @@ body.community-page #content-dialog.studio-workspace-dialog:has(.avatar-dressing
  --studio-ink:#253640;--studio-muted:#536a6c;--studio-line:#bcc8bd;--studio-accent:#315d5b;--studio-brass:#ba9367;--studio-paper:#e8e8dd;
  border:1px solid #839891!important;background:#e8e8dd!important;color:#263c41!important;border-radius:22px;
 }
+/* Ensure the genuine member studio fills the phone dialog, rather than
+   inheriting the old narrow two-column actor viewport. */
+body.community-page #content-dialog.studio-workspace-dialog:has(.avatar-dressing-studio[data-v8-live="true"]){
+ box-sizing:border-box!important;width:min(1180px,calc(100vw - 16px))!important;
+ max-width:calc(100vw - 16px)!important;min-width:0!important;
+}
+body.community-page .avatar-dressing-studio[data-v8-live="true"]{
+ box-sizing:border-box!important;width:100%!important;min-width:0!important;
+}
+body.community-page .avatar-dressing-studio[data-v8-live="true"] .studio-stage,
+body.community-page .avatar-dressing-studio[data-v8-live="true"] .studio-stage .avatar-turntable,
+body.community-page .avatar-dressing-studio[data-v8-live="true"] .studio-stage .avatar-turntable-frame{
+ box-sizing:border-box!important;width:100%!important;min-width:0!important;
+}
 body.community-page .avatar-dressing-studio[data-v8-live="true"]{
  grid-template-areas:"header header" "stage menu" "stage panel" "footer footer"!important;
  grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)!important;
