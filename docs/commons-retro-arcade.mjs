@@ -3,6 +3,7 @@
  * No copyrighted game assets, character likenesses, music or identical levels.
  */
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
+import {initialRetroV2,retroStepV2,RETRO_V2_RULES,fleetTargetsV2} from './retro-arcade-engine-v2.mjs?v=gameplay2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps2';
 import {retroStickDirection,retroStickOffset} from './retro-arcade-joystick.mjs?v=cabinet1';
@@ -20,6 +21,7 @@ const GAMES=[
 ];
 let client,user=null,mounted=false,overview={mine:[],trophies:[],leaders:[]};
 let current=null,actions='',ticker=null,working=false,activeScene='play',gameMode='';
+let selectedVersion={fleet:1,maze:1},v2Overview={mine:[],leaders:[]};
 const input=createRetroInput();
 const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
@@ -61,6 +63,8 @@ async function rpc(fn,args={}){
 function clearSharedScores(){
  scoreReadEpoch++;
  overview={mine:[],trophies:[],leaders:[]};
+ v2Overview={mine:[],leaders:[]};
+ selectedVersion={fleet:1,maze:1};
  requestedLooks={fleet:'patrol',maze:'scout'};
  window.dispatchEvent(new Event('family-retro-scoreboard-clear'));
 }
@@ -133,6 +137,40 @@ async function refresh(){
   for(const g of GAMES)paintScores(g.id);
   shareVerifiedScores();
  }catch(error){if(mounted&&user===owner&&!board.hidden&&epoch===scoreReadEpoch)status(error.message,'error');}
+}
+async function refreshV2(id){
+ if(!user||!mounted||board.hidden)return;
+ const owner=user;
+ try{
+  const result=await rpc('community_retro_state_v2');
+  if(!mounted||user!==owner||board.hidden)return;
+  v2Overview=result;
+  const mine=(result.mine||[]).find(p=>p.game===id);
+  const root=$(GAMES.find(g=>g.id===id)?.root);
+  const note=root?.querySelector('.retro-mode-note');
+  if(note)note.textContent='GAMEPLAY V2 · SEPARATE SCORES · BEST '+
+    Number(mine?.best||0).toLocaleString()+' · ROUNDS '+Number(mine?.runs||0);
+ }catch(error){
+  if(mounted&&user===owner&&!board.hidden&&selectedVersion[id]===2)
+    status('Gameplay V2 server not available yet. Classic V1 is still playable.','error');
+ }
+}
+function switchRetroVersion(id){
+ if(working||current||lifecycle.pendingGame())return;
+ selectedVersion[id]=selectedVersion[id]===1?2:1;
+ const ver=selectedVersion[id];
+ const root=$(GAMES.find(g=>g.id===id)?.root);
+ if(!root)return;
+ const mode=root.querySelector('.retro-mode');
+ mode.textContent=ver===2?'GAMEPLAY V2 · ACTIVE':'CLASSIC V1 · ACTIVE';
+ mode.setAttribute('aria-pressed',String(ver===2));
+ root.querySelector('.retro-begin').textContent=ver===2?'START VERIFIED V2':'Start verified round';
+ root.querySelector('.retro-mode-note').textContent=ver===2?
+   'V2 scores and rankings are separate. Classic trophies and high scores stay intact.':
+   'Classic V1 · Original family trophy road and verified scores.';
+ gameMode=id;
+ if(ver===2)void refreshV2(id);
+ else status('Classic V1 selected. Existing trophies and best scores remain available.');
 }
 function statsByGame(id){
  return overview.mine?.find(p=>p.game===id)||{game:id,runs:0,best:0,points:0,clears:0};
@@ -276,12 +314,16 @@ function makeGame(game){
     stick.addEventListener(name,releaseStick);
   controls.append(stick);
  }
+ const mode=richButton('CLASSIC V1 · ACTIVE',()=>switchRetroVersion(game.id),'retro-mode');
+ mode.setAttribute('aria-pressed','false');
+ const modeNote=el('p','retro-mode-note',
+   'Classic V1 · Original family trophy road and verified scores.');
  const begin=richButton('Start verified round',()=>void start(game.id),'retro-begin');
  const end=richButton('Leave round',()=>abandon(),'retro-end');
  const notification=el('p','retro-status','Choose Start to play. Family trophies are awarded from server-verified results.');
  notification.setAttribute('role','status');
- const buttons=add(el('div','retro-actions'),begin,end);
- live.append(canvas,info,controls,buttons,notification);
+ const buttons=add(el('div','retro-actions'),mode,begin,end);
+ live.append(canvas,info,modeNote,controls,buttons,notification);
  const trophies=el('div','retro-trophies retro-panel-view');trophies.hidden=true;
  const leaders=el('div','retro-leaders retro-panel-view');leaders.hidden=true;
  display.append(live,trophies,leaders);
@@ -330,7 +372,7 @@ function tick(){
  if(!current||working)return;
  const action=actionForTick(current.game);
  actions+=action;
- try{current=retroStep(current,action);}catch(error){stopTimer();status(error.message,'error');return;}
+ try{current=current.version===2?retroStepV2(current,action):retroStep(current,action);}catch(error){stopTimer();status(error.message,'error');return;}
  renderGame(current);
  if(current.done){
   stopTimer();
@@ -342,26 +384,31 @@ async function start(id){
  if(current)abandon();
  const root=$(GAMES.find(g=>g.id===id)?.root);
  if(!root||root.querySelector('.retro-inside')?.hidden)return;
- const ticket=lifecycle.begin(id),owner=user;
+ const ticket=lifecycle.begin(id),owner=user,version=selectedVersion[id];
  working=true;gameMode=id;
  root.querySelector('.retro-begin').disabled=true;
+ root.querySelector('.retro-mode').disabled=true;
  // Leaving is allowed while a server start is pending.
  root.querySelector('.retro-end').disabled=false;
  status('Starting a verified family round…');
  try{
-  const received=await rpc('community_retro_start',{p_game:id});
+  const received=await rpc(version===2?'community_retro_start_v2':'community_retro_start',{p_game:id});
   // A delayed server response cannot resurrect a left/hidden/signed-out game.
   if(!lifecycle.matches(ticket))return;
   const visible=mounted&&user===owner&&!board.hidden&&root.isConnected&&
    !root.querySelector('.retro-inside')?.hidden&&!root.querySelector('.retro-live')?.hidden&&
    (!document.body.classList.contains('arcade-on')||document.body.dataset.arcadeGame===id);
   if(!visible){abandon();return;}
-  if(received.game!==id||!received.run_id)throw new Error('Unexpected game session');
-  runId=received.run_id;current=initialRetro(id,received.seed);
+  if(received.game!==id||!received.run_id||
+     (version===2&&received.version!==2))throw new Error('Unexpected game session version');
+  runId=received.run_id;
+  current=version===2?initialRetroV2(id,received.seed):initialRetro(id,received.seed);
   actions='';input.reset();confirmed='';
   renderGame(current);
   root.querySelector('.retro-canvas')?.focus({preventScroll:true});
-  status('Round underway. Score stays unverified until the server checks your full run.');
+  status(version===2?
+    'V2 underway. Three enemy roles and separate V2 rankings. Score needs verified V2 replay.':
+    'Round underway. Score stays unverified until the server checks your full run.');
   ticker=document.hidden?null:setInterval(tick,RETRO_GAME_RULES[id].interval);
  }catch(error){
   if(lifecycle.matches(ticket))status(error.message,'error');
@@ -370,6 +417,7 @@ async function start(id){
    lifecycle.clearPending(ticket);working=false;
    if(!current){
     root.querySelector('.retro-begin').disabled=false;
+    root.querySelector('.retro-mode').disabled=false;
     root.querySelector('.retro-end').disabled=true;
    }
   }
@@ -382,6 +430,7 @@ function abandon(){
  for(const g of GAMES){
   const root=$(g.root);if(!root)continue;
   root.querySelector('.retro-begin').disabled=false;
+  root.querySelector('.retro-mode').disabled=false;
   root.querySelector('.retro-end').disabled=true;
  }
  if(gameMode)status(couldStillVerify?
@@ -395,15 +444,18 @@ async function finish(){
  const snapshot=current,id=runId,trace=actions;
  status('Replaying your moves on the server. Do not close the game yet.');
  try{
-  const result=await rpc('community_retro_finish',{p_run_id:id,p_actions:trace});
+  const result=await rpc(snapshot.version===2?'community_retro_finish_v2':'community_retro_finish',{p_run_id:id,p_actions:trace});
   if(!lifecycle.matches(ticket))return;
   if(Number(result.score)!==Number(snapshot.score)||
      Number(result.lives)!==Number(snapshot.lives))
     throw new Error('The local preview differs from verified gameplay. No score has been claimed in this view.');
-  confirmed='SERVER VERIFIED · '+Number(result.score).toLocaleString()+' pts';
-  status(confirmed+' · '+(result.trophies||[]).join(', '),'success');
-  await refresh();
-  if(lifecycle.matches(ticket))
+  confirmed=(snapshot.version===2?'V2 SERVER VERIFIED · ':'SERVER VERIFIED · ')+
+    Number(result.score).toLocaleString()+' pts';
+  status(confirmed+(snapshot.version===2?' · separate V2 rankings':
+    ' · '+(result.trophies||[]).join(', ')),'success');
+  if(snapshot.version===2)await refreshV2(snapshot.game);
+  else await refresh();
+  if(lifecycle.matches(ticket)&&snapshot.version!==2)
    window.dispatchEvent(new Event('family-arcade-achievements-updated'));
  }catch(error){
   if(lifecycle.matches(ticket))
@@ -415,6 +467,7 @@ async function finish(){
    for(const g of GAMES){
     const root=$(g.root);if(!root)continue;
     root.querySelector('.retro-begin').disabled=false;
+    root.querySelector('.retro-mode').disabled=false;
     root.querySelector('.retro-end').disabled=true;
    }
   }
@@ -447,6 +500,33 @@ function paintFleet(canvas,s,look='patrol'){
  ctx.fillStyle=cockpit;ctx.fillRect(-8,-3,16,10);
  ctx.restore();
  drawFleetGear(ctx,look,s,x,y);
+ if(s.version===2){
+   const targets=fleetTargetsV2(Math.max(0,s.tick-1),s.seed);
+   ctx.textAlign='center';ctx.font='bold 13px monospace';
+   ctx.fillStyle='#bff7ee';ctx.fillText('THREE ENEMY ATTACK WINDOWS · V2',w/2,27);
+   for(const target of targets){
+     if(s.destroyed.includes(target.id))continue;
+     const centerX=18+(target.lane+.5)*bw;
+     const yPos=target.active?66+target.progress*335:72+target.index*38;
+     const color=target.boss?'#f0a0cb':['#7dd4af','#96b3fa','#dfbb86'][target.index];
+     const tilt=target.active?Math.sin(Math.PI*target.progress)*(target.index===1?-.28:.24):0;
+     drawSquadronShip(ctx,centerX,yPos,target.active?1.13:.78,color,
+       {active:target.active,boss:target.boss,tilt});
+     if(target.active){
+       ctx.fillStyle=target.boss?'#ffdaac':'#a6ffee';
+       ctx.fillText(target.boss?'CAPTURE SHIP':'DIVE '+(target.index+1),
+         centerX,Math.min(h-113,yPos+40));
+     }
+   }
+   if(s.captured){
+     ctx.fillStyle='#ffc0c6';ctx.font='900 15px monospace';
+     ctx.fillText('ESCORT CAPTURED · DEFEAT NEXT COMMANDER',w/2,h-154);
+   }
+   if(s.events.includes('rescue')){
+     ctx.fillStyle='#fff0ae';ctx.font='900 24px monospace';
+     ctx.fillText('ESCORT RESCUED +100',w/2,h/2);
+   }
+ }else{
  // Reserve formation is visual only; only the bright diving attacker is
  // active in the server-verified wave. No new invisible hitboxes or points.
  ctx.save();ctx.globalAlpha=.34;
@@ -468,6 +548,7 @@ function paintFleet(canvas,s,look='patrol'){
    ctx.fillStyle=alien.boss?'#ffd79f':'#9ffff2';
    ctx.font='bold 12px monospace';ctx.textAlign='center';
    ctx.fillText(alien.boss?'COMMANDER DIVE':'ACTIVE DIVER',alien.x,Math.min(h-111,alien.y+44));
+ }
  }
  if(['F','A','D'].includes(s.prevAction)){
   ctx.strokeStyle='#fff0a6';ctx.lineWidth=5;
@@ -509,7 +590,11 @@ function renderGame(state){
  if(state.game==='fleet')paintFleet(canvas,state,activeLook(state.game));else paintMaze(canvas,state,activeLook(state.game));
  const n=root.querySelector('.retro-live-readout');
  n.textContent='SCORE '+state.score+' · LIVES '+state.lives+' · '+state.tick+'/'+RETRO_GAME_RULES[state.game].steps+
-   (state.game==='maze'?' · CLUES '+state.dots:'/ · SWARMS '+Math.ceil(state.tick/9));
+   (state.version===2?' · V2':'')+
+   (state.game==='maze'?' · CLUES '+state.dots+
+     (state.version===2?' · '+state.phase.toUpperCase()+' · GHOSTS 3':''):
+      state.version===2?' · RESCUES '+state.rescues:
+      ' · SWARMS '+Math.ceil(state.tick/9));
 }
 function onKeyDown(event){
  // Leave Space/Enter to the focused button, form, menu or link. Arcade

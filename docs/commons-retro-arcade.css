@@ -275,3 +275,21 @@ body.community-page .retro-controls[data-retro-game="maze"] .retro-stick-knob.is
  body.community-page .retro-controls .retro-control,
  body.community-page .retro-controls .retro-stick-knob{transition:none}
 }
+
+/* Versioned V2 selection: separate ranking clearly distinguished from V1 */
+body.community-page .retro-mode-note{
+ margin:0;padding:8px 12px;border:1px solid #5b8f92;border-radius:10px;
+ background:#172b41;color:#c6f0e8;
+ text-align:center;font:750 12px/1.4 system-ui;
+}
+body.community-page .retro-actions .retro-mode{
+ min-height:50px;flex:1 1 100%;
+ color:#eeebff;border-color:#b2bce2;
+ background:linear-gradient(145deg,#343f70,#292954);
+ font:900 13px/1.15 monospace;letter-spacing:.03em;
+}
+body.community-page .retro-actions .retro-mode[aria-pressed="true"]{
+ border-color:#c6f1ca;background:linear-gradient(145deg,#174d53,#305d75);
+ color:#f5ffe4;box-shadow:inset 0 0 0 2px #aafbc155;
+}
+body.community-page .retro-actions .retro-mode:disabled{opacity:.55}
