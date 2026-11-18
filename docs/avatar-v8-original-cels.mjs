@@ -119,9 +119,12 @@ function humanHead(c,recipe,back,profile){
     path(c,'M289 173 L302 184 284 192',skin);
   }else{
     const spacing=Number(recipe.eye_spacing||0)*2;
+    const shape=recipe.eye_shape||'classic';
+    const width=shape==='dramatic'?13:shape==='round'?12:shape==='almond'?12:10;
+    const height=shape==='dramatic'?17:shape==='sleepy'?7:shape==='round'?14:12;
     for(const x of [217-spacing,263+spacing]){
-      path(c,'M'+(x-14)+' 148 Q'+x+' 139 '+(x+13)+' 148',null,INK,3.4);
-      ellipse(c,x,160,10,12,'#faf2df',INK,3);
+      path(c,'M'+(x-14)+' 148 Q'+x+' '+(shape==='dramatic'?'131':'139')+' '+(x+13)+' 148',null,INK,3.4);
+      ellipse(c,x,160,width,height,'#faf2df',INK,3);
       ellipse(c,x+1,162,4,6,recipe.eyes==='blue'?'#3c738e':'#442d36',null);
       ellipse(c,x+2,159,1.5,2.2,'#fff',null);
     }
@@ -198,6 +201,13 @@ export function paintV8Character(canvas,recipe,view={},time=0){
   const back=angle>=135&&angle<=225;
   const profile=(angle>43&&angle<137)||(angle>223&&angle<317);
   const shirt=SHIRTS[recipe.shirt]||SHIRTS.violet;
+  const zoom=Math.max(1,Math.min(2.45,Number(view?.zoom)||1));
+  const panX=Number(view?.x)||0,panY=Number(view?.y)||0;
+  c.save();
+  c.translate(240+panX*.6,265-panY*.65);
+  c.scale(zoom,zoom);
+  c.transform(1,0,Math.sin(angle*Math.PI/180)*.065,1,0,0);
+  c.translate(-240,-265);
   const family=model.family;
   // The first three body families have distinct silhouettes, not scaled copies.
   if(family==='human')outfit(c,shirt,kit,kit.model,back);
@@ -213,6 +223,7 @@ export function paintV8Character(canvas,recipe,view={},time=0){
   if(family==='robot')robotHead(c,recipe,back,profile,kit.model);
   else if(family==='monster')monsterHead(c,recipe,back,profile,kit.model);
   else humanHead(c,recipe,back,profile);
+  c.restore();
   // Diegetic actor label, not a pretend saved state.
   c.fillStyle='#f9edda';c.font='800 14px system-ui';
   c.fillText('THE AFTER-HOURS MYSTERY CREW',18,31);
