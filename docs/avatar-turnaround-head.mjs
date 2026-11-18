@@ -91,14 +91,18 @@ function lips(c,x,y,v,skin){
     path(c,[x-span+4,y],[[x-5,y+6,x+9,y+6,x+span-4,y],
       [x+span-7,y+6,x-8,y+11,x-span+4,y]],PAPER,null);
     if(laugh)oval(c,x+2,y+depth+1,6,2.6,'#ca7a79',null);
-    for(const side of [-1,1])
+    for(const side of [-1,1]){
       path(c,[x+side*(span+1),y-2],[[x+side*(span+5),y+3]],
-        null,shade,1.5);
+        null,shade,1.7);
+      // Two fitted cheek creases, rather than extra floating mouth outlines.
+      path(c,[x+side*(span+3),y-3],[[x+side*(span+5),y+1,x+side*(span+3),y+6]],
+        null,ink,1.65);
+    }
   }else if(expression==='smirk'){
     // Asymmetric mouth and one cheek crease, rather than a miniature smile.
     path(c,[x-14,y+6],[[x-5,y+10,x+5,y+5,x+17,y-8]],
       null,ink,2.75);
-    path(c,[x+13,y-5],[[x+21,y-7,x+22,y-1]],null,shade,1.55);
+    path(c,[x+13,y-5],[[x+21,y-7,x+22,y-1]],null,shade,1.9);
   }else if(expression==='smile'||expression==='wink'){
     // A closed smile, distinct from an open toothy grin.
     path(c,[x-15,y-3],[[x-9,y+6,x+7,y+10,x+15,y-4]],
@@ -116,7 +120,9 @@ function lips(c,x,y,v,skin){
 
 function eyebrow(c,x,y,v,offset){
   const arch={soft:-2,straight:0,bold:-3,arching:-6}[v.brows]??-2;
-  path(c,[x-7,y+2],[[x-2,y+arch,x+5,y+offset]],null,INK,v.brows==='bold'?3.6:2.25);
+  // Firm outer shapes stay visible when the portrait shrinks to 48 pixels.
+  const weight=v.brows==='bold'?3.8:v.expression==='curious'||v.expression==='smirk'?2.9:2.55;
+  path(c,[x-8,y+2],[[x-2,y+arch-1,x+6,y+offset]],null,INK,weight);
 }
 
 function eye(c,x,y,iris,v,width=10,face=0){
