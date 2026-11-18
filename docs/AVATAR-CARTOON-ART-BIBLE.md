@@ -2,6 +2,12 @@
 
 **Owner:** Cowboy | **Repository:** `perhardt7686/cowboys-web-toolbox` | **Design revision:** November 15, 2026
 
+## V7 source-backed acting revision (November 17, 2026)
+
+The owner's eight original private screenshots (`IMG_0831.png` through `IMG_0838.png`) were reviewed in their private Library and **must not be copied into public source or release artifacts**. The images show early-era cel drawing references alongside some newer promotional examples, not eight clean production model sheets. Learn from broad visual grammar only: clear jaw/head silhouettes, selectively thick exterior ink, large simple color masses, expressive brow/mouth/cheek acting, and genuinely asymmetric shoulder/hand poses. Do not reproduce protected character silhouettes, logos, facial identities, scene paintings, or exact frame compositions.
+
+**Current candidate #71 changes:** raise contrast among the eight *existing* expression IDs without changing saved recipes; keep cheek/jaw strokes attached to fitted face planes; move relaxed human arms farther apart in tilt, leaving occupied hand sockets and mechanical limbs unchanged. The synthetic model-sheet browser test now produces **all eight moods** in both engines at 48 and 64 px, plus front/profile comparisons. Automated uniqueness is a necessary engineering check, **not** the owner's subjective art approval. Original reference match remains pending owner review of the newly generated contact sheets. The Commons browser CI now uses pinned Ubuntu 24.04 with its full browser-suite dependencies and no skipped tests.
+
 ## North star
 
 The Family Message Board is an original, warm, slightly eerie late-1960s mystery-cartoon world. Cowboy's user-provided screenshots of the original *Scooby-Doo, Where Are You!* series are a visual study reference, **not artwork to reproduce**. Do not copy its characters, logos, distinctive character designs, scene paintings, or licensed assets.
