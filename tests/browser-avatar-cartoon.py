@@ -498,9 +498,55 @@ async def review_angles(browser):
           throw Error('No 3D '+pose+' posture');
         poseCtx.drawImage(tile,26+j*229,76,195,293);
       }
+      // Six source-original face profiles at the real avatar sizes, using no
+      // private reference photos: 48/64/96/256px, in both live renderers.
+      const sizeFaces=['oval','round','square','heart','long','angular'];
+      const sizes=[48,64,96,256];
+      const sizeSheet=makeCanvas(1120,2230),sizeCtx=sizeSheet.getContext('2d');
+      sizeCtx.fillStyle='#f7efdf';sizeCtx.fillRect(0,0,1120,2230);
+      sizeCtx.fillStyle='#30243a';sizeCtx.font='bold 23px system-ui';
+      sizeCtx.fillText('Original face silhouettes · 48 / 64 / 96 / 256 px',20,32);
+      sizeCtx.font='bold 16px system-ui';
+      sizeCtx.fillText('3D character portrait',112,59);
+      sizeCtx.fillText('Layered cel character portrait',615,59);
+      const sizeTarget=makeCanvas(256,256),sizeHashes=new Map(),sizeDuplicates=[];
+      for(const [row,face] of sizeFaces.entries()){
+        const y=78+row*355;
+        sizeCtx.font='bold 17px system-ui';sizeCtx.fillStyle='#30243a';
+        sizeCtx.fillText(face.toUpperCase(),9,y+55,101);
+        const recipe={...SHOWROOM_LOOKS.mechanic,face,pose:'center',
+          expression:'calm',beard:'none',hat:'none',glasses:'none',
+          style:'short',background:'night',hair:'black'};
+        for(const [j,isCel] of [false,true].entries()){
+          const projection=figureAt(recipe,0);
+          const camera=isCel?{angle:0,crop:{x:projection.head.x,
+            y:projection.head.y+41*projection.design.scale,size:175}}:
+            {angle:0,zoom:2.4,y:166};
+          if(isCel)renderLoadout(sizeTarget,recipe,0,null,camera);
+          else if(!paintRoomAvatar(sizeTarget,recipe,camera,0,null,'body'))
+            throw Error('No 3D face profile for '+face);
+          let offset=j===0?112:615;
+          for(const size of sizes){
+            const mini=makeCanvas(size,size);
+            mini.getContext('2d').drawImage(sizeTarget,0,0,size,size);
+            const key=(isCel?'cel':'3d')+'-'+size;
+            const fingerprint=mini.toDataURL('image/png');
+            const previous=sizeHashes.get(key+'-'+fingerprint);
+            if(previous)sizeDuplicates.push(key+': '+previous+' = '+face);
+            sizeHashes.set(key+'-'+fingerprint,face);
+            sizeCtx.drawImage(mini,offset,y+15,size,size);
+            sizeCtx.font='13px system-ui';sizeCtx.fillStyle='#30243a';
+            sizeCtx.fillText(size+' px',offset,y+287,60);
+            offset+=size+8;
+          }
+        }
+      }
+      releaseStudioView(sizeTarget);
+      if(sizeDuplicates.length)throw Error('Face profiles visually repeat: '+sizeDuplicates.join('; '));
+      const sizeQA={faces:sizeFaces.length,sizes,renderers:2,duplicates:sizeDuplicates.length};
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet,sizeSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA,sizeQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
@@ -511,9 +557,11 @@ async def review_angles(browser):
                            'avatar-workshop-robot-silhouettes.png',
                            'avatar-workshop-robot-hat-fit.png',
                            'avatar-workshop-human-proportions.png',
-                           'avatar-workshop-human-poses.png'], sheets['images']):
+                           'avatar-workshop-human-poses.png',
+                            'avatar-workshop-face-size-matrix.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
+    assert sheets['sizeQA']['faces'] == 6 and sheets['sizeQA']['sizes'] == [48,64,96,256] and sheets['sizeQA']['renderers'] == 2 and sheets['sizeQA']['duplicates'] == 0, sheets['sizeQA']
     await page.close()
 
 
