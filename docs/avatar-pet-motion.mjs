@@ -11,15 +11,11 @@ export function petMotionFrame({species='woodland',move='hop',action='play',
   const extent=active?Math.sin(Math.PI*p):0;
   const idle=!active&&t>0;
   const clock=idle?Math.sin(t*.92):0;
-  const cycle=Math.sin(9*Math.PI*p)*extent;
-  const doubleStep=Math.abs(Math.sin(6*Math.PI*p))*extent;
   const petting=action==='pet',observing=action==='sniff'||action==='scan';
   const intensity=petting?.30:observing?.43:1;
   const energy=extent*intensity;
-  const air=species==='moth'||species==='winged'||
-    species==='phantom'||species==='oddity'||
-    (species==='bird'&&move==='glide')||
-    (species==='reptile'&&move==='float');
+  const cycle=Math.sin(9*Math.PI*p)*energy;
+  const doubleStep=Math.abs(Math.sin(6*Math.PI*p))*energy;
   const kind=species==='automaton'?'clockwork':
     species==='moth'?'flutter':
     species==='phantom'?'drift':
