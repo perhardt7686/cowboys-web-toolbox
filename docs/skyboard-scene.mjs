@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three-0.178.0/three.module.min.js';
-import {skyObjectX,skyTrack} from './skyboard-physics.mjs?v=courses2';
+import {SKY_INPUT,skyObjectX,skyTrack} from './skyboard-physics.mjs?v=courses2';
 import {populateSkyWorld,skyBackdrop} from './skyboard-world-art.mjs';
 
 const ground=(shape,color,roughness=.78)=>new THREE.Mesh(shape,new THREE.MeshStandardMaterial({color,roughness}));
@@ -229,6 +229,11 @@ export function createSkyScene(width,height){
       sun.position.z=-z-166;
       aim.set(skyTrack(course,z+11).center+state.x*.28,state.y*.30+track.y*.70+.45,-z-11);
       camera.lookAt(aim);
+      // A restrained camera bank makes drift legible while leaving replay physics untouched.
+      if(!lowMotion&&Math.abs(state.lean)>.02){
+        const roll=(state.mask&SKY_INPUT.drift)?0.05:0.018;
+        camera.rotateZ(-state.lean*roll);
+      }
       if(camera.fov!==51+pace*9){camera.fov=51+pace*9;camera.updateProjectionMatrix();}
       renderer.render(scene,camera);
       ctx.drawImage(renderer.domElement,0,0,ctx.canvas.width,ctx.canvas.height);
