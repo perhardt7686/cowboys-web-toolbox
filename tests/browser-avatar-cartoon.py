@@ -544,9 +544,45 @@ async def review_angles(browser):
       releaseStudioView(sizeTarget);
       if(sizeDuplicates.length)throw Error('Face profiles visually repeat: '+sizeDuplicates.join('; '));
       const sizeQA={faces:sizeFaces.length,sizes,renderers:2,duplicates:sizeDuplicates.length};
+      // Synthetic body/pet fit contact sheet in both renderers. No private data.
+      const companionSheet=makeCanvas(650,1570),pc=companionSheet.getContext('2d');
+      pc.fillStyle='#f7efdf';pc.fillRect(0,0,650,1570);
+      pc.fillStyle='#30243a';pc.font='bold 22px system-ui';
+      pc.fillText('Companion fit · original synthetic bodies and pets',15,31);
+      pc.font='bold 14px system-ui';
+      pc.fillText('3D body-fit socket',152,58);pc.fillText('Layered cel',390,58);
+      const pairSets=[
+        ['Detective / hound','detective','fog-hound'],
+        ['Detective / moth','detective','studio-observatory-moth'],
+        ['Mechanic / hound','mechanic','fog-hound'],
+        ['Mechanic / moth','mechanic','studio-observatory-moth'],
+        ['Armor / hound','armor','fog-hound'],
+        ['Armor / gargoyle','armor','bell-tower-gargoyle']
+      ];
+      const companionTile=makeCanvas(195,220),pairFingerprint=new Set();
+      for(const [row,[label,model,petId]] of pairSets.entries()){
+        const y=77+row*248;
+        pc.font='bold 15px system-ui';pc.fillStyle='#30243a';
+        pc.fillText(label,8,y+82,132);
+        const recipe={...SHOWROOM_LOOKS[model],pose:'center',
+          cosmetics:{companion:petId}};
+        for(const [col,isCel] of [false,true].entries()){
+          if(isCel)renderLoadout(companionTile,recipe,0,null,{angle:0});
+          else if(!paintRoomAvatar(companionTile,recipe,{angle:0},0,null,'body'))
+            throw Error('No 3D pet fit preview: '+label);
+          const signature=companionTile.toDataURL('image/png');
+          if(pairFingerprint.has(signature))
+            throw Error('Pet/body combination duplicates another render: '+label);
+          pairFingerprint.add(signature);
+          pc.drawImage(companionTile,150+col*234,y,207,230);
+        }
+      }
+      releaseStudioView(companionTile);
+      const companionQA={rows:pairSets.length,renderers:2,unique:pairFingerprint.size};
+      if(companionQA.unique!==12)throw Error('Missing body/pet review combinations');
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet,sizeSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA,sizeQA};
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet,sizeSheet,companionSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA,sizeQA,companionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
@@ -558,10 +594,12 @@ async def review_angles(browser):
                            'avatar-workshop-robot-hat-fit.png',
                            'avatar-workshop-human-proportions.png',
                            'avatar-workshop-human-poses.png',
-                            'avatar-workshop-face-size-matrix.png'], sheets['images']):
+                            'avatar-workshop-face-size-matrix.png',
+                            'avatar-workshop-companion-fit.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     assert sheets['sizeQA']['faces'] == 6 and sheets['sizeQA']['sizes'] == [48,64,96,256] and sheets['sizeQA']['renderers'] == 2 and sheets['sizeQA']['duplicates'] == 0, sheets['sizeQA']
+    assert sheets['companionQA']['rows'] == 6 and sheets['companionQA']['renderers'] == 2 and sheets['companionQA']['unique'] == 12, sheets['companionQA']
     await page.close()
 
 
