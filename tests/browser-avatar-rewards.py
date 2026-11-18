@@ -24,7 +24,7 @@ async def visit(browser, width, full=False, large_text=False):
     await editor.locator('[data-studio-part="hair"]').click()
     await editor.locator('[data-avatar-feature=hair][data-avatar-value=purple]').click()
     canvas = editor.locator('#family-avatar-canvas')
-    await expect(canvas).to_have_attribute('data-renderer','3d',timeout=18000)
+    await expect(canvas).to_have_attribute('data-backend','v8-original-cel',timeout=18000)
     await editor.locator('[data-studio-part="face"]').click()
     await editor.locator('summary').filter(has_text='Eyes & expressions').click()
     before = await canvas.evaluate('n=>n.toDataURL()')
