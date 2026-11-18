@@ -179,7 +179,9 @@ export function poseStudioAction(actor,time,motion,light){
   // Very restrained character acting. Never alter a saved recipe to animate it.
   const idle=!active&&time>0&&Number.isFinite(time);
   const breath=idle?Math.sin(time*1.18):0;
-  actor.figure.rotation.y=wearable&&!face&&id!=='phantom-cloak'?Math.sin(p*Math.PI*1.6)*amount*.23:0;
+  const authoredTurn=actor.figure.userData.studioActingTurn||0;
+  actor.figure.rotation.y=authoredTurn+
+    (wearable&&!face&&id!=='phantom-cloak'?Math.sin(p*Math.PI*1.6)*amount*.23:0);
   // A gesture must return to its authored body pose, not force a neutral rig.
   // That keeps held sword/lantern grip coordinates stable through an action.
   const authoredLean=actor.figure.userData.studioActingLean||0;
