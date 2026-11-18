@@ -6133,6 +6133,22 @@
         "https://www.facebook.com/watch/?ref=saved&v=1444200084348295",
         "https://shademap.app/help/"
       ]
+    },
+    {
+      "id": "blacklight",
+      "name": "Blacklight",
+      "url": "https://themarkup.org/blacklight",
+      "category": "Utilities",
+      "description": "Check a public website for advertising trackers, third-party cookies and other tracking technology.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_source_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://www.mattymctech.com/p/powerful-websites-296-301",
+        "https://themarkup.org/blacklight",
+        "https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector"
+      ]
     }
   ]
 }
