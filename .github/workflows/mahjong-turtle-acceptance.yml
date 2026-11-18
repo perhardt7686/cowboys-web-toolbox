@@ -1,0 +1,63 @@
+name: Classic Turtle 144 tile acceptance
+on:
+  pull_request:
+    paths:
+      - 'docs/mahjong-turtle*'
+      - 'docs/commons-mahjong.mjs'
+      - 'docs/community.html'
+      - 'tests/mahjong-turtle.test.mjs'
+      - 'tests/browser-mahjong-turtle.py'
+      - '.github/workflows/mahjong-turtle-acceptance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/mahjong-turtle*'
+      - 'docs/commons-mahjong.mjs'
+      - 'docs/community.html'
+      - 'tests/mahjong-turtle.test.mjs'
+      - 'tests/browser-mahjong-turtle.py'
+      - '.github/workflows/mahjong-turtle-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  turtle-engine-and-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Check syntax and execute entire node regression suite
+        run: |
+          npm ci
+          node --check docs/mahjong-turtle-engine.mjs
+          node --check docs/mahjong-turtle-ui.mjs
+          node --check docs/commons-mahjong.mjs
+          npm test
+  turtle-mobile-interactions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install browser automation
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Exercise full Turtle UI at iPhone sizes
+        run: |
+          python -m http.server 8765 --directory docs >/tmp/turtle-http.log 2>&1 &
+          python tests/browser-mahjong-turtle.py
+          python tests/browser-mahjong-kids.py
+      - name: Preserve visual proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mahjong-turtle-144-mobile
+          path: reports/mahjong-turtle-*.png
+          if-no-files-found: ignore
+          retention-days: 7
