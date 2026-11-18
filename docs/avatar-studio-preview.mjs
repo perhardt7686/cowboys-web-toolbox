@@ -21,7 +21,7 @@ export function studioCharacter(canvas,recipe,view,time=0,activity=null){
   // Live V8 actor cels: newly drawn artwork, activated only inside the modern
   // member studio. Existing earned equipment retains the proven full-fit
   // renderer until individual V8 gear illustrations pass their own tests.
-  if(canvas?.closest?.('.avatar-dressing-studio[data-v8-mode="modern"]')&&
+  if(canvas?.closest?.('.avatar-dressing-studio[data-v8-live="true"]')&&
      paintV8Character(canvas,recipe,view,time)){
     canvas.setAttribute('aria-label','Original V8 hand-drawn cartoon preview. Drag to rotate or zoom in to pan.');
     return false;
