@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {THREE,disposeFigure} from '../docs/avatar-studio-geometry.mjs';
 import {buildAvatar} from '../docs/avatar-studio-character.mjs';
+import {poseStudioAction} from '../docs/avatar-studio-actions.mjs';
 import {normalizeLoadout} from '../docs/avatar-reward-render.mjs';
 import {figureAt} from '../docs/avatar-turnaround-figure.mjs';
 import {faceSilhouetteRings} from '../docs/avatar-studio-faces.mjs';
@@ -97,6 +98,26 @@ test('tilt creates distinctly asymmetric, socket-safe 3D acting without changing
     assert.ok(pos.y>1.02&&pos.y<1.6,'keep hand inside readable full-body bounds');
   }
   for(const actor of [center,tilted])disposeFigure(actor.root);
+});
+
+test('action animation preserves the authored organic lean and sword grip on reset',()=>{
+  const actor=make({...SHOWROOM_LOOKS.detective,pose:'tilt',
+    cosmetics:{prop:'spectral-case-sword'}});
+  const prop=actor.arms.find(arm=>arm.prop)?.prop;
+  assert.ok(prop,'the synthetic detective has a fitted case sword');
+  const initial=actor.figure.rotation.z;
+  assert.ok(initial>.07);
+  actor.root.updateMatrixWorld(true);
+  const grip=prop.root.getWorldPosition(new THREE.Vector3()).clone();
+  const light=new THREE.PointLight();
+  poseStudioAction(actor,0,{id:prop.item.id,progress:.48},light);
+  poseStudioAction(actor,0,{id:prop.item.id,progress:1},light);
+  assert.equal(actor.figure.rotation.z,initial,
+    'return to the authored contrapposto, never neutralize body lean');
+  const after=prop.root.getWorldPosition(new THREE.Vector3());
+  assert.ok(after.distanceTo(grip)<1e-9,
+    'equipped sword remains at its original world grip after action reset');
+  disposeFigure(actor.root);
 });
 
 test('layered cel has compatible tilt acting through all four major angles',()=>{
