@@ -4,6 +4,8 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {BY_ID} from '../docs/avatar-reward-catalog.mjs';
 import {NEW_STUDIO_REWARDS} from '../docs/avatar-collection-edition.mjs';
+import {ARCADE_REWARDS} from '../docs/avatar-arcade-rewards.mjs';
+import {V8_ARCADE_ART_IDS,paintV8ArcadePrizeIcon} from '../docs/avatar-v8-arcade-prizes.mjs';
 import {BODY_MODELS} from '../docs/avatar-full-body.mjs';
 import {paintV8Character} from '../docs/avatar-v8-original-cels.mjs';
 import {V8_ART_IDS,paintV8RewardIcon} from '../docs/avatar-v8-prize-cels.mjs';
@@ -65,6 +67,23 @@ test('all 27 V8 prize designs render distinct authored paths without modifying r
       assert.equal(JSON.stringify(item),before,id);
     }
     assert.equal(paintV8RewardIcon(makeCanvas(),{id:'not-real'}),false);
+  }finally{globalThis.Path2D=oldPath;}
+});
+test('all 21 existing arcade achievements have individually drawable V8 prize artwork',()=>{
+  assert.equal(V8_ARCADE_ART_IDS.length,21);
+  assert.equal(new Set(V8_ARCADE_ART_IDS).size,21);
+  assert.equal(ARCADE_REWARDS.length,21);
+  assert.deepEqual(ARCADE_REWARDS.filter(item=>!V8_ARCADE_ART_IDS.includes(item.id)).map(item=>item.id),[]);
+  globalThis.Path2D=MockPath;
+  try{
+    for(const id of V8_ARCADE_ART_IDS){
+      const item=BY_ID.get(id),canvas=makeCanvas();
+      assert.ok(item,id);
+      assert.equal(paintV8ArcadePrizeIcon(canvas,item),true,id);
+      assert.equal(canvas.dataset.artPack,'v8-arcade');
+      assert.ok(canvas.trace.length>10,id);
+    }
+    assert.equal(paintV8ArcadePrizeIcon(makeCanvas(),{id:'unknown'}),false);
   }finally{globalThis.Path2D=oldPath;}
 });
 test('live cutover retains authenticated RPC gate, earned-state and save validation',()=>{
