@@ -742,7 +742,9 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       const next=asButton(label,()=>setSection(key));
       next.dataset.rewardSection=key;tabs.append(next);
     }
-    editor.prepend(tabs);enhanceMemberStudio(editor);pane.append(filters,results);
+    editor.prepend(tabs);enhanceMemberStudio(editor);
+    editor.addEventListener('avatar-v8-mode-changed',()=>paintPreview(),{signal:viewEvents.signal});
+    pane.append(filters,results);
     editor.querySelector('.studio-editor-panel').insertBefore(pane,editor.querySelector('#avatar-equipped'));
     section=nextSection;detail=item;
     if(section==='pets')pets.showPet(item);
