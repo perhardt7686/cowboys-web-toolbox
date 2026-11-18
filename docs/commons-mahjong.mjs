@@ -3,6 +3,7 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {isTileFree,countLegalPairs,adjacentMahjongTile} from './mahjong-moves.mjs?v=keyboard1';
 import {visualForTile} from './mahjong-kids-palette.mjs?v=kid7';
 import {addClassicTileArtwork,classicFaceForTile,playMahjongSound} from './mahjong-classic-tiles.mjs?v=classic1';
+import {mountClassicTurtle} from './mahjong-turtle-ui.mjs?v=turtle1';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
 const SKINS=[
@@ -35,7 +36,7 @@ const ACHIEVEMENTS=[
 ];
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  let client=null,userId=null,state=null,mounted=false,busy=false,expanded=false,selected=null,highlight=[],timer=null,resize=null,refreshing=false;
- let dialogTimer=null;
+ let dialogTimer=null,turtleCleanup=null;
  const prefsKey='cowboy-mahjong-display-v1';
  function loadPrefs(){
   try{const s=JSON.parse(window.localStorage.getItem(prefsKey)||'{}');return {tileset:s.tileset==='family'?'family':'classic',sound:s.sound===true,showFree:s.showFree===true};}
@@ -95,7 +96,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   $('mahjong-sound').addEventListener('click',()=>{prefs.sound=!prefs.sound;savePrefs();showPrefs();sound('select');});
   $('mahjong-show-free').addEventListener('click',()=>{prefs.showFree=!prefs.showFree;savePrefs();showPrefs();setStatus(prefs.showFree?'All selectable tiles are outlined.':'Free-tile outlines hidden.');});
   root.addEventListener('keydown',event=>{
-   if(event.altKey||event.ctrlKey||event.metaKey||event.isComposing||!state?.run||busy)return;
+   if(root.dataset.mahjongMode==='turtle'||event.altKey||event.ctrlKey||event.metaKey||event.isComposing||!state?.run||busy)return;
    if(event.target.closest('input,textarea,select,[contenteditable]'))return;
    const target={h:'mahjong-hint',u:'mahjong-undo',s:'mahjong-shuffle',p:'mahjong-pause'}[event.key.toLowerCase()];
    if(event.key==='Escape'&&selected!=null){selected=null;highlight=[];renderBoard();setStatus('Selection cleared.');return;}
@@ -345,10 +346,10 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   catch(e){setStatus('Could not save: '+(e.message||'Please retry.'));return null;}finally{busy=false;display();}
  }
  async function mount(){if(mounted||board.hidden||!client)return;const {data:{session}}=await client.auth.getSession();if(!session?.user?.id)return;
-  const {data,error}=await client.rpc('community_mahjong_state');if(error)return;userId=session.user.id;state=data;mounted=true;frame();display();timer=setInterval(()=>{if(!document.hidden&&mounted)refresh(true);},30000);
-   clockTimer=setInterval(()=>{if(!document.hidden&&mounted&&expanded&&state?.run&&!state.run.paused&&!busy){sessionSeconds++;syncSessionClock();}},1000);
+  const {data,error}=await client.rpc('community_mahjong_state');if(error)return;userId=session.user.id;state=data;mounted=true;frame();turtleCleanup=mountClassicTurtle($('mahjong-root'),{userId});display();timer=setInterval(()=>{if(!document.hidden&&mounted)refresh(true);},30000);
+   clockTimer=setInterval(()=>{if(!document.hidden&&mounted&&expanded&&$('mahjong-root')?.dataset.mahjongMode!=='turtle'&&state?.run&&!state.run.paused&&!busy){sessionSeconds++;syncSessionClock();}},1000);
  }
- function unmount(){mounted=false;state=null;userId=null;selected=null;highlight=[];expanded=false;if(timer){clearInterval(timer);timer=null;}if(clockTimer){clearInterval(clockTimer);clockTimer=null;}sessionRunKey=null;sessionSeconds=0;resize?.disconnect();resize=null;$('mahjong-root')?.remove();}
+ function unmount(){turtleCleanup?.();turtleCleanup=null;mounted=false;state=null;userId=null;selected=null;highlight=[];expanded=false;if(timer){clearInterval(timer);timer=null;}if(clockTimer){clearInterval(clockTimer);clockTimer=null;}sessionRunKey=null;sessionSeconds=0;resize?.disconnect();resize=null;$('mahjong-root')?.remove();}
  try{
   const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
   const local=window.localStorage,session=window.sessionStorage;
