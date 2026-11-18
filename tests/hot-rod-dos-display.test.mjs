@@ -14,6 +14,9 @@ test('320x200 Hot Rod art maps to a DOS CRT 4:3 viewport in garage and race',()=
   assert.match(css,/\.hot-rod-screen\s*\{[^}]*aspect-ratio:4\s*\/\s*3/s);
   assert.match(css,/\.hot-rod-monitor:has\(\.hot-rod-driving\) \.hot-rod-canvas\s*\{[^}]*aspect-ratio:4\s*\/\s*3/s);
   assert.match(css,/width:min\(100cqw,\s*133\.333cqh,\s*640px\)/);
+  assert.match(css,/\.hot-rod-monitor:not\(\[data-scene="race"\]\) \.hot-rod-housing/);
+  assert.doesNotMatch(css,/\.hot-rod-monitor:not\(:has\(\.hot-rod-driving\)\) \.hot-rod-housing/);
+
 });
 
 test('1989-style garage car nameplate and original selector gears remain usable',()=>{
