@@ -130,9 +130,10 @@ test('Mystery Maze queues a blocked corner turn and moves until the turn opens',
   for(const x of [2,3,4])
     assert.equal(pad.action('maze',{x,y:1}),'R','keep moving while turn is queued at '+x);
   assert.equal(pad.action('maze',{x:5,y:1}),'D','turn automatically at the next open tile');
-  assert.equal(pad.action('maze',{x:5,y:2}),'D','continue moving down while clear');
+  assert.equal(pad.action('maze',{x:5,y:2}),'N',
+    'the next south tile is a real maze wall, so no movement is recorded');
   pad.tap('maze','U');
-  assert.equal(pad.action('maze',{x:5,y:3}),'U','new request takes precedence');
+  assert.equal(pad.action('maze',{x:5,y:2}),'U','new request takes precedence');
   pad.clearHeld();
   assert.equal(pad.action('maze',{x:5,y:2}),'N','suspending the game stops steering');
   pad.tap('maze','U');
