@@ -11,6 +11,7 @@ export const RETRO_V2_RULES=Object.freeze({
 const DIRS=Object.freeze([[1,0],[0,1],[-1,0],[0,-1]]);
 const STEPS={R:[1,0],D:[0,1],L:[-1,0],U:[0,-1]};
 const HOME=Object.freeze([{x:13,y:1},{x:13,y:13},{x:7,y:7}]);
+const SCATTER=Object.freeze([{x:13,y:1},{x:13,y:13},{x:1,y:13}]);
 const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
 const open=(x,y)=>RETRO_MAZE[y]?.[x]!==undefined&&RETRO_MAZE[y][x]!=='#';
 
@@ -35,7 +36,7 @@ export function mazePhaseV2(tick,power){
 
 export function mazeGhostGoalV2(index,player,move,phase){
  const x=player.x,y=player.y;
- if(phase==='scatter')return HOME[index]||HOME[0];
+ if(phase==='scatter')return SCATTER[index]||SCATTER[0];
  if(index===0)return {x,y}; // direct hunter
  if(index===1){ // ambusher aims two cells ahead of the player
    const [dx,dy]=STEPS[move]||[1,0];
