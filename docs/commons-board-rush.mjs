@@ -59,6 +59,7 @@ function build(){
  '<div class="skyboard-hud"><span id="skyboard-live-stage">01 / 30</span><span id="skyboard-live-distance">0%</span><span id="skyboard-live-lives">♥♥♥</span><span id="skyboard-live-coins">★ 0</span></div>'+
  '<div id="skyboard-speed" class="skyboard-speed" hidden></div>'+
  '<div class="skyboard-progress" aria-hidden="true"><span id="skyboard-progress-fill"></span></div>'+
+ '<div class="skyboard-driving-hud" aria-live="off"><span id="skyboard-live-speed">100% PACE</span><span id="skyboard-live-drive">GRIP</span><span id="skyboard-live-ghost" hidden></span></div>'+
  '<div id="skyboard-message" class="skyboard-message"><strong>READY TO RIDE?</strong><p>Pick a board and press Start Stage.</p></div></div>'+
  '<div class="skyboard-touch arcade-control-deck" role="group" aria-label="Skyboard arcade controls">'+
  '<div class="arcade-stick-station"><div class="arcade-stick-pair">'+
@@ -386,6 +387,7 @@ function draw(){
   preview.y=skyTrack(preview.course,preview.progress).y;
  }
  const r=run||preview;
+ const shadow=run?ghostPosition(r):null;
  if(!compatibility&&!createSkyScene&&!sceneLoading){
   sceneLoading=true;
   import('./skyboard-scene.mjs?v=courses2').then(module=>{createSkyScene=module.createSkyScene;draw();})
@@ -394,7 +396,7 @@ function draw(){
  if(!compatibility&&createSkyScene){
   try{
    if(!scene)scene=createSkyScene(WIDTH,HEIGHT);
-   scene.draw(c,r,r.theme,r.board,run&&ghostPosition(r));
+   scene.draw(c,r,r.theme,r.board,shadow);
    canvas.dataset.renderer='webgl';
   }catch(e){
    compatibility=true;scene?.dispose();scene=null;
@@ -407,6 +409,15 @@ function draw(){
  canvas.dataset.distance=r.progress.toFixed(3);
  canvas.dataset.multiplier=(r.speed/r.normal).toFixed(3);
  canvas.dataset.ballHits=String(r.ballHits);
+ const drift=Boolean(r.mask&SKY_INPUT.drift)&&Math.abs(r.vx)>.8;
+ const drive=r.hurt>0?'KNOCKBACK':r.boost>0?'10× BOOST':r.coast>0?'BOOST COAST':!r.grounded?'AIRBORNE':drift?'DRIFTING':r.mask&SKY_INPUT.brake?'BRAKING':'GRIP';
+ const pace=Math.round(Math.abs(r.speed/r.normal)*100);
+ $('skyboard-live-speed').textContent=(r.speed<0?'REVERSE ':'')+pace+'% PACE';
+ $('skyboard-live-drive').textContent=drive;
+ const ghostHud=$('skyboard-live-ghost');
+ ghostHud.hidden=!shadow;
+ if(shadow){const gap=Math.round(r.progress-shadow.z);ghostHud.textContent='REPLAY GHOST '+(gap>=0?'+':'')+gap+' TRACK UNITS';}
+ canvas.dataset.drive=drive;
  const alert=$('skyboard-speed');
  const callout=r.countdown>0?(r.countdown>.94?'READY':'SET'):
   r.hurt>0?'RED BALL · RECOVER':r.boost>0?(r.boost<.135?'10× SPEED! · ENDING':'10× SPEED!'):
