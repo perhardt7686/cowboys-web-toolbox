@@ -38,6 +38,13 @@ async def run():
                 gallery=editor.locator('.avatar-v8-pet-gallery')
                 await expect(gallery).to_be_visible()
                 assert await gallery.locator('.avatar-v8-pet-pick').count()>=2
+                cards=await gallery.locator('.avatar-v8-pet-pick').evaluate_all("""nodes=>nodes.map(n=>({
+                  height:n.getBoundingClientRect().height,
+                  name:n.querySelector('.avatar-v8-pet-name')?.textContent,
+                  artHeight:n.querySelector('canvas')?.getBoundingClientRect().height
+                }))""")
+                assert all(card['height']>=152 and card['name'] and card['artHeight']>=85
+                           for card in cards),('Companion labels must not be cropped',label,cards)
                 await expect(editor.get_by_role('combobox',name='Choose a pet')).to_be_visible()
                 await gallery.screenshot(path=str(REPORTS/f'v8-live-pets-{label}.png'),animations='disabled')
                 await nav.get_by_role('button',name='Rewards').click()
