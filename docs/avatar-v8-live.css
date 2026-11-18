@@ -144,13 +144,17 @@ body.community-page .avatar-v8-pet-gallery p{
  color:#53686a;font-size:.79rem;line-height:1.4;margin:0;
 }
 body.community-page .avatar-v8-pet-strip{
- display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;
- max-height:305px;overflow:auto;overscroll-behavior:contain;
+ display:grid!important;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;
+ grid-auto-rows:minmax(158px,max-content)!important;align-items:stretch!important;
+ max-height:340px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
 }
 body.community-page .avatar-v8-pet-pick{
- display:grid;justify-items:center;gap:5px;min-width:0;
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:94px minmax(1.1em,auto) minmax(1.1em,auto)!important;
+ justify-items:center;align-content:start!important;align-items:center;gap:5px;min-width:0;
+ height:auto!important;max-height:none!important;min-height:158px!important;
  padding:7px 6px 10px;border:1px solid #bbcdc5;background:#fffef8;color:#2b494a;
- border-radius:11px;min-height:152px;cursor:pointer;
+ border-radius:11px;cursor:pointer;overflow:visible!important;
 }
 body.community-page .avatar-v8-pet-pick[aria-pressed=true]{
  background:#e0ece1;border:3px solid #518a7c;padding:5px 4px 8px;
