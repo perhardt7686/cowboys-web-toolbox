@@ -281,11 +281,11 @@ function arm(parent,side,v,body,wardrobe,palette,materials,item){
     // Contrapposto is visible even before the head rotates. This small
     // asymmetry avoids two identical stiff hanging sleeves; item-held arms
     // keep their existing socket and hand position instead.
-    elbow[0]+=side*(side===1?.040:.014);
-    elbow[1]+=side===1?.028:-.012;
-    hand[0]+=side*(side===1?.072:.019);
-    hand[1]+=side===1?.063:-.021;
-    hand[2]+=side===1?.044:.018;
+    elbow[0]+=side*(side===1?.065:.025);
+    elbow[1]+=side===1?.055:-.029;
+    hand[0]+=side*(side===1?.114:.031);
+    hand[1]+=side===1?.121:-.040;
+    hand[2]+=side===1?.059:.018;
   }else if(wardrobe.mechanical){
     elbow[0]+=side*.028;
     hand[0]+=side*.024;
@@ -383,7 +383,7 @@ export function buildAvatar(recipe){
   if(model==='specter')head.scale.set(.90,1.075,.965);
   if(model==='marsh')head.scale.set(1.02,1.065,1.09);
   if(model==='armor')head.rotation.z=-.10;
-  if(recipe.pose==='tilt')head.rotation.z=-.14;
+  if(recipe.pose==='tilt')head.rotation.z=-.205;
   sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',radio:model==='radio',marsh:model==='marsh',specter,
     headCovered:Boolean(cosmetics.hat||(recipe.hat&&recipe.hat!=='none')||recipe.accessory==='crown'),
     jawTune:Number(outfits.jaw)||0,eyeSpacing:Number(outfits.eye_spacing)||0,
