@@ -123,13 +123,13 @@ function build(){
   if(!user)return;
   steeringPreset=Object.hasOwn(SKY_STEERING_PRESETS,steeringSelect.value)?steeringSelect.value:DEFAULT_SKY_STEERING;
   resetSkyControls();
-  const saved=saveControlChoice(localStorage,'skyboard',user,steeringPreset);
+  let saved=false;try{saved=saveControlChoice(window.localStorage,'skyboard',user,steeringPreset);}catch{}
   status('Steering '+SKY_STEERING_PRESETS[steeringPreset].label+(saved?' saved for this member.':' active for this session (storage unavailable).'));
  });
  $('skyboard-steering-reset').addEventListener('click',()=>{
   if(!user)return;
   steeringPreset=DEFAULT_SKY_STEERING;steeringSelect.value=steeringPreset;
-  resetSkyControls();resetControlChoice(localStorage,'skyboard',user);
+  resetSkyControls();try{resetControlChoice(window.localStorage,'skyboard',user);}catch{}
   status('Steering sensitivity reset to Balanced.');
  });
  $('skyboard-ghost').addEventListener('click',e=>{
@@ -570,7 +570,7 @@ async function verify(){
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
  if(error||member?.status!=='approved'){reset();root?.remove();root=null;user=null;open=false;return;}
  if(user!==id){reset();root?.remove();root=null;user=id;profile=null;awards=[];leaders=[];open=false;
-  steeringPreset=readControlChoice(localStorage,'skyboard',id,DEFAULT_SKY_STEERING);
+  try{steeringPreset=readControlChoice(window.localStorage,'skyboard',id,DEFAULT_SKY_STEERING);}catch{steeringPreset=DEFAULT_SKY_STEERING;}
   riderLook=null;practiceChoice=0;practiceSeed=null;
   try{
    selectedBoard=localStorage.getItem('skyboard-board-'+id)||'sunny';
