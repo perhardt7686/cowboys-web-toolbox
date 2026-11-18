@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {RETRO_MAZE,RETRO_GAME_RULES,initialRetro,retroStep,retroReplay,alienAt} from '../docs/retro-arcade-engine.mjs';
 import {ARCADE_REWARDS} from '../docs/avatar-arcade-rewards.mjs';
+import {squadronFormation,squadronDiver,wispActing,drawSquadronShip,drawMazeWisp,drawMazeDetective} from '../docs/retro-arcade-visuals.mjs';
 import {CATALOG,BY_ID,GROUPS,GAME_LABELS} from '../docs/avatar-reward-catalog.mjs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 test('independent swarming shooter and mystery maze rules are deterministic',()=>{
@@ -58,4 +59,56 @@ test('games use private score RPCs, originals and readable independent title scr
  assert.match(html,/commons-retro-arcade\.mjs\?v=retro10/);
  assert.match(html,/commons-retro-arcade\.css\?v=retro5/);
  assert.doesNotMatch(js,/arcade\.archive|pac-man\.png|galaga\.png/);
+});
+
+
+test('Galaga-inspired formation and swooping dives align with the one verified target',()=>{
+  const first=squadronFormation(0,4,540);
+  assert.equal(first.length,27,'three rows by nine original waiting ships');
+  assert.equal(new Set(first.map(p=>p.row+':'+p.lane)).size,27);
+  for(const tick of [1,2,4,6,8,9,10,45,101,240]){
+    const ships=squadronFormation(tick,4,540);
+    assert.equal(ships.length,tick%9===0?26:26);
+    assert.ok(ships.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));
+    const dive=squadronDiver(tick,4,540);
+    const authoritative=alienAt(tick-1,4);
+    if(authoritative.age<=7){
+      assert.equal(dive.lane,authoritative.lane);
+      assert.equal(dive.wave,authoritative.wave);
+      assert.equal(dive.boss,authoritative.boss);
+      assert.ok(Math.abs(dive.x-(18+(authoritative.lane+.5)*56))<=18.001,
+        'visual dive must remain inside its authoritative lane');
+      assert.ok(dive.y>=65&&dive.y<=402);
+    }else assert.equal(dive,null);
+  }
+  assert.equal(squadronDiver(0,4,540),null);
+});
+
+test('distinct original wisps change only visible color and pupil mood during power',()=>{
+  const ghost={x:3,y:7},player={x:5,y:9};
+  const normal=wispActing(ghost,player,8,1,0);
+  const scared=wispActing(ghost,player,8,1,10);
+  assert.equal(normal.frightened,false);
+  assert.equal(scared.frightened,true);
+  assert.equal(normal.pupilX,2.2);
+  assert.equal(normal.pupilY,1.5);
+  assert.equal(scared.pupilX,0);
+  assert.notEqual(normal.color,scared.color);
+  assert.deepEqual(wispActing(ghost,player,8,1,0),normal,'cosmetic actors must be deterministic');
+  const ghostCopy=structuredClone(ghost);
+  wispActing(ghost,player,22,2,0);
+  assert.deepEqual(ghost,ghostCopy,'actor painting must not move collision positions');
+});
+
+test('original squadron ships, three wisps, and animated detective draw without external assets',()=>{
+  let paths=0;
+  const canvas=new Proxy({fillStyle:'',strokeStyle:'',lineWidth:1,save(){},restore(){},
+    translate(){},scale(){},rotate(){},beginPath(){paths++;},closePath(){},
+    moveTo(){},lineTo(){},quadraticCurveTo(){},bezierCurveTo(){},ellipse(){},arc(){},
+    fillRect(){},fill(){},stroke(){}},{get(t,k){return k in t?t[k]:undefined;}});
+  drawSquadronShip(canvas,70,130,.7,'#78bacf');
+  drawSquadronShip(canvas,190,345,1.1,'#f7abcd',{active:true,boss:true,tilt:.2});
+  for(let i=0;i<3;i++)drawMazeWisp(canvas,30+i*60,60,wispActing({x:i,y:2},{x:3,y:1},7,i,0),i,7);
+  drawMazeDetective(canvas,96,90,'R',12,'#efc886','#66537f');
+  assert.ok(paths>14,'real procedural artwork must not collapse into empty objects');
 });
