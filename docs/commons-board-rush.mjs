@@ -155,7 +155,8 @@ function build(){
   held.release('left','thumbstick');held.release('right','thumbstick');
   if(direction<0)held.hold('left','thumbstick');
   if(direction>0)held.hold('right','thumbstick');
-  knob.style.transform='translate3d('+Math.round(axis*25)+'px,0,0)';
+  const travel=Math.max(0,(rect.width-knob.getBoundingClientRect().width)/2-3);
+  knob.style.transform='translate3d('+Math.round(axis*travel)+'px,0,0)';
   stick.setAttribute('aria-valuenow',String(direction));
  };
  stick.addEventListener('pointerdown',e=>{
