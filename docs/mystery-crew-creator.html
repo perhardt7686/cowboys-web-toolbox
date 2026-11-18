@@ -29,6 +29,8 @@
   <h2>My Crew</h2>
   <div class="mc-portraits" id="mc-roster"></div>
   <button id="mc-add" class="mc-add" type="button"><span>＋</span> New Crew</button>
+  <button id="mc-rename" class="mc-roster-action" type="button">✎ Rename</button>
+  <button id="mc-remove" class="mc-roster-action" type="button">− Remove</button>
   <p class="mc-roster-note">Make up to six original characters.</p>
 </aside>
 <section class="mc-theater" id="mc-stage" aria-label="Character preview">
@@ -106,6 +108,8 @@
       <path d="M75 242L107 242 109 263 74 262Z" fill="#e5a65e" stroke="#573d3c" stroke-width="4"/>
       <path d="M27 224L53 237 46 261 22 254 M140 225L118 239 125 256 150 245" fill="none" stroke="#a94b36" stroke-width="5"/>
       <path d="M45 172 L48 134 115 131 125 180" fill="var(--skin,#f0b989)" stroke="#332d36" stroke-width="8"/>
+      <g id="mc-outfit-details" aria-hidden="true"></g>
+      <g id="mc-gear-detail" aria-hidden="true"></g>
       <g id="mc-head" transform-origin="91px 123px">
         <path d="M40 46Q37 1 93 3Q151 0 152 50L148 121Q135 158 95 162Q52 153 37 112Z" fill="var(--skin,#f0b989)" stroke="#322c36" stroke-width="9"/>
         <path d="M34 75Q11 17 63 14Q76 -16 113 4Q157 -8 155 38L153 78Q143 50 128 56Q116 31 95 45Q70 29 53 59L45 86Z" fill="var(--hair,#904b28)" stroke="#302b32" stroke-width="9"/>
@@ -155,7 +159,7 @@
 </aside>
 </main>
 <div class="mc-tools">
- <div class="mc-colors"><strong>Colors</strong><div id="mc-swatches" role="group" aria-label="Outfit color"></div></div>
+ <div class="mc-colors"><strong>Colors</strong><select id="mc-color-layer" aria-label="Color selection target"><option value="shirt">Jacket</option><option value="skin">Skin</option><option value="hair">Hair</option></select><div id="mc-swatches" role="group" aria-label="Color choices"></div></div>
  <div class="mc-views"><strong>View</strong><button id="mc-view-front" aria-pressed="true">Front</button><button id="mc-view-side" aria-pressed="false">Side</button><button id="mc-view-back" aria-pressed="false">Back</button></div>
  <div class="mc-rotate"><strong>Rotate</strong><button id="mc-turn-left" aria-label="Rotate left">↶</button><button id="mc-turn-right" aria-label="Rotate right">↷</button></div>
  <div class="mc-zoom"><strong>Zoom</strong><button id="mc-zoom-out" aria-label="Zoom out">−</button><button id="mc-zoom-in" aria-label="Zoom in">＋</button></div>
@@ -172,6 +176,7 @@
 <footer class="mc-footer"><span id="mc-status" role="status">Your characters and unlocks are saved on this device only. Previous creator data is not used.</span><a href="community.html">Back to Family Message Board</a></footer>
 </div>
 <dialog id="mc-info"><h2>Mystery Crew Creator</h2><p>A fresh character creator inspired by Cowboy's approved reference. This first release stores your crew, outfit choices, and earned workshop coins only in this browser. It does not change family accounts, achievement servers, or previous creator characters.</p><button id="mc-info-close">Got it</button></dialog>
-<script type="module" src="mystery-crew-creator.mjs?v=creator1"></script>
+<dialog id="mc-rename-dialog"><form method="dialog" id="mc-rename-form"><h2>Rename your character</h2><label for="mc-name-input">Crew member name</label><input id="mc-name-input" maxlength="28" minlength="1" required autocomplete="off"><div class="mc-dialog-actions"><button value="cancel" type="button" id="mc-rename-cancel">Cancel</button><button value="save" type="submit">Save name</button></div></form></dialog>
+<script type="module" src="mystery-crew-creator.mjs?v=creator2"></script>
 </body>
 </html>
