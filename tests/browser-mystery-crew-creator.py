@@ -81,7 +81,7 @@ async def main():
     async with async_playwright() as p:
         chromium=await p.chromium.launch(headless=True)
         try:
-            for w,name in [(390,'iphone-390'),(375,'iphone-375'),(1365,'desktop')]:
+            for w,name in [(390,'iphone-390'),(375,'iphone-375'),(1365,'desktop'),(1672,'reference-desktop')]:
                 await verify(chromium,w,name)
         finally:await chromium.close()
 
