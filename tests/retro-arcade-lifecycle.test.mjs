@@ -67,7 +67,7 @@ test('retro UI invalidates hidden, abandoned and superseded async rounds',()=>{
  assert.match(src,/root\.isConnected/);
  assert.match(src,/lifecycle\.current\(\)/);
  assert.match(src,/A completed run may still finish server verification/);
- assert.match(html,/commons-retro-arcade\.mjs\?v=retro10/);
+ assert.match(html,/commons-retro-arcade\.mjs\?v=retro11/);
 });
 
 test('pending member authorization is invalidated by board hide or account switch',()=>{
