@@ -500,6 +500,33 @@ function paintFleet(canvas,s,look='patrol'){
  ctx.fillStyle=cockpit;ctx.fillRect(-8,-3,16,10);
  ctx.restore();
  drawFleetGear(ctx,look,s,x,y);
+ if(s.version===2){
+   const targets=fleetTargetsV2(Math.max(0,s.tick-1),s.seed);
+   ctx.textAlign='center';ctx.font='bold 13px monospace';
+   ctx.fillStyle='#bff7ee';ctx.fillText('THREE ENEMY ATTACK WINDOWS · V2',w/2,27);
+   for(const target of targets){
+     if(s.destroyed.includes(target.id))continue;
+     const centerX=18+(target.lane+.5)*bw;
+     const yPos=target.active?66+target.progress*335:72+target.index*38;
+     const color=target.boss?'#f0a0cb':['#7dd4af','#96b3fa','#dfbb86'][target.index];
+     const tilt=target.active?Math.sin(Math.PI*target.progress)*(target.index===1?-.28:.24):0;
+     drawSquadronShip(ctx,centerX,yPos,target.active?1.13:.78,color,
+       {active:target.active,boss:target.boss,tilt});
+     if(target.active){
+       ctx.fillStyle=target.boss?'#ffdaac':'#a6ffee';
+       ctx.fillText(target.boss?'CAPTURE SHIP':'DIVE '+(target.index+1),
+         centerX,Math.min(h-113,yPos+40));
+     }
+   }
+   if(s.captured){
+     ctx.fillStyle='#ffc0c6';ctx.font='900 15px monospace';
+     ctx.fillText('ESCORT CAPTURED · DEFEAT NEXT COMMANDER',w/2,h-154);
+   }
+   if(s.events.includes('rescue')){
+     ctx.fillStyle='#fff0ae';ctx.font='900 24px monospace';
+     ctx.fillText('ESCORT RESCUED +100',w/2,h/2);
+   }
+ }else{
  // Reserve formation is visual only; only the bright diving attacker is
  // active in the server-verified wave. No new invisible hitboxes or points.
  ctx.save();ctx.globalAlpha=.34;
@@ -521,6 +548,7 @@ function paintFleet(canvas,s,look='patrol'){
    ctx.fillStyle=alien.boss?'#ffd79f':'#9ffff2';
    ctx.font='bold 12px monospace';ctx.textAlign='center';
    ctx.fillText(alien.boss?'COMMANDER DIVE':'ACTIVE DIVER',alien.x,Math.min(h-111,alien.y+44));
+ }
  }
  if(['F','A','D'].includes(s.prevAction)){
   ctx.strokeStyle='#fff0a6';ctx.lineWidth=5;
@@ -562,7 +590,11 @@ function renderGame(state){
  if(state.game==='fleet')paintFleet(canvas,state,activeLook(state.game));else paintMaze(canvas,state,activeLook(state.game));
  const n=root.querySelector('.retro-live-readout');
  n.textContent='SCORE '+state.score+' · LIVES '+state.lives+' · '+state.tick+'/'+RETRO_GAME_RULES[state.game].steps+
-   (state.game==='maze'?' · CLUES '+state.dots:'/ · SWARMS '+Math.ceil(state.tick/9));
+   (state.version===2?' · V2':'')+
+   (state.game==='maze'?' · CLUES '+state.dots+
+     (state.version===2?' · '+state.phase.toUpperCase()+' · GHOSTS 3':''):
+      state.version===2?' · RESCUES '+state.rescues:
+      ' · SWARMS '+Math.ceil(state.tick/9));
 }
 function onKeyDown(event){
  // Leave Space/Enter to the focused button, form, menu or link. Arcade
