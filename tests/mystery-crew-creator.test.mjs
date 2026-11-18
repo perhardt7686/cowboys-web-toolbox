@@ -13,7 +13,7 @@ test('approved reference and exact name are immutable source requirements',()=>{
  assert.match(html,/data-view="collections"/);
  assert.match(doc,/1672 × 941/);
  assert.match(doc,/4ad4fd88ddb53e5e7d9fd94aaa8739951b7fc393b5bbd62494b8385873bf8f7d/);
- assert.doesNotMatch(html,/Dressing room|Classic layout|Avatar Studio/);
+ assert.doesNotMatch(html,/<h3[^>]*>Dressing room|data-v8-mode|avatar-reward-tabs/);
 });
 test('real member launcher is redirected without rewriting the family-account API',()=>{
  const src=read('community-profiles.mjs');
@@ -30,7 +30,7 @@ test('new creator has working independent device-only state, not pretend server 
  assert.match(src,/draft\.coins-=item\.cost/);
  assert.match(src,/document\.addEventListener\('click'/);
  assert.match(src,/case 'mc-save'/);
- assert.match(src,/data\.motion/);
+ assert.match(src,/app\.dataset\.motion/);
  assert.doesNotMatch(src,/\bfetch\s*\(|supabase|\.rpc\(|\bindexedDB\b/);
 });
 test('responsive and reduced-motion rules keep original creator standalone',()=>{
