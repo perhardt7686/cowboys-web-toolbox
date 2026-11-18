@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import {readFileSync} from 'node:fs';
 import {EXPRESSION_KEYS,expressionActing} from '../docs/avatar-expression-acting.mjs';
 import {AVATAR_OPTIONS,normalizeAvatarRecipe} from '../docs/family-avatar-builder.mjs';
 import {cartoonFaceExpression} from '../docs/avatar-studio-faces.mjs';
+import {paintMysteryExpression} from '../docs/avatar-mystery-features.mjs';
 
 test('shared acting poses include every saved expression without changing recipe IDs',()=>{
   const options=AVATAR_OPTIONS.expression.map(([id])=>id);
@@ -50,4 +52,43 @@ test('art references are pure and cannot mutate saved poses',()=>{
   assert.equal(b.eyes[0],1);
   assert.equal(b.brows[1],0);
   assert.deepEqual(expressionActing('not-an-expression'),b);
+});
+
+
+test('cel portrait uses the single active acting painter and produces eight distinct gestures',()=>{
+  const source=readFileSync(new URL('../docs/avatar-cel-portrait.mjs',import.meta.url),'utf8');
+  assert.doesNotMatch(source,/function expression\(c,v,iris,skin\)/,
+    'the old unused portrait facial painter must not return');
+  assert.equal((source.match(/paintMysteryExpression\(c,v,eyes,skin\)/g)||[]).length,1,
+    'portrait rendering should have exactly one active eye/brow/mouth painter');
+
+  function capture(expression){
+    const trace=[];
+    const put=(name,args=[])=>{
+      assert.ok(args.every(Number.isFinite),expression+': non-finite canvas geometry');
+      trace.push(name+':'+args.map(x=>Math.round(x*1000)/1000).join(','));
+    };
+    const ctx={
+      beginPath(){put('begin');},
+      moveTo(...args){put('move',args);},
+      lineTo(...args){put('line',args);},
+      quadraticCurveTo(...args){put('quadratic',args);},
+      bezierCurveTo(...args){put('bezier',args);},
+      ellipse(...args){put('ellipse',args);},
+      closePath(){put('close');},
+      fill(){put('fill');},
+      stroke(){put('stroke');}
+    };
+    paintMysteryExpression(ctx,
+      {expression,brows:'soft',eye_shape:'classic',nose:'button'},
+      '#488392','#dcab8b');
+    assert.ok(trace.some(x=>x.startsWith('bezier:')),expression+': no ink contours');
+    assert.ok(trace.some(x=>x.startsWith('ellipse:')),expression+': no eye/face details');
+    return trace.join('|');
+  }
+  const variants=AVATAR_OPTIONS.expression.map(([id])=>id);
+  assert.equal(new Set(variants.map(capture)).size,variants.length,
+    'each saved facial expression must have distinct actual cel-painter geometry');
+  assert.equal(capture('smirk'),capture('smirk'),
+    'cel acting must render deterministically across saves/reloads');
 });
