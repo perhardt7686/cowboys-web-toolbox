@@ -21014,6 +21014,58 @@
       },
       "bestFor": "Estimate building, tree and terrain shadows for garden, travel and outdoor planning.",
       "uploadTool": false
+    },
+    {
+      "id": "blacklight",
+      "name": "Blacklight",
+      "url": "https://themarkup.org/blacklight",
+      "category": "Utilities",
+      "description": "Check a public website for advertising trackers, third-party cookies and other tracking technology.",
+      "sources": [],
+      "monogram": "BL",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "evidence": "Matty McTech's October 5, 2026 Powerful Websites (296–301), item 301, links to The Markup's official public Blacklight privacy inspector. Official feature description and limitations independently checked November 17, 2026.",
+      "evidenceUrls": [
+        "https://www.mattymctech.com/p/powerful-websites-296-301",
+        "https://themarkup.org/blacklight",
+        "https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector"
+      ],
+      "destinationCheck": {
+        "url": "https://themarkup.org/blacklight",
+        "title": "Blacklight – The Markup",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-11-17",
+        "notes": "Official Blacklight public inspection page was reachable and explains tracking-related tests. The URL-submit/scan workflow was not executed. Automated scan findings are indicative, not proof of privacy violations."
+      },
+      "topic": "Utilities",
+      "group": "Technology & privacy",
+      "addedAt": "2026-11-17",
+      "accessLabel": "Free website tracker check",
+      "accessReviewedAt": "2026-11-17",
+      "accessNote": "Public scan form observed; scan not submitted, account requirement not independently verified. A user-supplied public domain may be sent to The Markup for remote testing and reports may be cached.",
+      "access": {
+        "pricing": "free",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "no",
+        "processing": "remote",
+        "commercial": "unknown",
+        "kind": "tool",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "general"
+        ]
+      },
+      "bestFor": "A first-pass check of trackers and third-party cookies on a public website.",
+      "uploadTool": false,
+      "privacyNote": "Use public website domains, not private invitation or tokenized links. Blacklight visits the inspected domain remotely and caches reports; automated findings are not definitive proof of tracking or privacy violations."
     }
   ],
   "tips": [
@@ -22637,18 +22689,18 @@
     "videosWithMappings": 63,
     "videosWithTips": 31,
     "videosPending": 0,
-    "destinationLinks": 421,
+    "destinationLinks": 422,
     "addedDestinationLinks": 41,
-    "independentWebFinds": 346,
+    "independentWebFinds": 347,
     "videoDestinationLinks": 75,
     "savedCollectionLastChecked": "2026-11-04",
     "savedCollectionLastObservedVideos": 44,
     "savedCollectionNewRecords": 9,
     "destinationVerificationHolds": 1
   },
-  "scope": "421 website destinations: 75 traced to source videos and 346 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
+  "scope": "422 website destinations: 75 traced to source videos and 347 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
   "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
-  "updatedAt": "2026-11-04",
+  "updatedAt": "2026-11-17",
   "releases": [
     {
       "date": "2026-10-30",
