@@ -43,7 +43,7 @@ const PAINT_GROUPS=[
 const dataKey=()=>user?'dash-forge-draft-v2-'+user:null;
 const defaultDraft=(title='My First Dash')=>({id:null,title,difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[],song:'pulse'});
 let tileSelected=4,zoom=1,zoomStart=null,clipboard=null,pickTool='paint',paintGroup='Hazards',editLayer='track',drag=null,autoTimer=0;
-let inputHeld=false,inputTapped=false,lastRun=null,draftLoadedFor=null;
+let inputHeld=false,inputTapped=false,lastRun=null,draftLoadedFor=null,attemptKey='',attemptCount=0;
 function editableTile(index){return Number.isInteger(index)&&index>=4&&index<draft.pattern.length-4;}
 function draftSnapshot(){return structuredClone(draft);}
 function storeDraft(){
@@ -350,11 +350,11 @@ function build(){
  const main=board.querySelector('.community-main');if(!main)return;
  root=document.createElement('section');root.id='dash-forge-root';root.className='mahjong-game dash-forge';
  root.innerHTML='<button type="button" id="dash-forge-toggle" class="mahjong-entry-button" aria-expanded="false" aria-controls="dash-forge-inside">'+
- '<span class="mahjong-entry-icon" aria-hidden="true">◆</span><span class="mahjong-entry-copy"><strong>Dash Forge</strong>'+
+ '<span class="mahjong-entry-icon" aria-hidden="true">◆</span><span class="mahjong-entry-copy"><strong>Elliot’s Dash Forge</strong>'+
  '<small id="dash-forge-summary">Tablet racer · Family levels, achievements & builder awards</small></span>'+
  '<span class="mahjong-chevron" aria-hidden="true">▾</span></button>'+
  '<div id="dash-forge-inside" hidden>'+
-  '<header class="dash-top"><div><small>ORIGINAL FAMILY ARCADE · ONE-TAP RHYTHM PLATFORMER</small><h2>◆ DASH FORGE</h2>'+
+  '<header class="dash-top"><div><small>ELLIOT’S EDITION · ONE-TAP RHYTHM PLATFORMER</small><h2>◆ ELLIOT’S DASH FORGE</h2>'+
     '<p>Leap the spikes. Build your own levels. Earn verified family awards.</p></div>'+
     '<div id="dash-head-stats" class="dash-head-stats"></div></header>'+
   '<nav class="dash-tabs" aria-label="Dash Forge locations">'+TABS.map(([id,name])=>'<button data-dash-tab="'+id+
@@ -403,11 +403,11 @@ function build(){
   '<div id="dash-status" class="dash-status" role="status" aria-live="polite">Loading your family arcade…</div>'+
   '<div id="dash-play-overlay" class="dash-play-overlay" hidden>'+
     '<header class="dash-playing-head"><div><small>NOW PLAYING</small><strong id="dash-run-title">Loading…</strong></div>'+
-      '<strong id="dash-live-progress">0%</strong><button type="button" id="dash-sound" data-dash-action="sound" aria-pressed="false">♪ SOUND OFF</button><button type="button" id="dash-retry-live" data-dash-action="retry" hidden>Retry</button><button type="button" id="dash-practice-retry" data-dash-action="practice-retry" hidden>Checkpoint</button><button type="button" data-dash-action="leave">Leave track</button></header>'+
+      '<strong id="dash-live-progress">0%</strong><strong id="dash-attempt-count" aria-live="off">ATTEMPT 1</strong><button type="button" id="dash-sound" data-dash-action="sound" aria-pressed="false">♪ SOUND OFF</button><button type="button" id="dash-retry-live" data-dash-action="retry" hidden>Retry · R</button><button type="button" id="dash-practice-retry" data-dash-action="practice-retry" hidden>Checkpoint</button><button type="button" data-dash-action="leave">Leave track</button></header>'+
     '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" tabindex="0" role="img" aria-label="Running level. Press Space or Up to control your character."></canvas>'+
      '<div class="dash-run-overlay" id="dash-run-message" hidden></div></div>'+
     '<footer class="dash-game-controls arcade-control-deck" aria-label="Dash Forge arcade controls">'+
-    '<div class="arcade-control-info"><strong>PLAYER 1 · ARCADE CONTROLS</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
+    '<div class="arcade-control-info"><strong>ELLIOT’S EDITION · ARCADE CONTROLS</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
     '<div class="arcade-action-cluster"><div class="arcade-key-station">'+
     '<button type="button" id="dash-jump" class="arcade-button-a" aria-label="Arcade A, jump" aria-describedby="dash-action-label"><span class="arcade-button-face">A</span><span class="arcade-button-symbol" aria-hidden="true">↗</span></button>'+
     '<span id="dash-action-label" class="arcade-button-caption">JUMP</span><small class="arcade-keyboard-hint">SPACE / ↑ · HOLD</small></div></div></footer>'+
@@ -784,10 +784,16 @@ function draw(){
  g.fillStyle=accent;g.fillRect(0,0,W*Math.min(1,pos/run.pattern.length),5);
  g.font='bold 13px system-ui';g.fillStyle='#fff';
  g.fillText((run.world||'MAKER STUDIO').toUpperCase()+' · '+DASH_MODES[r.mode].toUpperCase(),13,31);
- if(r.tick%15<4){g.fillStyle=accent+'26';g.fillRect(0,H-11,W,11);}
+ const beatPhase=((dashBeatAt(r)%1)+1)%1;
+ g.fillStyle='#0a153b';g.fillRect(13,H-29,130,18);
+ g.strokeStyle=accent;g.lineWidth=2;g.strokeRect(13,H-29,130,18);
+ g.fillStyle=accent;g.fillRect(16,H-26,124*beatPhase,12);
+ g.fillStyle='#ffffff';g.font='bold 11px system-ui';g.fillText('BEAT',16,H-35);
+ if(r.tick%15<4){g.fillStyle=accent+'26';g.fillRect(0,H-6,W,6);}
  if(run.practice){g.fillStyle='#ffe692';g.font='bold 17px system-ui';g.fillText('PRACTICE',W/2-34,33);}
  canvas.dataset.light=String(r.lightCue);canvas.dataset.mode=DASH_MODES[r.mode];canvas.dataset.tile=String(Math.floor(r.x));canvas.dataset.y=r.y.toFixed(3);
  canvas.dataset.gravity=String(r.gravity);canvas.dataset.speed=String(r.speed);
+ canvas.dataset.beat=String(Math.floor(dashBeatAt(r)));
 }
 function frameStep(timestamp){
  if(!run||run.finishing)return;
@@ -820,6 +826,9 @@ function updateControls(){
   $('dash-jump').querySelector('.arcade-button-symbol').textContent=action==='JUMP'?'↗':action==='THRUST'?'▲':'⇅';
 }
 function beginDraw(l){
+ const nextKey=(run.practice?'practice:':'verified:')+String(user)+':'+String(run.level_id||run.item?.title||run.title);
+ if(attemptKey!==nextKey){attemptKey=nextKey;attemptCount=0;}
+ attemptCount++;
  try{if(!soundOn&&localStorage.getItem('dash-forge-audio')==='on')toggleSound();}catch{}
  const overlay=$('dash-play-overlay');overlay.hidden=false;overlay.dataset.finished='false';
  run.inArcade=document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='dashforge';
@@ -827,7 +836,7 @@ function beginDraw(l){
  $('dash-run-title').textContent=l.title;
  const returnButton=root?.querySelector('[data-dash-action="leave"]');
  if(returnButton)returnButton.textContent=runFromBuilder?'← BACK TO LEVEL CREATOR':'Leave track';
- $('dash-live-progress').textContent='0%';$('dash-run-message').hidden=true;
+ $('dash-live-progress').textContent='0%';$('dash-attempt-count').textContent='ATTEMPT '+attemptCount;$('dash-run-message').hidden=true;
  $('dash-retry-live').hidden=true;$('dash-practice-retry').hidden=true;
  run.lastFrame=null;run.elapsed=0;run.trace=[];run.input=0;run.accumulator=0;run.finishing=false;lastBeat=-1;
  inputHeld=inputTapped=false;
@@ -915,6 +924,9 @@ function onKeys(e){
  if(e.target?.closest?.('input,select,textarea,[contenteditable]'))return;
  if(run&&!run.finishing&&(e.code==='Space'||e.code==='ArrowUp')&&!e.target?.closest?.('button')){
   e.preventDefault();inputHeld=true;if(!e.repeat)jump();return;
+ }
+ if(!run&&$('dash-play-overlay')&&!$('dash-play-overlay').hidden&&e.code==='KeyR'&&!e.repeat){
+  e.preventDefault();void retryTrack();return;
  }
  if(run||scene!=='builder'||e.repeat)return;
  if((e.ctrlKey||e.metaKey)&&['KeyC','KeyV','KeyZ','KeyY'].includes(e.code)){
