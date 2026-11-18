@@ -204,7 +204,7 @@ export function paintV8Character(canvas,recipe,view={},time=0){
   const zoom=Math.max(1,Math.min(2.45,Number(view?.zoom)||1));
   const panX=Number(view?.x)||0,panY=Number(view?.y)||0;
   c.save();
-  c.translate(240+panX*.6,265-panY*.65);
+  c.translate(240+panX*.6,265+panY*1.05);
   c.scale(zoom,zoom);
   c.transform(1,0,Math.sin(angle*Math.PI/180)*.065,1,0,0);
   c.translate(-240,-265);
