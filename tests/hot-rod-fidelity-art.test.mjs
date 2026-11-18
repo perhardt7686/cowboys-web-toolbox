@@ -73,3 +73,34 @@ test('period scenes redraw from persistent and in-progress workshop or driving v
   compressed.push(render({...view,scene:'race',race:{...race,result:{outcome:'police75'}}}));
   assert.equal(new Set(compressed).size,compressed.length);
 });
+
+test('Pass 1 silhouettes retain unique period vehicle identities across every garage car',()=>{
+  const unique=new Set();
+  for(const model of Object.values(CARS)){
+    const frameImage=frame();
+    const car=makeCar(model,1);
+    paintVehicle(frameImage.screen,model,car,40,80,1);
+    const pixelCount=frameImage.pixels.filter(pixel=>pixel!==255).length;
+    assert.ok(pixelCount>2200,model.id+' silhouette visibility');
+    unique.add(digest(frameImage.pixels));
+    assert.notEqual(render({scene:'garage',car}),render({scene:'garage',car:{...car,color:car.color===3?12:3}}),model.id+' repaint visibility');
+  }
+  assert.equal(unique.size,Object.keys(CARS).length,'Each car has a distinct period profile');
+});
+
+test('Pass 1 cockpit responds to road, steering, speed and shifting without race mutations',()=>{
+  const car=makeCar(CARS.valiant61,1);
+  const start={...newCampaign(),cars:[car],selected:1};
+  const {state:staged}=startRace(start,{rival:'earl',kind:'drag',stake:'kicks'},{id:'art-only-ride',seed:208});
+  const race=createRace(staged.race);
+  const image=trial=>render({scene:'race',car,race:trial});
+  const untouched=JSON.stringify(race);
+  const base=image(race);
+  const steer=structuredClone(race);steer.player.heading=.85;
+  const speed=structuredClone(race);speed.player.speed=24;speed.player.engine=3850;speed.player.gear=2;speed.player.distance=145;
+  const road=structuredClone(race);road.contract.kind='road';road.length=4023.36;road.player.distance=180;
+  assert.notEqual(image(steer),base,'Wheel should visibly steer');
+  assert.notEqual(image(speed),base,'Gauges and road should react to driving');
+  assert.notEqual(image(road),base,'Road and drag scenes should differ');
+  assert.equal(JSON.stringify(race),untouched,'Painting must not mutate server-replayed race state');
+});
