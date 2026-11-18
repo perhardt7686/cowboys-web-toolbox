@@ -186,6 +186,7 @@ async def fit(page, game, *, driving=False):
         # follows the canvas, with no fake stretched DOS pixels.
         assert size['bounds']['top'] - size['header']['bottom'] <= 12, size
         assert size['driver']['top'] - size['bounds']['bottom'] <= 12, size
+        assert size['dlg']['height'] <= size['header']['height'] + size['bounds']['height'] + size['driver']['height'] + 16, size
         assert size['dlg']['top'] >= -2 and size['dlg']['bottom'] <= await page.evaluate('innerHeight') + 2, size
     if driving:
         for pad in size['pads']:
