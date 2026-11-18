@@ -367,6 +367,12 @@ export function buildAvatar(recipe){
   };
   const root=group(null);
   const figure=group(root);
+  // Shift the whole organic upper silhouette, not merely the head/hand decals.
+  // Rotating the rig preserves the parent-child chain for hats, hands and held props;
+  // machines retain rigid mechanical posture and the feet stay close to the floor.
+  const lean=recipe.pose==='tilt'&&!mechanical?.077:0;
+  figure.rotation.z=lean;
+  figure.userData.studioActingLean=lean;
   const body={...shape,width:shape.width*(1+(Number(outfits.build)||0)*.078)};
   figure.scale.y=shape.height*(1+(Number(outfits.height)||0)*.042);
   const color=cosmetics.bottoms?.color||{overalls:'#4b6878',dress:palette.cloth,pleats:'#a35757',flares:'#7b5653',slacks:'#575667',cuffs:'#596c6e'}[wardrobe.bottoms];
