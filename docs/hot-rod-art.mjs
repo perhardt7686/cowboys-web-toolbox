@@ -355,6 +355,23 @@ function roadScene(s,race) {
     s.box(x,y-h,Math.max(1,Math.round(ratio*2)),h,15);
     s.box(x,y-h,Math.max(1,Math.round(ratio*2)),Math.max(1,h/3),4);
   }
+  // Secondary fence rails and telephone poles distinguish the winding road
+  // from the quarter-mile strip without touching physics or input replays.
+  if(contract.kind==='road'){
+    for(let i=0;i<5;i++){
+      const z=14+i*59-(distance%59);
+      if(z<12)continue;
+      const y=trunc(Math.round(54+900/(z+20)),55,124);
+      const {center,edge,ratio}=projection(y);
+      const x=Math.round(center+edge+12*ratio);
+      const height=Math.max(4,Math.round(27*ratio));
+      s.line(x,y-height,x,y,8);
+      s.line(x+1,y-height,x+1,y,7);
+      s.line(x-5*ratio,y-height+4,x+5*ratio,y-height+4,0);
+      s.box(x-2,y-height-2,5,2,8);
+      s.line(x,y-height+2,x+3,y-height+6,15);
+    }
+  }
   if (distance<32) {
     const y=trunc(Math.round(110+(distance*2.1)),110,135);
     const {center,edge}=projection(y);
@@ -416,6 +433,16 @@ function dial(s,x,y,label,value,max,redline=Infinity,step=10) {
     s.line(x+Math.round(dx*19),y+Math.round(dy*19),x+Math.round(dx*21),y+Math.round(dy*21),t>=redline?12:7);
     if(t%(step*2)===0)s.box(x+Math.round(dx*17),y+Math.round(dy*17),1,1,t>=redline?12:15);
   }
+  // EGA glass reflections, a redline band and longer quarter marks make the
+  // analog instruments legible at the native 320x200 resolution.
+  for(let n=0;n<=4;n++){
+    const v=n*max/4, angle=tickAt(v);
+    const dx=Math.cos(angle),dy=Math.sin(angle);
+    s.line(x+15*dx,y+15*dy,x+20*dx,y+20*dy,v>=redline?12:15);
+  }
+  s.line(x-16,y-16,x-9,y-20,15);
+  s.line(x-16,y-14,x-12,y-16,7);
+  s.pixel?.(x+15,y-12,7);
   const a=tickAt(trunc(value,0,max));
   s.line(x,y,x+18*Math.cos(a),y+18*Math.sin(a),12);
   s.ellipse(x,y,3,3,7);s.box(x-1,y-1,2,2,15);
@@ -453,8 +480,13 @@ function dash(s,race,car) {
   for(let x=251;x<318;x+=4)s.box(x,133,2,4,8);
   for(let y=157;y<172;y+=3)s.box(63,y,32,1,0);
 
-  const wheelX=155+Math.round(player.heading*4);
+  const wheelX=155+Math.round(trunc(player.heading*11,-9,9));
   const rpmMax=Math.ceil(Math.max(6000,contract.player.redline+800)/1000)*1000;
+  // Chrome instrument binnacle and painted dash trim visible around the wheel.
+  s.poly([[82,136],[97,128],[216,127],[234,136],[235,171],[84,171]],8);
+  s.poly([[88,139],[102,132],[208,131],[228,139],[228,166],[90,167]],0);
+  s.line(99,131,208,131,15);
+  s.line(100,133,208,133,7);
   s.frame(87,136,136,39,0,8,0);
   s.ellipse(wheelX,172,71,49,0);s.ellipse(wheelX,171,69,46,15);
   s.ellipse(wheelX,172,66,45,8);s.ellipse(wheelX,172,64,42,15);
@@ -466,12 +498,26 @@ function dash(s,race,car) {
   s.ellipse(154,134,8,5,8);s.ellipse(154,134,5,3,7);s.box(153,133,2,2,4);
   dial(s,129,154,'RPM',player.engine,rpmMax,contract.player.redline,1000);
   dial(s,180,154,'MPH',displaySpeed(player),140,Infinity,10);
+  // Steel steering spokes and cutouts remain clear of the animated gauges.
+  s.line(wheelX-52,171,wheelX-11,182,15);
+  s.line(wheelX+52,171,wheelX+11,182,15);
+  s.line(wheelX-51,173,wheelX-11,184,8);
+  s.line(wheelX+51,173,wheelX+11,184,8);
+  s.box(wheelX-28,176,9,2,0);
+  s.box(wheelX+20,176,9,2,0);
   s.poly([[99,176],[114,172],[153,178],[192,172],[211,176],[165,185],[148,185]],7);
   s.line(104,176,152,181,15);s.line(161,181,205,176,15);
   s.ellipse(wheelX,185,12,6,0);s.ellipse(wheelX,184,10,6,7);
   s.ellipse(wheelX,184,6,4,8);s.ellipse(wheelX,184,3,3,12);
   s.box(wheelX-3,123,7,3,12);
 
+  // Period radio and rectangular dash switches instead of a bare fill panel.
+  s.frame(8,134,38,16,8,15,0);
+  s.box(11,137,32,7,0);
+  for(let n=0;n<5;n++)s.box(14+n*6,139,2,3,7);
+  s.box(13,146,7,2,15);s.box(31,146,8,2,15);
+  s.frame(219,129,17,7,8,15,0);
+  s.box(224,132,3,2,12);s.box(230,132,3,2,7);
   s.frame(238,139,71,42,8,15,0);
   s.frame(242,142,63,34,0,7,8);
   if(contract.player.automatic){
