@@ -57,7 +57,7 @@ The original 320×200 EGA art remains unchanged in pixel data, but the display n
 **Primary reference:** The 1989 DOS EGA version, not the Amiga layout or the 1991 Street Rod 2 VGA artwork. Compare against the [1989 manual](https://www.streetrodonline.com/wp-content/uploads/2012/09/street_rod_manual.pdf), [DOS screenshot gallery](https://www.mobygames.com/game/434/street-rod/screenshots/dos/), [DOS driving frame](https://www.mobygames.com/game/434/street-rod/screenshots/dos/10137/), and [period garage examples](https://www.drivingline.com/articles/back-to-89-before-there-was-forza-gran-turismo-there-was-street-rod/). Reference frames are not bundled, sampled as game sprites, or published to GitHub.
 
 **Implemented on the branch:**
-- All catalog cars retain separate independently drawn profiles, now with additional period styling: early hood louvers, chrome glass framing, rocker seams, 1950s fin treatments, Corvette cove lips and Sting Ray vents, windshield rails, and unchanged family van flower artwork.
+- All 25 period classified models plus the optional Mystery Machine retain separate independently drawn profiles, now with additional period styling: early hood louvers, chrome glass framing, rocker seams, 1950s fin treatments, Corvette cove lips and Sting Ray vents, windshield rails, and unchanged family van flower artwork.
 - The driving cockpit gains chrome instrument framing, redline tick clarity, gauge-glass reflections, steering-wheel response, analog radio/switches, and projected roadside poles.
 - The core is still native 320x200 EGA color, displayed at the intended 4:3 CRT proportions. Hotspots scale with the art.
 - Visual changes do not edit game state, driving physics, server replays, persistence, account permissions, scores, or family challenges.
@@ -66,7 +66,7 @@ The original 320×200 EGA art remains unchanged in pixel data, but the display n
 
 | DOS source feature | Hot Rod target | Acceptance |
 | --- | --- | --- |
-| Broadside garage car | 25 car side profiles | Recognizable roof, tail, wheelbase and whitewalls at 320x200 |
+| Broadside garage car | 26 vehicle side profiles (25 classifieds plus finale) | Recognizable roof, tail, wheelbase and whitewalls at 320x200 |
 | 1957 Fairlane's raised fin | Fairlane side profile | Rear point, chrome spear and correct body balance |
 | 1956 Corvette silver side cove | Corvette 56 | Cove, windshield and tire shape visible |
 | 1963 Corvette low roof and vents | Corvette 63 | Distinct from earlier Corvettes |
