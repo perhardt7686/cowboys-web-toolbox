@@ -4,11 +4,11 @@
  */
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {createRetroInput} from './retro-arcade-input.mjs?v=taps1';
+import {createRetroInput} from './retro-arcade-input.mjs?v=taps2';
 import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
 import {retroUnlocks,canEquipRetro,resolveRetroUnlock,retroCosmeticPalette} from './retro-game-unlockables.mjs?v=gear1';
 import {drawFleetWake,drawFleetGear,drawMazeFootprints,drawMazeGear} from './retro-unlock-art.mjs?v=gear1';
-import {squadronFormation,squadronDiver,wispActing,drawSquadronShip,drawMazeWisp,drawMazeDetective} from './retro-arcade-visuals.mjs';
+import {squadronFormation,squadronDiver,wispActing,drawSquadronShip,drawMazeWisp,drawMazeDetective} from './retro-arcade-visuals.mjs?v=classic1';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const GAMES=[
