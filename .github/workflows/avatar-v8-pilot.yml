@@ -1,0 +1,44 @@
+name: V8 original cartoon studio pilot acceptance
+on:
+  pull_request:
+    paths:
+      - 'docs/avatar-v8-*'
+      - 'tests/avatar-v8-pilot.test.mjs'
+      - 'tests/browser-avatar-v8-pilot.py'
+      - '.github/workflows/avatar-v8-pilot.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-art-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Check demo contract and JavaScript syntax
+        run: |
+          node --check docs/avatar-v8-core.mjs
+          node --check docs/avatar-v8-pilot.mjs
+          node --test tests/avatar-v8-pilot.test.mjs
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install Chromium browser for interaction acceptance
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Verify original stage and all four sections on phone and desktop
+        run: |
+          python -m http.server 8765 --directory docs >/tmp/v8-http.log 2>&1 &
+          python tests/browser-avatar-v8-pilot.py
+      - name: Preserve V8 comparison screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: avatar-v8-original-cartoon-pilot
+          path: reports/avatar-v8-*.png
+          if-no-files-found: ignore
+          retention-days: 7
