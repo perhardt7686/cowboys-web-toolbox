@@ -58,7 +58,10 @@ async def run():
                 await page.locator('[data-action="preview"][data-value="studio-tower-gargoyle"]').click()
                 assert 'Slatewing Gargoyle' in (await page.locator('.pet-feature').inner_text())
                 await page.locator('[data-action="pet-play"]').click()
-                assert await page.locator('.pet-play').count() == 1
+                # The mobile live-look intentionally duplicates the SVG in a compact preview.
+                # Test the real main stage rather than counting both render targets.
+                assert await page.locator('.art-stage .pet-play').count() == 1
+                assert await page.locator('.preview-peek .pet-play').count() == 1
                 await page.screenshot(path=str(REPORTS / ('avatar-v8-pets-'+label+'.png')), full_page=True)
                 await page.locator('[data-action="tab"][data-value="rewards"]').click()
                 assert await page.locator('.reward-card').count() == 12
