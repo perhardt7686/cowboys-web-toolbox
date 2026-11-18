@@ -234,11 +234,28 @@ export function paintDriveIn(s, view, paintCar) {
   s.noise(0, 3, 320, 39, 82, [0, 0, 8, 7], 3103);
   s.poly([[0, 44], [28, 38], [292, 38], [320, 45], [320, 65], [0, 65]], 4);
   for (const y of [43, 48, 53, 57, 61]) s.box(0, y, 320, 1, y % 3 === 0 ? 6 : 12);
+  // The original diner has a vivid layered EGA neon fascia, not flat text.
+  s.center("BOB'S DRIVE-IN", 162, 28, 0, 3);
   s.center("BOB'S DRIVE-IN", 161, 26, 5, 3);
   s.center("BOB'S DRIVE-IN", 160, 24, 13, 3);
+  for(let x=6;x<316;x+=12){
+    s.box(x,35,6,1,x%3?14:13);
+    s.box(x+1,38,3,1,15);
+  }
+  for(const x of [12,308]){
+    s.line(x,37,x,59,5);
+    s.box(x-2,36,5,3,13);
+    s.box(x-3,59,7,2,14);
+  }
   s.box(0, 63, 320, 3, 13);
   s.box(0, 66, 320, 2, 5);
-  for (let x = 4; x < 320; x += 12) s.box(x, 64, 3, 1, 15);
+  // Period checkerboard fringe under the bright marquee and bulbs.
+  for(let row=0;row<3;row++)for(let x=0;x<320;x+=5)
+    s.box(x,68+row*2,5,2,((x/5+row)&1)?0:15);
+  for (let x = 4; x < 320; x += 12) {
+    s.box(x, 64, 3, 1, 15);
+    s.box(x+1, 62, 1, 1, 14);
+  }
   s.box(1, 70, 318, 44, 7);
 
   for (const x of [3, 83, 163, 243]) {
@@ -246,6 +263,14 @@ export function paintDriveIn(s, view, paintCar) {
     s.box(x + 7, 72, 64, 18, 15);
     s.box(x + 7, 72, 64, 3, 14);
     s.box(x + 14, 78, 55, 1, 14);
+    // Lit lunch counter, stools and soft-drink cups behind the patrons.
+    s.box(x+9,92,61,3,7);
+    s.box(x+11,95,57,2,0);
+    for(const cx of [x+17,x+42,x+58]){
+      s.box(cx,87,4,5,15);
+      s.box(cx+1,88,2,3,12);
+      s.line(cx+2,86,cx+4,82,7);
+    }
     dinerPatron(s, x + 21, 80, 4, 3);
     dinerPatron(s, x + 49, 82, 0, x % 3 ? 2 : 4);
     for (let n = 0; n < 33; n++) {
@@ -268,8 +293,18 @@ export function paintDriveIn(s, view, paintCar) {
   dinerCaller(s);
   s.box(0, 145, 320, 42, 8);
   s.noise(0, 154, 320, 32, 263, [0, 8, 7], 403);
+  // Neon reflections in the damp blacktop, aligned with the diner windows.
+  for(const x of [25,105,184,266]){
+    s.line(x,147,x-6,154,5);
+    s.line(x+3,152,x-1,157,13);
+    s.line(x-8,165,x+5,165,7);
+  }
   const ownCar = view.car?.model === model.id && !view.rival ? view.car : null;
   paintCar(s, model, ownCar, 51, 101, 0.92);
+  // Ground reflections and a chrome bumper glint anchor the opponent car.
+  s.line(87,171,274,171,0);
+  s.line(108,173,246,173,7);
+  s.line(117,175,212,175,8);
   s.box(0, 170, 320, 2, 0);
   s.box(0, 172, 320, 2, 15);
   s.box(0, 174, 320, 2, 7);
@@ -282,6 +317,11 @@ export function paintDriveIn(s, view, paintCar) {
   s.line(14, 175, 23, 175, 15);
 
   const menu = view.menuItems || [];
+  // The original used a little pop-up offer board in front of the diner.
+  if(menu.length){
+    s.frame(20,36,104,15,8,15,0);
+    s.center('RACE OFFER',72,40,14);
+  }
   menu.slice(0, DRIVE_IN_HOTSPOTS.menu.length).forEach((item, index) => {
     const [x, y, w, h] = DRIVE_IN_HOTSPOTS.menu[index];
     s.frame(x, y, w, h, item.active ? 14 : 7, 15, 8);
