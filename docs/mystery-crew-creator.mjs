@@ -103,11 +103,59 @@ function writeState(){
  catch{$('mc-status').textContent='Browser storage unavailable. Keep this page open or enable local storage.';return false;}
 }
 function notice(s){$('mc-status').textContent=s;}
+
+/* Authored, item-specific character overlays. Each accessory has its own
+   silhouette instead of tinting a generic coat or pretending it is equipped. */
+function renderWearables(member){
+ const outfitArt={
+ detective:'<path d="M43 184L64 197 78 229 92 198 128 185 142 210 112 226 117 314 60 319 67 226Z" fill="#8a6a46" opacity=".88" stroke="#38303b" stroke-width="6"/><path d="M66 195L80 229 95 198 M83 226L90 316" fill="none" stroke="#f2d3a3" stroke-width="5"/>',
+ explorer:'<path d="M40 186L66 194 85 218 110 192 133 185 133 306 44 308Z" fill="#537444" stroke="#313a30" stroke-width="6"/><path d="M53 241H75V263H53Z M104 243H125V267H104Z" fill="#b4a06b" stroke="#354333" stroke-width="4"/><path d="M87 226V306" stroke="#e8c47e" stroke-width="4"/>',
+ viking:'<path d="M42 177L62 191 118 190 142 178 156 215 140 248 127 309 50 309 32 238 25 213Z" fill="#93775c" stroke="#30313e" stroke-width="8"/><path d="M48 192L24 225 32 246 64 228 M128 190L157 220 147 249 118 230" fill="#c9a575" stroke="#3c3941" stroke-width="8"/><path d="M67 212L113 213 118 270 65 271Z" fill="#748b94" stroke="#333641" stroke-width="5"/>',
+ pilot:'<path d="M37 192L57 180 77 199 113 199 135 181 152 196 134 320 39 321Z" fill="#785435" stroke="#35303a" stroke-width="8"/><path d="M60 185L78 228 92 203 113 229 130 184" fill="none" stroke="#d9b07a" stroke-width="8"/><path d="M44 238H70 M108 238H132" stroke="#ce985f" stroke-width="5"/>',
+ space:'<path d="M26 200Q93 170 153 200L163 289 136 331 42 331 15 291Z" fill="#eee9d9" stroke="#384256" stroke-width="8"/><path d="M44 218H130V291H44Z" fill="#d8dfe3" stroke="#5d7a91" stroke-width="5"/><circle cx="89" cy="250" r="17" fill="#4e98b0" stroke="#d3ab48" stroke-width="6"/><path d="M43 309H134" stroke="#d89c53" stroke-width="7"/>',
+ knight:'<path d="M37 188L89 175 146 188 150 307 124 332 55 333 31 308Z" fill="#aeb7b9" stroke="#434956" stroke-width="8"/><path d="M45 205L25 216 35 263 60 254 M131 205L161 217 148 265 121 251" fill="#d3d7d7" stroke="#434956" stroke-width="6"/><path d="M87 207V316 M59 236H120 M57 289H127" stroke="#697787" stroke-width="6"/>',
+ outdoors:'<path d="M39 184L68 186 87 209 109 183 138 186 151 305 40 317Z" fill="#c64534" stroke="#35303c" stroke-width="7"/><path d="M49 206H141 M47 248H142 M44 289H147 M66 186V310 M101 186V317 M129 187V310" stroke="#293c41" stroke-width="8" opacity=".9"/><path d="M49 219H140 M53 265H144" stroke="#ecb88c" stroke-width="3"/>',
+ stealth:'<path d="M35 183L81 186 127 183 154 209 143 308 39 312 24 217Z" fill="#303d49" stroke="#202a37" stroke-width="8"/><path d="M54 208H124V278H54Z" fill="#3c5160" stroke="#1b2836" stroke-width="4"/><path d="M42 237H65 M112 237H143 M64 305H119" stroke="#9cacb5" stroke-width="5"/>'
+ };
+ $('mc-outfit-details').innerHTML=outfitArt[member.outfit]||outfitArt.detective;
+ const gearArt={
+ none:'',binoculars:'<g transform="translate(47 253)"><path d="M0 13L17 0 34 12 47 12 63 0 79 13 78 49 56 53 38 35 22 53 0 46Z" fill="#354f5b" stroke="#27313a" stroke-width="5"/><circle cx="17" cy="42" r="10" fill="#8ab1bb"/><circle cx="63" cy="42" r="10" fill="#8ab1bb"/></g>',
+ flashlight:'<path d="M25 269L53 286 26 348 5 340Z" fill="#d09a53" stroke="#38323a" stroke-width="6"/><path d="M28 271L59 271 63 285 32 290Z" fill="#f5d7a0" stroke="#4d4444" stroke-width="5"/>',
+ compass:'<g transform="translate(107 258)"><circle cx="12" cy="12" r="17" fill="#d5ad74" stroke="#453e3d" stroke-width="5"/><path d="M12 -1L18 12 12 27 5 12Z" fill="#386d87"/></g>',
+ pack:'<path d="M123 203L159 213 174 288 149 305 135 267Z" fill="#95734f" stroke="#41383a" stroke-width="7"/><path d="M153 238V284" stroke="#e3c69a" stroke-width="6"/>'
+ };
+ $('mc-gear-detail').innerHTML=gearArt[member.gear]||'';
+ const hatArt={
+ none:'',fedora:'<path d="M27 34Q85 -14 161 27L156 52Q92 66 28 50Z" fill="#9a6235" stroke="#342d35" stroke-width="9"/><path d="M17 48Q91 72 169 48" fill="none" stroke="#4c352d" stroke-width="14"/>',
+ helmet:'<path d="M30 52Q35 -16 94 -20Q156 -12 164 58L150 74 35 71Z" fill="#b7b6a6" stroke="#333746" stroke-width="8"/><path d="M45 28Q13 -20 6 -35Q-7 5 48 46M137 29Q174 -17 180 -35Q191 0 151 47" fill="#e7d2a8" stroke="#3b3438" stroke-width="8"/>',
+ goggles:'<path d="M20 20Q89 -12 163 21L159 41Q92 56 20 40Z" fill="#735c40" stroke="#343542" stroke-width="7"/><circle cx="64" cy="25" r="24" fill="#83bcd1" stroke="#423d42" stroke-width="8"/><circle cx="126" cy="25" r="23" fill="#83bcd1" stroke="#423d42" stroke-width="8"/>',
+ cap:'<path d="M27 46Q38 -8 91 -13Q150 -5 158 51L39 67Z" fill="#338e95" stroke="#323748" stroke-width="8"/><path d="M71 52Q135 41 178 57Q164 80 92 75Z" fill="#197587" stroke="#353444" stroke-width="6"/>'
+ };
+ const hat=$('mc-hat');hat.innerHTML=hatArt[member.hat]||'';hat.hidden=member.hat==='none';
+}
+function renderPetSpecies(member){
+ const group=$('mc-pet'),p=member.pet;
+ const source={
+ dog:'<path d="M26 123Q2 87 15 50Q12 18 47 15L68 39Q92 3 114 24L120 48Q141 71 128 122Z" fill="var(--pet)" stroke="#332d32" stroke-width="8"/><path d="M21 43Q1 14 20 6L57 36Z M98 35Q134 3 142 19L125 63Z" fill="var(--pet)" stroke="#332d32" stroke-width="7"/><path d="M36 91Q72 65 111 92L109 128Q71 145 37 124Z" fill="#f9edd5" stroke="#43343a" stroke-width="6"/>',
+ cat:'<path d="M30 128L33 37 14 6 58 38Q86 27 106 39L143 10 132 63 134 128Z" fill="var(--pet)" stroke="#352f3e" stroke-width="8"/><path d="M46 118Q74 100 123 119" fill="none" stroke="#e6d9cc" stroke-width="7"/><path d="M19 27L36 50 50 38 M119 40L137 27 130 57" fill="#d7b6ae"/>',
+ ghost:'<path d="M16 130Q13 76 28 48Q45 21 81 22Q124 20 138 68L140 139 117 120 96 140 76 122 57 142 39 124Z" fill="#c8f2d5" stroke="#526b65" stroke-width="7"/><path d="M23 110Q64 124 126 105" fill="none" stroke="#dffbed" stroke-width="6"/>',
+ owl:'<path d="M28 132L30 43 12 19 53 41Q83 23 107 41L145 18 133 57 138 134Z" fill="var(--pet)" stroke="#3d3442" stroke-width="8"/><path d="M42 101Q80 78 123 102L123 137 43 137Z" fill="#e9dbc0"/><path d="M78 105L88 118 97 104Z" fill="#e9a35b"/>',
+ fox:'<path d="M28 128L26 67 10 11 59 45Q82 30 106 42L145 11 135 74 137 130Z" fill="var(--pet)" stroke="#3a2e33" stroke-width="8"/><path d="M28 91L86 129 133 91 118 139 45 143Z" fill="#f7e6d4" stroke="#35303e" stroke-width="4"/><path d="M47 66Q86 51 121 65" fill="none" stroke="#f5d4ac" stroke-width="5"/>'
+ };
+ const eyes=p==='owl'?'<circle cx="51" cy="78" r="24" fill="#f3ecd5"/><circle cx="103" cy="78" r="24" fill="#f3ecd5"/>':'<ellipse cx="50" cy="72" rx="10" ry="12" fill="#fff"/><ellipse cx="98" cy="72" rx="10" ry="12" fill="#fff"/>';
+ group.innerHTML='<ellipse cx="72" cy="135" rx="83" ry="15" fill="#503f38" opacity=".18"/>'+(source[p]||source.dog)+eyes+
+  '<circle cx="55" cy="75" r="5" fill="#2b333a"/><circle cx="96" cy="75" r="5" fill="#2b333a"/>'+
+  (p==='ghost'?'<ellipse cx="77" cy="104" rx="8" ry="13" fill="#657c71"/>':p==='owl'?'<path d="M73 95L87 110 98 93Z" fill="#eaa95e"/>':'<ellipse cx="77" cy="98" rx="11" ry="8" fill="#3e3135"/><path d="M62 114Q79 129 97 113" fill="none" stroke="#513636" stroke-width="5"/>')+
+  '<path d="M27 128L14 143 M112 130L124 143" stroke="#e6ddc4" stroke-width="12" stroke-linecap="round"/>';
+}
+
 function updateScene(){
  const m=current(),actor=$('mc-actor'),scene=$('mc-scene');
  actor.style.setProperty('--shirt',m.shirt);actor.style.setProperty('--pants',m.pants);
  actor.style.setProperty('--skin',m.skin);actor.style.setProperty('--hair',m.hair);
  $('mc-pet').style.setProperty('--pet',petColors[m.pet]||petColors.dog);
+ renderWearables(m);
+ renderPetSpecies(m);
  const stageMood={sunlit:'none',twilight:'hue-rotate(35deg) brightness(.84)',autumn:'sepia(.24) saturate(1.18)'}[m.scene]||'none';
  scene.style.filter=stageMood;
  $('mc-character-name').textContent=m.name;
@@ -117,7 +165,7 @@ function updateScene(){
  const rear=angle===180;
  $('mc-head').style.filter=rear?'brightness(.76)':'none';
  $('mc-vehicle').style.filter=m.vehicle==='jeep'?'hue-rotate(94deg)':m.vehicle==='camper'?'hue-rotate(-26deg) saturate(.8)':'none';
- $('mc-hat').hidden=m.hat==='none';
+
  $('mc-mouth').setAttribute('d',m.expression==='curious'?'M78 133Q99 137 118 132':m.expression==='grin'?'M74 130Q96 167 128 130':'M75 133Q96 157 123 130');
  for(const b of document.querySelectorAll('.mc-views button'))b.setAttribute('aria-pressed',String((b.id==='mc-view-front'&&angle===0)||(b.id==='mc-view-side'&&angle===90)||(b.id==='mc-view-back'&&angle===180)));
 }
@@ -131,10 +179,15 @@ function renderRoster(){
  $('mc-add').disabled=draft.crew.length>=6;
 }
 function renderColors(){
- const row=$('mc-swatches');row.replaceChildren();
- for(const color of themes){
-  const b=document.createElement('button');b.type='button';b.className='mc-swatch';b.style.background=color;b.dataset.color=color;
-  b.setAttribute('aria-label','Set jacket color '+color);b.setAttribute('aria-pressed',String(current().shirt===color));row.append(b);
+ const row=$('mc-swatches'),layer=$('mc-color-layer').value;
+ const palette=layer==='skin'?skins:layer==='hair'?hairs:themes;
+ row.setAttribute('aria-label',layer+' color choices');
+ row.replaceChildren();
+ for(const color of palette){
+  const b=document.createElement('button');b.type='button';b.className='mc-swatch';b.style.background=color;
+  b.dataset.color=color;b.dataset.layer=layer;
+  b.setAttribute('aria-label','Set '+layer+' color '+color);
+  b.setAttribute('aria-pressed',String(current()[layer]===color));row.append(b);
  }
 }
 function setFilter(next){
@@ -189,7 +242,7 @@ function actionItem(item){
 document.addEventListener('click',event=>{
  const el=event.target.closest('button');if(!el)return;
  if(el.dataset.crewId){draft.active=el.dataset.crewId;render();return;}
- if(el.dataset.color){current().shirt=el.dataset.color;render();notice('Jacket color changed. Save to keep it.');return;}
+ if(el.dataset.color){current()[el.dataset.layer||'shirt']=el.dataset.color;render();notice((el.dataset.layer||'Jacket')+' color changed. Save to keep it.');return;}
  if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)actionItem(i);return;}
  if(el.dataset.view){view=el.dataset.view;setFilter(view);return;}
  if(el.dataset.jump){view=el.dataset.jump;setFilter(view);document.querySelector('.mc-market').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
@@ -206,6 +259,12 @@ document.addEventListener('click',event=>{
    const id='crew-'+Date.now().toString(36).slice(-7);
    const m=starter(draft.crew.length+1);m.id=id;draft.crew.push(m);draft.active=id;notice(m.name+' joined your crew. Save Crew to keep this character.');render();break;
   }
+  case 'mc-rename':$('mc-name-input').value=current().name;$('mc-rename-dialog').showModal();$('mc-name-input').focus();break;
+  case 'mc-remove':
+   if(draft.crew.length<=1){notice('Keep at least one character in your crew.');break;}
+   if(!confirm('Remove '+current().name+' from your crew? This change saves when you press Save Crew.'))break;
+   draft.crew=draft.crew.filter(m=>m.id!==draft.active);draft.active=draft.crew[0].id;
+   notice('Character removed from the draft crew. Press Save Crew to keep the change.');render();break;
   case 'mc-fit':zoom=1;angle=0;updateScene();break;
   case 'mc-face':zoom=1.35;angle=0;updateScene();break;
   case 'mc-turn-left':angle=(angle+270)%360;updateScene();break;
@@ -228,6 +287,17 @@ document.addEventListener('click',event=>{
  }
 });
 $('mc-market-filter').addEventListener('change',e=>{view=e.target.value;setFilter(view);});
+$('mc-color-layer').addEventListener('change',renderColors);
+$('mc-rename-cancel').addEventListener('click',()=>$('mc-rename-dialog').close());
+$('mc-rename-form').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=$('mc-name-input').value.trim().slice(0,28);
+ if(!name){notice('Give your character a name first.');return;}
+ current().name=name;
+ $('mc-rename-dialog').close();render();
+ notice('Character renamed to '+name+'. Press Save Crew to keep it.');
+});
+
 window.addEventListener('beforeunload',e=>{
  if(JSON.stringify(draft)!==savedSnapshot){e.preventDefault();e.returnValue='';}
 });
