@@ -131,7 +131,7 @@ function renderWearables(member){
  goggles:'<path d="M20 20Q89 -12 163 21L159 41Q92 56 20 40Z" fill="#735c40" stroke="#343542" stroke-width="7"/><circle cx="64" cy="25" r="24" fill="#83bcd1" stroke="#423d42" stroke-width="8"/><circle cx="126" cy="25" r="23" fill="#83bcd1" stroke="#423d42" stroke-width="8"/>',
  cap:'<path d="M27 46Q38 -8 91 -13Q150 -5 158 51L39 67Z" fill="#338e95" stroke="#323748" stroke-width="8"/><path d="M71 52Q135 41 178 57Q164 80 92 75Z" fill="#197587" stroke="#353444" stroke-width="6"/>'
  };
- const hat=$('mc-hat');hat.innerHTML=hatArt[member.hat]||'';hat.hidden=member.hat==='none';
+ const hat=$('mc-hat');hat.innerHTML=hatArt[member.hat]||'';hat.style.display=member.hat==='none'?'none':'inline';
 }
 function renderPetSpecies(member){
  const group=$('mc-pet'),p=member.pet;
