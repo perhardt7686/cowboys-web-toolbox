@@ -1,10 +1,9 @@
-/* V8 MEMBER STUDIO: visual shell only, preserving the live profile, reward and pet controllers.
-   Toggle is session-local and never writes to profile, Supabase or storage. */
+/* V8 MEMBER STUDIO: new interface only, preserving authenticated member, reward and pet records.
+   No legacy-layout toggle or local-storage mode selector. */
 
 export function enhanceMemberStudio(editor){
   if(!editor||editor.dataset.v8Live==='true')return null;
   editor.dataset.v8Live='true';
-  editor.dataset.v8Mode='modern';
   const banner=document.createElement('header');
   banner.className='avatar-v8-member-heading';
   const words=document.createElement('div');
@@ -21,30 +20,14 @@ export function enhanceMemberStudio(editor){
   const connected=document.createElement('span');
   connected.className='avatar-v8-member-connection';
   connected.textContent='Family account · real saved progress';
-  const fallback=document.createElement('button');
-  fallback.type='button';
-  fallback.className='avatar-v8-classic-toggle';
-  fallback.textContent='Classic layout';
-  fallback.setAttribute('aria-pressed','false');
-  fallback.setAttribute('aria-label','Switch to classic Avatar Studio layout');
-  fallback.addEventListener('click',()=>{
-    const classic=editor.dataset.v8Mode!=='classic';
-    editor.dataset.v8Mode=classic?'classic':'modern';
-    editor.closest('dialog')?.classList.toggle('avatar-v8-classic-mode',classic);
-    fallback.textContent=classic?'V8 layout':'Classic layout';
-    fallback.setAttribute('aria-pressed',String(classic));
-    fallback.setAttribute('aria-label',classic?'Switch to V8 Avatar Studio layout':'Switch to classic Avatar Studio layout');
-    editor.dispatchEvent(new CustomEvent('avatar-v8-mode-changed'));
-
-  });
-  utilities.append(connected,fallback);
+  utilities.append(connected);
   banner.append(words,utilities);
   editor.prepend(banner);
   const hint=document.createElement('p');
   hint.className='avatar-v8-member-footer-note';
   hint.textContent='Earned rewards and pet bonds are checked with your family account. Previews do not unlock items. Use Save look to keep changes.';
   editor.append(hint);
-  return {banner,fallback};
+  return {banner};
 }
 
 export function makePetGallery(eligible,selected,earnedIds,onChoose){
