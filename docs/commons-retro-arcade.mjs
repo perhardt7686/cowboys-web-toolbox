@@ -8,6 +8,7 @@ import {createRetroInput} from './retro-arcade-input.mjs?v=taps1';
 import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
 import {retroUnlocks,canEquipRetro,resolveRetroUnlock,retroCosmeticPalette} from './retro-game-unlockables.mjs?v=gear1';
 import {drawFleetWake,drawFleetGear,drawMazeFootprints,drawMazeGear} from './retro-unlock-art.mjs?v=gear1';
+import {squadronFormation,squadronDiver,wispActing,drawSquadronShip,drawMazeWisp,drawMazeDetective} from './retro-arcade-visuals.mjs';
 const board=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const GAMES=[
@@ -188,7 +189,7 @@ function makeGame(game){
  canvas.setAttribute('role','img');
  canvas.setAttribute('aria-label',game.title+' live game canvas; use the buttons below or arrow keys');
  const info=el('div','retro-live-readout','SCORE 0 · LIVES 3');
- const controls=el('div','retro-controls');
+ const controls=el('div','retro-controls');controls.dataset.retroGame=game.id;
  for(const [code,label] of game.id==='fleet'?
  [['L','◀ LEFT'],['F','FIRE ✦'],['R','RIGHT ▶']]:
  [['U','▲ UP'],['L','◀ LEFT'],['D','▼ DOWN'],['R','RIGHT ▶']]){
@@ -260,7 +261,7 @@ function renderScene(id,scene){
  if(page!=='play'&&(current?.game===id||lifecycle.pendingGame()===id))abandon();
  if(page!=='play')void refresh();
 }
-function actionForTick(game){return input.action(game);}
+function actionForTick(game){return input.action(game,current);}
 function tick(){
  if(!current||working)return;
  const action=actionForTick(current.game);
@@ -381,19 +382,27 @@ function paintFleet(canvas,s,look='patrol'){
  ctx.fillStyle=cockpit;ctx.fillRect(-8,-3,16,10);
  ctx.restore();
  drawFleetGear(ctx,look,s,x,y);
- if(s.tick>0){
-  const alien=alienAt(s.tick-1,s.seed);
-  if(!s.destroyed.includes(alien.wave)&&alien.age<=7){
-   const enemyX=18+alien.lane*bw+bw/2;
-   const enemyY=65+alien.age*48;
-   ctx.save();ctx.translate(enemyX,enemyY);
-   ctx.fillStyle=alien.boss?'#ee86ca':'#76cba9';ctx.strokeStyle='#f9d9a7';ctx.lineWidth=3;
-   ctx.beginPath();ctx.moveTo(-21,-13);ctx.lineTo(-37,3);ctx.lineTo(-23,15);
-   ctx.lineTo(-11,3);ctx.lineTo(0,16);ctx.lineTo(11,3);ctx.lineTo(24,15);
-   ctx.lineTo(37,3);ctx.lineTo(21,-13);ctx.closePath();ctx.fill();ctx.stroke();
-   ctx.fillStyle='#28264c';ctx.fillRect(-11,-9,9,9);ctx.fillRect(4,-9,9,9);
+ // Reserve formation is visual only; only the bright diving attacker is
+ // active in the server-verified wave. No new invisible hitboxes or points.
+ ctx.save();ctx.globalAlpha=.34;
+ for(const ship of squadronFormation(s.tick,s.seed,w))
+   drawSquadronShip(ctx,ship.x,ship.y,ship.scale,'#6c8eb6');
+ ctx.restore();
+ ctx.fillStyle='#9ab5d1';ctx.font='bold 11px monospace';
+ ctx.fillText('STANDBY FORMATION',18,28);
+ const alien=squadronDiver(s.tick,s.seed,w);
+ if(alien&&!s.destroyed.includes(alien.wave)){
+   ctx.save();
+   ctx.globalAlpha=.18;ctx.strokeStyle=alien.boss?'#ffc9f3':'#97f4d8';
+   ctx.lineWidth=8;ctx.beginPath();
+   ctx.moveTo(alien.x,alien.y-36);ctx.lineTo(alien.x,alien.y-72);ctx.stroke();
    ctx.restore();
-  }
+   drawSquadronShip(ctx,alien.x,alien.y,1.12,
+     alien.boss?'#f08acc':'#72dfb0',
+     {active:true,boss:alien.boss,tilt:alien.tilt});
+   ctx.fillStyle=alien.boss?'#ffd79f':'#9ffff2';
+   ctx.font='bold 12px monospace';ctx.textAlign='center';
+   ctx.fillText(alien.boss?'COMMANDER DIVE':'ACTIVE DIVER',alien.x,Math.min(h-111,alien.y+44));
  }
  if(['F','A','D'].includes(s.prevAction)){
   ctx.strokeStyle='#fff0a6';ctx.lineWidth=5;
@@ -418,20 +427,15 @@ function paintMaze(canvas,s,look='scout'){
   }
  }
  drawMazeFootprints(ctx,look,s,tile);
+ // Distinct wisp colors, eye tracking and frightened poses follow the
+ // authoritative positions and power timer without changing danger cells.
  for(const [i,g] of s.ghosts.entries()){
-  const xx=(g.x+.5)*tile,yy=(g.y+.5)*tile;
-  ctx.save();ctx.translate(xx,yy);ctx.rotate(Math.PI/4);
-  ctx.fillStyle=s.power>0?'#7ed8f0':['#f18cb0','#ffbd77','#a6a4ee'][i];ctx.strokeStyle='#f5e6c3';ctx.lineWidth=2;
-  ctx.fillRect(-9,-9,18,18);ctx.strokeRect(-9,-9,18,18);ctx.restore();
-  ctx.fillStyle='#1a1838';ctx.beginPath();ctx.arc(xx-4,yy-2,2,0,7);ctx.arc(xx+4,yy-2,2,0,7);ctx.fill();
+   const xx=(g.x+.5)*tile,yy=(g.y+.5)*tile;
+   drawMazeWisp(ctx,xx,yy,wispActing(g,s,s.tick,i,s.power),i,s.tick);
  }
  const xx=(s.x+.5)*tile,yy=(s.y+.5)*tile;
  const [coat,outline]=retroCosmeticPalette('maze',look);
- ctx.fillStyle=coat;ctx.strokeStyle=outline;ctx.lineWidth=3;
- ctx.beginPath();ctx.arc(xx,yy,12,0,Math.PI*2);ctx.fill();ctx.stroke();
- ctx.fillStyle='#493459';ctx.beginPath();ctx.arc(xx-4,yy-4,2.5,0,7);ctx.arc(xx+4,yy-4,2.5,0,7);ctx.fill();
- ctx.strokeStyle='#493459';ctx.beginPath();ctx.arc(xx,yy+1,5,0,Math.PI);ctx.stroke();
- ctx.fillStyle=outline;ctx.fillRect(xx-12,yy-16,24,4);ctx.fillRect(xx-7,yy-24,14,9);
+ drawMazeDetective(ctx,xx,yy,s.prevAction,s.tick,coat,outline);
  drawMazeGear(ctx,look,s,xx,yy);
 }
 function renderGame(state){
