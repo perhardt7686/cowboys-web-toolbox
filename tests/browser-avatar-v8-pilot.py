@@ -41,7 +41,7 @@ async def run():
                 await page.locator('[data-action="redo"]').click()
                 assert await page.locator('.art-stage svg').inner_html() == after, 'redo did not restore art'
                 await page.locator('[data-action="body"][data-value="robot"]').click()
-                assert await page.locator('.art-stage svg').get_attribute('aria-label').startswith('Original robot')
+                assert (await page.locator('.art-stage svg').get_attribute('aria-label')).startswith('Original robot')
                 await page.locator('[data-action="tab"][data-value="outfits"]').click()
                 assert await page.locator('.reward-card').count() == 10
                 visor = page.locator('[data-action="preview"][data-value="studio-workshop-visor"]')
@@ -59,7 +59,7 @@ async def run():
                 await page.locator('[data-action="filter"][data-value="companion"]').click()
                 assert await page.locator('.reward-card').count() == 2
                 await page.locator('[data-action="reset"]').click()
-                assert await page.locator('.art-stage svg').get_attribute('aria-label').startswith('Original human')
+                assert (await page.locator('.art-stage svg').get_attribute('aria-label')).startswith('Original human')
                 assert not errors, (label, errors)
                 print(f'V8 {label}: stage, mobile width, undo/redo, equipment, pets, gallery and reset PASS')
                 await page.close()
