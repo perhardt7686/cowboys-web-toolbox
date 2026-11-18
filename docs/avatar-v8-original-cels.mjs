@@ -230,5 +230,8 @@ export function paintV8Character(canvas,recipe,view={},time=0){
   c.font='600 12px system-ui';c.fillText('Original V8 character art',18,51);
   c.restore();
   canvas.dataset.renderer='2d';canvas.dataset.backend='v8-original-cel';canvas.dataset.previewStyle='v8';
+  // Returning from a showroom action must not retain the previous character's
+  // action/reaction labels on the new V8 canvas.
+  canvas.dataset.studioAction='';canvas.dataset.studioReaction='';
   return true;
 }
