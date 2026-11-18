@@ -171,7 +171,7 @@ async def fit(page, game, *, driving=False):
     }""", driving)
     assert size['overflow'] <= 2 and size['layout'] <= 2, size
     assert size['width'] >= 180 and size['height'] >= 112, size
-    assert abs(size['width'] / size['height'] - 1.6) <= 0.035, size
+    assert abs(size['width'] / size['height'] - (4 / 3)) <= 0.035, size  # 320x200 DOS pixels displayed at 4:3
     if driving:
         for pad in size['pads']:
             assert pad['min'] >= 43 and pad['height'] >= 44, size
@@ -330,7 +330,7 @@ async def campaign_flow(page, name, *, touch):
     if not touch:
         # Select first at the red light with the throttle released. Catch the
         # first green frame without pausing or taking a screenshot at launch.
-        await page.keyboard.press('e')
+        await page.keyboard.press('Space')  # Original DOS selector upshifts with no brake held
         await expect(game.locator('.hot-rod-meters')).to_contain_text('GEAR 1')
     await page.wait_for_function("""() =>
       !document.querySelector('.hot-rod-meters').textContent.includes('WAIT FOR GREEN')
