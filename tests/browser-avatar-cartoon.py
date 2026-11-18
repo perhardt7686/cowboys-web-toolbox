@@ -580,9 +580,54 @@ async def review_angles(browser):
       releaseStudioView(companionTile);
       const companionQA={rows:pairSets.length,renderers:2,unique:pairFingerprint.size};
       if(companionQA.unique!==12)throw Error('Missing body/pet review combinations');
+      // Four original synthetic 3D action frames per pet/body pairing.
+      // These are moving-stage screenshots, never a real member's saved pet.
+      const petActs=[
+        ['hound trot','detective','fog-hound'],
+        ['bunny hop','sleuth','bunny-baker'],
+        ['moth flutter','mechanic','studio-observatory-moth'],
+        ['ghost drift','specter','lamp-house-ghost'],
+        ['gargoyle leap','armor','bell-tower-gargoyle'],
+        ['gremlin clockwork','automaton','wind-up-gremlin']
+      ];
+      const gaitFrames=[0,.32,.57,1];
+      const gaitSheet=makeCanvas(790,1390),gc=gaitSheet.getContext('2d');
+      gc.fillStyle='#f7efdf';gc.fillRect(0,0,790,1390);
+      gc.fillStyle='#30243a';gc.font='bold 21px system-ui';
+      gc.fillText('Original pet gaits · rest / motion / motion / reset',12,33);
+      const petGaitCanvas=makeCanvas(145,179);
+      let movingSequences=0,returnSequences=0;
+      for(const [row,[label,model,petId]] of petActs.entries()){
+        const y=62+row*220;
+        gc.fillStyle='#30243a';gc.font='bold 14px system-ui';
+        gc.fillText(label,8,y+81,142);
+        const recipe={...SHOWROOM_LOOKS[model],pose:'center',
+          cosmetics:{companion:petId}};
+        const fingerprints=[];
+        for(const [column,progress] of gaitFrames.entries()){
+          const active=progress>0?{id:petId,progress,action:'play'}:null;
+          if(!paintRoomAvatar(petGaitCanvas,recipe,{angle:0},0,active,'body'))
+            throw Error('No 3D pet gait frame: '+label+'/'+progress);
+          const encoded=petGaitCanvas.toDataURL('image/png');
+          fingerprints.push(encoded);
+          gc.drawImage(petGaitCanvas,153+column*159,y,149,185);
+          gc.fillStyle='#30243a';gc.font='13px system-ui';
+          gc.fillText(['rest','acting 1','acting 2','reset'][column],
+            153+column*159,y+205,90);
+        }
+        if(fingerprints[0]!==fingerprints[1]&&fingerprints[1]!==fingerprints[2])
+          movingSequences++;
+        if(fingerprints[0]===fingerprints[3])returnSequences++;
+      }
+      releaseStudioView(petGaitCanvas);
+      const gaitQA={species:petActs.length,phases:gaitFrames.length,
+        moving:movingSequences,settled:returnSequences};
+      if(movingSequences!==petActs.length||returnSequences!==petActs.length)
+        throw Error('Pet gait visually unchanged or did not return to rest: '+
+          JSON.stringify(gaitQA));
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet,sizeSheet,companionSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA,sizeQA,companionQA};
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet,sizeSheet,companionSheet,gaitSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA,sizeQA,companionQA,gaitQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
@@ -595,11 +640,13 @@ async def review_angles(browser):
                            'avatar-workshop-human-proportions.png',
                            'avatar-workshop-human-poses.png',
                             'avatar-workshop-face-size-matrix.png',
-                            'avatar-workshop-companion-fit.png'], sheets['images']):
+                            'avatar-workshop-companion-fit.png',
+                             'avatar-workshop-pet-motion-phases.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     assert sheets['sizeQA']['faces'] == 6 and sheets['sizeQA']['sizes'] == [48,64,96,256] and sheets['sizeQA']['renderers'] == 2 and sheets['sizeQA']['duplicates'] == 0, sheets['sizeQA']
     assert sheets['companionQA']['rows'] == 6 and sheets['companionQA']['renderers'] == 2 and sheets['companionQA']['unique'] == 12, sheets['companionQA']
+    assert sheets['gaitQA']['species'] == 6 and sheets['gaitQA']['phases'] == 4 and sheets['gaitQA']['moving'] == 6 and sheets['gaitQA']['settled'] == 6, sheets['gaitQA']
     await page.close()
 
 
