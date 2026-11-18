@@ -390,7 +390,7 @@ function draw(){
  const shadow=run?ghostPosition(r):null;
  if(!compatibility&&!createSkyScene&&!sceneLoading){
   sceneLoading=true;
-  import('./skyboard-scene.mjs?v=courses2').then(module=>{createSkyScene=module.createSkyScene;draw();})
+  import('./skyboard-scene.mjs?v=drift1').then(module=>{createSkyScene=module.createSkyScene;draw();})
    .catch(()=>{compatibility=true;draw();});
  }
  if(!compatibility&&createSkyScene){
