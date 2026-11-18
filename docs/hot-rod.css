@@ -257,6 +257,69 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
   .hot-rod-panel { padding-inline:10px; }
   .hot-rod-spec { grid-template-columns:minmax(85px,1fr) minmax(0,1.8fr); }
 }
+
+/* A short landscape phone must show the entire 4:3 DOS room, not just its
+   bottom edge after the browser scrolls a long vertical workshop panel. */
+@media (orientation:landscape) and (max-height:550px) {
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-housing {
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+    align-content:stretch;
+    grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+    grid-template-rows:auto auto minmax(0,1fr) auto;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-header {
+    grid-column:1/-1;
+    grid-row:1;
+    padding-block:4px;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-bank {
+    grid-column:1;
+    grid-row:2;
+    font-size:.78rem;
+    padding-block:2px;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-screen {
+    grid-column:1;
+    grid-row:3;
+    align-self:center;
+    width:min(100%, calc((100dvh - 122px) * 4 / 3));
+    max-height:100%;
+    margin-inline:auto;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-panel {
+    grid-column:2;
+    grid-row:2 / 4;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    padding:7px 8px;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-panel h3 {
+    font-size:1rem;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-status {
+    position:static;
+    grid-column:1;
+    grid-row:4;
+    min-height:0;
+    padding:3px 8px;
+    font-size:.78rem;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-tabs {
+    grid-column:2;
+    grid-row:4;
+    padding:4px 6px;
+    gap:3px;
+  }
+  .hot-rod-monitor:not(:has(.hot-rod-driving)) .hot-rod-tabs button {
+    min-height:35px;
+    padding:2px 4px;
+    font-size:.75rem;
+  }
+}
+
 @media (orientation:landscape) and (max-height:550px) {
   .hot-rod-monitor:has(.hot-rod-driving) { width:100%; height:100%; }
   .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-housing { grid-template-columns:minmax(0,1fr) minmax(252px,.65fr); grid-template-rows:auto minmax(0,1fr); }
