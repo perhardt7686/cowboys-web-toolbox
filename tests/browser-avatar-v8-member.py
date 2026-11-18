@@ -52,6 +52,12 @@ async def run():
                 await card.scroll_into_view_if_needed()
                 await expect(card).to_be_visible()
                 await expect(card.locator('canvas.avatar-reward-thumbnail')).to_have_attribute('data-art-pack','v8-ink',timeout=18000)
+                # The picture and title are one light, readable surface. Only the
+                # 'Try it on' action gets the dark-teal button background.
+                picture_style=await card.locator('.avatar-item-open').evaluate(
+                  'n=>getComputedStyle(n).backgroundColor')
+                assert picture_style in ('rgba(0, 0, 0, 0)', 'transparent'),(
+                  'Reward title lost contrast',label,picture_style)
                 await card.screenshot(path=str(REPORTS/f'v8-live-rewards-{label}.png'),animations='disabled')
                 assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth')<=2,'Dialog overflow'
                 assert not errors,(label,errors)
