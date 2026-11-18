@@ -250,6 +250,13 @@ export function createProfileStudio(ctx){
 
   async function show(requested='profile',options={}){
     if(!ctx.state.member)return;
+    // New product: approved real family members launch Mystery Crew Creator.
+    // The preview sandbox alone retains legacy fixture DOM for unrelated
+    // regression tests, not as an option exposed to the family.
+    if(requested==='avatar'&&!ctx.isPreview&&approved()){
+      location.assign(new URL('./mystery-crew-creator.html',location.href).href);
+      return;
+    }
     memberView?.destroy();memberView=null;
     const who=ctx.state.member.user_id;
     if(ownerId&&ownerId!==who)clear();
@@ -285,7 +292,7 @@ export function createProfileStudio(ctx){
        '<div class="profile-form-column"><form id="profile-studio-form">',
         '<div class="studio-tabs" role="tablist" aria-label="Profile customization">',
          '<button type="button" role="tab" data-profile-tab="profile" aria-selected="',selectedTab==='profile','">My Profile</button>',
-         approved()?'<button type="button" role="tab" data-profile-tab="avatar" aria-selected="'+(selectedTab==='avatar')+'">Avatar Studio</button>':'',
+         approved()?'<button type="button" role="tab" data-profile-tab="avatar" aria-selected="'+(selectedTab==='avatar')+'">'+(ctx.isPreview?'Avatar Studio':'Mystery Crew Creator')+'</button>':'',
          '<button type="button" role="tab" data-profile-tab="account" aria-selected="',selectedTab==='account','">Privacy & Account</button>',
         '</div>',
         '<div data-profile-pane="profile">',
@@ -501,6 +508,10 @@ export function createProfileStudio(ctx){
     try{
       if(b.hasAttribute('data-member-profile'))await showMember(b.dataset.memberProfile);
       else if(b.hasAttribute('data-profile-tab')){
+        if(b.dataset.profileTab==='avatar'&&!ctx.isPreview&&approved()){
+          location.assign(new URL('./mystery-crew-creator.html',location.href).href);
+          return;
+        }
         selectedTab=b.dataset.profileTab;
         if(selectedTab==='avatar'){
           if(!avatarChanged&&!photoChanged)avatarMethod='character';
