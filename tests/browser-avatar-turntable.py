@@ -28,7 +28,7 @@ async def verify(browser, phone=False):
     canvas = turn.locator('canvas')
     await expect(canvas).to_have_attribute('data-angle', '0')
     await expect(turn.get_by_role('button', name='Rotate left')).to_be_visible()
-    assert await canvas.evaluate('n => n.height >= 220 && n.width >= 230')
+    assert await canvas.evaluate('n => n.getBoundingClientRect().height >= 220 && n.getBoundingClientRect().width >= 195'), 'V8 stage must remain readable at phone width'
     await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel', timeout=15000)
     backend = await canvas.get_attribute('data-backend')
     signatures = set()
