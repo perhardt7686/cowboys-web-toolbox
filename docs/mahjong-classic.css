@@ -1,0 +1,141 @@
+/* Classic Mahjong Studio. Visual-only: scores, saved runs and move rules
+   remain controlled by the existing private Commons game. */
+body.community-page .mahjong-preferences{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  gap:8px;margin:0 0 12px;
+}
+body.community-page .mahjong-preferences button{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  min-height:44px;min-width:93px;padding:8px 12px;
+  border:2px solid #d3b879;border-radius:11px;
+  background:#254e48;color:#fff8e4;
+  font:800 13px/1.2 system-ui,sans-serif;cursor:pointer;
+}
+body.community-page .mahjong-preferences button[aria-pressed="true"]{
+  background:#f6e3b4;color:#243d33;border-color:#fff4c7;
+  box-shadow:inset 0 0 0 2px #a9783c;
+}
+body.community-page .mahjong-preferences button:disabled{opacity:.5}
+body.community-page .mahjong-free-count{
+  display:inline-flex;align-items:center;min-height:30px;padding:5px 11px;
+  border:1px solid #b6a26e;border-radius:999px;
+  background:#163d38;color:#fff7d9;font:850 12px/1.25 system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+body.community-page .mahjong-shortcut-hint{
+  margin:4px 0 10px;text-align:center;color:#e8d7a9;
+  font:650 11px/1.45 system-ui,sans-serif;
+}
+body.community-page .mahjong-classic-face{display:none}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-game-zone{
+  border-color:#8a5930;
+  background:radial-gradient(ellipse at 48% 0,#2e785e,transparent 65%),linear-gradient(155deg,#145845,#07362f);
+  box-shadow:inset 0 0 0 3px #d7ad62,inset 0 0 0 7px #213b30,inset 0 0 36px #031e19,0 9px 18px #1c2b244d;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-board{
+  background:radial-gradient(ellipse at 50% 35%,#34766580,transparent 65%),linear-gradient(145deg,#14624e,#064035);
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile.mahjong-kids-tile{
+  border-top:2px solid #fffff7!important;
+  border-left:2px solid #f1eacb!important;
+  border-right:clamp(3px,calc(var(--mahjong-size,36px)*.095),7px) solid #6a9b85!important;
+  border-bottom:clamp(3px,calc(var(--mahjong-size,36px)*.10),8px) solid #39745b!important;
+  border-radius:clamp(5px,calc(var(--mahjong-size,36px)*.13),10px)!important;
+  background:linear-gradient(136deg,#fffdf0 0%,#f4f0da 60%,#dedbbf 100%)!important;
+  box-shadow:inset 1px 1px 1px #fff,inset -2px -3px 5px #bcb59c80,2px 5px 6px #001b17b0;
+  color:#173f32!important;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile.mahjong-kids-tile::before{
+  inset:2px 3px 4px;border:1px solid #b6ab8a80;border-radius:4px;box-shadow:inset 0 1px #fff9;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile .mahjong-glyph,
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile .mahjong-match-code{
+  display:none!important;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-classic-face{
+  position:relative;z-index:1;display:grid;place-content:center;
+  align-items:center;justify-items:center;gap:0;
+  width:100%;height:100%;min-width:0;min-height:0;
+  overflow:hidden;text-shadow:none;
+}
+body.community-page .mahjong-classic-numeral{
+  display:block;font-family:Georgia,'Noto Serif CJK SC',serif;
+  font-size:clamp(15px,calc(var(--mahjong-size,36px)*.45),40px);
+  font-weight:900;line-height:.9;color:#174a72;
+}
+body.community-page .mahjong-classic-unit{
+  display:block;font-family:Georgia,'Noto Serif CJK SC',serif;
+  font-size:clamp(11px,calc(var(--mahjong-size,36px)*.30),28px);
+  font-weight:900;line-height:1;color:#af3d2e;
+}
+body.community-page .mahjong-classic-pips,
+body.community-page .mahjong-classic-stalks{
+  width:72%;max-width:70px;height:61%;display:grid;place-content:center;
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1px,calc(var(--mahjong-size,36px)*.055),5px);
+  align-items:center;justify-items:center;
+}
+body.community-page .mahjong-classic-pips[data-count="1"],
+body.community-page .mahjong-classic-stalks[data-count="1"]{grid-template-columns:1fr}
+body.community-page .mahjong-classic-pips[data-count="2"],
+body.community-page .mahjong-classic-stalks[data-count="2"]{grid-template-columns:repeat(2,1fr)}
+body.community-page .mahjong-classic-pip{
+  aspect-ratio:1;display:block;width:clamp(5px,calc(var(--mahjong-size,36px)*.16),14px);
+  border-radius:50%;border:1px solid #fff9;
+  background:radial-gradient(circle at 37% 32%,#e9f8eb 0 12%,#297159 24% 62%,#103f37 75%);
+  box-shadow:inset 0 0 0 1px #0b4e46,0 1px 1px #544b3040;
+}
+body.community-page .mahjong-classic-pip:nth-child(3n+2){
+  background:radial-gradient(circle at 37% 32%,#ffe6dc 0 12%,#b93e36 24% 62%,#68212c 75%);
+}
+body.community-page .mahjong-classic-pip:nth-child(3n+3){
+  background:radial-gradient(circle at 37% 32%,#e5eeff 0 12%,#325f9d 24% 62%,#1b365e 75%);
+}
+body.community-page .mahjong-classic-stalk{
+  display:block;height:clamp(12px,calc(var(--mahjong-size,36px)*.36),30px);
+  width:clamp(4px,calc(var(--mahjong-size,36px)*.105),10px);
+  border-radius:3px;background:repeating-linear-gradient(to bottom,#13794d 0 5px,#e2cf93 5px 6px,#27744c 6px 10px);
+  border-left:1px solid #164d37;border-right:1px solid #9bb98b;
+  box-shadow:1px 1px 1px #12432f60;
+}
+body.community-page .mahjong-classic-stalk:nth-child(even){
+  background:repeating-linear-gradient(to bottom,#296d92 0 5px,#d4e4dc 5px 6px,#22577e 6px 10px);
+}
+body.community-page .mahjong-classic-code{
+  position:absolute;bottom:1px;left:2px;
+  font:900 clamp(8px,calc(var(--mahjong-size,36px)*.2),13px)/1 system-ui,sans-serif;
+  letter-spacing:-.025em;color:#425d4f;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile .mahjong-mini{
+  width:clamp(10px,calc(var(--mahjong-size,36px)*.26),19px);
+  height:clamp(10px,calc(var(--mahjong-size,36px)*.26),19px);
+  top:1px;right:1px;border-radius:50%;
+  font-size:clamp(8px,calc(var(--mahjong-size,36px)*.19),13px);
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile.mahjong-blocked{
+  filter:saturate(.64) brightness(.83);opacity:.95;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile.mahjong-blocked::after{
+  opacity:0;transform:none;background:none;
+}
+body.community-page #mahjong-root[data-highlight-free="true"] .mahjong-tile.mahjong-free{
+  box-shadow:inset 0 0 0 2px #e1c264,0 0 0 2px #f7d97a,1px 4px 9px #021d16b8;
+}
+body.community-page #mahjong-root[data-highlight-free="true"] .mahjong-tile.mahjong-selected{
+  box-shadow:0 0 0 5px #ffcc5580,0 0 17px #ffed95aa,0 5px 8px #0b3344;
+}
+body.community-page #mahjong-root[data-highlight-free="true"] .mahjong-tile.mahjong-hinted{
+  box-shadow:0 0 0 5px #52eccd75,0 0 16px #7ffff7bd,0 5px 9px #092632;
+}
+body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile:focus-visible{
+  outline:3px solid #ffd369!important;outline-offset:2px!important;
+}
+@media(max-width:430px){
+  body.community-page .mahjong-preferences{gap:6px}
+  body.community-page .mahjong-preferences button{min-width:90px;min-height:44px;padding:7px 8px;font-size:12px}
+  body.community-page .mahjong-shortcut-hint{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  body.community-page #mahjong-root[data-tileset="classic"] .mahjong-tile{
+    animation:none!important;transition:none!important;
+  }
+}
