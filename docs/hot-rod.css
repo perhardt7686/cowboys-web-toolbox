@@ -359,11 +359,13 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
    is vertically centered; its interior has no spare filler rows. */
 @media (orientation:portrait) and (max-width:700px) {
   .hot-rod-monitor:has(.hot-rod-driving) {
-    height:auto;
+    height:fit-content;
+    min-height:0;
     max-height:100dvh;
   }
   .hot-rod-monitor:has(.hot-rod-driving) .hot-rod-housing {
-    height:auto;
+    height:fit-content;
+    min-height:0;
     grid-template-rows:auto auto auto;
     align-content:start;
   }
