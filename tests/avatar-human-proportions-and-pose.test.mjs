@@ -9,6 +9,7 @@ import {faceSilhouetteRings} from '../docs/avatar-studio-faces.mjs';
 import {paintHead,celFaceProfile} from '../docs/avatar-turnaround-head.mjs';
 import {tint} from '../docs/avatar-cel-art.mjs';
 import {SHOWROOM_LOOKS} from '../docs/avatar-showroom-presets.mjs';
+import {BODY_ACTING_EXPRESSIONS,expressionBodyActing} from '../docs/avatar-expression-body-acting.mjs';
 
 const copy=recipe=>structuredClone(recipe);
 const make=(recipe)=>buildAvatar(normalizeLoadout(recipe));
@@ -181,4 +182,69 @@ test('Marsh Watchkeeper cel preserves green skin and fin-ear silhouette at front
   const detective=canvas(),normal=structuredClone(SHOWROOM_LOOKS.detective);
   paintHead(detective,figureAt(normal,0),normal,colors,()=>true);
   assert.ok(!detective.fills.includes('#668a52'),'human faces must not inherit monster fins');
+});
+
+
+test('all eight saved expressions have original, distinct, read-only full-body gestures',()=>{
+  const names=['smile','grin','calm','wink','curious','smirk','laugh','determined'];
+  assert.deepEqual(BODY_ACTING_EXPRESSIONS,names);
+  const actual2d=new Set(),actual3d=new Set();
+  const base={...SHOWROOM_LOOKS.detective,pose:'center'};
+  for(const expression of names){
+    const recipe={...base,expression};
+    const baseline=structuredClone(recipe);
+    const acting=expressionBodyActing(expression);
+    assert.ok(acting.elbowOut.every(x=>Number.isFinite(x)&&Math.abs(x)<=.09));
+    assert.ok(acting.handLift.every(x=>Number.isFinite(x)&&Math.abs(x)<=.1));
+    assert.ok(Number.isFinite(acting.headRoll)&&Number.isFinite(acting.yaw));
+    const ink=figureAt(recipe,0);
+    actual2d.add(ink.limbs.map(a=>[a.side,a.elbow.x,a.elbow.y,a.hand.x,a.hand.y]
+      .map(n=>Number(n).toFixed(2)).join(',')).join('|'));
+    const actor=make(recipe);
+    actual3d.add(actor.arms.map(a=>[a.side,a.hinge.position.x,a.hinge.position.y,
+      a.palm.position.x,a.palm.position.y].map(n=>Number(n).toFixed(4)).join(',')).join('|'));
+    assert.equal(actor.figure.userData.studioActingTurn,actor.figure.rotation.y);
+    assert.equal(actor.arms[0].shoulder.parent,actor.figure);
+    assert.deepEqual(recipe,baseline,'body acting must never rewrite saved recipes');
+    disposeFigure(actor.root);
+  }
+  assert.equal(actual2d.size,names.length,'2D cel silhouettes need eight distinguishable gestures');
+  assert.equal(actual3d.size,names.length,'3D fitted sleeves need eight distinguishable gestures');
+  const mutated=expressionBodyActing('laugh');mutated.elbowOut[0]=88;
+  assert.ok(expressionBodyActing('laugh').elbowOut[0]<.1,'acting models return copies');
+  assert.deepEqual(expressionBodyActing('unknown'),expressionBodyActing('smile'));
+});
+
+test('rigid robots do not inherit flexible face-driven shoulder or torso movement',()=>{
+  const original={...SHOWROOM_LOOKS.automaton,pose:'center',expression:'smile'};
+  const expressive={...original,expression:'laugh'};
+  const a=make(original),b=make(expressive);
+  assert.equal(a.figure.rotation.y,0);
+  assert.equal(b.figure.rotation.y,0);
+  for(let i=0;i<2;i++){
+    assert.deepEqual(a.arms[i].palm.position.toArray(),b.arms[i].palm.position.toArray());
+    assert.deepEqual(a.arms[i].hinge.position.toArray(),b.arms[i].hinge.position.toArray());
+  }
+  const frameA=figureAt(original,45),frameB=figureAt(expressive,45);
+  assert.deepEqual(frameA.limbs,frameB.limbs);
+  disposeFigure(a.root);disposeFigure(b.root);
+});
+
+test('idle and completed actions preserve a smirk acting turn and held props',()=>{
+  const recipe={...SHOWROOM_LOOKS.mechanic,pose:'center',expression:'smirk',
+    cosmetics:{prop:'spectral-case-sword'}};
+  const actor=make(recipe);
+  const initial=actor.figure.rotation.y;
+  assert.ok(initial>.025,'asymmetric torso turn must be visible');
+  const original=actor.arms.find(arm=>arm.prop)?.prop;
+  assert.ok(original,'known earned display prop must be fitted to the palm');
+  actor.root.updateMatrixWorld(true);
+  const before=original.root.getWorldPosition(new THREE.Vector3()).clone();
+  const lamp=new THREE.PointLight();
+  poseStudioAction(actor,0,{id:original.item.id,progress:.5},lamp);
+  poseStudioAction(actor,0,{id:original.item.id,progress:1},lamp);
+  actor.root.updateMatrixWorld(true);
+  assert.equal(actor.figure.rotation.y,initial);
+  assert.ok(before.distanceTo(original.root.getWorldPosition(new THREE.Vector3()))<1e-9);
+  disposeFigure(actor.root);
 });
