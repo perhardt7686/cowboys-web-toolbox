@@ -20,7 +20,7 @@ async def run():
                 await page.goto(URL,wait_until='domcontentloaded')
                 await page.locator('#family-avatar-quick').click()
                 editor=page.locator('#profile-studio-form .avatar-dressing-studio')
-                await expect(editor).to_have_attribute('data-v8-mode','modern')
+                await expect(editor).to_have_attribute('data-v8-live','true')
                 await expect(editor.get_by_role('heading',name='Make your mystery character')).to_be_visible()
                 canvas=editor.locator('#family-avatar-canvas')
                 await expect(canvas).to_have_attribute('data-backend','v8-original-cel',timeout=18000)
@@ -29,12 +29,8 @@ async def run():
                 await editor.locator('[data-avatar-feature="hair"][data-avatar-value="purple"]').first.click()
                 assert await canvas.evaluate('n=>n.toDataURL()')!=initial,'V8 hair color invisible'
                 await page.screenshot(path=str(REPORTS/f'v8-live-character-{label}.png'),full_page=True)
-                await editor.locator('.avatar-v8-classic-toggle').click()
-                await expect(editor).to_have_attribute('data-v8-mode','classic')
-                await expect(canvas).to_have_attribute('data-renderer','3d',timeout=18000)
-                await editor.locator('.avatar-v8-classic-toggle').click()
-                await expect(editor).to_have_attribute('data-v8-mode','modern')
-                await expect(canvas).to_have_attribute('data-backend','v8-original-cel',timeout=18000)
+                assert await editor.locator('.avatar-v8-classic-toggle').count()==0
+                assert await page.get_by_role('button',name='Classic layout').count()==0
                 # The existing server-backed pet inventory is still the source of truth.
                 nav=editor.get_by_role('navigation',name='Avatar Studio sections')
                 await nav.get_by_role('button',name='Companions').click()
@@ -51,7 +47,7 @@ async def run():
                 await page.screenshot(path=str(REPORTS/f'v8-live-rewards-{label}.png'),full_page=True)
                 assert await page.locator('#content-dialog').evaluate('n=>n.scrollWidth-n.clientWidth')<=2,'Dialog overflow'
                 assert not errors,(label,errors)
-                print('V8 member '+label+': new character art, live fallback, pets gallery, reward cels, layout PASS')
+                print('V8 member '+label+': new character art, no classic switch, pets gallery, reward cels, layout PASS')
                 await page.close()
         finally:
             await browser.close()
