@@ -1,7 +1,7 @@
 import {button,el} from './family-board-core.mjs?v=family3';
 import {FIRST_PET_ID} from './avatar-collection-edition.mjs';
 import {petBehavior} from './avatar-prize-actions.mjs?v=workshop1';
-import {playCel} from './avatar-reward-render.mjs?v=workshop1';
+import {playCel,drawPetPortrait} from './avatar-reward-render.mjs?v=workshop1';
 import {createPetTradeUI} from './avatar-pet-trading.mjs?v=workshop1';
 import {makePetGallery} from './avatar-v8-live.mjs?v=v8member1';
 
@@ -223,7 +223,7 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
     const galleryTiles=[...gallery.querySelectorAll('[data-v8-pet-art]')];
     for(const tile of galleryTiles){
       const petItem=chosen.find(entry=>entry.id===tile.dataset.v8PetArt);
-      if(petItem)studioPet(tile,petItem);
+      if(petItem)drawPetPortrait(tile,petItem);
     }
     void prepareStudioRenderer().then(renderer=>{
       if(renderer&&isOpen()&&canvas.isConnected&&!activity)studioPet(canvas,item);
