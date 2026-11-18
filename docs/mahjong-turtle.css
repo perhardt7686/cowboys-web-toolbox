@@ -1,0 +1,120 @@
+/* Classic Turtle mode: an independent 144-tile alternative to Mystery Road. */
+body.community-page .turtle-mode-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 15px}
+body.community-page .turtle-mode-tabs button{min-width:0;min-height:58px;border:2px solid #9572a6;border-radius:13px;background:#f5e9f8;color:#3f2953;font:850 clamp(14px,2.5vw,17px)/1.2 system-ui,sans-serif;cursor:pointer;padding:9px 8px;box-shadow:0 3px 0 #59436144}
+body.community-page .turtle-mode-tabs button small{display:block;font-size:11px;font-weight:650;margin:4px 0 0;color:inherit}
+body.community-page .turtle-mode-tabs button[aria-pressed="true"]{border-color:#dbb46e;background:#204d40;color:#fff4d8;box-shadow:inset 0 0 0 1px #ffe0a8,0 3px 0 #284439}
+body.community-page #mahjong-root[data-mahjong-mode="turtle"] #mahjong-inside > :not(.turtle-mode-tabs):not(#mahjong-classic-root){display:none!important}
+body.community-page #mahjong-root[data-mahjong-mode="road"] #mahjong-classic-root{display:none!important}
+body.community-page #mahjong-classic-root{min-width:0;color:#2e2730}
+body.community-page #mahjong-classic-root button,body.community-page #mahjong-classic-root select{font-family:system-ui,sans-serif}
+body.community-page .turtle-heading{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:4px 0 15px}
+body.community-page .turtle-heading h3{font:900 clamp(23px,4.8vw,34px)/1.14 Georgia,serif;color:#23473b;margin:5px 0}
+body.community-page .turtle-heading p{font:650 14px/1.5 system-ui,sans-serif;color:#4f4b50;margin:6px 0;max-width:66ch}
+body.community-page .turtle-authentic{white-space:nowrap;border:2px solid #b38f54;border-radius:99px;background:#f5deaa;color:#523c28;padding:9px 11px;font:900 12px/1.2 system-ui,sans-serif}
+body.community-page .turtle-modes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+body.community-page .turtle-modes button{flex:1;min-height:44px;border:2px solid #b6a17e;background:#f8f0df;color:#55452e;border-radius:9px;cursor:pointer;font:850 14px/1.2 system-ui,sans-serif}
+body.community-page .turtle-modes button[aria-pressed="true"]{background:#205f4c;color:#fff7db;border-color:#134a3c}
+body.community-page .turtle-options{display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin:11px 0 13px}
+body.community-page .turtle-options label{display:grid;gap:5px;min-width:170px;flex:2;font:850 12px/1.2 system-ui,sans-serif;color:#3d413a}
+body.community-page .turtle-options select{height:46px;max-width:100%;min-width:0;border:2px solid #a58c58;border-radius:9px;padding:7px 8px;background:#fffef5;color:#30372f;font:750 13px/1.2 system-ui,sans-serif}
+body.community-page .turtle-options button{min-height:46px;flex:1;min-width:132px;padding:9px 12px;border:2px solid #2d7157;border-radius:10px;background:#215f4d;color:#fff5dc;font:850 13px/1.2 system-ui,sans-serif;cursor:pointer}
+body.community-page .turtle-options #turtle-restart{border-color:#c8b58a;background:#f7eedc;color:#473729}
+body.community-page .turtle-options button:disabled,body.community-page .turtle-options select:disabled{opacity:.55;cursor:not-allowed}
+body.community-page .turtle-hud{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;background:#eee3ca;border:2px solid #b49b6c;border-radius:13px 13px 0 0;padding:9px 10px;color:#3e4435;font:800 clamp(11px,2vw,14px)/1.25 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+body.community-page .turtle-hud strong{font-size:clamp(14px,2.7vw,19px)}
+body.community-page .turtle-hud span{padding:4px 7px;border-radius:8px;background:#fff9eb;border:1px solid #d3be95}
+body.community-page .turtle-daily-banner{margin:0;padding:9px 11px;background:#efe2ff;border:2px solid #b5a0c7;border-top:0;color:#4d365c;font:800 12px/1.35 system-ui,sans-serif}
+body.community-page .turtle-table{background:radial-gradient(ellipse at 50% 23%,#378768 0%,transparent 65%),linear-gradient(138deg,#195944,#073c32 70%,#082b2e);border:5px solid #a87c42;border-top:0;border-radius:0 0 18px 18px;box-shadow:inset 0 0 0 3px #d1b36b,inset 0 0 20px #062b23,0 8px 16px #273a3460;padding:9px}
+body.community-page .turtle-board-tools{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:2px 0 10px;color:#fff1ce}
+body.community-page .turtle-board-tools button{min-width:44px;min-height:44px;padding:8px 12px;border:2px solid #d4b575;border-radius:9px;background:#f5dea9;color:#3d342c;font:800 14px/1 system-ui,sans-serif;cursor:pointer}
+body.community-page .turtle-board-tools button:disabled{opacity:.42;cursor:not-allowed}
+body.community-page .turtle-board-tools strong{min-width:47px;font:850 13px/1.2 system-ui,sans-serif;text-align:center}
+body.community-page .turtle-board-tools span{font:750 12px/1.2 system-ui,sans-serif;color:#e5d9ba}
+body.community-page .turtle-board-scroll{position:relative;width:100%;max-height:min(72dvh,695px);overflow:auto;overscroll-behavior:contain;scrollbar-color:#d4ac71 #1a4a40;scrollbar-width:thin;touch-action:pan-x pan-y;border:2px solid #caa973;border-radius:13px;background:radial-gradient(ellipse at 50% 45%,#348b6f70,transparent 60%),linear-gradient(135deg,#175946,#073e35);box-shadow:inset 0 0 22px #072e27;min-height:230px}
+body.community-page .turtle-board{position:relative;isolation:isolate;margin:0;min-width:0}
+body.community-page .turtle-board::before{content:'◇';position:absolute;top:35%;left:42%;font:130px/1 Georgia,serif;color:#e3c88119;pointer-events:none}
+body.community-page .turtle-tile{box-sizing:border-box;position:absolute;display:grid;place-items:center;padding:0!important;margin:0!important;min-width:0!important;min-height:0!important;touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer;border-top:2px solid #fffef1!important;border-left:2px solid #fff7dd!important;border-right:clamp(3px,calc(var(--turtle-tile-size,40px)*.1),7px) solid #74a88a!important;border-bottom:clamp(4px,calc(var(--turtle-tile-size,40px)*.12),9px) solid #317254!important;border-radius:clamp(5px,calc(var(--turtle-tile-size,40px)*.14),11px)!important;background:linear-gradient(148deg,#fffef0 0%,#f1eed8 63%,#d7dbc1 100%)!important;box-shadow:inset 1px 1px 1px #fff,inset -2px -2px 4px #9a987544,1px 3px 4px #04261f85;transition:filter .1s,box-shadow .12s}
+body.community-page .turtle-tile::before{content:'';position:absolute;inset:2px 3px 4px 2px;border:1px solid #aeac866a;border-radius:3px;pointer-events:none}
+body.community-page .turtle-tile.is-blocked{filter:grayscale(.22) brightness(.84);cursor:not-allowed}
+body.community-page .turtle-tile.is-free:hover{filter:brightness(1.07);box-shadow:inset 0 1px 1px #fff,0 0 0 2px #ead08d,1px 4px 8px #001e18a0}
+body.community-page .turtle-tile.is-free.show-free{box-shadow:inset 0 0 0 2px #edce79,0 0 0 2px #ffe4a4,1px 4px 8px #001e18a0}
+body.community-page .turtle-tile.is-selected{outline:3px solid #ffe168!important;outline-offset:1px!important;filter:brightness(1.14)!important;box-shadow:0 0 0 4px #f3cb5b80,0 0 18px #ffed8b99;z-index:5200!important}
+body.community-page .turtle-tile.is-hinted{outline:3px solid #5cf8d8!important;outline-offset:1px!important;filter:brightness(1.12)!important;box-shadow:0 0 0 4px #55e8ce80,0 0 17px #83ffe6a1;z-index:5100!important}
+body.community-page .turtle-tile:focus-visible{outline:3px solid #fff06e!important;outline-offset:2px!important}
+body.community-page .turtle-art{position:relative;display:grid;align-items:center;justify-items:center;align-content:center;width:100%;height:100%;max-width:100%;min-width:0;min-height:0;line-height:1;font-family:Georgia,'Noto Serif CJK SC','Noto Sans Symbols 2','Apple Color Emoji',serif;pointer-events:none}
+body.community-page .turtle-number{font-size:clamp(13px,calc(var(--turtle-tile-size,40px)*.51),38px);font-weight:900;color:#15557a}
+body.community-page .turtle-unit{font-size:clamp(9px,calc(var(--turtle-tile-size,40px)*.31),22px);color:#aa2d28;font-weight:900}
+body.community-page .turtle-hanzi{font-size:clamp(16px,calc(var(--turtle-tile-size,40px)*.67),50px);font-weight:900;color:#184e67}
+body.community-page .turtle-art-dragon .turtle-hanzi{color:#b12d2b}
+body.community-page .turtle-art-dragon:has(.turtle-hanzi):not(:has(.turtle-white-dragon)) .turtle-hanzi{filter:drop-shadow(0 1px 1px #ffe8ce)}
+body.community-page .turtle-art-flower .turtle-hanzi{color:#ad4a5b}
+body.community-page .turtle-art-season .turtle-hanzi{color:#267e5b}
+body.community-page .turtle-white-dragon{color:#316a76;font:900 clamp(17px,calc(var(--turtle-tile-size,40px)*.72),50px)/1 Georgia,serif;text-shadow:1px 1px #c1d8d4}
+body.community-page .turtle-small{font:900 clamp(5px,calc(var(--turtle-tile-size,40px)*.14),10px)/1 system-ui,sans-serif;letter-spacing:-.02em;color:#584d43;margin-top:1px}
+body.community-page .turtle-symbols{width:72%;height:78%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1px,calc(var(--turtle-tile-size,40px)*.055),5px);place-items:center;place-content:center}
+body.community-page .turtle-symbols[data-count="1"]{grid-template-columns:1fr}
+body.community-page .turtle-symbols[data-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.community-page .turtle-dot{display:block;aspect-ratio:1;width:clamp(4px,calc(var(--turtle-tile-size,40px)*.17),15px);border:1px solid #e3eee0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#51a084 22%,#155642 74%);box-shadow:inset 0 0 0 1px #235d4a,0 1px 1px #234f3566}
+body.community-page .turtle-dot:nth-child(3n+2){background:radial-gradient(circle at 35% 30%,#fff4e0,#bd4b47 35%,#7f2b2d 80%)}
+body.community-page .turtle-dot:nth-child(3n+3){background:radial-gradient(circle at 35% 30%,#ecf6ff,#5386ba 35%,#224f7b 80%)}
+body.community-page .turtle-stem{width:clamp(3px,calc(var(--turtle-tile-size,40px)*.12),9px);height:clamp(9px,calc(var(--turtle-tile-size,40px)*.31),27px);border-radius:4px;background:repeating-linear-gradient(to bottom,#1e8655 0 4px,#a9c3a2 4px 6px,#207a50 6px 10px);box-shadow:inset 1px 0 #0d4d31,1px 1px #30624644}
+body.community-page .turtle-stem:nth-child(even){background:repeating-linear-gradient(to bottom,#286da5 0 4px,#d4e4f2 4px 6px,#2c6795 6px 10px)}
+body.community-page .turtle-pause-screen{position:absolute;inset:0;z-index:6000;display:flex;align-items:center;justify-content:center;gap:11px;flex-direction:column;background:#042922e0;color:#fff6dd;text-align:center;padding:20px}
+body.community-page .turtle-pause-screen[hidden]{display:none!important}
+body.community-page .turtle-pause-screen strong{font:900 28px/1.2 Georgia,serif}
+body.community-page .turtle-pause-screen span{font:650 13px/1.4 system-ui,sans-serif}
+body.community-page .turtle-pause-screen button{min-height:45px;padding:10px 17px;border-radius:11px;background:#ffdb8b;color:#463829;border:2px solid #fff7cf;font-weight:900;cursor:pointer}
+body.community-page .turtle-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;margin:12px 0 2px}
+body.community-page .turtle-actions button{flex:1 1 112px;min-height:45px;max-width:220px;padding:8px 10px;border:2px solid #d1b478;border-radius:10px;background:#f8e4b5;color:#42372d;font:850 13px/1.25 system-ui,sans-serif;cursor:pointer}
+body.community-page .turtle-actions button[aria-pressed="true"]{background:#175b49;color:#fff3d5;border-color:#acdeb4}
+body.community-page .turtle-actions button:disabled{opacity:.5;cursor:not-allowed}
+body.community-page .turtle-status{padding:10px 12px;min-height:39px;border:1px solid #bbcb96;border-radius:9px;background:#e7f3d5;color:#21452e;font:750 13px/1.5 system-ui,sans-serif;margin:10px 0 0!important}
+body.community-page .turtle-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+body.community-page .turtle-bottom section,body.community-page .turtle-bottom details{border:2px solid #c7b490;border-radius:12px;background:#fdf6e8;color:#443d32;padding:12px;min-width:0}
+body.community-page .turtle-bottom h4{font:900 18px/1.3 Georgia,serif;margin:0 0 8px;color:#355442}
+body.community-page .turtle-record{display:flex;gap:7px;flex-wrap:wrap}
+body.community-page .turtle-record span{padding:8px 10px;background:#e4f0de;border-radius:8px;font:850 13px/1.3 system-ui,sans-serif}
+body.community-page .turtle-local-note{font:650 12px/1.5 system-ui,sans-serif;color:#60574a}
+body.community-page .turtle-bottom summary{font:900 16px/1.3 system-ui,sans-serif;color:#345544;cursor:pointer}
+body.community-page .turtle-bottom details p{font:650 12px/1.5 system-ui,sans-serif}
+body.community-page .turtle-face-guide{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:12px 0 2px}
+body.community-page .turtle-guide-tile{display:grid;justify-items:center;gap:4px;min-width:0;padding:3px;border:1px solid #cabfa7;border-radius:6px;background:#fffdf4}
+body.community-page .turtle-guide-tile .turtle-art{--turtle-tile-size:39px;width:37px;height:42px}
+body.community-page .turtle-guide-tile small{font:650 9px/1.1 system-ui,sans-serif;text-align:center;overflow-wrap:anywhere}
+@media(max-width:720px){body.community-page .turtle-heading{align-items:flex-start}body.community-page .turtle-authentic{font-size:10px;padding:7px}body.community-page .turtle-bottom{grid-template-columns:1fr}body.community-page .turtle-face-guide{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:410px){body.community-page .turtle-options label{flex:1 1 100%}body.community-page .turtle-options button{min-width:0}body.community-page .turtle-board-tools{gap:5px}body.community-page .turtle-board-tools button{padding:6px 8px}body.community-page .turtle-board-tools span{flex-basis:100%;text-align:center}body.community-page .turtle-hud{gap:5px;padding:7px 8px}}
+@media(prefers-reduced-motion:reduce){body.community-page .turtle-tile{transition:none!important}body.community-page .turtle-board-scroll{scroll-behavior:auto!important}}
+
+/* Arcade's one-screen compositor hides all direct Mahjong children by default.
+ * Keep the game selector available, then show only the active game mode.
+ * Specificity intentionally exceeds commons-arcade-shell.css scene selectors. */
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-inside > .turtle-mode-tabs{
+ display:grid!important;flex:0 0 auto!important;gap:5px;margin:1px 0 5px;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-inside > .turtle-mode-tabs button{
+ min-height:44px;padding:5px 8px;font-size:12px;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-inside > .turtle-mode-tabs button small{font-size:9px;margin:2px 0 0}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-root[data-mahjong-mode="turtle"] #mahjong-inside > #mahjong-classic-root{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-height:0!important;max-height:100%!important;overflow:auto!important;
+ padding:2px 3px 12px!important;box-sizing:border-box!important;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-root[data-mahjong-mode="turtle"] #mahjong-inside > :is(.mahjong-game-zone,.mahjong-stats,.mahjong-campaign,.mahjong-history,.mahjong-bottom,.commons-score-ribbon){
+ display:none!important;
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading{margin:0 0 5px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading h3{font-size:20px;margin:2px 0}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading p{display:none}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-authentic{display:none}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-modes{margin:1px 0 4px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-modes button{min-height:38px;font-size:12px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options{margin:3px 0;gap:5px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options select,
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options button{min-height:38px;height:38px;font-size:12px;padding:5px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-hud{padding:4px 6px;font-size:11px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-table{min-height:235px;padding:5px;display:flex;flex-direction:column}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-board-scroll{height:min(49dvh,470px);max-height:min(49dvh,470px);min-height:180px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions{margin:6px 0 0}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions button{min-height:42px;font-size:12px}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-bottom{margin:10px 0}
