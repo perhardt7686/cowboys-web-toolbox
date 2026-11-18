@@ -21052,7 +21052,7 @@
           "browser"
         ],
         "offline": "no",
-        "processing": "remote",
+        "processing": "cloud",
         "commercial": "unknown",
         "kind": "tool",
         "region": "unknown",
@@ -21060,7 +21060,7 @@
           "en"
         ],
         "audience": [
-          "general"
+          "beginner"
         ]
       },
       "bestFor": "A first-pass check of trackers and third-party cookies on a public website.",
