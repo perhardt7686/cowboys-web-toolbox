@@ -36,7 +36,7 @@ body.community-page .mahjong-no-moves{
 }
 body.community-page .mahjong-no-moves[hidden]{display:none!important}
 body.community-page.arcade-on[data-arcade-game="wordle"] #letter-lock-grid{
- max-height:min(40dvh,395px);overflow-y:auto!important;overscroll-behavior:contain;
+ max-height:min(38dvh,260px);overflow-y:auto;overscroll-behavior:contain;
 }
 body.community-page.arcade-on[data-arcade-game="wordquest"] .family-quest-keyboard{padding:8px}
 body.community-page.arcade-on[data-arcade-game="wordquest"] .family-quest-key-row button{min-height:43px!important}

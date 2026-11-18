@@ -46,12 +46,19 @@ body.community-page .arcade-game-metrics{display:grid;grid-template-columns:repe
 body.community-page .arcade-metric{display:flex;flex-direction:column;gap:3px;padding:9px 7px;text-align:center;border:1px solid #6e5e85;border-radius:11px;background:#362749;min-width:0;}
 body.community-page .arcade-metric small{font:850 10px/1.4 system-ui,sans-serif;letter-spacing:.03em;color:#d1c2e0;}
 body.community-page .arcade-metric strong{font:900 14px/1.25 system-ui,sans-serif;color:#fff2cc;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;}
-body.community-page .letter-lock-grid{display:grid;gap:7px;max-width:405px;margin:10px auto 18px;}
-body.community-page .letter-lock-grid-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;}
-body.community-page .letter-lock-tile{display:grid;place-items:center;min-width:0;aspect-ratio:1;border:2px solid #78678d;border-radius:11px;background:linear-gradient(150deg,#4f4165,#271e3c);box-shadow:inset 0 2px #ffffff18,0 3px 0 #080613;color:#f7eef9;font:900 clamp(23px,5vw,34px)/1 system-ui,sans-serif;}
-body.community-page .letter-lock-tile.correct{background:linear-gradient(150deg,#17986b,#116e55);border-color:#75d6ad;color:white;}
-body.community-page .letter-lock-tile.present{background:linear-gradient(150deg,#f2bb49,#b57722);border-color:#ffe0a0;color:#22150d;}
-body.community-page .letter-lock-tile.absent{background:linear-gradient(150deg,#5e5867,#3a3546);border-color:#756b7a;color:#fff;}
+body.community-page .letter-lock-history{min-width:0;margin:9px 0 14px;padding:9px 10px;background:#120d22;border:1px solid #746188;border-radius:13px}
+body.community-page .letter-lock-history-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:5px 10px;margin:0 0 8px;color:#f3e4fb;font:750 13px/1.4 system-ui,sans-serif}
+body.community-page .letter-lock-history-head>span{font-size:12px;color:#d2c7df}
+body.community-page .letter-lock-grid{display:grid;gap:4px;min-width:0;max-width:100%;max-height:min(38dvh,260px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;margin:0;padding:2px}
+body.community-page .letter-lock-guess-entry{display:flex;align-items:center;gap:8px;min-width:0;min-height:37px;padding:4px 6px;border:1px solid #544761;border-radius:7px;background:#21182d}
+body.community-page .letter-lock-guess-entry.is-latest{border-color:#aa8e61}
+body.community-page .letter-lock-grid-row{display:grid;grid-template-columns:repeat(5,clamp(23px,5.2vw,27px));gap:3px;flex:none}
+body.community-page .letter-lock-tile{display:grid;place-items:center;min-width:0;height:27px;border:1px solid #78678d;border-radius:5px;background:#4f4165;color:#f7eef9;font:850 14px/1 system-ui,sans-serif}
+body.community-page .letter-lock-tile.correct{background:#146e55;border-color:#75d6ad;color:#fff}
+body.community-page .letter-lock-tile.present{background:#b57f25;border-color:#ffe0a0;color:#21150b}
+body.community-page .letter-lock-tile.absent{background:#4a4454;border-color:#756b7a;color:#fff}
+body.community-page .letter-lock-history-empty{font:650 13px/1.5 system-ui,sans-serif;color:#e8ddee;margin:8px}
+body.community-page .letter-lock-grid:focus-visible{outline:3px solid #f8d17c;outline-offset:2px}
 body.community-page .letter-lock-form{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:0 auto 14px;max-width:440px;}
 body.community-page .letter-lock-form input{flex:1;min-width:130px;min-height:49px;padding:8px 12px;border:2px solid #aa92c8;border-radius:11px;background:#f8f3ff;color:#22182c;font:900 18px/1.4 monospace;letter-spacing:.08em;text-align:center;text-transform:uppercase;}
 body.community-page .letter-lock-form button{min-height:49px;padding:9px 16px;border:2px solid #ffe5a9;border-radius:11px;background:linear-gradient(135deg,#ffd77a,#bfa5e5);color:#2b1b37;font:900 15px/1.2 system-ui,sans-serif;cursor:pointer;}
@@ -77,16 +84,15 @@ body.community-page .arcade-toast{position:fixed;bottom:calc(env(safe-area-inset
 body.community-page .arcade-toast.visible{transform:translate(-50%,0);}
 body.community-page .letter-lock-key:focus-visible,body.community-page .letter-lock-form button:focus-visible,body.community-page .letter-lock-form input:focus-visible{outline:3px solid #f8d17c;outline-offset:3px;}
 @media(max-width:840px){body.community-page .arcade-mode-list{grid-template-columns:repeat(2,minmax(0,1fr));}body.community-page .letter-lock-layout{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-grid{max-width:380px}}
-@media(max-width:490px){body.community-page .arcade-passport{padding:14px;}body.community-page .arcade-passport-symbol{width:49px;height:49px;font-size:27px;}body.community-page .arcade-medal-shelf,body.community-page .arcade-team-progress .arcade-medal-shelf{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-inner{padding:12px}body.community-page .letter-lock-grid{gap:5px;max-width:350px;}body.community-page .letter-lock-grid-row{gap:5px}body.community-page .letter-lock-tile{border-radius:8px;font-size:clamp(24px,7vw,31px);}body.community-page .letter-lock-key{min-height:43px;border-radius:5px}body.community-page .arcade-metric small{font-size:9px}body.community-page .arcade-metric strong{font-size:12px}}
+@media(max-width:490px){body.community-page .arcade-passport{padding:14px;}body.community-page .arcade-passport-symbol{width:49px;height:49px;font-size:27px;}body.community-page .arcade-medal-shelf,body.community-page .arcade-team-progress .arcade-medal-shelf{grid-template-columns:minmax(0,1fr)}body.community-page .letter-lock-inner{padding:12px}body.community-page .letter-lock-history{padding:7px 6px}body.community-page .letter-lock-grid{gap:3px}body.community-page .letter-lock-guess-entry{gap:5px;padding:4px}body.community-page .letter-lock-key{min-height:43px;border-radius:5px}body.community-page .arcade-metric small{font-size:9px}body.community-page .arcade-metric strong{font-size:12px}}
 @media(prefers-reduced-motion:reduce){body.community-page .arcade-toast,body.community-page .arcade-meter-fill{transition:none}}
 
 
 /* w0rdle co-op visual v2: show who contributed each shared guess. */
-body.community-page .letter-lock-guess-entry{display:grid;gap:4px;min-width:0}
-body.community-page .letter-lock-guess-caption{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 2px 4px;color:#eddfef;font:700 11px/1.4 system-ui,sans-serif}
-body.community-page .letter-lock-guess-caption strong{color:#f9e2a5;overflow-wrap:anywhere}
-body.community-page .letter-lock-guess-caption span{font-variant-numeric:tabular-nums;color:#c2f0de}
+body.community-page .letter-lock-guess-caption{display:flex;flex:1 1 0;min-width:0;flex-direction:column;gap:1px;margin:0;color:#eddfef;font:700 11px/1.35 system-ui,sans-serif}
+body.community-page .letter-lock-guess-caption strong{min-width:0;color:#f9e2a5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.community-page .letter-lock-guess-caption span{font-variant-numeric:tabular-nums;color:#c2f0de;white-space:nowrap}
 body.community-page .arcade-game-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
 body.community-page #letter-lock-refresh{background:#372a4c;color:#f5e4ff;border-color:#a891bb}
-body.community-page .letter-lock-grid{gap:12px}
+/* History rows deliberately remain compact on every viewport. */
 @media(max-width:430px){body.community-page .arcade-game-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}body.community-page .letter-lock-guess-caption{font-size:10px}}

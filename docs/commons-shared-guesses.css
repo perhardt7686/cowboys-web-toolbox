@@ -1,4 +1,4 @@
-/* All-member shared guess log, visible outside each closed game panel. */
+/* Approved-member archive of previous word-game rounds. */
 .shared-word-ledger{
   background:linear-gradient(145deg,#151321,#202033 60%,#141522);
   color:#f3f2fc;
@@ -13,7 +13,6 @@
 .shared-word-ledger-title{font-size:.82rem;letter-spacing:.06em;color:#e2d3ff}
 .shared-word-counter{font-size:.79rem;color:#d3d9ef}
 .shared-word-help{font-size:.78rem;line-height:1.45;color:#c9c9d9;margin:7px 0}
-.shared-word-current{display:grid;gap:6px;max-width:100%;margin:10px 0}
 .shared-word-guess{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
   background:#0b0d18aa;border:1px solid #55536c;border-radius:9px;padding:7px 8px}
 .shared-word-number{color:#aeb6cb;font-size:.76rem;min-width:1.6rem}
