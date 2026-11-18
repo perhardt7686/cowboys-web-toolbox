@@ -13,6 +13,7 @@ import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,st
 import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=workshop1';
 import {enhanceMemberStudio} from './avatar-v8-live.mjs?v=v8member1';
 import {paintV8RewardIcon} from './avatar-v8-prize-cels.mjs?v=v8art1';
+import {paintV8ArcadePrizeIcon} from './avatar-v8-arcade-prizes.mjs?v=v8arcade1';
 import {NEW_STUDIO_REWARDS,STUDIO_EDITION} from './avatar-collection-edition.mjs';
 
 const PAGE=18;
@@ -47,7 +48,7 @@ let thumbnailObserver;
 const thumbnails=new WeakMap();
 function paintThumbnail(node,item){
   if(node.closest?.('.avatar-dressing-studio[data-v8-live="true"]')&&
-     paintV8RewardIcon(node,item))return;
+     (paintV8RewardIcon(node,item)||paintV8ArcadePrizeIcon(node,item)))return;
   studioPrize(node,item);
   releaseStudioArt(node);
 }
