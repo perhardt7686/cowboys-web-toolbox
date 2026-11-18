@@ -99,3 +99,17 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 }
 @media(max-width:365px){.tabs button{font-size:.65rem}.identity strong{font-size:1rem}.selection-list{grid-template-columns:1fr 1fr}.stage-actions span{max-width:190px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pet-tail,.pet-bob,.char-show{animation:none!important}*{transition:none!important}}
+
+/* V8 visual acceptance: keep the edited character visible alongside mobile controls. */
+.preview-peek{display:none}
+@media(max-width:600px){
+  .side-card{overflow:visible}
+  .preview-peek{display:flex;align-items:center;gap:9px;position:sticky;top:0;z-index:4;
+    min-height:86px;padding:6px 12px;background:#f4eee0;border-block:1px solid #d4cbb8;
+    box-shadow:0 5px 13px #22303b24}
+  .peek-art{display:grid;place-items:center;width:94px;height:74px;flex:0 0 94px;overflow:hidden;
+    border-radius:8px;background:#9d8385}
+  .peek-art svg{width:94px;height:87px;max-width:none;flex:none}
+  .preview-peek strong{display:block;font-size:.85rem;color:#2d4d51}
+  .preview-peek small{display:block;color:#576c6d;font-size:.75rem;line-height:1.4}
+}
