@@ -43,7 +43,7 @@ test('capture and rescue are earned from actual commander encounters',()=>{
   for(let tick=0;tick<=112;tick++){
     let move='N';
     if(tick<4)move='L'; // lane zero for wave five commander
-    else if(tick>=56&&tick<63)move='R'; // move into later commander lane seven
+    else if(tick>=59&&tick<66)move='R'; // wait for wave-five flanker's dive, then reach lane seven
     else if(tick===112)move='F';
     else if(tick>55){
       const target=fleetTargetsV2(tick,seed)
