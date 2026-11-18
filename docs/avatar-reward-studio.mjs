@@ -12,6 +12,7 @@ import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,st
 
 import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=workshop1';
 import {enhanceMemberStudio} from './avatar-v8-live.mjs?v=v8member1';
+import {paintV8RewardIcon} from './avatar-v8-prize-cels.mjs?v=v8art1';
 import {NEW_STUDIO_REWARDS,STUDIO_EDITION} from './avatar-collection-edition.mjs';
 
 const PAGE=18;
@@ -45,6 +46,8 @@ function meter(value,max=1,label='Progress'){
 let thumbnailObserver;
 const thumbnails=new WeakMap();
 function paintThumbnail(node,item){
+  if(node.closest?.('.avatar-dressing-studio[data-v8-mode="modern"]')&&
+     paintV8RewardIcon(node,item))return;
   studioPrize(node,item);
   releaseStudioArt(node);
 }
