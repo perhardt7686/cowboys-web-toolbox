@@ -36,7 +36,7 @@ export function petMotionFrame({species='woodland',move='hop',action='play',
     acting.pitch=-energy*.047;
     acting.tail=energy*.19+clock*.085;
   }else if(kind==='hop'||kind==='spring'){
-    acting.bob=doubleStep*(kind==='spring'?.17:.135);
+    acting.bob=doubleStep*(kind==='spring'?.17:.135)+clock*.008;
     acting.forward=energy*.025;
     acting.stride=cycle*.26;
     acting.pitch=-energy*.095;
