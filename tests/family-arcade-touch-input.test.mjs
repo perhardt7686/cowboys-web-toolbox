@@ -66,8 +66,8 @@ test('touch-control layout keeps original action mappings with mobile thumb targ
  const css=read('family-arcade-touch-controls.css');
  const dash=read('commons-dash-forge.mjs'),sky=read('commons-board-rush.mjs');
  assert.match(html,/family-arcade-touch-controls\.css\?v=touch1/);
- assert.match(html,/commons-board-rush\.mjs\?v=skyboard8/);
- assert.match(html,/commons-dash-forge\.mjs\?v=dash8/);
+ assert.match(html,/commons-board-rush\.mjs\?v=skyboard9/);
+ assert.match(html,/commons-dash-forge\.mjs\?v=dash9/);
  for(const token of ['skyboard-thumbstick','data-sky-action="jump"',
  'data-sky-hold="drift"','data-sky-hold="brake"','data-sky-hold="left"','data-sky-hold="right"'])
   assert.ok(sky.includes(token),token);
