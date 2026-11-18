@@ -282,6 +282,12 @@ export function mountClassicTurtle(root,{userId}){
   if(best){event.preventDefault();event.stopPropagation();origin.tabIndex=-1;const dest=view('#turtle-board').querySelector(`[data-tile-id="${best.id}"]`);if(dest){dest.tabIndex=0;dest.focus();}}
  };
  section.addEventListener('keydown',keyHandler);
+ // The Arcade scene switcher belongs to Mystery Road; show those records only
+ // after leaving Classic Play, never expose unrelated campaign pages as Turtle stats.
+ const arcadeSceneWatcher=new MutationObserver(()=>{
+  if(mode==='turtle'&&document.body.classList.contains('arcade-on')&&document.body.dataset.arcadeGame==='mahjong'&&document.body.dataset.arcadeScene!=='play')toggleMode('road');
+ });
+ arcadeSceneWatcher.observe(document.body,{attributes:true,attributeFilter:['data-arcade-scene','data-arcade-game']});
  clock=window.setInterval(()=>{
   if(destroyed||mode!=='turtle'||inside.hidden||document.hidden)return;
   const game=current();if(!game||game.paused||game.completedAt)return;
@@ -290,5 +296,5 @@ export function mountClassicTurtle(root,{userId}){
  },1000);
  if('ResizeObserver' in window){resize=new ResizeObserver(()=>{if(mode==='turtle'&&!inside.hidden)render();});resize.observe(view('#turtle-board-scroll'));}
  toggleMode(mode);
- return ()=>{destroyed=true;if(clock)window.clearInterval(clock);resize?.disconnect();persist();section.remove();tabs.remove();delete root.dataset.mahjongMode;};
+ return ()=>{destroyed=true;if(clock)window.clearInterval(clock);resize?.disconnect();arcadeSceneWatcher.disconnect();persist();section.remove();tabs.remove();delete root.dataset.mahjongMode;};
 }
