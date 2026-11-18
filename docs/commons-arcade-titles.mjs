@@ -14,8 +14,8 @@ export const titleProfiles={
  fleet:{
   eyebrow:'STAR SQUADRON · FAMILY ARCADE',
   name:'STAR SQUADRON',tag:'One pilot against an alien swarm.',
-  subtitle:'Slide between lanes, fire at the swooping ships, and survive the next wave.',
-  help:'Move left and right with the big touch buttons or arrows. Hold FIRE or press Space to shoot. Hit the swooping swarm before it reaches your ship. Five-wave commanders are worth extra points. Trophies and family rankings only count after server verification.',
+  subtitle:'A waiting enemy formation sends brightly marked attackers diving toward your ship. Stay alive, fire, and reach the next wave.',
+  help:'Steer left and right with the arcade buttons or arrow keys. Hold FIRE or Space to shoot. The dim formation is waiting scenery; shoot the BRIGHT diving attacker in its marked lane. Every fifth commander earns bonus points. Trophies and scores count only after server verification.',
   first:'DEFEND THE STARLANES',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
   accent:'#91f4e7',scene:'fleet'
  },
@@ -23,7 +23,7 @@ export const titleProfiles={
   eyebrow:'MYSTERY MAZE · FAMILY ARCADE',
   name:'MYSTERY MAZE',tag:'Follow the clues. Escape the wisps.',
   subtitle:'Explore an original twisting labyrinth and collect clue lights while evading wandering ghosts.',
-  help:'Use the large directional buttons or arrow keys to explore. Every new tile earns a clue. Power orbs let you pass a ghost safely for a little while. Earn trophies from verified scores and challenge the family leaderboard.',
+  help:'Use the four-way arcade controls or arrow keys. Press a turn before the junction: it stays queued while you follow the current hallway, then turns when the path opens. Collect clue lights only once per tile. Power orbs make wisps harmless briefly. Scores and trophies require server verification.',
   first:'ENTER THE LABYRINTH',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
   accent:'#f5d487',scene:'maze'
  },
