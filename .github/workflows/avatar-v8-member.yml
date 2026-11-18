@@ -37,7 +37,7 @@ jobs:
       - name: Install real Chromium acceptance engine
         run: |
           python -m pip install 'playwright>=1.50,<2'
-          python -m playwright install --with-deps chromium
+          python -m playwright install --with-deps chromium webkit
       - name: Test actual member art, rewards, pets and save flow
         run: |
           python -m http.server 8765 --directory docs >/tmp/v8-member-http.log 2>&1 &
