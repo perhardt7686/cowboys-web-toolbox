@@ -1,6 +1,7 @@
 /* Dash Forge · Original member-only rhythm-platformer. No Geometry Dash assets,
  * music or proprietary levels. Server owns timing validation, achievements and awards. */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {createSourceHolds} from './family-arcade-touch-input.mjs';
 import {DASH_DT,DASH_CEILING,DASH_MODES,DASH_TOOLS,dashCanTransform,dashCanRotate,dashBeatAt,dashGateActive,dashObjects,createDashCourse,createDashRun,stepDash} from './dash-physics.mjs?v=courses2';
 import {DASH_PALETTES,drawDashObject,drawDashPlayer} from './dash-art.mjs?v=courses2';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
@@ -43,7 +44,31 @@ const PAINT_GROUPS=[
 const dataKey=()=>user?'dash-forge-draft-v2-'+user:null;
 const defaultDraft=(title='My First Dash')=>({id:null,title,difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[],song:'pulse'});
 let tileSelected=4,zoom=1,zoomStart=null,clipboard=null,pickTool='paint',paintGroup='Hazards',editLayer='track',drag=null,autoTimer=0;
-let inputHeld=false,inputTapped=false,lastRun=null,draftLoadedFor=null,attemptKey='',attemptCount=0;
+let inputTapped=false,lastRun=null,draftLoadedFor=null,attemptKey='',attemptCount=0;
+const dashControls=createSourceHolds(['jump']);
+let dashTouchTargets=[];
+function resetDashTouch(){
+ dashControls.clear();inputTapped=false;
+ for(const item of dashTouchTargets){item.pointers.clear();item.node.classList.remove('pressed');}
+}
+function bindDashTouch(node){
+ const pointers=new Set();dashTouchTargets.push({node,pointers});
+ node.addEventListener('pointerdown',event=>{
+  if(!run||run.finishing||node.disabled||(event.pointerType==='mouse'&&event.button!==0))return;
+  event.preventDefault();
+  pointers.add(event.pointerId);
+  dashControls.hold('jump','pointer:'+event.pointerId);
+  node.classList.add('pressed');
+  try{node.setPointerCapture(event.pointerId);}catch{}
+  jump();
+ },{passive:false});
+ const release=event=>{
+  if(!pointers.delete(event.pointerId))return;
+  dashControls.release('jump','pointer:'+event.pointerId);
+  if(!pointers.size)node.classList.remove('pressed');
+ };
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])node.addEventListener(type,release);
+}
 function editableTile(index){return Number.isInteger(index)&&index>=4&&index<draft.pattern.length-4;}
 function draftSnapshot(){return structuredClone(draft);}
 function storeDraft(){
@@ -404,10 +429,10 @@ function build(){
   '<div id="dash-play-overlay" class="dash-play-overlay" hidden>'+
     '<header class="dash-playing-head"><div><small>NOW PLAYING</small><strong id="dash-run-title">Loading…</strong></div>'+
       '<strong id="dash-live-progress">0%</strong><strong id="dash-attempt-count" aria-live="off">ATTEMPT 1</strong><button type="button" id="dash-sound" data-dash-action="sound" aria-pressed="false">♪ SOUND OFF</button><button type="button" id="dash-retry-live" data-dash-action="retry" hidden>Retry · R</button><button type="button" id="dash-practice-retry" data-dash-action="practice-retry" hidden>Checkpoint</button><button type="button" data-dash-action="leave">Leave track</button></header>'+
-    '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" tabindex="0" role="img" aria-label="Running level. Press Space or Up to control your character."></canvas>'+
+    '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" tabindex="0" role="img" aria-label="Running level. Tap or hold anywhere on the playfield; press Space or Up on a keyboard."></canvas>'+
      '<div class="dash-run-overlay" id="dash-run-message" hidden></div></div>'+
     '<footer class="dash-game-controls arcade-control-deck" aria-label="Dash Forge arcade controls">'+
-    '<div class="arcade-control-info"><strong>ELLIOT’S EDITION · ARCADE CONTROLS</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap or press Space. Avoid spikes, blocks and gaps.</p></div>'+
+    '<div class="arcade-control-info"><strong>ELLIOT’S EDITION · TAP THE GAME TO PLAY</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap anywhere in the level. Hold for flight. Space / ↑ on keyboard.</p></div>'+
     '<div class="arcade-action-cluster"><div class="arcade-key-station">'+
     '<button type="button" id="dash-jump" class="arcade-button-a" aria-label="Arcade A, jump" aria-describedby="dash-action-label"><span class="arcade-button-face">A</span><span class="arcade-button-symbol" aria-hidden="true">↗</span></button>'+
     '<span id="dash-action-label" class="arcade-button-caption">JUMP</span><small class="arcade-keyboard-hint">SPACE / ↑ · HOLD</small></div></div></footer>'+
@@ -419,14 +444,13 @@ function build(){
   $('dash-forge-toggle').setAttribute('aria-expanded',String(open));
   if(open){void refresh();choosePane(scene);}});
  root.addEventListener('click',onClick);
- root.addEventListener('pointerdown',event=>{
-  if(event.target.closest('#dash-canvas,#dash-jump')){event.preventDefault();inputHeld=true;jump();try{event.target.setPointerCapture(event.pointerId);}catch{}}
- },{passive:false});
+ dashTouchTargets=[];
+ bindDashTouch($('dash-canvas'));
+ bindDashTouch($('dash-jump'));
  $('dash-creator-preview').addEventListener('click',event=>{
   if(busy||run)return;
   editTile(previewTile(event.currentTarget,event.clientX),pickTool==='select'?null:brush);
  });
- for(const type of ['pointerup','pointercancel','lostpointercapture'])root.addEventListener(type,()=>{inputHeld=false;});
  root.addEventListener('dragstart',event=>{
   const tool=event.target.closest('[data-dash-brush]'),cell=event.target.closest('[data-dash-cell]');
   if(tool){drag={token:tool.dataset.dashBrush};event.dataTransfer.setData('text/plain',drag.token);}
@@ -804,7 +828,7 @@ function frameStep(timestamp){
   run.accumulator-=DASH_DT;
   const pads=navigator.getGamepads?.();
   const pad=pads&&Array.from(pads).find(p=>p?.connected);
-  const input=(inputHeld||pad?.buttons[0]?.pressed?1:0)|(inputTapped?2:0);
+  const input=(dashControls.has('jump')||pad?.buttons[0]?.pressed?1:0)|(inputTapped?2:0);
   inputTapped=false;
   if(input!==run.input){run.trace.push([physics.tick,input]);run.input=input;}
   stepDash(physics,input);
@@ -839,7 +863,7 @@ function beginDraw(l){
  $('dash-live-progress').textContent='0%';$('dash-attempt-count').textContent='ATTEMPT '+attemptCount;$('dash-run-message').hidden=true;
  $('dash-retry-live').hidden=true;$('dash-practice-retry').hidden=true;
  run.lastFrame=null;run.elapsed=0;run.trace=[];run.input=0;run.accumulator=0;run.finishing=false;lastBeat=-1;
- inputHeld=inputTapped=false;
+ resetDashTouch();
  $('dash-canvas').focus({preventScroll:true});
  updateControls();draw();frame=requestAnimationFrame(frameStep);
 }
@@ -904,7 +928,7 @@ async function finishRun(){
    if(runFromBuilder)creatorTestOutcome='Your draft is saved. Try a verified playtest again.';
   }
  }
- run=null;$('dash-jump').disabled=false;$('dash-live-progress').textContent=visualWin?'FINISHED':'RETRY';
+ run=null;resetDashTouch();$('dash-jump').disabled=false;$('dash-live-progress').textContent=visualWin?'FINISHED':'RETRY';
  $('dash-play-overlay').dataset.finished='true';
  $('dash-retry-live').hidden=Boolean(snapshot.practice);
  $('dash-practice-retry').hidden=!snapshot.practice;
@@ -912,7 +936,7 @@ async function finishRun(){
 }
 async function leaveRun(){
  const returnToCreator=runFromBuilder;runFromBuilder=false;
- cancelAnimationFrame(frame);
+ cancelAnimationFrame(frame);resetDashTouch();
  run=null;$('dash-play-overlay').hidden=true;
  $('dash-play-overlay').dataset.finished='false';
  document.body.classList.remove('dash-playing');
@@ -923,7 +947,7 @@ function onKeys(e){
  if(!root||!open||!root.isConnected||board.hidden)return;
  if(e.target?.closest?.('input,select,textarea,[contenteditable]'))return;
  if(run&&!run.finishing&&(e.code==='Space'||e.code==='ArrowUp')&&!e.target?.closest?.('button')){
-  e.preventDefault();inputHeld=true;if(!e.repeat)jump();return;
+  e.preventDefault();dashControls.hold('jump','key:'+e.code);if(!e.repeat)jump();return;
  }
  if(!run&&$('dash-play-overlay')&&!$('dash-play-overlay').hidden&&e.code==='KeyR'&&!e.repeat){
   e.preventDefault();void retryTrack();return;
@@ -950,7 +974,7 @@ function syncArcade(){
   if(TABS.some(([id])=>id===s)&&!run)choosePane(s);
  }else if(run?.inArcade){
   // Safe teardown: no synthetic success is sent when family exits the game.
-  cancelAnimationFrame(frame);run=null;runFromBuilder=false;$('dash-play-overlay').hidden=true;document.body.classList.remove('dash-playing');
+  cancelAnimationFrame(frame);resetDashTouch();run=null;runFromBuilder=false;$('dash-play-overlay').hidden=true;document.body.classList.remove('dash-playing');
  }
 }
 async function boot(){
@@ -964,11 +988,11 @@ async function boot(){
     persistSession:true,autoRefreshToken:false,detectSessionInUrl:false,storage:store}});
   let pending=null;
   const verify=async()=>{
-   if(board.hidden){user=null;root?.remove();root=null;open=false;cancelAnimationFrame(frame);run=null;return;}
+   if(board.hidden){resetDashTouch();user=null;root?.remove();root=null;open=false;cancelAnimationFrame(frame);run=null;return;}
    const {data:{session:s}}=await client.auth.getSession();
    const id=s?.user?.id;if(!id){user=null;return;}
    const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
-   if(error||member?.status!=='approved'){user=null;root?.remove();root=null;return;}
+   if(error||member?.status!=='approved'){resetDashTouch();user=null;root?.remove();root=null;return;}
    if(user!==id){user=id;root?.remove();root=null;open=false;state=null;}
    if(!root?.isConnected){build();await refresh(true);}
    syncArcade();
@@ -977,10 +1001,10 @@ async function boot(){
   new MutationObserver(schedule).observe(board,{attributes:true,attributeFilter:['hidden']});
   new MutationObserver(syncArcade).observe(document.body,{attributes:true,attributeFilter:['class','data-arcade-game','data-arcade-scene']});
   window.addEventListener('keydown',onKeys);
-  window.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='ArrowUp')inputHeld=false;});
-  window.addEventListener('blur',()=>{inputHeld=inputTapped=false;});
+  window.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='ArrowUp')dashControls.release('jump','key:'+e.code);});
+  window.addEventListener('blur',resetDashTouch);
   client.auth.onAuthStateChange((_event)=>schedule());
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)resetDashTouch();else schedule();});
   refreshTimer=setInterval(()=>{if(root&&open&&!run&&!document.hidden)void refresh(true);},25000);
   schedule();
  }catch(e){console.warn('Dash Forge unavailable:',e);}
