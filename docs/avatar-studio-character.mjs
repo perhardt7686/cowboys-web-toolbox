@@ -277,6 +277,15 @@ function arm(parent,side,v,body,wardrobe,palette,materials,item){
     hand[1]=1.969;hand[2]=.169;
   }else if(item){
     hand[0]+=side*.020;hand[1]=1.398;hand[2]=.256;
+  }else if(v.pose==='tilt'&&!wardrobe.mechanical){
+    // Contrapposto is visible even before the head rotates. This small
+    // asymmetry avoids two identical stiff hanging sleeves; item-held arms
+    // keep their existing socket and hand position instead.
+    elbow[0]+=side*(side===1?.065:.025);
+    elbow[1]+=side===1?.055:-.029;
+    hand[0]+=side*(side===1?.114:.031);
+    hand[1]+=side===1?.121:-.040;
+    hand[2]+=side===1?.059:.018;
   }else if(wardrobe.mechanical){
     elbow[0]+=side*.028;
     hand[0]+=side*.024;
@@ -358,6 +367,12 @@ export function buildAvatar(recipe){
   };
   const root=group(null);
   const figure=group(root);
+  // Shift the whole organic upper silhouette, not merely the head/hand decals.
+  // Rotating the rig preserves the parent-child chain for hats, hands and held props;
+  // machines retain rigid mechanical posture and the feet stay close to the floor.
+  const lean=recipe.pose==='tilt'&&!mechanical?0.077:0;
+  figure.rotation.z=lean;
+  figure.userData.studioActingLean=lean;
   const body={...shape,width:shape.width*(1+(Number(outfits.build)||0)*.078)};
   figure.scale.y=shape.height*(1+(Number(outfits.height)||0)*.042);
   const color=cosmetics.bottoms?.color||{overalls:'#4b6878',dress:palette.cloth,pleats:'#a35757',flares:'#7b5653',slacks:'#575667',cuffs:'#596c6e'}[wardrobe.bottoms];
@@ -368,13 +383,13 @@ export function buildAvatar(recipe){
   const head=group(figure,model==='armor'?-.032:0,2.440,0);
   head.rotation.y={detective:.065,mechanic:-.075,sleuth:.08,specter:-.115,marsh:.17,armor:-.04,scout:.10,radio:.08}[model]||0;
   head.rotation.z={detective:-.055,mechanic:.035,sleuth:-.079,specter:.048,marsh:.06,radio:-.043}[model]||0;
-  if(model==='detective')head.scale.set(.93,1.055,.98);
+  if(model==='detective')head.scale.set(.99,1.015,1.00);
   if(model==='mechanic')head.scale.set(1.07,.99,1.07);
   if(model==='sleuth')head.scale.set(1,.99,.985);
   if(model==='specter')head.scale.set(.90,1.075,.965);
   if(model==='marsh')head.scale.set(1.02,1.065,1.09);
   if(model==='armor')head.rotation.z=-.10;
-  if(recipe.pose==='tilt')head.rotation.z=-.14;
+  if(recipe.pose==='tilt')head.rotation.z=-.205;
   sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',radio:model==='radio',marsh:model==='marsh',specter,
     headCovered:Boolean(cosmetics.hat||(recipe.hat&&recipe.hat!=='none')||recipe.accessory==='crown'),
     jawTune:Number(outfits.jaw)||0,eyeSpacing:Number(outfits.eye_spacing)||0,

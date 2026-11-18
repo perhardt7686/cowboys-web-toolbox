@@ -8,10 +8,15 @@ const hairCuts={
   crop:[12,0,0],shaved:[5,0,0],coils:[24,4,3],ponytail:[18,43,2],shag:[23,27,4],
   flip:[24,37,1],pompadour:[34,2,0],afro:[32,21,3],fringe:[19,5,0],feathered:[28,27,4]
 };
+// Distinct original hand-inked cranium and jaw silhouettes in the flat-cel path.
+// Keep the same face IDs, mouth anchor logic and clothing/hat sockets.
 const faceShapes={
-  oval:[32,20,78],round:[35,26,73],long:[30,16,88],
-  angular:[33,13,82],square:[35,30,78],heart:[33,15,73]
+  oval:[32,20,78],round:[38,29,74],long:[30,18,86],
+  angular:[35,13,84],square:[36,33,78],heart:[36,12,77]
 };
+export function celFaceProfile(face='oval'){
+  return [...(faceShapes[face]||faceShapes.oval)];
+}
 const noseLengths={button:12,straight:16,swoop:15,pointed:20,freckled:12};
 
 function planes(c,hair,skin,frame,recipe){
@@ -91,14 +96,18 @@ function lips(c,x,y,v,skin){
     path(c,[x-span+4,y],[[x-5,y+6,x+9,y+6,x+span-4,y],
       [x+span-7,y+6,x-8,y+11,x-span+4,y]],PAPER,null);
     if(laugh)oval(c,x+2,y+depth+1,6,2.6,'#ca7a79',null);
-    for(const side of [-1,1])
+    for(const side of [-1,1]){
       path(c,[x+side*(span+1),y-2],[[x+side*(span+5),y+3]],
-        null,shade,1.5);
+        null,shade,1.7);
+      // Two fitted cheek creases, rather than extra floating mouth outlines.
+      path(c,[x+side*(span+3),y-3],[[x+side*(span+5),y+1,x+side*(span+3),y+6]],
+        null,ink,1.65);
+    }
   }else if(expression==='smirk'){
     // Asymmetric mouth and one cheek crease, rather than a miniature smile.
     path(c,[x-14,y+6],[[x-5,y+10,x+5,y+5,x+17,y-8]],
       null,ink,2.75);
-    path(c,[x+13,y-5],[[x+21,y-7,x+22,y-1]],null,shade,1.55);
+    path(c,[x+13,y-5],[[x+21,y-7,x+22,y-1]],null,shade,1.9);
   }else if(expression==='smile'||expression==='wink'){
     // A closed smile, distinct from an open toothy grin.
     path(c,[x-15,y-3],[[x-9,y+6,x+7,y+10,x+15,y-4]],
@@ -116,7 +125,9 @@ function lips(c,x,y,v,skin){
 
 function eyebrow(c,x,y,v,offset){
   const arch={soft:-2,straight:0,bold:-3,arching:-6}[v.brows]??-2;
-  path(c,[x-7,y+2],[[x-2,y+arch,x+5,y+offset]],null,INK,v.brows==='bold'?3.6:2.25);
+  // Firm outer shapes stay visible when the portrait shrinks to 48 pixels.
+  const weight=v.brows==='bold'?3.8:v.expression==='curious'||v.expression==='smirk'?2.9:2.55;
+  path(c,[x-8,y+2],[[x-2,y+arch-1,x+6,y+offset]],null,INK,weight);
 }
 
 function eye(c,x,y,iris,v,width=10,face=0){
@@ -396,14 +407,40 @@ function machineHead(c,v,frame,color,faceLight,hood){
   }
 }
 
+// Preserve the Marsh Watchkeeper's fin-eared creature silhouette in every cel view.
+// The 3D sculpt has leafy fins and a rounded crown crest, even with bald hair.
+function marshFins(c,frame){
+  const {view}=frame;
+  const leaf='#668a52',inner='#a5b266',vein='#375b50';
+  for(const side of [-1,1]){
+    const x=side*(37-5*Math.abs(view.depth))+view.depth*4;
+    path(c,[x-side*6,36],[
+      [x+side*7,18,x+side*19,-5,x+side*27,-6],
+      [x+side*27,9,x+side*27,29,x+side*15,47],
+      [x+side*7,54,x-side*3,56,x-side*6,36]
+    ],leaf,INK,2.45);
+    path(c,[x+side*3,41],[[x+side*14,21,x+side*20,6]],null,inner,2.05);
+    for(let i=0;i<3;i++)
+      path(c,[x+side*(8+i*3),29-i*6],[[x+side*(14+i*2),26-i*7]],null,vein,1.55);
+  }
+  path(c,[-17+view.depth*5,-13],[
+    [-18+view.depth*5,-26,-10+view.depth*5,-34,1+view.depth*5,-31],
+    [14+view.depth*5,-33,21+view.depth*5,-21,19+view.depth*5,-13],
+    [9+view.depth*5,-7,-7+view.depth*5,-7,-17+view.depth*5,-13]
+  ],leaf,INK,2.15);
+  path(c,[-9+view.depth*5,-19],[[1+view.depth*5,-24,10+view.depth*5,-18]],null,inner,1.6);
+}
+
 export function paintHead(c,frame,v,colors,stamp){
   const {view,design}=frame;
-  const skin=frame.model==='specter'?tint(colors.skin,'#79a285',.71):colors.skin;
+  const skin=frame.model==='specter'?tint(colors.skin,'#79a285',.71):
+    frame.model==='marsh'?tint(colors.skin,'#598e61',.74):colors.skin;
   const machine=design.family==='robot'||frame.model==='armor';
   c.save();
   c.translate(frame.head.x,frame.head.y);
   c.rotate(v.pose==='tilt'?.08*view.across:0);
   c.scale(design.scale,design.scale);
+  if(frame.model==='marsh')marshFins(c,frame);
   if(machine){
     machineHead(c,v,frame,colors.shirt,colors.eyes,frame.model==='armor');
   }else{

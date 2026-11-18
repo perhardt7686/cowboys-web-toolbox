@@ -180,7 +180,10 @@ export function poseStudioAction(actor,time,motion,light){
   const idle=!active&&time>0&&Number.isFinite(time);
   const breath=idle?Math.sin(time*1.18):0;
   actor.figure.rotation.y=wearable&&!face&&id!=='phantom-cloak'?Math.sin(p*Math.PI*1.6)*amount*.23:0;
-  actor.figure.rotation.z=idle?breath*.008:0;
+  // A gesture must return to its authored body pose, not force a neutral rig.
+  // That keeps held sword/lantern grip coordinates stable through an action.
+  const authoredLean=actor.figure.userData.studioActingLean||0;
+  actor.figure.rotation.z=authoredLean+(idle?breath*.008:0);
   actor.head.userData.studioRestTilt ??= actor.head.rotation.z;
   actor.head.rotation.z=actor.head.userData.studioRestTilt+(idle?Math.sin(time*.77+.5)*.018:0);
   actor.head.userData.studioRestYaw ??= actor.head.rotation.y;

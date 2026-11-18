@@ -3,7 +3,7 @@ import {expressionActing,traceCuriousMouth} from './avatar-expression-acting.mjs
 
 const HEAD_SHAPES={
   oval:[1,1,1], angular:[.98,1.065,1.08], round:[1.09,.94,.92],
-  square:[1.07,.98,1.18], long:[.91,1.13,.93], heart:[1.03,.98,.79]
+  square:[1.07,.98,1.18], long:[.97,1.055,.98], heart:[1.03,.98,.79]
 };
 const HAIR_FORM={
   short:'sweep',wavy:'sweep',curly:'curls',long:'flow',spiky:'quiff',bald:'none',
@@ -88,14 +88,26 @@ function makeScalp(head,hair,shine,style,key){
   }
 }
 
-function faceRings(shape){
-  const [w,h,jaw]=shape;
+// Relative changes to the outer skin shell, not the eye/gear sockets.
+// Original character-family signatures are deliberately distinct at 48px.
+const FACE_CONTOURS=Object.freeze({
+  oval:    {brow:1,    cheek:1,    jaw:1,    chin:1},
+  angular: {brow:1.06, cheek:1.035,jaw:1.045,chin:.92},
+  round:   {brow:1.095,cheek:1.095,jaw:1.105,chin:1.14},
+  square:  {brow:1.04, cheek:1.045,jaw:1.115,chin:1.24},
+  long:    {brow:.99,  cheek:.975,jaw:.905,chin:.81},
+  heart:   {brow:1.095,cheek:1.07, jaw:.935,chin:.82}
+});
+export function faceSilhouetteRings(face='oval',jawTune=0){
+  const [w,h,baseJaw]=HEAD_SHAPES[face]||HEAD_SHAPES.oval;
+  const {brow,cheek,jaw,chin}=FACE_CONTOURS[face]||FACE_CONTOURS.oval;
+  const lowerJaw=baseJaw*(1+jawTune*.069)*jaw;
   return [
-    [-.278*h,.037,.065,0,.033],[-.262*h,.116*jaw*w,.104,0,.044],
-    [-.207*h,.159*jaw*w,.141,0,.027],[-.155*h,.188*jaw*w,.163,0,.016],
-    [-.08*h,.218*w,.181],[-.015*h,.229*w,.191],
-    [.051*h,.229*w,.192],[.12*h,.224*w,.186],
-    [.186*h,.197*w,.156,0,-.008],[.242*h,.136*w,.109,0,-.012],
+    [-.278*h,.037*chin,.065,0,.033],[-.262*h,.116*lowerJaw*w,.104,0,.044],
+    [-.207*h,.159*lowerJaw*w,.141,0,.027],[-.155*h,.188*lowerJaw*w,.163,0,.016],
+    [-.08*h,.218*w*cheek,.181],[-.015*h,.229*w*cheek,.191],
+    [.051*h,.229*w*brow,.192],[.12*h,.224*w*brow,.186],
+    [.186*h,.197*w*brow,.156,0,-.008],[.242*h,.136*w*brow,.109,0,-.012],
     [.276*h,.065*w,.06,0,-.019],[.29*h,.001,.001,0,-.026]
   ];
 }
@@ -145,10 +157,10 @@ function facePlanes(head,v,palette,w,h,jaw,specter){
     // Flat color blocks tuck behind the eyes and outline the cheek and jaw.
     // Expressions change the mass of each cheek, not merely the mouth decal.
     // Stay inside the fitted face plane; no separate free-floating smile lines.
-    const cheekLift=v.expression==='grin'?.023:
+    const cheekLift=v.expression==='grin'?.028:
       v.expression==='smile'?.010:
-      v.expression==='smirk'&&side===1?.025:0;
-    const cheekWide=v.expression==='grin'?1.22:
+      v.expression==='smirk'&&side===1?.030:0;
+    const cheekWide=v.expression==='grin'?1.27:
       v.expression==='smirk'&&side===1?1.12:1;
     const cheek=oval(head,shadow,side*.158*w,-.092*h+cheekLift,.128,
       .037*cheekWide,.068*cheekWide,.020);
@@ -156,7 +168,7 @@ function facePlanes(head,v,palette,w,h,jaw,specter){
     const highlight=oval(head,light,side*.111*w,.104*h,.159,.039,.013,.007);
     highlight.rotation.z=-side*.32;
     stroke(head,ink,[[side*.175*w,-.113*h,.142],
-      [side*.147*w,-.174*h,.139],[side*.092*jaw*w,-.224*h,.107]],.0046,16);
+      [side*.147*w,-.174*h,.139],[side*.092*jaw*w,-.224*h,.107]],.0054,16);
   }
   stroke(head,ink,[[-.052*jaw*w,-.247*h,.099],[0,-.268*h,.078],
     [.052*jaw*w,-.247*h,.099]],.0046,14);
@@ -214,9 +226,9 @@ function browsAndEyes(head,v,palette,w,spacing){
       stroke(eye,shadow,[[-ew*.64,-eh*.94,.008],
         [0,-eh*1.06,.013],[ew*.62,-eh*.89,.008]],.0035);
     }
-    const brows=expression.brow+(v.brows==='arching'?.013:0)+acting.brows[index]*.0025;
+    const brows=expression.brow+(v.brows==='arching'?.013:0)+acting.brows[index]*.0031;
     const height=.071+browLift+(v.brows==='bold'?.004:0);
-    const pitch=expression.mouth==='determined'?-side*.024:side*brows*.5+acting.browEnd[index]*.0016;
+    const pitch=expression.mouth==='determined'?-side*.028:side*brows*.58+acting.browEnd[index]*.0020;
     stroke(eye,brow,[[-.061,height+pitch*.8,-.003],
       [-.023,height+.010+pitch,.016],[.034,height+brows*.5-pitch,.010],
       [.062,height-.008-pitch*.7,-.007]],v.brows==='bold'?.012:.0094,20);
@@ -541,7 +553,7 @@ export function sculptFace(head,v,palette,{mechanical=false,armor=false,scout=fa
   const shape=(HEAD_SHAPES[v.face]||HEAD_SHAPES.oval).slice();
   shape[2]*=1+jawTune*.069;
   const [w,h,jaw]=shape;
-  const rings=faceRings(shape);
+  const rings=faceSilhouetteRings(v.face,jawTune);
   shell(head,tone,rings,{segments:48,warp([x,y,z],angle){
     return [x,y,z+skinRelief(y,angle)];
   }});
