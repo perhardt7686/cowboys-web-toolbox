@@ -44,6 +44,8 @@ async def main():
     await expect(page.locator('#mahjong-root')).to_have_attribute('data-mahjong-mode','turtle')
     await expect(page.locator('.turtle-tile')).to_have_count(144)
     assert await page.locator('#turtle-remaining').inner_text()=='144 tiles remain'
+    debug=await page.evaluate("""()=>{const el=document.querySelector('#turtle-zoom-in');let n=el;const out=[];while(n&&out.length<12){const st=getComputedStyle(n);out.push({id:n.id,tag:n.tagName,cls:n.className,hidden:n.hidden,display:st.display,visibility:st.visibility,width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height});n=n.parentElement;}return out;}""")
+    print('TURTLE BUTTON DEBUG',width,debug,flush=True)
     assert await page.locator('#turtle-zoom-in').is_visible()
     assert await page.locator('#turtle-hint').is_visible()
     assert await page.locator('#turtle-board-scroll').evaluate('(el)=>el.scrollWidth>el.clientWidth'),'zoom should allow pan'
