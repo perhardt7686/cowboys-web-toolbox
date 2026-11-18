@@ -114,3 +114,22 @@ test('V2 SQL and RPC tables are independent from all legacy trophy and leaderboa
     'V2 may not claim V1 family unlockables');
   assert.doesNotMatch(sql,/perform community_private\.avatar_reward_award/i);
 });
+
+
+test('opt-in browser V2 mode never routes its score to Classic V1 trophies',()=>{
+  const script=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+  assert.match(script,/selectedVersion=\{fleet:1,maze:1\}/,
+    'legacy game must remain the initial default');
+  assert.match(script,/community_retro_start_v2/);
+  assert.match(script,/community_retro_finish_v2/);
+  assert.match(script,/community_retro_state_v2/);
+  assert.match(script,/retroStepV2\(current,action\)/);
+  assert.match(script,/snapshot\.version!==2/,
+    'V2 must not emit legacy achievement-award notifications');
+  assert.match(script,/const mode=richButton\('CLASSIC V1 · ACTIVE'/);
+  assert.match(script,/GAMEPLAY V2 · SEPARATE SCORES/);
+  assert.match(script,/if\(snapshot\.version===2\)await refreshV2/);
+  const page=readFileSync(new URL('../docs/community.html',import.meta.url),'utf8');
+  assert.match(page,/commons-retro-arcade\.mjs\?v=retro13/);
+  assert.match(page,/commons-retro-arcade\.css\?v=retro8/);
+});
