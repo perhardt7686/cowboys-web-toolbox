@@ -59,7 +59,7 @@ test('retro mobile controls actually use the tap buffer and keyboard activation'
  assert.match(src,/createRetroInput\(\)/);
  assert.match(src,/input\.press\(game\.id,code\)/);
  assert.match(src,/event\.detail===0&&current\?\.game===game\.id\)input\.tap/);
- assert.match(src,/function actionForTick\(game\)\{return input\.action\(game\);\}/);
+ assert.match(src,/function actionForTick\(game\)\{return input\.action\(game,current\);\}/);
  assert.match(src,/Round paused while the page is hidden/);
  assert.match(src,/Round resumed\. Keep playing/);
  assert.match(board,/commons-retro-arcade\.mjs\?v=retro10/);
@@ -118,4 +118,41 @@ test('both family originals retain deterministic, bounded classic arcade rules',
   assert.equal(power.power,23,'power duration begins with 24 ticks and consumes one');
   assert.deepEqual(retroReplay('maze',0,'DD'),power,
     'local gameplay and score replay remain bitwise-identical');
+});
+
+
+test('Mystery Maze queues a blocked corner turn and moves until the turn opens',()=>{
+  const pad=createRetroInput();
+  const start={x:1,y:1};
+  pad.tap('maze','R');
+  assert.equal(pad.action('maze',start),'R');
+  pad.tap('maze','D'); // blocked by wall at x=2,3,4; open at x=5
+  for(const x of [2,3,4])
+    assert.equal(pad.action('maze',{x,y:1}),'R','keep moving while turn is queued at '+x);
+  assert.equal(pad.action('maze',{x:5,y:1}),'D','turn automatically at the next open tile');
+  assert.equal(pad.action('maze',{x:5,y:2}),'D','continue moving down while clear');
+  pad.tap('maze','U');
+  assert.equal(pad.action('maze',{x:5,y:3}),'U','new request takes precedence');
+  pad.clearHeld();
+  assert.equal(pad.action('maze',{x:5,y:2}),'N','suspending the game stops steering');
+  pad.tap('maze','U');
+  assert.equal(pad.action('maze',{x:5,y:2}),'U');
+  pad.reset();
+  assert.equal(pad.action('maze',{x:5,y:2}),'N');
+});
+
+test('queued turns produce only replayable server-authoritative maze actions',()=>{
+  const pad=createRetroInput(),actions=[];
+  let state=initialRetro('maze',4);
+  pad.tap('maze','R');
+  for(let i=0;i<5;i++){
+    if(i===1)pad.tap('maze','D');
+    const code=pad.action('maze',state);
+    assert.ok(RETRO_GAME_RULES.maze.controls.includes(code));
+    actions.push(code);
+    state=retroStep(state,code);
+  }
+  assert.deepEqual(state,retroReplay('maze',4,actions.join('')),
+    'no cosmetic or predictive movement bypasses the submitted replay trace');
+  assert.equal(actions.length,state.tick);
 });
