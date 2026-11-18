@@ -3,6 +3,7 @@
  * Supabase score authority remain in place. Never awards offline wins.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {createSourceHolds,thumbstickAxis,thumbstickDirection} from './family-arcade-touch-input.mjs';
 import {SKY_DT,SKY_INPUT,buildSkyCourse,createSkyRide,skyTrack,skyObjectX,stepSky} from './skyboard-physics.mjs?v=courses2';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
 import {SKY_COURSE_EDITION,SKY_WORLDS,SKY_COLORS,skyCourseInfo} from './skyboard-courses.mjs';
@@ -29,7 +30,15 @@ const BADGES=[
  ['ball-survivor','Red Ball Comeback','Recover from a red ball and finish the stage','🔴',0]
 ];
 let client=null,user=null,root=null,profile=null,leaders=[],awards=[],open=false,booted=false;
-let selectedBoard='sunny',currentScene='play',run=null,request=0,last=0,held=new Set(),busy=false;
+let selectedBoard='sunny',currentScene='play',run=null,request=0,last=0,busy=false;
+const held=createSourceHolds(['left','right','drift','brake']);
+let stickPointer=null,canvasSteerPointer=null,canvasSteerOrigin=0;
+function resetSkyControls(){
+ held.clear();jumpQueued=false;stickPointer=null;canvasSteerPointer=null;canvasSteerOrigin=0;
+ const stick=$('skyboard-thumbstick');if(stick){stick.classList.remove('pressed');stick.setAttribute('aria-valuenow','0');}
+ const knob=stick?.querySelector('.arcade-stick-knob');if(knob)knob.style.transform='translate3d(0,0,0)';
+ root?.querySelectorAll('[data-sky-hold],[data-sky-action="jump"]').forEach(el=>el.classList.remove('pressed'));
+}
 let practiceChoice=0,practiceSeed=null;
 let scene=null,createSkyScene=null,sceneLoading=false,compatibility=false,jumpQueued=false,accumulator=0,preview=null,showGhost=true,shareReplay=false,riderLook=null;
 const status=(message,isError=false)=>{const node=$('skyboard-status');if(node){node.textContent=message;node.dataset.error=String(isError)}};
@@ -64,7 +73,8 @@ function build(){
  '<div class="skyboard-touch arcade-control-deck" role="group" aria-label="Skyboard arcade controls">'+
  '<div class="arcade-stick-station"><div class="arcade-stick-pair">'+
  '<button data-sky-hold="left" type="button" aria-label="Joystick left" aria-describedby="skyboard-steer-label">◀</button>'+
- '<span class="arcade-stick-knob" aria-hidden="true">●</span>'+
+ '<div id="skyboard-thumbstick" class="skyboard-thumbstick" role="slider" tabindex="0" aria-label="Steering thumbstick: drag left or right" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0">'+
+ '<span class="skyboard-stick-ring" aria-hidden="true"><span class="arcade-stick-knob">●</span></span></div>'+
  '<button data-sky-hold="right" type="button" aria-label="Joystick right" aria-describedby="skyboard-steer-label">▶</button></div>'+
  '<span id="skyboard-steer-label" class="arcade-button-caption">JOYSTICK · STEER</span><small class="arcade-keyboard-hint">← / → or A / D</small></div>'+
  '<div class="arcade-action-cluster">'+
@@ -96,7 +106,7 @@ function build(){
   if(route){choosePractice(route.dataset.skyPractice);return;}
   const pick=e.target.closest('[data-sky-board]');
   if(pick){pickBoard(pick.dataset.skyBoard);return;}
-  if(e.target.closest('[data-sky-action="jump"]'))jump();
+  if(e.target.closest('[data-sky-action="jump"]')&&e.detail===0)jump();
  });
  $('skyboard-start').addEventListener('click',()=>void start());
  $('skyboard-retry').addEventListener('click',()=>void start(true));
@@ -117,19 +127,83 @@ function build(){
   catch(error){status('New replays will stay private. Existing shared replays could not be removed. '+error.message,true);}
   finally{e.target.disabled=false;}
  });
- root.querySelectorAll('[data-sky-hold]').forEach(b=>{
-  const action=b.dataset.skyHold;b.style.touchAction='none';
-  b.addEventListener('pointerdown',e=>{e.preventDefault();held.add(action);b.classList.add('pressed');try{b.setPointerCapture(e.pointerId)}catch{}});
-  for(const type of ['pointerup','pointercancel','lostpointercapture','pointerleave'])b.addEventListener(type,()=>{held.delete(action);b.classList.remove('pressed')});
+ // Every input owns its own pointer; sliding off a button does not cancel a hold.
+ root.querySelectorAll('[data-sky-hold],[data-sky-action="jump"]').forEach(b=>{
+  const action=b.dataset.skyHold||'jump',pointers=new Set();
+  b.style.touchAction='none';
+  b.addEventListener('pointerdown',e=>{
+   if(!run||run.done||run.paused||(e.pointerType==='mouse'&&e.button!==0))return;
+   e.preventDefault();
+   const source='button:'+action+':'+e.pointerId;
+   pointers.add(e.pointerId);b.classList.add('pressed');
+   if(action==='jump')jump();else held.hold(action,source);
+   try{b.setPointerCapture(e.pointerId)}catch{}
+  },{passive:false});
+  const release=e=>{
+   if(!pointers.delete(e.pointerId))return;
+   if(action!=='jump')held.release(action,'button:'+action+':'+e.pointerId);
+   if(!pointers.size)b.classList.remove('pressed');
+  };
+  for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,release);
+ });
+ const stick=$('skyboard-thumbstick'),knob=stick.querySelector('.arcade-stick-knob');
+ const steer=e=>{
+  if(e.pointerId!==stickPointer)return;
+  const rect=stick.getBoundingClientRect();
+  const axis=thumbstickAxis(e.clientX,rect.left+rect.width/2,Math.max(22,rect.width*.35));
+  const direction=thumbstickDirection(axis);
+  held.release('left','thumbstick');held.release('right','thumbstick');
+  if(direction<0)held.hold('left','thumbstick');
+  if(direction>0)held.hold('right','thumbstick');
+  const travel=Math.max(0,(rect.width-knob.getBoundingClientRect().width)/2-3);
+  knob.style.transform='translate3d('+Math.round(axis*travel)+'px,0,0)';
+  stick.setAttribute('aria-valuenow',String(direction));
+ };
+ stick.addEventListener('pointerdown',e=>{
+  if(!run||run.done||run.paused||stickPointer!==null||(e.pointerType==='mouse'&&e.button!==0))return;
+  e.preventDefault();stickPointer=e.pointerId;stick.classList.add('pressed');
+  try{stick.setPointerCapture(e.pointerId)}catch{}
+  steer(e);
+ },{passive:false});
+ stick.addEventListener('pointermove',steer);
+ const stopStick=e=>{
+  if(stickPointer!==e.pointerId)return;
+  stickPointer=null;held.releaseSource('thumbstick');stick.classList.remove('pressed');
+  knob.style.transform='translate3d(0,0,0)';stick.setAttribute('aria-valuenow','0');
+ };
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])stick.addEventListener(type,stopStick);
+ stick.addEventListener('keydown',e=>{
+  if(!run||run.done||run.paused)return;
+  if(e.code==='ArrowLeft'||e.code==='ArrowRight'){
+   e.preventDefault();held.hold(e.code==='ArrowLeft'?'left':'right','stick-key:'+e.code);
+   stick.setAttribute('aria-valuenow',e.code==='ArrowLeft'?'-1':'1');
+  }
+ });
+ stick.addEventListener('keyup',e=>{
+  if(e.code==='ArrowLeft'||e.code==='ArrowRight'){
+   held.release(e.code==='ArrowLeft'?'left':'right','stick-key:'+e.code);
+   stick.setAttribute('aria-valuenow','0');
+  }
  });
  const canvas=$('skyboard-canvas');
- canvas.addEventListener('pointerdown',e=>{if(!run||run.done)return;canvas.dataset.touchX=String(e.clientX);});
- canvas.addEventListener('pointermove',e=>{
-  if(!run||!e.buttons||!canvas.dataset.touchX)return;
-  const dx=e.clientX-Number(canvas.dataset.touchX);
-  held.delete('left');held.delete('right');if(dx>15)held.add('right');else if(dx< -15)held.add('left');
- });
- for(const type of ['pointerup','pointercancel','pointerleave'])canvas.addEventListener(type,()=>{delete canvas.dataset.touchX;held.delete('left');held.delete('right')});
+ const steerCanvas=e=>{
+  if(e.pointerId!==canvasSteerPointer)return;
+  const dx=e.clientX-canvasSteerOrigin;
+  held.releaseSource('canvas');
+  if(dx>17)held.hold('right','canvas');
+  else if(dx< -17)held.hold('left','canvas');
+ };
+ canvas.addEventListener('pointerdown',e=>{
+  if(!run||run.done||run.paused||canvasSteerPointer!==null||(e.pointerType==='mouse'&&e.button!==0))return;
+  e.preventDefault();canvasSteerPointer=e.pointerId;canvasSteerOrigin=e.clientX;
+  try{canvas.setPointerCapture(e.pointerId)}catch{}
+ },{passive:false});
+ canvas.addEventListener('pointermove',steerCanvas);
+ const stopCanvas=e=>{
+  if(e.pointerId!==canvasSteerPointer)return;
+  canvasSteerPointer=null;canvasSteerOrigin=0;held.releaseSource('canvas');
+ };
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,stopCanvas);
  render();draw();
 }
 function choose(next){
@@ -211,7 +285,7 @@ async function refresh(){
 }
 function reset(){
  if(request){cancelAnimationFrame(request);request=0;}
- held.clear();last=accumulator=0;jumpQueued=false;run=null;preview=null;
+ resetSkyControls();last=accumulator=0;run=null;preview=null;
  const next=$('skyboard-next'),startButton=$('skyboard-start'),pauseButton=$('skyboard-pause'),message=$('skyboard-message');
  if(next)next.hidden=true;if(startButton)startButton.disabled=false;
  if(pauseButton)pauseButton.textContent='PAUSE';
@@ -251,7 +325,7 @@ function jump(){
  if(run&&!run.done&&!run.paused&&active())jumpQueued=true;
 }
 function pause(silent=false){
- held.clear();jumpQueued=false;
+ resetSkyControls();
  if(!run||run.done)return;
  run.paused=silent?true:!run.paused;
  $('skyboard-pause').textContent=run.paused?'RESUME':'PAUSE';
@@ -294,7 +368,7 @@ function ghostPosition(r){
 async function finish(win){
  if(!run||run.announced)return;
  const snapshot=run;run.announced=run.done=true;if(request){cancelAnimationFrame(request);request=0;}
- held.clear();
+ resetSkyControls();
  const message=$('skyboard-message');message.hidden=false;
  message.innerHTML='<strong>'+(win?'FINISH LINE!':'TRY AGAIN!')+'</strong><p>'+
   (win?'You reached the flag with '+snapshot.coins+' stars!':'The track won this round. You can do it!')+'</p>';
@@ -446,18 +520,18 @@ function frame(ts){
 function onKeyDown(e){
  if(!active()||!run||run.done||e.target?.closest?.('input,textarea,select,[contenteditable]'))return;
  if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space','KeyA','KeyD','KeyW','ShiftLeft','ShiftRight'].includes(e.code))e.preventDefault();
- if(['ArrowLeft','KeyA'].includes(e.code))held.add('left');
- if(['ArrowRight','KeyD'].includes(e.code))held.add('right');
- if(['ShiftLeft','ShiftRight'].includes(e.code))held.add('drift');
- if(e.code==='ArrowDown')held.add('brake');
+ if(['ArrowLeft','KeyA'].includes(e.code))held.hold('left','key:'+e.code);
+ if(['ArrowRight','KeyD'].includes(e.code))held.hold('right','key:'+e.code);
+ if(['ShiftLeft','ShiftRight'].includes(e.code))held.hold('drift','key:'+e.code);
+ if(e.code==='ArrowDown')held.hold('brake','key:'+e.code);
  if(e.code==='Escape'&&!e.repeat)pause();
  if(['ArrowUp','Space','KeyW'].includes(e.code)&&!e.repeat)jump();
 }
 function onKeyUp(e){
- if(['ArrowLeft','KeyA'].includes(e.code))held.delete('left');
- if(['ArrowRight','KeyD'].includes(e.code))held.delete('right');
- if(['ShiftLeft','ShiftRight'].includes(e.code))held.delete('drift');
- if(e.code==='ArrowDown')held.delete('brake');
+ if(['ArrowLeft','KeyA'].includes(e.code))held.release('left','key:'+e.code);
+ if(['ArrowRight','KeyD'].includes(e.code))held.release('right','key:'+e.code);
+ if(['ShiftLeft','ShiftRight'].includes(e.code))held.release('drift','key:'+e.code);
+ if(e.code==='ArrowDown')held.release('brake','key:'+e.code);
 }
 function syncArcade(){
  if(!root?.isConnected)return;
