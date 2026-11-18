@@ -145,10 +145,10 @@ function facePlanes(head,v,palette,w,h,jaw,specter){
     // Flat color blocks tuck behind the eyes and outline the cheek and jaw.
     // Expressions change the mass of each cheek, not merely the mouth decal.
     // Stay inside the fitted face plane; no separate free-floating smile lines.
-    const cheekLift=v.expression==='grin'?.023:
+    const cheekLift=v.expression==='grin'?.028:
       v.expression==='smile'?.010:
-      v.expression==='smirk'&&side===1?.025:0;
-    const cheekWide=v.expression==='grin'?1.22:
+      v.expression==='smirk'&&side===1?.030:0;
+    const cheekWide=v.expression==='grin'?1.27:
       v.expression==='smirk'&&side===1?1.12:1;
     const cheek=oval(head,shadow,side*.158*w,-.092*h+cheekLift,.128,
       .037*cheekWide,.068*cheekWide,.020);
@@ -156,7 +156,7 @@ function facePlanes(head,v,palette,w,h,jaw,specter){
     const highlight=oval(head,light,side*.111*w,.104*h,.159,.039,.013,.007);
     highlight.rotation.z=-side*.32;
     stroke(head,ink,[[side*.175*w,-.113*h,.142],
-      [side*.147*w,-.174*h,.139],[side*.092*jaw*w,-.224*h,.107]],.0046,16);
+      [side*.147*w,-.174*h,.139],[side*.092*jaw*w,-.224*h,.107]],.0054,16);
   }
   stroke(head,ink,[[-.052*jaw*w,-.247*h,.099],[0,-.268*h,.078],
     [.052*jaw*w,-.247*h,.099]],.0046,14);
@@ -214,9 +214,9 @@ function browsAndEyes(head,v,palette,w,spacing){
       stroke(eye,shadow,[[-ew*.64,-eh*.94,.008],
         [0,-eh*1.06,.013],[ew*.62,-eh*.89,.008]],.0035);
     }
-    const brows=expression.brow+(v.brows==='arching'?.013:0)+acting.brows[index]*.0025;
+    const brows=expression.brow+(v.brows==='arching'?.013:0)+acting.brows[index]*.0031;
     const height=.071+browLift+(v.brows==='bold'?.004:0);
-    const pitch=expression.mouth==='determined'?-side*.024:side*brows*.5+acting.browEnd[index]*.0016;
+    const pitch=expression.mouth==='determined'?-side*.028:side*brows*.58+acting.browEnd[index]*.0020;
     stroke(eye,brow,[[-.061,height+pitch*.8,-.003],
       [-.023,height+.010+pitch,.016],[.034,height+brows*.5-pitch,.010],
       [.062,height-.008-pitch*.7,-.007]],v.brows==='bold'?.012:.0094,20);
