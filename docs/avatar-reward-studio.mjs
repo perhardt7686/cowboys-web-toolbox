@@ -11,6 +11,9 @@ import {SHOWROOM_LOOKS,STUDIO_COLLECTIONS} from './avatar-showroom-presets.mjs?v
 import {pickStudioPart,prepareStudioRenderer,releaseStudioArt,studioCharacter,studioLook,studioPortrait,studioPrize} from './avatar-studio-preview.mjs?v=workshop1';
 
 import {drawWardrobeReward} from './avatar-wardrobe-art.mjs?v=workshop1';
+import {enhanceMemberStudio} from './avatar-v8-live.mjs?v=v8member1';
+import {paintV8RewardIcon} from './avatar-v8-prize-cels.mjs?v=v8art1';
+import {paintV8ArcadePrizeIcon} from './avatar-v8-arcade-prizes.mjs?v=v8arcade1';
 import {NEW_STUDIO_REWARDS,STUDIO_EDITION} from './avatar-collection-edition.mjs';
 
 const PAGE=18;
@@ -44,6 +47,8 @@ function meter(value,max=1,label='Progress'){
 let thumbnailObserver;
 const thumbnails=new WeakMap();
 function paintThumbnail(node,item){
+  if(node.closest?.('.avatar-dressing-studio[data-v8-live="true"]')&&
+     (paintV8RewardIcon(node,item)||paintV8ArcadePrizeIcon(node,item)))return;
   studioPrize(node,item);
   releaseStudioArt(node);
 }
@@ -394,7 +399,7 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       detail=item.id;renderResults();focusDetail();
     },'avatar-item-open');
     open.setAttribute('aria-label','See '+item.name);
-    open.append(thumbnail(item,96,{lazy:true}),el('strong','',item.name));
+    open.append(thumbnail(item,156,{lazy:true}),el('strong','',item.name));
     const status=el('span','avatar-reward-tag',RARITIES[item.tier]+' · '+(have(item.id)?'Unlocked':'Locked'));
     const aim=el('small','avatar-reward-aim',(achievement?.name||GAME_LABELS[item.group])+' · '+fitLabel(item));
     const tryButton=asButton(have(item.id)?'Equip':'Try it on',()=>tryOn(item));
@@ -738,7 +743,8 @@ export function createRewardStudio({getLoadout,setLoadout,setStatus,playGame,rpc
       const next=asButton(label,()=>setSection(key));
       next.dataset.rewardSection=key;tabs.append(next);
     }
-    editor.prepend(tabs);pane.append(filters,results);
+    editor.prepend(tabs);enhanceMemberStudio(editor);
+    pane.append(filters,results);
     editor.querySelector('.studio-editor-panel').insertBefore(pane,editor.querySelector('#avatar-equipped'));
     section=nextSection;detail=item;
     if(section==='pets')pets.showPet(item);

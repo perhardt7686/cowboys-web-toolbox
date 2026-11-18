@@ -26,10 +26,12 @@ async def verify(browser, phone=False):
     edit = form.locator('.family-character-editor')
     turn = edit.locator('.studio-stage [data-avatar-turntable]')
     canvas = turn.locator('canvas')
+    # Mounting the authorized member studio is asynchronous; wait for the
+    # V8 renderer itself before asserting its controls and initial angle.
+    await expect(canvas).to_have_attribute('data-backend', 'v8-original-cel', timeout=18000)
     await expect(canvas).to_have_attribute('data-angle', '0')
     await expect(turn.get_by_role('button', name='Rotate left')).to_be_visible()
-    assert await canvas.evaluate('n => n.height >= 220 && n.width >= 230')
-    await expect(canvas).to_have_attribute('data-renderer', '3d', timeout=15000)
+    assert await canvas.evaluate('n => n.getBoundingClientRect().height >= 220 && n.getBoundingClientRect().width >= 195'), 'V8 stage must remain readable at phone width'
     backend = await canvas.get_attribute('data-backend')
     signatures = set()
     for angle in range(0, 360, 45):
@@ -46,27 +48,9 @@ async def verify(browser, phone=False):
     await turn.get_by_role('button', name='Zoom in').click()
     await expect(canvas).to_have_attribute('data-zoom', '1.35')
     assert await fingerprints(canvas) != before_zoom
-    # Same person, camera angle and zoom, different original render pipelines.
-    # The setting is preview-only and never mutates the saved avatar recipe.
-    cel = turn.get_by_role('button', name='Layered 2D')
-    before_compare = await fingerprints(canvas)
-    await expect(cel).to_have_attribute('aria-pressed', 'false')
-    await cel.click()
-    await expect(cel).to_have_attribute('aria-pressed', 'true')
-    await expect(canvas).to_have_attribute('data-renderer', '2d')
-    await expect(canvas).to_have_attribute('data-preview-style', 'cel')
-    await expect(canvas).to_have_attribute('data-angle', '315')
-    await expect(canvas).to_have_attribute('data-zoom', '1.35')
-    layered = await fingerprints(canvas)
-    assert layered != before_compare
-    (ROOT / 'reports').mkdir(exist_ok=True)
-    await canvas.screenshot(path=str(ROOT / 'reports' / ('avatar-workshop-cel-iphone.png' if phone else 'avatar-workshop-cel-desktop.png')))
-    await cel.click()
-    await expect(cel).to_have_attribute('aria-pressed', 'false')
-    await expect(canvas).to_have_attribute('data-renderer', '3d')
-    await expect(canvas).to_have_attribute('data-preview-style', '3d')
-    await expect(canvas).to_have_attribute('data-angle', '315')
-    assert await fingerprints(canvas) != layered, 'Returning to 3D restores the original rendering path'
+    # V8 is the only visible character render mode: no comparison or Classic switch.
+    assert await turn.get_by_role('button',name='Layered 2D').count()==0
+    assert await edit.locator('.avatar-v8-classic-toggle').count()==0
     await expect(canvas).to_have_attribute('data-angle', '315')
     await turn.get_by_role('button', name='Fit', exact=True).click()
     await expect(canvas).to_have_attribute('data-zoom', '1')

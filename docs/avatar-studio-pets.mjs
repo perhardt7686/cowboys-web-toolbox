@@ -1,8 +1,9 @@
 import {button,el} from './family-board-core.mjs?v=family3';
 import {FIRST_PET_ID} from './avatar-collection-edition.mjs';
 import {petBehavior} from './avatar-prize-actions.mjs?v=workshop1';
-import {playCel} from './avatar-reward-render.mjs?v=workshop1';
+import {playCel,drawPetPortrait} from './avatar-reward-render.mjs?v=workshop1';
 import {createPetTradeUI} from './avatar-pet-trading.mjs?v=workshop1';
+import {makePetGallery} from './avatar-v8-live.mjs?v=v8member1';
 
 import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
 import {prepareStudioRenderer,releaseStudioArt,studioPet} from './avatar-studio-preview.mjs?v=workshop1';
@@ -129,6 +130,14 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
     const label=el('label','avatar-pet-select');
     label.append(el('span','','Choose a pet'),selection);
     tab.append(label,el('span','avatar-reward-tag',known?earned.length+' of '+chosen.length+' earned':chosen.length+' pets'));
+    // The gallery is a view of server-authoritative earned/locked state.
+    // Keep the native select for keyboard and low-end-device fallback.
+    const gallery=makePetGallery(chosen,selected,new Set(earned.map(entry=>entry.id)),id=>{
+      showPet(id);
+      render();
+      const target=[...root.querySelectorAll('[data-v8-pet-id]')].find(n=>n.dataset.v8PetId===id);
+      target?.focus({preventScroll:true});
+    });
     const card=el('article','avatar-pet-card');
     const canvas=el('canvas','avatar-pet-portrait');
     canvas.width=canvas.height=256;
@@ -206,9 +215,16 @@ export function createPetStudio({rpc,catalog,tradeCatalog=catalog,have,unlocksKn
     details.append(status);
     card.append(canvas,details);
     const tradeHost=el('div','avatar-pet-trade-host');
-    root.replaceChildren(tab,card,tradeHost);
+    root.replaceChildren(gallery,tab,card,tradeHost);
     trading.mount(tradeHost,pets,selected);
     studioPet(canvas,item);
+    // Paint companion thumbnails only for live, connected gallery tiles.
+    // Thumbnails do not perform adoption, bonding or trade RPCs.
+    const galleryTiles=[...gallery.querySelectorAll('[data-v8-pet-art]')];
+    for(const tile of galleryTiles){
+      const petItem=chosen.find(entry=>entry.id===tile.dataset.v8PetArt);
+      if(petItem)drawPetPortrait(tile,petItem);
+    }
     void prepareStudioRenderer().then(renderer=>{
       if(renderer&&isOpen()&&canvas.isConnected&&!activity)studioPet(canvas,item);
     });
