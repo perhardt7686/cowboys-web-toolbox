@@ -1,0 +1,81 @@
+/* Accessible, collapsed per-player input preferences.
+ * UI feel only: shared 120 Hz simulation and verified replays are unchanged.
+ */
+body.community-page #dash-forge-root .dash-player-settings,
+body.community-page #skyboard-root .skyboard-player-settings{
+ color:#e6ebff;font:800 11px/1.25 system-ui;letter-spacing:.01em;
+ border:1px solid #8496c0;border-radius:8px;background:#151f43e8;
+ padding:3px 6px;max-width:100%;z-index:6
+}
+body.community-page #dash-forge-root .dash-player-settings{flex:0 1 130px}
+body.community-page #skyboard-root .skyboard-player-settings{
+ grid-column:1/-1;justify-self:stretch;min-width:0
+}
+body.community-page #dash-forge-root .dash-player-settings summary,
+body.community-page #skyboard-root .skyboard-player-settings summary{
+ display:flex;align-items:center;justify-content:center;gap:5px;
+ cursor:pointer;min-height:32px;color:#ffeaa3;font:900 11px/1.25 system-ui;
+}
+body.community-page #dash-forge-root .dash-player-settings[open],
+body.community-page #skyboard-root .skyboard-player-settings[open]{
+ padding:6px;display:block
+}
+body.community-page #dash-forge-root .dash-player-settings label,
+body.community-page #skyboard-root .skyboard-player-settings label{
+ display:block;margin:4px 0;font:750 12px/1.25 system-ui;color:#e8faff
+}
+body.community-page #dash-forge-root .dash-player-settings select,
+body.community-page #skyboard-root .skyboard-player-settings select{
+ display:inline-block;min-height:42px;max-width:100%;
+ padding:6px 7px;border:2px solid #9defff;border-radius:7px;
+ background:#111c46;color:#fff;font:750 13px/1.25 system-ui
+}
+body.community-page #dash-forge-root .dash-player-settings button,
+body.community-page #skyboard-root .skyboard-player-settings button{
+ min-height:42px;margin-left:5px;border:2px solid #e8db99;border-radius:7px;
+ padding:5px 8px;background:#27345e;color:#fff;font:800 12px/1.2 system-ui
+}
+body.community-page #dash-forge-root .dash-player-settings small,
+body.community-page #skyboard-root .skyboard-player-settings small{
+ display:block;max-width:34ch;color:#cbdff0;padding:4px 0;
+ font:600 10px/1.3 system-ui
+}
+body.community-page #dash-forge-root .dash-player-settings :focus-visible,
+body.community-page #skyboard-root .skyboard-player-settings :focus-visible{
+ outline:3px solid #fff0a6;outline-offset:2px
+}
+body.community-page #dash-forge-root.dash-input-active .dash-canvas-wrap{
+ box-shadow:inset 0 0 0 3px #91f7ff,0 0 13px #8af5ff66
+}
+body.community-page #dash-forge-root[data-dash-touch-target=large] #dash-jump{
+ width:84px!important;height:84px!important;min-height:70px!important
+}
+body.community-page #dash-forge-root[data-dash-touch-target=extra] #dash-jump{
+ width:98px!important;height:98px!important;min-height:76px!important
+}
+@media(max-width:430px){
+ body.community-page #dash-forge-root .dash-player-settings{flex-basis:82px;font-size:10px}
+ body.community-page #dash-forge-root .dash-player-settings summary{font-size:9px}
+ body.community-page #dash-forge-root[data-dash-touch-target=large] #dash-jump{
+  width:66px!important;height:66px!important;min-height:58px!important
+ }
+ body.community-page #dash-forge-root[data-dash-touch-target=extra] #dash-jump{
+  width:74px!important;height:74px!important;min-height:62px!important
+ }
+ body.community-page #skyboard-root .skyboard-player-settings summary{min-height:26px;font-size:10px}
+}
+@media(orientation:landscape) and (max-height:580px){
+ body.community-page #dash-forge-root .dash-player-settings,
+ body.community-page #skyboard-root .skyboard-player-settings{padding:2px 5px}
+ body.community-page #dash-forge-root .dash-player-settings summary,
+ body.community-page #skyboard-root .skyboard-player-settings summary{min-height:24px}
+ body.community-page #dash-forge-root[data-dash-touch-target=large] #dash-jump{
+  width:56px!important;height:56px!important;min-height:48px!important
+ }
+ body.community-page #dash-forge-root[data-dash-touch-target=extra] #dash-jump{
+  width:62px!important;height:62px!important;min-height:52px!important
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #dash-forge-root.dash-input-active .dash-canvas-wrap{transition:none!important}
+}
