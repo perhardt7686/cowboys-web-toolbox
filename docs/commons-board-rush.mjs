@@ -3,7 +3,8 @@
  * Supabase score authority remain in place. Never awards offline wins.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
-import {createSourceHolds,thumbstickAxis,thumbstickDirection} from './family-arcade-touch-input.mjs';
+import {createSourceHolds,thumbstickAxis} from './family-arcade-touch-input.mjs';
+import {DEFAULT_SKY_STEERING,SKY_STEERING_PRESETS,readControlChoice,saveControlChoice,resetControlChoice,steeringWithHysteresis,canvasSteeringDirection} from './family-arcade-player-feel.mjs';
 import {SKY_DT,SKY_INPUT,buildSkyCourse,createSkyRide,skyTrack,skyObjectX,stepSky} from './skyboard-physics.mjs?v=courses2';
 import {submitArcadeReplay} from './family-arcade-replay.mjs';
 import {SKY_COURSE_EDITION,SKY_WORLDS,SKY_COLORS,skyCourseInfo} from './skyboard-courses.mjs';
@@ -32,9 +33,11 @@ const BADGES=[
 let client=null,user=null,root=null,profile=null,leaders=[],awards=[],open=false,booted=false;
 let selectedBoard='sunny',currentScene='play',run=null,request=0,last=0,busy=false;
 const held=createSourceHolds(['left','right','drift','brake']);
+let steeringPreset=DEFAULT_SKY_STEERING,stickDirection=0,canvasDirection=0;
 let stickPointer=null,canvasSteerPointer=null,canvasSteerOrigin=0;
 function resetSkyControls(){
  held.clear();jumpQueued=false;stickPointer=null;canvasSteerPointer=null;canvasSteerOrigin=0;
+ stickDirection=0;canvasDirection=0;
  const stick=$('skyboard-thumbstick');if(stick){stick.classList.remove('pressed');stick.setAttribute('aria-valuenow','0');}
  const knob=stick?.querySelector('.arcade-stick-knob');if(knob)knob.style.transform='translate3d(0,0,0)';
  root?.querySelectorAll('[data-sky-hold],[data-sky-action="jump"]').forEach(el=>el.classList.remove('pressed'));
@@ -83,7 +86,10 @@ function build(){
  '<div class="arcade-key-station"><button data-sky-hold="drift" type="button" class="arcade-button-b" aria-label="Arcade B, hold to drift" aria-describedby="skyboard-drift-label"><span>B</span></button>'+
  '<span id="skyboard-drift-label" class="arcade-button-caption">DRIFT</span><small class="arcade-keyboard-hint">SHIFT</small></div>'+
  '<div class="arcade-key-station"><button data-sky-hold="brake" type="button" class="arcade-button-c" aria-label="Arcade C, hold to brake" aria-describedby="skyboard-brake-label"><span>C</span></button>'+
- '<span id="skyboard-brake-label" class="arcade-button-caption">BRAKE</span><small class="arcade-keyboard-hint">↓</small></div></div></div>'+
+ '<span id="skyboard-brake-label" class="arcade-button-caption">BRAKE</span><small class="arcade-keyboard-hint">↓</small></div></div>'+ 
+ '<details class="skyboard-player-settings"><summary>STEERING FEEL</summary><label for="skyboard-steering-choice">Touch sensitivity</label>'+ 
+ '<select id="skyboard-steering-choice" aria-label="Skyboard steering sensitivity"><option value="quick">Quick</option><option value="balanced">Balanced</option><option value="steady">Steady</option></select>'+ 
+ '<button type="button" id="skyboard-steering-reset">Reset</button><small>Saved only for this family member on this device. Race physics stays the same.</small></details></div>'+
  '<div class="skyboard-help">Steer with ← →, jump with Space, drift with Shift and brake with ↓. A gamepad uses the stick, A to jump, X to drift and B to brake.</div>'+
  '<div class="skyboard-round-actions"><button type="button" id="skyboard-pause">PAUSE</button>'+
  '<button type="button" id="skyboard-retry">RETRY STAGE</button><button type="button" id="skyboard-ghost" aria-pressed="true">Family ghost on</button><button type="button" id="skyboard-share" aria-pressed="false">Share my ghost</button><button type="button" id="skyboard-next" hidden>NEXT STAGE ▶</button></div>'+
@@ -112,6 +118,20 @@ function build(){
  $('skyboard-retry').addEventListener('click',()=>void start(true));
  $('skyboard-next').addEventListener('click',()=>void start());
  $('skyboard-pause').addEventListener('click',()=>pause());
+ const steeringSelect=$('skyboard-steering-choice');steeringSelect.value=steeringPreset;
+ steeringSelect.addEventListener('change',()=>{
+  if(!user)return;
+  steeringPreset=Object.hasOwn(SKY_STEERING_PRESETS,steeringSelect.value)?steeringSelect.value:DEFAULT_SKY_STEERING;
+  resetSkyControls();
+  const saved=saveControlChoice(localStorage,'skyboard',user,steeringPreset);
+  status('Steering '+SKY_STEERING_PRESETS[steeringPreset].label+(saved?' saved for this member.':' active for this session (storage unavailable).'));
+ });
+ $('skyboard-steering-reset').addEventListener('click',()=>{
+  if(!user)return;
+  steeringPreset=DEFAULT_SKY_STEERING;steeringSelect.value=steeringPreset;
+  resetSkyControls();resetControlChoice(localStorage,'skyboard',user);
+  status('Steering sensitivity reset to Balanced.');
+ });
  $('skyboard-ghost').addEventListener('click',e=>{
   showGhost=!showGhost;e.target.setAttribute('aria-pressed',String(showGhost));
   e.target.textContent=showGhost?'Family ghost on':'Family ghost off';draw();
@@ -150,8 +170,8 @@ function build(){
  const steer=e=>{
   if(e.pointerId!==stickPointer)return;
   const rect=stick.getBoundingClientRect();
-  const axis=thumbstickAxis(e.clientX,rect.left+rect.width/2,Math.max(22,rect.width*.35));
-  const direction=thumbstickDirection(axis);
+  const axis=thumbstickAxis(e.clientX,rect.left+rect.width/2,Math.max(22,rect.width*.35),0);
+  const direction=steeringWithHysteresis(axis,stickDirection,steeringPreset);stickDirection=direction;
   held.release('left','thumbstick');held.release('right','thumbstick');
   if(direction<0)held.hold('left','thumbstick');
   if(direction>0)held.hold('right','thumbstick');
@@ -168,7 +188,7 @@ function build(){
  stick.addEventListener('pointermove',steer);
  const stopStick=e=>{
   if(stickPointer!==e.pointerId)return;
-  stickPointer=null;held.releaseSource('thumbstick');stick.classList.remove('pressed');
+  stickPointer=null;stickDirection=0;held.releaseSource('thumbstick');stick.classList.remove('pressed');
   knob.style.transform='translate3d(0,0,0)';stick.setAttribute('aria-valuenow','0');
  };
  for(const type of ['pointerup','pointercancel','lostpointercapture'])stick.addEventListener(type,stopStick);
@@ -189,9 +209,10 @@ function build(){
  const steerCanvas=e=>{
   if(e.pointerId!==canvasSteerPointer)return;
   const dx=e.clientX-canvasSteerOrigin;
+  canvasDirection=canvasSteeringDirection(dx,canvasDirection,steeringPreset);
   held.releaseSource('canvas');
-  if(dx>17)held.hold('right','canvas');
-  else if(dx< -17)held.hold('left','canvas');
+  if(canvasDirection>0)held.hold('right','canvas');
+  else if(canvasDirection<0)held.hold('left','canvas');
  };
  canvas.addEventListener('pointerdown',e=>{
   if(!run||run.done||run.paused||canvasSteerPointer!==null||(e.pointerType==='mouse'&&e.button!==0))return;
@@ -201,7 +222,7 @@ function build(){
  canvas.addEventListener('pointermove',steerCanvas);
  const stopCanvas=e=>{
   if(e.pointerId!==canvasSteerPointer)return;
-  canvasSteerPointer=null;canvasSteerOrigin=0;held.releaseSource('canvas');
+  canvasSteerPointer=null;canvasSteerOrigin=0;canvasDirection=0;held.releaseSource('canvas');
  };
  for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,stopCanvas);
  render();draw();
@@ -549,6 +570,7 @@ async function verify(){
  const {data:member,error}=await client.from('community_members').select('status').eq('user_id',id).maybeSingle();
  if(error||member?.status!=='approved'){reset();root?.remove();root=null;user=null;open=false;return;}
  if(user!==id){reset();root?.remove();root=null;user=id;profile=null;awards=[];leaders=[];open=false;
+  steeringPreset=readControlChoice(localStorage,'skyboard',id,DEFAULT_SKY_STEERING);
   riderLook=null;practiceChoice=0;practiceSeed=null;
   try{
    selectedBoard=localStorage.getItem('skyboard-board-'+id)||'sunny';
