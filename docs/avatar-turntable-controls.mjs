@@ -17,8 +17,7 @@ export function turntableHTML({editor=false}={}){
     '<output class="avatar-view-angle" data-view-angle aria-live="polite">Front</output>'+
     '<button type="button" data-turn="right" aria-label="Rotate right">›</button>'+
     (editor?'<details class="studio-camera-menu"><summary>Camera</summary>'+
-      '<div class="studio-camera-sheet">'+zoom+settings+
-      '<button type="button" data-turn="cel" aria-pressed="false" title="Compare the same character as original layered 2D art. Preview only; saves stay unchanged.">Layered 2D</button></div></details>':
+      '<div class="studio-camera-sheet">'+zoom+settings+'</div></details>':
       settings+zoom+'<button type="button" data-turn="fit">Fit</button>')+
     '</div></div>';
 }
@@ -29,11 +28,10 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false,selectPa
   const spin=root.querySelector('[data-turn=spin]');
   const minus=root.querySelector('[data-turn=less]');
   const plus=root.querySelector('[data-turn=more]');
-  const celButton=root.querySelector('[data-turn=cel]');
   const presets=root.querySelector('.studio-camera-presets');
   const media=window.matchMedia('(prefers-reduced-motion: reduce)');
   const reduced=()=>media.matches||preferReducedMotion();
-  const camera={angle:0,zoom:1,x:0,y:0,artStyle:'3d'};
+  const camera={angle:0,zoom:1,x:0,y:0};
   let pointer=null,frame=0,rotating=false,paintTime=0,positionTime=0;
   let pausedAt=0,animationStart=0,tweenFrom=0,tweenDistance=0;
   const controller=new AbortController();
@@ -49,10 +47,6 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false,selectPa
     if(label.textContent!==direction)label.textContent=direction;
     canvas.dataset.angle=String(Math.round(camera.angle));
     canvas.dataset.zoom=String(camera.zoom);
-    celButton?.setAttribute('aria-pressed',String(camera.artStyle==='cel'));
-    if(celButton)canvas.setAttribute('aria-label',camera.artStyle==='cel'?
-      'Layered 2D cartoon preview. Drag to rotate or zoom in to pan.':
-      'Full-body 3D preview. Drag to rotate or zoom in to pan.');
     paint(camera,time,activity);
   }
 
@@ -111,10 +105,6 @@ export function mountTurntable(root,paint,preferReducedMotion=()=>false,selectPa
     const action=event.target.closest('[data-turn]')?.dataset.turn;
     if(!action)return;
     if(action==='left'||action==='right'){step(action==='left'?-1:1);return;}
-    if(action==='cel'){
-      stop();camera.artStyle=camera.artStyle==='cel'?'3d':'cel';
-      draw();return;
-    }
     if(action==='spin'){
       if(rotating||reduced()){stop();return;}
       stop();rotating=true;positionTime=paintTime=0;
