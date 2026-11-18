@@ -70,5 +70,5 @@ test('verified trophy gating, per-user equipment and sign-out clearing are wired
  assert.match(html,/commons-retro-arcade\.mjs\?v=retro11/);
  assert.match(html,/commons-family-fun\.css\?v=marquee6/);
  assert.match(html,/commons-arcade-shell\.mjs\?v=arcade10/);
- assert.match(html,/commons-retro-arcade\.css\?v=retro5/);
+ assert.match(html,/commons-retro-arcade\.css\?v=retro6/);
 });
