@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07517d">
+<meta name="description" content="Mystery Crew Creator, a new family cartoon character workshop.">
+<title>Mystery Crew Creator | Cowboy's Web Toolbox</title>
+<link rel="stylesheet" href="mystery-crew-creator.css?v=creator1">
+</head>
+<body>
+<a class="skip-link" href="#mc-stage">Skip to character stage</a>
+<div class="mc-app" id="mc-app">
+<header class="mc-top">
+  <a class="mc-brand" href="community.html"><span class="mc-brand-icon" aria-hidden="true">✹</span><span>Cowboy's<small>Web Toolbox</small></span></a>
+  <div class="mc-title"><span class="mc-title-main">Mystery Crew <b>Creator</b></span><span class="mc-subtitle">Create • Customize • Equip • Collect</span></div>
+  <div class="mc-statbar"><span class="mc-save-indicator" title="Stored only in this browser">MY DEVICE <b>● LOCAL</b></span><span class="mc-pill">★ <strong id="mc-rank">Level 1</strong></span><span class="mc-pill">🪙 <strong id="mc-coins">0</strong></span><button class="mc-icon-button" id="mc-help" aria-label="About local progress">?</button></div>
+</header>
+<nav class="mc-topnav" aria-label="Creator sections">
+<button data-view="character" aria-pressed="true">♟ Character</button>
+<button data-view="outfits" aria-pressed="false">♜ Outfits</button>
+<button data-view="pets" aria-pressed="false">♣ Pets</button>
+<button data-view="collections" aria-pressed="false">🏆 Unlockables</button>
+<button data-view="gear" aria-pressed="false">▣ Gear</button>
+<button data-view="studio" aria-pressed="false">🎨 Studio</button>
+</nav>
+<main class="mc-layout" id="mc-main">
+<aside class="mc-roster" aria-label="My characters">
+  <h2>My Crew</h2>
+  <div class="mc-portraits" id="mc-roster"></div>
+  <button id="mc-add" class="mc-add" type="button"><span>＋</span> New Crew</button>
+  <p class="mc-roster-note">Make up to six original characters.</p>
+</aside>
+<section class="mc-theater" id="mc-stage" aria-label="Character preview">
+ <div class="mc-stage-frame">
+  <svg id="mc-scene" viewBox="0 0 960 620" role="img" aria-label="Cartoon adventurer, companion and adventure van in a sunny woodland workshop" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#1b83c3"/><stop offset=".75" stop-color="#b5e8e8"/><stop offset="1" stop-color="#e2e3b3"/></linearGradient>
+      <linearGradient id="ground" x2="0" y2="1"><stop stop-color="#e0c284"/><stop offset="1" stop-color="#a8814d"/></linearGradient>
+      <linearGradient id="vanbody" x2="0" y2="1"><stop stop-color="#ede3c5"/><stop offset=".43" stop-color="#edd9b8"/><stop offset=".44" stop-color="#257da5"/><stop offset="1" stop-color="#115779"/></linearGradient>
+      <linearGradient id="barn" x2="0" y2="1"><stop stop-color="#bf573d"/><stop offset="1" stop-color="#803b32"/></linearGradient>
+      <filter id="shadow"><feGaussianBlur stdDeviation="9"/></filter>
+    </defs>
+    <path fill="url(#sky)" d="M0 0H960V620H0Z"/>
+    <g fill="#f7f2d9" opacity=".8"><ellipse cx="104" cy="98" rx="77" ry="24"/><ellipse cx="178" cy="95" rx="58" ry="17"/><ellipse cx="783" cy="101" rx="66" ry="21"/></g>
+    <path fill="#528e71" d="M0 326 Q130 260 240 310 Q389 263 503 301 Q712 233 960 286V465H0Z"/>
+    <path fill="#3d765f" d="M0 349 L65 210 118 338 161 205 226 347 273 233 335 347 380 229 436 347 507 211 577 350 629 214 689 335 761 192 819 335 892 227 960 333V453H0Z"/>
+    <g stroke="#483b36" stroke-width="9" stroke-linejoin="round">
+      <path d="M15 0 Q10 145 50 345" fill="none" stroke="#5d4430" stroke-width="44"/>
+      <path d="M16 61 L198 -18 M28 157 L167 82" fill="none" stroke="#5d4430" stroke-width="25"/>
+      <path d="M950 15 Q874 142 913 325" fill="none" stroke="#674830" stroke-width="34"/>
+    </g>
+    <g fill="#347d54"><ellipse cx="101" cy="44" rx="169" ry="83"/><ellipse cx="199" cy="5" rx="112" ry="59"/><ellipse cx="910" cy="49" rx="137" ry="71"/><ellipse cx="797" cy="17" rx="91" ry="56"/></g>
+    <g stroke="#274a37" stroke-width="5" fill="none" opacity=".7"><path d="M-10 67Q54 15 130 56 M84 57Q151 20 205 52 M783 60Q851 18 952 69"/></g>
+    <g id="mc-barn">
+      <path d="M668 194 L801 103 949 188 949 464 668 464Z" fill="url(#barn)" stroke="#513e3b" stroke-width="11"/>
+      <path d="M647 208 L799 85 969 195" fill="none" stroke="#e8d0b2" stroke-width="25" stroke-linejoin="round"/>
+      <path d="M705 231H917V465H705Z" fill="#5c3e35" stroke="#f2d9bd" stroke-width="13"/>
+      <path d="M729 256H891V451H729Z" fill="#7a4f37"/>
+      <path d="M705 231L917 465M917 231L705 465" stroke="#e3b18e" stroke-width="16" opacity=".5"/>
+      <path d="M745 180H857" stroke="#e9b97e" stroke-width="8"/>
+      <path d="M773 290L855 310L833 377L771 361Z" fill="#c79c6b" stroke="#694d43" stroke-width="7"/>
+    </g>
+    <path fill="url(#ground)" d="M0 443 Q167 416 298 441 Q436 410 584 440 Q756 414 960 446V620H0Z"/>
+    <path d="M-20 525Q190 474 353 505Q566 554 965 486" fill="none" stroke="#d3b27e" stroke-width="18" opacity=".8"/>
+    <ellipse cx="475" cy="540" rx="309" ry="27" fill="#593d2e" opacity=".2" filter="url(#shadow)"/>
+    <g id="mc-vehicle" transform="translate(65 12)">
+      <path d="M125 300 Q130 255 182 249 L439 249 Q479 260 491 310 L502 416 Q483 441 448 442 H136 Q108 437 111 408Z" fill="url(#vanbody)" stroke="#354657" stroke-width="9"/>
+      <path d="M185 261 L249 262 248 339 149 339 Q148 285 185 261Z" fill="#77bbd2" stroke="#344956" stroke-width="8"/>
+      <path d="M266 261 L424 265 Q455 273 469 341H263Z" fill="#76b1c9" stroke="#344956" stroke-width="8"/>
+      <path d="M155 345 H477" stroke="#e2753e" stroke-width="24"/>
+      <path d="M123 379H495" stroke="#eab06d" stroke-width="10"/>
+      <path d="M146 248 L446 246" stroke="#434956" stroke-width="11"/>
+      <path d="M167 246V216H436V246 M208 216V198M399 216V198" stroke="#353c47" stroke-width="8" fill="none"/>
+      <circle cx="207" cy="430" r="35" fill="#272c34" stroke="#e8d8b8" stroke-width="13"/>
+      <circle cx="422" cy="430" r="35" fill="#272c34" stroke="#e8d8b8" stroke-width="13"/>
+      <circle cx="130" cy="379" r="20" fill="#e6dbb7" stroke="#9a7754" stroke-width="8"/>
+      <circle cx="484" cy="382" r="20" fill="#e6dbb7" stroke="#9a7754" stroke-width="8"/>
+      <path d="M282 271V419" stroke="#304c62" stroke-width="5" opacity=".75"/>
+      <circle cx="330" cy="354" r="35" fill="#f2d09d" stroke="#b57943" stroke-width="7"/>
+      <path d="M308 362L326 346L337 362L347 346" fill="none" stroke="#a86c47" stroke-width="7"/>
+      <path d="M180 328 L217 286 M295 286 L326 304" stroke="#e6f6ee" stroke-width="7" opacity=".6"/>
+    </g>
+    <g id="mc-actor" transform="translate(405 85)">
+      <ellipse cx="77" cy="501" rx="100" ry="13" fill="#64492f" opacity=".25"/>
+      <g id="mc-legs">
+        <path d="M30 306L83 310 72 442 34 450 21 391Z" fill="var(--pants,#315b93)" stroke="#252d40" stroke-width="9"/>
+        <path d="M91 310L145 299 157 434 109 448 96 393Z" fill="var(--pants,#315b93)" stroke="#252d40" stroke-width="9"/>
+        <path d="M26 423Q47 437 73 421L74 443Q67 464 50 463L27 457Z" fill="#9eb5cc" stroke="#292d3a" stroke-width="6"/>
+        <path d="M105 423Q131 434 158 414L158 443Q154 463 132 463L109 454Z" fill="#9eb5cc" stroke="#292d3a" stroke-width="6"/>
+        <path d="M26 451Q54 430 80 450L86 480Q65 498 10 481Z" fill="#f7f8f0" stroke="#252a37" stroke-width="7"/>
+        <path d="M110 451Q137 427 166 448L173 481Q145 499 103 483Z" fill="#f7f8f0" stroke="#252a37" stroke-width="7"/>
+        <path d="M15 473H84M106 474H171" stroke="#273b51" stroke-width="5"/>
+      </g>
+      <g id="mc-arm-left" transform-origin="40px 228px">
+        <path d="M44 179Q8 202 -1 250L20 293 54 272 69 210Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="9"/>
+        <path d="M13 281Q-7 307 16 323Q34 322 39 292Z" fill="var(--skin,#f0b989)" stroke="#3b2d36" stroke-width="6"/>
+      </g>
+      <g id="mc-arm-right" transform-origin="143px 220px">
+        <path d="M125 192Q162 197 185 246L164 285 133 271 112 214Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="9"/>
+        <path d="M153 281Q161 320 187 312Q201 298 180 277Z" fill="var(--skin,#f0b989)" stroke="#3b2d36" stroke-width="6"/>
+      </g>
+      <path d="M43 183Q84 159 139 184L157 318Q88 347 14 318Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="10"/>
+      <path d="M49 189Q93 219 136 188" fill="none" stroke="#f7cf89" stroke-width="5"/>
+      <path d="M84 211V322" stroke="#9b4d35" stroke-width="5"/>
+      <path d="M75 242L107 242 109 263 74 262Z" fill="#e5a65e" stroke="#573d3c" stroke-width="4"/>
+      <path d="M27 224L53 237 46 261 22 254 M140 225L118 239 125 256 150 245" fill="none" stroke="#a94b36" stroke-width="5"/>
+      <path d="M45 172 L48 134 115 131 125 180" fill="var(--skin,#f0b989)" stroke="#332d36" stroke-width="8"/>
+      <g id="mc-head" transform-origin="91px 123px">
+        <path d="M40 46Q37 1 93 3Q151 0 152 50L148 121Q135 158 95 162Q52 153 37 112Z" fill="var(--skin,#f0b989)" stroke="#322c36" stroke-width="9"/>
+        <path d="M34 75Q11 17 63 14Q76 -16 113 4Q157 -8 155 38L153 78Q143 50 128 56Q116 31 95 45Q70 29 53 59L45 86Z" fill="var(--hair,#904b28)" stroke="#302b32" stroke-width="9"/>
+        <path d="M46 19Q72 -4 84 11 M112 8Q135 -4 150 21" fill="none" stroke="#cd9254" stroke-width="8"/>
+        <ellipse cx="37" cy="94" rx="13" ry="19" fill="var(--skin,#f0b989)" stroke="#322c36" stroke-width="6"/>
+        <ellipse cx="152" cy="92" rx="12" ry="18" fill="var(--skin,#f0b989)" stroke="#322c36" stroke-width="6"/>
+        <ellipse cx="70" cy="89" rx="16" ry="21" fill="#fffaf0" stroke="#302b35" stroke-width="5"/>
+        <ellipse cx="116" cy="88" rx="16" ry="21" fill="#fffaf0" stroke="#302b35" stroke-width="5"/>
+        <circle cx="75" cy="94" r="8" fill="#236287"/><circle cx="112" cy="93" r="8" fill="#236287"/>
+        <circle cx="78" cy="91" r="3" fill="#fff"/><circle cx="115" cy="90" r="3" fill="#fff"/>
+        <path d="M56 64Q73 56 84 66 M103 67Q121 56 133 64" fill="none" stroke="#613d2e" stroke-width="6"/>
+        <path d="M96 98L88 118Q100 124 108 117" fill="none" stroke="#bd7957" stroke-width="5"/>
+        <path id="mc-mouth" d="M75 133Q96 157 123 130" fill="none" stroke="#713b37" stroke-width="6" stroke-linecap="round"/>
+        <g id="mc-hat" hidden><path d="M27 34Q85 -14 161 27L156 52Q92 66 28 50Z" fill="#9a6235" stroke="#342d35" stroke-width="9"/><path d="M17 48Q91 72 169 48" fill="none" stroke="#4c352d" stroke-width="14"/></g>
+      </g>
+    </g>
+    <g id="mc-pet" transform="translate(641 433)">
+      <ellipse cx="72" cy="135" rx="83" ry="15" fill="#503f38" opacity=".18"/>
+      <path d="M26 123Q2 87 15 50Q12 18 47 15L68 39Q92 3 114 24L120 48Q141 71 128 122Z" fill="var(--pet,#b77a43)" stroke="#332d32" stroke-width="8"/>
+      <path d="M21 43Q1 14 20 6L57 36Z" fill="var(--pet,#b77a43)" stroke="#332d32" stroke-width="7"/>
+      <path d="M98 35Q134 3 142 19L125 63Z" fill="var(--pet,#b77a43)" stroke="#332d32" stroke-width="7"/>
+      <path d="M36 91Q72 65 111 92L109 128Q71 145 37 124Z" fill="#f9edd5" stroke="#43343a" stroke-width="6"/>
+      <ellipse cx="50" cy="72" rx="10" ry="12" fill="#fff"/><ellipse cx="98" cy="72" rx="10" ry="12" fill="#fff"/>
+      <circle cx="55" cy="75" r="5" fill="#2b333a"/><circle cx="96" cy="75" r="5" fill="#2b333a"/>
+      <ellipse cx="77" cy="98" rx="13" ry="9" fill="#3e3135"/>
+      <path d="M62 114Q79 129 97 113" fill="none" stroke="#513636" stroke-width="5"/>
+      <path d="M27 128L14 143 M112 130L124 143" stroke="#e6ddc4" stroke-width="14" stroke-linecap="round"/>
+      <path d="M123 112Q158 106 151 76" fill="none" stroke="#8b613f" stroke-width="11"/>
+    </g>
+    <g fill="#fff8d6" opacity=".9"><circle cx="840" cy="280" r="4"/><circle cx="891" cy="349" r="3"/><circle cx="734" cy="487" r="3"/></g>
+  </svg>
+  <div class="mc-scene-tools"><button type="button" id="mc-fit">Fit</button><button type="button" id="mc-face">Face</button></div>
+  <div class="mc-scene-label">Adventure Base Camp <span id="mc-character-name">Scout</span></div>
+ </div>
+ <div class="mc-performance" role="group" aria-label="Character actions">
+   <button data-motion="idle" aria-pressed="true">♟<small>Idle</small></button>
+   <button data-motion="wave" aria-pressed="false">♧<small>Wave</small></button>
+   <button data-motion="cheer" aria-pressed="false">✴<small>Cheer</small></button>
+   <button data-motion="think" aria-pressed="false">◉<small>Think</small></button>
+   <button data-motion="run" aria-pressed="false">➟<small>Run</small></button>
+   <button data-motion="action" aria-pressed="false">⚡<small>Action</small></button>
+ </div>
+</section>
+<aside class="mc-market" aria-label="Creator wardrobe and unlockables">
+ <div class="mc-market-title"><h2 id="mc-market-title">Outfits</h2><select id="mc-market-filter" aria-label="Wardrobe category"><option value="outfits">Adventure Outfits</option><option value="hats">Hats & Helmets</option><option value="gear">Gear</option><option value="pets">Pets</option><option value="vehicles">Vehicles</option><option value="collections">Collections</option></select></div>
+ <div id="mc-cards" class="mc-cards" aria-live="polite"></div>
+</aside>
+</main>
+<div class="mc-tools">
+ <div class="mc-colors"><strong>Colors</strong><div id="mc-swatches" role="group" aria-label="Outfit color"></div></div>
+ <div class="mc-views"><strong>View</strong><button id="mc-view-front" aria-pressed="true">Front</button><button id="mc-view-side" aria-pressed="false">Side</button><button id="mc-view-back" aria-pressed="false">Back</button></div>
+ <div class="mc-rotate"><strong>Rotate</strong><button id="mc-turn-left" aria-label="Rotate left">↶</button><button id="mc-turn-right" aria-label="Rotate right">↷</button></div>
+ <div class="mc-zoom"><strong>Zoom</strong><button id="mc-zoom-out" aria-label="Zoom out">−</button><button id="mc-zoom-in" aria-label="Zoom in">＋</button></div>
+ <button id="mc-save" class="mc-save" type="button">✓ Save Crew</button>
+</div>
+<nav class="mc-bottom" aria-label="Creator shortcuts">
+ <button data-jump="outfits">🧥 <span>Outfits</span></button>
+ <button data-jump="hats">🎩 <span>Hats</span></button>
+ <button data-jump="gear">🔭 <span>Gear</span></button>
+ <button data-jump="pets">🐕 <span>Pets</span></button>
+ <button data-jump="vehicles">🚐 <span>Vehicles</span></button>
+ <button data-jump="collections">🏆 <span>Collections</span></button>
+</nav>
+<footer class="mc-footer"><span id="mc-status" role="status">Your characters and unlocks are saved on this device only. No old Avatar Studio data is used.</span><a href="community.html">Back to Family Message Board</a></footer>
+</div>
+<dialog id="mc-info"><h2>Mystery Crew Creator</h2><p>A fresh character creator inspired by Cowboy's approved reference. This first release stores your crew, outfit choices, and earned workshop coins only in this browser. It does not change family accounts, achievement servers, or past avatars.</p><button id="mc-info-close">Got it</button></dialog>
+<script type="module" src="mystery-crew-creator.mjs?v=creator1"></script>
+</body>
+</html>
