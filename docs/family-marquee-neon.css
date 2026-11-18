@@ -1,0 +1,65 @@
+/* Neon arcade marquee: presentation only. Rankings remain server verified. */
+body.community-page .family-fun-scoreboard.family-fun-single{
+ position:relative;isolation:isolate;overflow:hidden;padding:clamp(12px,2.2vw,22px)!important;
+ border:3px solid #ff9c31;border-radius:20px;color:#f8f7ff;
+ background:radial-gradient(ellipse at 50% -35%,#48226d 0%,transparent 65%),
+ radial-gradient(circle at 90% 80%,#151b59,transparent 50%),#070a20;
+ box-shadow:0 0 0 3px #11102a,0 0 0 5px #28d9ff,0 0 22px #e63cff77,inset 0 0 30px #201151;
+}
+body.community-page .family-fun-scoreboard.family-fun-single:before{
+ content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.28;
+ background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#46cfff 1px,transparent 1.5px);
+ background-size:67px 61px,101px 89px;background-position:0 0,35px 25px;
+}
+body.community-page .family-fun-heading{align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid #e832d9;margin-bottom:12px}
+body.community-page .family-fun-brand{display:grid;gap:3px}
+body.community-page .family-fun-cabinet-sign{
+ font:1000 clamp(20px,4vw,40px)/1.05 system-ui,sans-serif;
+ color:#ffdf63;letter-spacing:.045em;text-transform:uppercase;
+ -webkit-text-stroke:.4px #ff6a22;
+ text-shadow:2px 3px #a3216b,0 0 12px #ff4d9c,0 0 25px #ff9d1b;
+}
+body.community-page .family-fun-subtitle{font:850 clamp(10px,1.6vw,14px)/1.3 system-ui;color:#66efff;letter-spacing:.14em;text-shadow:0 0 9px #04c8ff}
+body.community-page .family-fun-controls{flex:1 1 170px}
+body.community-page .family-fun-picker,body.community-page .family-fun-home{
+ background:#101239;color:#fff;border:2px solid #35cfff;border-radius:10px;
+ box-shadow:inset 0 0 9px #1e82ff66,0 0 8px #15d8ff55;
+}
+body.community-page .family-fun-intro{font-size:12px;color:#e9ddff;margin:0 0 10px!important}
+body.community-page .family-fun-all-games{max-height:260px;gap:9px;padding:4px}
+body.community-page .family-fun-game-chip{
+ min-height:66px;padding:10px;border:2px solid #6a55ff;border-radius:12px;
+ background:linear-gradient(140deg,#21174b,#101b41);box-shadow:0 3px 0 #060c26,0 0 10px #682eff44;
+}
+body.community-page .family-fun-game-chip:nth-child(3n+1){border-color:#ff47ad}
+body.community-page .family-fun-game-chip:nth-child(3n+2){border-color:#27d6f3}
+body.community-page .family-fun-game-chip strong{font-size:clamp(12px,1.4vw,15px);color:#fff0a9}
+body.community-page .family-fun-game-chip span{font-size:11px;color:#baf4ff}
+body.community-page .family-fun-game-chip:is(:hover,:focus-visible){background:#39306e;border-color:#ffe079;transform:translateY(-1px)}
+body.community-page .family-fun-game-head{border-color:#fd4bd4;padding:5px 0 9px}
+body.community-page .family-fun-game-head strong{font-size:clamp(16px,2vw,22px);color:#ffe36d;text-shadow:0 0 9px #ff8a2a}
+body.community-page .family-fun-verified{color:#7fffe5}
+body.community-page .family-fun-podium{max-height:340px;gap:7px;margin-top:10px!important}
+body.community-page .family-fun-row{
+ grid-template-columns:40px minmax(0,1fr) auto;min-height:48px;padding:9px 12px;
+ background:#111b3d;border:2px solid #4359b3;border-radius:10px;font-size:clamp(12px,1.6vw,16px);
+}
+body.community-page .family-fun-row.is-first{background:linear-gradient(90deg,#51311b,#25214a);border-color:#ffca48;box-shadow:0 0 13px #ffc04855}
+body.community-page .family-fun-rank{color:#ffe15b}
+body.community-page .family-fun-points{color:#9df8ff}
+body.community-page .family-fun-footer{border-top:1px solid #7952b7;padding-top:10px;margin-top:12px}
+body.community-page .family-fun-play{border:2px solid #ffda63;border-radius:12px;background:linear-gradient(#ffec8b,#ff9c30);color:#20102e;box-shadow:0 0 13px #ffa31c88;font-size:14px}
+body.community-page .family-fun-rewards{border-color:#ad64e8;background:#17153a}
+body.community-page .family-fun-empty{background:#161d42;border-color:#5b55aa}
+@media(max-width:600px){
+ body.community-page .family-fun-scoreboard.family-fun-single{padding:11px!important;border-width:2px;border-radius:14px}
+ body.community-page .family-fun-cabinet-sign{font-size:clamp(19px,6vw,29px)}
+ body.community-page .family-fun-heading{display:grid}
+ body.community-page .family-fun-controls{justify-content:stretch}
+ body.community-page .family-fun-all-games{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:245px;gap:6px}
+ body.community-page .family-fun-game-chip{min-height:60px;padding:7px}
+ body.community-page .family-fun-row{grid-template-columns:28px minmax(0,1fr);gap:3px 7px;padding:8px}
+ body.community-page .family-fun-points{grid-column:2;text-align:left;font-size:12px}
+ body.community-page .family-fun-footer{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){body.community-page .family-fun-game-chip{transform:none!important}}
