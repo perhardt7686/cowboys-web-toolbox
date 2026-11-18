@@ -5,7 +5,7 @@
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps2';
-import {retroStickDirection,retroStickOffset} from './retro-arcade-joystick.mjs?v=cabinet1';
+import {retroStickDirection,retroStickOffset,retroControlSlide} from './retro-arcade-joystick.mjs?v=cabinet2';
 import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
 import {retroUnlocks,canEquipRetro,resolveRetroUnlock,retroCosmeticPalette} from './retro-game-unlockables.mjs?v=gear1';
 import {drawFleetWake,drawFleetGear,drawMazeFootprints,drawMazeGear} from './retro-unlock-art.mjs?v=gear1';
@@ -208,20 +208,35 @@ function makeGame(game){
   control.dataset.control=code;
   control.setAttribute('aria-label',label);
   control.style.touchAction='none';
-  let pointerId=null;
+  let pointerId=null,activeCode=code;
   control.addEventListener('pointerdown',e=>{
    if(!current||current.game!==game.id||pointerId!==null)return;
    e.preventDefault();
-   pointerId=e.pointerId;
+   pointerId=e.pointerId;activeCode=code;
    control.setPointerCapture?.(e.pointerId);
    control.classList.add('is-pressed');
    input.press(game.id,code);
   });
+  control.addEventListener('pointermove',e=>{
+   if(pointerId!==e.pointerId||code==='F'||current?.game!==game.id)return;
+   const next=retroControlSlide(game.id,controls.getBoundingClientRect(),
+     e.clientX,e.clientY,activeCode);
+   if(next===activeCode)return;
+   input.release(activeCode);
+   const old=controls.querySelector('[data-control="'+activeCode+'"]');
+   old?.classList.remove('is-pressed');
+   activeCode=next;
+   input.press(game.id,activeCode);
+   controls.querySelector('[data-control="'+activeCode+'"]')?.classList.add('is-pressed');
+  });
   function finishPointer(e,cancelled=false){
    if(pointerId!==e.pointerId)return;
-   pointerId=null;control.classList.remove('is-pressed');
-   if(cancelled)input.cancel(code);
-   else input.release(code);
+   pointerId=null;
+   control.classList.remove('is-pressed');
+   controls.querySelector('[data-control="'+activeCode+'"]')?.classList.remove('is-pressed');
+   if(cancelled)input.cancel(activeCode);
+   else input.release(activeCode);
+   activeCode=code;
   }
   control.addEventListener('pointerup',e=>finishPointer(e));
   control.addEventListener('pointercancel',e=>finishPointer(e,true));
@@ -230,7 +245,7 @@ function makeGame(game){
   control.addEventListener('pointerleave',e=>{
     if(!control.hasPointerCapture?.(e.pointerId))finishPointer(e);
   });
-  control.addEventListener('blur',()=>control.classList.remove('is-pressed'));
+  control.addEventListener('blur',()=>{if(pointerId===null)control.classList.remove('is-pressed');});
   controls.append(control);
  }
  if(game.id==='maze'){
