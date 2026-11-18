@@ -1,4 +1,5 @@
 import {AVATAR_OPTIONS} from './family-avatar-builder.mjs?v=workshop1';
+import {expressionBodyActing} from './avatar-expression-body-acting.mjs';
 import {normalizeBody,fitsBody} from './avatar-full-body.mjs?v=workshop1';
 import {BY_ID} from './avatar-reward-catalog.mjs?v=workshop1';
 import {THREE,attach,band,box,group,hash,join,medallion,oval,shade,shell,stroke,surface} from './avatar-studio-geometry.mjs?v=workshop1';
@@ -293,6 +294,16 @@ function arm(parent,side,v,body,wardrobe,palette,materials,item){
     hand[1]+=.049;
     hand[2]+=.047;
   }
+  // Expression-specific body acting happens after the authored pose and before
+  // garment construction. Item-held palms and rigid machine joints stay fixed.
+  if(!wardrobe.mechanical&&!item&&v.pose!=='wave'){
+    const acting=expressionBodyActing(v.expression);
+    const index=side===-1?0:1;
+    elbow[0]+=side*acting.elbowOut[index]*.60;
+    elbow[1]+=acting.handLift[index]*.46;
+    hand[0]+=side*acting.elbowOut[index];
+    hand[1]+=acting.handLift[index];
+  }
   const covered=wardrobe.outer!=='none'&&wardrobe.outer!=='cape';
   const fabric=covered?materials.coat:materials.material;
   const short=['striped','safari','vest'].includes(wardrobe.top)&&!covered;
@@ -368,12 +379,15 @@ export function buildAvatar(recipe){
   };
   const root=group(null);
   const figure=group(root);
+  const expressionAct=expressionBodyActing(recipe.expression);
   // Shift the whole organic upper silhouette, not merely the head/hand decals.
   // Rotating the rig preserves the parent-child chain for hats, hands and held props;
   // machines retain rigid mechanical posture and the feet stay close to the floor.
   const lean=recipe.pose==='tilt'&&!mechanical?0.077:0;
   figure.rotation.z=lean;
+  figure.rotation.y=mechanical?0:expressionAct.yaw;
   figure.userData.studioActingLean=lean;
+  figure.userData.studioActingTurn=figure.rotation.y;
   const body={...shape,width:shape.width*(1+(Number(outfits.build)||0)*.078)};
   figure.scale.y=shape.height*(1+(Number(outfits.height)||0)*.042);
   const color=cosmetics.bottoms?.color||{overalls:'#4b6878',dress:palette.cloth,pleats:'#a35757',flares:'#7b5653',slacks:'#575667',cuffs:'#596c6e'}[wardrobe.bottoms];
@@ -391,6 +405,7 @@ export function buildAvatar(recipe){
   if(model==='marsh')head.scale.set(1.02,1.065,1.09);
   if(model==='armor')head.rotation.z=-.10;
   if(recipe.pose==='tilt')head.rotation.z=-.205;
+  if(!mechanical)head.rotation.z+=expressionAct.headRoll;
   sculptFace(head,recipe,palette,{mechanical,armor:model==='armor',scout:model==='scout',radio:model==='radio',marsh:model==='marsh',specter,
     headCovered:Boolean(cosmetics.hat||(recipe.hat&&recipe.hat!=='none')||recipe.accessory==='crown'),
     jawTune:Number(outfits.jaw)||0,eyeSpacing:Number(outfits.eye_spacing)||0,
