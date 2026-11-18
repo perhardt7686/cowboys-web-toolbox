@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {BY_ID} from '../docs/avatar-reward-catalog.mjs';
+import {NEW_STUDIO_REWARDS} from '../docs/avatar-collection-edition.mjs';
 import {BODY_MODELS} from '../docs/avatar-full-body.mjs';
 import {paintV8Character} from '../docs/avatar-v8-original-cels.mjs';
 import {V8_ART_IDS,paintV8RewardIcon} from '../docs/avatar-v8-prize-cels.mjs';
@@ -46,12 +47,14 @@ test('the new painter deliberately yields gear to the complete legacy fitting en
   assert.deepEqual(canvas.dataset,{});
   assert.equal(canvas.trace.length,0);
 });
-test('twelve individual V8 art IDs exist in the authoritative catalog',()=>{
-  assert.equal(V8_ART_IDS.length,12);
+test('all 26 workshop rewards plus Viking helmet have unique V8 art',()=>{
+  assert.equal(V8_ART_IDS.length,27);
+  assert.equal(NEW_STUDIO_REWARDS.length,26);
+  assert.deepEqual(NEW_STUDIO_REWARDS.filter(item=>!V8_ART_IDS.includes(item.id)).map(item=>item.id),[]);
   assert.equal(new Set(V8_ART_IDS).size,12);
   for(const id of V8_ART_IDS)assert.ok(BY_ID.has(id),id);
 });
-test('all twelve reward designs render original cels without changing item state',()=>{
+test('all 27 V8 prize designs render distinct authored paths without modifying reward state',()=>{
   globalThis.Path2D=MockPath;
   try{
     for(const id of V8_ART_IDS){
