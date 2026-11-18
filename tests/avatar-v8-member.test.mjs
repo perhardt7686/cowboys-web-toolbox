@@ -81,6 +81,7 @@ test('live cutover retains authenticated RPC gate, earned-state and save validat
   assert.match(read('avatar-studio-preview.mjs'),/paintV8Character/);
   assert.doesNotMatch(read('avatar-v8-live.mjs'),/Classic layout|v8Mode|classic-toggle/);
   assert.match(read('community.html'),/avatar-v8-live\.css/);
+  assert.doesNotMatch(read('avatar-turntable-controls.mjs'),/Layered 2D|data-turn="cel"/);
 });
 test('V8 editor has no classic-layout switch and never writes account state from its shell',()=>{
   const js=read('avatar-v8-live.mjs'),css=read('avatar-v8-live.css');
