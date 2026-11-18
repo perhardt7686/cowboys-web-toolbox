@@ -4,7 +4,7 @@
  */
 export function createRetroInput(){
   const held=new Set(), pending=new Set();
-  let direction='N';
+  let direction='N',lastSteer='N';
   function activate(game,code){
     if(game==='maze'){
       if('LRUD'.includes(code)&&code.length===1)direction=code;
@@ -12,8 +12,8 @@ export function createRetroInput(){
     }
     if(game!=='fleet'||!['L','R','F'].includes(code))return;
     // A more recent quick directional tap wins over the previous tap.
-    if(code==='L')pending.delete('R');
-    if(code==='R')pending.delete('L');
+    if(code==='L'){pending.delete('R');lastSteer='L';}
+    if(code==='R'){pending.delete('L');lastSteer='R';}
     pending.add(code);
   }
   return {
@@ -29,11 +29,14 @@ export function createRetroInput(){
       const fire=held.has('F')||pending.has('F');
       // Consume momentary taps once; persistent held buttons remain active.
       pending.clear();
-      if(left&&!right)return fire?'A':'L';
-      if(right&&!left)return fire?'D':'R';
+      // Two thumbs can overlap: the most recently pressed direction wins,
+      // rather than cancelling movement when both controls remain held.
+      const steer=left&&right?lastSteer:left?'L':right?'R':'N';
+      if(steer==='L')return fire?'A':'L';
+      if(steer==='R')return fire?'D':'R';
       return fire?'F':'N';
     },
-    clearHeld(){held.clear();pending.clear();},
-    reset(){held.clear();pending.clear();direction='N';}
+    clearHeld(){held.clear();pending.clear();lastSteer='N';},
+    reset(){held.clear();pending.clear();direction='N';lastSteer='N';}
   };
 }
