@@ -76,14 +76,15 @@ test('live cutover retains authenticated RPC gate, earned-state and save validat
   assert.match(sources[2],/community_avatar_pet_action/);
   assert.match(sources[2],/makePetGallery/);
   assert.match(read('avatar-studio-preview.mjs'),/paintV8Character/);
-  assert.match(read('avatar-v8-live.mjs'),/Classic layout/);
+  assert.doesNotMatch(read('avatar-v8-live.mjs'),/Classic layout|v8Mode|classic-toggle/);
   assert.match(read('community.html'),/avatar-v8-live\.css/);
 });
-test('redesigned studio is reversible and never writes account state from its shell',()=>{
+test('V8 editor has no classic-layout switch and never writes account state from its shell',()=>{
   const js=read('avatar-v8-live.mjs'),css=read('avatar-v8-live.css');
   assert.doesNotMatch(js,/\bfetch\s*\(|localStorage|sessionStorage|supabase|\.rpc\(|\.insert\(|\.upsert\(/);
-  assert.match(js,/avatar-v8-mode-changed/);
-  assert.match(css,/\[data-v8-mode="classic"\]/);
+  assert.doesNotMatch(js,/Classic layout|v8Mode|classic-toggle/);
+  assert.doesNotMatch(css,/classic-toggle|data-v8-mode|classic-mode/);
+  assert.match(css,/\[data-v8-live="true"\]/);
   assert.match(css,/prefers-reduced-motion/);
   assert.match(css,/max-width:420px/);
 });
