@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createRetroInput} from '../docs/retro-arcade-input.mjs';
-import {retroStickDirection,retroStickOffset} from '../docs/retro-arcade-joystick.mjs';
+import {retroStickDirection,retroStickOffset,retroControlSlide} from '../docs/retro-arcade-joystick.mjs';
 import {initialRetro,retroStep,retroReplay,RETRO_GAME_RULES} from '../docs/retro-arcade-engine.mjs';
 
 test('a short Star Squadron touch registers exactly once after release',()=>{
@@ -162,12 +162,13 @@ test('queued turns produce only replayable server-authoritative maze actions',()
 
 test('four-way cabinet joystick tracks diagonals, deadzone and bounded thumb movement',()=>{
   assert.equal(retroStickDirection(0,0),'N');
-  assert.equal(retroStickDirection(12,0),'N');
+  assert.equal(retroStickDirection(7,0),'N');
+  assert.equal(retroStickDirection(12,0),'R');
   assert.equal(retroStickDirection(-14,1),'L');
   assert.equal(retroStickDirection(20,7),'R');
   assert.equal(retroStickDirection(3,-25),'U');
   assert.equal(retroStickDirection(9,30),'D');
-  assert.equal(retroStickDirection(8,8),'N');
+  assert.equal(retroStickDirection(8,8),'D');
   assert.equal(retroStickDirection(NaN,2),'N');
   assert.deepEqual(retroStickOffset(0,0),[0,0]);
   assert.deepEqual(retroStickOffset(50,0),[25,0]);
@@ -194,4 +195,29 @@ test('physical cabinet touch lifecycle retains captured pointer until up or canc
   assert.match(styles,/min-height:88px/);
   assert.doesNotMatch(source,/control\.addEventListener\(name,\(\)=>input\.cancel\(code\)\)/,
     'do not cancel a captured thumb simply because it leaves the button');
+});
+
+
+test('classic cabinet slide tracks finger outside original captured button',()=>{
+ const panel={left:100,top:200,width:300,height:240};
+ assert.equal(retroControlSlide('fleet',panel,125,300,'L'),'L');
+ assert.equal(retroControlSlide('fleet',panel,375,300,'L'),'R',
+   'left finger sliding across to right changes steering despite capture');
+ assert.equal(retroControlSlide('fleet',panel,251,300,'R'),'R',
+   'crossing the middle FIRE button does not interrupt current steering');
+ assert.equal(retroControlSlide('maze',panel,250,220,'L'),'U');
+ assert.equal(retroControlSlide('maze',panel,380,320,'U'),'R');
+ assert.equal(retroControlSlide('maze',panel,250,438,'R'),'D');
+ assert.equal(retroControlSlide('maze',panel,104,320,'D'),'L');
+ assert.equal(retroControlSlide('maze',panel,250,320,'L'),'L',
+   'near joystick center keeps the last direction to prevent jitter');
+ assert.equal(retroControlSlide('maze',panel,NaN,320,'U'),'U');
+ assert.equal(retroControlSlide('not-a-game',panel,300,320,'N'),'N');
+ const src=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+ assert.match(src,/control\.addEventListener\('pointermove'/);
+ assert.match(src,/retroControlSlide\(game\.id,controls\.getBoundingClientRect\(\)/);
+ assert.match(src,/input\.release\(activeCode\)/);
+ assert.match(src,/input\.press\(game\.id,activeCode\)/);
+ assert.match(src,/code==='F'/,
+   'held FIRE thumb is independent from swiping the other finger');
 });
