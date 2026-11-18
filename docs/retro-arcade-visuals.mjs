@@ -15,7 +15,7 @@ export function squadronFormation(tick,seed,width){
     ships.push({
       row,lane,x:18+(lane+.5)*bw+offset+(row-1)*3,
       y:65+row*37+(lane%2)*3,
-      scale:row===0?.62:row===1?.74:.84
+      scale:row===0 ? 0.62 : row===1 ? 0.74 : 0.84
     });
   }
   return ships;
