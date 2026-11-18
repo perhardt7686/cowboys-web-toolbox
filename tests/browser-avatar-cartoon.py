@@ -446,9 +446,61 @@ async def review_angles(browser):
           hc.drawImage(target,120+j*235,y,194,194);
         }
       }
+      // Human silhouette evidence: original heads at 0° and 90° in 3D and
+      // layered cel, with real 48/64 px face thumbnails. A second sheet
+      // compares the full-body tilt to the unchanged neutral silhouette.
+      const humanModels=['detective','mechanic','sleuth','specter','marsh'];
+      const humanViews=[['3D front',0,false],['Cel front',0,true],
+        ['3D side',90,false],['Cel side',90,true]];
+      const humanSheet=makeCanvas(1090,1320),humanCtx=humanSheet.getContext('2d');
+      humanCtx.fillStyle='#f7efdf';humanCtx.fillRect(0,0,1090,1320);
+      humanCtx.fillStyle='#35273f';humanCtx.font='bold 22px system-ui';
+      humanCtx.fillText('Human and monster head proportions · full face / side',16,29);
+      humanCtx.font='bold 14px system-ui';
+      humanViews.forEach(([label],i)=>humanCtx.fillText(label,124+i*239,58));
+      for(const [row,model] of humanModels.entries()){
+        const recipe={...SHOWROOM_LOOKS[model]};
+        const y=73+row*248;
+        humanCtx.fillStyle='#35273f';humanCtx.font='bold 16px system-ui';
+        humanCtx.fillText(model.toUpperCase(),5,y+74);
+        for(const [j,[label,angle,isCel]] of humanViews.entries()){
+          const target=isCel?celTile:faceTile;
+          const projected=figureAt(recipe,angle);
+          const cam=isCel?{angle,crop:{x:projected.head.x,
+            y:projected.head.y+40*projected.design.scale,size:175}}:
+            {angle,zoom:2.40,y:166};
+          if(isCel)renderLoadout(target,recipe,0,null,cam);
+          else if(!paintRoomAvatar(target,recipe,cam,0,null,'body'))
+            throw Error('Human head preview missing '+model+'/'+label);
+          humanCtx.drawImage(target,124+j*239,y,204,185);
+          if(angle===0){
+            for(const [k,size] of [48,64].entries()){
+              const thumb=makeCanvas(size,size);
+              thumb.getContext('2d').drawImage(target,0,0,size,size);
+              humanCtx.drawImage(thumb,124+j*239+k*66,y+184,size,size);
+            }
+          }
+        }
+      }
+      const poseSheet=makeCanvas(970,400),poseCtx=poseSheet.getContext('2d');
+      poseCtx.fillStyle='#f7efdf';poseCtx.fillRect(0,0,970,400);
+      poseCtx.fillStyle='#35273f';poseCtx.font='bold 21px system-ui';
+      poseCtx.fillText('Detective silhouette · hands and head in neutral / tilt',14,29);
+      const poseOptions=[
+        ['3D neutral',false,'center'],['3D tilt',false,'tilt'],
+        ['Cel neutral',true,'center'],['Cel tilt',true,'tilt']];
+      for(const [j,[label,isCel,pose]] of poseOptions.entries()){
+        const recipe={...SHOWROOM_LOOKS.detective,pose};
+        poseCtx.fillStyle='#35273f';poseCtx.font='bold 15px system-ui';
+        poseCtx.fillText(label,28+j*229,64);
+        if(isCel)renderLoadout(tile,recipe,0,null,{angle:0});
+        else if(!paintRoomAvatar(tile,recipe,{angle:0},0,null,'body'))
+          throw Error('No 3D '+pose+' posture');
+        poseCtx.drawImage(tile,26+j*229,76,195,293);
+      }
       const expressionQA={three:fingerprints.three.size,cel:fingerprints.cel.size,duplicates};
       for(const canvas of [tile,shadows,portrait,faceTile,beardTarget,turnTile])releaseStudioView(canvas);
-      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
+      return {images:[sheet,comparison,close,expressions,small,beardSheet,beardMouth,turning,continuity,robotSheet,robotHats,humanSheet,poseSheet].map(node=>node.toDataURL('image/png').split(',')[1]),expressionQA};
     }""")
     for name, data in zip(['avatar-workshop-turnaround.png','avatar-workshop-rendering-comparison.png',
                            'avatar-workshop-face-angles.png','avatar-workshop-expression-model-sheet.png',
@@ -457,7 +509,9 @@ async def review_angles(browser):
                            'avatar-workshop-turn-direction.png',
                            'avatar-workshop-expression-continuity.png',
                            'avatar-workshop-robot-silhouettes.png',
-                           'avatar-workshop-robot-hat-fit.png'], sheets['images']):
+                           'avatar-workshop-robot-hat-fit.png',
+                           'avatar-workshop-human-proportions.png',
+                           'avatar-workshop-human-poses.png'], sheets['images']):
         (REPORTS/name).write_bytes(base64.b64decode(data))
     assert sheets['expressionQA']['three'] == 8 and sheets['expressionQA']['cel'] == 8, sheets['expressionQA']
     await page.close()
