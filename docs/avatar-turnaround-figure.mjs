@@ -1,5 +1,6 @@
 import {INK,PAPER,oval,path,tint} from './avatar-cel-art.mjs?v=workshop1';
 import {BODY_MODELS,CENTER,normalizeBody,projectTurn} from './avatar-full-body.mjs?v=workshop1';
+import {expressionBodyActing} from './avatar-expression-body-acting.mjs';
 
 const PANTS='#705043',LEATHER='#634333',BUCKLE='#d7a75b';
 const palette=(v,highlight=.29,shadow=.34)=>[v,tint(v,'#ffd697',highlight),tint(v,'#252b42',shadow)];
@@ -7,7 +8,9 @@ function seam(c,x,y,points,color,width=1.6){path(c,[x,y],points,null,color,width
 
 export function figureAt(recipe,angle,holding=[]){
   const kit=normalizeBody(recipe),model=kit.model,design=BODY_MODELS[model],view=projectTurn(angle);
-  const head={x:CENTER+view.head,y:design.head};
+  const acting=expressionBodyActing(recipe.expression);
+  const rigid=design.family==='robot'||model==='armor';
+  const head={x:CENTER+view.head+(rigid?0:acting.yaw*75*view.across),y:design.head};
   const shoulder=head.y+89*design.scale;
   const hip=515-design.leg-45;
   const silhouette=(w,d,correction)=>Math.hypot(w*view.across,d*view.depth)*correction;
@@ -20,13 +23,17 @@ export function figureAt(recipe,angle,holding=[]){
     const hipPose=side===1&&['sleuth','detective','scout'].includes(model)&&!raised&&!busy;
     const leading=side===1?17:-8;
     const relaxed=recipe.pose==='tilt'&&!busy&&design.family!=='robot'&&model!=='armor';
+    const index=side===-1?0:1;
+    const expressive=!rigid&&!busy&&!raised&&recipe.pose!=='wave';
+    const sleeve=expressive?acting.elbowOut[index]:0;
+    const lift=expressive?acting.handLift[index]:0;
     const xy=(x,z)=>CENTER+view.at(x*side,z);
     const near=view.toward(side*design.shoulder,0);
     return {
       side,near,raised,busy,
       shoulder:{x:xy(design.shoulder-7,1),y:shoulder+8+view.arm*side*.24+(relaxed?(side===1?-5:4):0)},
-      elbow:{x:xy(design.shoulder+(hipPose?20:5)+(relaxed?(side===1?13:5):0),raised?10:busy?17:5),y:raised?shoulder+63:hip-73+(relaxed?(side===1?-18:9):0)},
-      hand:{x:xy((hipPose?design.waist+7:design.shoulder+9)+(relaxed?(side===1?17:5):0),raised?15:busy?25:6),y:raised?shoulder-3:busy?hip-63:hip+(hipPose?-47:3)+(relaxed?(side===1?-31:11):0)},
+      elbow:{x:xy(design.shoulder+(hipPose?20:5)+(relaxed?(side===1?13:5):0)+sleeve*72,raised?10:busy?17:5),y:raised?shoulder+63:hip-73+(relaxed?(side===1?-18:9):0)-lift*58},
+      hand:{x:xy((hipPose?design.waist+7:design.shoulder+9)+(relaxed?(side===1?17:5):0)+sleeve*96,raised?15:busy?25:6),y:raised?shoulder-3:busy?hip-63:hip+(hipPose?-47:3)+(relaxed?(side===1?-31:11):0)-lift*124},
       thigh:{x:xy(design.hip*.49,2),y:hip-4},
       knee:{x:xy(design.hip*.63,leading*.4),y:hip+(487-hip)*.53},
       ankle:{x:xy(design.hip*.77,leading),y:488+(side===-1?-7:0)}
