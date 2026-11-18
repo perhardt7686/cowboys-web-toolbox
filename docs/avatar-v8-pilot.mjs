@@ -245,7 +245,7 @@ function render(focus=null){
       '<nav class="tabs" role="tablist" aria-label="Studio areas">'+
       TABS.map(pair=>'<button type="button" role="tab" aria-selected="'+String(state.tab===pair[0])+
         '" data-action="tab" data-value="'+pair[0]+'">'+pair[1]+'</button>').join('')+
-      '</nav><div role="tabpanel" aria-label="'+safeName(TABS.find(p=>p[0]===state.tab)[1])+'">'+panel()+'</div></section></div>';
+      '</nav><div class="preview-peek" aria-hidden="true"><div class="peek-art">'+stageSvg()+'</div><div><strong>Live look</strong><small>Changes appear here as you edit</small></div></div><div role="tabpanel" aria-label="'+safeName(TABS.find(p=>p[0]===state.tab)[1])+'">'+panel()+'</div></section></div>';
   if(focus){
     const target=[...root.querySelectorAll('[data-action]')].find(node=>node.dataset.action===focus.action&&
       (focus.value===undefined||node.dataset.value===focus.value));
