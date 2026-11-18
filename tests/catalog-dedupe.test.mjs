@@ -36,6 +36,6 @@ test('Blacklight entry credits its public sources and explains scanning limitati
   assert.ok(entry.evidenceUrls.includes('https://themarkup.org/blacklight'));
   assert.equal(entry.destinationCheck.status,'official_source_checked_workflow_untested');
   assert.match(entry.privacyNote,/automated findings are not definitive/i);
-  assert.match(entry.privacyNote,/cached reports/i);
+  assert.match(entry.privacyNote,/cach(?:es|ed) reports/i);
   assert.equal(entry.uploadTool,false);
 });
