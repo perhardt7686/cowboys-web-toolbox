@@ -38,6 +38,8 @@ test('new actor cels draw human, robot, and monster families using saved model k
       const canvas=makeCanvas();
       assert.equal(paintV8Character(canvas,{skin:'sand',hair:'brown',style:'shag',shirt:'forest',full_body:{model}}, {angle:45,zoom:1.2}),true,model);
       assert.equal(canvas.dataset.backend,'v8-original-cel');
+      assert.equal(canvas.dataset.studioAction,'');
+      assert.equal(canvas.dataset.studioReaction,'');
       assert.ok(canvas.trace.length>70,model);
       assert.ok(canvas.trace.some(a=>a[0]==='transform'),model);
     }
