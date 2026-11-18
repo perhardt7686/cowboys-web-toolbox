@@ -53,7 +53,7 @@ test('all 26 workshop rewards plus Viking helmet have unique V8 art',()=>{
   assert.equal(V8_ART_IDS.length,27);
   assert.equal(NEW_STUDIO_REWARDS.length,26);
   assert.deepEqual(NEW_STUDIO_REWARDS.filter(item=>!V8_ART_IDS.includes(item.id)).map(item=>item.id),[]);
-  assert.equal(new Set(V8_ART_IDS).size,12);
+  assert.equal(new Set(V8_ART_IDS).size,27);
   for(const id of V8_ART_IDS)assert.ok(BY_ID.has(id),id);
 });
 test('all 27 V8 prize designs render distinct authored paths without modifying reward state',()=>{
