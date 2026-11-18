@@ -180,3 +180,98 @@ body.community-page .retro-controls[data-retro-game="fleet"] [data-control="F"]{
   min-height:52px;padding-inline:3px;font-size:12px
  }
 }
+
+
+/* Tactile, original cabinet-inspired controls. Enlarged hit targets, persistent
+   pointer-capture visual state and independent two-thumb FIRE. */
+body.community-page .retro-controls .retro-control,
+body.community-page .retro-controls .retro-stick-knob{
+ appearance:none;-webkit-appearance:none;
+ -webkit-tap-highlight-color:transparent;
+ touch-action:none;user-select:none;-webkit-user-select:none;
+ transition:box-shadow .08s ease,transform .08s ease,background .08s ease;
+}
+body.community-page .retro-controls .retro-control:focus-visible,
+body.community-page .retro-controls .retro-stick-knob:focus-visible,
+body.community-page .retro-canvas:focus-visible{
+ outline:3px solid #a4ffee;outline-offset:3px;
+}
+body.community-page .retro-controls[data-retro-game="maze"]{
+ grid-template-columns:repeat(3,minmax(66px,74px));
+ grid-template-rows:repeat(3,66px);
+ gap:5px;max-width:254px;
+ padding:7px;border:4px solid #77869f;border-radius:24px;
+ background:radial-gradient(circle at 50% 50%,#223a51,#111a30 76%);
+ box-shadow:inset 0 5px 14px #000a,0 5px 0 #080d19;
+}
+body.community-page .retro-controls[data-retro-game="maze"]::before{content:none;display:none}
+body.community-page .retro-controls[data-retro-game="maze"] .retro-control{
+ min-width:66px;min-height:66px;width:100%;height:100%;
+ border:4px solid #a5b4c6;border-radius:16px;
+ background:linear-gradient(155deg,#e5e6da,#aabbd2);
+ box-shadow:inset 0 4px 0 #fff8,0 5px 0 #46566f;
+ color:#182b46;font:900 13px/1 monospace;
+}
+body.community-page .retro-controls[data-retro-game="maze"] .retro-stick-knob{
+ display:grid;place-items:center;
+ grid-column:2;grid-row:2;justify-self:center;align-self:center;
+ width:58px;min-width:58px;height:58px;min-height:58px;
+ padding:0;border-radius:50%;border:5px solid #9cb3c8;
+ background:radial-gradient(circle at 36% 25%,#ecfdff,#69a5a9 46%,#234d68 94%);
+ color:#18324c;font:900 18px/1 monospace;
+ box-shadow:inset 0 3px 2px #fff8,0 5px 0 #152b42;
+ transform:translate(var(--stick-x,0px),var(--stick-y,0px));
+ position:relative;z-index:1;
+}
+body.community-page .retro-controls[data-retro-game="fleet"]{
+ grid-template-columns:minmax(0,1fr) minmax(88px,1.17fr) minmax(0,1fr);
+ max-width:420px;gap:8px;
+ padding:10px;border-radius:30px;border:4px solid #6d819f;
+ background:linear-gradient(150deg,#243c58,#101d38);
+ box-shadow:inset 0 6px 13px #000a,0 5px 0 #090d1d;
+}
+body.community-page .retro-controls[data-retro-game="fleet"] .retro-control{
+ min-width:0;min-height:75px;height:75px;
+ border:4px solid #b9c8d8;border-radius:22px;
+ background:linear-gradient(148deg,#e8e7d8,#9cabc8);
+ color:#142940;font:900 13px/1.2 monospace;
+ box-shadow:inset 0 4px 0 #fff8,0 5px 0 #42546b;
+}
+body.community-page .retro-controls[data-retro-game="fleet"] [data-control="F"]{
+ width:100%;height:88px;min-height:88px;align-self:center;
+ border:6px solid #d9c0bd;border-radius:50%;
+ background:radial-gradient(circle at 32% 20%,#fff2b5,#fc986c 47%,#b9345e 95%);
+ color:#32182a;font:950 15px monospace;
+ box-shadow:inset 0 4px 0 #fff7,0 6px 0 #552340;
+}
+body.community-page .retro-controls .retro-control.is-pressed,
+body.community-page .retro-controls .retro-control:active{
+ transform:translateY(4px);
+ background:linear-gradient(135deg,#c1fff0,#74c9d9);
+ box-shadow:inset 0 3px 7px #1d334966,0 1px 0 #334a66;
+}
+body.community-page .retro-controls[data-retro-game="fleet"] [data-control="F"].is-pressed,
+body.community-page .retro-controls[data-retro-game="fleet"] [data-control="F"]:active{
+ background:radial-gradient(circle at 40% 28%,#ffdf9a,#e95d72 75%);
+ box-shadow:inset 0 4px 8px #72304d,0 1px 0 #552340;
+}
+body.community-page .retro-controls[data-retro-game="maze"] .retro-stick-knob.is-pressed{
+ box-shadow:inset 0 5px 7px #183d5880,0 1px 0 #152b42;
+}
+@media(max-width:350px){
+ body.community-page .retro-controls[data-retro-game="maze"]{
+  grid-template-columns:repeat(3,minmax(60px,68px));
+  grid-template-rows:repeat(3,60px);
+  gap:3px;padding:5px;
+ }
+ body.community-page .retro-controls[data-retro-game="maze"] .retro-control{
+  min-width:60px;min-height:60px;
+ }
+ body.community-page .retro-controls[data-retro-game="fleet"]{gap:5px;padding:6px}
+ body.community-page .retro-controls[data-retro-game="fleet"] .retro-control{min-height:70px;height:70px;font-size:11px}
+ body.community-page .retro-controls[data-retro-game="fleet"] [data-control="F"]{min-height:82px;height:82px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .retro-controls .retro-control,
+ body.community-page .retro-controls .retro-stick-knob{transition:none}
+}

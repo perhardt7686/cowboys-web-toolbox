@@ -56,8 +56,8 @@ test('games use private score RPCs, originals and readable independent title scr
  assert.match(js,/community_retro_finish/);
  assert.match(js,/community_retro_state/);
  assert.match(js,/session\?\.user\?\.id/);
- assert.match(html,/commons-retro-arcade\.mjs\?v=retro11/);
- assert.match(html,/commons-retro-arcade\.css\?v=retro6/);
+ assert.match(html,/commons-retro-arcade\.mjs\?v=retro12/);
+ assert.match(html,/commons-retro-arcade\.css\?v=retro7/);
  assert.doesNotMatch(js,/arcade\.archive|pac-man\.png|galaga\.png/);
 });
 

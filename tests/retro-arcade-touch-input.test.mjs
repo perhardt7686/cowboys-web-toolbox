@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createRetroInput} from '../docs/retro-arcade-input.mjs';
+import {retroStickDirection,retroStickOffset} from '../docs/retro-arcade-joystick.mjs';
 import {initialRetro,retroStep,retroReplay,RETRO_GAME_RULES} from '../docs/retro-arcade-engine.mjs';
 
 test('a short Star Squadron touch registers exactly once after release',()=>{
@@ -62,7 +63,7 @@ test('retro mobile controls actually use the tap buffer and keyboard activation'
  assert.match(src,/function actionForTick\(game\)\{return input\.action\(game,current\);\}/);
  assert.match(src,/Round paused while the page is hidden/);
  assert.match(src,/Round resumed\. Keep playing/);
- assert.match(board,/commons-retro-arcade\.mjs\?v=retro11/);
+ assert.match(board,/commons-retro-arcade\.mjs\?v=retro12/);
 });
 
 
@@ -156,4 +157,41 @@ test('queued turns produce only replayable server-authoritative maze actions',()
   assert.deepEqual(state,retroReplay('maze',4,actions.join('')),
     'no cosmetic or predictive movement bypasses the submitted replay trace');
   assert.equal(actions.length,state.tick);
+});
+
+
+test('four-way cabinet joystick tracks diagonals, deadzone and bounded thumb movement',()=>{
+  assert.equal(retroStickDirection(0,0),'N');
+  assert.equal(retroStickDirection(12,0),'N');
+  assert.equal(retroStickDirection(-14,1),'L');
+  assert.equal(retroStickDirection(20,7),'R');
+  assert.equal(retroStickDirection(3,-25),'U');
+  assert.equal(retroStickDirection(9,30),'D');
+  assert.equal(retroStickDirection(8,8),'N');
+  assert.equal(retroStickDirection(NaN,2),'N');
+  assert.deepEqual(retroStickOffset(0,0),[0,0]);
+  assert.deepEqual(retroStickOffset(50,0),[25,0]);
+  assert.deepEqual(retroStickOffset(0,-50),[0,-25]);
+  const [x,y]=retroStickOffset(100,-100);
+  assert.ok(Math.hypot(x,y)<=25.5);
+});
+
+test('physical cabinet touch lifecycle retains captured pointer until up or cancel',()=>{
+  const source=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+  const styles=readFileSync(new URL('../docs/commons-retro-arcade.css',import.meta.url),'utf8');
+  assert.match(source,/stick\.addEventListener\('pointermove',moveStick\)/);
+  assert.match(source,/retroStickDirection\(dx,dy\)/);
+  assert.match(source,/stick\.setPointerCapture\?\.\(e\.pointerId\)/);
+  assert.match(source,/control\.setPointerCapture\?\.\(e\.pointerId\)/);
+  assert.match(source,/pointerId!==e\.pointerId/);
+  assert.match(source,/!control\.hasPointerCapture\?\.\(e\.pointerId\)/,
+    'pointerleave cannot cancel a valid captured finger slide');
+  assert.match(source,/root\.querySelector\('\.retro-canvas'\)\?\.focus\(\{preventScroll:true\}\)/);
+  assert.match(source,/canvas\.tabIndex=0/);
+  assert.match(styles,/\.retro-stick-knob\.is-pressed/);
+  assert.match(styles,/retro-controls\[data-retro-game="maze"\] \.retro-stick-knob/);
+  assert.match(styles,/min-height:66px/);
+  assert.match(styles,/min-height:88px/);
+  assert.doesNotMatch(source,/control\.addEventListener\(name,\(\)=>input\.cancel\(code\)\)/,
+    'do not cancel a captured thumb simply because it leaves the button');
 });
