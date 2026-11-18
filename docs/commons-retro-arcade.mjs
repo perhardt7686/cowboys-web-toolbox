@@ -5,6 +5,7 @@
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps2';
+import {retroStickDirection,retroStickOffset} from './retro-arcade-joystick.mjs?v=cabinet1';
 import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
 import {retroUnlocks,canEquipRetro,resolveRetroUnlock,retroCosmeticPalette} from './retro-game-unlockables.mjs?v=gear1';
 import {drawFleetWake,drawFleetGear,drawMazeFootprints,drawMazeGear} from './retro-unlock-art.mjs?v=gear1';
@@ -35,7 +36,12 @@ function el(name,cls,content){
  if(content!==undefined)node.textContent=String(content);
  return node;
 }
-function stopTimer(){if(ticker!==null){clearInterval(ticker);ticker=null;}input.reset();}
+function stopTimer(){
+ if(ticker!==null){clearInterval(ticker);ticker=null;}
+ input.reset();
+ document.querySelectorAll('.retro-control.is-pressed,.retro-stick-knob.is-pressed')
+   .forEach(node=>node.classList.remove('is-pressed'));
+}
 function add(parent,...children){parent.append(...children);return parent;}
 function richButton(label,callback,cls=''){
  const b=el('button','retro-button '+cls,label);b.type='button';
@@ -187,6 +193,7 @@ function makeGame(game){
  const canvas=el('canvas','retro-canvas');
  canvas.width=game.id==='fleet'?540:450;canvas.height=game.id==='fleet'?540:450;
  canvas.setAttribute('role','img');
+ canvas.tabIndex=0;
  canvas.setAttribute('aria-label',game.title+' live game canvas; use the buttons below or arrow keys');
  const info=el('div','retro-live-readout','SCORE 0 · LIVES 3');
  const controls=el('div','retro-controls');controls.dataset.retroGame=game.id;
@@ -201,16 +208,73 @@ function makeGame(game){
   control.dataset.control=code;
   control.setAttribute('aria-label',label);
   control.style.touchAction='none';
+  let pointerId=null;
   control.addEventListener('pointerdown',e=>{
-   if(!current||current.game!==game.id)return;
+   if(!current||current.game!==game.id||pointerId!==null)return;
    e.preventDefault();
-   control.setPointerCapture?.(e.pointerId);input.press(game.id,code);
+   pointerId=e.pointerId;
+   control.setPointerCapture?.(e.pointerId);
+   control.classList.add('is-pressed');
+   input.press(game.id,code);
   });
-  for(const name of ['pointerup','lostpointercapture'])
-   control.addEventListener(name,()=>input.release(code));
-  for(const name of ['pointercancel','pointerleave'])
-   control.addEventListener(name,()=>input.cancel(code));
+  function finishPointer(e,cancelled=false){
+   if(pointerId!==e.pointerId)return;
+   pointerId=null;control.classList.remove('is-pressed');
+   if(cancelled)input.cancel(code);
+   else input.release(code);
+  }
+  control.addEventListener('pointerup',e=>finishPointer(e));
+  control.addEventListener('pointercancel',e=>finishPointer(e,true));
+  control.addEventListener('lostpointercapture',e=>finishPointer(e));
+  // On browsers without capture, do not leave an indefinitely held button.
+  control.addEventListener('pointerleave',e=>{
+    if(!control.hasPointerCapture?.(e.pointerId))finishPointer(e);
+  });
+  control.addEventListener('blur',()=>control.classList.remove('is-pressed'));
   controls.append(control);
+ }
+ if(game.id==='maze'){
+  // A physical-style joystick can be dragged in one gesture. Four explicit
+  // buttons remain for keyboard/screen-reader use and precise one-tile taps.
+  const stick=richButton('●',()=>{},'retro-stick-knob');
+  stick.setAttribute('aria-label','Drag joystick in any direction to steer the detective');
+  stick.setAttribute('title','Drag to steer; arrow buttons also work');
+  stick.style.touchAction='none';
+  let activePointer=null,lastDirection='N';
+  function moveStick(e){
+    if(activePointer!==e.pointerId||current?.game!=='maze')return;
+    const box=controls.getBoundingClientRect();
+    const dx=e.clientX-(box.left+box.width/2);
+    const dy=e.clientY-(box.top+box.height/2);
+    const dir=retroStickDirection(dx,dy);
+    const [x,y]=retroStickOffset(dx,dy);
+    stick.style.setProperty('--stick-x',x+'px');
+    stick.style.setProperty('--stick-y',y+'px');
+    if(dir!=='N'&&dir!==lastDirection){
+      if(lastDirection!=='N')input.release(lastDirection);
+      input.press('maze',dir);lastDirection=dir;
+    }
+  }
+  function releaseStick(e){
+    if(activePointer!==e.pointerId)return;
+    activePointer=null;
+    if(lastDirection!=='N')input.release(lastDirection);
+    lastDirection='N';
+    stick.classList.remove('is-pressed');
+    stick.style.setProperty('--stick-x','0px');
+    stick.style.setProperty('--stick-y','0px');
+  }
+  stick.addEventListener('pointerdown',e=>{
+    if(current?.game!=='maze'||activePointer!==null)return;
+    e.preventDefault();activePointer=e.pointerId;
+    stick.setPointerCapture?.(e.pointerId);
+    stick.classList.add('is-pressed');
+    moveStick(e);
+  });
+  stick.addEventListener('pointermove',moveStick);
+  for(const name of ['pointerup','pointercancel','lostpointercapture'])
+    stick.addEventListener(name,releaseStick);
+  controls.append(stick);
  }
  const begin=richButton('Start verified round',()=>void start(game.id),'retro-begin');
  const end=richButton('Leave round',()=>abandon(),'retro-end');
@@ -296,6 +360,7 @@ async function start(id){
   runId=received.run_id;current=initialRetro(id,received.seed);
   actions='';input.reset();confirmed='';
   renderGame(current);
+  root.querySelector('.retro-canvas')?.focus({preventScroll:true});
   status('Round underway. Score stays unverified until the server checks your full run.');
   ticker=document.hidden?null:setInterval(tick,RETRO_GAME_RULES[id].interval);
  }catch(error){
