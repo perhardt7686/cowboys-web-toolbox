@@ -32,7 +32,7 @@ test('original family arcade games remain playable, with score backend intact',(
   assert.ok(Object.hasOwn(titleProfiles,id));
   assert.match(nav,new RegExp('  '+id+':'));
  }
- assert.match(html,/commons-retro-arcade\.mjs\?v=retro11/);
+ assert.match(html,/commons-retro-arcade\.mjs\?v=retro12/);
  assert.match(retro,/community_retro_start/);
  assert.match(retro,/community_retro_finish/);
  assert.match(retro,/community_retro_state/);
