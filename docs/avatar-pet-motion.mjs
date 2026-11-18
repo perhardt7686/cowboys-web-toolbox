@@ -67,7 +67,7 @@ export function petMotionFrame({species='woodland',move='hop',action='play',
     const tick=Math.round(p*8)/8;
     acting.yaw=energy*Math.sin(tick*6*Math.PI)*.21;
     acting.roll=energy*Math.sin(tick*4*Math.PI)*.075;
-    acting.bob=doubleStep*.021;
+    acting.bob=doubleStep*.021+clock*.004;
     acting.forward=energy*.03;
   }else{
     // Ghosts, aquatic oddities and floating reptiles drift, not trot.
