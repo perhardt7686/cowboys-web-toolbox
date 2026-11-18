@@ -167,11 +167,14 @@ async def fit(page, game, *, driving=False):
           right:r.right,top:r.top,bottom:r.bottom};
       });
       return {overflow: dialog.scrollWidth - dialog.clientWidth, width:grid.width, height:grid.height,
-        layout:document.documentElement.scrollWidth-innerWidth, dlg:dlg.toJSON(), pads, driving};
+        layout:document.documentElement.scrollWidth-innerWidth, dlg:dlg.toJSON(), bounds:grid.toJSON(), pads, driving};
     }""", driving)
     assert size['overflow'] <= 2 and size['layout'] <= 2, size
     assert size['width'] >= 180 and size['height'] >= 112, size
     assert abs(size['width'] / size['height'] - (4 / 3)) <= 0.035, size  # 320x200 DOS pixels displayed at 4:3
+    if not driving:  # Garage, engine bay and diner should never crop on short phones.
+        assert size['bounds']['top'] >= size['dlg']['top'] - 2, size
+        assert size['bounds']['bottom'] <= size['dlg']['bottom'] + 2, size
     if driving:
         for pad in size['pads']:
             assert pad['min'] >= 43 and pad['height'] >= 44, size
