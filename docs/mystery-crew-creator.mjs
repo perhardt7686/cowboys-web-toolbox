@@ -167,7 +167,7 @@ async function initializeAccount(){
    silhouette instead of tinting a generic coat or pretending it is equipped. */
 function renderWearables(member){
  const outfitArt={
- detective:'<path d="M43 184L64 197 78 229 92 198 128 185 142 210 112 226 117 314 60 319 67 226Z" fill="#8a6a46" opacity=".88" stroke="#38303b" stroke-width="6"/><path d="M66 195L80 229 95 198 M83 226L90 316" fill="none" stroke="#f2d3a3" stroke-width="5"/>',
+ detective:'<path d="M43 184L64 197 78 229 92 198 128 185 142 210 112 226 117 314 60 319 67 226Z" fill="#ed7c31" opacity=".9" stroke="#38303b" stroke-width="6"/><path d="M66 195L80 229 95 198 M83 226L90 316" fill="none" stroke="#f2d3a3" stroke-width="5"/>',
  explorer:'<path d="M40 186L66 194 85 218 110 192 133 185 133 306 44 308Z" fill="#537444" stroke="#313a30" stroke-width="6"/><path d="M53 241H75V263H53Z M104 243H125V267H104Z" fill="#b4a06b" stroke="#354333" stroke-width="4"/><path d="M87 226V306" stroke="#e8c47e" stroke-width="4"/>',
  viking:'<path d="M42 177L62 191 118 190 142 178 156 215 140 248 127 309 50 309 32 238 25 213Z" fill="#93775c" stroke="#30313e" stroke-width="8"/><path d="M48 192L24 225 32 246 64 228 M128 190L157 220 147 249 118 230" fill="#c9a575" stroke="#3c3941" stroke-width="8"/><path d="M67 212L113 213 118 270 65 271Z" fill="#748b94" stroke="#333641" stroke-width="5"/>',
  pilot:'<path d="M37 192L57 180 77 199 113 199 135 181 152 196 134 320 39 321Z" fill="#785435" stroke="#35303a" stroke-width="8"/><path d="M60 185L78 228 92 203 113 229 130 184" fill="none" stroke="#d9b07a" stroke-width="8"/><path d="M44 238H70 M108 238H132" stroke="#ce985f" stroke-width="5"/>',
