@@ -73,6 +73,8 @@ test('new portraits replace old forum profile pictures without trusting user SVG
  const profile=read('community-profiles.mjs');
  assert.match(profile,/mysteryCrewPortraitSVG/);
  assert.match(profile,/community_mystery_crew_portraits/);
+ assert.match(profile,/row\.crew_character/);
+ assert.match(profile,/data\[0\]\.crew_character/);
  assert.doesNotMatch(profile,/const inspect=p\.avatar_display/);
 });
 test('new creator page loads same family login and advertises real sync',()=>{
