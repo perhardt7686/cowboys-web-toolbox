@@ -26,3 +26,18 @@ test('1989-style garage car nameplate and original selector gears remain usable'
   assert.match(input,/includes\(INPUT\.brake\)\s*\?\s*INPUT\.down\s*:\s*INPUT\.up/);
   assert.match(game,/Original-style Space shifts up with gas or down with brake/);
 });
+
+test('1989 repair clicks are on-art with no duplicate bolt menu or iOS title popup',()=>{
+  assert.match(game,/hotspot\(label,x-11,y-10,22,20,\(\)=>turnFastener/);
+  assert.doesNotMatch(game,/mechanics\.append\(action\(label,wrench/);
+  assert.doesNotMatch(game,/node\.title = label;/);
+  assert.match(game,/Original Street Rod reference card: number keys 1-9/);
+  assert.match(css,/-webkit-touch-callout:none/);
+  assert.match(css,/hot-rod-assembly-picker/);
+});
+
+test('game-art hotspots never turn into opaque hover or pressed rectangles',()=>{
+  assert.match(css,/button\.hot-rod-hotspot:hover[\s\S]*button\.hot-rod-hotspot:active/);
+  assert.match(css,/button\.hot-rod-hotspot\.is-held\s*\{[\s\S]*?background:transparent;/);
+  assert.match(css,/button\.hot-rod-hotspot:focus-visible\s*\{[\s\S]*?background:transparent;/);
+});

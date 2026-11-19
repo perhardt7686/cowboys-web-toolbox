@@ -242,10 +242,22 @@ async def campaign_flow(page, name, *, touch):
     await game.get_by_role('button',name='Open the hood').click()
     await scene(game,'workbench')
     await expect(game.get_by_role('heading',name=re.compile('Carburetor|Carter',re.I))).to_be_visible()
+    if not touch:
+        await game.get_by_role('button',name='Open parts shelf',exact=True).hover()
+    # The general :hover rule previously painted opaque #41416a rectangles
+    # on invisible canvas hotspots, obscuring the engine bolt counter.
+    hotspot_backgrounds = await game.locator('.hot-rod-hotspot').evaluate_all(
+        '(nodes) => nodes.map(node => getComputedStyle(node).backgroundColor)'
+    )
+    assert hotspot_backgrounds and all(
+        color == 'rgba(0, 0, 0, 0)' for color in hotspot_backgrounds
+    ), f'Art hotspots must stay transparent: {hotspot_backgrounds}'
     await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-engine.png')
-    wrench=game.locator('.hot-rod-wrench')
-    await game.locator('.hot-rod-fastener').first.click()
-    await expect(wrench.get_by_role('button',name='Remove bolt 1',exact=True)).to_be_visible()
+    fasteners=game.locator('.hot-rod-fastener')
+    await expect(fasteners).to_have_count(4)
+    assert await game.locator('.hot-rod-panel').get_by_role('button',name='Loosen bolt 1').count() == 0
+    await fasteners.first.click()
+    await expect(game.get_by_role('button',name='Remove bolt 1',exact=True)).to_be_visible()
     assert await page.evaluate("fixture.received().filter(call=>call.type==='bolt').length") == 0
     await page.evaluate('fixture.interrupt()')
     await game.locator('.hot-rod-fastener').first.click()
@@ -268,53 +280,61 @@ async def campaign_flow(page, name, *, touch):
     await expect(game.locator('.hot-rod-bank')).to_contain_text('$370')
     await game.get_by_role('button',name='Open the hood').click()
     await expect(game.get_by_text('1 loose',exact=False)).to_be_visible()
-    await wrench.get_by_role('button',name='Seat bolt 1',exact=True).click()
-    await wrench.get_by_role('button',name='Tighten bolt 1',exact=True).click()
-    await wrench.get_by_role('button',name='Torque bolt 1',exact=True).click()
+    await game.get_by_role('button',name='Seat bolt 1',exact=True).click()
+    await game.get_by_role('button',name='Tighten bolt 1',exact=True).click()
+    await game.get_by_role('button',name='Torque bolt 1',exact=True).click()
+    await expect(game.get_by_text('0 loose',exact=False)).to_be_visible()
+    # The reference card's number keys operate those same physical bolts.
+    await page.keyboard.press('2')
+    await expect(game.get_by_role('button',name='Remove bolt 2',exact=True)).to_be_visible()
+    await page.keyboard.press('2')
+    await expect(game.get_by_text('1 loose',exact=False)).to_be_visible()
+    for bolt_label in ('Seat bolt 2','Tighten bolt 2','Torque bolt 2'):
+        await game.get_by_role('button',name=bolt_label,exact=True).click()
     await expect(game.get_by_text('0 loose',exact=False)).to_be_visible()
 
     work=game.locator('.hot-rod-panel')
     await work.get_by_role('combobox',name='Work area').select_option('engine')
     await expect(work.get_by_text('Remove the carburetor and intake to reach the engine mounts.')).to_be_visible()
-    await expect(wrench.get_by_role('button')).to_have_count(0)
+    await expect(game.locator('.hot-rod-fastener')).to_have_count(0)
     await work.get_by_role('combobox',name='Work area').select_option('carb')
     for bolt in range(1,5):
-        await wrench.get_by_role('button',name=f'Loosen bolt {bolt}',exact=True).click()
-        await wrench.get_by_role('button',name=f'Remove bolt {bolt}',exact=True).click()
+        await game.get_by_role('button',name=f'Loosen bolt {bolt}',exact=True).click()
+        await game.get_by_role('button',name=f'Remove bolt {bolt}',exact=True).click()
     await expect(work.get_by_role('combobox',name='Work area')).to_have_value('manifold')
     if touch:
         for bolt in range(1,7):
-            await wrench.get_by_role('button',name=f'Loosen bolt {bolt}',exact=True).click()
-            await wrench.get_by_role('button',name=f'Remove bolt {bolt}',exact=True).click()
+            await game.get_by_role('button',name=f'Loosen bolt {bolt}',exact=True).click()
+            await game.get_by_role('button',name=f'Remove bolt {bolt}',exact=True).click()
         await expect(work.get_by_role('combobox',name='Work area')).to_have_value('engine')
         for bolt in range(1,7):
-            await wrench.get_by_role('button',name=f'Loosen bolt {bolt}',exact=True).click()
-            await wrench.get_by_role('button',name=f'Remove bolt {bolt}',exact=True).click()
-        await expect(work.get_by_text('Unclip the ignition lead to lift the block.')).to_be_visible()
-        await work.get_by_role('button',name='Disconnect ignition',exact=True).click()
-        await expect(work.get_by_role('button',name='Choose a spare',exact=True)).to_be_visible()
+            await game.get_by_role('button',name=f'Loosen bolt {bolt}',exact=True).click()
+            await game.get_by_role('button',name=f'Remove bolt {bolt}',exact=True).click()
+        await expect(work.get_by_text('Tap the ignition lead to disconnect it.')).to_be_visible()
+        await game.get_by_role('button',name='Disconnect ignition lead',exact=True).click()
+        await expect(work.get_by_text('Select PARTS on the engine display to fit a compatible spare.')).to_be_visible()
         for slot,length in [('engine',6),('manifold',6)]:
             await work.get_by_role('combobox',name='Work area').select_option(slot)
-            await work.get_by_role('button',name='Parts',exact=True).click()
+            await game.get_by_role('button',name='Open parts shelf',exact=True).click()
             await expect(game).to_have_attribute('data-bay-mode','shelf')
             await work.get_by_role('button',name='Change',exact=True).click()
             for bolt in range(1,length+1):
-                await wrench.get_by_role('button',name=f'Tighten bolt {bolt}',exact=True).click()
-                await wrench.get_by_role('button',name=f'Torque bolt {bolt}',exact=True).click()
+                await game.get_by_role('button',name=f'Tighten bolt {bolt}',exact=True).click()
+                await game.get_by_role('button',name=f'Torque bolt {bolt}',exact=True).click()
             if slot=='engine':
-                await work.get_by_role('button',name='Connect ignition',exact=True).click()
-    await work.get_by_role('button',name='Parts',exact=True).click()
+                await game.get_by_role('button',name='Connect ignition lead',exact=True).click()
+    await game.get_by_role('button',name='Open parts shelf',exact=True).click()
     await expect(work.get_by_role('combobox',name='Work area')).to_have_value('carb')
     await work.get_by_role('button',name='Change',exact=True).click()
     for bolt in range(1,5):
-        await wrench.get_by_role('button',name=f'Tighten bolt {bolt}',exact=True).click()
-        await wrench.get_by_role('button',name=f'Torque bolt {bolt}',exact=True).click()
-    await work.get_by_role('button',name='Tune',exact=True).click()
+        await game.get_by_role('button',name=f'Tighten bolt {bolt}',exact=True).click()
+        await game.get_by_role('button',name=f'Torque bolt {bolt}',exact=True).click()
+    await game.get_by_role('button',name='Tune engine',exact=True).click()
     await expect(work.get_by_role('heading',name='Timing belt')).to_be_visible()
     await work.get_by_role('button',name='↓ Advance timing',exact=True).click()
     await work.get_by_role('button',name='Done',exact=True).click()
     await expect(game.get_by_role('status')).to_contain_text('Ignition timing set to 5°.')
-    await work.get_by_role('button',name='Done',exact=True).click()
+    await game.get_by_role('button',name='Close the hood',exact=True).click()
     await scene(game,'garage')
     await game.get_by_role('button',name='Wall calendar').click()
     await scene(game,'calendar')
