@@ -1,8 +1,9 @@
-/* Mystery Crew Creator
- * New product and visuals, independent of the previous character creator.
- * Explicitly local-only user state; zero remote writes, no fake server awards.
- */
+/* Mystery Crew Creator: family-account sync is server-authoritative. 
+ * The local-only preview fixture works only on localhost test builds. */
+import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 const KEY='cowboy-mystery-crew-creator-v1';
+const isPreview=new URLSearchParams(location.search).get('preview')==='1'&&['localhost','127.0.0.1'].includes(location.hostname);
+let account=null,accountReady=isPreview,revision=0,busy=false;
 const app=document.getElementById('mc-app'),$=id=>document.getElementById(id);
 const themes=['#ef792f','#69a55e','#315fa2','#cc5654','#6a5588','#a87640','#2c8e97','#e3c36c'];
 const skins=['#f0b989','#c98760','#ab6948','#6e432e','#f6d2ae','#d9a27b'];
@@ -46,6 +47,7 @@ const choices={outfits:'outfit',hats:'hat',gear:'gear',pets:'pet',vehicles:'vehi
 const unlockedInitial=['detective','explorer','outdoors','fedora','cap','binoculars','dog','cat','van','sunlit'];
 const fresh=()=>({version:1,crew:[starter()],active:'crew-1',coins:60,xp:0,unlocked:[...unlockedInitial],rewardedDesigns:[]});
 function read(){
+ if(!isPreview)return fresh();
  try{const raw=localStorage.getItem(KEY);if(!raw)return fresh();
   const saved=JSON.parse(raw);if(saved?.version!==1||!Array.isArray(saved.crew)||!saved.crew.length)return fresh();
   const crew=saved.crew.slice(0,6).map((v,i)=>({...starter(i+1),...v,id:String(v.id||('crew-'+(i+1))).slice(0,30),name:String(v.name||'Crew member').slice(0,28)}));
@@ -99,10 +101,65 @@ function portrait(member){
  '<path d="M46 70Q58 82 72 69" fill="none" stroke="#6c4744" stroke-width="4"/></svg>';
 }
 function writeState(){
+ if(!isPreview)return false;
  try{localStorage.setItem(KEY,JSON.stringify(draft));state=structuredClone(draft);savedSnapshot=JSON.stringify(state);return true;}
  catch{$('mc-status').textContent='Browser storage unavailable. Keep this page open or enable local storage.';return false;}
 }
 function notice(s){$('mc-status').textContent=s;}
+function lockEditor(lock){
+ for(const element of document.querySelectorAll('.mc-app button,.mc-app select'))element.disabled=lock;
+ $('mc-help').disabled=false;
+}
+function syncServer(data,{preserveDraft=false}={}){
+ if(!data||!Array.isArray(data.crew)||!data.crew.length)throw new Error('Family character data was missing.');
+ revision=Number(data.revision)||0;
+ const normalized={version:1,crew:data.crew,active:data.active,coins:data.coins,xp:data.xp,
+   unlocked:data.unlocked,rewardedDesigns:data.rewardedDesigns};
+ state=structuredClone(normalized);savedSnapshot=JSON.stringify(state);
+ if(preserveDraft){
+   draft.coins=normalized.coins;draft.xp=normalized.xp;draft.unlocked=[...normalized.unlocked];
+   draft.rewardedDesigns=[...normalized.rewardedDesigns];
+ }else draft=structuredClone(state);
+ render();
+}
+async function commitRPC(name,args,{preserveDraft=false}={}){
+ if(!accountReady||!account)throw new Error('Log in to save your family crew.');
+ if(busy)throw new Error('A save is already running.');
+ busy=true;
+ try{
+   const result=await account.call(name,args);
+   syncServer(result,{preserveDraft});
+   window.dispatchEvent(new CustomEvent('mystery-crew-saved',{detail:{account:true}}));
+   return result;
+ }catch(error){
+   if(error?.code==='40001')notice('Your character was updated on another device. Reload this page before saving again.');
+   throw error;
+ }finally{busy=false;}
+}
+async function initializeAccount(){
+ if(isPreview){notice('Local browser test preview. No real family records are changed.');return;}
+ lockEditor(true);
+ notice('Connecting your family account and loading your crew…');
+ try{
+   account=await connectMysteryCrew();
+   accountReady=true;
+   syncServer(account.initial);
+   const dot=document.querySelector('.mc-save-indicator');
+   if(dot){dot.title='Saved to your approved family account';dot.innerHTML='FAMILY ACCOUNT <b>● SYNCED</b>';}
+   notice('Your crew is connected to your family account. Changes sync across your devices when saved.');
+   lockEditor(false);
+   account.client.auth.onAuthStateChange(event=>{
+     if(event==='SIGNED_OUT'){accountReady=false;lockEditor(true);notice('Signed out. Open the Family Message Board to sign in again.');}
+   });
+ }catch(error){
+   accountReady=false;lockEditor(true);
+   const reason=error?.code==='LOGIN_REQUIRED'?'Please sign in on the Family Message Board first.':(error?.message||'Connection unavailable');
+   notice(reason+' No changes can be saved while disconnected.');
+   const link=document.createElement('a');
+   link.href='./community.html';link.textContent='Sign in to Family Message Board';link.className='mc-signin-link';
+   $('mc-status').append(document.createTextNode(' '),link);
+ }
+}
 
 /* Authored, item-specific character overlays. Each accessory has its own
    silhouette instead of tinting a generic coat or pretending it is equipped. */
@@ -224,33 +281,40 @@ function render(){
  const dirty=JSON.stringify(draft)!==savedSnapshot;
  $('mc-save').textContent=dirty?'✓ Save Crew *':'✓ Save Crew';
 }
-function actionItem(item){
- const member=current(),isOwned=draft.unlocked.includes(item.id);
- if(!isOwned){
-  if(draft.coins<item.cost){notice('Earn coins by saving new looks. '+item.name+' costs '+item.cost+' device coins; you have '+draft.coins+'.');return;}
-  draft.coins-=item.cost;draft.unlocked.push(item.id);
-  if(!writeState())return;
-  notice('Unlocked '+item.name+' using device-only workshop coins.');
+async function actionItem(item){
+ if(!accountReady){notice('Sign in to your family account first.');return;}
+ const owned=draft.unlocked.includes(item.id);
+ if(!owned){
+   if(draft.coins<item.cost){notice('Save new looks to earn coins. '+item.name+' needs '+item.cost+' coins; you have '+draft.coins+'.');return;}
+   if(isPreview){
+     draft.coins-=item.cost;draft.unlocked.push(item.id);writeState();
+   }else{
+     await commitRPC('community_mystery_crew_unlock',{p_item:item.id,p_expected:revision},{preserveDraft:true});
+   }
+   notice('Unlocked '+item.name+' in your family account.');
  }
- const key=choices[item.type];
- if(key){member[key]=item.id;
-   if(item.type==='outfits')member.shirt=item.color;
- }
- notice('Previewing '+item.name+'. Press Save Crew to keep this look.');
+ const member=current(),key=choices[item.type];
+ if(key){member[key]=item.id;if(item.type==='outfits')member.shirt=item.color;}
+ notice('Previewing '+item.name+'. Press Save Crew to keep it across devices.');
  render();
 }
-document.addEventListener('click',event=>{
+document.addEventListener('click',async event=>{
  const el=event.target.closest('button');if(!el)return;
  if(el.dataset.crewId){draft.active=el.dataset.crewId;render();return;}
  if(el.dataset.color){current()[el.dataset.layer||'shirt']=el.dataset.color;render();notice((el.dataset.layer||'Jacket')+' color changed. Save to keep it.');return;}
- if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)actionItem(i);return;}
+ if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)try{await actionItem(i);}catch(error){notice(error?.message||'Item unlock failed.');}return;}
  if(el.dataset.view){view=el.dataset.view;setFilter(view);return;}
  if(el.dataset.jump){view=el.dataset.jump;setFilter(view);document.querySelector('.mc-market').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
  if(el.dataset.motion){
   motion=el.dataset.motion;app.dataset.motion=motion;
   for(const b of document.querySelectorAll('[data-motion]'))b.setAttribute('aria-pressed',String(b.dataset.motion===motion));
   if(!draft.rewardedDesigns.includes('motion:'+motion)&&motion!=='idle'){
-   draft.rewardedDesigns.push('motion:'+motion);draft.xp+=10;draft.coins+=5;writeState();renderStats();notice('Explored '+motion+'! +10 local XP, +5 local coins.');}
+    try{
+      if(isPreview){draft.rewardedDesigns.push('motion:'+motion);draft.xp+=10;draft.coins+=5;writeState();renderStats();}
+      else await commitRPC('community_mystery_crew_motion',{p_motion:motion,p_expected:revision},{preserveDraft:true});
+      notice('Explored '+motion+'! Your family account earned its one-time action reward.');
+    }catch(error){notice(error?.message||'Could not record the action reward.');}
+  }
   return;
  }
  switch(el.id){
@@ -275,11 +339,19 @@ document.addEventListener('click',event=>{
   case 'mc-zoom-in':zoom=Math.min(1.5,Math.round((zoom+.1)*100)/100);updateScene();break;
   case 'mc-zoom-out':zoom=Math.max(.8,Math.round((zoom-.1)*100)/100);updateScene();break;
   case 'mc-save':{
-   const design=draft.crew.map(m=>[m.id,m.shirt,m.outfit,m.hat,m.gear,m.pet,m.vehicle,m.scene].join(':')).join('|');
-   if(!draft.rewardedDesigns.includes('look:'+design)){
-    draft.rewardedDesigns.push('look:'+design);draft.xp+=25;draft.coins+=15;
-   }
-   if(writeState()){notice('Saved on this device. +25 XP and 15 coins for each new look; no shared account sync yet.');render();}
+   try{
+     if(isPreview){
+       const design=draft.crew.map(m=>[m.id,m.shirt,m.outfit,m.hat,m.gear,m.pet,m.vehicle,m.scene].join(':')).join('|');
+       if(!draft.rewardedDesigns.includes('look:'+design)){
+         draft.rewardedDesigns.push('look:'+design);draft.xp+=25;draft.coins+=15;
+       }
+       if(writeState())notice('Saved in the local test preview.');
+     }else{
+       await commitRPC('community_mystery_crew_save',{p_crew:draft.crew,p_active:draft.active,p_expected:revision});
+       notice('Mystery Crew saved to your family account. Your other devices will load this look.');
+     }
+     render();
+   }catch(error){notice(error?.message||'Could not save crew.');}
    break;
   }
   case 'mc-help':$('mc-info').showModal();break;
@@ -301,6 +373,5 @@ $('mc-rename-form').addEventListener('submit',e=>{
 window.addEventListener('beforeunload',e=>{
  if(JSON.stringify(draft)!==savedSnapshot){e.preventDefault();e.returnValue='';}
 });
-const params=new URLSearchParams(location.search);
-if(params.get('preview')==='1')notice('Design preview: device-local characters only. No family account data is loaded or changed.');
 app.dataset.motion='idle';setFilter('character');render();
+void initializeAccount();
