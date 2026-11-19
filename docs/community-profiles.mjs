@@ -46,7 +46,7 @@ export function createProfileStudio(ctx){
     if(profiles.error)return;
     for(const id of unique){cache.delete(id);mysteryPortraits.delete(id);}
     for(const p of profiles.data||[])cache.set(p.user_id,{...p,avatar_display:null});
-    if(!portraits.error)for(const row of portraits.data||[])mysteryPortraits.set(row.user_id,row.character||BASIC_MYSTERY_CREW);
+    if(!portraits.error)for(const row of portraits.data||[])mysteryPortraits.set(row.user_id,row.crew_character||BASIC_MYSTERY_CREW);
   }
   function card(p,editor=false,draftImage=''){const links=[...(p.website?[{label:'My website',url:p.website}]:[]),...(p.links||[])].filter(l=>safeHttps(l.url)).map(l=>({...l,url:safeHttps(l.url)}));return `<article class="member-card theme-${esc(p.theme)} layout-${esc(p.details?.layout||'classic')}"><div class="profile-cover cover-${esc(p.cover)}"><span class="cover-mark" aria-hidden="true">✳</span><span class="cover-caption">THE COMMONS / ${p.badge?'COWBOY’S CORNER':'MEMBER FIELD NOTES'}</span></div><div class="member-card-body">${avatar(p,'avatar-large',draftImage)}<div class="profile-heading"><h3>${esc(p.display_name)}</h3>${p.badge?'<span class="profile-badge">Owner</span>':''}</div>${p.handle?`<p class="profile-handle">@${esc(p.handle)}</p>`:''}<p class="profile-headline">${esc(p.headline||'A little curious. In good company.')}</p>${p.location?`<p class="profile-location">⌖ ${esc(p.location)}</p>`:''}${p.bio?`<div class="profile-bio">${renderBody(p.bio)}</div>`:'<p class="profile-placeholder">A little about you goes here.</p>'}${extrasCard(p)}<div class="profile-interests">${(p.interests||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>${links.length?`<div class="profile-links">${links.map(link=>`<a href="${esc(link.url)}" target="_blank" rel="noopener noreferrer">${esc(link.label)} ↗</a>`).join('')}</div>`:''}<p class="profile-card-foot">${editor?'YOUR LIVE PREVIEW':p.joined_at?'IN GOOD COMPANY SINCE '+new Date(p.joined_at).getFullYear():'COME CURIOUS. LEAVE INSPIRED.'}</p></div></article>`;}
   function extrasCard(p){const d=p.details||{};return `${d.share_about?`<div class="profile-extras">${d.title?`<strong>${esc(d.title)}</strong>`:''}${d.status?`<p class="member-status">${esc(d.status)}</p>`:''}${[d.pronouns,d.occupation].filter(Boolean).length?`<p>${[d.pronouns,d.occupation].filter(Boolean).map(esc).join(' · ')}</p>`:''}${d.skills?.length?`<h4>Know-how</h4><div class="profile-interests">${d.skills.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}${d.favorite_tools?.length?`<h4>Favorite tools</h4><p>${d.favorite_tools.map(esc).join(' · ')}</p>`:''}</div>`:''}${d.share_signature&&d.signature?`<div class="forum-signature">${forumBody(d.signature)}</div>`:''}`;}
@@ -643,7 +643,7 @@ export function createProfileStudio(ctx){
     if(approved()&&!ctx.isPreview&&ctx.client()){
       const {data,error}=await ctx.client().rpc('community_mystery_crew_portraits',{p_members:[p.user_id]});
       if(p.user_id!==ctx.state.member?.user_id)return;
-      if(!error&&data?.[0])mysteryPortraits.set(p.user_id,data[0].character);
+      if(!error&&data?.[0])mysteryPortraits.set(p.user_id,data[0].crew_character);
     }
     cache.set(p.user_id,{...p,avatar_display:null});
     applyReader(p.details);
