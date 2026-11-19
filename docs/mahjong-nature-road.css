@@ -145,3 +145,27 @@ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels
 }
 body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
  .mahjong-nature-road{width:100%;max-width:920px;margin:10px auto}
+
+/* Compact persistent progress inside the Mahjong playboard, including Arcade play scene. */
+body.community-page .mahjong-journey-mini{
+ display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;
+ padding:7px 9px;margin:0 0 7px;border:2px solid #cfbf7c;border-radius:12px;
+ background:linear-gradient(120deg,#fffae6,#e2f5dc);color:#27503a;
+ min-width:0;font:850 11px/1.3 system-ui,sans-serif;
+}
+body.community-page #mahjong-journey-mini-name{flex:1 1 130px}
+body.community-page #mahjong-journey-mini-progress{width:min(110px,27%);height:10px;accent-color:#277f57}
+body.community-page #mahjong-journey-mini-map{
+ min-height:37px;padding:6px 9px;cursor:pointer;flex:0 0 auto;
+ border:2px solid #4b7e56;border-radius:9px;background:#275f47;color:#fff8db;
+ font:900 11px/1.2 system-ui,sans-serif;
+}
+body.community-page #mahjong-journey-mini-map:focus-visible{outline:3px solid #9b5cc8;outline-offset:2px}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] .mahjong-journey-mini{
+ flex:0 0 auto!important;min-height:36px;margin:0!important;padding:3px 6px;font-size:10px
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-journey-mini-map{min-height:32px;font-size:10px}
+@media(max-width:390px){
+ body.community-page .mahjong-journey-mini{gap:5px}
+ body.community-page #mahjong-journey-mini-progress{flex:1;min-width:45px}
+}

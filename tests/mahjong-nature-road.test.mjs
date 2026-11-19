@@ -89,3 +89,16 @@ test('mobile-first map has accessible colors, no art dependency or forced motion
  assert.match(profile,/progress\.max=5000/);
  assert.match(profile,/campaign_5000/);
 });
+
+test('on-board progress ribbon and full garden map share server-saved progression',()=>{
+ const game=src('docs/commons-mahjong.mjs');
+ const css=src('docs/mahjong-nature-road.css');
+ assert.match(game,/id="mahjong-journey-mini"/);
+ assert.match(game,/id="mahjong-journey-mini-progress"/);
+ assert.match(game,/mahjong-journey-mini-name/);
+ assert.match(game,/arcadeMahjongNavigate\('play'\)/);
+ assert.match(game,/arcadeMahjongNavigate\('levels'\)/);
+ assert.match(game,/popup\.querySelectorAll\('button'\)/);
+ assert.match(css,/\.mahjong-journey-mini/);
+ assert.match(css,/prefers-reduced-motion:reduce/);
+});
