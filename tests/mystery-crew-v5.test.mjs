@@ -40,6 +40,8 @@ test('non-matching colors, invented recipes, hats and side views fall back safel
  }
  assert.equal(paintedRecipe(m,{angle:90}),null);
  assert.equal(paintedRecipe(m,{angle:180}),null);
+ for(const motion of ['wave','cheer','think','run','action'])
+  assert.equal(paintedRecipe(m,{motion}),null,'Keep the established animated rig for '+motion);
  assert.equal(paintedRecipe({}),null);
 });
 test('every sprite is a genuine independently decodable 430×574 painterly WebP',()=>{
