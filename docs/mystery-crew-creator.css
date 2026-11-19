@@ -357,3 +357,40 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
  .mc-topnav button{border-width:2px;box-shadow:0 2px #01243e}
  .mc-cards .mc-card{border-width:1.5px}
 }
+
+/* Source rail proportions and honest, distinguishable unsaved starter previews. */
+.mc-reference-portrait{
+ border-style:dashed;
+ border-color:#fff4d8;
+ background:linear-gradient(125deg,#8ec4dc,#4d8aa7);
+ position:relative;
+}
+.mc-reference-portrait::after{
+ content:"TRY";
+ position:absolute;
+ bottom:2px;
+ right:2px;
+ font-size:.48rem;
+ line-height:1;
+ letter-spacing:.02em;
+ border-radius:4px;
+ color:#fff5d6;
+ padding:2px 3px;
+ background:#0a4779df;
+}
+.mc-reference-portrait:hover{
+ border-color:#ffdd68;
+ filter:saturate(1.09);
+}
+@media(min-width:981px){
+ .mc-layout{
+  grid-template-columns:clamp(118px,10vw,168px) minmax(0,1.23fr) minmax(0,.98fr);
+  gap:9px;
+ }
+ .mc-roster h2{font-size:clamp(.95rem,1.15vw,1.35rem)}
+ .mc-roster .mc-portraits{grid-template-rows:repeat(5,minmax(0,1fr))}
+ .mc-roster .mc-portrait svg{max-height:none}
+}
+@media(max-width:650px){
+ .mc-reference-portrait::after{font-size:.45rem;right:1px;bottom:1px;padding:1px 2px}
+}
