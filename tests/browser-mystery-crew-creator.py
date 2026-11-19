@@ -21,7 +21,11 @@ async def verify(browser,width,height,label):
     await expect(page.locator('.mc-title-main')).to_contain_text('Mystery Crew')
     await expect(page.locator('#mc-scene')).to_be_visible()
     await expect(page.locator('#mc-scene')).to_have_attribute('data-painterly','ready',timeout=20000)
-    await expect(page.locator('#mc-painted-hero')).to_be_visible()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_be_visible(timeout=20000)
+    await expect(page.locator('#mc-scene')).to_have_attribute('data-crew-art-pack','ready',timeout=20000)
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-anchor','0')
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
+    await expect(page.locator('#mc-painted-hero')).to_be_hidden()
     await expect(page.locator('#mc-painted-hound')).to_be_visible()
     await expect(page.locator('#mc-scene')).to_have_attribute('data-scene-version','4',timeout=20000)
     await expect(page.locator('#mc-v4-seamless-workshop')).to_be_visible()
@@ -43,6 +47,7 @@ async def verify(browser,width,height,label):
         ...document.querySelectorAll('#mc-painted-van image'),
         ...document.querySelectorAll('#mc-painted-workshop image'),
         ...document.querySelectorAll('#mc-v4-seamless-workshop, #mc-v4-complete-van'),
+        ...document.querySelectorAll('#mc-v5-illustrated-image'),
         ...document.querySelectorAll('#mc-cards .mc-painted-outfit')
       ];
       const checks=await Promise.all(elements.map(async el=>{
@@ -57,7 +62,7 @@ async def verify(browser,width,height,label):
       return {count:elements.length,checks};
     }""")
     gallery_items=await page.locator('#mc-cards .mc-painted-outfit').count()
-    assert painted['count']==11+gallery_items,painted
+    assert painted['count']==12+gallery_items,painted
     assert all(x['ok'] for x in painted['checks']),'Painterly image missing/corrupted/CSP blocked: '+str(painted)
     await page.screenshot(path=str(REPORTS/f'mystery-crew-painted-fresh-{label}.png'),
                           full_page=False,animations='disabled')
@@ -79,6 +84,21 @@ async def verify(browser,width,height,label):
     await page.locator('#mc-cards [data-reference-look="juniper"]').click()
     await expect(page.locator('#mc-cards [data-reference-look="juniper"]')).to_have_attribute('aria-pressed','true')
     assert '#b8432a' in await page.locator('#mc-fidelity-head').inner_html()
+    # Different face / body with actual raster art, not the fallback vector.
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_be_visible()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-anchor','1')
+    before=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
+    await set_category(page,'outfits')
+    await page.locator('.mc-card[data-item="explorer"]').click()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','explorer')
+    after=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
+    assert before!=after,'Equip must change illustrated costume on center-stage body'
+    await page.locator('.mc-card[data-item="outdoors"]').click()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','outdoors')
+    await page.locator('.mc-card[data-item="detective"]').click()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
+    await set_category(page,'presets')
+
 
     # Five independently persisted, allowlisted face traits.
     for category,property_,value in [('faces','faceShape','round'),
@@ -91,6 +111,7 @@ async def verify(browser,width,height,label):
         await choice.click()
         await expect(choice).to_have_attribute('aria-pressed','true')
         if property_=='faceShape':
+            await expect(page.locator('#mc-v5-illustrated-actor')).to_be_hidden()
             await expect(page.locator('#mc-painted-hero')).to_be_hidden()
             assert await page.locator('#mc-actor').evaluate('el=>el.style.opacity')=='1','Changed face should show actual custom actor'
     assert await page.locator('#mc-fidelity-head circle').count()>=4 # irises, highlights and optional glasses
