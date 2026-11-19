@@ -154,8 +154,13 @@ export function syncPainterlyStage(member,options={}){
  pet.style.opacity=petPainted?'0':'1';
  const paintedVan=member.vehicle==='van';
  van.style.display=paintedVan?'':'none';
- vanBacking.style.display=paintedVan?'':'none';
- vectorVan.style.display=paintedVan?'none':'';
+ // Reuse the complete window/roof/wheel detailing as an underpainting.
+ // Its geometry is registered to the illustrated cutout so that the
+ // painted foreground and its transparent gaps form ONE continuous van.
+ // The flat backing panel is never displayed.
+ vanBacking.style.display='none';
+ vectorVan.style.display='';
+ vectorVan.setAttribute('transform',paintedVan?'translate(-60 -155) scale(1.55 1.34)':'');
  const zoom=Math.min(1.5,Math.max(.8,Number(options.zoom)||1));
  hero.setAttribute('transform','translate(399 270) scale('+zoom+') translate(-399 -270)');
  dog.setAttribute('transform','translate(626 375) scale('+zoom+') translate(-626 -375)');
