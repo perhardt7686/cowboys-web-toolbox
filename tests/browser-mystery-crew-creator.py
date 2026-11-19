@@ -137,6 +137,19 @@ async def verify(browser,width,height,label):
     await set_category(page,'outfits')
     await choose_item(page,'detective')
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
+    # Every V6 movement must remain real illustrated paint, not switch to SVG.
+    painted_actor=page.locator('#mc-v5-illustrated-actor')
+    for action,part in [('idle','torso'),('wave','arm-right'),('cheer','arm-left'),
+                        ('think','head'),('run','leg-left'),('action','torso')]:
+        await page.locator(f'.mc-performance [data-motion="{action}"]').click()
+        await expect(painted_actor).to_be_visible()
+        await expect(painted_actor).to_have_attribute('data-motion',action)
+        await expect(page.locator('#mc-scene')).to_have_attribute('data-crew-art','painted')
+        animated=await page.locator(f'#mc-v6-painted-rig [data-v6-part="{part}"]').evaluate(
+            'el => getComputedStyle(el).animationName')
+        assert animated.startswith('mc-v6-'),f'{action} did not animate painted {part}: {animated}'
+        await expect(page.locator('#mc-v6-painted-rig [data-v6-part] image')).to_have_count(7)
+    await page.locator('.mc-performance [data-motion="idle"]').click()
     await set_category(page,'presets')
 
 
