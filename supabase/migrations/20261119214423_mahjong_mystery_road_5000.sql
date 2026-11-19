@@ -3,7 +3,7 @@
 -- This file is deployed via Supabase migration only after CI succeeds.
 -- No new exposed tables, JWT changes, RLS bypass, external network or service keys.
 -- New badge names are whitelisted, not minted from user-supplied text.
-BEGIN;
+-- Supabase's migration executor wraps this script in its own transaction.
 ALTER TABLE public.community_mahjong_campaign DROP CONSTRAINT IF EXISTS community_mahjong_campaign_level_check;
 ALTER TABLE public.community_mahjong_campaign ADD CONSTRAINT community_mahjong_campaign_level_check CHECK (level between 1 and 5000);
 
@@ -145,4 +145,3 @@ begin
  'campaign_bonus_earned',bonus,'campaign_message',reason,'completed_level',r.level,
  'next_level',case when qualified then next_level else c.level end);
 end $function$;
-COMMIT;
