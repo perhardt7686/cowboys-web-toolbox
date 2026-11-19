@@ -12,13 +12,20 @@
 - **Right:** Warm cream collectible wardrobe gallery with large illustrated clothing cards and visible Equipped, Equip, Locked or Unlock states. All displayed currencies, progress and item states must be truthful; never fabricate shared/online rewards.
 - **Bottom:** Big illustrated category launchers for Outfits, Hats, Gear, Pets, Vehicles and Collections; generous 44px touch targets.
 - **Small-screen:** One real responsive creator, not a tiny legacy form: horizontally scrolling category navigation, stage first, roster and item gallery below, actions sticky or easily reachable, no clipping or horizontal page overflow.
-- **Data migration:** Cowboy explicitly allows abandoning previous characters and unlockables. Do not delete old backend records. New creator should not pretend that local demo progress is backed by server accounts. Account-scoped remote persistence can be added separately after safe rollout.
+- **Data migration:** Cowboy explicitly allows abandoning previous characters and unlockables. Do not delete old backend records. **Updated November 18:** Mystery Crew Creator now uses account-scoped Supabase persistence for approved family members, including their pets and unlockables; a local demo is allowed only on localhost. The new six-member starter rollout is complete in the database. Never show fake online currencies or confuse workshop coins with other arcade awards.
 
 ## Acceptance criteria
 
 1. Open the actual family-board avatar launcher and arrive at **Mystery Crew Creator**, not the old Dressing room.
 2. Screenshot desktop, 390px iPhone and 375px iPhone. Compare composition to uploaded reference: blue/gold banner, character stage, roster, illustrated equipment grid, bottom cards.
-3. Create and switch between characters; modify outfit, face/color and pet. Verify that animations and rotation work and changes survive reload in the same browser.
+3. Create and switch between characters; modify outfit, face/color and pet. Verify animations/rotation, and that character, outfit, pet and unlock state survive reload and follow the same approved family account across different devices.
 4. Ensure unlocks have explicit rules, no fake online/verified currency and no privileged backend writes.
 5. Verify existing family message board and games are unaffected. No Classic switch or embedded old avatar panel.
 6. Do not claim full original image fidelity until approved by Cowboy with side-by-side screenshots.
+
+## Mandatory account cutover
+
+- All approved family members receive one new Scout by server-side migration and approval trigger. Previous avatar mode, stored photographs, legacy V8 character and unlocked items are never used as the live portrait.
+- Forum author chips, profile cards and account menu avatars use only Mystery Crew character art. Account-sync row ownership is enforced with RLS; server-owned approval cannot be modified by clients.
+- New device loads cloud state, not whatever happened to be in old browser storage. Approved sign-in required on the public domain.
+- Retire public legacy creator previews and gallery routes after dependency audit; keep unrelated family games, achievements, and member profiles functional.
