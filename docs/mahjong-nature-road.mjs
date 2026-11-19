@@ -43,7 +43,7 @@ export function roadEncounter(level){
  const v=clampRoadLevel(level);
  if(v===MYSTERY_ROAD_TOTAL)return {kind:'crown',name:'Evergreen Crown',icon:'👑',description:'The final garden challenge'};
  if(v%ROAD_REGION_SIZE===0)return {kind:'gate',name:'Garden Gate',icon:'🏛️',description:'Conquer this region and open the next'};
- if(v%50===0)return {kind:'milestone',name:'Grand Bloom',icon:'🏆',description:'A major checkpoint and reward'};
+ if(v%50===0)return {kind:'milestone',name:'Grand Bloom',icon:'🏆',description:'A major scenic milestone, with another garden to explore'};
  if(v%25===0)return {kind:'milestone',name:'Bloom Arch',icon:'🌷',description:'A floral landmark'};
  return ROAD_ENCOUNTERS[(v*7+Math.floor(v/11))%ROAD_ENCOUNTERS.length];
 }
@@ -94,7 +94,7 @@ export function mountNatureRoad(container,{onPlay}={}){
  <p class="nature-road-footnote">Completed paths bloom. Future spaces can be previewed, but cannot be skipped. Garden art does not change tile matching rules or account progress.</p>`;
  container.append(root);
  const $=sel=>root.querySelector(sel);
- let snapshot={level:1,cleared:0,streak:0,run:null},windowStart=1,focusLevel=1;
+ let snapshot={level:1,cleared:0,streak:0,run:null},windowStart=1,focusLevel=1,initialized=false;
  const regionButtons=[];
  ROAD_REGIONS.forEach((r,i)=>{
   const b=button('nature-road-region-button',r.icon+' '+r.name);
@@ -124,6 +124,8 @@ export function mountNatureRoad(container,{onPlay}={}){
   $('#nature-road-region').textContent=region.flower+' '+region.name;
   $('#nature-road-flora').textContent=region.flora+' · '+region.fauna;
   $('#nature-road-creature').textContent=region.icon;
+  $('.nature-road-canopy-a').textContent=region.flower;
+  $('.nature-road-canopy-b').textContent=region.icon;
   const progress=roadProgress(snapshot.cleared);
   $('#nature-road-progress').textContent=count(progress.cleared)+' / '+count(progress.total);
   $('#nature-road-percent').textContent=progress.percent.toFixed(2)+'%';
@@ -163,7 +165,7 @@ export function mountNatureRoad(container,{onPlay}={}){
  $('#nature-road-play').addEventListener('click',()=>{if(focusLevel!==snapshot.level||snapshot.cleared>=MYSTERY_ROAD_TOTAL)return;onPlay?.(snapshot);});
  function update(next={}){
   const nextLevel=clampRoadLevel(next.level||1);
-  const initial=snapshot.level===1&&snapshot.cleared===0&&snapshot.run===null;
+  const initial=!initialized;initialized=true;
   const changed=nextLevel!==snapshot.level;
   snapshot={level:nextLevel,cleared:Math.max(0,Math.min(5000,Number(next.cleared)||0)),
    streak:Math.max(0,Number(next.streak)||0),run:next.run||null};

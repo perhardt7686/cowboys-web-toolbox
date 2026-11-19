@@ -78,7 +78,7 @@ body.community-page .mahjong-game button:focus-visible{outline:4px solid #d29438
 @media(prefers-reduced-motion:reduce){body.community-page .mahjong-hinted{animation:none}body.community-page .mahjong-chevron{transition:none}}
 
 
-/* Mahjong Mystery Road 1000-level campaign HUD v2 */
+/* Mystery Road 5,000-level botanical garden campaign HUD */
 body.community-page .mahjong-campaign{border:2px solid #ac7a48;border-radius:17px;background:linear-gradient(130deg,#fff1ce,#f4e1f5 70%,#dcf5e8);padding:clamp(12px,3vw,20px);margin:0 0 17px;color:#332345;box-shadow:0 3px 0 #b77a5238}
 body.community-page .mahjong-campaign-heading{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:9px}
 body.community-page .mahjong-campaign-heading h3{font:900 clamp(20px,4vw,28px)/1.15 system-ui,sans-serif;margin:4px 0 8px;color:#38264c}

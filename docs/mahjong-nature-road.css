@@ -134,3 +134,14 @@ body.community-page .nature-road-footnote{font:650 11px/1.5 system-ui,sans-serif
  body.community-page .nature-road-creature,body.community-page .nature-road-node[data-state=current]{animation:none!important}
  body.community-page .nature-road-node{transition:none!important}
 }
+
+/* The fullscreen Arcade's Levels scene must scroll through the whole campaign,
+   while the Play scene can keep the Mahjong tiles in one uncluttered viewport. */
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-inside > .mahjong-campaign{
+ display:block!important;overflow:auto!important;min-height:0!important;
+ max-height:100%!important;overscroll-behavior:contain;
+ scrollbar-color:#9bba9f #f8f2dc;
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ .mahjong-nature-road{width:100%;max-width:920px;margin:10px auto}
