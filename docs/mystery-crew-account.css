@@ -8,3 +8,32 @@
 }
 .mc-signin-link{font-weight:900;color:#ffda72;text-decoration:underline;text-underline-offset:3px}
 .mc-save-indicator b{color:#b9ebc5}
+
+
+/* Legacy avatar award showroom retired. This opens only Mystery Crew. */
+.community-page .family-mystery-crew-showcase{
+  display:flex;align-items:center;gap:14px;width:100%;margin:10px 0 20px;
+  border:3px solid #f2be42;border-radius:20px;padding:13px 16px;
+  background:linear-gradient(115deg,#063c70,#076e9a);
+  color:#fff7dc;text-decoration:none;box-shadow:0 6px 18px #032f5633;
+}
+.community-page .family-mystery-crew-symbol{
+  font-size:2.4rem;line-height:1;color:#ffd34b;
+}
+.community-page .family-mystery-crew-text{display:grid;gap:4px;flex:1}
+.community-page .family-mystery-crew-text strong{
+  font-size:clamp(1rem,2.2vw,1.35rem);color:#ffe15f;line-height:1.2;
+}
+.community-page .family-mystery-crew-text small{font-size:.82rem;line-height:1.45}
+.community-page .family-mystery-crew-arrow{
+  border-radius:10px;background:#f8cb2e;color:#183148;padding:9px 12px;
+  font-size:.85rem;font-weight:900;min-height:44px;display:grid;place-items:center;
+}
+.community-page .family-mystery-crew-showcase:focus-visible{
+  outline:3px solid #ffe77b;outline-offset:3px;
+}
+@media(max-width:540px){
+  .community-page .family-mystery-crew-showcase{gap:9px;padding:10px}
+  .community-page .family-mystery-crew-symbol{font-size:1.7rem}
+  .community-page .family-mystery-crew-arrow{font-size:.75rem;padding:7px}
+}
