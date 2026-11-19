@@ -180,6 +180,10 @@ async def fit(page, game, *, driving=False):
     if not driving:  # Garage, engine bay and diner should never crop on short phones.
         assert size['bounds']['top'] >= size['dlg']['top'] - 2, size
         assert size['bounds']['bottom'] <= size['dlg']['bottom'] + 2, size
+    if driving and not size['portrait']:
+        # Landscape race artwork must remain fully visible inside the viewport.
+        # A passing input test alone must not mask a cropped dashboard.
+        assert size['bounds']['top'] >= -2 and size['bounds']['bottom'] <= await page.evaluate('innerHeight') + 2, size
     if driving and size['portrait']:
         # No empty 170px letterbox strips inside the portrait racing modal.
         # The 4:3 picture follows the fixed header and the two-thumb deck
