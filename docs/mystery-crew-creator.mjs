@@ -249,7 +249,9 @@ function updateScene(){
  $('mc-character-name').textContent=m.name;
  const scale=angle===90||angle===270?.74:1;
  const mirror=angle===180?-1:1;
- actor.setAttribute('transform','translate(405 85) translate(90 254) scale('+(zoom*scale*mirror)+' '+zoom+') translate(-90 -254)');
+ const bodyProfiles={oval:[1,1],heart:[.96,1.02],round:[1.04,.98],square:[1.02,.99],narrow:[.91,1.06],broad:[1.1,.96]};
+ const proportions=bodyProfiles[m.faceShape]||bodyProfiles.oval;
+ actor.setAttribute('transform','translate(405 85) translate(90 254) scale('+(zoom*scale*mirror*proportions[0])+' '+(zoom*proportions[1])+') translate(-90 -254)');
  const rear=angle===180;
  $('mc-head').style.filter=rear?'brightness(.76)':'none';
  $('mc-vehicle').style.filter=m.vehicle==='jeep'?'hue-rotate(94deg)':m.vehicle==='camper'?'hue-rotate(-26deg) saturate(.8)':'none';
@@ -278,6 +280,14 @@ function renderColors(){
   b.setAttribute('aria-pressed',String(current()[layer]===color));row.append(b);
  }
 }
+const referenceLooks=[
+ {id:'scout',name:'Trail Scout',skin:'#f0b989',hair:'#904b28',...CREW_ANCHORS[0]},
+ {id:'juniper',name:'Copper Sleuth',skin:'#f4c8a9',hair:'#b8432a',...CREW_ANCHORS[1]},
+ {id:'finn',name:'Sunshine Scout',skin:'#f7cfa8',hair:'#e0b447',...CREW_ANCHORS[2]},
+ {id:'riley',name:'Bookish Detective',skin:'#ebbe99',hair:'#302b46',...CREW_ANCHORS[3]},
+ {id:'atlas',name:'Gentle Giant',skin:'#d69a77',hair:'#5c3424',...CREW_ANCHORS[4]},
+ {id:'wren',name:'Curly Adventurer',skin:'#bb8767',hair:'#342e32',...CREW_ANCHORS[5]}
+];
 const traitCategories={
  faces:{key:'faceShape',label:'Face Shape',options:CREW_OPTIONS.faceShape},
  haircuts:{key:'hairStyle',label:'Hairstyle',options:CREW_OPTIONS.hairStyle},
@@ -291,15 +301,15 @@ function pageSize(){
    window.matchMedia('(max-width:1380px)').matches?4:8;
 }
 function setFilter(next){
- const known=['faces','haircuts','eyes','expressions','details','outfits','hats','gear','pets','vehicles','collections','studio'];
- filter=next==='character'?'faces':known.includes(next)?next:'faces';
+ const known=['presets','faces','haircuts','eyes','expressions','details','outfits','hats','gear','pets','vehicles','collections','studio'];
+ filter=next==='character'?'presets':known.includes(next)?next:'presets';
  page=0;
  $('mc-market-filter').value=filter;
- const labels={faces:'Face Shapes',haircuts:'Hairstyles',eyes:'Eye Styles',expressions:'Expressions',details:'Face Details',
+ const labels={presets:'Crew Looks',faces:'Face Shapes',haircuts:'Hairstyles',eyes:'Eye Styles',expressions:'Expressions',details:'Face Details',
   outfits:'Outfits',hats:'Hats',gear:'Adventure Gear',pets:'Pets',vehicles:'Vehicles',studio:'Backdrops',collections:'Unlockables'};
  $('mc-market-title').textContent=labels[filter];
  for(const b of document.querySelectorAll('[data-view]')){
-  b.setAttribute('aria-pressed',String(b.dataset.view===filter||((b.dataset.view==='character')&&Boolean(traitCategories[filter]))));
+  b.setAttribute('aria-pressed',String(b.dataset.view===filter||((b.dataset.view==='character')&&(filter==='presets'||Boolean(traitCategories[filter])))));
  }
  for(const b of document.querySelectorAll('[data-jump]'))b.setAttribute('aria-pressed',String(b.dataset.jump===filter));
  renderCards();
@@ -307,14 +317,22 @@ function setFilter(next){
 function renderCards(){
  const panel=$('mc-cards');panel.replaceChildren();
  const trait=traitCategories[filter];
- const category=trait?trait.options.map(id=>({id})):
+ const category=filter==='presets'?referenceLooks:trait?trait.options.map(id=>({id})):
   filter==='collections'?items.filter(i=>i.cost>0):items.filter(i=>i.type===filter);
  const size=pageSize();
  const count=Math.max(1,Math.ceil(category.length/size));
  page=Math.max(0,Math.min(page,count-1));
  for(const item of category.slice(page*size,(page+1)*size)){
   const card=document.createElement('button');card.type='button';card.className='mc-card';
-  if(trait){
+  if(filter==='presets'){
+   const active=['skin','hair','faceShape','hairStyle','eyeShape','expression','detail'].every(k=>current()[k]===item[k]);
+   card.dataset.referenceLook=item.id;
+   card.setAttribute('aria-pressed',String(active));
+   card.setAttribute('aria-label',item.name+(active?' selected':''));
+   card.innerHTML='<span class="mc-card-art">'+crewHeadPreviewSVG(item,114)+'</span>'+
+     '<span class="mc-card-name">'+safe(item.name)+'</span>'+
+     '<span class="mc-card-state '+(active?'equipped':'available')+'">'+(active?'✓ Selected':'Try Look')+'</span>';
+  }else if(trait){
    const active=current()[trait.key]===item.id;
    card.dataset.styleKind=trait.key;
    card.dataset.styleValue=item.id;
@@ -369,6 +387,14 @@ document.addEventListener('click',async event=>{
  if(el.dataset.crewId){draft.active=el.dataset.crewId;render();return;}
  if(el.id==='mc-page-prev'){page=Math.max(0,page-1);renderCards();return;}
  if(el.id==='mc-page-next'){page+=1;renderCards();return;}
+ if(el.dataset.referenceLook){
+  const look=referenceLooks.find(x=>x.id===el.dataset.referenceLook);
+  if(look){
+   for(const key of ['skin','hair','faceShape','hairStyle','eyeShape','expression','detail'])current()[key]=look[key];
+   render();notice(look.name+' selected for this character. Press Save Crew to keep the look.');
+  }
+  return;
+ }
  if(el.dataset.styleKind){
   const kind=el.dataset.styleKind,value=el.dataset.styleValue;
   if(Object.values(traitCategories).some(x=>x.key===kind&&x.options.includes(value))){current()[kind]=value;render();notice(prettyLabel(value)+' selected. Press Save Crew to sync it.');}
@@ -377,7 +403,7 @@ document.addEventListener('click',async event=>{
  if(el.dataset.color){current()[el.dataset.layer||'shirt']=el.dataset.color;render();notice((el.dataset.layer||'Jacket')+' color changed. Save to keep it.');return;}
  if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)try{await actionItem(i);}catch(error){notice(error?.message||'Item unlock failed.');}return;}
  if(el.dataset.view){view=el.dataset.view;setFilter(view);return;}
- if(el.dataset.jump){view=el.dataset.jump;setFilter(view);document.querySelector('.mc-market').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+ if(el.dataset.jump){view=el.dataset.jump;setFilter(view);return;}
  if(el.dataset.motion){
   motion=el.dataset.motion;app.dataset.motion=motion;
   for(const b of document.querySelectorAll('[data-motion]'))b.setAttribute('aria-pressed',String(b.dataset.motion===motion));
