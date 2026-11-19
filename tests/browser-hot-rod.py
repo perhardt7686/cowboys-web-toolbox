@@ -426,6 +426,50 @@ async def campaign_flow(page, name, *, touch):
     await expect(page.get_by_text('Test driver',exact=True)).to_have_count(0)
 
 
+
+async def capture_vehicle_gallery(page, label):
+    # Screenshot all 25 original-era models at their native pixel-art size.
+    # This is an inspectable visual artifact, not proof of 1:1 DOS fidelity.
+    count = await page.evaluate("""async () => {
+        const [{CARS},{makeCar},{paintVehicle},{EGA}] = await Promise.all([
+            import('/hot-rod-catalog.mjs'),
+            import('/hot-rod-campaign.mjs'),
+            import('/hot-rod-vehicle-art.mjs'),
+            import('/hot-rod-art.mjs')
+        ]);
+        const grid=document.createElement('section');
+        grid.id='hotrod-gallery';
+        grid.style.cssText='display:grid;grid-template-columns:repeat(3,480px);gap:14px;'+
+            'width:1510px;padding:20px;background:#12121d;color:#fff8df;font:18px monospace;';
+        const models=Object.values(CARS).filter(m=>m.id!=='mystery66');
+        for(const model of models) {
+            const card=document.createElement('div');
+            card.style.cssText='width:480px;background:#34343a;padding:9px;';
+            const label=document.createElement('div');
+            label.textContent=model.name;
+            label.style.cssText='margin-bottom:9px;white-space:nowrap;font-weight:bold;font-size:17px;';
+            const canvas=document.createElement('canvas');
+            canvas.width=240;canvas.height=76;
+            canvas.style.cssText='display:block;width:480px;height:152px;image-rendering:pixelated;';
+            const ctx=canvas.getContext('2d',{alpha:false});
+            ctx.fillStyle='#151522';ctx.fillRect(0,0,240,76);
+            const screen={box:(x,y,w,h,ink)=>{
+                ctx.fillStyle=EGA[ink];ctx.fillRect(x,y,w,h);
+            }};
+            paintVehicle(screen,model,makeCar(model,1),0,0,1);
+            card.append(label,canvas);
+            grid.append(card);
+        }
+        document.body.append(grid);
+        return models.length;
+    }""")
+    assert count == 25, f'Expected 25 distinct period cars, got {count}'
+    await page.locator('#hotrod-gallery').screenshot(
+        path=ROOT / 'reports' / f'hot-rod-{label}-all-25-cars.png'
+    )
+    await page.locator('#hotrod-gallery').evaluate('(node)=>node.remove()')
+
+
 async def main():
     (ROOT / 'reports').mkdir(exist_ok=True)
     async with async_playwright() as p:
@@ -442,6 +486,8 @@ async def main():
                     await page.route('**/__hot_rod_smoke__/community.html*',
                                      lambda route:route.fulfill(status=200,content_type='text/html',body=HTML))
                     await campaign_flow(page,engine+'-'+label,touch=touch)
+                    if label == 'portrait':
+                        await capture_vehicle_gallery(page,engine)
                     assert not failures, (engine,label,failures)
                     await page.close()
                     print(f'Hot Rod {engine} {label} passed',flush=True)
