@@ -49,7 +49,8 @@ async def verify(browser,width,height,label):
       }));
       return {count:elements.length,checks};
     }""")
-    assert painted['count']>=17,painted
+    gallery_items=await page.locator('#mc-cards .mc-painted-outfit').count()
+    assert painted['count']==9+gallery_items,painted
     assert all(x['ok'] for x in painted['checks']),'Painterly image missing/corrupted/CSP blocked: '+str(painted)
     await page.screenshot(path=str(REPORTS/f'mystery-crew-painted-fresh-{label}.png'),
                           full_page=False,animations='disabled')
