@@ -1,0 +1,172 @@
+/* Original painted-in-CSS garden board: twenty strongly contrasting regions,
+ * a five-row serpentine path, accessible non-color-only state indicators.
+ * Decorative fauna never become invisible click blockers. */
+body.community-page .mahjong-nature-road{
+ --nature-sky:#e8f5b5;--nature-land:#57966c;--nature-ink:#173f2e;--nature-accent:#f9d44d;
+ color:var(--nature-ink);margin:15px 0 18px;padding:12px;
+ scroll-margin-top:calc(82px + env(safe-area-inset-top));
+ border:3px solid #e1c77a;border-radius:20px;
+ background:linear-gradient(172deg,#fffef2 0%,#f3f9eb 40%,#f4eddb 100%);
+ box-shadow:0 8px 24px #123f371c,inset 0 1px 0 #fff;
+ font-family:system-ui,-apple-system,sans-serif;position:relative;isolation:isolate;
+}
+body.community-page .mahjong-nature-road *{box-sizing:border-box}
+body.community-page .nature-road-header{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ border:2px solid var(--nature-land);border-radius:17px;padding:14px 17px;
+ background:linear-gradient(115deg,var(--nature-sky),#fffaf0);
+ box-shadow:inset 0 1px #fff;
+}
+body.community-page .nature-road-identity{min-width:0}
+body.community-page .nature-road-kicker{display:block;font-size:11px;line-height:1.35;font-weight:950;letter-spacing:.11em}
+body.community-page .nature-road-header h3{margin:5px 0;font:900 clamp(22px,5vw,35px)/1.08 Georgia,serif;color:var(--nature-ink);text-shadow:0 1px #fffb}
+body.community-page .nature-road-header p{margin:4px 0 0;font:750 13px/1.4 system-ui,sans-serif;color:var(--nature-ink)}
+body.community-page .nature-road-creature{font-size:clamp(38px,10vw,68px);filter:drop-shadow(0 5px 3px #1b362d5a);animation:nature-fauna-bob 4.5s ease-in-out infinite}
+body.community-page .nature-road-dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:13px 0 10px}
+body.community-page .nature-road-dashboard>div{display:grid;gap:3px;padding:9px 7px;background:#fffef5;border:2px solid #b2a875;border-radius:10px;min-width:0}
+body.community-page .nature-road-dashboard span{font:850 9px/1.35 system-ui,sans-serif;letter-spacing:.035em;color:#515146}
+body.community-page .nature-road-dashboard strong{font:950 clamp(12px,2.6vw,19px)/1.2 system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#233f35}
+body.community-page #nature-road-world-progress{display:block;width:100%;height:15px;margin:5px 0 15px;accent-color:#287550;border:1px solid #fff;border-radius:20px;overflow:hidden}
+body.community-page .nature-road-garden-title{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;margin:10px 0 7px}
+body.community-page .nature-road-garden-title strong{font:950 14px/1.35 Georgia,serif;color:#274c38}
+body.community-page .nature-road-garden-title small{font:650 11px/1.3 system-ui,sans-serif;color:#445c52}
+body.community-page .nature-road-regions{display:flex;align-items:stretch;gap:7px;padding:7px 2px 12px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scroll-snap-type:x proximity}
+body.community-page .nature-road-region-button{
+ flex:none;min-height:48px;max-width:148px;min-width:116px;padding:8px 9px;
+ border:2px solid #acbda9;border-radius:11px;cursor:pointer;
+ background:#eef5e9;color:#253d35;font:850 12px/1.3 system-ui,sans-serif;
+ text-align:center;scroll-snap-align:start;
+}
+body.community-page .nature-road-region-button.is-cleared{border-color:#c1a24d;background:#fff1b3}
+body.community-page .nature-road-region-button.is-current{box-shadow:inset 0 -4px #5b986f}
+body.community-page .nature-road-region-button[aria-pressed=true]{border:3px solid #6a488c;background:#f0dafa;color:#342044;box-shadow:0 0 0 2px #dbbaf1}
+body.community-page .nature-road-region-button:focus-visible,
+body.community-page .nature-road-stage-nav button:focus-visible,
+body.community-page .nature-road-node:focus-visible,
+body.community-page .nature-road-play:focus-visible{outline:3px solid #5c267d;outline-offset:2px}
+body.community-page .nature-road-stage-title{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 5px 9px}
+body.community-page .nature-road-stage-title>div:first-child{display:grid;gap:2px}
+body.community-page .nature-road-stage-title strong{font:900 20px/1.2 Georgia,serif;color:var(--nature-ink)}
+body.community-page .nature-road-stage-title small{font:700 12px/1.35 system-ui,sans-serif;color:#364b43}
+body.community-page .nature-road-stage-nav{display:flex;align-items:center;gap:5px}
+body.community-page .nature-road-stage-nav button{
+ min-height:42px;min-width:43px;padding:6px 11px;border:2px solid #586859;
+ border-radius:9px;background:#f9f3de;color:#223c34;font:850 12px system-ui,sans-serif;cursor:pointer
+}
+body.community-page .nature-road-stage-nav button:disabled{opacity:.46;cursor:default}
+body.community-page .nature-road-landscape{
+ position:relative;min-width:0;width:100%;height:clamp(345px,54vw,440px);
+ overflow:hidden;border:5px solid #b59867;border-radius:23px;isolation:isolate;
+ background:
+ radial-gradient(ellipse 42% 21% at 18% 14%,#fffae6 0%,transparent 88%),
+ radial-gradient(ellipse 29% 34% at 81% 18%,#ffffffb8,transparent 90%),
+ radial-gradient(ellipse 43% 42% at 72% 69%,var(--nature-sky),transparent),
+ repeating-radial-gradient(ellipse at 43% 120%,#ffffff22 0 8px,transparent 10px 21px),
+ linear-gradient(145deg,var(--nature-sky),var(--nature-land));
+ box-shadow:inset 0 -16px 45px #0d2b2a30,inset 0 2px 0 #fff8;
+}
+body.community-page .nature-road-landscape:before,
+body.community-page .nature-road-landscape:after{
+ content:'';position:absolute;pointer-events:none;z-index:0;width:42%;height:34%;
+ background:radial-gradient(ellipse at 32% 80%,#fff7c7ad,transparent 70%),radial-gradient(circle at 85% 20%,#ffffff8c,transparent 60%);
+ filter:blur(7px);
+}
+body.community-page .nature-road-landscape:before{left:-10%;bottom:-12%}
+body.community-page .nature-road-landscape:after{right:-13%;top:-10%}
+body.community-page .nature-road-canopy{position:absolute;z-index:1;pointer-events:none;font-size:clamp(41px,9vw,88px);opacity:.7;filter:drop-shadow(0 3px 7px #26443666)}
+body.community-page .nature-road-canopy-a{top:-10px;left:-15px;transform:rotate(-20deg)}
+body.community-page .nature-road-canopy-b{bottom:-14px;right:-16px;transform:rotate(20deg)}
+body.community-page #nature-road-trail{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;filter:drop-shadow(0 3px 2px #21413970)}
+body.community-page #nature-road-trail-shadow{stroke:#594f3ca8}
+body.community-page #nature-road-trail-line{stroke:#fff3c4}
+body.community-page .nature-road-nodes{position:absolute;inset:0;z-index:2;pointer-events:none}
+body.community-page .nature-road-node{
+ position:absolute;pointer-events:auto;left:var(--nx);top:var(--ny);
+ transform:translate(-50%,-50%);width:clamp(42px,8.1vw,57px);height:clamp(42px,8.1vw,57px);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ border:3px solid #867f70;border-radius:50%;
+ background:linear-gradient(135deg,#fffdf2,#e4e6dc);color:#284434;
+ font:900 19px/1 system-ui,sans-serif;cursor:pointer;
+ box-shadow:0 3px 0 #273a35a4,0 4px 11px #10292476;touch-action:manipulation;
+ transition:filter .12s,transform .12s;
+}
+body.community-page .nature-road-node small{font:900 10px/1.1 system-ui,sans-serif;margin-top:3px;background:#fffdf7dd;border-radius:5px;padding:1px 3px;color:#273a30}
+body.community-page .nature-road-node[data-state=cleared]{
+ border-color:#347648;background:linear-gradient(135deg,#fff4a7,#bee8b5);box-shadow:0 3px 0 #28533b,0 0 0 2px #fff1aa9e;
+}
+body.community-page .nature-road-node[data-state=cleared]:after{content:'✓';position:absolute;right:-5px;top:-8px;background:#267345;color:#fff;padding:1px 4px;border-radius:50%;font:850 13px system-ui,sans-serif}
+body.community-page .nature-road-node[data-state=current]{
+ background:linear-gradient(140deg,#fffac0,#ffc769);border-color:#52378a;
+ box-shadow:0 0 0 4px #fff6b9,0 0 20px 8px #fff1a9ad,0 4px 0 #4d3e67;
+ animation:nature-current-pulse 2s ease-in-out infinite;z-index:3;
+}
+body.community-page .nature-road-node[data-state=locked]{filter:saturate(.65);opacity:.82}
+body.community-page .nature-road-node[data-kind=milestone],body.community-page .nature-road-node[data-kind=gate],body.community-page .nature-road-node[data-kind=crown]{border-radius:13px;border-width:3px}
+body.community-page .nature-road-node[aria-pressed=true]:not([data-state=current]){outline:3px solid #53297a;outline-offset:2px}
+body.community-page .nature-road-node:hover{filter:brightness(1.1);transform:translate(-50%,-50%) scale(1.08)}
+body.community-page .nature-road-spotlight{display:flex;align-items:center;gap:11px;min-height:70px;padding:11px 13px;margin:12px 0 10px;
+ border:2px solid #9a986e;border-radius:13px;background:#fffdf0;color:#293f34;}
+body.community-page #nature-road-spotlight-icon{font-size:29px;flex:none}
+body.community-page .nature-road-spotlight>div{display:grid;gap:4px;min-width:0}
+body.community-page .nature-road-spotlight strong{font:900 16px/1.25 system-ui,sans-serif}
+body.community-page .nature-road-spotlight small{font:700 12px/1.35 system-ui,sans-serif}
+body.community-page .nature-road-play{
+ width:100%;min-height:57px;padding:12px 15px;cursor:pointer;border:3px solid #fff2af;border-radius:13px;
+ background:linear-gradient(120deg,#275d4b,#265a73);color:#fff7d2;
+ font:950 clamp(16px,4vw,21px)/1.2 system-ui,sans-serif;letter-spacing:.025em;
+ box-shadow:0 5px 0 #263f47,0 0 15px #53887275;
+}
+body.community-page .nature-road-play:disabled{background:#edf1e9;border-color:#a7b4a6;color:#515e56;box-shadow:none;cursor:not-allowed}
+body.community-page .nature-road-footnote{font:650 11px/1.5 system-ui,sans-serif;margin:13px 0 3px;color:#526056}
+@keyframes nature-current-pulse{0%,100%{box-shadow:0 0 0 3px #fff6b9,0 0 15px 4px #fff1a9b2,0 4px 0 #4d3e67}50%{box-shadow:0 0 0 5px #fff6b9,0 0 23px 10px #fff1a9e8,0 4px 0 #4d3e67}}
+@keyframes nature-fauna-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+@media(max-width:560px){
+ body.community-page .mahjong-nature-road{padding:8px;border-width:2px;margin-inline:0}
+ body.community-page .nature-road-header{padding:11px}
+ body.community-page .nature-road-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.community-page .nature-road-stage-title{align-items:flex-start}
+ body.community-page .nature-road-landscape{height:365px;border-width:3px}
+ body.community-page .nature-road-node{width:clamp(39px,10vw,48px);height:clamp(39px,10vw,48px);font-size:17px}
+ body.community-page .nature-road-node small{font-size:9px}
+ body.community-page .nature-road-canopy{font-size:44px}
+}
+@media(max-width:370px){body.community-page .nature-road-node{width:38px;height:38px;font-size:15px}body.community-page .nature-road-node small{font-size:8px}body.community-page .nature-road-stage-nav button{padding:5px 7px}}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .nature-road-creature,body.community-page .nature-road-node[data-state=current]{animation:none!important}
+ body.community-page .nature-road-node{transition:none!important}
+}
+
+/* The fullscreen Arcade's Levels scene must scroll through the whole campaign,
+   while the Play scene can keep the Mahjong tiles in one uncluttered viewport. */
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-inside > .mahjong-campaign{
+ display:block!important;overflow:auto!important;min-height:0!important;
+ max-height:100%!important;overscroll-behavior:contain;
+ scrollbar-color:#9bba9f #f8f2dc;
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ .mahjong-nature-road{width:100%;max-width:920px;margin:10px auto}
+
+/* Compact persistent progress inside the Mahjong playboard, including Arcade play scene. */
+body.community-page .mahjong-journey-mini{
+ display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;
+ padding:7px 9px;margin:0 0 7px;border:2px solid #cfbf7c;border-radius:12px;
+ background:linear-gradient(120deg,#fffae6,#e2f5dc);color:#27503a;
+ min-width:0;font:850 11px/1.3 system-ui,sans-serif;
+}
+body.community-page #mahjong-journey-mini-name{flex:1 1 130px}
+body.community-page #mahjong-journey-mini-progress{width:min(110px,27%);height:10px;accent-color:#277f57}
+body.community-page #mahjong-journey-mini-map{
+ min-height:37px;padding:6px 9px;cursor:pointer;flex:0 0 auto;
+ border:2px solid #4b7e56;border-radius:9px;background:#275f47;color:#fff8db;
+ font:900 11px/1.2 system-ui,sans-serif;
+}
+body.community-page #mahjong-journey-mini-map:focus-visible{outline:3px solid #9b5cc8;outline-offset:2px}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] .mahjong-journey-mini{
+ flex:0 0 auto!important;min-height:36px;margin:0!important;padding:3px 6px;font-size:10px
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play] #mahjong-journey-mini-map{min-height:32px;font-size:10px}
+@media(max-width:390px){
+ body.community-page .mahjong-journey-mini{gap:5px}
+ body.community-page #mahjong-journey-mini-progress{flex:1;min-width:45px}
+}

@@ -17,7 +17,15 @@ const MEDALS=[
  ['campaign_100','Phantom Conqueror','Reach level 101','👑'],
  ['campaign_250','Lagoon Sovereign','Reach level 251','🌊'],
  ['campaign_500','Midnight Myth','Reach level 501','🌙'],
- ['campaign_1000','The Vanishing Crown','Clear level 1,000','♛']
+ ['campaign_1000','The Vanishing Crown','Clear level 1,000','♛'],
+ ['campaign_1500','Moss Monarch','Reach garden level 1,501','🌿'],
+ ['campaign_2000','Rose Crown','Reach garden level 2,001','🌹'],
+ ['campaign_2500','Lantern Keeper','Reach garden level 2,501','✨'],
+ ['campaign_3000','Copperwood Royalty','Reach garden level 3,001','🍁'],
+ ['campaign_3500','Winter Bloom','Reach garden level 3,501','❄️'],
+ ['campaign_4000','Canopy Sovereign','Reach garden level 4,001','🦜'],
+ ['campaign_4500','Aurora Gardener','Reach garden level 4,501','🌸'],
+ ['campaign_5000','Evergreen Crown','Clear level 5,000','👑']
 ];
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n;};
 const stat=x=>Number(x||0).toLocaleString('en-US');
@@ -33,10 +41,10 @@ export async function showAchievements(ctx,userId){
  const section=el('section','mahjong-profile-achievements');section.id='mahjong-profile-achievements';
  section.append(el('h3','','🀄 Mystery Machine Mahjong'));
  section.append(el('p','','Achievements earned in The Commons. Badges are unlocked automatically as you play.'));
- const campaign=data.campaign||{},rules=campaign.rules||{};section.append(el('p','mahjong-profile-campaign',`Campaign level ${campaign.level||1}/1000 · ${rules.name||'Mystery Mile'} · ${campaign.cleared||0} stages conquered · streak ${campaign.streak||0}`));
+ const campaign=data.campaign||{},rules=campaign.rules||{};section.append(el('p','mahjong-profile-campaign',`Campaign level ${campaign.level||1}/5000 · ${rules.name||'Mystery Mile'} · ${campaign.cleared||0} stages conquered · streak ${campaign.streak||0}`));
  const numbers=el('div','mahjong-profile-numbers');
  for(const [name,v] of [['Best game',data.best_score],['All-time points',data.all_time_points],['Wins',data.wins],['Campaign bonus',campaign.campaign_bonus]])numbers.append(el('span','',name+': '+stat(v)));
- section.append(numbers);const progress=el('progress','mahjong-profile-progress');progress.max=1000;progress.value=Number(campaign.cleared||0);progress.setAttribute('aria-label','Mahjong campaign levels completed');section.append(progress);
+ section.append(numbers);const progress=el('progress','mahjong-profile-progress');progress.max=5000;progress.value=Number(campaign.cleared||0);progress.setAttribute('aria-label','Mahjong campaign levels completed');section.append(progress);
  const unlocked=new Set((data.badges||[]).map(b=>b.code));
  const grid=el('div','mahjong-profile-grid');
  for(const [code,name,detail,icon] of MEDALS){const box=el('div','mahjong-badge '+(unlocked.has(code)?'earned':'locked'));
