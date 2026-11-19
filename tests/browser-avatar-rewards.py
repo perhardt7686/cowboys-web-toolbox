@@ -101,7 +101,7 @@ async def visit(browser, width, full=False, large_text=False):
         await editor.get_by_role('button', name='Save look').click()
         await expect(editor.locator('#profile-save-status')).to_have_text('Preview saved locally for this session.', timeout=15000)
         await page.locator('#content-dialog').evaluate('n=>n.close()')
-        await expect(page.locator('#family-avatar-quick img')).to_be_visible()
+        await expect(page.locator('#family-avatar-quick .mystery-crew-portrait svg')).to_be_visible()
         await page.locator('#family-avatar-quick').click()
         await expect(editor.locator('#avatar-equipped').get_by_text('Clue-Seeker Compass',exact=True)).to_be_visible()
 

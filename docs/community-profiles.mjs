@@ -5,13 +5,14 @@ import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar
 import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=history1';
 import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=workshop1';
+import {mysteryCrewPortraitSVG,BASIC_MYSTERY_CREW} from './mystery-crew-portrait.mjs?v=account1';
 
 import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=workshop1';
 import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';
 import {SHOWROOM_LOOKS} from './avatar-showroom-presets.mjs?v=workshop1';
 
 export function createProfileStudio(ctx){
-  const cache=new Map(),images=new Map(),characterURLs=new Map();
+  const cache=new Map(),images=new Map(),characterURLs=new Map(),mysteryPortraits=new Map();
   const approved=()=>canPost(ctx.state.member);
   const copy=value=>JSON.parse(JSON.stringify(value));
   let bitmap=null,draft=null,photoChanged=false,selectedTab='profile',avatarRecipe=null,avatarMethod='photo';
@@ -21,7 +22,10 @@ export function createProfileStudio(ctx){
   const portrait=p=>p?.avatar_display&&characterURLs.get(p?.user_id);
   const icon=p=>PROFILE_ICONS.find(i=>i.id===p?.avatar_icon)?.symbol||'◈';
   const getOwn=()=>({...PROFILE_DEFAULTS,...ctx.state.profile,details:{...DETAIL_DEFAULTS,...ctx.state.profile?.details},user_id:ctx.state.member?.user_id,display_name:ctx.state.member?.display_name||'Your name',badge:ctx.state.member?.role==='owner'?'Owner':null});
-  function avatar(p,size='',draftImage=''){const src=draftImage||portrait(p)||(p?.avatar_mode==='photo'&&images.get(p?.avatar_path));return `<span class="avatar profile-avatar frame-${esc(p?.details?.frame||'plain')} ${size} theme-${esc(p?.theme||'forest')}" aria-hidden="true">${src?`<img src="${esc(src)}" alt="" width="96" height="96">`:p?.avatar_mode==='icon'?esc(icon(p)):esc(initials(p?.display_name))}</span>`;}
+  function avatar(p,size='',draftImage=''){
+    const figure=mysteryPortraits.get(p?.user_id)||BASIC_MYSTERY_CREW;
+    return '<span class="avatar profile-avatar mystery-crew-portrait '+esc(size)+'" aria-hidden="true">'+mysteryCrewPortraitSVG(figure)+'</span>';
+  }
   function author(id,name,edward=false){const p=cache.get(id);return edward?`<span class="avatar edward-small" aria-hidden="true">E</span><b>Edward</b>`:`<button type="button" class="member-author" data-member-profile="${esc(id||'')}" ${id?'':'disabled'} aria-label="View ${esc(name)}’s profile">${avatar(p||{display_name:name})}<span>${esc(name)}${p?.details?.share_about&&p.details.title?`<small class="author-title">${esc(p.details.title)}</small>`:''}</span>${p?.badge?'<span class="profile-badge">Owner</span>':''}</button>`;}
   async function imageURLs(profiles){
     const paths=[...new Set(profiles.filter(p=>p?.avatar_mode==='photo'&&p.avatar_path).map(p=>p.avatar_path))];
@@ -33,10 +37,16 @@ export function createProfileStudio(ctx){
     const urls=await Promise.all(paths.map(async path=>[path,await getAvatarPhoto(ctx.client(),path)]));
     for(const [path,url] of urls)if(url)images.set(path,url);
   }
-  async function load(ids){const unique=[...new Set(ids.filter(Boolean))].slice(0,100);if(ctx.isPreview){for(const id of unique)if(!cache.has(id))cache.set(id,{...PROFILE_DEFAULTS,user_id:id,display_name:'Example maker',headline:'Curious by nature. Maker by habit.',bio:'Here for practical ideas, good tools, and the occasional rabbit hole.',interests:['Making','Good finds','Learning'],theme:'copper',cover:'sunburst',avatar_mode:'icon',avatar_icon:'hammer',published:true,account_active:true});return;}
-    if(!ctx.client()||!unique.length)return;const {data,error}=await ctx.client().from('community_profiles').select(PROFILE_FIELDS).in('user_id',unique);if(error)return;for(const id of unique)cache.delete(id);const projection=await avatarProjections(ctx.client(),(data||[]).filter(p=>p.published||p.user_id===ctx.state.member?.user_id).map(p=>p.user_id));
-    for(const p of data||[])cache.set(p.user_id,{...p,avatar_display:projection.get(p.user_id)});
-    await imageURLs((data||[]).map(p=>cache.get(p.user_id)));
+  async function load(ids){const unique=[...new Set(ids.filter(Boolean))].slice(0,100);if(ctx.isPreview){for(const id of unique)if(!cache.has(id))cache.set(id,{...PROFILE_DEFAULTS,user_id:id,display_name:'Example maker',headline:'Curious by nature. Maker by habit.',bio:'Here for practical ideas, and family time.',interests:['Making','Good finds','Learning'],theme:'copper',cover:'sunburst',published:true,account_active:true});return;}
+    if(!ctx.client()||!unique.length)return;
+    const [profiles,portraits]=await Promise.all([
+      ctx.client().from('community_profiles').select(PROFILE_FIELDS).in('user_id',unique),
+      ctx.client().rpc('community_mystery_crew_portraits',{p_members:unique})
+    ]);
+    if(profiles.error)return;
+    for(const id of unique){cache.delete(id);mysteryPortraits.delete(id);}
+    for(const p of profiles.data||[])cache.set(p.user_id,{...p,avatar_display:null});
+    if(!portraits.error)for(const row of portraits.data||[])mysteryPortraits.set(row.user_id,row.crew_character||BASIC_MYSTERY_CREW);
   }
   function card(p,editor=false,draftImage=''){const links=[...(p.website?[{label:'My website',url:p.website}]:[]),...(p.links||[])].filter(l=>safeHttps(l.url)).map(l=>({...l,url:safeHttps(l.url)}));return `<article class="member-card theme-${esc(p.theme)} layout-${esc(p.details?.layout||'classic')}"><div class="profile-cover cover-${esc(p.cover)}"><span class="cover-mark" aria-hidden="true">✳</span><span class="cover-caption">THE COMMONS / ${p.badge?'COWBOY’S CORNER':'MEMBER FIELD NOTES'}</span></div><div class="member-card-body">${avatar(p,'avatar-large',draftImage)}<div class="profile-heading"><h3>${esc(p.display_name)}</h3>${p.badge?'<span class="profile-badge">Owner</span>':''}</div>${p.handle?`<p class="profile-handle">@${esc(p.handle)}</p>`:''}<p class="profile-headline">${esc(p.headline||'A little curious. In good company.')}</p>${p.location?`<p class="profile-location">⌖ ${esc(p.location)}</p>`:''}${p.bio?`<div class="profile-bio">${renderBody(p.bio)}</div>`:'<p class="profile-placeholder">A little about you goes here.</p>'}${extrasCard(p)}<div class="profile-interests">${(p.interests||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>${links.length?`<div class="profile-links">${links.map(link=>`<a href="${esc(link.url)}" target="_blank" rel="noopener noreferrer">${esc(link.label)} ↗</a>`).join('')}</div>`:''}<p class="profile-card-foot">${editor?'YOUR LIVE PREVIEW':p.joined_at?'IN GOOD COMPANY SINCE '+new Date(p.joined_at).getFullYear():'COME CURIOUS. LEAVE INSPIRED.'}</p></div></article>`;}
   function extrasCard(p){const d=p.details||{};return `${d.share_about?`<div class="profile-extras">${d.title?`<strong>${esc(d.title)}</strong>`:''}${d.status?`<p class="member-status">${esc(d.status)}</p>`:''}${[d.pronouns,d.occupation].filter(Boolean).length?`<p>${[d.pronouns,d.occupation].filter(Boolean).map(esc).join(' · ')}</p>`:''}${d.skills?.length?`<h4>Know-how</h4><div class="profile-interests">${d.skills.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}${d.favorite_tools?.length?`<h4>Favorite tools</h4><p>${d.favorite_tools.map(esc).join(' · ')}</p>`:''}</div>`:''}${d.share_signature&&d.signature?`<div class="forum-signature">${forumBody(d.signature)}</div>`:''}`;}
@@ -471,8 +481,7 @@ export function createProfileStudio(ctx){
       ctx.showDialog('<p class="eyebrow">Member profile</p><h2 id="content-title">A little privacy.</h2><p class="dialog-lead">This member has not shared a member profile. You can still read their published conversations.</p>');
       return;
     }
-    const inspect=p.avatar_display?
-      '<details class="member-avatar-inspection"><summary>Inspect full avatar</summary>'+turntableHTML()+'</details>':'';
+    const inspect=''; // Mystery Crew is the only character editor, opened through its own page.
     ctx.showDialog(`<h2 id="content-title" class="sr-only">${esc(p.display_name)}’s profile</h2>${card(p)}${inspect}
       <button class="button-quiet" data-member-posts="${esc(id)}">Published activity ↗</button>${id===ctx.state.member?.user_id?'<button class="button-primary" data-profile>Edit my profile ↗</button>':''}`);
     const dialog=document.getElementById('content-dialog');
@@ -625,19 +634,18 @@ export function createProfileStudio(ctx){
     previewImage='';undo=[];redo=[];rewards?.clear();
     activeCelebration?.remove();activeCelebration=null;
     bitmap?.close?.();bitmap=null;
-    cache.clear();images.clear();characterURLs.clear();clearAvatarPhotos();clearAvatarCharacters();
+    cache.clear();mysteryPortraits.clear();images.clear();characterURLs.clear();clearAvatarPhotos();clearAvatarCharacters();
   }
   async function setOwn(p){
     if(!p)return;
     if(ownerId&&ownerId!==p.user_id)clear();
     ownerId=p.user_id;
-    if(approved()&&!ctx.isPreview){
-      const found=await avatarProjections(ctx.client(),[p.user_id]);
+    if(approved()&&!ctx.isPreview&&ctx.client()){
+      const {data,error}=await ctx.client().rpc('community_mystery_crew_portraits',{p_members:[p.user_id]});
       if(p.user_id!==ctx.state.member?.user_id)return;
-      p.avatar_display=found.get(p.user_id)||null;
+      if(!error&&data?.[0])mysteryPortraits.set(p.user_id,data[0].crew_character);
     }
-    cache.set(p.user_id,p);
-    await imageURLs([p]);
+    cache.set(p.user_id,{...p,avatar_display:null});
     applyReader(p.details);
   }
   return {show,showMember,load,author,avatar,cache,clear,setOwn,applyReader};
