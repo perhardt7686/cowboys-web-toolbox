@@ -1,3 +1,4 @@
+import {mysteryLoad,mysterySave,isLocalDemo} from './mystery-crew-sync.mjs?v=sync1';
 /* Mystery Crew Creator
  * New product and visuals, independent of the previous character creator.
  * Explicitly local-only user state; zero remote writes, no fake server awards.
@@ -45,15 +46,36 @@ const itemById=new Map(items.map(x=>[x.id,x]));
 const choices={outfits:'outfit',hats:'hat',gear:'gear',pets:'pet',vehicles:'vehicle',studio:'scene'};
 const unlockedInitial=['detective','explorer','outdoors','fedora','cap','binoculars','dog','cat','van','sunlit'];
 const fresh=()=>({version:1,crew:[starter()],active:'crew-1',coins:60,xp:0,unlocked:[...unlockedInitial],rewardedDesigns:[]});
-function read(){
- try{const raw=localStorage.getItem(KEY);if(!raw)return fresh();
-  const saved=JSON.parse(raw);if(saved?.version!==1||!Array.isArray(saved.crew)||!saved.crew.length)return fresh();
-  const crew=saved.crew.slice(0,6).map((v,i)=>({...starter(i+1),...v,id:String(v.id||('crew-'+(i+1))).slice(0,30),name:String(v.name||'Crew member').slice(0,28)}));
-  const allValid=(saved.unlocked||[]).filter(id=>itemById.has(id));
-  return {version:1,crew,active:crew.some(x=>x.id===saved.active)?saved.active:crew[0].id,coins:Math.min(99999,Math.max(0,Number(saved.coins)||0)),xp:Math.min(999999,Math.max(0,Number(saved.xp)||0)),unlocked:[...new Set([...unlockedInitial,...allValid])],rewardedDesigns:Array.isArray(saved.rewardedDesigns)?saved.rewardedDesigns.slice(-250):[]};
- }catch{return fresh();}
+function normalizeState(saved){
+ if(saved?.version!==1||!Array.isArray(saved.crew)||!saved.crew.length)return fresh();
+ const crew=saved.crew.slice(0,6).map((v,i)=>({...starter(i+1),...v,
+  id:String(v.id||('crew-'+(i+1))).slice(0,30),
+  name:String(v.name||'Crew member').slice(0,28),
+  skin:skins.includes(v.skin)?v.skin:skins[0],
+  hair:hairs.includes(v.hair)?v.hair:hairs[0],
+  shirt:themes.includes(v.shirt)?v.shirt:themes[0],
+  pants:pants.includes(v.pants)?v.pants:pants[0],
+  outfit:items.some(q=>q.id===v.outfit&&q.type==='outfits')?v.outfit:'detective',
+  pet:items.some(q=>q.id===v.pet&&q.type==='pets')?v.pet:'dog',
+  hat:v.hat==='none'||items.some(q=>q.id===v.hat&&q.type==='hats')?v.hat:'none',
+  gear:v.gear==='none'||items.some(q=>q.id===v.gear&&q.type==='gear')?v.gear:'none',
+  vehicle:items.some(q=>q.id===v.vehicle&&q.type==='vehicles')?v.vehicle:'van',
+  scene:items.some(q=>q.id===v.scene&&q.type==='studio')?v.scene:'sunlit'
+ }));
+ const allValid=(saved.unlocked||[]).filter(id=>itemById.has(id));
+ return {version:1,crew,active:crew.some(x=>x.id===saved.active)?saved.active:crew[0].id,
+  coins:Math.min(99999,Math.max(0,Number(saved.coins)||0)),
+  xp:Math.min(999999,Math.max(0,Number(saved.xp)||0)),
+  unlocked:[...new Set([...unlockedInitial,...allValid])],
+  rewardedDesigns:Array.isArray(saved.rewardedDesigns)?saved.rewardedDesigns.slice(-250):[]};
 }
-let state=read(),savedSnapshot=JSON.stringify(state),view='character',filter='outfits',motion='idle',zoom=1,angle=0;
+function read(){
+ try{const raw=localStorage.getItem(KEY);return raw?normalizeState(JSON.parse(raw)):fresh();}
+ catch{return fresh();}
+}
+const preview=isLocalDemo()&&new URLSearchParams(location.search).get('preview')==='1';
+let state=preview?read():fresh(),savedSnapshot=JSON.stringify(state),view='character',filter='outfits',motion='idle',zoom=1,angle=0;
+let cloud=null,ready=preview,saveBusy=false;
 let draft=structuredClone(state);
 function current(){return draft.crew.find(v=>v.id===draft.active)||draft.crew[0];}
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -98,9 +120,28 @@ function portrait(member){
  '<circle cx="48" cy="50" r="4" fill="#395474"/><circle cx="68" cy="50" r="4" fill="#395474"/>'+
  '<path d="M46 70Q58 82 72 69" fill="none" stroke="#6c4744" stroke-width="4"/></svg>';
 }
-function writeState(){
- try{localStorage.setItem(KEY,JSON.stringify(draft));state=structuredClone(draft);savedSnapshot=JSON.stringify(state);return true;}
- catch{$('mc-status').textContent='Browser storage unavailable. Keep this page open or enable local storage.';return false;}
+async function writeState(){
+ if(!ready||saveBusy)return false;
+ saveBusy=true;
+ try{
+  if(cloud){
+   const saved=await mysterySave(cloud.client,cloud.userId,draft);
+   state=normalizeState(saved.state);
+   draft=structuredClone(state);
+   savedSnapshot=JSON.stringify(state);
+   cloud.updatedAt=saved.updated_at;
+   return true;
+  }
+  if(preview){
+   localStorage.setItem(KEY,JSON.stringify(draft));
+   state=structuredClone(draft);savedSnapshot=JSON.stringify(state);
+   return true;
+  }
+  return false;
+ }catch(error){
+  notice('Account save failed: '+(error?.message||'Please sign in again.')+' Your changes are not synced.');
+  return false;
+ }finally{saveBusy=false;}
 }
 function notice(s){$('mc-status').textContent=s;}
 
@@ -224,12 +265,12 @@ function render(){
  const dirty=JSON.stringify(draft)!==savedSnapshot;
  $('mc-save').textContent=dirty?'✓ Save Crew *':'✓ Save Crew';
 }
-function actionItem(item){
+async function actionItem(item){
  const member=current(),isOwned=draft.unlocked.includes(item.id);
  if(!isOwned){
   if(draft.coins<item.cost){notice('Earn coins by saving new looks. '+item.name+' costs '+item.cost+' device coins; you have '+draft.coins+'.');return;}
   draft.coins-=item.cost;draft.unlocked.push(item.id);
-  if(!writeState())return;
+  if(!await writeState())return;
   notice('Unlocked '+item.name+' using device-only workshop coins.');
  }
  const key=choices[item.type];
@@ -239,18 +280,19 @@ function actionItem(item){
  notice('Previewing '+item.name+'. Press Save Crew to keep this look.');
  render();
 }
-document.addEventListener('click',event=>{
+document.addEventListener('click',async event=>{
+ if(!ready){notice('Sign in on the family message board to edit your account crew.');return;}
  const el=event.target.closest('button');if(!el)return;
  if(el.dataset.crewId){draft.active=el.dataset.crewId;render();return;}
  if(el.dataset.color){current()[el.dataset.layer||'shirt']=el.dataset.color;render();notice((el.dataset.layer||'Jacket')+' color changed. Save to keep it.');return;}
- if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)actionItem(i);return;}
+ if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)await actionItem(i);return;}
  if(el.dataset.view){view=el.dataset.view;setFilter(view);return;}
  if(el.dataset.jump){view=el.dataset.jump;setFilter(view);document.querySelector('.mc-market').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
  if(el.dataset.motion){
   motion=el.dataset.motion;app.dataset.motion=motion;
   for(const b of document.querySelectorAll('[data-motion]'))b.setAttribute('aria-pressed',String(b.dataset.motion===motion));
   if(!draft.rewardedDesigns.includes('motion:'+motion)&&motion!=='idle'){
-   draft.rewardedDesigns.push('motion:'+motion);draft.xp+=10;draft.coins+=5;writeState();renderStats();notice('Explored '+motion+'! +10 local XP, +5 local coins.');}
+   draft.rewardedDesigns.push('motion:'+motion);draft.xp+=10;draft.coins+=5;if(await writeState()){renderStats();notice('Explored '+motion+'! +10 crew XP and +5 crew coins, synced to your family account.');}}
   return;
  }
  switch(el.id){
@@ -279,7 +321,7 @@ document.addEventListener('click',event=>{
    if(!draft.rewardedDesigns.includes('look:'+design)){
     draft.rewardedDesigns.push('look:'+design);draft.xp+=25;draft.coins+=15;
    }
-   if(writeState()){notice('Saved on this device. +25 XP and 15 coins for each new look; no shared account sync yet.');render();}
+   if(await writeState()){notice(cloud?'Saved to your family account. Your avatar, pets and unlockables follow you on other devices.':'Saved in local test preview.');render();}
    break;
   }
   case 'mc-help':$('mc-info').showModal();break;
@@ -301,6 +343,22 @@ $('mc-rename-form').addEventListener('submit',e=>{
 window.addEventListener('beforeunload',e=>{
  if(JSON.stringify(draft)!==savedSnapshot){e.preventDefault();e.returnValue='';}
 });
-const params=new URLSearchParams(location.search);
-if(params.get('preview')==='1')notice('Design preview: device-local characters only. No family account data is loaded or changed.');
 app.dataset.motion='idle';setFilter('character');render();
+if(preview){
+ notice('Local test preview only. No real family records are touched.');
+}else{
+ $('mc-status').textContent='Connecting your approved family account…';
+ mysteryLoad().then(remote=>{
+  cloud={client:remote.client,userId:remote.userId,updatedAt:remote.updated_at};
+  state=normalizeState(remote.state);draft=structuredClone(state);
+  savedSnapshot=JSON.stringify(state);
+  ready=true;render();
+  notice('Your Mystery Crew is synced to your approved family account. Everyone starts with the new basic Scout.');
+ }).catch(error=>{
+  ready=false;
+  notice('Sign in on the family message board to use Mystery Crew Creator. '+(error?.message||''));
+  $('mc-save').disabled=true;
+  const hint=document.createElement('a');hint.href='community.html';hint.className='mc-signin-link';
+  hint.textContent='Open family sign-in';$('mc-status').append(' ',hint);
+ });
+}
