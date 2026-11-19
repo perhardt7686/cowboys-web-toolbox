@@ -11,6 +11,7 @@ on:
       - 'tests/mystery-painterly.test.mjs'
       - 'docs/mystery-painterly-*'
       - 'docs/mystery-workshop-v4.svg'
+      - 'docs/mystery-workshop-v4.webp'
       - 'docs/mystery-van-v4.svg'
       - 'tests/mystery-scene-v4.test.mjs'
       - 'supabase/migrations/20261119023000_mystery_crew_fidelity_traits.sql'
