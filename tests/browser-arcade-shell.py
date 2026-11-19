@@ -23,6 +23,8 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <link rel="stylesheet" href="/commons-compact-ui.css">
 <link rel="stylesheet" href="/family-board.css">
 <link rel="stylesheet" href="/family-arcade.css">
+<link rel="stylesheet" href="/family-word-feedback.css">
+<link rel="stylesheet" href="/commons-wordquest-keyboard-visibility.css">
 <script>window.COWBOY_COMMUNITY_CONFIG={enabled:true}</script></head>
 <body class="community-page"><section id="conversations">
 <div class="community-main">
@@ -63,7 +65,18 @@ HTML="""<!doctype html><html><head><meta name="viewport" content="width=device-w
 <div class="word-layout"><div class="word-panel">
 <p class="word-clue">Find the hidden word</p>
 <div class="word-stats"><span class="family-pill">WINS 3</span><span class="family-pill">SCORE 25</span></div>
-<div id="commons-word-moves">GUESS HISTORY</div><form class="word-guess-form"><input aria-label="guess"><button>GUESS</button></form>
+<section class="word-history" aria-label="Previous guesses">
+<div class="word-history-head"><strong>Previous guesses</strong><span>12 / 12</span></div>
+<div id="commons-word-moves" class="word-history-list" tabindex="0" role="list"></div></section>
+<p id="commons-word-finish" class="word-message">Work together: 5 letters and 12 guesses as a team.</p>
+<form id="commons-word-form" class="word-guess-form"><input id="commons-word-guess" aria-label="Five-letter guess" maxlength="5" placeholder="WORD?"><button type="submit">Try word</button><button type="button">Refresh team</button></form>
+<section id="commons-quest-keyboard" class="family-quest-keyboard" aria-label="Team used-letter keyboard">
+<strong class="family-letter-heading">Team letter clues</strong>
+<div id="commons-quest-confirmed" class="family-fixed-positions"><span>·</span><span>·</span><span>·</span><span>·</span><span>·</span></div>
+<p class="family-letter-note">Green letters stay in their confirmed positions.</p>
+<div class="family-quest-keys" id="test-quest-keys"></div>
+<p class="family-letter-excluded">Not in the word: A · B · C · D · E · F · G · H · I · J · K</p>
+</section><p id="commons-word-message" class="word-message" role="status"></p>
 </div><div class="word-leaderboard">TEAM SCORES</div></div></section></div></section>
 <section id="streetrod-root"><button class="mahjong-entry-button" id="sr-toggle" aria-expanded="false">STREET R0D</button><div id="sr-inside" hidden>
 <div id="src-classic-hub"><div id="streetrod-summer"><div id="ss-tabs">
@@ -94,6 +107,29 @@ for (const [btn,inside] of [['mahjong-toggle','mahjong-inside'],['plate-game-ope
 document.getElementById('ss-tabs').addEventListener('click',event=>{
  const b=event.target.closest('[data-ss-tab]');if(!b)return;
  document.querySelectorAll('#ss-tabs [data-ss-tab]').forEach(el=>el.setAttribute('aria-pressed',String(el===b)));
+});
+for(let i=0;i<12;i++){
+ const row=document.createElement('div');row.className='word-tile-row';row.setAttribute('role','listitem');
+ const player=document.createElement('span');player.className='word-player';player.textContent='#'+(i+1)+' · Team';
+ row.append(player);
+ for(const ch of 'RUNES'){const tile=document.createElement('span');tile.className='word-tile absent';tile.textContent=ch;row.append(tile);}
+ const points=document.createElement('strong');points.textContent='+5';row.append(points);
+ document.getElementById('commons-word-moves').append(row);
+}
+for(const chars of ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM']){
+ const row=document.createElement('div');row.className='family-quest-key-row';
+ if(chars==='ZXCVBNM'){const enter=document.createElement('button');enter.type='button';enter.dataset.questKey='ENTER';enter.textContent='Enter';row.append(enter);}
+ for(const key of chars){const b=document.createElement('button');b.type='button';b.dataset.questKey=key;b.textContent=key;row.append(b);}
+ if(chars==='ZXCVBNM'){const back=document.createElement('button');back.type='button';back.dataset.questKey='BACK';back.textContent='⌫';row.append(back);}
+ document.getElementById('test-quest-keys').append(row);
+}
+document.getElementById('commons-quest-keyboard').addEventListener('click',event=>{
+ const key=event.target.closest('[data-quest-key]')?.dataset.questKey;
+ const field=document.getElementById('commons-word-guess');
+ if(!key)return;
+ if(key==='BACK')field.value=field.value.slice(0,-1);
+ else if(key.length===1&&field.value.length<5)field.value+=key;
+ field.dispatchEvent(new Event('input',{bubbles:true}));
 });
 for(let i=0;i<12;i++){
  const row=document.createElement('div');row.className='letter-lock-grid-row';
@@ -197,6 +233,28 @@ async def run_device(browser,width,height):
   assert not await page.evaluate("document.body.classList.contains('arcade-on')")
   await check_one(page,"#letter-lock-toggle","wordle")
   await check_one(page,"#word-game-toggle","wordquest")
+  await open_game(page,"#word-game-toggle")
+  panel=await page.locator("#commons-word .word-panel").bounding_box()
+  history=await page.locator("#commons-word-moves").bounding_box()
+  keyboard=await page.locator("#commons-quest-keyboard").bounding_box()
+  bottom=await page.locator('#commons-quest-keyboard [data-quest-key="BACK"]').bounding_box()
+  viewport=page.viewport_size
+  assert panel and history and keyboard and bottom, ("Word Quest board missing",width,height)
+  assert keyboard["height"]>=75, ("Word Quest keyboard collapsed",width,height,keyboard)
+  assert keyboard["y"]>=panel["y"]-2 and keyboard["y"]+keyboard["height"]<=panel["y"]+panel["height"]+2, ("Word Quest keyboard clipped by panel",width,height,panel,keyboard)
+  assert bottom["y"]+bottom["height"]<=min(panel["y"]+panel["height"],viewport["height"])+2, ("Last keyboard row below viewport",width,height,bottom,panel)
+  assert await page.locator("#commons-word-moves").evaluate("el=>el.scrollHeight>el.clientHeight"), ("12 guesses should scroll inside history",width,height)
+  assert await page.locator("#commons-word-moves").evaluate("el=>getComputedStyle(el).overflowY==='auto'"), ("History must scroll, not the page",width,height)
+  assert await page.locator("#commons-word-guess").input_value()==""
+  await page.locator('#commons-quest-keyboard [data-quest-key="R"]').click()
+  await page.locator('#commons-quest-keyboard [data-quest-key="U"]').click()
+  await page.locator('#commons-quest-keyboard [data-quest-key="BACK"]').click()
+  assert await page.locator("#commons-word-guess").input_value()=="R", ("Custom keyboard interaction failed",width,height)
+  assert not await page.evaluate("document.activeElement?.id==='commons-word-guess'"), "Onscreen keys should not focus the native phone keyboard"
+  (ROOT/"reports").mkdir(exist_ok=True,parents=True)
+  if width in (320,375,390,844):
+   await page.screenshot(path=str(ROOT/"reports"/f"wordquest-keyboard-{width}x{height}.png"),full_page=False,animations="disabled")
+  await page.get_by_role("button",name="Back to games").click()
   await check_one(page,"#plate-game-open","plates")
   await open_game(page,"#plate-game-open")
   await page.get_by_role("button",name="Review Plates",exact=True).click()

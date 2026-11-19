@@ -16,6 +16,8 @@ on:
       - 'docs/retro-unlock-art.mjs'
       - 'tests/retro-game-unlockables.test.mjs'
       - 'docs/commons-arcade-shell.css'
+      - 'docs/commons-wordquest-keyboard-visibility.css'
+      - 'docs/commons-family.mjs'
       - 'docs/commons-arcade-titles.mjs'
       - 'docs/commons-dash-forge.mjs'
       - 'docs/commons-dash-forge.css'
@@ -45,6 +47,8 @@ on:
       - 'tests/retired-classics.test.mjs'
       - 'tests/browser-classic-family-fun.py'
       - 'docs/commons-arcade-*'
+      - 'docs/commons-wordquest-keyboard-visibility.css'
+      - 'docs/commons-family.mjs'
       - 'docs/commons-dash-forge.*'
       - 'tests/arcade-boss-title-screens.test.mjs'
       - 'tests/dash-forge.test.mjs'
@@ -105,6 +109,7 @@ jobs:
             reports/skyboard-sprint-iphone.png
             reports/skyboard-course-worlds.png
             reports/arcade-one-screen-iphone-sample.png
+            reports/wordquest-keyboard-*.png
             reports/family-fun-original-390.png
           if-no-files-found: ignore
           retention-days: 7
