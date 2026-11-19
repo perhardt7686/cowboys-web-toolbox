@@ -39,6 +39,9 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-anchor','0')
     await expect(page.locator('#mc-roster .mc-portrait[data-crew-id] .mc-v5-portrait-art')).to_have_count(1)
     await expect(page.locator('#mc-roster .mc-reference-portrait .mc-v5-portrait-art')).to_have_count(4)
+    painted_faces=await page.locator('#mc-roster .mc-v5-portrait-art').evaluate_all(
+        "(nodes)=>nodes.map(n=>getComputedStyle(n).backgroundImage)")
+    assert len(painted_faces)==5 and all('blob:' in bg for bg in painted_faces),painted_faces
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
     await expect(page.locator('#mc-painted-hero')).to_be_hidden()
     await expect(page.locator('#mc-painted-hound')).to_be_visible()
@@ -106,6 +109,8 @@ async def verify(browser,width,height,label):
     await set_category(page,'outfits')
     await page.locator('.mc-card[data-item="explorer"]').click()
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','explorer')
+    await page.screenshot(path=str(REPORTS/f'mystery-crew-v5-explorer-{label}.png'),
+                          full_page=False,animations='disabled')
     after=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
     assert before!=after,'Equip must change illustrated costume on center-stage body'
     await choose_item(page,'outdoors')
