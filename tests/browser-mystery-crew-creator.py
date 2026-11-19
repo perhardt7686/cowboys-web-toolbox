@@ -39,6 +39,8 @@ async def verify(browser,width,height,label):
 
     # Wardrobe and palette remain real interactions, not decorative previews.
     await set_category(page,'outfits')
+    artwork=await page.locator('.mc-card-art svg').evaluate_all('(nodes)=>nodes.map(el=>el.innerHTML)')
+    assert len(set(artwork))==len(artwork),'Outfit cards must have distinct illustrated silhouettes'
     await page.locator('.mc-card[data-item="explorer"]').click()
     await expect(page.locator('#mc-actor')).to_have_attribute('style',re.compile('.*--shirt.*#6c9354.*'))
     assert await page.locator('#mc-outfit-details path').count()>2
@@ -75,6 +77,8 @@ async def verify(browser,width,height,label):
     await page.locator('[data-motion="wave"]').click()
     await expect(page.locator('#mc-app')).to_have_attribute('data-motion','wave')
     await set_category(page,'pets')
+    pet_art=await page.locator('.mc-card-art svg').evaluate_all('(nodes)=>nodes.map(el=>el.innerHTML)')
+    assert len(set(pet_art))==len(pet_art),'Pet choices must have distinct species silhouettes'
     await page.locator('.mc-card[data-item="cat"]').click()
     assert await page.locator('#mc-pet path').count()>=3
     await set_category(page,'hats')
