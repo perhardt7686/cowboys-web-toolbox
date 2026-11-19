@@ -59,6 +59,11 @@ async def verify(browser,width,height,label):
     await page.locator('#mc-save').click()
     await page.reload(wait_until='domcontentloaded')
     await expect(page.locator('#mc-roster .mc-portrait')).to_have_count(2)
+    geometry=await page.evaluate("""() => Object.fromEntries(
+      ['.mc-layout','.mc-roster','.mc-market','.mc-cards','.mc-pages','.mc-theater','.mc-tools']
+      .map(k=>[k,document.querySelector(k).getBoundingClientRect().toJSON()]))""")
+    print('Layout after reload',label,geometry,flush=True)
+    await page.screenshot(path=str(REPORTS/f'mystery-crew-before-roster-{label}.png'),full_page=False)
     await page.locator('#mc-roster .mc-portrait').first.click()
     await expect(page.locator('#mc-character-name')).to_have_text('Trailblazer')
     for category,property_,value in [('faces','faceShape','round'),('haircuts','hairStyle','bob'),
