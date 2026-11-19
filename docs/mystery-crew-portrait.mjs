@@ -1,6 +1,6 @@
 /* Shared original Mystery Crew portrait art. No untrusted user SVG injection.
  * One geometry pipeline for roster thumbnails, selection cards and forum photos. */
-import {crewHeadMarkup} from './mystery-crew-art.mjs';
+import {crewHeadMarkup} from './mystery-crew-art.mjs?v=paint2';
 export const BASIC_MYSTERY_CREW=Object.freeze({
  id:'crew-1',name:'Scout',skin:'#f0b989',hair:'#904b28',shirt:'#ef792f',pants:'#315b93',
  outfit:'detective',hat:'none',gear:'none',pet:'dog',vehicle:'van',scene:'sunlit',
