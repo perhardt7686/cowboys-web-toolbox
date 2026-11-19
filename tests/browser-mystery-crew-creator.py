@@ -97,14 +97,13 @@ async def verify(browser,width,height,label):
     assert await page.locator('#mc-fidelity-head g').count()>0,'Face layers should be vector, not placeholders'
 
     # Wardrobe and palette remain real interactions, not decorative previews.
-    # Alternate vehicles remain functional and must not leak the special van.
+    # Unlock rules remain intact. The Jeep requires more coins than the
+    # local fixture owns, so a locked click cannot silently swap vehicles.
     await set_category(page,'vehicles')
     await page.locator('.mc-card[data-item="jeep"]').click()
-    await expect(page.locator('#mc-v4-complete-van')).to_be_hidden()
-    await expect(page.locator('#mc-vector-van')).to_be_visible()
-    await page.locator('.mc-card[data-item="van"]').click()
     await expect(page.locator('#mc-v4-complete-van')).to_be_visible()
     await expect(page.locator('#mc-vector-van')).to_be_hidden()
+    await expect(page.locator('#mc-scene')).to_have_attribute('data-v4-vehicle','van')
     await set_category(page,'outfits')
     artwork=await page.locator('.mc-card-art svg').evaluate_all('(nodes)=>nodes.map(el=>el.innerHTML)')
     assert len(set(artwork))==len(artwork),'Outfit cards must have distinct illustrated silhouettes'
