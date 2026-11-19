@@ -108,7 +108,7 @@ function lockEditor(lock){
 function syncServer(data,{preserveDraft=false}={}){
  if(!data||!Array.isArray(data.crew)||!data.crew.length)throw new Error('Family character data was missing.');
  revision=Number(data.revision)||0;
- const normalized={version:1,crew:data.crew,active:data.active,coins:data.coins,xp:data.xp,
+ const normalized={version:1,crew:data.crew.map((member,index)=>({...starter(index+1),...member})),active:data.active,coins:data.coins,xp:data.xp,
    unlocked:data.unlocked,rewardedDesigns:data.rewardedDesigns};
  state=structuredClone(normalized);savedSnapshot=JSON.stringify(state);
  if(preserveDraft){
