@@ -57,6 +57,6 @@ test('art remains optional; existing live SVG and account save workflow are inta
  assert.match(art,/member\.faceShape==='oval'/);
  assert.match(art,/actor\.style\.opacity=anchor\?'0':'1'/);
  assert.match(art,/member\.pet==='dog'/);
- assert.match(html,/mystery-crew-creator\.css\?v=layered3/);
- assert.match(html,/mystery-crew-creator\.mjs\?v=layered3/);
+ assert.match(html,/mystery-crew-creator\.css\?v=scene4/);
+ assert.match(html,/mystery-crew-creator\.mjs\?v=scene4/);
 });

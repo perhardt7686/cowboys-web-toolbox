@@ -62,3 +62,15 @@ equipment and touch controls. Browser CI must also pass genuine 375 × 667,
 zero document overflow, item/trait changes, saves and account isolation.
 Never claim source equivalence or real-device iPhone verification solely
 because Playwright passed.
+
+## V4 continuity note | November 19, 2026
+
+Reference lock remains the original privately held 1672 × 941 illustration. Do not upload those original pixels to public Pages.
+
+**New independently replaceable scenery:** mystery-workshop-v4.webp (generated painterly forest and workshop, 820 × 550, about 72 KB), with the inspectable mystery-workshop-v4.svg scenic source study. mystery-van-v4.svg is a separate complete 760 × 465 vehicle with wheels, windows, four roof lights, orange stripes and magnifier emblem. The old cropped/occluded van and workshop picture patches no longer show while V4 is active. Both new files must decode before the art swap, and V3 is the fallback.
+
+**Original-art benchmark:** The approved image remains richer than the shipped title, facial acting, outfit-on-body variants and van painting. Do not report pixel-perfect parity. Compare fresh 1672 × 941 desktop and 375 × 667 and 390 × 844 phone captures, and require one visible van, no broken images and no document/internal gallery scrolling.
+
+**Live data:** No database migration or changes to family accounts, rewards, saved crew identities, pet IDs or outfit IDs.
+
+**Next pass after V4:** Full painted outfit-on-actor variations and five remaining distinguishable crew anchors; see Issue #106. Verify pose, hat and gear combinations visibly change character artwork rather than silently returning to generic anchor art.

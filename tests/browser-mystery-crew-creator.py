@@ -23,10 +23,13 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-scene')).to_have_attribute('data-painterly','ready',timeout=20000)
     await expect(page.locator('#mc-painted-hero')).to_be_visible()
     await expect(page.locator('#mc-painted-hound')).to_be_visible()
-    await expect(page.locator('#mc-painted-van')).to_be_visible()
+    await expect(page.locator('#mc-scene')).to_have_attribute('data-scene-version','4',timeout=20000)
+    await expect(page.locator('#mc-v4-seamless-workshop')).to_be_visible()
+    await expect(page.locator('#mc-v4-complete-van')).to_be_visible()
+    await expect(page.locator('#mc-painted-van')).to_be_hidden()
+    await expect(page.locator('#mc-painted-van-backing')).to_be_hidden()
     await expect(page.locator('#mc-vector-van')).to_be_hidden()
-    await expect(page.locator('#mc-painted-van-backing')).to_be_visible()
-    assert await page.locator('#mc-painted-van-backing circle').count()>=4,'Backed painted van needs actual wheels and rims'
+    assert await page.locator('#mc-v4-complete-van').get_attribute('href')!='', 'Independent complete van missing'
     assert await page.locator('#mc-painted-hero image').count()==6,'Hero must have six independent painted parts'
     assert await page.locator('#mc-cards .mc-painted-outfit').count()>0,'Working gallery must display actual painted outfits'
     assert await page.locator('#mc-painted-workshop image').count()==1
@@ -39,6 +42,7 @@ async def verify(browser,width,height,label):
         ...document.querySelectorAll('#mc-painted-hound image'),
         ...document.querySelectorAll('#mc-painted-van image'),
         ...document.querySelectorAll('#mc-painted-workshop image'),
+        ...document.querySelectorAll('#mc-v4-seamless-workshop, #mc-v4-complete-van'),
         ...document.querySelectorAll('#mc-cards .mc-painted-outfit')
       ];
       const checks=await Promise.all(elements.map(async el=>{
@@ -53,7 +57,7 @@ async def verify(browser,width,height,label):
       return {count:elements.length,checks};
     }""")
     gallery_items=await page.locator('#mc-cards .mc-painted-outfit').count()
-    assert painted['count']==9+gallery_items,painted
+    assert painted['count']==11+gallery_items,painted
     assert all(x['ok'] for x in painted['checks']),'Painterly image missing/corrupted/CSP blocked: '+str(painted)
     await page.screenshot(path=str(REPORTS/f'mystery-crew-painted-fresh-{label}.png'),
                           full_page=False,animations='disabled')
@@ -93,6 +97,13 @@ async def verify(browser,width,height,label):
     assert await page.locator('#mc-fidelity-head g').count()>0,'Face layers should be vector, not placeholders'
 
     # Wardrobe and palette remain real interactions, not decorative previews.
+    # Unlock rules remain intact. The Jeep requires more coins than the
+    # local fixture owns, so a locked click cannot silently swap vehicles.
+    await set_category(page,'vehicles')
+    await page.locator('.mc-card[data-item="jeep"]').click()
+    await expect(page.locator('#mc-v4-complete-van')).to_be_visible()
+    await expect(page.locator('#mc-vector-van')).to_be_hidden()
+    await expect(page.locator('#mc-scene')).to_have_attribute('data-v4-vehicle','van')
     await set_category(page,'outfits')
     artwork=await page.locator('.mc-card-art svg').evaluate_all('(nodes)=>nodes.map(el=>el.innerHTML)')
     assert len(set(artwork))==len(artwork),'Outfit cards must have distinct illustrated silhouettes'
