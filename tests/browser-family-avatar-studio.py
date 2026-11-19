@@ -28,7 +28,7 @@ async def main():
                     raise
                 bounds=await quick.bounding_box()
                 assert bounds and bounds['width']>=44 and bounds['height']>=44,(width,bounds)
-                assert await quick.get_attribute('aria-label')=='Open my avatar studio'
+                assert await quick.get_attribute('aria-label')=='Open Mystery Crew Creator'
                 hamburger=await page.locator('#cowboy-site-nav .cowboy-nav-toggle').bounding_box()
                 assert hamburger and 0<=hamburger['x']-bounds['x']<=120,(
                     width,'header avatar not next to menu',bounds,hamburger)
