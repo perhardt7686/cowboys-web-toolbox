@@ -34,9 +34,9 @@ async def verify(browser,width,height,label):
     await page.screenshot(path=str(REPORTS/f'mystery-crew-fresh-reference-{label}.png'),
                           full_page=False,animations='disabled')
     await set_category(page,'presets')
-    await expect(page.locator('[data-reference-look="juniper"]')).to_be_visible()
-    await page.locator('[data-reference-look="juniper"]').click()
-    await expect(page.locator('[data-reference-look="juniper"]')).to_have_attribute('aria-pressed','true')
+    await expect(page.locator('#mc-cards [data-reference-look="juniper"]')).to_be_visible()
+    await page.locator('#mc-cards [data-reference-look="juniper"]').click()
+    await expect(page.locator('#mc-cards [data-reference-look="juniper"]')).to_have_attribute('aria-pressed','true')
     assert '#b8432a' in await page.locator('#mc-fidelity-head').inner_html()
 
     # Five independently persisted, allowlisted face traits.
