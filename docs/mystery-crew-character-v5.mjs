@@ -48,6 +48,7 @@ export function paintedAnchor(m){
 export function paintedRecipe(m,opt={}){
  const index=paintedAnchor(m);
  if(index<0||!OUTFITS.includes(m.outfit)||m.shirt!==COLORS[m.outfit]||
+  (opt.motion&&opt.motion!=='idle')||
   m.hat!=='none'||m.gear!=='none'||(opt.angle||0)!==0)return null;
  return 'crew-'+index+'-'+m.outfit+'.webp';
 }
