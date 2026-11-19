@@ -1,0 +1,34 @@
+name: Mystery Crew V7 actual-painted-pose acceptance
+on:
+  pull_request:
+    paths:
+      - 'tests/mystery-crew-v7-visual-integrity.py'
+      - 'scripts/build_mystery_crew_v7_source_layers.py'
+      - 'scripts/build_mystery_crew_v7_pose_studio.py'
+      - 'docs/mystery-crew-motion-v6.mjs'
+      - '.github/workflows/mystery-crew-v7-visual-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  painted-pose-art-review:
+    name: painted-shoulder-continuity-MUST-PASS-BEFORE-MERGE
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install image reference verification dependencies
+        run: python -m pip install 'pillow>=11,<13' 'numpy>=2,<3'
+      - name: Check all 48 moving painted costumes for exposed shoulder and torso gaps
+        run: python tests/mystery-crew-v7-visual-integrity.py
+      - name: Preserve art rejection report for manual painter review
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mystery-crew-v7-art-continuity-acceptance
+          path: reports/mystery-crew-v7-visual-integrity.json
+          if-no-files-found: warn
+          retention-days: 7
