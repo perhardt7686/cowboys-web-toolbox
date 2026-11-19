@@ -194,6 +194,34 @@ function renderWearables(member){
 }
 function renderPetSpecies(member){
  const group=$('mc-pet'),p=member.pet;
+ if(p==='dog'){
+  group.setAttribute('transform','translate(623 380)');
+  group.innerHTML=[
+    '<ellipse cx="95" cy="195" rx="93" ry="14" fill="#4f412e" opacity=".22"/>',
+    '<path d="M139 152Q189 147 166 109" fill="none" stroke="#986237" stroke-width="18" stroke-linecap="round"/>',
+    '<path d="M55 108Q49 72 92 74Q143 69 150 121L148 173Q129 197 79 195Q35 193 38 162Z" fill="#faf4e7" stroke="#3c3437" stroke-width="7"/>',
+    '<path d="M47 126Q54 92 72 85L87 116 69 178 47 174Z" fill="#b9783c" stroke="#493331" stroke-width="4"/>',
+    '<path d="M113 84Q134 94 136 125L144 173 113 171Z" fill="#a16c3c" opacity=".75"/>',
+    '<path d="M67 150Q56 167 51 187Q65 198 80 189L84 146M121 147L121 184Q129 197 146 188L142 145" fill="#faf8ee" stroke="#3c3437" stroke-width="6"/>',
+    '<path d="M53 186Q63 197 82 188M117 186Q135 196 147 187" fill="none" stroke="#3d3436" stroke-width="5"/>',
+    '<path d="M42 43Q21 11 43 0Q73 2 78 32L102 35Q122 2 150 10Q160 40 138 69L144 112Q114 141 72 122L42 94Z" fill="#b87b3f" stroke="#352d30" stroke-width="7"/>',
+    '<path d="M47 38Q23 18 31 50Q34 91 54 94L69 49Z" fill="#945b32" stroke="#332e32" stroke-width="5"/>',
+    '<path d="M126 37Q153 17 152 44Q150 81 133 91L111 54Z" fill="#915930" stroke="#332e32" stroke-width="5"/>',
+    '<path d="M64 64Q79 53 89 65Q106 55 118 66L128 108Q99 128 70 109Z" fill="#f9f4e7" stroke="#443738" stroke-width="5"/>',
+    '<ellipse cx="80" cy="67" rx="12" ry="17" fill="white" stroke="#38333a" stroke-width="3"/>',
+    '<ellipse cx="113" cy="68" rx="12" ry="17" fill="white" stroke="#38333a" stroke-width="3"/>',
+    '<circle cx="85" cy="69" r="6" fill="#263e48"/><circle cx="108" cy="71" r="6" fill="#263e48"/>',
+    '<circle cx="87" cy="66" r="2" fill="#fff"/><circle cx="110" cy="68" r="2" fill="#fff"/>',
+    '<path d="M88 86Q99 80 110 89Q109 104 97 104Q86 100 88 86Z" fill="#272a32"/>',
+    '<path d="M96 105Q102 119 117 108" fill="none" stroke="#6a3940" stroke-width="5" stroke-linecap="round"/>',
+    '<path d="M101 111Q107 133 113 125L114 113Z" fill="#f1949c" stroke="#7b4249" stroke-width="3"/>',
+    '<path d="M54 126Q99 138 146 125" fill="none" stroke="#b93c31" stroke-width="12"/>',
+    '<circle cx="100" cy="133" r="12" fill="#e6bf57" stroke="#644e32" stroke-width="5"/>',
+    '<circle cx="100" cy="130" r="3" fill="#fff4b8"/>'
+   ].join('');
+  return;
+ }
+ group.setAttribute('transform','translate(641 433)');
  const source={
  dog:'<path d="M26 123Q2 87 15 50Q12 18 47 15L68 39Q92 3 114 24L120 48Q141 71 128 122Z" fill="var(--pet)" stroke="#332d32" stroke-width="8"/><path d="M21 43Q1 14 20 6L57 36Z M98 35Q134 3 142 19L125 63Z" fill="var(--pet)" stroke="#332d32" stroke-width="7"/><path d="M36 91Q72 65 111 92L109 128Q71 145 37 124Z" fill="#f9edd5" stroke="#43343a" stroke-width="6"/>',
  cat:'<path d="M30 128L33 37 14 6 58 38Q86 27 106 39L143 10 132 63 134 128Z" fill="var(--pet)" stroke="#352f3e" stroke-width="8"/><path d="M46 118Q74 100 123 119" fill="none" stroke="#e6d9cc" stroke-width="7"/><path d="M19 27L36 50 50 38 M119 40L137 27 130 57" fill="#d7b6ae"/>',
