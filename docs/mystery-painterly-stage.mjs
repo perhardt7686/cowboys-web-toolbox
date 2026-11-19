@@ -57,11 +57,27 @@ function mountPaintedLayers(){
  const pet=document.getElementById('mc-pet');
  if(!scene||!barn||!vehicle||!actor||!pet)return false;
  const forest=group('mc-painted-forest','mc-painterly-atmosphere');
+ // The forest source is a small cutout. Soften its edge rather than
+ // showing a sharp rectangular picture pasted over the vector woodland.
+ forest.style.opacity='.28';
  forest.append(image('forest.webp',115,0,280,157));
  scene.insertBefore(forest,barn);
  const shop=group('mc-painted-workshop','mc-painterly-atmosphere');
  shop.append(image('workshop-painted.webp',763,4,195,431));
  barn.append(shop);
+ // Keep the original SVG van in a named layer for alternative vehicles.
+ // The painterly cutout is larger than that original SVG van and contains
+ // intentional transparent holes where characters used to overlap it.
+ // Showing both unscaled vans caused an obvious second cartoon van.
+ const vectorVan=group('mc-vector-van','mc-vector-van');
+ for(const child of [...vehicle.childNodes])vectorVan.append(child);
+ vehicle.append(vectorVan);
+ const vanBacking=group('mc-painted-van-backing','mc-painterly-van-backing');
+ vanBacking.innerHTML='<path d="M67 289Q65 217 144 174L594 160Q677 161 704 242L718 407Q705 442 658 445H108Q60 437 61 408Z" fill="#347f9f" stroke="#284759" stroke-width="7"/>'+
+ '<path d="M90 280L152 184Q181 159 250 159L590 159Q654 166 680 237L684 282Z" fill="#e4dec5" stroke="#38576b" stroke-width="6"/>'+
+ '<path d="M95 310H706" stroke="#ec8e43" stroke-width="21"/>'+
+ '<path d="M116 359H713" stroke="#e5a16b" stroke-width="7"/>';
+ vehicle.append(vanBacking);
  const van=group('mc-painted-van','mc-painterly-van');
  van.append(image('van-painted.webp',54,54,686,385));
  vehicle.append(van);
@@ -79,7 +95,7 @@ function mountPaintedLayers(){
  const dog=group('mc-painted-hound','mc-painterly-hound');
  dog.append(image('hound.webp',527,245,205,276));
  pet.parentNode.insertBefore(dog,pet.nextSibling);
- nodes={hero,dog,van,actor,pet,scene};
+ nodes={hero,dog,van,vanBacking,vectorVan,actor,pet,scene};
  scene.dataset.painterly='ready';
  return true;
 }
@@ -122,7 +138,7 @@ export function painterlyOutfitHTML(item){
 }
 export function syncPainterlyStage(member,options={}){
  if(!nodes)return false;
- const {hero,dog,van,actor,pet,scene}=nodes;
+ const {hero,dog,van,vanBacking,vectorVan,actor,pet,scene}=nodes;
  // Only replace the actual approved illustrated anchor. Every other outfit,
  // skin tone, face, hair and body view continues to use live SVG customization
  // rather than showing the wrong person's painted face.
@@ -136,7 +152,10 @@ export function syncPainterlyStage(member,options={}){
  const petPainted=member.pet==='dog';
  dog.style.display=petPainted?'':'none';
  pet.style.opacity=petPainted?'0':'1';
- van.style.display=member.vehicle==='van'?'':'none';
+ const paintedVan=member.vehicle==='van';
+ van.style.display=paintedVan?'':'none';
+ vanBacking.style.display=paintedVan?'':'none';
+ vectorVan.style.display=paintedVan?'none':'';
  const zoom=Math.min(1.5,Math.max(.8,Number(options.zoom)||1));
  hero.setAttribute('transform','translate(399 270) scale('+zoom+') translate(-399 -270)');
  dog.setAttribute('transform','translate(626 375) scale('+zoom+') translate(-626 -375)');
