@@ -3,7 +3,7 @@
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
 import {loadPainterlyPack,painterlyOutfitHTML,syncPainterlyStage} from './mystery-painterly-stage.mjs?v=layered3';
-import {loadCrewV5,syncCrewV5} from './mystery-crew-character-v5.mjs?v=crew5';
+import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML} from './mystery-crew-character-v5.mjs?v=crew5';
 import {mountSceneV4,syncSceneV4} from './mystery-crew-scene-v4.mjs?v=scene4';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
@@ -103,7 +103,7 @@ function icon(item){
  return '<svg viewBox="0 0 160 160" aria-hidden="true" focusable="false">'+svg+'</svg>';
 }
 
-function portrait(member){return mysteryCrewPortraitSVG(member);}
+function portrait(member){return paintedCrewPortraitHTML(member)||mysteryCrewPortraitSVG(member);}
 
 function writeState(){
  if(!isPreview)return false;
