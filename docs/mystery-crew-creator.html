@@ -4,9 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#07517d">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://cdn.jsdelivr.net; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="description" content="Mystery Crew Creator, a new family cartoon character workshop.">
 <title>Mystery Crew Creator | Cowboy's Web Toolbox</title>
-<link rel="stylesheet" href="mystery-crew-creator.css?v=creator1">
+<link rel="stylesheet" href="mystery-crew-creator.css?v=account1">
+<script src="community-config.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#mc-stage">Skip to character stage</a>
@@ -14,7 +18,7 @@
 <header class="mc-top">
   <a class="mc-brand" href="community.html"><span class="mc-brand-icon" aria-hidden="true">✹</span><span>Cowboy's<small>Web Toolbox</small></span></a>
   <div class="mc-title"><span class="mc-title-main">Mystery Crew <b>Creator</b></span><span class="mc-subtitle">Create • Customize • Equip • Collect</span></div>
-  <div class="mc-statbar"><span class="mc-save-indicator" title="Stored only in this browser">MY DEVICE <b>● LOCAL</b></span><span class="mc-pill">★ <strong id="mc-rank">Level 1</strong></span><span class="mc-pill">🪙 <strong id="mc-coins">0</strong></span><button class="mc-icon-button" id="mc-help" aria-label="About local progress">?</button></div>
+  <div class="mc-statbar"><span class="mc-save-indicator" title="Saved in your family account">FAMILY ACCOUNT <b>● CONNECTING</b></span><span class="mc-pill">★ <strong id="mc-rank">Level 1</strong></span><span class="mc-pill">🪙 <strong id="mc-coins">0</strong></span><button class="mc-icon-button" id="mc-help" aria-label="About local progress">?</button></div>
 </header>
 <nav class="mc-topnav" aria-label="Creator sections">
 <button data-view="character" aria-pressed="true">♟ Character</button>
@@ -173,10 +177,10 @@
  <button data-jump="vehicles">🚐 <span>Vehicles</span></button>
  <button data-jump="collections">🏆 <span>Collections</span></button>
 </nav>
-<footer class="mc-footer"><span id="mc-status" role="status">Your characters and unlocks are saved on this device only. Previous creator data is not used.</span><a href="community.html">Back to Family Message Board</a></footer>
+<footer class="mc-footer"><span id="mc-status" role="status">Your characters and unlocks sync to your approved family account. Every member starts with a basic Mystery Crew character.</span><a href="community.html">Back to Family Message Board</a></footer>
 </div>
-<dialog id="mc-info"><h2>Mystery Crew Creator</h2><p>A fresh character creator inspired by Cowboy's approved reference. This first release stores your crew, outfit choices, and earned workshop coins only in this browser. It does not change family accounts, achievement servers, or previous creator characters.</p><button id="mc-info-close">Got it</button></dialog>
+<dialog id="mc-info"><h2>Mystery Crew Creator</h2><p>Your Mystery Crew, pets, outfits and earned unlocks belong to your own approved family account and sync between devices. Every approved member starts with Scout. The old avatar creator is retired.</p><button id="mc-info-close">Got it</button></dialog>
 <dialog id="mc-rename-dialog"><form method="dialog" id="mc-rename-form"><h2>Rename your character</h2><label for="mc-name-input">Crew member name</label><input id="mc-name-input" maxlength="28" minlength="1" required autocomplete="off"><div class="mc-dialog-actions"><button value="cancel" type="button" id="mc-rename-cancel">Cancel</button><button value="save" type="submit">Save name</button></div></form></dialog>
-<script type="module" src="mystery-crew-creator.mjs?v=creator2"></script>
+<script type="module" src="mystery-crew-creator.mjs?v=account1"></script>
 </body>
 </html>
