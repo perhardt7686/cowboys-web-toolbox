@@ -84,9 +84,10 @@ async def verify(browser,width,height,label):
     await page.locator('.mc-card[data-item="binoculars"]').click()
     assert await page.locator('#mc-gear-detail circle').count()>=2
     await set_category(page,'outfits')
-    if await page.locator('#mc-turn-right').is_visible():
-        await page.locator('#mc-turn-right').click()
-        await expect(page.locator('#mc-view-side')).to_have_attribute('aria-pressed','true')
+    rotate=page.locator('#mc-scene-turn-right' if width<700 else '#mc-turn-right')
+    await expect(rotate).to_be_visible()
+    await rotate.click()
+    await expect(page.locator('#mc-view-side')).to_have_attribute('aria-pressed','true')
     await page.locator('#mc-fit').click()
     await expect(page.locator('#mc-view-front')).to_have_attribute('aria-pressed','true')
 
