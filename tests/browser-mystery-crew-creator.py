@@ -12,6 +12,19 @@ async def set_category(page,value):
     await page.locator('#mc-market-filter').select_option(value)
     await expect(page.locator('#mc-market-filter')).to_have_value(value)
 
+async def choose_item(page,item):
+    # Short phones intentionally show two choices per page, with no scrolling.
+    for _ in range(8):
+        found=page.locator(f'.mc-card[data-item="{item}"]')
+        if await found.count():
+            await found.click()
+            return
+        next_page=page.locator('#mc-page-next')
+        if await next_page.is_disabled():
+            raise AssertionError(f'Item {item} was absent from paged wardrobe')
+        await next_page.click()
+    raise AssertionError(f'Item {item} was not found')
+
 async def verify(browser,width,height,label):
     page=await browser.new_page(viewport={'width':width,'height':height},
         is_mobile=width<700,has_touch=width<700,reduced_motion='reduce')
@@ -93,9 +106,10 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','explorer')
     after=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
     assert before!=after,'Equip must change illustrated costume on center-stage body'
-    await page.locator('.mc-card[data-item="outdoors"]').click()
+    await choose_item(page,'outdoors')
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','outdoors')
-    await page.locator('.mc-card[data-item="detective"]').click()
+    await set_category(page,'outfits')
+    await choose_item(page,'detective')
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
     await set_category(page,'presets')
 
