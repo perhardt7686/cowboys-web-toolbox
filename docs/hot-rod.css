@@ -385,3 +385,41 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
     padding-block:6px;
   }
 }
+
+/* Work on the original-style art rather than a second stack of controls. */
+.hot-rod-monitor .hot-rod-screen,
+.hot-rod-monitor .hot-rod-hotspots,
+.hot-rod-monitor .hot-rod-hotspot {
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.hot-rod-monitor[data-scene=workbench] .hot-rod-panel {
+  gap:6px;
+  padding-block:9px;
+}
+.hot-rod-monitor[data-scene=workbench] .hot-rod-panel h3 {font-size:1.02rem;}
+.hot-rod-monitor[data-scene=workbench] .hot-rod-assembly-picker {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:.84rem;
+}
+.hot-rod-monitor[data-scene=workbench] .hot-rod-assembly-picker select {
+  flex:1;
+  min-height:36px;
+  padding-block:4px;
+  font-size:.9rem;
+}
+.hot-rod-monitor[data-scene=workbench] .hot-rod-work-instructions,
+.hot-rod-monitor[data-scene=workbench] .hot-rod-work-meta {
+  font-size:.83rem;
+  line-height:1.35;
+}
+.hot-rod-monitor[data-scene=workbench] .hot-rod-work-meta { color:var(--rod-gold); }
+.hot-rod-monitor[data-scene=workbench] .hot-rod-row:empty,
+.hot-rod-monitor[data-scene=workbench] .hot-rod-work-meta:empty {display:none;}
+@media (max-width:700px) {
+  .hot-rod-monitor[data-scene=workbench] .hot-rod-panel {padding-inline:10px;}
+}

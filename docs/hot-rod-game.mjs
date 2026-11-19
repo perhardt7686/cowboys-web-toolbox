@@ -185,7 +185,7 @@ export function makeHotRod({client, memberId, launcher}) {
     node.classList.add('hot-rod-hotspot');
     for (const [name,value] of Object.entries({left:x / 320 * 100,top:y / 200 * 100,
       width:w / 320 * 100,height:h / 200 * 100})) node.style[name] = value + '%';
-    node.title = label;
+    // Native title tooltips cause long-press callouts on mobile Safari.
     node.setAttribute('aria-label', label);
     hotspots.append(node);
     return node;
@@ -504,7 +504,10 @@ export function makeHotRod({client, memberId, launcher}) {
     focusBolt=index;
     if(stage<(tight?1:2)){
       fastenerTurns.set(key,stage+1);
-      message=!tight&&!stage?'Bolt seated. Turn it twice to tighten.':'One turn. Turn again to '+(tight?'remove':'tighten')+' the fastener.';
+      const part=isWheel(slot)?'Lug ':'Bolt ';
+      message=tight?part+(index+1)+': one turn loose. Tap again to remove.':
+        !stage?part+(index+1)+': seated. Tap twice to tighten.':
+        part+(index+1)+': one turn tight. Tap again to secure.';
       problem='';retry=null;render();return;
     }
     void mutate('bolt',{slot,index},()=>{
@@ -539,6 +542,7 @@ export function makeHotRod({client, memberId, launcher}) {
       timing=car.timing;bayMode='tune';render();
     };
     const mount=select('Work area',SLOTS.map(name=>[name,SLOT_NAMES[name]]),slot,work);
+    mount.classList.add('hot-rod-assembly-picker');
     if(bayMode==='tune'){
       const adjust=delta=>{
         timing=Math.max(0,Math.min(16,timing+delta));render();
@@ -584,14 +588,14 @@ export function makeHotRod({client, memberId, launcher}) {
       pixelButton('Close the hood',BAY_MENU.done,done,'art-done');
     }
     const loose=item?BOLTS[slot]-workbenchFasteners(slot).filter((_,i)=>bolts&(1<<i)).length:0;
-    const mechanics=el('div','hot-rod-wrench');
-    if(item&&!blocked)workbenchFasteners(slot).forEach(({x,y},index)=>{
+    // Real wrench interaction happens on the engine artwork. Keep the
+    // server-authoritative hardware mutations, not duplicate menu buttons.
+    if(item&&!blocked&&!busy)workbenchFasteners(slot).forEach(({x,y},index)=>{
       const tight=Boolean(bolts&(1<<index)),turn=fastenerStage(car,slot,index);
       const type=tire?'lug ':'bolt ';
       const label=(tight?(turn?'Remove ':'Loosen '):(turn===0?'Seat ':turn===1?'Tighten ':'Torque '))+type+(index+1);
-      const wrench=()=>turnFastener(car,slot,index);
-      if(!busy)hotspot(label,x-11,y-9,22,18,wrench,'art-bolt'+index).classList.add('hot-rod-fastener');
-      mechanics.append(action(label,wrench,{disabled:busy,focus:'bolt'+index}));
+      hotspot(label,x-11,y-10,22,20,()=>turnFastener(car,slot,index),'art-bolt'+index)
+        .classList.add('hot-rod-fastener');
     });
     const ignition=()=>{
       void mutate('ignition',{},()=>{if(car.ignition)removeIfReady(slot);});
@@ -601,18 +605,17 @@ export function makeHotRod({client, memberId, launcher}) {
     if(!tire&&slot!=='gearbox'&&!busy&&(car.ignition||canConnect))
       pixelButton(ignitionLabel+' lead',IGNITION,ignition,'art-ignition');
     const controls=row();
+    // Wheels still require a physical jack step. TUNE, PARTS, DONE and the
+    // ignition lead are already selectable on the illustrated display.
     if(tire)controls.append(action(car.jack?'Lower jack':'Raise corner',doWork('jack',{slot}),
       {disabled:busy||Boolean(car.jack&&car.jack!==slot)}));
-    else if(slot!=='gearbox')controls.append(action(ignitionLabel,ignition,{disabled:busy||!car.ignition&&!canConnect}));
-    if(item&&bolts===0&&!blocked)controls.append(action('Lift off '+SLOT_NAMES[slot],()=>removeIfReady(slot),
-      {accent:true,disabled:busy||slot==='engine'&&car.ignition}));
-    if(!item&&!blocked)controls.append(action('Choose a spare',parts,{accent:true,disabled:busy}));
-    const note=blocked||(!item?'Open Parts to fit a compatible spare.':
-      slot==='engine'&&bolts===0&&car.ignition?'Unclip the ignition lead to lift the block.':
-      'Turn each '+(tire?'lug':'bolt')+' twice to remove it. Tap an empty hole to seat it again.');
-    panel(item?PARTS[item.id].name:SLOT_NAMES[slot],mount,
-      row(action('Tune',tune,{disabled:busy||!canTune(car)}),action('Parts',parts,{disabled:busy}),action('Done',done,{disabled:busy})),
-      copy(note),item?copy(item.wear+'% condition · '+loose+' loose'):el('span'),mechanics,controls);
+    const note=blocked||(!item?'Select PARTS on the engine display to fit a compatible spare.':
+      slot==='engine'&&bolts===0&&car.ignition?'Tap the ignition lead to disconnect it.':
+      'Tap each '+(tire?'lug':'bolt')+' twice to loosen. Tap an empty hole to replace, then twice to tighten.');
+    const detail=copy(note);detail.classList.add('hot-rod-work-instructions');
+    const condition=item?copy(item.wear+'% condition · '+loose+' loose'):el('span');
+    condition.classList.add('hot-rod-work-meta');
+    panel(item?PARTS[item.id].name:SLOT_NAMES[slot],mount,detail,condition,controls);
   }
 
   function renderClip() {
@@ -1166,7 +1169,17 @@ export function makeHotRod({client, memberId, launcher}) {
     else close();
   },{signal:abort.signal});
   dialog.addEventListener('keydown',event=>{
-    if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input,select,textarea,button')) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    // Original Street Rod reference card: number keys 1-9 select fasteners.
+    if(scene==='workbench' && bayMode==='work' && /^[1-9]$/.test(event.key) &&
+        !event.target.closest('input,select,textarea')){
+      const index=Number(event.key)-1,car=activeCar(state);
+      if(!busy && car?.installed[selectedSlot] && index<BOLTS[selectedSlot] && !bayBlock(car,selectedSlot)){
+        event.preventDefault();turnFastener(car,selectedSlot,index);
+      }
+      return;
+    }
+    if (event.target.closest('input,select,textarea,button')) return;
     if (scene==='garage' && event.code==='KeyN') openPaper('cover');
     if (scene==='garage' && event.code==='KeyM') toggleRadio();
     if (scene==='race' && event.code==='KeyP') togglePaused();
