@@ -204,6 +204,8 @@ async def verify(browser,width,height,label):
 
     await page.locator('[data-motion="wave"]').click()
     await expect(page.locator('#mc-app')).to_have_attribute('data-motion','wave')
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_be_hidden()
+    assert await page.locator('#mc-actor').evaluate('node=>node.style.opacity')=='1','Wave must use the articulated, responsive original rig'
     await set_category(page,'pets')
     pet_art=await page.locator('.mc-card-art svg').evaluate_all('(nodes)=>nodes.map(el=>el.innerHTML)')
     assert len(set(pet_art))==len(pet_art),'Pet choices must have distinct species silhouettes'
