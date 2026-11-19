@@ -18,6 +18,13 @@ test('workshop is an original full-viewport asset, not a cropped overlay',()=>{
  assert.doesNotMatch(art,/<image |data:image|\.png|\.webp/i);
 });
 
+test('published painterly workshop image is real, compressed, same-origin WebP',()=>{
+ const data=readFileSync(fileURLToPath(new URL('../docs/mystery-workshop-v4.webp',import.meta.url)));
+ assert.ok(data.byteLength>25000&&data.byteLength<250000,'Workshop image unexpectedly empty or oversized');
+ assert.equal(data.subarray(0,4).toString('ascii'),'RIFF');
+ assert.equal(data.subarray(8,12).toString('ascii'),'WEBP');
+});
+
 test('mystery van is independent, complete and specifically illustrated',()=>{
  const art=read('mystery-van-v4.svg');
  assert.match(art,/viewBox="0 0 760 465"/);
