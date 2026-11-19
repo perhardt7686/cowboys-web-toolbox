@@ -4,6 +4,7 @@
 body.community-page .mahjong-nature-road{
  --nature-sky:#e8f5b5;--nature-land:#57966c;--nature-ink:#173f2e;--nature-accent:#f9d44d;
  color:var(--nature-ink);margin:15px 0 18px;padding:12px;
+ scroll-margin-top:calc(82px + env(safe-area-inset-top));
  border:3px solid #e1c77a;border-radius:20px;
  background:linear-gradient(172deg,#fffef2 0%,#f3f9eb 40%,#f4eddb 100%);
  box-shadow:0 8px 24px #123f371c,inset 0 1px 0 #fff;
