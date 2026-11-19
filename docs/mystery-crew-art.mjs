@@ -81,9 +81,13 @@ export function crewHeadMarkup(raw={}){
  return '<path d="'+facePaths[v.faceShape]+'" fill="'+v.skin+'" stroke="#332d39" stroke-width="8" stroke-linejoin="round"/>'+
  '<ellipse cx="40" cy="96" rx="13" ry="18" fill="'+v.skin+'" stroke="#392f3b" stroke-width="5"/>'+
  '<ellipse cx="151" cy="96" rx="13" ry="18" fill="'+v.skin+'" stroke="#392f3b" stroke-width="5"/>'+
+ '<path d="M49 101Q54 130 82 147Q94 151 108 146Q132 133 145 104Q141 147 100 160Q64 157 49 122Z" fill="#713c30" opacity=".12"/>'+
+ '<path d="M52 72Q66 56 85 66M106 63Q129 55 141 73" fill="none" stroke="#fff1cb" stroke-width="5" opacity=".32"/>'+
  '<path d="M49 116Q61 134 78 137 M110 137Q129 133 143 116" fill="none" stroke="#d38568" stroke-width="4" opacity=".42"/>'+
+ '<path d="M54 119Q68 124 77 119 M115 118Q129 125 140 117" fill="none" stroke="#d97d66" stroke-width="3" opacity=".4"/>'+
  eyeMarkup(v.eyeShape)+
  '<path d="M96 99L88 116Q98 123 107 117" fill="none" stroke="#bd7957" stroke-width="4.5"/>'+
+ '<path d="M95 111Q100 113 104 110" fill="none" stroke="#ffe1b4" stroke-width="3" opacity=".7"/>'+
  mouthMarkup(v.expression)+hairMarkup(v.hairStyle,v.hair)+detailMarkup(v);
 }
 export function crewHeadPreviewSVG(raw={},size=128){
