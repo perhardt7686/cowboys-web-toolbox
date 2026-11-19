@@ -70,7 +70,9 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
       if(key==='ENTER'){form.requestSubmit();return;}
       if(key==='BACK')input.value=input.value.slice(0,-1);
       else if(input.value.length<5)input.value+=key;
-      input.focus();
+      // Touch keys should not pop open iOS's native keyboard or pan the
+      // fullscreen arcade. The text input remains available for typing.
+      input.dispatchEvent(new Event('input',{bubbles:true}));
     });
     return board;
   }
