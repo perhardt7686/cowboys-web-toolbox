@@ -18,6 +18,10 @@ async def main():
     await page.goto(URL,wait_until="domcontentloaded",timeout=30000)
     await page.wait_for_load_state("domcontentloaded")
     await page.evaluate("""async()=>{
+      // The sample tiles must be outside whichever family Arcade scene is
+      // currently hidden. This fixture tests colors, not logged-in navigation.
+      document.body.classList.remove('arcade-ready','arcade-on');
+      document.documentElement.classList.remove('arcade-on');
       const {MAHJONG_VISUALS,visualForTile}=await import('/mahjong-kids-palette.mjs?v=kid7');
       const holder=document.createElement('section');
       holder.id='mahjong-kid-visual-fixture';
@@ -45,7 +49,7 @@ async def main():
         board.append(tile);
       }
       holder.append(board);
-      document.querySelector('#conversations .community-main').append(holder);
+      document.body.append(holder);
     }""")
     tiles=page.locator('#mahjong-kid-test-board .mahjong-kids-tile')
     await expect(tiles).to_have_count(18)

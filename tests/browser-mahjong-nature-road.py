@@ -63,6 +63,8 @@ async def main():
     await page.evaluate("""()=>{
       document.body.classList.add('arcade-on');
       document.body.dataset.arcadeGame='mahjong';document.body.dataset.arcadeScene='levels';
+      document.documentElement.classList.add('arcade-on');
+      document.getElementById('mahjong-root').classList.add('arcade-game-active');
     }""")
     assert await root.is_visible(),'Full-screen arcade Levels view must expose journey map'
     assert await page.locator('.mahjong-campaign').evaluate('(el)=>getComputedStyle(el).overflowY')=='auto'
