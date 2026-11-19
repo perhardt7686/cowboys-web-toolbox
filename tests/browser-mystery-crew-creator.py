@@ -20,7 +20,8 @@ async def verify(browser,width,height,label):
     await page.goto(URL,wait_until='domcontentloaded')
     await expect(page.locator('.mc-title-main')).to_contain_text('Mystery Crew')
     await expect(page.locator('#mc-scene')).to_be_visible()
-    await expect(page.locator('.mc-portrait')).to_have_count(1)
+    await expect(page.locator('.mc-portrait[data-crew-id]')).to_have_count(1)
+    await expect(page.locator('.mc-reference-portrait')).to_have_count(4)
     await expect(page.locator('#mc-fidelity-head path').first).to_be_visible()
     assert await page.get_by_text('Dressing room').count()==0
     # Source-reference artwork is real vector layers, not a static screenshot.
@@ -71,7 +72,7 @@ async def verify(browser,width,height,label):
     await page.locator('#mc-save').click()
     await expect(page.locator('#mc-status')).to_contain_text('Saved in the local test preview')
     await page.locator('#mc-add').click()
-    await expect(page.locator('#mc-roster .mc-portrait')).to_have_count(2)
+    await expect(page.locator('#mc-roster .mc-portrait[data-crew-id]')).to_have_count(2)
     await page.locator('#mc-save').click()
     await page.reload(wait_until='domcontentloaded')
     await expect(page.locator('#mc-roster .mc-portrait')).to_have_count(2)
