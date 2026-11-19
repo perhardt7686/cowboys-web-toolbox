@@ -86,3 +86,12 @@ test('new creator page loads same family login and advertises real sync',()=>{
  const board=read('community.html');
  assert.match(board,/mystery-crew-account\.css/);
 });
+
+test('retired V8 demo and public reward showroom cannot reopen legacy avatar studio',()=>{
+ const board=read('family-board.mjs'),community=read('community.js');
+ assert.doesNotMatch(board,/makeAvatarShowcase|import\(['"]\.\/avatar-reward-studio/);
+ assert.doesNotMatch(community,/makeAvatarShowcase/);
+ assert.match(board,/mystery-crew-creator\.html/);
+ assert.match(community,/mystery-crew-creator\.html\?preview=1/);
+ assert.match(read('mystery-crew-account.css'),/family-mystery-crew-showcase/);
+});
