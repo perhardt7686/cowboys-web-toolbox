@@ -32,7 +32,7 @@ async def verify(browser,width,label):
     await page.locator('#mc-rename-form button[type="submit"]').click()
     await expect(page.locator('#mc-character-name')).to_have_text('Trailblazer')
     await page.get_by_role('button',name='Save Crew').first.click()
-    await expect(page.locator('#mc-status')).to_contain_text('Saved on this device')
+    await expect(page.locator('#mc-status')).to_contain_text('Saved in local test preview')
     await page.locator('#mc-add').click()
     await expect(page.locator('#mc-roster .mc-portrait')).to_have_count(2)
     await page.get_by_role('button',name='Save Crew').first.click()
@@ -72,6 +72,7 @@ async def verify(browser,width,label):
         stage=await page.locator('.mc-stage-frame').bounding_box()
         assert pos and stage and pos['y']>stage['y']+stage['height'],'Market should stack below stage'
     await page.screenshot(path=str(REPORTS/f'mystery-crew-{label}.png'),full_page=True,animations='disabled')
+    assert await page.locator('script[src^="community-config.js"]').count()==1
     assert not errors,errors
     print(f'Mystery Crew Creator {label}: working roster, outfits, pet, animation, rotation, local persistence, responsive UI PASS')
     await page.close()
