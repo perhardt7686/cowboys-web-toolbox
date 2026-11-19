@@ -12,6 +12,19 @@ async def set_category(page,value):
     await page.locator('#mc-market-filter').select_option(value)
     await expect(page.locator('#mc-market-filter')).to_have_value(value)
 
+async def choose_item(page,item):
+    # Short phones intentionally show two choices per page, with no scrolling.
+    for _ in range(8):
+        found=page.locator(f'.mc-card[data-item="{item}"]')
+        if await found.count():
+            await found.click()
+            return
+        next_page=page.locator('#mc-page-next')
+        if await next_page.is_disabled():
+            raise AssertionError(f'Item {item} was absent from paged wardrobe')
+        await next_page.click()
+    raise AssertionError(f'Item {item} was not found')
+
 async def verify(browser,width,height,label):
     page=await browser.new_page(viewport={'width':width,'height':height},
         is_mobile=width<700,has_touch=width<700,reduced_motion='reduce')
@@ -21,7 +34,16 @@ async def verify(browser,width,height,label):
     await expect(page.locator('.mc-title-main')).to_contain_text('Mystery Crew')
     await expect(page.locator('#mc-scene')).to_be_visible()
     await expect(page.locator('#mc-scene')).to_have_attribute('data-painterly','ready',timeout=20000)
-    await expect(page.locator('#mc-painted-hero')).to_be_visible()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_be_visible(timeout=20000)
+    await expect(page.locator('#mc-scene')).to_have_attribute('data-crew-art-pack','ready',timeout=20000)
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-anchor','0')
+    await expect(page.locator('#mc-roster .mc-portrait[data-crew-id] .mc-v5-portrait-art')).to_have_count(1)
+    await expect(page.locator('#mc-roster .mc-reference-portrait .mc-v5-portrait-art')).to_have_count(4)
+    painted_faces=await page.locator('#mc-roster .mc-v5-portrait-art').evaluate_all(
+        "(nodes)=>nodes.map(n=>getComputedStyle(n).backgroundImage)")
+    assert len(painted_faces)==5 and all('blob:' in bg for bg in painted_faces),painted_faces
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
+    await expect(page.locator('#mc-painted-hero')).to_be_hidden()
     await expect(page.locator('#mc-painted-hound')).to_be_visible()
     await expect(page.locator('#mc-scene')).to_have_attribute('data-scene-version','4',timeout=20000)
     await expect(page.locator('#mc-v4-seamless-workshop')).to_be_visible()
@@ -43,6 +65,7 @@ async def verify(browser,width,height,label):
         ...document.querySelectorAll('#mc-painted-van image'),
         ...document.querySelectorAll('#mc-painted-workshop image'),
         ...document.querySelectorAll('#mc-v4-seamless-workshop, #mc-v4-complete-van'),
+        ...document.querySelectorAll('#mc-v5-illustrated-image'),
         ...document.querySelectorAll('#mc-cards .mc-painted-outfit')
       ];
       const checks=await Promise.all(elements.map(async el=>{
@@ -57,7 +80,7 @@ async def verify(browser,width,height,label):
       return {count:elements.length,checks};
     }""")
     gallery_items=await page.locator('#mc-cards .mc-painted-outfit').count()
-    assert painted['count']==11+gallery_items,painted
+    assert painted['count']==12+gallery_items,painted
     assert all(x['ok'] for x in painted['checks']),'Painterly image missing/corrupted/CSP blocked: '+str(painted)
     await page.screenshot(path=str(REPORTS/f'mystery-crew-painted-fresh-{label}.png'),
                           full_page=False,animations='disabled')
@@ -79,6 +102,43 @@ async def verify(browser,width,height,label):
     await page.locator('#mc-cards [data-reference-look="juniper"]').click()
     await expect(page.locator('#mc-cards [data-reference-look="juniper"]')).to_have_attribute('aria-pressed','true')
     assert '#b8432a' in await page.locator('#mc-fidelity-head').inner_html()
+    # Different face / body with actual raster art, not the fallback vector.
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_be_visible()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-anchor','1')
+    before=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
+    await set_category(page,'outfits')
+    await page.locator('.mc-card[data-item="explorer"]').click()
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','explorer')
+    # Inspect real WebP pixels. A changed CSS/class/URL alone is not enough:
+    # the green vest must be illustrated on the main body.
+    cloth=await page.evaluate("""async () => {
+      const url=document.querySelector('#mc-v5-illustrated-image').getAttribute('href');
+      const pic=new Image();pic.src=url;await pic.decode();
+      const canvas=document.createElement('canvas');canvas.width=430;canvas.height=574;
+      const context=canvas.getContext('2d',{willReadFrequently:true});
+      context.drawImage(pic,0,0,430,574);
+      const data=context.getImageData(140,170,150,150).data;
+      let green=0,orange=0;
+      for(let i=0;i<data.length;i+=4){
+        const r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
+        if(a>30 && g>r*1.10 && g>b*1.20)green++;
+        if(a>30 && r>g*1.26 && g>b*1.25)orange++;
+      }
+      return {green,orange};
+    }""")
+    assert cloth['green']>2000 and cloth['green']>cloth['orange'],f'Explorer garment not truly green: {cloth}'
+    await page.wait_for_timeout(250)
+    await page.screenshot(path=str(REPORTS/f'mystery-crew-v5-explorer-{label}.png'),
+                          full_page=False,animations='disabled')
+    after=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
+    assert before!=after,'Equip must change illustrated costume on center-stage body'
+    await choose_item(page,'outdoors')
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','outdoors')
+    await set_category(page,'outfits')
+    await choose_item(page,'detective')
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
+    await set_category(page,'presets')
+
 
     # Five independently persisted, allowlisted face traits.
     for category,property_,value in [('faces','faceShape','round'),
@@ -91,6 +151,8 @@ async def verify(browser,width,height,label):
         await choice.click()
         await expect(choice).to_have_attribute('aria-pressed','true')
         if property_=='faceShape':
+            await expect(page.locator('#mc-v5-illustrated-actor')).to_be_hidden()
+            await expect(page.locator('#mc-roster .mc-portrait[data-crew-id] svg')).to_be_attached()
             await expect(page.locator('#mc-painted-hero')).to_be_hidden()
             assert await page.locator('#mc-actor').evaluate('el=>el.style.opacity')=='1','Changed face should show actual custom actor'
     assert await page.locator('#mc-fidelity-head circle').count()>=4 # irises, highlights and optional glasses
@@ -142,6 +204,8 @@ async def verify(browser,width,height,label):
 
     await page.locator('[data-motion="wave"]').click()
     await expect(page.locator('#mc-app')).to_have_attribute('data-motion','wave')
+    await expect(page.locator('#mc-v5-illustrated-actor')).to_be_hidden()
+    assert await page.locator('#mc-actor').evaluate('node=>node.style.opacity')=='1','Wave must use the articulated, responsive original rig'
     await set_category(page,'pets')
     pet_art=await page.locator('.mc-card-art svg').evaluate_all('(nodes)=>nodes.map(el=>el.innerHTML)')
     assert len(set(pet_art))==len(pet_art),'Pet choices must have distinct species silhouettes'

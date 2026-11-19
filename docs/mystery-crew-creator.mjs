@@ -3,6 +3,7 @@
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
 import {loadPainterlyPack,painterlyOutfitHTML,syncPainterlyStage} from './mystery-painterly-stage.mjs?v=layered3';
+import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML} from './mystery-crew-character-v5.mjs?v=crew5';
 import {mountSceneV4,syncSceneV4} from './mystery-crew-scene-v4.mjs?v=scene4';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
@@ -102,7 +103,7 @@ function icon(item){
  return '<svg viewBox="0 0 160 160" aria-hidden="true" focusable="false">'+svg+'</svg>';
 }
 
-function portrait(member){return mysteryCrewPortraitSVG(member);}
+function portrait(member){return paintedCrewPortraitHTML(member)||mysteryCrewPortraitSVG(member);}
 
 function writeState(){
  if(!isPreview)return false;
@@ -261,6 +262,7 @@ function updateScene(){
 
  for(const b of document.querySelectorAll('.mc-views button'))b.setAttribute('aria-pressed',String((b.id==='mc-view-front'&&angle===0)||(b.id==='mc-view-side'&&angle===90)||(b.id==='mc-view-back'&&angle===180)));
  syncPainterlyStage(m,{zoom,angle,motion});
+ syncCrewV5(m,{zoom,angle,motion});
  syncSceneV4(m);
 }
 function renderRoster(){
@@ -503,6 +505,8 @@ document.querySelector('[data-view="outfits"]')?.setAttribute('aria-pressed','fa
 render();
 // Asset pack failure leaves the live, proven SVG creator and family saves usable.
 void loadPainterlyPack(render).then(async loaded=>{
- if(loaded){await mountSceneV4();render();}
+ if(loaded){await mountSceneV4();}
+ await loadCrewV5();
+ render();
 });
 void initializeAccount();

@@ -537,3 +537,38 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @media(prefers-reduced-motion:reduce){
  #mc-v4-seamless-workshop,#mc-v4-complete-van{transition:none}
 }
+
+/* V5 character-and-outfit fidelity: the actual center actor changes costume.
+   Keep the complete underlying V4 workshop, van and family control layout. */
+#mc-v5-illustrated-actor{pointer-events:none;will-change:transform}
+#mc-v5-illustrated-image{pointer-events:none}
+#mc-v5-illustrated-actor[data-motion="idle"]{animation:mc-v5-idle 3.2s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="wave"]{animation:mc-v5-wave 1s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="cheer"]{animation:mc-v5-cheer .7s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="think"]{animation:mc-v5-think 2.2s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="run"]{animation:mc-v5-run .36s ease-in-out infinite alternate}
+#mc-v5-illustrated-actor[data-motion="action"]{animation:mc-v5-action .55s ease-in-out infinite alternate}
+@keyframes mc-v5-idle{0%,100%{translate:0 0}50%{translate:0 -3px}}
+@keyframes mc-v5-wave{0%,100%{rotate:0deg}50%{rotate:-3deg}}
+@keyframes mc-v5-cheer{0%,100%{translate:0 0}50%{translate:0 -6px}}
+@keyframes mc-v5-think{0%,100%{rotate:0deg}50%{rotate:2deg}}
+@keyframes mc-v5-run{0%{translate:-4px 0;rotate:-2deg}100%{translate:4px -3px;rotate:2deg}}
+@keyframes mc-v5-action{0%{scale:1}100%{scale:1.025}}
+@media(prefers-reduced-motion:reduce){
+ #mc-v5-illustrated-actor{animation:none!important}
+}
+
+/* The crew rail now previews the painted face and shoulders from its live
+   model. Unmatched or modified faces retain their tested vector fallback. */
+.mc-portrait .mc-v5-portrait-art{
+ display:block;width:100%;height:100%;min-height:0;overflow:hidden;
+ background-repeat:no-repeat;
+ background-position:center top;
+ background-size:auto 265%;
+ border-radius:inherit;
+ image-rendering:auto;
+ filter:drop-shadow(0 1px 1px #3b33302a);
+}
+@media(max-width:650px){
+ .mc-portrait .mc-v5-portrait-art{background-size:auto 310%}
+}
