@@ -171,3 +171,46 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
  .mc-tools .mc-rotate,.mc-tools .mc-zoom{display:none}
  .mc-save{flex:0 0 auto;min-width:96px}
 }
+
+/* Short-phone acceptance fix: prevent CSS Grid's intrinsic min-content width
+   (formerly 464px inside a 375px viewport) from extending or overlaying peers. */
+.mc-app{width:100%;grid-template-columns:minmax(0,1fr)}
+.mc-app>*,.mc-layout,.mc-roster,.mc-market,.mc-theater,.mc-tools,.mc-topnav{min-width:0;max-width:100%}
+.mc-compact-action{display:none}
+@media(max-width:650px){
+ .mc-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px}
+ .mc-brand{display:none}
+ .mc-title{order:0;flex:auto;min-width:0;white-space:nowrap;text-align:left}
+ .mc-title-main{font-size:clamp(1rem,4.5vw,1.45rem);letter-spacing:-.04em;-webkit-text-stroke:0;text-shadow:1px 2px #123858}
+ .mc-title-main b{display:inline}
+ .mc-subtitle{display:none}
+ .mc-statbar{display:flex;align-items:center;justify-content:flex-end;min-width:0}
+ .mc-statbar .mc-pill:first-of-type{display:none}
+ .mc-topnav{width:100%;min-width:0}
+ .mc-topnav button{max-width:100%;white-space:nowrap}
+ .mc-layout{width:100%;min-width:0}
+ .mc-roster{position:relative;z-index:2}
+ .mc-market{position:relative;z-index:1}
+ .mc-portraits{min-width:0}
+ .mc-portrait{overflow:hidden}
+ .mc-scene-tools{display:grid;grid-template-columns:repeat(2,42px);gap:2px}
+ .mc-scene-tools button{width:42px;min-width:42px;min-height:33px;height:33px}
+ .mc-compact-action{display:block}
+ .mc-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"colors save";align-items:center;gap:4px;overflow:hidden}
+ .mc-tools .mc-colors{grid-area:colors;display:flex;min-width:0;align-items:center;overflow:hidden}
+ .mc-tools .mc-colors strong{display:none}
+ .mc-tools .mc-colors select{max-width:68px;min-width:59px}
+ .mc-tools .mc-colors #mc-swatches{min-width:0;flex:1;display:flex;align-items:center;justify-content:space-between;gap:2px}
+ .mc-tools .mc-colors .mc-swatch{flex:0 1 22px;min-width:18px;width:22px;height:23px}
+ .mc-tools .mc-views,.mc-tools .mc-rotate,.mc-tools .mc-zoom{display:none}
+ .mc-save{grid-area:save;min-width:85px;min-height:40px;width:88px}
+ .mc-footer a{display:none}
+}
+@media(max-width:650px) and (max-height:740px){
+ .mc-layout{grid-template-rows:minmax(0,1fr) minmax(0,.9fr) 91px}
+ .mc-roster .mc-portraits{min-height:0;grid-template-rows:repeat(2,minmax(0,1fr))}
+ .mc-roster .mc-portrait{min-height:0}
+ .mc-market .mc-cards{grid-template-rows:minmax(0,1fr)}
+ .mc-topnav button{min-height:35px}
+ .mc-market-title{min-height:30px}
+}
