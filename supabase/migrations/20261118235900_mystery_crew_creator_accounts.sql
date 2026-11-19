@@ -56,7 +56,7 @@ revoke all on function public.community_mystery_crew_state() from public,anon;
 grant execute on function public.community_mystery_crew_state() to authenticated;
 
 create or replace function public.community_mystery_crew_portraits(p_members uuid[])
-returns table (user_id uuid, character jsonb)
+returns table (user_id uuid, crew_character jsonb)
 language plpgsql stable security definer set search_path='' as $$
 declare viewer uuid := auth.uid();
 begin
