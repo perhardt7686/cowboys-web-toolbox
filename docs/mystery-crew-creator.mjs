@@ -478,5 +478,9 @@ window.addEventListener('beforeunload',e=>{
  if(JSON.stringify(draft)!==savedSnapshot){e.preventDefault();e.returnValue='';}
 });
 enhanceMysteryScene();
-app.dataset.motion='idle';setFilter('character');render();
+app.dataset.motion='idle';
+setFilter('outfits');
+document.querySelector('[data-view="character"]')?.setAttribute('aria-pressed','true');
+document.querySelector('[data-view="outfits"]')?.setAttribute('aria-pressed','false');
+render();
 void initializeAccount();
