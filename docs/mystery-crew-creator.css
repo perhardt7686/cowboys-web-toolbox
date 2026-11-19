@@ -526,3 +526,14 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
   align-self:start;
  }
 }
+
+/* V4: ONE complete illustration per static subject. Prevent V3's
+   painted cutout + blue underpainting + vector vehicle from stacking. */
+#mc-v4-seamless-workshop,#mc-v4-complete-van{pointer-events:none}
+#mc-scene[data-scene-version="4"] #mc-painted-van,
+#mc-scene[data-scene-version="4"] #mc-painted-van-backing{display:none!important}
+#mc-scene[data-v4-vehicle="van"] #mc-vector-van{display:none!important}
+#mc-v4-complete-van{filter:drop-shadow(0 5px 6px #2b342b3a)}
+@media(prefers-reduced-motion:reduce){
+ #mc-v4-seamless-workshop,#mc-v4-complete-van{transition:none}
+}
