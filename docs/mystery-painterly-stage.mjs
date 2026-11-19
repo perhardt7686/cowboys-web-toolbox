@@ -73,10 +73,30 @@ function mountPaintedLayers(){
  for(const child of [...vehicle.childNodes])vectorVan.append(child);
  vehicle.append(vectorVan);
  const vanBacking=group('mc-painted-van-backing','mc-painterly-van-backing');
- vanBacking.innerHTML='<path d="M67 289Q65 217 144 174L594 160Q677 161 704 242L718 407Q705 442 658 445H108Q60 437 61 408Z" fill="#347f9f" stroke="#284759" stroke-width="7"/>'+
- '<path d="M90 280L152 184Q181 159 250 159L590 159Q654 166 680 237L684 282Z" fill="#e4dec5" stroke="#38576b" stroke-width="6"/>'+
- '<path d="M95 310H706" stroke="#ec8e43" stroke-width="21"/>'+
- '<path d="M116 359H713" stroke="#e5a16b" stroke-width="7"/>';
+ // Complete custom underpainting fills the character-shaped gaps in the
+ // cropped source illustration, without duplicating the legacy vehicle.
+ scene.querySelector('defs')?.insertAdjacentHTML('beforeend',
+ '<linearGradient id="mc-paint-van-fill" x2="0" y2="1"><stop stop-color="#55a3b8"/><stop offset=".54" stop-color="#2f8aab"/><stop offset="1" stop-color="#135675"/></linearGradient>'+
+ '<linearGradient id="mc-paint-window-fill" x2=".8" y2="1"><stop stop-color="#bde5e6"/><stop offset=".5" stop-color="#78b7ca"/><stop offset="1" stop-color="#346f8d"/></linearGradient>');
+ vanBacking.innerHTML=[
+ '<ellipse cx="392" cy="443" rx="328" ry="21" fill="#695444" opacity=".24"/>',
+ '<path d="M71 289Q76 227 141 192L234 169H583Q665 174 700 240L718 299 717 415Q699 448 642 448H124Q59 439 62 405Z" fill="url(#mc-paint-van-fill)" stroke="#30495a" stroke-width="8"/>',
+ '<path d="M109 273L143 206Q178 158 236 160H580Q649 170 685 238L695 278Z" fill="#e6dfca" stroke="#3d5460" stroke-width="8"/>',
+ '<path d="M113 274L147 209Q181 189 235 189L240 305 92 306Z" fill="url(#mc-paint-window-fill)" stroke="#344d60" stroke-width="7"/>',
+ '<path d="M258 192L419 190 419 304 259 303Z" fill="url(#mc-paint-window-fill)" stroke="#35495a" stroke-width="7"/>',
+ '<path d="M434 193L584 194Q646 201 665 272L665 302H435Z" fill="url(#mc-paint-window-fill)" stroke="#35495a" stroke-width="7"/>',
+ '<path d="M146 223L192 201M277 211L316 200M467 212L512 201" fill="none" stroke="#e3ffff" stroke-width="5" opacity=".45"/>',
+ '<path d="M87 322H710" stroke="#f18e46" stroke-width="23"/>',
+ '<path d="M85 369H714" stroke="#edbb80" stroke-width="7" opacity=".82"/>',
+ '<path d="M242 309V420M427 302V423M665 305V423" stroke="#47778d" stroke-width="5" opacity=".75"/>',
+ '<path d="M261 324L306 324M452 323L482 323" stroke="#ddd5c5" stroke-width="6" stroke-linecap="round"/>',
+ '<path d="M80 397H715" stroke="#1e6c88" stroke-width="8" opacity=".7"/>',
+ '<g fill="#27343e" stroke="#e6d9c0" stroke-width="10"><circle cx="183" cy="429" r="35"/><circle cx="622" cy="429" r="35"/></g>',
+ '<g fill="#79919a" stroke="#374955" stroke-width="5"><circle cx="183" cy="429" r="17"/><circle cx="622" cy="429" r="17"/></g>',
+ '<path d="M108 405H151M651 405H714" stroke="#d9ccb8" stroke-width="12" stroke-linecap="round"/>',
+ '<path d="M173 187L609 182" fill="none" stroke="#33434e" stroke-width="8" opacity=".85"/>',
+ '<path d="M110 285Q133 250 168 237" stroke="#fff" stroke-width="4" opacity=".3" fill="none"/>'
+ ].join('');
  vehicle.append(vanBacking);
  const van=group('mc-painted-van','mc-painterly-van');
  van.append(image('van-painted.webp',54,54,686,385));
@@ -154,13 +174,9 @@ export function syncPainterlyStage(member,options={}){
  pet.style.opacity=petPainted?'0':'1';
  const paintedVan=member.vehicle==='van';
  van.style.display=paintedVan?'':'none';
- // Reuse the complete window/roof/wheel detailing as an underpainting.
- // Its geometry is registered to the illustrated cutout so that the
- // painted foreground and its transparent gaps form ONE continuous van.
- // The flat backing panel is never displayed.
- vanBacking.style.display='none';
- vectorVan.style.display='';
- vectorVan.setAttribute('transform',paintedVan?'translate(-60 -155) scale(1.55 1.34)':'');
+ vanBacking.style.display=paintedVan?'':'none';
+ vectorVan.style.display=paintedVan?'none':'';
+ vectorVan.removeAttribute('transform');
  const zoom=Math.min(1.5,Math.max(.8,Number(options.zoom)||1));
  hero.setAttribute('transform','translate(399 270) scale('+zoom+') translate(-399 -270)');
  dog.setAttribute('transform','translate(626 375) scale('+zoom+') translate(-626 -375)');
