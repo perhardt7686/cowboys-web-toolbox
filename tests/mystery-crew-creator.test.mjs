@@ -79,7 +79,7 @@ test('new creator page loads same family login and advertises real sync',()=>{
  const html=read('mystery-crew-creator.html');
  assert.match(html,/community-config\.js/);
  assert.match(html,/FAMILY ACCOUNT/);
- assert.match(html,/synced to your approved family account/);
+ assert.match(html,/sync to your approved family account/);
  assert.doesNotMatch(html,/MY DEVICE|● LOCAL|stored only in this browser/);
  const board=read('community.html');
  assert.match(board,/mystery-crew-account\.css/);
