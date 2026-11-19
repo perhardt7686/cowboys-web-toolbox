@@ -20,6 +20,43 @@ async def verify(browser,width,height,label):
     await page.goto(URL,wait_until='domcontentloaded')
     await expect(page.locator('.mc-title-main')).to_contain_text('Mystery Crew')
     await expect(page.locator('#mc-scene')).to_be_visible()
+    await expect(page.locator('#mc-scene')).to_have_attribute('data-painterly','ready',timeout=20000)
+    await expect(page.locator('#mc-painted-hero')).to_be_visible()
+    await expect(page.locator('#mc-painted-hound')).to_be_visible()
+    await expect(page.locator('#mc-painted-van')).to_be_visible()
+    await expect(page.locator('#mc-vector-van')).to_be_hidden()
+    await expect(page.locator('#mc-painted-van-backing')).to_be_visible()
+    assert await page.locator('#mc-painted-van-backing circle').count()>=4,'Backed painted van needs actual wheels and rims'
+    assert await page.locator('#mc-painted-hero image').count()==6,'Hero must have six independent painted parts'
+    assert await page.locator('#mc-cards .mc-painted-outfit').count()>0,'Working gallery must display actual painted outfits'
+    assert await page.locator('#mc-painted-workshop image').count()==1
+    # Validate actual browser decoding, not merely the presence of SVG <image>
+    # elements or gallery <img> tags. A CSP-blocked Blob can pass those tests
+    # while leaving giant broken-image placeholders over the characters.
+    painted=await page.evaluate("""async () => {
+      const elements=[
+        ...document.querySelectorAll('#mc-painted-hero image'),
+        ...document.querySelectorAll('#mc-painted-hound image'),
+        ...document.querySelectorAll('#mc-painted-van image'),
+        ...document.querySelectorAll('#mc-painted-workshop image'),
+        ...document.querySelectorAll('#mc-cards .mc-painted-outfit')
+      ];
+      const checks=await Promise.all(elements.map(async el=>{
+        const src=el.getAttribute('href')||el.getAttribute('src');
+        try{
+          const probe=new Image();
+          probe.src=src;
+          await probe.decode();
+          return {src:src?.slice(0,18),ok:probe.naturalWidth>0&&probe.naturalHeight>0};
+        }catch(error){return {src:src?.slice(0,18),ok:false,error:String(error)}}
+      }));
+      return {count:elements.length,checks};
+    }""")
+    gallery_items=await page.locator('#mc-cards .mc-painted-outfit').count()
+    assert painted['count']==9+gallery_items,painted
+    assert all(x['ok'] for x in painted['checks']),'Painterly image missing/corrupted/CSP blocked: '+str(painted)
+    await page.screenshot(path=str(REPORTS/f'mystery-crew-painted-fresh-{label}.png'),
+                          full_page=False,animations='disabled')
     await expect(page.locator('.mc-portrait[data-crew-id]')).to_have_count(1)
     await expect(page.locator('.mc-reference-portrait')).to_have_count(4)
     await expect(page.locator('#mc-fidelity-head path').first).to_be_visible()
@@ -49,6 +86,9 @@ async def verify(browser,width,height,label):
         choice=page.locator(f'[data-style-kind="{property_}"][data-style-value="{value}"]')
         await choice.click()
         await expect(choice).to_have_attribute('aria-pressed','true')
+        if property_=='faceShape':
+            await expect(page.locator('#mc-painted-hero')).to_be_hidden()
+            assert await page.locator('#mc-actor').evaluate('el=>el.style.opacity')=='1','Changed face should show actual custom actor'
     assert await page.locator('#mc-fidelity-head circle').count()>=4 # irises, highlights and optional glasses
     assert await page.locator('#mc-fidelity-head g').count()>0,'Face layers should be vector, not placeholders'
 

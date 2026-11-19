@@ -439,3 +439,90 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
  .mc-save{min-width:67px;width:68px;font-size:.72rem}
  .mc-tools .mc-colors .mc-swatch{flex:0 1 21px;min-width:18px}
 }
+
+/* Real separated painterly illustration layers, not background screenshot.
+   Each frame is registered to the SVG workshop's 960×620 coordinate space. */
+#mc-painted-workshop,#mc-painted-forest,#mc-painted-van,
+#mc-painted-hero,#mc-painted-hound{pointer-events:none}
+.mc-painted-outfit{display:block;width:100%;height:100%;max-width:100%;max-height:100%;
+ object-fit:contain;object-position:center bottom;border-radius:7px;
+ filter:drop-shadow(0 2px 2px #49342435)}
+.mc-card-art:has(.mc-painted-outfit){padding:2px 3px}
+#mc-painted-hero,#mc-painted-hound{will-change:transform}
+#mc-painted-hero[data-motion="idle"]{animation:mc-painted-idle 3.2s ease-in-out infinite}
+#mc-painted-hero[data-motion="wave"] [data-part="leftarm"]{
+ transform-box:view-box;transform-origin:359px 199px;
+ animation:mc-painted-wave .85s ease-in-out infinite}
+#mc-painted-hero[data-motion="cheer"] [data-part="leftarm"]{
+ transform-box:view-box;transform-origin:359px 199px;
+ animation:mc-painted-cheer-left .62s ease-in-out infinite}
+#mc-painted-hero[data-motion="cheer"] [data-part="rightarm"]{
+ transform-box:view-box;transform-origin:460px 199px;
+ animation:mc-painted-cheer-right .62s ease-in-out infinite}
+#mc-painted-hero[data-motion="think"] [data-part="head"]{
+ transform-box:view-box;transform-origin:401px 121px;
+ animation:mc-painted-think 2s ease-in-out infinite}
+#mc-painted-hero[data-motion="run"]{animation:mc-painted-run .36s ease-in-out infinite alternate}
+#mc-painted-hero[data-motion="action"]{animation:mc-painted-action .48s ease-in-out infinite alternate}
+#mc-painted-hound[data-motion="wave"],#mc-painted-hound[data-motion="cheer"]{
+ animation:mc-painted-dog .4s ease-in-out infinite alternate}
+@keyframes mc-painted-idle{0%,100%{translate:0 0}50%{translate:0 -3px}}
+@keyframes mc-painted-wave{0%,100%{rotate:0deg}50%{rotate:-16deg}}
+@keyframes mc-painted-cheer-left{0%,100%{rotate:0deg}50%{rotate:-18deg}}
+@keyframes mc-painted-cheer-right{0%,100%{rotate:0deg}50%{rotate:18deg}}
+@keyframes mc-painted-think{0%,100%{rotate:0deg}50%{rotate:5deg}}
+@keyframes mc-painted-run{0%{translate:-5px 0;rotate:-2deg}100%{translate:5px -3px;rotate:2deg}}
+@keyframes mc-painted-action{0%{scale:1}100%{scale:1.025}}
+@keyframes mc-painted-dog{0%{translate:0 0}100%{translate:0 -3px}}
+@media(prefers-reduced-motion:reduce){
+ #mc-painted-hero,#mc-painted-hound,#mc-painted-hero [data-part]{animation:none!important}
+}
+
+/* Short-phone illustrated wardrobe: show the WHOLE garment beside its
+   selection label, not a thin crop of the neckline. Remains one page. */
+@media(max-width:650px) and (max-height:740px){
+ .mc-cards .mc-card{
+  display:grid;
+  grid-template-columns:minmax(0,46%) minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;
+  justify-items:stretch;
+  gap:1px 3px;
+  padding:3px;
+  min-height:0;
+ }
+ .mc-cards .mc-card .mc-card-art{
+  grid-column:1;
+  grid-row:1/3;
+  height:100%;
+  width:100%;
+  min-height:0!important;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+ }
+ .mc-cards .mc-card .mc-card-art svg,
+ .mc-cards .mc-card .mc-card-art img.mc-painted-outfit{
+  height:100%;
+  width:100%;
+  max-height:100%;
+  max-width:100%;
+  object-fit:contain;
+ }
+ .mc-cards .mc-card .mc-card-name{
+  grid-column:2;
+  grid-row:1;
+  line-height:1.05;
+  font-size:.55rem;
+  min-height:0;
+  align-self:end;
+ }
+ .mc-cards .mc-card .mc-card-state{
+  grid-column:2;
+  grid-row:2;
+  font-size:.5rem;
+  padding:3px 1px;
+  min-height:18px;
+  align-self:start;
+ }
+}
