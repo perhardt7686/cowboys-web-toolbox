@@ -150,6 +150,10 @@ async def verify(browser,width,height,label):
             'el => getComputedStyle(el).animationName')
         assert animated.startswith('mc-v6-'),f'{action} did not animate painted {part}: {animated}'
         await expect(page.locator('#mc-v6-painted-rig [data-v6-part] image')).to_have_count(7)
+        if action in ('wave','run'):
+            await page.wait_for_timeout(200)
+            await page.screenshot(path=str(REPORTS/f'mystery-crew-v6-{action}-{label}.png'),
+                                  full_page=False,animations='allow')
     await page.emulate_media(reduced_motion='reduce')
     stopped=await page.locator('#mc-v6-painted-rig [data-v6-part="torso"]').evaluate('el=>getComputedStyle(el).animationName')
     assert stopped=='none',f'Reduced-motion must disable animated paint: {stopped}'
