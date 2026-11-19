@@ -45,7 +45,7 @@ test('runtime uses two independently decoded, same-origin illustrations with rol
  assert.match(html,/mystery-crew-creator\.mjs\?v=scene4/);
  assert.match(html,/mystery-crew-creator\.css\?v=scene4/);
  const assets=v4AssetUrls();
- assert.ok(assets.landscape.endsWith('mystery-workshop-v4.svg'));
+ assert.ok(assets.landscape.endsWith('mystery-workshop-v4.webp'));
  assert.ok(assets.van.endsWith('mystery-van-v4.svg'));
 });
 
