@@ -69,6 +69,8 @@ test('V5 changes illustration only and keeps exact V4 account paths',()=>{
  assert.match(js,/community_mystery_crew_save/);
  assert.match(js,/community_mystery_crew_unlock/);
  assert.match(js,/syncCrewV5\(m,\{zoom,angle,motion\}\)/);
+ assert.match(js,/paintedCrewPortraitHTML\(member\)\|\|mysteryCrewPortraitSVG\(member\)/);
+ assert.match(runtime,/background-image:url/);
  assert.match(js,/await loadCrewV5\(\)/);
  assert.match(runtime,/data-crew-art-pack|crewArtPack/);
  assert.doesNotMatch(runtime,/supabase|localStorage|indexedDB|XMLHttpRequest|eval\(/i);
