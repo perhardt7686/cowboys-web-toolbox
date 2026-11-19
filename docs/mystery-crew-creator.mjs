@@ -2,6 +2,7 @@
  * The local-only preview fixture works only on localhost test builds. */
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
+import {loadPainterlyPack,painterlyOutfitHTML,syncPainterlyStage} from './mystery-painterly-stage.mjs?v=layered3';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
 const KEY='cowboy-mystery-crew-creator-v1';
@@ -258,6 +259,7 @@ function updateScene(){
 
 
  for(const b of document.querySelectorAll('.mc-views button'))b.setAttribute('aria-pressed',String((b.id==='mc-view-front'&&angle===0)||(b.id==='mc-view-side'&&angle===90)||(b.id==='mc-view-back'&&angle===180)));
+ syncPainterlyStage(m,{zoom,angle,motion});
 }
 function renderRoster(){
  const wrap=$('mc-roster');wrap.replaceChildren();
@@ -359,7 +361,8 @@ function renderCards(){
    const label=equipped?'✓ Equipped':owned?'Equip':'★ '+item.cost+' coins';
    const badge=equipped?'equipped':owned?'available':'locked';
    card.setAttribute('aria-label',item.name+'. '+(equipped?'Equipped':owned?'Equip':'Unlock for '+item.cost+' crew coins'));
-   card.innerHTML='<span class="mc-card-art">'+icon(item)+'</span><span class="mc-card-name">'+safe(item.name)+'</span><span class="mc-card-state '+badge+'">'+safe(label)+'</span>';
+   const illustrated=filter==='outfits'?painterlyOutfitHTML(item.id):null;
+   card.innerHTML='<span class="mc-card-art">'+(illustrated||icon(item))+'</span><span class="mc-card-name">'+safe(item.name)+'</span><span class="mc-card-state '+badge+'">'+safe(label)+'</span>';
   }
   panel.append(card);
  }
@@ -496,4 +499,6 @@ setFilter('outfits');
 document.querySelector('[data-view="character"]')?.setAttribute('aria-pressed','true');
 document.querySelector('[data-view="outfits"]')?.setAttribute('aria-pressed','false');
 render();
+// Asset pack failure leaves the live, proven SVG creator and family saves usable.
+void loadPainterlyPack(render);
 void initializeAccount();
