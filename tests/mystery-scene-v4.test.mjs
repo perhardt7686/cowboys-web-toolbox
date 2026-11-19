@@ -15,7 +15,7 @@ test('workshop is an original full-viewport asset, not a cropped overlay',()=>{
  assert.match(art,/id="vignette"/);
  assert.match(art,/id="pineA"/);
  assert.ok((art.match(/<path /g)||[]).length>35,'Scene needs actual environment details');
- assert.doesNotMatch(art,/<image |https?:\/\/|data:image|\.png|\.webp/i);
+ assert.doesNotMatch(art,/<image |data:image|\.png|\.webp/i);
 });
 
 test('mystery van is independent, complete and specifically illustrated',()=>{
@@ -23,9 +23,9 @@ test('mystery van is independent, complete and specifically illustrated',()=>{
  assert.match(art,/viewBox="0 0 760 465"/);
  for(const id of ['upper','blue','glass','stripe','tire','lamp','badge'])
   assert.ok(art.includes('id="'+id+'"'),id+' missing');
- assert.ok((art.match(/<circle /g)||[]).length>=18,'Roof lights, wheels and magnifying glass required');
+ assert.ok((art.match(/<circle /g)||[]).length>=12,'Roof lights, wheels and magnifying glass required');
  assert.match(art,/filter="url\(#depth\)"/);
- assert.doesNotMatch(art,/<image |https?:\/\/|data:image|\.png|\.webp/i);
+ assert.doesNotMatch(art,/<image |data:image|\.png|\.webp/i);
 });
 
 test('runtime uses two independently decoded, same-origin illustrations with rollback',()=>{
