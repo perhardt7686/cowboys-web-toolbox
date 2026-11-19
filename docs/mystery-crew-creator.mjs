@@ -1,6 +1,7 @@
 /* Mystery Crew Creator: family-account sync is server-authoritative. 
  * The local-only preview fixture works only on localhost test builds. */
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
+import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=fidelity1';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=fidelity1';
 const KEY='cowboy-mystery-crew-creator-v1';
@@ -422,5 +423,6 @@ $('mc-rename-form').addEventListener('submit',e=>{
 window.addEventListener('beforeunload',e=>{
  if(JSON.stringify(draft)!==savedSnapshot){e.preventDefault();e.returnValue='';}
 });
+enhanceMysteryScene();
 app.dataset.motion='idle';setFilter('character');render();
 void initializeAccount();
