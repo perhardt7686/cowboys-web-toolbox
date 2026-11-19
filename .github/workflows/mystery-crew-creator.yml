@@ -28,6 +28,7 @@ jobs:
         run: |
           node --check docs/mystery-crew-creator.mjs
           node --check docs/mystery-crew-art.mjs
+          node --check docs/mystery-crew-stage-art.mjs
           node --check docs/mystery-crew-portrait.mjs
           node --check docs/community-profiles.mjs
           node --test tests/mystery-crew-creator.test.mjs tests/mystery-crew-art.test.mjs
