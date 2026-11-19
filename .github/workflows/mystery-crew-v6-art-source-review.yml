@@ -1,0 +1,30 @@
+name: Mystery Crew painted sprite source review
+on:
+  push:
+    branches:
+      - feature/mystery-crew-v6-painted-articulation-20261119
+    paths:
+      - '.github/workflows/mystery-crew-v6-art-source-review.yml'
+      - 'scripts/build_mystery_crew_v7_parts.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-art:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify original art is unchanged
+        run: |
+          test -s docs/mystery-crew-v5-atlas.png
+          test -s docs/mystery-crew-v5-illustrated.tar
+          sha256sum docs/mystery-crew-v5-atlas.png docs/mystery-crew-v5-illustrated.tar
+      - name: Upload V5 source for bounded per-piece artwork inspection
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: v5-painterly-source-reference
+          path: |
+            docs/mystery-crew-v5-atlas.png
+            docs/mystery-crew-v5-illustrated.tar
+          retention-days: 1
