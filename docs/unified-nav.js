@@ -122,8 +122,8 @@
     avatarQuick.id='family-avatar-quick';
     avatarQuick.type='button';
     avatarQuick.hidden=true;
-    avatarQuick.setAttribute('aria-label','Open my avatar studio');
-    avatarQuick.title='Make your avatar';
+    avatarQuick.setAttribute('aria-label','Open Mystery Crew Creator');
+    avatarQuick.title='Make your Mystery Crew character';
     avatarQuick.addEventListener('click',()=>{
       if(avatarQuick.hidden)return;
       close();
