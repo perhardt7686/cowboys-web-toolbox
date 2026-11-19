@@ -4,7 +4,7 @@
  * published V3 artwork remains visible and interactive. */
 const SVG='http://www.w3.org/2000/svg';
 const ASSET={
- landscape:new URL('./mystery-workshop-v4.svg',import.meta.url).href,
+ landscape:new URL('./mystery-workshop-v4.webp',import.meta.url).href,
  van:new URL('./mystery-van-v4.svg',import.meta.url).href
 };
 let mounted=false;
