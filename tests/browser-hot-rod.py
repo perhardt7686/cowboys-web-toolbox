@@ -242,6 +242,16 @@ async def campaign_flow(page, name, *, touch):
     await game.get_by_role('button',name='Open the hood').click()
     await scene(game,'workbench')
     await expect(game.get_by_role('heading',name=re.compile('Carburetor|Carter',re.I))).to_be_visible()
+    if not touch:
+        await game.get_by_role('button',name='Open parts shelf',exact=True).hover()
+    # The general :hover rule previously painted opaque #41416a rectangles
+    # on invisible canvas hotspots, obscuring the engine bolt counter.
+    hotspot_backgrounds = await game.locator('.hot-rod-hotspot').evaluate_all(
+        '(nodes) => nodes.map(node => getComputedStyle(node).backgroundColor)'
+    )
+    assert hotspot_backgrounds and all(
+        color == 'rgba(0, 0, 0, 0)' for color in hotspot_backgrounds
+    ), f'Art hotspots must stay transparent: {hotspot_backgrounds}'
     await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-engine.png')
     fasteners=game.locator('.hot-rod-fastener')
     await expect(fasteners).to_have_count(4)
