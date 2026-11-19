@@ -72,6 +72,11 @@ async def main():
     await expect(page.locator('.turtle-tile.is-selected')).to_have_count(1)
     await page.locator(f'.turtle-tile[data-tile-id="{pair[1]}"]').tap()
     await expect(page.locator('.turtle-tile')).to_have_count(142)
+    await expect(page.locator('#turtle-awards-count')).to_contain_text('/ 195 trophies')
+    assert await page.locator('#turtle-awards-list .turtle-award.is-earned').count()>=1
+    await page.locator('#turtle-award-filter').select_option('extreme')
+    assert await page.locator('#turtle-awards-list .turtle-award').count()>0
+    await page.locator('#turtle-award-filter').select_option('all')
     await page.locator('#turtle-pause').tap()
     await expect(page.locator('#turtle-pause-screen')).to_be_visible()
     await page.reload(wait_until='domcontentloaded')
@@ -118,6 +123,12 @@ async def main():
        return {cleared:now.free.moves.length,won:Boolean(now.free.completedAt),history:now.history.length,remain:document.querySelectorAll('.turtle-tile').length};
      }""")
      assert completed['cleared']==72 and completed['won'] and completed['remain']==0 and completed['history']>0,completed
+     await expect(page.locator('.mahjong-spectacle-words strong')).to_have_text('TURTLE MASTER!')
+     awards=await page.evaluate("""()=>{
+       const saved=JSON.parse(localStorage.getItem('cowboy-mahjong-turtle-v1:synthetic-turtle-test'));
+       return {earned:saved.achievements.length,pairs:saved.stats.pairs,wins:saved.stats.wins,streak:saved.stats.bestStreak};
+     }""")
+     assert awards['earned']>=10 and awards['pairs']>=72 and awards['wins']>=1 and awards['streak']>=50,awards
      await page.locator('button[data-kind="daily"]').tap()
      await expect(page.locator('.turtle-tile')).to_have_count(144)
      await page.locator('button[data-kind="free"]').tap()

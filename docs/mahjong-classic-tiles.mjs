@@ -61,8 +61,11 @@ export function playMahjongSound(kind,enabled){
     if(!context)context=new Audio();
     if(context.state==='suspended')void context.resume().catch(()=>{});
     const t=context.currentTime;
-    const pitches=kind==='win'?[392,523.25,659.25]:kind==='match'?[392,587.33]:kind==='blocked'?[185]:[330];
-    const length=kind==='win'?.17:kind==='match'?.11:.055;
+    const notes={win:[392,523.25,659.25],match:[392,587.33],blocked:[185],
+      streak:[440,554.37,659.25],rush:[587.33,739.99,880],
+      award:[392,523.25,659.25,783.99],legendary:[392,493.88,587.33,783.99,1046.5]};
+    const pitches=notes[kind]||[330];
+    const length=kind==='legendary'?.22:kind==='award'?.18:kind==='win'?.17:kind==='match'?.11:.08;
     pitches.forEach((frequency,index)=>{
       const oscillator=context.createOscillator();
       const volume=context.createGain();

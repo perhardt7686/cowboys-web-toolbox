@@ -7,6 +7,7 @@ import {
  availablePairs,pairIsLegal,replayTurtleMoves,utcDailyKey,dailyDealSeed
 } from './mahjong-turtle-engine.mjs';
 import {playMahjongSound} from './mahjong-classic-tiles.mjs?v=classic1';
+import {CLASSIC_AWARDS,awardEarned,awardMetric,awardLevel,freshlyEarned,celebrateMahjong} from './mahjong-classic-awards.mjs';
 const HEIGHT=1.16,ZOOMS=[1,1.3,1.6,1.9,2.3];
 const $=(root,selector)=>root.querySelector(selector);
 const make=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n;};
@@ -18,7 +19,9 @@ function readStorage(key){try{
  const s=JSON.parse(window.localStorage.getItem(key)||'null');
  return s?.version===1&&s.dailies&&typeof s.dailies==='object'&&Array.isArray(s.history)?s:emptyStorage();
 }catch{return emptyStorage();}}
-function newGame(kind,layout,seed,date=null){return {kind,layout,seed, ...(date?{date}:{}),moves:[],elapsed:0,paused:false,hints:0,startedAt:new Date().toISOString(),completedAt:null};}
+function newGame(kind,layout,seed,date=null){return {kind,layout,seed,...(date?{date}:{}),moves:[],elapsed:0,paused:false,hints:0,
+ misses:0,undos:0,pauses:0,streak:0,fastStreak:0,lastMatchAt:0,highestPairs:0,
+ startedAt:new Date().toISOString(),completedAt:null};}
 function validateGame(s){
  try{
  if(!s||typeof s!=='object'||!Object.hasOwn(TURTLE_LAYOUTS,s.layout)||
@@ -59,12 +62,25 @@ export function mountClassicTurtle(root,{userId}){
  if(!inside)return ()=>{};
  const key='cowboy-mahjong-turtle-v1:'+userId;
  const prefKey='cowboy-mahjong-turtle-preferences-v1:'+userId;
- let saved=readStorage(key),activeKind='free',selected=null,highlight=[],zoom=2,
+ let saved=readStorage(key),activeKind='free',selected=null,highlight=[],zoom=2,awardFilter='all',awardLimit=30,
   destroyed=false,clock=null,resize=null,prefs={sound:false,showFree:false},mode='turtle',lastStatus='';
  try{const val=JSON.parse(window.localStorage.getItem(prefKey)||'{}');
   if(val&&typeof val==='object')prefs={sound:val.sound===true,showFree:val.showFree===true};
   mode=val?.mode==='road'?'road':'turtle';
  }catch{}
+ // Additive browser-local stats upgrade; keep all v1 game history and Mystery Road RPCs untouched.
+ const stats=saved.stats&&typeof saved.stats==='object'?saved.stats:{};
+ saved.stats=stats;
+ if(!Array.isArray(saved.achievements))saved.achievements=[];
+ const counts=['pairs','wins','dailyWins','dailyChain','bestStreak','bestRush','flawlessWins','unassistedWins','noUndoWins','noPauseWins',
+  'layoutturtleWins','layouttempleWins','layoutgardenWins','dragonPairs','windPairs','flowerPairs','seasonPairs',
+  'bambooPairs','circlesPairs','charactersPairs','mistakes'];
+ for(const metric of counts){if(!Number.isSafeInteger(stats[metric])||stats[metric]<0)stats[metric]=0;}
+ stats.wins=Math.max(stats.wins,saved.history.length);
+ stats.dailyWins=Math.max(stats.dailyWins,new Set(saved.history.filter(g=>g.kind==='daily').map(g=>g.date)).size);
+ const completed=saved.history.map(g=>g.elapsed).filter(n=>Number.isSafeInteger(n)&&n>0);
+ stats.bestWinSeconds=Math.min(...[stats.bestWinSeconds,...completed].filter(n=>Number.isSafeInteger(n)&&n>0),Infinity);
+ if(!Number.isFinite(stats.bestWinSeconds))stats.bestWinSeconds=0;
  function savePrefs(){try{window.localStorage.setItem(prefKey,JSON.stringify({...prefs,mode}));}catch{}}
  function persist(){
   const cutoff=utcDailyKey(new Date(Date.now()-15*86400000));
@@ -74,7 +90,7 @@ export function mountClassicTurtle(root,{userId}){
   catch{status('Saving unavailable on this device. Keep this tab open or free browser storage.');return false;}
  }
  const tabs=make('nav','turtle-mode-tabs');tabs.setAttribute('aria-label','Mahjong game modes');
- tabs.innerHTML='<button type="button" data-mode="road" aria-pressed="true">Mystery Road <small>72 tiles · family campaign</small></button><button type="button" data-mode="turtle" aria-pressed="false">Classic Turtle <small>144 tiles · traditional solitaire</small></button>';
+ tabs.innerHTML='<button type="button" data-mode="road" aria-pressed="true">Mystery Road <small>72 tiles · family campaign</small></button><button type="button" class="turtle-glow-tab" data-mode="turtle" aria-pressed="false"><span aria-hidden="true">✦</span> CLASSIC TURTLE <span aria-hidden="true">✦</span> <small>PLAY 144 TILES · 5 LAYERS</small></button>';
  const section=make('section','mahjong-turtle');section.id='mahjong-classic-root';
  section.innerHTML=`<div class="turtle-heading"><div><span class="mahjong-kicker">CLASSIC SOLITAIRE · FIVE-LAYER TURTLE</span><h3>Classic Turtle</h3><p>Clear 144 tiles in 72 pairs. The top must be clear and at least one side open. Any Flower matches another Flower; Seasons match Seasons. No shuffle.</p></div><span class="turtle-authentic">144 TILES</span></div>
  <div class="turtle-modes" role="group" aria-label="Turtle play type"><button type="button" data-kind="free" aria-pressed="true">Free Play</button><button type="button" data-kind="daily" aria-pressed="false">Daily Challenge</button></div>
@@ -85,7 +101,12 @@ export function mountClassicTurtle(root,{userId}){
  <div id="turtle-board-scroll" class="turtle-board-scroll" tabindex="-1"><div id="turtle-board" class="turtle-board" role="group" aria-label="Classic Turtle Mahjong tiles"></div><div id="turtle-pause-screen" class="turtle-pause-screen" hidden><strong>Game paused</strong><span>Progress is saved in this browser.</span><button type="button" id="turtle-resume">Resume</button></div></div>
  <div class="turtle-actions"><button type="button" id="turtle-undo">↶ Undo</button><button type="button" id="turtle-hint">♧ Hint</button><button type="button" id="turtle-pause">⏸ Pause</button><button type="button" id="turtle-show-free" aria-pressed="false">Show free tiles</button><button type="button" id="turtle-sound" aria-pressed="false">Sound off</button></div>
  <p class="turtle-status" id="turtle-status" role="status" aria-live="polite">Choose two matching exposed tiles.</p></div>
- <div class="turtle-bottom"><section><h4>Your Classic record</h4><div id="turtle-record" class="turtle-record"></div><p class="turtle-local-note">This mode saves progress on this browser and device only. Mystery Road account saves and achievements are separate and untouched.</p></section><details><summary>Tile guide and keyboard controls</summary><p>Match identical numbered suits, winds, or dragons. Any two Flower tiles match; any two Season tiles match. Keyboard: arrows navigate free tiles, Enter selects, H hint, U undo, P pause, Escape clears selection.</p><div id="turtle-face-guide" class="turtle-face-guide"></div></details></div>`;
+ <div class="turtle-bottom"><section><h4>Your Classic record</h4><div id="turtle-record" class="turtle-record"></div><p class="turtle-local-note">This mode saves progress on this browser and device only. Mystery Road account saves and achievements are separate and untouched.</p></section><details><summary>Tile guide and keyboard controls</summary><p>Match identical numbered suits, winds, or dragons. Any two Flower tiles match; any two Season tiles match. Keyboard: arrows navigate free tiles, Enter selects, H hint, U undo, P pause, Escape clears selection.</p><div id="turtle-face-guide" class="turtle-face-guide"></div></details></div>
+ <section class="turtle-awards" aria-label="Classic Turtle challenges and achievements"><div class="turtle-awards-heading">
+ <div><span class="mahjong-kicker">CHALLENGES FROM EASY TO NEAR-IMPOSSIBLE</span><h4>🏆 Trophy Gallery</h4><p id="turtle-awards-count" role="status"></p></div>
+ <label>Show <select id="turtle-award-filter" aria-label="Filter Classic Turtle achievements"><option value="all">All challenges</option><option value="earned">Unlocked</option><option value="extreme">Legendary and above</option></select></label></div>
+ <div id="turtle-awards-list" class="turtle-awards-list"></div><button type="button" id="turtle-awards-more">Show more challenges</button>
+ <p class="turtle-local-note">These Classic Turtle trophies are saved on this browser only. Mystery Road's existing account badges remain separate.</p></section>`;
  inside.prepend(section);inside.prepend(tabs);
  const view=sel=>$(section,sel);
  function status(msg){lastStatus=msg;const el=view('#turtle-status');if(el)el.textContent=msg;}
@@ -104,7 +125,21 @@ export function mountClassicTurtle(root,{userId}){
   if(!valid)throw new Error('Turtle game recovery failed');return valid;}
  function recordWin(game){
   const record={kind:game.kind,layout:game.layout,date:game.date||null,elapsed:game.elapsed,hints:game.hints,moves:game.moves.length,completedAt:game.completedAt};
-  if(!saved.history.some(r=>r.kind===record.kind&&r.layout===record.layout&&r.completedAt===record.completedAt))saved.history.unshift(record);
+  if(saved.history.some(r=>r.kind===record.kind&&r.layout===record.layout&&r.completedAt===record.completedAt))return;
+  saved.history.unshift(record);
+  stats.wins++;
+  stats['layout'+game.layout+'Wins']++;
+  if(game.misses===0&&game.hints===0&&game.undos===0)stats.flawlessWins++;
+  if(game.hints===0&&game.undos===0)stats.unassistedWins++;
+  if(game.undos===0)stats.noUndoWins++;
+  if(game.pauses===0)stats.noPauseWins++;
+  if(game.elapsed>0&&(stats.bestWinSeconds===0||game.elapsed<stats.bestWinSeconds))stats.bestWinSeconds=game.elapsed;
+  if(game.kind==='daily'&&game.date!==stats.lastDailyDate){
+    const previous=stats.lastDailyDate?Date.parse(stats.lastDailyDate+'T00:00:00Z'):NaN;
+    const date=Date.parse(game.date+'T00:00:00Z');
+    stats.dailyChain=Number.isFinite(previous)&&date-previous===86400000?stats.dailyChain+1:1;
+    stats.lastDailyDate=game.date;stats.dailyWins++;
+  }
  }
  function startFree(){
   const previous=saved.free;
@@ -137,35 +172,64 @@ export function mountClassicTurtle(root,{userId}){
   if(!possible.length){status('No available pairs. Undo a move or restart this deal. Classic mode never shuffles.');return;}
   // Prefer the original guaranteed solution path when its next pair is still available.
   const match=deal.witness.find(([a,b])=>!removed.has(a)&&!removed.has(b)&&pairIsLegal(deal,removed,a,b));
-  highlight=match||possible[0];game.hints=(game.hints||0)+1;persist();render();sound('select');
+  highlight=match||possible[0];game.hints=(game.hints||0)+1;game.streak=0;game.fastStreak=0;persist();render();sound('select');
   status('Highlighted one available pair. A hint cannot guarantee that every future choice stays solvable.');
  }
  function undo(){
   const game=ensureGame();
   if(game.paused||game.completedAt||!game.moves.length)return;
-  game.moves.pop();selected=null;highlight=[];persist();render();status('Last pair restored.');
+  game.moves.pop();game.undos=(game.undos||0)+1;game.streak=0;game.fastStreak=0;selected=null;highlight=[];persist();render();status('Last pair restored.');
  }
  function togglePause(force){
   const game=ensureGame();if(game.completedAt)return;
-  game.paused=typeof force==='boolean'?force:!game.paused;
-  selected=null;highlight=[];persist();render();status(game.paused?'Paused and saved on this device.':'Resumed. Good luck!');
+  const next=typeof force==='boolean'?force:!game.paused;
+  if(next&&!game.paused)game.pauses=(game.pauses||0)+1;
+  game.paused=next;selected=null;highlight=[];persist();render();status(game.paused?'Paused and saved on this device.':'Resumed. Good luck!');
  }
  function choose(id){
   const {game,deal,removed}=details();
   if(game.paused||game.completedAt)return;
   const tile=deal.tiles[id];
-  if(!isFreeTile(deal.tiles,tile,removed)){sound('blocked');status('Tile is blocked. Free one of its sides and clear any tiles above it.');return;}
+  if(!isFreeTile(deal.tiles,tile,removed)){game.misses=(game.misses||0)+1;stats.mistakes++;game.streak=0;game.fastStreak=0;persist();sound('blocked');status('Tile is blocked. Free one of its sides and clear any tiles above it.');return;}
   if(selected===id){selected=null;highlight=[];render();status('Selection cleared.');return;}
   if(selected===null){selected=id;highlight=[];render();sound('select');status(`${faceById(tile.face).label} selected. Find a matching free tile.`);return;}
   if(!pairIsLegal(deal,removed,selected,id)){
-   selected=id;highlight=[];render();sound('blocked');status('Tiles do not match. Selection moved to the new tile.');return;
+   game.misses=(game.misses||0)+1;stats.mistakes++;game.streak=0;game.fastStreak=0;
+   selected=id;highlight=[];persist();render();sound('blocked');status('Tiles do not match. Selection moved to the new tile.');return;
   }
+  const matchedKind=faceById(deal.tiles[selected].face)?.kind;
   game.moves.push([selected,id]);selected=null;highlight=[];
-  if(game.moves.length===72){
-   game.completedAt=new Date().toISOString();recordWin(game);sound('win');
-  }else sound('match');
+  const now=Date.now();
+  game.fastStreak=game.lastMatchAt&&now-game.lastMatchAt<=6000?(game.fastStreak||1)+1:1;
+  game.lastMatchAt=now;game.streak=(game.streak||0)+1;
+  stats.bestStreak=Math.max(stats.bestStreak,game.streak);
+  stats.bestRush=Math.max(stats.bestRush,game.fastStreak);
+  // Never award cumulative pairs twice simply by undoing and replaying the same point.
+  if(game.moves.length>(game.highestPairs||0)){
+   game.highestPairs=game.moves.length;stats.pairs++;
+   if(matchedKind&&Object.hasOwn(stats,matchedKind+'Pairs'))stats[matchedKind+'Pairs']++;
+  }
+  if(game.moves.length===72){game.completedAt=new Date().toISOString();recordWin(game);}
+  const newAwards=freshlyEarned(stats,saved.achievements);
+  if(newAwards.length)saved.achievements.push(...newAwards.map(a=>a.id));
   persist();render();
-  status(game.completedAt?`Victory! All 144 tiles cleared in ${duration(game.elapsed)}. Your result is saved on this device.`:'Pair matched!');
+  const rush=[3,5,8,12,20,36,50,72].includes(game.fastStreak);
+  const streak=[3,5,8,12,20,36,50,72].includes(game.streak);
+  const best=newAwards.slice().sort((a,b)=>awardLevel(b.grade)-awardLevel(a.grade))[0];
+  const effect=game.completedAt||best&&awardLevel(best.grade)>=7?'confetti':'sparkles';
+  if(game.completedAt)celebrateMahjong(section,{title:'TURTLE MASTER!',subtitle:'144 tiles cleared · '+duration(game.elapsed),grade:'Celestial',effect});
+  else if(best)celebrateMahjong(section,{title:newAwards.length>1?'GREAT JOB!':'ACHIEVEMENT UNLOCKED!',subtitle:best.title+(newAwards.length>1?' · +'+(newAwards.length-1)+' more':''),grade:best.grade,effect});
+  else if(rush)celebrateMahjong(section,{title:game.fastStreak>=12?'LIGHTNING HANDS!':'SPEED BURST!',subtitle:game.fastStreak+' fast matches in a row',grade:'Gold',effect:'sparkles'});
+  else if(streak)celebrateMahjong(section,{title:game.streak>=12?'UNSTOPPABLE!':'GREAT JOB!',subtitle:game.streak+' clean matches in a row',grade:'Silver',effect:'sparkles'});
+  if(game.completedAt)sound('win');
+  else if(best)sound(awardLevel(best.grade)>=7?'legendary':'award');
+  else if(rush)sound('rush');
+  else if(streak)sound('streak');
+  else sound('match');
+  status(game.completedAt?`Victory! All 144 tiles cleared in ${duration(game.elapsed)}. Your result is saved on this device.`:
+    best?'Unlocked '+newAwards.length+' new Classic trophy'+(newAwards.length===1?'':'ies')+'!':
+    rush?'Lightning hands! '+game.fastStreak+' fast matches without a mistake.':
+    streak?'Great job! '+game.streak+' correct matches in a row.':'Pair matched!');
  }
  function faceNode(tile,removed,free,sz){
   const face=faceById(tile.face),button=make('button','turtle-tile');
@@ -178,7 +242,7 @@ export function mountClassicTurtle(root,{userId}){
   button.style.top=Math.round(14+(tile.y-tile.z*.12)*sz*HEIGHT)+'px';
   button.style.zIndex=String(10+tile.z*1000+Math.round(tile.y*10));
   button.setAttribute('aria-label',face.label+', layer '+(tile.z+1)+', '+(free?'free':'blocked'));
-  button.title=face.label+' · '+(free?'free':'blocked');
+  // No native long-press tooltip over the board; the accessible name already describes the tile.
   if(prefs.showFree&&free)button.classList.add('show-free');
   button.append(tileArtwork(face));
   button.addEventListener('click',()=>choose(tile.id));
@@ -234,9 +298,30 @@ export function mountClassicTurtle(root,{userId}){
   const wins=saved.history.filter(x=>x.kind===activeKind),best=wins.length?Math.min(...wins.map(x=>x.elapsed)):null;
   const dailyWins=new Set(saved.history.filter(x=>x.kind==='daily').map(x=>x.date));
   view('#turtle-record').replaceChildren(make('span','',`Wins: ${wins.length}`),make('span','',`Best: ${best===null?'—':duration(best)}`),make('span','',`Daily clears: ${dailyWins.size}`));
+  renderAchievements();
   if(game.completedAt)status('Board cleared! Start a fresh Free Play deal or return for tomorrow’s Daily Challenge.');
   else if(!pairs.length)status('No legal pairs remain. Classic Turtle has no shuffle. Undo or restart this same deal.');
   else if(!lastStatus)status('Choose two matching free tiles.');
+ }
+ function renderAchievements(){
+  const earned=new Set(saved.achievements),filter=awardFilter;
+  const available=CLASSIC_AWARDS.filter(a=>filter==='earned'?earned.has(a.id):filter==='extreme'?awardLevel(a.grade)>=7:true);
+  available.sort((a,b)=>Number(earned.has(b.id))-Number(earned.has(a.id))||awardLevel(a.grade)-awardLevel(b.grade));
+  view('#turtle-awards-count').textContent=earned.size+' / '+CLASSIC_AWARDS.length+' trophies unlocked · '+available.length+' shown in this category';
+  const list=view('#turtle-awards-list');list.replaceChildren();
+  for(const award of available.slice(0,awardLimit)){
+   const unlocked=earned.has(award.id);
+   const box=make('article','turtle-award '+(unlocked?'is-earned':'is-locked'));box.dataset.grade=award.grade.toLowerCase();
+   const emblem=make('span','turtle-award-icon',unlocked?'★':'◇');
+   const caption=make('div','turtle-award-copy');
+   caption.append(make('strong','',award.title),make('small','',award.grade+' · '+award.description));
+   const progress=make('progress','');progress.max=award.unit==='seconds'?1:award.target;
+   progress.value=unlocked?progress.max:Math.min(progress.max,awardMetric(stats,award));
+   progress.setAttribute('aria-label',award.title+' progress');
+   caption.append(progress);box.append(emblem,caption);list.append(box);
+  }
+  view('#turtle-awards-more').hidden=available.length<=awardLimit;
+  view('#turtle-awards-more').textContent='Show more challenges ('+Math.max(0,available.length-awardLimit)+' left)';
  }
  const faceGuide=view('#turtle-face-guide');
  for(const face of TURTLE_FACES){const swatch=make('div','turtle-guide-tile');swatch.append(tileArtwork(face),make('small','',face.label));faceGuide.append(swatch);}
@@ -258,6 +343,8 @@ export function mountClassicTurtle(root,{userId}){
  view('#turtle-hint').addEventListener('click',hint);
  view('#turtle-show-free').addEventListener('click',()=>{prefs.showFree=!prefs.showFree;savePrefs();render();});
  view('#turtle-sound').addEventListener('click',()=>{prefs.sound=!prefs.sound;savePrefs();render();sound('select');});
+ view('#turtle-award-filter').addEventListener('change',event=>{awardFilter=event.target.value;awardLimit=30;renderAchievements();});
+ view('#turtle-awards-more').addEventListener('click',()=>{awardLimit+=30;renderAchievements();});
  const changeZoom=z=>{zoom=Math.max(0,Math.min(ZOOMS.length-1,z));render();};
  view('#turtle-fit').addEventListener('click',()=>changeZoom(0));
  view('#turtle-zoom-out').addEventListener('click',()=>changeZoom(zoom-1));
