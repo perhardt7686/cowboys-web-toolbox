@@ -75,7 +75,7 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-roster .mc-portrait[data-crew-id]')).to_have_count(2)
     await page.locator('#mc-save').click()
     await page.reload(wait_until='domcontentloaded')
-    await expect(page.locator('#mc-roster .mc-portrait')).to_have_count(2)
+    await expect(page.locator('#mc-roster .mc-portrait[data-crew-id]')).to_have_count(2)
     geometry=await page.evaluate("""() => Object.fromEntries(
       ['.mc-layout','.mc-roster','.mc-market','.mc-cards','.mc-pages','.mc-theater','.mc-tools']
       .map(k=>[k,document.querySelector(k).getBoundingClientRect().toJSON()]))""")
