@@ -24,8 +24,9 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-painted-hero')).to_be_visible()
     await expect(page.locator('#mc-painted-hound')).to_be_visible()
     await expect(page.locator('#mc-painted-van')).to_be_visible()
-    await expect(page.locator('#mc-vector-van')).to_have_attribute('transform','translate(-60 -155) scale(1.55 1.34)')
-    await expect(page.locator('#mc-painted-van-backing')).to_be_hidden()
+    await expect(page.locator('#mc-vector-van')).to_be_hidden()
+    await expect(page.locator('#mc-painted-van-backing')).to_be_visible()
+    assert await page.locator('#mc-painted-van-backing circle').count()>=4,'Backed painted van needs actual wheels and rims'
     assert await page.locator('#mc-painted-hero image').count()==6,'Hero must have six independent painted parts'
     assert await page.locator('#mc-cards .mc-painted-outfit').count()>0,'Working gallery must display actual painted outfits'
     assert await page.locator('#mc-painted-workshop image').count()==1
