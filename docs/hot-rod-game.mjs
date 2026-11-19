@@ -1168,8 +1168,10 @@ export function makeHotRod({client, memberId, launcher}) {
     if (scene==='race' && race && !race.result && !staged) togglePaused();
     else close();
   },{signal:abort.signal});
-  dialog.addEventListener('keydown',event=>{
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
+  // A redraw replaces the focused bolt element. Listen at document scope so
+  // numeric wrench keys still reach the open modal when focus falls to body.
+  document.addEventListener('keydown',event=>{
+    if (!dialog.open || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
     // Original Street Rod reference card: number keys 1-9 select fasteners.
     if(scene==='workbench' && bayMode==='work' && /^[1-9]$/.test(event.key) &&
         !event.target.closest('input,select,textarea')){
