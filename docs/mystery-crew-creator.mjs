@@ -1,18 +1,20 @@
 /* Mystery Crew Creator: family-account sync is server-authoritative. 
  * The local-only preview fixture works only on localhost test builds. */
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
+import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=fidelity1';
+import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=fidelity1';
 const KEY='cowboy-mystery-crew-creator-v1';
 const isPreview=new URLSearchParams(location.search).get('preview')==='1'&&['localhost','127.0.0.1'].includes(location.hostname);
 let account=null,accountReady=isPreview,revision=0,busy=false;
 const app=document.getElementById('mc-app'),$=id=>document.getElementById(id);
 const themes=['#ef792f','#69a55e','#315fa2','#cc5654','#6a5588','#a87640','#2c8e97','#e3c36c'];
 const skins=['#f0b989','#c98760','#ab6948','#6e432e','#f6d2ae','#d9a27b'];
-const hairs=['#904b28','#342e32','#cd8c32','#ab4232','#6f4f37','#302b46'];
+const hairs=['#904b28','#b8432a','#e0b447','#302b46','#6b4531','#36243b'];
 const pants=['#315b93','#355b6b','#644f78','#567158'];
 const petColors={dog:'#b77a43',cat:'#8b879a',ghost:'#b4e5c9',owl:'#b4a084',fox:'#d88c55'};
 const starter=(n=1)=>({id:'crew-'+n,name:['Scout','Juniper','Finn','Riley','Atlas','Wren'][(n-1)%6],skin:skins[(n-1)%skins.length],
  hair:hairs[(n-1)%hairs.length],shirt:themes[(n-1)%themes.length],pants:pants[(n-1)%pants.length],
- outfit:'detective',hat:'none',gear:'none',pet:'dog',vehicle:'van',scene:'sunlit',expression:'smile'});
+ outfit:'detective',hat:'none',gear:'none',pet:'dog',vehicle:'van',scene:'sunlit',...CREW_ANCHORS[(n-1)%CREW_ANCHORS.length]});
 const items=[
 {id:'detective',name:'Detective Coat',type:'outfits',color:'#ef792f',cost:0,art:'coat'},
 {id:'explorer',name:'Explorer Vest',type:'outfits',color:'#6c9354',cost:0,art:'vest'},
@@ -55,7 +57,7 @@ function read(){
   return {version:1,crew,active:crew.some(x=>x.id===saved.active)?saved.active:crew[0].id,coins:Math.min(99999,Math.max(0,Number(saved.coins)||0)),xp:Math.min(999999,Math.max(0,Number(saved.xp)||0)),unlocked:[...new Set([...unlockedInitial,...allValid])],rewardedDesigns:Array.isArray(saved.rewardedDesigns)?saved.rewardedDesigns.slice(-250):[]};
  }catch{return fresh();}
 }
-let state=read(),savedSnapshot=JSON.stringify(state),view='character',filter='outfits',motion='idle',zoom=1,angle=0;
+let state=read(),savedSnapshot=JSON.stringify(state),view='character',filter='faces',page=0,motion='idle',zoom=1,angle=0;
 let draft=structuredClone(state);
 function current(){return draft.crew.find(v=>v.id===draft.active)||draft.crew[0];}
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -91,15 +93,8 @@ function icon(item){
  else svg='<circle cx="80" cy="80" r="47" fill="'+base+'" stroke="#3d3946" stroke-width="6"/><path d="M38 80H123M80 38V122" stroke="#fff3d3" stroke-width="5"/>';
  return '<svg viewBox="0 0 160 160" aria-hidden="true" focusable="false">'+svg+'</svg>';
 }
-function portrait(member){
- const skin=member.skin,hair=member.hair,shirt=member.shirt;
- return '<svg viewBox="0 0 110 105" aria-hidden="true"><path fill="'+shirt+'" stroke="#323346" stroke-width="4" d="M17 110Q18 77 51 74Q87 73 97 110Z"/>'+
- '<path fill="'+skin+'" stroke="#323346" stroke-width="4" d="M26 33Q26 8 56 10Q88 9 89 35L86 68Q58 100 31 67Z"/>'+
- '<path fill="'+hair+'" stroke="#323346" stroke-width="4" d="M23 46Q9 14 38 10Q65 -12 81 9Q102 13 91 47Q81 28 67 30Q50 22 35 41Z"/>'+
- '<ellipse cx="45" cy="48" rx="8" ry="11" fill="white"/><ellipse cx="70" cy="48" rx="8" ry="11" fill="white"/>'+
- '<circle cx="48" cy="50" r="4" fill="#395474"/><circle cx="68" cy="50" r="4" fill="#395474"/>'+
- '<path d="M46 70Q58 82 72 69" fill="none" stroke="#6c4744" stroke-width="4"/></svg>';
-}
+function portrait(member){return mysteryCrewPortraitSVG(member);}
+
 function writeState(){
  if(!isPreview)return false;
  try{localStorage.setItem(KEY,JSON.stringify(draft));state=structuredClone(draft);savedSnapshot=JSON.stringify(state);return true;}
@@ -211,6 +206,7 @@ function updateScene(){
  actor.style.setProperty('--shirt',m.shirt);actor.style.setProperty('--pants',m.pants);
  actor.style.setProperty('--skin',m.skin);actor.style.setProperty('--hair',m.hair);
  $('mc-pet').style.setProperty('--pet',petColors[m.pet]||petColors.dog);
+ $('mc-fidelity-head').innerHTML=crewHeadMarkup(m);
  renderWearables(m);
  renderPetSpecies(m);
  const stageMood={sunlit:'none',twilight:'hue-rotate(35deg) brightness(.84)',autumn:'sepia(.24) saturate(1.18)'}[m.scene]||'none';
@@ -223,7 +219,7 @@ function updateScene(){
  $('mc-head').style.filter=rear?'brightness(.76)':'none';
  $('mc-vehicle').style.filter=m.vehicle==='jeep'?'hue-rotate(94deg)':m.vehicle==='camper'?'hue-rotate(-26deg) saturate(.8)':'none';
 
- $('mc-mouth').setAttribute('d',m.expression==='curious'?'M78 133Q99 137 118 132':m.expression==='grin'?'M74 130Q96 167 128 130':'M75 133Q96 157 123 130');
+
  for(const b of document.querySelectorAll('.mc-views button'))b.setAttribute('aria-pressed',String((b.id==='mc-view-front'&&angle===0)||(b.id==='mc-view-side'&&angle===90)||(b.id==='mc-view-back'&&angle===180)));
 }
 function renderRoster(){
@@ -247,30 +243,65 @@ function renderColors(){
   b.setAttribute('aria-pressed',String(current()[layer]===color));row.append(b);
  }
 }
+const traitCategories={
+ faces:{key:'faceShape',label:'Face Shape',options:CREW_OPTIONS.faceShape},
+ haircuts:{key:'hairStyle',label:'Hairstyle',options:CREW_OPTIONS.hairStyle},
+ eyes:{key:'eyeShape',label:'Eye Shape',options:CREW_OPTIONS.eyeShape},
+ expressions:{key:'expression',label:'Expression',options:CREW_OPTIONS.expression},
+ details:{key:'detail',label:'Face Details',options:CREW_OPTIONS.detail}
+};
+const prettyLabel=value=>value.replace(/-/g,' ').replace(/\\b\\w/g,char=>char.toUpperCase());
+function pageSize(){
+ return window.matchMedia('(max-width:650px) and (max-height:740px)').matches?2:
+   window.matchMedia('(max-width:1380px)').matches?4:8;
+}
 function setFilter(next){
- filter=next==='collections'?'collections':next==='character'?'outfits':next;
- if(!['outfits','hats','gear','pets','vehicles','collections','studio'].includes(filter))filter='outfits';
- $('mc-market-filter').value=filter==='collections'?'collections':filter;
- const labels={outfits:'Outfits',hats:'Hats',gear:'Adventure Gear',pets:'Pets',vehicles:'Vehicles',studio:'Backdrops',collections:'Unlockables'};
+ const known=['faces','haircuts','eyes','expressions','details','outfits','hats','gear','pets','vehicles','collections','studio'];
+ filter=next==='character'?'faces':known.includes(next)?next:'faces';
+ page=0;
+ $('mc-market-filter').value=filter;
+ const labels={faces:'Face Shapes',haircuts:'Hairstyles',eyes:'Eye Styles',expressions:'Expressions',details:'Face Details',
+  outfits:'Outfits',hats:'Hats',gear:'Adventure Gear',pets:'Pets',vehicles:'Vehicles',studio:'Backdrops',collections:'Unlockables'};
  $('mc-market-title').textContent=labels[filter];
- for(const b of document.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===next || (next==='collections'&&b.dataset.view==='collections')));
+ for(const b of document.querySelectorAll('[data-view]')){
+  b.setAttribute('aria-pressed',String(b.dataset.view===filter||((b.dataset.view==='character')&&Boolean(traitCategories[filter]))));
+ }
  for(const b of document.querySelectorAll('[data-jump]'))b.setAttribute('aria-pressed',String(b.dataset.jump===filter));
  renderCards();
 }
 function renderCards(){
  const panel=$('mc-cards');panel.replaceChildren();
- const category=filter==='collections'?items.filter(i=>i.cost>0):items.filter(i=>i.type===filter);
- for(const item of category){
-  const owned=draft.unlocked.includes(item.id);
-  const equipped=Object.entries(choices).some(([category,key])=>current()[key]===item.id);
+ const trait=traitCategories[filter];
+ const category=trait?trait.options.map(id=>({id})):
+  filter==='collections'?items.filter(i=>i.cost>0):items.filter(i=>i.type===filter);
+ const size=pageSize();
+ const count=Math.max(1,Math.ceil(category.length/size));
+ page=Math.max(0,Math.min(page,count-1));
+ for(const item of category.slice(page*size,(page+1)*size)){
   const card=document.createElement('button');card.type='button';card.className='mc-card';
-  card.dataset.item=item.id;card.dataset.locked=String(!owned);
-  const label=equipped?'✓ Equipped':owned?'Equip':'★ '+item.cost+' coins';
-  const badge=equipped?'equipped':owned?'available':'locked';
-  card.setAttribute('aria-label',item.name+'. '+(equipped?'Equipped':owned?'Equip':'Unlock for '+item.cost+' device coins'));
-  card.innerHTML='<span class="mc-card-art">'+icon(item)+'</span><span class="mc-card-name">'+safe(item.name)+'</span><span class="mc-card-state '+badge+'">'+safe(label)+'</span>';
+  if(trait){
+   const active=current()[trait.key]===item.id;
+   card.dataset.styleKind=trait.key;
+   card.dataset.styleValue=item.id;
+   card.setAttribute('aria-pressed',String(active));
+   card.setAttribute('aria-label',prettyLabel(item.id)+' '+trait.label+(active?' selected':''));
+   card.innerHTML='<span class="mc-card-art">'+crewHeadPreviewSVG({...current(),[trait.key]:item.id},110)+'</span>'+
+    '<span class="mc-card-name">'+safe(prettyLabel(item.id))+'</span>'+
+    '<span class="mc-card-state '+(active?'equipped':'available')+'">'+(active?'✓ Selected':'Choose')+'</span>';
+  }else{
+   const owned=draft.unlocked.includes(item.id);
+   const equipped=Object.values(choices).some(key=>current()[key]===item.id);
+   card.dataset.item=item.id;card.dataset.locked=String(!owned);
+   const label=equipped?'✓ Equipped':owned?'Equip':'★ '+item.cost+' coins';
+   const badge=equipped?'equipped':owned?'available':'locked';
+   card.setAttribute('aria-label',item.name+'. '+(equipped?'Equipped':owned?'Equip':'Unlock for '+item.cost+' crew coins'));
+   card.innerHTML='<span class="mc-card-art">'+icon(item)+'</span><span class="mc-card-name">'+safe(item.name)+'</span><span class="mc-card-state '+badge+'">'+safe(label)+'</span>';
+  }
   panel.append(card);
  }
+ $('mc-page-label').textContent=(page+1)+' / '+count;
+ $('mc-page-prev').disabled=page<=0;
+ $('mc-page-next').disabled=page>=count-1;
 }
 function renderStats(){
  $('mc-coins').textContent=draft.coins.toLocaleString();
@@ -301,6 +332,13 @@ async function actionItem(item){
 document.addEventListener('click',async event=>{
  const el=event.target.closest('button');if(!el)return;
  if(el.dataset.crewId){draft.active=el.dataset.crewId;render();return;}
+ if(el.id==='mc-page-prev'){page=Math.max(0,page-1);renderCards();return;}
+ if(el.id==='mc-page-next'){page+=1;renderCards();return;}
+ if(el.dataset.styleKind){
+  const kind=el.dataset.styleKind,value=el.dataset.styleValue;
+  if(Object.values(traitCategories).some(x=>x.key===kind&&x.options.includes(value))){current()[kind]=value;render();notice(prettyLabel(value)+' selected. Press Save Crew to sync it.');}
+  return;
+ }
  if(el.dataset.color){current()[el.dataset.layer||'shirt']=el.dataset.color;render();notice((el.dataset.layer||'Jacket')+' color changed. Save to keep it.');return;}
  if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)try{await actionItem(i);}catch(error){notice(error?.message||'Item unlock failed.');}return;}
  if(el.dataset.view){view=el.dataset.view;setFilter(view);return;}
@@ -360,6 +398,7 @@ document.addEventListener('click',async event=>{
 });
 $('mc-market-filter').addEventListener('change',e=>{view=e.target.value;setFilter(view);});
 $('mc-color-layer').addEventListener('change',renderColors);
+window.addEventListener('resize',()=>renderCards());
 $('mc-rename-cancel').addEventListener('click',()=>$('mc-rename-dialog').close());
 $('mc-rename-form').addEventListener('submit',e=>{
  e.preventDefault();
