@@ -109,6 +109,25 @@ async def verify(browser,width,height,label):
     await set_category(page,'outfits')
     await page.locator('.mc-card[data-item="explorer"]').click()
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','explorer')
+    # Inspect real WebP pixels. A changed CSS/class/URL alone is not enough:
+    # the green vest must be illustrated on the main body.
+    cloth=await page.evaluate("""async () => {
+      const url=document.querySelector('#mc-v5-illustrated-image').getAttribute('href');
+      const pic=new Image();pic.src=url;await pic.decode();
+      const canvas=document.createElement('canvas');canvas.width=430;canvas.height=574;
+      const context=canvas.getContext('2d',{willReadFrequently:true});
+      context.drawImage(pic,0,0,430,574);
+      const data=context.getImageData(140,170,150,150).data;
+      let green=0,orange=0;
+      for(let i=0;i<data.length;i+=4){
+        const r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
+        if(a>30 && g>r*1.10 && g>b*1.20)green++;
+        if(a>30 && r>g*1.26 && g>b*1.25)orange++;
+      }
+      return {green,orange};
+    }""")
+    assert cloth['green']>2000 and cloth['green']>cloth['orange'],f'Explorer garment not truly green: {cloth}'
+    await page.wait_for_timeout(250)
     await page.screenshot(path=str(REPORTS/f'mystery-crew-v5-explorer-{label}.png'),
                           full_page=False,animations='disabled')
     after=await page.locator('#mc-v5-illustrated-image').get_attribute('href')
