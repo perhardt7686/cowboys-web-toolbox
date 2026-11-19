@@ -35,3 +35,9 @@ test('1989 repair clicks are on-art with no duplicate bolt menu or iOS title pop
   assert.match(css,/-webkit-touch-callout:none/);
   assert.match(css,/hot-rod-assembly-picker/);
 });
+
+test('game-art hotspots never turn into opaque hover or pressed rectangles',()=>{
+  assert.match(css,/button\.hot-rod-hotspot:hover[\s\S]*button\.hot-rod-hotspot:active/);
+  assert.match(css,/button\.hot-rod-hotspot\.is-held\s*\{[\s\S]*?background:transparent;/);
+  assert.match(css,/button\.hot-rod-hotspot:focus-visible\s*\{[\s\S]*?background:transparent;/);
+});

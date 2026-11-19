@@ -279,8 +279,8 @@ async def campaign_flow(page, name, *, touch):
     await expect(game.get_by_role('button',name='Remove bolt 2',exact=True)).to_be_visible()
     await page.keyboard.press('2')
     await expect(game.get_by_text('1 loose',exact=False)).to_be_visible()
-    for name in ('Seat bolt 2','Tighten bolt 2','Torque bolt 2'):
-        await game.get_by_role('button',name=name,exact=True).click()
+    for bolt_label in ('Seat bolt 2','Tighten bolt 2','Torque bolt 2'):
+        await game.get_by_role('button',name=bolt_label,exact=True).click()
     await expect(game.get_by_text('0 loose',exact=False)).to_be_visible()
 
     work=game.locator('.hot-rod-panel')

@@ -111,11 +111,28 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
   pointer-events:auto;
   cursor:crosshair;
 }
-.hot-rod-monitor .hot-rod-hotspot:active,
-.hot-rod-monitor .hot-rod-hotspot:focus-visible { border-color:var(--rod-gold); background:#ffff5519; }
-@media (hover:hover) {
-  .hot-rod-monitor .hot-rod-hotspot:hover { border-color:var(--rod-gold); background:#ffff5519; }
+/* Generic button:hover and button:active previously painted an opaque
+   rectangle over the 320x200 engine, covering fasteners and the status bar.
+   These higher-specificity art controls must remain transparent on hover,
+   press and long-touch. Only keyboard focus gets a discreet outline. */
+.hot-rod-monitor button.hot-rod-hotspot,
+.hot-rod-monitor button.hot-rod-hotspot:hover,
+.hot-rod-monitor button.hot-rod-hotspot:active,
+.hot-rod-monitor button.hot-rod-hotspot.is-held {
+  background:transparent;
+  color:transparent;
+  border-color:transparent;
+  border-style:solid;
+  box-shadow:none;
+  text-shadow:none;
 }
+.hot-rod-monitor button.hot-rod-hotspot:focus-visible {
+  background:transparent;
+  border-color:transparent;
+  outline:2px solid var(--rod-gold);
+  outline-offset:-2px;
+}
+
 .hot-rod-screen[data-cursor=wrench], .hot-rod-screen[data-cursor=wrench] .hot-rod-hotspot {
   cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M13 1l-5 3-1 5 2 3L1 19v3h3l8-8 5 1 5-5V6l-5 4-3-3 4-5z' fill='%23ffff90' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 2 21,crosshair;
 }
