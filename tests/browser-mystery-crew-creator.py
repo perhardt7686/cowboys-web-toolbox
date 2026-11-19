@@ -23,6 +23,20 @@ async def verify(browser,width,height,label):
     await expect(page.locator('.mc-portrait')).to_have_count(1)
     await expect(page.locator('#mc-fidelity-head path').first).to_be_visible()
     assert await page.get_by_text('Dressing room').count()==0
+    # Source-reference artwork is real vector layers, not a static screenshot.
+    await expect(page.locator('#mc-woods-detail')).to_be_attached()
+    await expect(page.locator('#mc-ground-fidelity')).to_be_attached()
+    assert await page.locator('#mc-barn path').count()>=12
+    assert await page.locator('#mc-vehicle path').count()>=9
+    assert await page.locator('#mc-pet path').count()>=9,'Starter dog must have body, paws and expression'
+    await expect(page.locator('#mc-market-title')).to_have_text('Outfits')
+    await page.screenshot(path=str(REPORTS/f'mystery-crew-fresh-reference-{label}.png'),
+                          full_page=False,animations='disabled')
+    await set_category(page,'presets')
+    await expect(page.locator('[data-reference-look="juniper"]')).to_be_visible()
+    await page.locator('[data-reference-look="juniper"]').click()
+    await expect(page.locator('[data-reference-look="juniper"]')).to_have_attribute('aria-pressed','true')
+    assert '#b8432a' in await page.locator('#mc-fidelity-head').inner_html()
 
     # Five independently persisted, allowlisted face traits.
     for category,property_,value in [('faces','faceShape','round'),
