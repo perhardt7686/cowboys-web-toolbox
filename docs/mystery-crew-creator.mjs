@@ -374,7 +374,9 @@ function renderStats(){
 function render(){
  renderRoster();renderColors();renderCards();renderStats();updateScene();
  const dirty=JSON.stringify(draft)!==savedSnapshot;
- $('mc-save').textContent=dirty?'✓ Save Crew *':'✓ Save Crew';
+ const compactSave=window.matchMedia('(max-width:650px) and (max-height:740px)').matches;
+ $('mc-save').textContent=compactSave?(dirty?'✓ Save *':'✓ Save'):(dirty?'✓ Save Crew *':'✓ Save Crew');
+ $('mc-save').setAttribute('aria-label',dirty?'Save Crew changes':'Save Crew');
 }
 async function actionItem(item){
  if(!accountReady){notice('Sign in to your family account first.');return;}
@@ -474,7 +476,7 @@ document.addEventListener('click',async event=>{
 });
 $('mc-market-filter').addEventListener('change',e=>{view=e.target.value;setFilter(view);});
 $('mc-color-layer').addEventListener('change',renderColors);
-window.addEventListener('resize',()=>renderCards());
+window.addEventListener('resize',render);
 $('mc-rename-cancel').addEventListener('click',()=>$('mc-rename-dialog').close());
 $('mc-rename-form').addEventListener('submit',e=>{
  e.preventDefault();
