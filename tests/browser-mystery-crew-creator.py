@@ -37,6 +37,8 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-v5-illustrated-actor')).to_be_visible(timeout=20000)
     await expect(page.locator('#mc-scene')).to_have_attribute('data-crew-art-pack','ready',timeout=20000)
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-anchor','0')
+    await expect(page.locator('#mc-roster .mc-portrait[data-crew-id] .mc-v5-portrait-art')).to_have_count(1)
+    await expect(page.locator('#mc-roster .mc-reference-portrait .mc-v5-portrait-art')).to_have_count(4)
     await expect(page.locator('#mc-v5-illustrated-actor')).to_have_attribute('data-outfit','detective')
     await expect(page.locator('#mc-painted-hero')).to_be_hidden()
     await expect(page.locator('#mc-painted-hound')).to_be_visible()
@@ -126,6 +128,7 @@ async def verify(browser,width,height,label):
         await expect(choice).to_have_attribute('aria-pressed','true')
         if property_=='faceShape':
             await expect(page.locator('#mc-v5-illustrated-actor')).to_be_hidden()
+            await expect(page.locator('#mc-roster .mc-portrait[data-crew-id] svg')).to_be_attached()
             await expect(page.locator('#mc-painted-hero')).to_be_hidden()
             assert await page.locator('#mc-actor').evaluate('el=>el.style.opacity')=='1','Changed face should show actual custom actor'
     assert await page.locator('#mc-fidelity-head circle').count()>=4 # irises, highlights and optional glasses
