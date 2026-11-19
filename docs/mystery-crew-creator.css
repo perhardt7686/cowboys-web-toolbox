@@ -572,3 +572,46 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @media(max-width:650px){
  .mc-portrait .mc-v5-portrait-art{background-size:auto 310%}
 }
+
+/* V6: seven clipped copies of the same painted actor and equipped costume.
+   Fixed stage geometry: no viewport, scrollbar or touch-target changes. */
+#mc-v6-painted-rig{overflow:visible;pointer-events:none}
+#mc-v6-painted-rig [data-v6-part]{transform-box:view-box}
+#mc-v6-painted-rig [data-v6-part="leg-left"]{transform-origin:174px 335px}
+#mc-v6-painted-rig [data-v6-part="leg-right"]{transform-origin:255px 335px}
+#mc-v6-painted-rig [data-v6-part="torso"]{transform-origin:215px 324px}
+#mc-v6-painted-rig [data-v6-part="arm-left"]{transform-origin:149px 179px}
+#mc-v6-painted-rig [data-v6-part="arm-right"]{transform-origin:281px 179px}
+#mc-v6-painted-rig [data-v6-part="head"]{transform-origin:214px 163px}
+#mc-v6-painted-rig [data-v6-part="hair"]{transform-origin:214px 88px}
+#mc-v5-illustrated-actor[data-motion="idle"] [data-v6-part="torso"]{animation:mc-v6-breathe 3.1s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="idle"] [data-v6-part="head"]{animation:mc-v6-nod 3.1s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="wave"] [data-v6-part="arm-right"]{animation:mc-v6-wave .82s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="wave"] [data-v6-part="head"]{animation:mc-v6-nod 1.6s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="cheer"] [data-v6-part="arm-left"]{animation:mc-v6-cheer-left .72s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="cheer"] [data-v6-part="arm-right"]{animation:mc-v6-cheer-right .72s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="cheer"] [data-v6-part="torso"]{animation:mc-v6-bounce .72s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="think"] [data-v6-part="head"]{animation:mc-v6-think 2s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="think"] [data-v6-part="arm-left"]{animation:mc-v6-think-arm 2s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="run"] [data-v6-part="leg-left"]{animation:mc-v6-stride-left .52s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="run"] [data-v6-part="leg-right"]{animation:mc-v6-stride-right .52s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="run"] [data-v6-part="arm-left"]{animation:mc-v6-stride-right .52s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="run"] [data-v6-part="arm-right"]{animation:mc-v6-stride-left .52s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="run"] [data-v6-part="torso"]{animation:mc-v6-bounce .52s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="action"] [data-v6-part="torso"]{animation:mc-v6-action .55s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="action"] [data-v6-part="arm-left"]{animation:mc-v6-cheer-left .55s ease-in-out infinite}
+#mc-v5-illustrated-actor[data-motion="action"] [data-v6-part="arm-right"]{animation:mc-v6-cheer-right .55s ease-in-out infinite}
+#mc-v5-illustrated-actor:is([data-motion="run"],[data-motion="wave"],[data-motion="cheer"],[data-motion="action"]) [data-v6-part="hair"]{animation:mc-v6-hair .82s ease-in-out infinite}
+@keyframes mc-v6-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-2px) scaleY(1.008)}}
+@keyframes mc-v6-nod{0%,100%{transform:rotate(0)}50%{transform:rotate(1.5deg)}}
+@keyframes mc-v6-wave{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(-20deg)}}
+@keyframes mc-v6-cheer-left{0%,100%{transform:rotate(5deg)}50%{transform:rotate(17deg)}}
+@keyframes mc-v6-cheer-right{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(-17deg)}}
+@keyframes mc-v6-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes mc-v6-think{0%,100%{transform:rotate(0)}50%{transform:rotate(-5deg)}}
+@keyframes mc-v6-think-arm{0%,100%{transform:rotate(0)}50%{transform:rotate(9deg)}}
+@keyframes mc-v6-stride-left{0%,100%{transform:rotate(9deg)}50%{transform:rotate(-9deg)}}
+@keyframes mc-v6-stride-right{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+@keyframes mc-v6-action{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+@keyframes mc-v6-hair{0%,100%{transform:rotate(0)}50%{transform:rotate(1.8deg)}}
+@media(prefers-reduced-motion:reduce){#mc-v6-painted-rig [data-v6-part]{animation:none!important;transform:none!important}}
