@@ -121,7 +121,7 @@ begin
       raise exception 'Invalid or duplicated character' using errcode='22023';
     end if;
     seen:=array_append(seen,item_id);
-    if coalesce(item->>'outfit','')<>all(known_outfits) and not (item->>'outfit'=any(known_outfits)) then
+    if not(coalesce(item->>'outfit','')=any(known_outfits)) then
       raise exception 'Invalid outfit' using errcode='22023';
     end if;
     if not(item->>'hat'=any(known_hats)) or not(item->>'gear'=any(known_gear))
@@ -156,9 +156,9 @@ begin
   key:='look:'||md5(normalized::text);
   update community_private.mystery_crew_state
     set crew=normalized,active=p_active,
-      coins=least(99999,saved.coins+case when not(key=any(saved.rewarded_designs)) then 15 else 0 end),
-      xp=least(999999,saved.xp+case when not(key=any(saved.rewarded_designs)) then 25 else 0 end),
-      rewarded_designs=case when not(key=any(saved.rewarded_designs))
+      coins=least(99999,saved.coins+case when not(key=any(saved.rewarded_designs)) and cardinality(saved.rewarded_designs)<200 then 15 else 0 end),
+      xp=least(999999,saved.xp+case when not(key=any(saved.rewarded_designs)) and cardinality(saved.rewarded_designs)<200 then 25 else 0 end),
+      rewarded_designs=case when not(key=any(saved.rewarded_designs)) and cardinality(saved.rewarded_designs)<200
         then array_append(saved.rewarded_designs,key) else saved.rewarded_designs end,
       revision=saved.revision+1,updated_at=now()
     where member_id=viewer;
