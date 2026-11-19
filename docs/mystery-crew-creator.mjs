@@ -250,7 +250,7 @@ const traitCategories={
  expressions:{key:'expression',label:'Expression',options:CREW_OPTIONS.expression},
  details:{key:'detail',label:'Face Details',options:CREW_OPTIONS.detail}
 };
-const prettyLabel=value=>value.replace(/-/g,' ').replace(/\\b\\w/g,char=>char.toUpperCase());
+const prettyLabel=value=>value.split('-').map(part=>part.slice(0,1).toUpperCase()+part.slice(1)).join(' ');
 function pageSize(){
  return window.matchMedia('(max-width:650px) and (max-height:740px)').matches?2:
    window.matchMedia('(max-width:1380px)').matches?4:8;
