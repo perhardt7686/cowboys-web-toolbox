@@ -62,11 +62,11 @@ function mouthMarkup(expression){
 }
 function eyeMarkup(shape){
  const pairs={
- bright:[15,20],almond:[17,13],soft:[15,16],keen:[17,12]
+ bright:[11,16],almond:[12,11],soft:[11,14],keen:[12,10]
  };
  const [rx,ry]=pairs[shape]||pairs.bright;
  const brow=shape==='keen'?'M55 70L86 65 M106 65L135 70':shape==='soft'?'M56 69Q71 61 87 67 M104 67Q121 61 134 69':'M55 64Q73 56 85 64 M104 64Q122 55 135 64';
- return `<g stroke="#3c3036" stroke-width="4"><ellipse cx="72" cy="92" rx="${rx}" ry="${ry}" fill="#fffaf3"/><ellipse cx="118" cy="91" rx="${rx}" ry="${ry}" fill="#fffaf3"/></g><circle cx="77" cy="94" r="8" fill="#3d708c"/><circle cx="114" cy="93" r="8" fill="#3d708c"/><circle cx="80" cy="91" r="3.2" fill="#fff"/><circle cx="117" cy="90" r="3.2" fill="#fff"/><path d="${brow}" fill="none" stroke="#5d3f38" stroke-width="5.5" stroke-linecap="round"/>`;
+ return `<g stroke="#3c3036" stroke-width="2.8"><ellipse cx="72" cy="92" rx="${rx}" ry="${ry}" fill="#fffaf3"/><ellipse cx="118" cy="91" rx="${rx}" ry="${ry}" fill="#fffaf3"/></g><circle cx="77" cy="94" r="5.6" fill="#3d708c"/><circle cx="114" cy="93" r="5.6" fill="#3d708c"/><circle cx="80" cy="91" r="2.4" fill="#fff"/><circle cx="117" cy="90" r="2.4" fill="#fff"/><path d="${brow}" fill="none" stroke="#5d3f38" stroke-width="5.5" stroke-linecap="round"/>`;
 }
 function detailMarkup(v){
  return {
