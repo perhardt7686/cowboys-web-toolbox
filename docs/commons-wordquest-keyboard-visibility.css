@@ -121,6 +121,15 @@ body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="p
   body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-fixed-positions>span{
     width:23px!important;height:20px!important;font-size:12px!important;
   }
+  /* In a 390px-tall landscape arcade, the panel itself supplies this
+     accessible name. Remove only the duplicate printed heading. */
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-letter-heading{
+    display:none!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-history{
+    min-height:22px!important;
+  }
+
   body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-quest-key-row button{
     min-height:26px!important;
   }
