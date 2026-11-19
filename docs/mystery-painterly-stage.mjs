@@ -90,12 +90,26 @@ export async function loadPainterlyPack(onReady){
   if(!response.ok)throw Error('Painterly art HTTP '+response.status);
   const payload=unpackPainterlyTar(await response.arrayBuffer());
   for(const [name,bytes] of payload)urls.set(name,URL.createObjectURL(new Blob([bytes],{type:'image/webp'})));
+  // A syntactically valid WebP is not proof that the browser rendered it.
+  // Decode all layers BEFORE hiding a live SVG character or displaying the
+  // painterly stage. This also catches image CSP restrictions and Safari gaps.
+  await Promise.all([...urls].map(async ([name,url])=>{
+   const element=new Image();
+   element.src=url;
+   await element.decode();
+   if(!element.naturalWidth||!element.naturalHeight)throw Error('Image could not render: '+name);
+  }));
   if(!mountPaintedLayers())throw Error('Creator art stage unavailable');
   if(typeof onReady==='function')onReady();
   return true;
  })().catch(error=>{
   document.getElementById('mc-scene')?.setAttribute('data-painterly','fallback');
-  // Don't stop character creation if a legacy browser cannot unpack WebP.
+  // Restore the known working vector art if a browser cannot decode WebP.
+  // Never leave blank or broken image placeholders covering the character.
+  for(const url of urls.values())URL.revokeObjectURL(url);
+  urls.clear();
+  document.getElementById('mc-actor')?.style.setProperty('opacity','1');
+  document.getElementById('mc-pet')?.style.setProperty('opacity','1');
   console.warn('Painterly art fallback:',error.message);
   return false;
  });
