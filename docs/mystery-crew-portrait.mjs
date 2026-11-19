@@ -20,7 +20,7 @@ export function mysteryCrewPortrait(state,compact=false){
  const shirt=take(shirts,actor.shirt,STARTER_CREW.shirt);
  // Decorative SVG is shared in profile cards, forum author chips and
  // the family arcade mini profile. It contains no arbitrary user HTML.
- return '<span class="avatar mystery-crew-portrait'+(compact?' mystery-crew-small':'')+'" aria-hidden="true">'+
+ return '<span class="avatar profile-avatar mystery-crew-portrait'+(compact?' mystery-crew-small':' avatar-large')+'" aria-hidden="true">'+
  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="96" height="96" role="presentation" focusable="false">'+
  '<rect x="1" y="1" width="108" height="108" rx="22" fill="#3e9bc5"/>'+
  '<circle cx="88" cy="25" r="16" fill="#fff0b3" opacity=".8"/>'+
