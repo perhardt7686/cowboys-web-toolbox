@@ -42,7 +42,7 @@ export function createProfileStudio(ctx){
     for(const row of data||[])if(row.user_id)crewStates.set(row.user_id,row.state);
   }
   async function load(ids){const unique=[...new Set(ids.filter(Boolean))].slice(0,100);if(ctx.isPreview){for(const id of unique)if(!cache.has(id))cache.set(id,{...PROFILE_DEFAULTS,user_id:id,display_name:'Example maker',headline:'Curious by nature. Maker by habit.',bio:'Here for practical ideas, good tools, and the occasional rabbit hole.',interests:['Making','Good finds','Learning'],theme:'copper',cover:'sunburst',avatar_mode:'icon',avatar_icon:'hammer',published:true,account_active:true});return;}
-    if(!ctx.client()||!unique.length)return;const {data,error}=await ctx.client().from('community_profiles').select(PROFILE_FIELDS).in('user_id',unique);if(error)return;for(const id of unique)cache.delete(id);const projection=await avatarProjections(ctx.client(),(data||[]).filter(p=>p.published||p.user_id===ctx.state.member?.user_id).map(p=>p.user_id));
+    if(!ctx.client()||!unique.length)return;const {data,error}=await ctx.client().from('community_profiles').select(PROFILE_FIELDS).in('user_id',unique);if(error)return;for(const id of unique)cache.delete(id);const projection=new Map(); // Retire legacy avatar projection lookups in live family display.
     for(const p of data||[])cache.set(p.user_id,{...p,avatar_display:projection.get(p.user_id)});
     await loadCrews(unique);
     if(ctx.isPreview)await imageURLs((data||[]).map(p=>cache.get(p.user_id)));
@@ -480,7 +480,7 @@ export function createProfileStudio(ctx){
       ctx.showDialog('<p class="eyebrow">Member profile</p><h2 id="content-title">A little privacy.</h2><p class="dialog-lead">This member has not shared a member profile. You can still read their published conversations.</p>');
       return;
     }
-    const inspect=p.avatar_display?
+    const inspect=ctx.isPreview&&p.avatar_display?
       '<details class="member-avatar-inspection"><summary>Inspect full avatar</summary>'+turntableHTML()+'</details>':'';
     ctx.showDialog(`<h2 id="content-title" class="sr-only">${esc(p.display_name)}’s profile</h2>${card(p)}${inspect}
       <button class="button-quiet" data-member-posts="${esc(id)}">Published activity ↗</button>${id===ctx.state.member?.user_id?'<button class="button-primary" data-profile>Edit my profile ↗</button>':''}`);
@@ -640,7 +640,7 @@ export function createProfileStudio(ctx){
     if(!p)return;
     if(ownerId&&ownerId!==p.user_id)clear();
     ownerId=p.user_id;
-    if(approved()&&!ctx.isPreview){
+    if(approved()&&ctx.isPreview){
       const found=await avatarProjections(ctx.client(),[p.user_id]);
       if(p.user_id!==ctx.state.member?.user_id)return;
       p.avatar_display=found.get(p.user_id)||null;
