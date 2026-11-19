@@ -5,6 +5,7 @@ on:
       - 'tests/mystery-crew-v7-visual-integrity.py'
       - 'scripts/build_mystery_crew_v7_source_layers.py'
       - 'scripts/build_mystery_crew_v7_pose_studio.py'
+      - 'docs/mystery-crew-v9-scout-wave-art-review.md'
       - 'docs/mystery-crew-motion-v6.mjs'
       - '.github/workflows/mystery-crew-v7-visual-acceptance.yml'
   workflow_dispatch:
