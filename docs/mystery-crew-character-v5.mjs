@@ -101,5 +101,15 @@ export function syncCrewV5(member,options={}){
  if(scene)scene.dataset.crewArt='painted';
  return true;
 }
+export function paintedCrewPortraitHTML(member){
+ if(!ready)return null;
+ const anchor=paintedAnchor(member);
+ if(anchor<0)return null;
+ const url=urls.get('crew-'+anchor+'-detective.webp');
+ if(!url)return null;
+ // URL comes from the validated same-origin archive, never account input.
+ // This is a clipped bust drawn from the EXACT same painted character sheet.
+ return '<span class="mc-v5-portrait-art" style="background-image:url(&quot;'+url+'&quot;)" aria-hidden="true"></span>';
+}
 export function disposeCrewV5(){for(const url of urls.values())URL.revokeObjectURL(url);urls.clear();ready=false;loading=null;visual?.remove();visual=null;}
 export const V5_MANIFEST=Object.freeze({outfits:OUTFITS,variations:48,anchors:6});
