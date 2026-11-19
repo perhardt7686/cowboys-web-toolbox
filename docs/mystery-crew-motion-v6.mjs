@@ -4,11 +4,11 @@
 const NS='http://www.w3.org/2000/svg';
 export const PAINTED_MOTIONS=Object.freeze(['idle','wave','cheer','think','run','action']);
 export const PAINTED_PARTS=Object.freeze([
- {id:'leg-left',shape:'M75 325H218V574H0V408H75Z'},
- {id:'leg-right',shape:'M213 325H354V408H430V574H213Z'},
- {id:'torso',shape:'M135 164H294L319 362H111Z'},
- {id:'arm-left',shape:'M0 163H163L157 335L183 409H0Z'},
- {id:'arm-right',shape:'M270 163H430V409H245L275 335Z'},
+ {id:'leg-left',shape:'M154 334H217V574H0V395H123Z'},
+ {id:'leg-right',shape:'M214 334H275L306 395H430V574H214Z'},
+ {id:'torso',shape:'M135 164H294L285 351H144Z'},
+ {id:'arm-left',shape:'M0 163H173L169 346H0Z'},
+ {id:'arm-right',shape:'M257 163H430V346H261Z'},
  {id:'head',shape:'M0 0H430V185H0Z'},
  {id:'hair',shape:'M0 0H430V83H0Z'}
 ]);
