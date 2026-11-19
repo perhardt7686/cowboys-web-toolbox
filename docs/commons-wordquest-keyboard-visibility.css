@@ -1,0 +1,130 @@
+/* Daily Word Quest arcade: preserve the entire 3-row letter keyboard on
+   compact screens. Only the guess HISTORY scrolls; the game is still one screen.
+   Scoped narrowly: other Commons games and ordinary Word Quest are unchanged. */
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-panel{
+  display:flex!important;
+  flex-direction:column!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  gap:3px!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word :is(.word-clue,.word-stats,.word-guess-form,#commons-word-finish,#commons-word-message){
+  flex:0 0 auto!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-history{
+  flex:1 1 0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:42px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  margin:2px 0!important;
+  padding:4px 6px!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-history-head{
+  flex:0 0 auto!important;
+  margin:0 0 2px!important;
+  font-size:12px!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word #commons-word-moves{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:auto;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word :is(#commons-word-finish,#commons-word-message){
+  min-height:0!important;
+  margin:0!important;
+  font-size:clamp(11px,2.7vw,14px)!important;
+  line-height:1.24!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word #commons-word-message:empty{
+  display:none!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard{
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  width:100%!important;
+  padding:4px 6px!important;
+  margin:1px 0 0!important;
+  overflow:visible!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-letter-heading{
+  margin:0 0 2px!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-fixed-positions{
+  gap:4px!important;
+  margin:2px 0!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-fixed-positions>span{
+  width:clamp(27px,7vw,38px)!important;
+  height:clamp(25px,3.5dvh,32px)!important;
+  font-size:clamp(13px,3vw,18px)!important;
+  border-radius:6px!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-letter-note{
+  display:none!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-quest-keys{
+  width:100%!important;
+  max-width:540px!important;
+  margin:3px auto!important;
+  gap:3px!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-quest-key-row{
+  gap:2px!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-quest-key-row button{
+  min-height:clamp(29px,4dvh,36px)!important;
+  padding:2px 0!important;
+  font-size:clamp(10px,2.5vw,14px)!important;
+  line-height:1!important;
+  touch-action:manipulation;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-quest-key-row button:is([data-quest-key="ENTER"],[data-quest-key="BACK"]){
+  font-size:clamp(9px,2.2vw,12px)!important;
+}
+body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-letter-excluded{
+  font-size:clamp(10px,2.6vw,12px)!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis;
+  margin:2px 0 0!important;
+}
+@media(max-height:560px){
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-history{
+    min-height:29px!important;
+    padding:2px 4px!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-stats .family-pill{
+    min-height:19px!important;
+    padding:1px 3px!important;
+    font-size:10px!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-word .word-guess-form :is(input,button){
+    height:31px!important;
+    min-height:31px!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard{
+    padding:2px 4px!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-fixed-positions>span{
+    width:23px!important;height:20px!important;font-size:12px!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-quest-key-row button{
+    min-height:26px!important;
+  }
+  body.community-page.arcade-on[data-arcade-game="wordquest"][data-arcade-scene="play"] #commons-quest-keyboard .family-letter-excluded{
+    display:none!important;
+  }
+}
