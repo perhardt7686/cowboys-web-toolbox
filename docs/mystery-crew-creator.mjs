@@ -266,19 +266,23 @@ function render(){
  $('mc-save').textContent=dirty?'✓ Save Crew *':'✓ Save Crew';
 }
 async function actionItem(item){
- const member=current(),isOwned=draft.unlocked.includes(item.id);
+ const isOwned=draft.unlocked.includes(item.id);
  if(!isOwned){
-  if(draft.coins<item.cost){notice('Earn coins by saving new looks. '+item.name+' costs '+item.cost+' device coins; you have '+draft.coins+'.');return;}
-  draft.coins-=item.cost;draft.unlocked.push(item.id);
-  if(!await writeState())return;
-  notice('Unlocked '+item.name+' using device-only workshop coins.');
+  if(draft.coins<item.cost){
+   notice('Earn coins by saving new looks. '+item.name+' costs '+item.cost+' crew coins; you have '+draft.coins+'.');return;
+  }
+  draft.coins-=item.cost;
+  draft.unlocked.push(item.id);
  }
  const key=choices[item.type];
- if(key){member[key]=item.id;
-   if(item.type==='outfits')member.shirt=item.color;
+ if(key){
+  current()[key]=item.id;
+  if(item.type==='outfits')current().shirt=item.color;
  }
- notice('Previewing '+item.name+'. Press Save Crew to keep this look.');
- render();
+ if(await writeState()){
+  notice((isOwned?'Equipped ':'Unlocked and equipped ')+item.name+' on your '+(cloud?'family account.':'test device.'));
+  render();
+ }
 }
 document.addEventListener('click',async event=>{
  if(!ready){notice('Sign in on the family message board to edit your account crew.');return;}
