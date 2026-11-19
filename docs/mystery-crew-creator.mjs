@@ -263,8 +263,19 @@ function renderRoster(){
  const wrap=$('mc-roster');wrap.replaceChildren();
  for(const p of draft.crew){
   const btn=document.createElement('button');btn.type='button';btn.className='mc-portrait';btn.dataset.crewId=p.id;
-  btn.setAttribute('aria-label','Choose '+p.name);btn.setAttribute('aria-pressed',String(p.id===draft.active));
+  btn.setAttribute('aria-label','Choose saved crew member '+p.name);btn.setAttribute('aria-pressed',String(p.id===draft.active));
+  btn.title=p.name+' · saved crew';
   btn.innerHTML=portrait(p);wrap.append(btn);
+ }
+ // Match the original five-portrait rail without inventing additional saved
+ // characters. Distinct dashed previews apply to the active DRAFT only.
+ const previews=referenceLooks.slice(1,1+Math.max(0,5-draft.crew.length));
+ for(const look of previews){
+  const btn=document.createElement('button');btn.type='button';btn.className='mc-portrait mc-reference-portrait';
+  btn.dataset.referenceLook=look.id;
+  btn.setAttribute('aria-label','Try '+look.name+' on the current character');
+  btn.title='Try look: '+look.name+' · not yet saved';
+  btn.innerHTML=portrait({...current(),...look});wrap.append(btn);
  }
  $('mc-add').disabled=draft.crew.length>=6;
 }
