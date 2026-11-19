@@ -22,3 +22,43 @@
 4. Ensure unlocks have explicit rules, no fake online/verified currency and no privileged backend writes.
 5. Verify existing family message board and games are unaffected. No Classic switch or embedded old avatar panel.
 6. Do not claim full original image fidelity until approved by Cowboy with side-by-side screenshots.
+
+## Fidelity Pass 2 | Source-specific visual comparison (November 19, 2026)
+
+**The approved 1672 × 941 PNG remains the single visual target.** Its exact
+original bytes stay private in the approved Google Drive attachment. No copy
+or crop of that private image is published through GitHub Pages.
+
+Reference composition to compare in every desktop screenshot:
+- Header: illustrated blue woodland banner, wood-plank Cowboy's sign,
+  yellow/blue ink-outlined creator masthead, truthful player progression
+- Navigation: navy lacquer with bright gold Character active tab
+- Left rail: five distinct illustrated face portraits, cream frame;
+  drafts/presets clearly marked as UNSAVED rather than misrepresented as users
+- Center: tall, expressive adventurer with orange adventure clothing,
+  cargo pants, shoes and gear, next to a **sitting white-and-brown hound**
+- Behind the characters: dimensional blue-and-orange adventure van,
+  magnifying glass badge, four roof lights, shadowed pine forest,
+  barn with glowing interior work light and cluttered shelves
+- Right: cream gallery with eight individually illustrated outfits
+  in a 4-column × 2-row grid; accurate equip/unlock states
+- Bottom: fixed action/color toolbar and category launchers
+- Viewports: all visible in a single window at desktop and at both small
+  phone sizes, never a disguised vertically scrolling document
+
+Current improvement commits: native vector layers in
+`mystery-crew-stage-art.mjs`, shared facial contours in
+`mystery-crew-art.mjs`, full-bodied companion, five-portrait rail with
+clearly identified optional previews, and one-window styling. These changes
+are **artistic improvements, not evidence of pixel-for-pixel identity**.
+
+### Acceptance gate
+
+The visual reviewer must look at a **fresh-load screenshot** against the
+approved image, *not only after tests recolor the character and equip gear*.
+Confirm the environment, human and companion proportions, illustrated
+equipment and touch controls. Browser CI must also pass genuine 375 × 667,
+390 × 844, desktop and original 1672 × 941 viewport checks, including
+zero document overflow, item/trait changes, saves and account isolation.
+Never claim source equivalence or real-device iPhone verification solely
+because Playwright passed.

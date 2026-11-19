@@ -5,7 +5,7 @@ import {getAvatarPhoto,cacheAvatarPhoto,clearAvatarPhotos} from './family-avatar
 import {DEFAULT_AVATAR_RECIPE,normalizeAvatarRecipe,makeAvatarStudioHTML,randomAvatarRecipe} from './family-avatar-builder.mjs?v=history1';
 import {avatarProjections,cacheAvatarCharacter,clearAvatarCharacters,forgetAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
 import {watchRewardGame} from './avatar-reward-session.mjs?v=workshop1';
-import {mysteryCrewPortraitSVG,BASIC_MYSTERY_CREW} from './mystery-crew-portrait.mjs?v=fidelity1';
+import {mysteryCrewPortraitSVG,BASIC_MYSTERY_CREW} from './mystery-crew-portrait.mjs?v=paint2';
 
 import {fitsBody,normalizeBody,starterBody} from './avatar-full-body.mjs?v=workshop1';
 import {mountTurntable,turntableHTML} from './avatar-turntable-controls.mjs?v=workshop1';

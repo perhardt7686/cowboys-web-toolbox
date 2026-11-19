@@ -1,8 +1,9 @@
 /* Mystery Crew Creator: family-account sync is server-authoritative. 
  * The local-only preview fixture works only on localhost test builds. */
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
-import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=fidelity1';
-import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=fidelity1';
+import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
+import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
+import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
 const KEY='cowboy-mystery-crew-creator-v1';
 const isPreview=new URLSearchParams(location.search).get('preview')==='1'&&['localhost','127.0.0.1'].includes(location.hostname);
 let account=null,accountReady=isPreview,revision=0,busy=false;
@@ -166,7 +167,7 @@ async function initializeAccount(){
    silhouette instead of tinting a generic coat or pretending it is equipped. */
 function renderWearables(member){
  const outfitArt={
- detective:'<path d="M43 184L64 197 78 229 92 198 128 185 142 210 112 226 117 314 60 319 67 226Z" fill="#8a6a46" opacity=".88" stroke="#38303b" stroke-width="6"/><path d="M66 195L80 229 95 198 M83 226L90 316" fill="none" stroke="#f2d3a3" stroke-width="5"/>',
+ detective:'<path d="M43 184L64 197 78 229 92 198 128 185 142 210 112 226 117 314 60 319 67 226Z" fill="#ed7c31" opacity=".9" stroke="#38303b" stroke-width="6"/><path d="M66 195L80 229 95 198 M83 226L90 316" fill="none" stroke="#f2d3a3" stroke-width="5"/>',
  explorer:'<path d="M40 186L66 194 85 218 110 192 133 185 133 306 44 308Z" fill="#537444" stroke="#313a30" stroke-width="6"/><path d="M53 241H75V263H53Z M104 243H125V267H104Z" fill="#b4a06b" stroke="#354333" stroke-width="4"/><path d="M87 226V306" stroke="#e8c47e" stroke-width="4"/>',
  viking:'<path d="M42 177L62 191 118 190 142 178 156 215 140 248 127 309 50 309 32 238 25 213Z" fill="#93775c" stroke="#30313e" stroke-width="8"/><path d="M48 192L24 225 32 246 64 228 M128 190L157 220 147 249 118 230" fill="#c9a575" stroke="#3c3941" stroke-width="8"/><path d="M67 212L113 213 118 270 65 271Z" fill="#748b94" stroke="#333641" stroke-width="5"/>',
  pilot:'<path d="M37 192L57 180 77 199 113 199 135 181 152 196 134 320 39 321Z" fill="#785435" stroke="#35303a" stroke-width="8"/><path d="M60 185L78 228 92 203 113 229 130 184" fill="none" stroke="#d9b07a" stroke-width="8"/><path d="M44 238H70 M108 238H132" stroke="#ce985f" stroke-width="5"/>',
@@ -193,6 +194,34 @@ function renderWearables(member){
 }
 function renderPetSpecies(member){
  const group=$('mc-pet'),p=member.pet;
+ if(p==='dog'){
+  group.setAttribute('transform','translate(623 380)');
+  group.innerHTML=[
+    '<ellipse cx="95" cy="195" rx="93" ry="14" fill="#4f412e" opacity=".22"/>',
+    '<path d="M139 152Q189 147 166 109" fill="none" stroke="#986237" stroke-width="18" stroke-linecap="round"/>',
+    '<path d="M55 108Q49 72 92 74Q143 69 150 121L148 173Q129 197 79 195Q35 193 38 162Z" fill="#faf4e7" stroke="#3c3437" stroke-width="7"/>',
+    '<path d="M47 126Q54 92 72 85L87 116 69 178 47 174Z" fill="#b9783c" stroke="#493331" stroke-width="4"/>',
+    '<path d="M113 84Q134 94 136 125L144 173 113 171Z" fill="#a16c3c" opacity=".75"/>',
+    '<path d="M67 150Q56 167 51 187Q65 198 80 189L84 146M121 147L121 184Q129 197 146 188L142 145" fill="#faf8ee" stroke="#3c3437" stroke-width="6"/>',
+    '<path d="M53 186Q63 197 82 188M117 186Q135 196 147 187" fill="none" stroke="#3d3436" stroke-width="5"/>',
+    '<path d="M42 43Q21 11 43 0Q73 2 78 32L102 35Q122 2 150 10Q160 40 138 69L144 112Q114 141 72 122L42 94Z" fill="#b87b3f" stroke="#352d30" stroke-width="7"/>',
+    '<path d="M47 38Q23 18 31 50Q34 91 54 94L69 49Z" fill="#945b32" stroke="#332e32" stroke-width="5"/>',
+    '<path d="M126 37Q153 17 152 44Q150 81 133 91L111 54Z" fill="#915930" stroke="#332e32" stroke-width="5"/>',
+    '<path d="M64 64Q79 53 89 65Q106 55 118 66L128 108Q99 128 70 109Z" fill="#f9f4e7" stroke="#443738" stroke-width="5"/>',
+    '<ellipse cx="80" cy="67" rx="12" ry="17" fill="white" stroke="#38333a" stroke-width="3"/>',
+    '<ellipse cx="113" cy="68" rx="12" ry="17" fill="white" stroke="#38333a" stroke-width="3"/>',
+    '<circle cx="85" cy="69" r="6" fill="#263e48"/><circle cx="108" cy="71" r="6" fill="#263e48"/>',
+    '<circle cx="87" cy="66" r="2" fill="#fff"/><circle cx="110" cy="68" r="2" fill="#fff"/>',
+    '<path d="M88 86Q99 80 110 89Q109 104 97 104Q86 100 88 86Z" fill="#272a32"/>',
+    '<path d="M96 105Q102 119 117 108" fill="none" stroke="#6a3940" stroke-width="5" stroke-linecap="round"/>',
+    '<path d="M101 111Q107 133 113 125L114 113Z" fill="#f1949c" stroke="#7b4249" stroke-width="3"/>',
+    '<path d="M54 126Q99 138 146 125" fill="none" stroke="#b93c31" stroke-width="12"/>',
+    '<circle cx="100" cy="133" r="12" fill="#e6bf57" stroke="#644e32" stroke-width="5"/>',
+    '<circle cx="100" cy="130" r="3" fill="#fff4b8"/>'
+   ].join('');
+  return;
+ }
+ group.setAttribute('transform','translate(641 433)');
  const source={
  dog:'<path d="M26 123Q2 87 15 50Q12 18 47 15L68 39Q92 3 114 24L120 48Q141 71 128 122Z" fill="var(--pet)" stroke="#332d32" stroke-width="8"/><path d="M21 43Q1 14 20 6L57 36Z M98 35Q134 3 142 19L125 63Z" fill="var(--pet)" stroke="#332d32" stroke-width="7"/><path d="M36 91Q72 65 111 92L109 128Q71 145 37 124Z" fill="#f9edd5" stroke="#43343a" stroke-width="6"/>',
  cat:'<path d="M30 128L33 37 14 6 58 38Q86 27 106 39L143 10 132 63 134 128Z" fill="var(--pet)" stroke="#352f3e" stroke-width="8"/><path d="M46 118Q74 100 123 119" fill="none" stroke="#e6d9cc" stroke-width="7"/><path d="M19 27L36 50 50 38 M119 40L137 27 130 57" fill="#d7b6ae"/>',
@@ -220,7 +249,9 @@ function updateScene(){
  $('mc-character-name').textContent=m.name;
  const scale=angle===90||angle===270?.74:1;
  const mirror=angle===180?-1:1;
- actor.setAttribute('transform','translate(405 85) translate(90 254) scale('+(zoom*scale*mirror)+' '+zoom+') translate(-90 -254)');
+ const bodyProfiles={oval:[1,1],heart:[.96,1.02],round:[1.04,.98],square:[1.02,.99],narrow:[.91,1.06],broad:[1.1,.96]};
+ const proportions=bodyProfiles[m.faceShape]||bodyProfiles.oval;
+ actor.setAttribute('transform','translate(405 85) translate(90 254) scale('+(zoom*scale*mirror*proportions[0])+' '+(zoom*proportions[1])+') translate(-90 -254)');
  const rear=angle===180;
  $('mc-head').style.filter=rear?'brightness(.76)':'none';
  $('mc-vehicle').style.filter=m.vehicle==='jeep'?'hue-rotate(94deg)':m.vehicle==='camper'?'hue-rotate(-26deg) saturate(.8)':'none';
@@ -232,8 +263,19 @@ function renderRoster(){
  const wrap=$('mc-roster');wrap.replaceChildren();
  for(const p of draft.crew){
   const btn=document.createElement('button');btn.type='button';btn.className='mc-portrait';btn.dataset.crewId=p.id;
-  btn.setAttribute('aria-label','Choose '+p.name);btn.setAttribute('aria-pressed',String(p.id===draft.active));
+  btn.setAttribute('aria-label','Choose saved crew member '+p.name);btn.setAttribute('aria-pressed',String(p.id===draft.active));
+  btn.title=p.name+' · saved crew';
   btn.innerHTML=portrait(p);wrap.append(btn);
+ }
+ // Match the original five-portrait rail without inventing additional saved
+ // characters. Distinct dashed previews apply to the active DRAFT only.
+ const previews=referenceLooks.slice(1,1+Math.max(0,5-draft.crew.length));
+ for(const look of previews){
+  const btn=document.createElement('button');btn.type='button';btn.className='mc-portrait mc-reference-portrait';
+  btn.dataset.referenceLook=look.id;
+  btn.setAttribute('aria-label','Try '+look.name+' on the current character');
+  btn.title='Try look: '+look.name+' · not yet saved';
+  btn.innerHTML=portrait({...current(),...look});wrap.append(btn);
  }
  $('mc-add').disabled=draft.crew.length>=6;
 }
@@ -249,6 +291,14 @@ function renderColors(){
   b.setAttribute('aria-pressed',String(current()[layer]===color));row.append(b);
  }
 }
+const referenceLooks=[
+ {id:'scout',name:'Trail Scout',skin:'#f0b989',hair:'#904b28',...CREW_ANCHORS[0]},
+ {id:'juniper',name:'Copper Sleuth',skin:'#f4c8a9',hair:'#b8432a',...CREW_ANCHORS[1]},
+ {id:'finn',name:'Sunshine Scout',skin:'#f7cfa8',hair:'#e0b447',...CREW_ANCHORS[2]},
+ {id:'riley',name:'Bookish Detective',skin:'#ebbe99',hair:'#302b46',...CREW_ANCHORS[3]},
+ {id:'atlas',name:'Gentle Giant',skin:'#d69a77',hair:'#5c3424',...CREW_ANCHORS[4]},
+ {id:'wren',name:'Curly Adventurer',skin:'#bb8767',hair:'#342e32',...CREW_ANCHORS[5]}
+];
 const traitCategories={
  faces:{key:'faceShape',label:'Face Shape',options:CREW_OPTIONS.faceShape},
  haircuts:{key:'hairStyle',label:'Hairstyle',options:CREW_OPTIONS.hairStyle},
@@ -262,15 +312,15 @@ function pageSize(){
    window.matchMedia('(max-width:1380px)').matches?4:8;
 }
 function setFilter(next){
- const known=['faces','haircuts','eyes','expressions','details','outfits','hats','gear','pets','vehicles','collections','studio'];
- filter=next==='character'?'faces':known.includes(next)?next:'faces';
+ const known=['presets','faces','haircuts','eyes','expressions','details','outfits','hats','gear','pets','vehicles','collections','studio'];
+ filter=next==='character'?'presets':known.includes(next)?next:'presets';
  page=0;
  $('mc-market-filter').value=filter;
- const labels={faces:'Face Shapes',haircuts:'Hairstyles',eyes:'Eye Styles',expressions:'Expressions',details:'Face Details',
+ const labels={presets:'Crew Looks',faces:'Face Shapes',haircuts:'Hairstyles',eyes:'Eye Styles',expressions:'Expressions',details:'Face Details',
   outfits:'Outfits',hats:'Hats',gear:'Adventure Gear',pets:'Pets',vehicles:'Vehicles',studio:'Backdrops',collections:'Unlockables'};
  $('mc-market-title').textContent=labels[filter];
  for(const b of document.querySelectorAll('[data-view]')){
-  b.setAttribute('aria-pressed',String(b.dataset.view===filter||((b.dataset.view==='character')&&Boolean(traitCategories[filter]))));
+  b.setAttribute('aria-pressed',String(b.dataset.view===filter||((b.dataset.view==='character')&&(filter==='presets'||Boolean(traitCategories[filter])))));
  }
  for(const b of document.querySelectorAll('[data-jump]'))b.setAttribute('aria-pressed',String(b.dataset.jump===filter));
  renderCards();
@@ -278,14 +328,22 @@ function setFilter(next){
 function renderCards(){
  const panel=$('mc-cards');panel.replaceChildren();
  const trait=traitCategories[filter];
- const category=trait?trait.options.map(id=>({id})):
+ const category=filter==='presets'?referenceLooks:trait?trait.options.map(id=>({id})):
   filter==='collections'?items.filter(i=>i.cost>0):items.filter(i=>i.type===filter);
  const size=pageSize();
  const count=Math.max(1,Math.ceil(category.length/size));
  page=Math.max(0,Math.min(page,count-1));
  for(const item of category.slice(page*size,(page+1)*size)){
   const card=document.createElement('button');card.type='button';card.className='mc-card';
-  if(trait){
+  if(filter==='presets'){
+   const active=['skin','hair','faceShape','hairStyle','eyeShape','expression','detail'].every(k=>current()[k]===item[k]);
+   card.dataset.referenceLook=item.id;
+   card.setAttribute('aria-pressed',String(active));
+   card.setAttribute('aria-label',item.name+(active?' selected':''));
+   card.innerHTML='<span class="mc-card-art">'+crewHeadPreviewSVG(item,114)+'</span>'+
+     '<span class="mc-card-name">'+safe(item.name)+'</span>'+
+     '<span class="mc-card-state '+(active?'equipped':'available')+'">'+(active?'✓ Selected':'Try Look')+'</span>';
+  }else if(trait){
    const active=current()[trait.key]===item.id;
    card.dataset.styleKind=trait.key;
    card.dataset.styleValue=item.id;
@@ -316,7 +374,9 @@ function renderStats(){
 function render(){
  renderRoster();renderColors();renderCards();renderStats();updateScene();
  const dirty=JSON.stringify(draft)!==savedSnapshot;
- $('mc-save').textContent=dirty?'✓ Save Crew *':'✓ Save Crew';
+ const compactSave=window.matchMedia('(max-width:650px) and (max-height:740px)').matches;
+ $('mc-save').textContent=compactSave?(dirty?'✓ Save *':'✓ Save'):(dirty?'✓ Save Crew *':'✓ Save Crew');
+ $('mc-save').setAttribute('aria-label',dirty?'Save Crew changes':'Save Crew');
 }
 async function actionItem(item){
  if(!accountReady){notice('Sign in to your family account first.');return;}
@@ -340,6 +400,14 @@ document.addEventListener('click',async event=>{
  if(el.dataset.crewId){draft.active=el.dataset.crewId;render();return;}
  if(el.id==='mc-page-prev'){page=Math.max(0,page-1);renderCards();return;}
  if(el.id==='mc-page-next'){page+=1;renderCards();return;}
+ if(el.dataset.referenceLook){
+  const look=referenceLooks.find(x=>x.id===el.dataset.referenceLook);
+  if(look){
+   for(const key of ['skin','hair','faceShape','hairStyle','eyeShape','expression','detail'])current()[key]=look[key];
+   render();notice(look.name+' selected for this character. Press Save Crew to keep the look.');
+  }
+  return;
+ }
  if(el.dataset.styleKind){
   const kind=el.dataset.styleKind,value=el.dataset.styleValue;
   if(Object.values(traitCategories).some(x=>x.key===kind&&x.options.includes(value))){current()[kind]=value;render();notice(prettyLabel(value)+' selected. Press Save Crew to sync it.');}
@@ -348,7 +416,7 @@ document.addEventListener('click',async event=>{
  if(el.dataset.color){current()[el.dataset.layer||'shirt']=el.dataset.color;render();notice((el.dataset.layer||'Jacket')+' color changed. Save to keep it.');return;}
  if(el.dataset.item){const i=itemById.get(el.dataset.item);if(i)try{await actionItem(i);}catch(error){notice(error?.message||'Item unlock failed.');}return;}
  if(el.dataset.view){view=el.dataset.view;setFilter(view);return;}
- if(el.dataset.jump){view=el.dataset.jump;setFilter(view);document.querySelector('.mc-market').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+ if(el.dataset.jump){view=el.dataset.jump;setFilter(view);return;}
  if(el.dataset.motion){
   motion=el.dataset.motion;app.dataset.motion=motion;
   for(const b of document.querySelectorAll('[data-motion]'))b.setAttribute('aria-pressed',String(b.dataset.motion===motion));
@@ -408,7 +476,7 @@ document.addEventListener('click',async event=>{
 });
 $('mc-market-filter').addEventListener('change',e=>{view=e.target.value;setFilter(view);});
 $('mc-color-layer').addEventListener('change',renderColors);
-window.addEventListener('resize',()=>renderCards());
+window.addEventListener('resize',render);
 $('mc-rename-cancel').addEventListener('click',()=>$('mc-rename-dialog').close());
 $('mc-rename-form').addEventListener('submit',e=>{
  e.preventDefault();
@@ -422,5 +490,10 @@ $('mc-rename-form').addEventListener('submit',e=>{
 window.addEventListener('beforeunload',e=>{
  if(JSON.stringify(draft)!==savedSnapshot){e.preventDefault();e.returnValue='';}
 });
-app.dataset.motion='idle';setFilter('character');render();
+enhanceMysteryScene();
+app.dataset.motion='idle';
+setFilter('outfits');
+document.querySelector('[data-view="character"]')?.setAttribute('aria-pressed','true');
+document.querySelector('[data-view="outfits"]')?.setAttribute('aria-pressed','false');
+render();
 void initializeAccount();

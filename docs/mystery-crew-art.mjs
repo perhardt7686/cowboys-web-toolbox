@@ -62,11 +62,11 @@ function mouthMarkup(expression){
 }
 function eyeMarkup(shape){
  const pairs={
- bright:[15,20],almond:[17,13],soft:[15,16],keen:[17,12]
+ bright:[11,16],almond:[12,11],soft:[11,14],keen:[12,10]
  };
  const [rx,ry]=pairs[shape]||pairs.bright;
  const brow=shape==='keen'?'M55 70L86 65 M106 65L135 70':shape==='soft'?'M56 69Q71 61 87 67 M104 67Q121 61 134 69':'M55 64Q73 56 85 64 M104 64Q122 55 135 64';
- return `<g stroke="#3c3036" stroke-width="4"><ellipse cx="72" cy="92" rx="${rx}" ry="${ry}" fill="#fffaf3"/><ellipse cx="118" cy="91" rx="${rx}" ry="${ry}" fill="#fffaf3"/></g><circle cx="77" cy="94" r="8" fill="#3d708c"/><circle cx="114" cy="93" r="8" fill="#3d708c"/><circle cx="80" cy="91" r="3.2" fill="#fff"/><circle cx="117" cy="90" r="3.2" fill="#fff"/><path d="${brow}" fill="none" stroke="#5d3f38" stroke-width="5.5" stroke-linecap="round"/>`;
+ return `<g stroke="#3c3036" stroke-width="2.8"><ellipse cx="72" cy="92" rx="${rx}" ry="${ry}" fill="#fffaf3"/><ellipse cx="118" cy="91" rx="${rx}" ry="${ry}" fill="#fffaf3"/></g><circle cx="77" cy="94" r="5.6" fill="#3d708c"/><circle cx="114" cy="93" r="5.6" fill="#3d708c"/><circle cx="80" cy="91" r="2.4" fill="#fff"/><circle cx="117" cy="90" r="2.4" fill="#fff"/><path d="${brow}" fill="none" stroke="#5d3f38" stroke-width="5.5" stroke-linecap="round"/>`;
 }
 function detailMarkup(v){
  return {
@@ -81,9 +81,13 @@ export function crewHeadMarkup(raw={}){
  return '<path d="'+facePaths[v.faceShape]+'" fill="'+v.skin+'" stroke="#332d39" stroke-width="8" stroke-linejoin="round"/>'+
  '<ellipse cx="40" cy="96" rx="13" ry="18" fill="'+v.skin+'" stroke="#392f3b" stroke-width="5"/>'+
  '<ellipse cx="151" cy="96" rx="13" ry="18" fill="'+v.skin+'" stroke="#392f3b" stroke-width="5"/>'+
+ '<path d="M49 101Q54 130 82 147Q94 151 108 146Q132 133 145 104Q141 147 100 160Q64 157 49 122Z" fill="#713c30" opacity=".12"/>'+
+ '<path d="M52 72Q66 56 85 66M106 63Q129 55 141 73" fill="none" stroke="#fff1cb" stroke-width="5" opacity=".32"/>'+
  '<path d="M49 116Q61 134 78 137 M110 137Q129 133 143 116" fill="none" stroke="#d38568" stroke-width="4" opacity=".42"/>'+
+ '<path d="M54 119Q68 124 77 119 M115 118Q129 125 140 117" fill="none" stroke="#d97d66" stroke-width="3" opacity=".4"/>'+
  eyeMarkup(v.eyeShape)+
  '<path d="M96 99L88 116Q98 123 107 117" fill="none" stroke="#bd7957" stroke-width="4.5"/>'+
+ '<path d="M95 111Q100 113 104 110" fill="none" stroke="#ffe1b4" stroke-width="3" opacity=".7"/>'+
  mouthMarkup(v.expression)+hairMarkup(v.hairStyle,v.hair)+detailMarkup(v);
 }
 export function crewHeadPreviewSVG(raw={},size=128){

@@ -9,7 +9,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://cdn.jsdelivr.net; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="description" content="Mystery Crew Creator, a new family cartoon character workshop.">
 <title>Mystery Crew Creator | Cowboy's Web Toolbox</title>
-<link rel="stylesheet" href="mystery-crew-creator.css?v=fidelity1">
+<link rel="stylesheet" href="mystery-crew-creator.css?v=paint2">
 <script src="community-config.js" defer></script>
 </head>
 <body>
@@ -99,12 +99,12 @@
         <path d="M15 473H84M106 474H171" stroke="#273b51" stroke-width="5"/>
       </g>
       <g id="mc-arm-left" transform-origin="40px 228px">
-        <path d="M44 179Q8 202 -1 250L20 293 54 272 69 210Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="9"/>
-        <path d="M13 281Q-7 307 16 323Q34 322 39 292Z" fill="var(--skin,#f0b989)" stroke="#3b2d36" stroke-width="6"/>
+        <path d="M44 179Q12 197 6 229Q-1 251 29 270L51 249 31 235Q39 215 69 209Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="9"/>
+        <path d="M28 255Q40 244 53 253Q68 270 51 287Q34 292 26 275Z" fill="var(--skin,#f0b989)" stroke="#3b2d36" stroke-width="6"/>
       </g>
       <g id="mc-arm-right" transform-origin="143px 220px">
-        <path d="M125 192Q162 197 185 246L164 285 133 271 112 214Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="9"/>
-        <path d="M153 281Q161 320 187 312Q201 298 180 277Z" fill="var(--skin,#f0b989)" stroke="#3b2d36" stroke-width="6"/>
+        <path d="M126 183Q164 193 180 227Q187 255 157 270L135 247 156 231Q150 214 113 211Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="9"/>
+        <path d="M150 252Q168 240 181 256Q190 275 172 286Q151 290 142 274Z" fill="var(--skin,#f0b989)" stroke="#3b2d36" stroke-width="6"/>
       </g>
       <path d="M43 183Q84 159 139 184L157 318Q88 347 14 318Z" fill="var(--shirt,#ef792f)" stroke="#332d36" stroke-width="10"/>
       <path d="M49 189Q93 219 136 188" fill="none" stroke="#f7cf89" stroke-width="5"/>
@@ -147,7 +147,7 @@
  </div>
 </section>
 <aside class="mc-market" aria-label="Creator wardrobe and unlockables">
- <div class="mc-market-title"><h2 id="mc-market-title">Outfits</h2><select id="mc-market-filter" aria-label="Wardrobe category"><option value="faces">Face Shapes</option><option value="haircuts">Hairstyles</option><option value="eyes">Eyes</option><option value="expressions">Expressions</option><option value="details">Face Details</option><option value="outfits">Adventure Outfits</option><option value="hats">Hats & Helmets</option><option value="gear">Gear</option><option value="pets">Pets</option><option value="vehicles">Vehicles</option><option value="collections">Collections</option><option value="studio">Backdrops</option></select></div>
+ <div class="mc-market-title"><h2 id="mc-market-title">Outfits</h2><select id="mc-market-filter" aria-label="Wardrobe category"><option value="presets">Crew Looks</option><option value="faces">Face Shapes</option><option value="haircuts">Hairstyles</option><option value="eyes">Eyes</option><option value="expressions">Expressions</option><option value="details">Face Details</option><option value="outfits">Adventure Outfits</option><option value="hats">Hats & Helmets</option><option value="gear">Gear</option><option value="pets">Pets</option><option value="vehicles">Vehicles</option><option value="collections">Collections</option><option value="studio">Backdrops</option></select></div>
  <div id="mc-cards" class="mc-cards" aria-live="polite"></div><div class="mc-pages" id="mc-pagination" aria-label="Wardrobe pages"><button id="mc-page-prev" type="button" aria-label="Previous choices">◀</button><span id="mc-page-label">1 / 1</span><button id="mc-page-next" type="button" aria-label="Next choices">▶</button></div>
 </aside>
 </main>
@@ -170,6 +170,6 @@
 </div>
 <dialog id="mc-info"><h2>Mystery Crew Creator</h2><p>This single-window workshop has page buttons instead of scrolling panels. Face, hair, eye and expression choices stay with each saved character.</p><p>Your Mystery Crew, pets, outfits and earned unlocks belong to your own approved family account and sync between devices. Every approved member starts with Scout. The old avatar creator is retired.</p><button id="mc-info-close">Got it</button></dialog>
 <dialog id="mc-rename-dialog"><form method="dialog" id="mc-rename-form"><h2>Rename your character</h2><label for="mc-name-input">Crew member name</label><input id="mc-name-input" maxlength="28" minlength="1" required autocomplete="off"><div class="mc-dialog-actions"><button value="cancel" type="button" id="mc-rename-cancel">Cancel</button><button value="save" type="submit">Save name</button></div></form></dialog>
-<script type="module" src="mystery-crew-creator.mjs?v=fidelity1"></script>
+<script type="module" src="mystery-crew-creator.mjs?v=paint2"></script>
 </body>
 </html>
