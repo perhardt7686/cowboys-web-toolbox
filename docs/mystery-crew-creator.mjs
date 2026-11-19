@@ -2,8 +2,8 @@
  * The local-only preview fixture works only on localhost test builds. */
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
-import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=fidelity1';
-import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=fidelity1';
+import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
+import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
 const KEY='cowboy-mystery-crew-creator-v1';
 const isPreview=new URLSearchParams(location.search).get('preview')==='1'&&['localhost','127.0.0.1'].includes(location.hostname);
 let account=null,accountReady=isPreview,revision=0,busy=false;
