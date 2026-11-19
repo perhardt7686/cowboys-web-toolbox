@@ -77,13 +77,19 @@ export function createFamilyBoard() {
     celebration.id = 'avatar-lobby-celebration';
     // The one FAMILY FUN marquee owns all scoreboard UI.
     host.append(nav, celebration, gamesTitle);
-    void import('./avatar-reward-studio.mjs?v=workshop1').then(({makeAvatarShowcase})=>{
-      if(!active())return;
-      const showcase=makeAvatarShowcase(item=>document.dispatchEvent(new CustomEvent('family-open-avatar-studio',{
-        detail:{section:'collection',item}
-      })));
-      gamesTitle.after(showcase);
-    }).catch(()=>{});
+    // One family character product: the new Mystery Crew Creator.
+    // The previous Avatar Studio rewards showcase is retired.
+    const crewLink=el('a','family-mystery-crew-showcase');
+    crewLink.href='mystery-crew-creator.html';
+    crewLink.setAttribute('aria-label','Open Mystery Crew Creator to customize characters, pets and unlockables');
+    const crewSymbol=el('span','family-mystery-crew-symbol','✦');
+    crewSymbol.setAttribute('aria-hidden','true');
+    const crewCopy=el('span','family-mystery-crew-text');
+    crewCopy.append(el('strong','','Mystery Crew Creator'),
+      el('small','','Your characters · Pets · Outfits · Unlockables'));
+    const crewArrow=el('span','family-mystery-crew-arrow','Open creator ›');
+    crewLink.append(crewSymbol,crewCopy,crewArrow);
+    gamesTitle.after(crewLink);
     // Keep family announcements in their permanent DOM home across sign-out.
     const sidebar = board.querySelector('.community-sidebar');
     document.getElementById('family-conversations')?.after(sidebar);

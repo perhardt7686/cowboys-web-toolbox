@@ -65,12 +65,12 @@ function renderBoardAccess(){
     if(isPreview){
       const host=$('family-overview');
       if(host&&!host.childNodes.length){
-        const id=state.member.user_id;
-        void import('./avatar-reward-studio.mjs?v=workshop1').then(({makeAvatarShowcase})=>{
-          if(!canReadBoard(state.member)||state.member.user_id!==id||host.childNodes.length)return;
-          host.hidden=false;
-          host.append(makeAvatarShowcase(item=>void showProfile('avatar',{section:'collection',item})));
-        }).catch(()=>{});
+        host.hidden=false;
+        const link=document.createElement('a');
+        link.className='family-mystery-crew-showcase';
+        link.href='mystery-crew-creator.html?preview=1';
+        link.textContent='✦ Mystery Crew Creator · Characters · Pets · Unlockables';
+        host.append(link);
       }
     }
     return true;
