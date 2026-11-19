@@ -43,6 +43,7 @@ const items=[
 {id:'autumn',name:'Autumn Hollow',type:'studio',color:'#c98f58',cost:70,art:'autumn'}
 ];
 const itemById=new Map(items.map(x=>[x.id,x]));
+const shirtColors=[...new Set([...themes,...items.filter(item=>item.type==='outfits').map(item=>item.color)])];
 const choices={outfits:'outfit',hats:'hat',gear:'gear',pets:'pet',vehicles:'vehicle',studio:'scene'};
 const unlockedInitial=['detective','explorer','outdoors','fedora','cap','binoculars','dog','cat','van','sunlit'];
 const fresh=()=>({version:1,crew:[starter()],active:'crew-1',coins:60,xp:0,unlocked:[...unlockedInitial],rewardedDesigns:[]});
@@ -53,7 +54,7 @@ function normalizeState(saved){
   name:String(v.name||'Crew member').slice(0,28),
   skin:skins.includes(v.skin)?v.skin:skins[0],
   hair:hairs.includes(v.hair)?v.hair:hairs[0],
-  shirt:themes.includes(v.shirt)?v.shirt:themes[0],
+  shirt:shirtColors.includes(v.shirt)?v.shirt:themes[0],
   pants:pants.includes(v.pants)?v.pants:pants[0],
   outfit:items.some(q=>q.id===v.outfit&&q.type==='outfits')?v.outfit:'detective',
   pet:items.some(q=>q.id===v.pet&&q.type==='pets')?v.pet:'dog',
