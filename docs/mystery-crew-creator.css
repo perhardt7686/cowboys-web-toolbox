@@ -604,9 +604,9 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
 #mc-v5-illustrated-actor:is([data-motion="run"],[data-motion="wave"],[data-motion="cheer"],[data-motion="action"]) [data-v6-part="hair"]{animation:mc-v6-hair .82s ease-in-out infinite}
 @keyframes mc-v6-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-2px) scaleY(1.008)}}
 @keyframes mc-v6-nod{0%,100%{transform:rotate(0)}50%{transform:rotate(1.5deg)}}
-@keyframes mc-v6-wave{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(-20deg)}}
-@keyframes mc-v6-cheer-left{0%,100%{transform:rotate(5deg)}50%{transform:rotate(17deg)}}
-@keyframes mc-v6-cheer-right{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(-17deg)}}
+@keyframes mc-v6-wave{0%,100%{transform:rotate(-101deg)}50%{transform:rotate(-117deg)}}
+@keyframes mc-v6-cheer-left{0%,100%{transform:rotate(98deg)}50%{transform:rotate(114deg)}}
+@keyframes mc-v6-cheer-right{0%,100%{transform:rotate(-98deg)}50%{transform:rotate(-114deg)}}
 @keyframes mc-v6-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes mc-v6-think{0%,100%{transform:rotate(0)}50%{transform:rotate(-5deg)}}
 @keyframes mc-v6-think-arm{0%,100%{transform:rotate(0)}50%{transform:rotate(9deg)}}
