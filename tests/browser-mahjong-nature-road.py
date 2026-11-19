@@ -70,6 +70,19 @@ async def main():
     assert await page.locator('.mahjong-campaign').evaluate('(el)=>getComputedStyle(el).overflowY')=='auto'
     await page.emulate_media(reduced_motion='reduce')
     assert await root.locator('.nature-road-creature').evaluate('(el)=>getComputedStyle(el).animationName')=='none'
+    # The fullscreen compositor migrates the real game into its own shell.
+    # This test fixture stays attached to body, so return to normal Commons
+    # layout for accurate mobile-width visual proof instead of screenshotting
+    # an artificial 921px offscreen Arcade host.
+    await page.evaluate("""()=>{
+      document.body.classList.remove('arcade-on');
+      document.documentElement.classList.remove('arcade-on');
+      delete document.body.dataset.arcadeGame;delete document.body.dataset.arcadeScene;
+      document.getElementById('mahjong-root').classList.remove('arcade-game-active');
+    }""")
+    await expect(root).to_be_visible()
+    box=await root.bounding_box()
+    assert box and box['width']<=width+1,(width,box)
     (ROOT/'reports').mkdir(exist_ok=True)
     await root.screenshot(path=str(ROOT/'reports'/f'mahjong-nature-road-{width}.png'),animations='disabled')
     assert not [s for s in errors if 'nature' in s.lower()],(width,errors[:5])
