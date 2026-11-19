@@ -369,12 +369,16 @@ document.addEventListener('click',async event=>{
    notice('Character removed from the draft crew. Press Save Crew to keep the change.');render();break;
   case 'mc-fit':zoom=1;angle=0;updateScene();break;
   case 'mc-face':zoom=1.35;angle=0;updateScene();break;
+  case 'mc-scene-turn-left':
   case 'mc-turn-left':angle=(angle+270)%360;updateScene();break;
+  case 'mc-scene-turn-right':
   case 'mc-turn-right':angle=(angle+90)%360;updateScene();break;
   case 'mc-view-front':angle=0;updateScene();break;
   case 'mc-view-side':angle=90;updateScene();break;
   case 'mc-view-back':angle=180;updateScene();break;
+  case 'mc-scene-zoom-in':
   case 'mc-zoom-in':zoom=Math.min(1.5,Math.round((zoom+.1)*100)/100);updateScene();break;
+  case 'mc-scene-zoom-out':
   case 'mc-zoom-out':zoom=Math.max(.8,Math.round((zoom-.1)*100)/100);updateScene();break;
   case 'mc-save':{
    try{
