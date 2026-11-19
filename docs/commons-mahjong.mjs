@@ -3,7 +3,8 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {isTileFree,countLegalPairs,adjacentMahjongTile} from './mahjong-moves.mjs?v=keyboard1';
 import {visualForTile} from './mahjong-kids-palette.mjs?v=kid7';
 import {addClassicTileArtwork,classicFaceForTile,playMahjongSound} from './mahjong-classic-tiles.mjs?v=classic1';
-import {mountClassicTurtle} from './mahjong-turtle-ui.mjs?v=turtle1';
+import {mountClassicTurtle} from './mahjong-turtle-ui.mjs?v=turtle2';
+import {celebrateMahjong} from './mahjong-classic-awards.mjs';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
 const SKINS=[
@@ -76,6 +77,11 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const main=board.querySelector('.community-main');if(!main)return;
   const root=node('section','mahjong-game');root.id='mahjong-root';
   root.innerHTML=`<button id="mahjong-toggle" type="button" class="mahjong-entry-button" aria-expanded="false" aria-controls="mahjong-inside"><span class="mahjong-entry-icon" aria-hidden="true">🀄</span><span class="mahjong-entry-copy"><strong>Mahjong Solitaire</strong><small id="mahjong-button-score">Mystery Machine · High scores & badges</small></span><span class="mahjong-chevron" aria-hidden="true">▾</span></button>
+  <button type="button" class="mahjong-classic-launch" id="mahjong-classic-launch" aria-controls="mahjong-inside" aria-expanded="false">
+   <span class="mahjong-classic-launch-symbol" aria-hidden="true">✦ 🀄 ✦</span>
+   <span><strong>PLAY CLASSIC TURTLE</strong><small>144 TILES · 5 LAYERS · NEW TROPHIES</small></span>
+   <span class="mahjong-classic-launch-arrow" aria-hidden="true">▶</span>
+  </button>
   <div id="mahjong-inside" hidden>
    <section class="commons-score-ribbon" aria-label="Live Mahjong scores" aria-live="polite">
     <div class="commons-score-tile is-record"><span class="commons-score-label">RECORD RUN</span><strong id="mahjong-ribbon-record">…</strong><small id="mahjong-ribbon-holder">Best completed game</small></div>
@@ -104,7 +110,21 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    const button=$(target);if(!button||button.disabled)return;
    event.preventDefault();button.click();
   });
-  $('mahjong-toggle').addEventListener('click',()=>{expanded=!expanded;$('mahjong-inside').hidden=!expanded;$('mahjong-toggle').setAttribute('aria-expanded',String(expanded));if(expanded){display();$('mahjong-inside').scrollIntoView({behavior:'smooth',block:'nearest'});}});
+  const setExpanded=value=>{
+   expanded=Boolean(value);$('mahjong-inside').hidden=!expanded;
+   $('mahjong-toggle').setAttribute('aria-expanded',String(expanded));
+   $('mahjong-classic-launch').setAttribute('aria-expanded',String(expanded&&$('mahjong-root').dataset.mahjongMode==='turtle'));
+   if(expanded)display();
+  };
+  $('mahjong-toggle').addEventListener('click',()=>{setExpanded(!expanded);if(expanded)$('mahjong-inside').scrollIntoView({behavior:'smooth',block:'nearest'});});
+  $('mahjong-classic-launch').addEventListener('click',()=>{
+   setExpanded(true);
+   const turtle=$('mahjong-root').querySelector('.turtle-mode-tabs button[data-mode="turtle"]');
+   if(turtle)turtle.click();
+   $('mahjong-classic-launch').setAttribute('aria-expanded','true');
+   const target=$('mahjong-classic-root');
+   if(target){target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'nearest'});turtle?.focus({preventScroll:true});}
+  });
   const browse=$('mahjong-level-form');
   browse.addEventListener('submit',async event=>{
    event.preventDefault();
@@ -254,7 +274,17 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const point=zoneBox&&tileBox?{x:tileBox.left-zoneBox.left+tileBox.width/2,y:tileBox.top-zoneBox.top+tileBox.height/2}:null;
   selected=null;highlight=[];
   void run('community_mahjong_pair',{p_a:a,p_b:b},'Nice match! The tiles have disappeared.')
-    .then(result=>{if(result)celebratePair(point);});
+    .then(result=>{
+     if(!result)return;
+     celebratePair(point);
+     const combo=Number(result.run?.combo||0);
+     if([3,5,8,12,20,30,36].includes(combo)){
+      celebrateMahjong(zone,{title:combo>=12?'UNSTOPPABLE!':combo>=8?'ON FIRE!':'GREAT JOB!',
+       subtitle:combo+' consecutive server-confirmed matches',grade:combo>=20?'Legendary':'Gold',
+       effect:combo>=12?'confetti':'sparkles'});
+      sound(combo>=12?'legendary':'streak');
+     }
+    });
  }
  function display(){if(!state||!$('mahjong-root'))return;const p=state.profile||{},runState=state.run,leaders=state.leaders||[],me=leaders.find(e=>e.user_id===userId),record=Math.max(0,...leaders.map(e=>Number(e.best||0)));const cp=p.campaign||state.campaign||{},rules=cp.rules||{},stage=Number(cp.level||1);
   $('mahjong-button-score').textContent=`Level ${stage}/1000 · Record ${stat(record)} · Yours ${stat(p.best_score)}`;

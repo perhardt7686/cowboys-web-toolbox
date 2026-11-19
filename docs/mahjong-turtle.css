@@ -118,3 +118,63 @@ body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root 
 body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions{margin:6px 0 0}
 body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions button{min-height:42px;font-size:12px}
 body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-bottom{margin:10px 0}
+/* Ana's no-hunt entry: a visibly animated invitation even BEFORE Mahjong expands. */
+body.community-page .mahjong-classic-launch {
+ display:flex;align-items:center;gap:12px;width:100%;min-height:86px;
+ padding:13px 18px;margin:10px 0 12px;text-align:left;cursor:pointer;
+ border:3px solid #fff5ad;border-radius:19px;
+ background:linear-gradient(112deg,#3f206a,#5b247b 40%,#136f64);
+ box-shadow:0 0 0 3px #e3b9539e,0 0 22px #f6ce5ec9,inset 0 0 25px #b44fea55;
+ color:#fffbea;animation:turtle-launch-glow 2.6s ease-in-out infinite;
+}
+body.community-page .mahjong-classic-launch strong{display:block;font:900 clamp(19px,4vw,26px)/1.08 system-ui,sans-serif;color:#fff5a9;letter-spacing:.03em;text-shadow:0 2px 4px #1e123b}
+body.community-page .mahjong-classic-launch small{display:block;margin-top:6px;color:#f5f9eb;font:850 12px/1.3 system-ui,sans-serif;letter-spacing:.07em}
+body.community-page .mahjong-classic-launch-symbol{font-size:25px;white-space:nowrap}
+body.community-page .mahjong-classic-launch-arrow{font:900 23px/1 system-ui;margin-left:auto;color:#ffe682}
+body.community-page .mahjong-classic-launch:hover,body.community-page .mahjong-classic-launch:focus-visible{border-color:white;filter:brightness(1.15)}
+body.community-page .turtle-mode-tabs button[data-mode="turtle"]{
+ background:linear-gradient(115deg,#51246b,#215c65);
+ border:3px solid #ffde7c;color:#fff9d9;
+ box-shadow:0 0 0 2px #f0ca6288,0 0 20px #e8ad45b8;
+ animation:turtle-launch-glow 2.6s ease-in-out infinite;
+ font-size:clamp(14px,3vw,19px);font-weight:900;
+}
+body.community-page .turtle-mode-tabs button[data-mode="turtle"][aria-pressed="true"]{
+ background:linear-gradient(110deg,#0b704f,#175649);
+ border-color:#fff8b8;color:#fff6b6;box-shadow:0 0 0 3px #dfbe6c,0 0 20px #7afcba;
+}
+@keyframes turtle-launch-glow{
+ 0%,100%{box-shadow:0 0 0 2px #edcf7fb4,0 0 10px #f8cf7b99,inset 0 0 14px #f2ce7155}
+ 50%{box-shadow:0 0 0 3px #ffec9b,0 0 28px #ffe36ed9,inset 0 0 24px #e6ffb555}
+}
+body.community-page #mahjong-classic-root{position:relative;isolation:isolate}
+body.community-page .turtle-awards{margin:14px 0 8px;padding:14px;border:3px solid #b29755;border-radius:16px;background:linear-gradient(135deg,#fef9eb,#f4ebd8);color:#273f38}
+body.community-page .turtle-awards-heading{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:13px}
+body.community-page .turtle-awards h4{font:900 23px/1.1 Georgia,serif;color:#31523e;margin:3px 0}
+body.community-page .turtle-awards-heading p{font:750 13px/1.5 system-ui,sans-serif;margin:4px 0}
+body.community-page .turtle-awards-heading label{display:grid;gap:4px;font:800 12px/1.2 system-ui,sans-serif}
+body.community-page .turtle-awards-heading select{min-height:44px;padding:5px;border:2px solid #9c8a5c;border-radius:9px;background:#fffaf0;color:#2d443b}
+body.community-page .turtle-awards-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:9px}
+body.community-page .turtle-award{display:flex;align-items:flex-start;gap:9px;padding:10px;border:2px solid #c9b797;border-radius:12px;background:#fff8e9;min-width:0}
+body.community-page .turtle-award.is-earned{border-color:#8da64d;background:linear-gradient(120deg,#fffbdc,#e8f6dd)}
+body.community-page .turtle-award[data-grade="legendary"],body.community-page .turtle-award[data-grade="celestial"],body.community-page .turtle-award[data-grade="impossible"]{border-color:#7b5dbd}
+body.community-page .turtle-award-icon{font:900 24px/1 Georgia,serif;color:#957b51}
+body.community-page .turtle-award.is-earned .turtle-award-icon{color:#ac7421}
+body.community-page .turtle-award-copy{display:grid;gap:4px;min-width:0;flex:1}
+body.community-page .turtle-award-copy strong{font:850 14px/1.2 system-ui,sans-serif;overflow-wrap:anywhere}
+body.community-page .turtle-award-copy small{font:650 11px/1.35 system-ui,sans-serif;color:#605a4b}
+body.community-page .turtle-award-copy progress{height:8px;width:100%;accent-color:#4e9365}
+body.community-page #turtle-awards-more{display:block;width:100%;min-height:45px;margin:13px 0 0;border:2px solid #7d6483;border-radius:9px;background:#3f235c;color:#fff9e6;font:900 14px system-ui,sans-serif;cursor:pointer}
+body.community-page #turtle-awards-more[hidden]{display:none}
+body.community-page .mahjong-spectacle{position:fixed;z-index:99999;inset:17% 5% auto;display:grid;place-items:center;pointer-events:none;text-align:center;overflow:visible}
+body.community-page .mahjong-spectacle-words{position:relative;z-index:2;display:grid;justify-items:center;gap:7px;padding:16px 24px;border:4px double #fff2a4;border-radius:24px;background:linear-gradient(125deg,#3a1a66ed,#0c6656f2);color:#fffdd4;box-shadow:0 0 36px #f7dd73,0 13px 38px #081822aa;animation:mahjong-reward-pop 1.85s ease-out both}
+body.community-page .mahjong-spectacle-words strong{font:1000 clamp(25px,7vw,58px)/1.04 system-ui,sans-serif;letter-spacing:.035em;text-shadow:0 3px 6px #1c113c}
+body.community-page .mahjong-spectacle-words span{font:800 clamp(13px,3vw,22px)/1.2 system-ui,sans-serif}
+body.community-page .mahjong-spectacle-bit{position:absolute;left:50%;top:50%;width:9px;height:13px;border-radius:2px;background:#ffe48f;opacity:0;transform:translate(-50%,-50%);animation:mahjong-sparks 1.25s ease-out var(--delay) both}
+body.community-page .mahjong-spectacle-bit:nth-of-type(3n){background:#87eecd;border-radius:50%}
+body.community-page .mahjong-spectacle-bit:nth-of-type(4n){background:#d79bfa}
+body.community-page .mahjong-spectacle-bit[data-effect="sparkles"]{width:7px;height:7px;clip-path:polygon(50% 0,65% 38%,100% 50%,65% 62%,50% 100%,35% 62%,0 50%,35% 38%)}
+@keyframes mahjong-reward-pop{0%{transform:scale(.25) rotate(-4deg);opacity:0}20%{transform:scale(1.16);opacity:1}38%{transform:scale(1)}83%{opacity:1}100%{transform:scale(1.02);opacity:0}}
+@keyframes mahjong-sparks{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}18%{opacity:1}100%{transform:translate(calc(-50% + var(--mx)),calc(-50% + var(--my))) rotate(var(--rotate));opacity:0}}
+@media(max-width:430px){body.community-page .mahjong-classic-launch{gap:7px;padding:11px 9px;min-height:78px}body.community-page .mahjong-classic-launch-symbol{font-size:16px}body.community-page .mahjong-classic-launch small{font-size:10px}body.community-page .turtle-awards{padding:10px}}
+@media(prefers-reduced-motion:reduce){body.community-page .mahjong-classic-launch,body.community-page .turtle-mode-tabs button[data-mode="turtle"],body.community-page .mahjong-spectacle-words,body.community-page .mahjong-spectacle-bit{animation:none!important}body.community-page .mahjong-spectacle-bit{display:none!important}}
