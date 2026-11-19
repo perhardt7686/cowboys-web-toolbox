@@ -4,6 +4,7 @@ import {isTileFree,countLegalPairs,adjacentMahjongTile} from './mahjong-moves.mj
 import {visualForTile} from './mahjong-kids-palette.mjs?v=kid7';
 import {addClassicTileArtwork,classicFaceForTile,playMahjongSound} from './mahjong-classic-tiles.mjs?v=classic1';
 import {mountClassicTurtle} from './mahjong-turtle-ui.mjs?v=turtle2';
+import {mountNatureRoad,MYSTERY_ROAD_TOTAL,roadRegion,roadEncounter} from './mahjong-nature-road.mjs?v=nature1';
 import {celebrateMahjong} from './mahjong-classic-awards.mjs';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
@@ -33,11 +34,19 @@ const ACHIEVEMENTS=[
  ['campaign_100','Phantom Conqueror','Clear level 100','👑'],
  ['campaign_250','Lagoon Sovereign','Clear level 250','🌊'],
  ['campaign_500','Midnight Myth','Clear level 500','🌙'],
- ['campaign_1000','The Vanishing Crown','Conquer all 1,000 levels','♛']
+ ['campaign_1000','The Vanishing Crown','Clear original 1,000-level journey','♛'],
+ ['campaign_1500','Moss Monarch','Reach garden level 1,501','🌿'],
+ ['campaign_2000','Rose Crown','Reach garden level 2,001','🌹'],
+ ['campaign_2500','Lantern Keeper','Reach garden level 2,501','✨'],
+ ['campaign_3000','Copperwood Royalty','Reach garden level 3,001','🍁'],
+ ['campaign_3500','Winter Bloom','Reach garden level 3,501','❄️'],
+ ['campaign_4000','Canopy Sovereign','Reach garden level 4,001','🦜'],
+ ['campaign_4500','Aurora Gardener','Reach garden level 4,501','🌸'],
+ ['campaign_5000','Evergreen Crown','Conquer all 5,000 levels','👑']
 ];
 if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
  let client=null,userId=null,state=null,mounted=false,busy=false,expanded=false,selected=null,highlight=[],timer=null,resize=null,refreshing=false;
- let dialogTimer=null,turtleCleanup=null;
+ let dialogTimer=null,turtleCleanup=null,natureRoad=null;
  const prefsKey='cowboy-mahjong-display-v1';
  function loadPrefs(){
   try{const s=JSON.parse(window.localStorage.getItem(prefsKey)||'{}');return {tileset:s.tileset==='family'?'family':'classic',sound:s.sound===true,showFree:s.showFree===true};}
@@ -89,7 +98,9 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     <div class="commons-score-tile is-live"><span class="commons-score-label">CURRENT RUN</span><strong id="mahjong-ribbon-current">…</strong><small id="mahjong-ribbon-current-note">No game in progress</small></div>
    </section>
    <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match two identical free tiles with the same sun or flower corner. A tile is free if nothing covers it and either horizontal side is open. Switch between traditional-style ivory tiles and the colorful family set. Hint highlights a matching pair.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
-   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 1000</strong></div><progress id="mahjong-progress" max="1000" value="0" aria-label="Levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">The Vanishing Crown awaits at level 1000.</p><details id="mahjong-level-browser"><summary id="mahjong-browse-level">Browse campaign levels</summary><form id="mahjong-level-form"><label>Level <input name="level" type="number" required min="1" max="1000" value="1"></label><button type="submit">See level rules</button></form><p id="mahjong-lookup-result" role="status">Campaign stages unlock in order.</p></details></section>
+   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 5000</strong></div>
+   <div id="mahjong-nature-map-host"></div>
+   <progress id="mahjong-progress" max="5000" value="0" aria-label="Mystery Road levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">Twenty living gardens await, with the Evergreen Crown at level 5,000.</p><details id="mahjong-level-browser"><summary id="mahjong-browse-level">Browse campaign levels</summary><form id="mahjong-level-form"><label>Level <input name="level" type="number" required min="1" max="5000" value="1"></label><button type="submit">See level rules</button></form><p id="mahjong-lookup-result" role="status">Campaign stages unlock in order.</p></details></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
    <div class="mahjong-game-zone"><div class="mahjong-hud"><span id="mahjong-run-title">Ready to play?</span><span id="mahjong-pairs"></span><strong id="mahjong-remaining" class="mahjong-remaining" aria-live="polite"></strong><span id="mahjong-free-count" class="mahjong-free-count">0 free matches</span><span id="mahjong-session-time" class="mahjong-free-count" title="Time spent viewing this board in this tab; not the campaign timer">Session 00:00</span></div><p id="mahjong-no-moves" class="mahjong-no-moves" aria-live="polite" role="status" hidden></p><div class="mahjong-view-tools" role="group" aria-label="Mahjong board view controls"><button type="button" id="mahjong-fit-button" aria-label="Fit entire board on screen">Fit board</button><button type="button" id="mahjong-zoom-out" aria-label="Zoom out">−</button><strong id="mahjong-zoom-label" aria-live="polite">100%</strong><button type="button" id="mahjong-zoom-in" aria-label="Zoom in">+</button></div><p class="mahjong-pan-help" id="mahjong-view-hint">Every tile visible. Zoom in for a closer look.</p><div id="mahjong-board-wrap" class="mahjong-board-wrap"><div id="mahjong-board" class="mahjong-board" role="group" aria-label="Mahjong game board"></div><div id="mahjong-pause-screen" class="mahjong-pause-screen" hidden><div class="mahjong-pause-card"><span class="mahjong-pause-symbol" aria-hidden="true">⏸</span><strong>Game paused</strong><p>Your tiles, matches, and score are saved to your Commons account.</p><button type="button" id="mahjong-overlay-resume">▶ Resume game</button></div></div></div>
    <div class="mahjong-preferences" role="group" aria-label="Mahjong appearance and feedback"><button type="button" id="mahjong-tileset" aria-pressed="true" title="Switch between classic ivory and colorful family tiles">🀄 Classic tiles</button><button type="button" id="mahjong-sound" aria-pressed="false">🔇 Sound off</button><button type="button" id="mahjong-show-free" aria-pressed="false" title="Outline all currently available tiles">◯ Show free</button></div><p class="mahjong-shortcut-hint">Keyboard: arrows to move · Enter to select · H hint · U undo · S shuffle · P pause</p><div class="mahjong-actions"><button type="button" id="mahjong-new">New game</button><button type="button" id="mahjong-pause">⏸ Pause</button><button type="button" id="mahjong-hint">💡 Hint</button><button type="button" id="mahjong-shuffle">⤨ Shuffle</button><button type="button" id="mahjong-undo">↶ Undo</button></div><p class="mahjong-status" id="mahjong-status" role="status" aria-live="polite">Tap New game to begin.</p></div>
@@ -98,6 +109,13 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    <p class="mahjong-footnote">The tile faces are original art inspired by classic browser Mahjong. This version keeps its existing 72-tile Mystery Road layouts and flower/sun matching rules, not the 144-tile traditional Turtle deal. Hints and shuffles may reduce score or be restricted by stage; your achievements and progress remain saved in your Commons account. The session clock is local to this open tab.</p>
   </div>`;
   main.prepend(root);locate();showPrefs();
+  natureRoad=mountNatureRoad($('mahjong-nature-map-host'),{onPlay:()=>{
+   if(state?.run){
+    const board=$('mahjong-board-wrap');
+    board?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'center'});
+   }else $('mahjong-new')?.click();
+  }});
+
   $('mahjong-tileset').addEventListener('click',()=>{prefs.tileset=prefs.tileset==='classic'?'family':'classic';savePrefs();showPrefs();renderBoard();setStatus(prefs.tileset==='classic'?'Classic ivory tiles selected.':'Colorful family tiles selected.');});
   $('mahjong-sound').addEventListener('click',()=>{prefs.sound=!prefs.sound;savePrefs();showPrefs();sound('select');});
   $('mahjong-show-free').addEventListener('click',()=>{prefs.showFree=!prefs.showFree;savePrefs();showPrefs();setStatus(prefs.showFree?'All selectable tiles are outlined.':'Free-tile outlines hidden.');});
@@ -287,21 +305,26 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     });
  }
  function display(){if(!state||!$('mahjong-root'))return;const p=state.profile||{},runState=state.run,leaders=state.leaders||[],me=leaders.find(e=>e.user_id===userId),record=Math.max(0,...leaders.map(e=>Number(e.best||0)));const cp=p.campaign||state.campaign||{},rules=cp.rules||{},stage=Number(cp.level||1);
-  $('mahjong-button-score').textContent=`Level ${stage}/1000 · Record ${stat(record)} · Yours ${stat(p.best_score)}`;
+  $('mahjong-button-score').textContent=`Level ${stage}/${MYSTERY_ROAD_TOTAL} · Record ${stat(record)} · Yours ${stat(p.best_score)}`;
   const tied=leaders.filter(e=>Number(e.best||0)===record);
   $('mahjong-ribbon-record').textContent=stat(record);
   $('mahjong-ribbon-holder').textContent=record<=0?'No completed game yet':tied.length>1?'Shared record · best game':`${tied[0]?.name||'Member'} · best game`;
   $('mahjong-ribbon-mine').textContent=stat(p.best_score);
   $('mahjong-ribbon-current').textContent=runState?stat(runState.score):'—';
   $('mahjong-ribbon-current-note').textContent=runState?(runState.paused?'Paused · progress saved':`${runState.pairs||0}/36 pairs · Level ${runState.level||stage}`):'No game in progress';
-  $('mahjong-level-number').textContent=`Level ${stage} / 1000`;
+  $('mahjong-level-number').textContent=`Level ${stage} / ${MYSTERY_ROAD_TOTAL}`;
   $('mahjong-level-name').textContent=rules.name||'Mystery Mile';
-  $('mahjong-progress').value=Math.max(0,Math.min(1000,Number(cp.cleared)||0));
+  $('mahjong-progress').max=MYSTERY_ROAD_TOTAL;
+  $('mahjong-progress').value=Math.max(0,Math.min(MYSTERY_ROAD_TOTAL,Number(cp.cleared)||0));
+  natureRoad?.update({level:stage,cleared:cp.cleared,streak:cp.streak,run:runState});
   const assists=Number(rules.max_assists??99);const clock=rules.max_seconds;
   const cap=stage>=51&&stage<=100?'No hints or shuffles; maximum one undo':assists>=99?'Practice stage: assistance allowed':assists===0?'No hints, shuffles, or undo':`At most ${assists} total hints, shuffles, or undos`;
   $('mahjong-level-rules').textContent=`${cap}${clock?` · Clear within ${Math.floor(Number(clock)/60)}:${String(Number(clock)%60).padStart(2,'0')}`:''} · ×${rules.multiplier||1} points`;
   $('mahjong-level-streak').textContent=`Levels cleared: ${stat(cp.cleared)} · Qualifying streak: ${stat(cp.streak)}${rules.required_streak?` · Crown requires ${rules.required_streak}+ consecutive qualifying clears`:''}`;
-  $('mahjong-campaign-goal').textContent=cp.crown_earned?'♛ The Vanishing Crown is yours. Legend secured.':'Final challenge: 1,000 levels, a 10-win streak, no assistance, and a five-minute finish.';
+  $('mahjong-campaign-goal').textContent=Number(cp.cleared)>=MYSTERY_ROAD_TOTAL?
+    '🌿 You have conquered all 5,000 gardens! The Evergreen Crown is yours.':
+    cp.crown_earned?'♛ Vanishing Crown earned at level 1,000. Keep exploring toward the Evergreen Sanctuary at 5,000.':
+    'Travel through 20 contrasting botanical worlds. Every 25th stage is a landmark; the first crown awaits at level 1,000.';
   const score=$('mahjong-stats');score.replaceChildren();for(const [label,val] of [['CURRENT RUN',stat(runState?.score)],['PERSONAL BEST',stat(p.best_score)],['ALL-TIME POINTS',stat(p.all_time_points)],['COMMONS RECORD',stat(record)]]){const c=node('div','mahjong-stat');c.append(node('small','',label),node('strong','',val));score.append(c);}
   $('mahjong-run-title').textContent=runState?`Level ${runState.level||stage} · Score ${stat(runState.score)} · Combo ${stat(runState.combo)}`:`Level ${stage}: Your next adventure`;
   $('mahjong-pairs').textContent=runState?`${runState.pairs} / 36 matched`:'';
@@ -370,7 +393,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   }
   root.append(list);
  }
- async function refresh(silent=false){if(!client||!mounted||refreshing||busy)return;refreshing=true;try{const {data,error}=await client.rpc('community_mahjong_state');if(error)throw error;state=data;if(expanded)display();else if($('mahjong-button-score')){const p=data.profile||{},cp=p.campaign||{},leaders=data.leaders||[],record=Math.max(0,...leaders.map(e=>Number(e.best||0)));$('mahjong-button-score').textContent=`Level ${cp.level||1}/1000 · Record ${stat(record)} · Yours ${stat(p.best_score)}`;}}catch(e){if(!silent)setStatus(e.message||'Unable to refresh scores.');}finally{refreshing=false;}}
+ async function refresh(silent=false){if(!client||!mounted||refreshing||busy)return;refreshing=true;try{const {data,error}=await client.rpc('community_mahjong_state');if(error)throw error;state=data;if(expanded)display();else if($('mahjong-button-score')){const p=data.profile||{},cp=p.campaign||{},leaders=data.leaders||[],record=Math.max(0,...leaders.map(e=>Number(e.best||0)));$('mahjong-button-score').textContent=`Level ${cp.level||1}/${MYSTERY_ROAD_TOTAL} · Record ${stat(record)} · Yours ${stat(p.best_score)}`;}}catch(e){if(!silent)setStatus(e.message||'Unable to refresh scores.');}finally{refreshing=false;}}
  async function run(method,params,message){if(!client||busy)return null;busy=true;for(const id of ['mahjong-new','mahjong-pause','mahjong-overlay-resume','mahjong-hint','mahjong-shuffle','mahjong-undo'])if($(id))$(id).disabled=true;setStatus('Saving your move…');
   try{const {data,error}=await client.rpc(method,params);if(error)throw error;state=data;selected=null;highlight=Array.isArray(data.hint)?data.hint:[];display();if(data.event==='won'){sound('win');setStatus(data.campaign_event==='retry'?`Board cleared, but level ${data.completed_level} requirements were missed. Replay the stage to advance.`:data.campaign_event==='advanced'?`🏆 Level ${data.completed_level} conquered! +${stat(data.campaign_bonus_earned)} campaign points. Next: level ${data.next_level}.`:'🏆 Mystery solved! Your high score and achievements are saved.');}else if(data.run&&!data.run.paused&&Number(data.run.remaining_pairs)>0&&countLegalPairs(data.run.tiles||[])===0)setStatus('No matching pairs remain on this board. Try Shuffle or Undo.');else setStatus(message);return data;}
   catch(e){setStatus('Could not save: '+(e.message||'Please retry.'));return null;}finally{busy=false;display();}
@@ -379,7 +402,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
   const {data,error}=await client.rpc('community_mahjong_state');if(error)return;userId=session.user.id;state=data;mounted=true;frame();turtleCleanup=mountClassicTurtle($('mahjong-root'),{userId});display();timer=setInterval(()=>{if(!document.hidden&&mounted)refresh(true);},30000);
    clockTimer=setInterval(()=>{if(!document.hidden&&mounted&&expanded&&$('mahjong-root')?.dataset.mahjongMode!=='turtle'&&state?.run&&!state.run.paused&&!busy){sessionSeconds++;syncSessionClock();}},1000);
  }
- function unmount(){turtleCleanup?.();turtleCleanup=null;mounted=false;state=null;userId=null;selected=null;highlight=[];expanded=false;if(timer){clearInterval(timer);timer=null;}if(clockTimer){clearInterval(clockTimer);clockTimer=null;}sessionRunKey=null;sessionSeconds=0;resize?.disconnect();resize=null;$('mahjong-root')?.remove();}
+ function unmount(){natureRoad?.destroy();natureRoad=null;turtleCleanup?.();turtleCleanup=null;mounted=false;state=null;userId=null;selected=null;highlight=[];expanded=false;if(timer){clearInterval(timer);timer=null;}if(clockTimer){clearInterval(clockTimer);clockTimer=null;}sessionRunKey=null;sessionSeconds=0;resize?.disconnect();resize=null;$('mahjong-root')?.remove();}
  try{
   const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
   const local=window.localStorage,session=window.sessionStorage;
