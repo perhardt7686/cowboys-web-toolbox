@@ -56,9 +56,23 @@ test('Mahjong score, accounts and campaign remain under server validation',()=>{
   for(const rpc of ['community_mahjong_start','community_mahjong_state','community_mahjong_pair',
     'community_mahjong_hint','community_mahjong_shuffle','community_mahjong_undo','community_mahjong_pause'])
       assert.ok(game.includes(rpc),rpc);
-  assert.match(game,/if\(result\)celebratePair\(point\)/);
+  assert.match(game,/if\(!result\)return;/);
+  assert.match(game,/celebratePair\(point\)/);
+  assert.match(game,/combo=Number\(result\.run\?\.combo/);
   assert.match(game,/const canPlay=t=>/);
   assert.match(game,/if\(!canPlay\(t\)\)/);
   assert.match(game,/if\(first\.s!==t\.s\)/);
   assert.match(game,/This version keeps its existing 72-tile/);
+});
+
+test('Classic Turtle is prominent before opening Mahjong and retains a dedicated launch action',()=>{
+ const game=text('docs/commons-mahjong.mjs');
+ const style=text('docs/mahjong-turtle.css');
+ assert.match(game,/id="mahjong-classic-launch"/);
+ assert.match(game,/PLAY CLASSIC TURTLE/);
+ assert.match(game,/mahjong-classic-launch'\)\.addEventListener\('click'/);
+ assert.match(game,/turtle\.click\(\)/);
+ assert.match(style,/mahjong-classic-launch/);
+ assert.match(style,/turtle-launch-glow/);
+ assert.match(style,/prefers-reduced-motion:reduce/);
 });

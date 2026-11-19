@@ -89,4 +89,18 @@ test('UI is separate from Mystery Road, has no shuffle, and labels browser-local
  assert.match(m,/turtle-zoom-in/);
  assert.match(c,/min-height:44px/);
  assert.match(c,/prefers-reduced-motion/);
+}); 
+test('Classic Turtle adds local reward tiers without altering Mystery Road or traditional solvability',()=>{
+ const m=readFileSync(new URL('../docs/mahjong-turtle-ui.mjs',import.meta.url),'utf8');
+ const css=readFileSync(new URL('../docs/mahjong-turtle.css',import.meta.url),'utf8');
+ assert.match(m,/CLASSIC_AWARDS/);
+ assert.match(m,/Trophy Gallery/);
+ assert.match(m,/GREAT JOB!/);
+ assert.match(m,/LIGHTNING HANDS!/);
+ assert.match(m,/saved\.achievements/);
+ assert.match(m,/highestPairs/);
+ assert.match(m,/sound\('rush'\)/);
+ assert.match(css,/mahjong-spectacle/);
+ assert.match(css,/mahjong-sparks/);
+ assert.match(css,/prefers-reduced-motion:reduce/);
 });

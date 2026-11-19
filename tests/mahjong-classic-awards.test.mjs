@@ -40,5 +40,5 @@ test('Classic award model avoids server RPСs, licensing or downloading music',a
   assert.equal(module.includes(forbidden),false,'pure award engine must not use '+forbidden);
  assert.match(module,/prefers-reduced-motion/);
  assert.match(module,/aria-hidden/);
- assert.match(module,/pointer/);
+ assert.match(module,/querySelectorAll/);
 });
