@@ -1,6 +1,7 @@
 import {escapeHTML as esc,CATEGORIES,canPost} from './community-core.mjs';
 import {POWERS,POWER_IDS,POWER_COLORS,POWER_FRAMES,POWER_AURAS,validateRank,validatePowerChange,publicHonor} from './powers-core.mjs?v=powers1';
 import {easternTime,forumBody} from './forum-core.mjs?v=powers1';
+import {EDWARD_PREVIEW_ID,edwardTestRank} from './edward-test-persona.mjs';
 
 const $=id=>document.getElementById(id);
 const empty=()=>({owner:false,rank:{id:'member',name:'Member',level:0,color:'violet',capabilities:[]},scopes:[],expires_at:null});
@@ -140,7 +141,7 @@ export function createPowerHouse(ctx){
 
   // Fictional preview data. These records never leave the page.
   const demoRoles=[['guide','Guide',100,'teal',['posts.note','posts.label','members.honor']],['curator','Curator',300,'violet',['posts.note','posts.label','posts.style','topics.organize','topics.pin','topics.spotlight','answers.choose','members.honor','members.style']],['moderator','Moderator',500,'blue',POWER_IDS.filter(id=>id!=='ranks.delegate')],['steward','Steward',750,'gold',POWER_IDS]].map(([id,name,level,color,capabilities])=>({id,name,level,color,capabilities,description:'A customizable community rank.',active:true,revision:1}));
-  const demoGrants=new Map(),demoHonors=new Map(),demoHistory=[];let demoSequence=100;
+  const demoGrants=new Map([[EDWARD_PREVIEW_ID,edwardTestRank()]]),demoHonors=new Map(),demoHistory=[];let demoSequence=100;
   const exampleMembers=()=>[{user_id:ctx.state.member?.user_id||'99999999-9999-4999-8999-999999999999',display_name:ctx.state.member?.display_name||'Cowboy',role:ctx.state.member?.role||'owner'}, {user_id:'77777777-7777-4777-8777-777777777777',display_name:'Example maker',role:'member'},{user_id:'88888888-8888-4888-8888-888888888888',display_name:'Sample explorer',role:'member'}];
   const demoState=id=>{const m=exampleMembers().find(m=>m.user_id===id),g=demoGrants.get(id),r=g&&demoRoles.find(r=>r.id===g.role_id&&r.active);return m?.role==='owner'?{owner:true,rank:{id:'owner',name:'Cowboy · Owner',level:1000,color:'gold',capabilities:POWER_IDS},scopes:[],expires_at:null}:r?{owner:false,rank:r,scopes:g.scopes,expires_at:g.expires_at}:empty();};
   async function previewAPI(action,payload){
