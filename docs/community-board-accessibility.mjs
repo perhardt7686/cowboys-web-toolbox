@@ -20,6 +20,7 @@ if(board){
     // Keep reading controls in the search/sort toolbar rather than taking
     // a full-width block at the top of conversations on small iPhones.
     const tools=main.querySelector('.community-tools')||main;
+    tools.classList.add('has-reading-dropdown');
     const previous=main.querySelector('.family-reading-bar');
     const reading=document.createElement('details');
     reading.className='family-reading-bar';
