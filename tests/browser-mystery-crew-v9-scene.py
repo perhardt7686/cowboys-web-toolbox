@@ -31,8 +31,6 @@ async def test_scene(browser,w,h,name):
  }""")
  assert details['width']==430 and details['height']==574,details
  assert 'scout-v9-frame-' in details['href']
- await page.screenshot(path=str(REPORTS/f'mystery-crew-v9-wave-scene-{name}.png'),
-                       full_page=False,animations='allow')
  await page.locator('.mc-performance [data-motion="idle"]').click()
  await expect(page.locator('#mc-v9-scout-wave-image')).to_be_hidden()
  await expect(page.locator('#mc-v6-painted-rig')).to_be_visible()
@@ -49,6 +47,11 @@ async def test_scene(browser,w,h,name):
  await page.locator('.mc-performance [data-motion="wave"]').click()
  await expect(page.locator('#mc-scene')).to_have_attribute('data-v9-wave','reduced')
  await expect(page.locator('#mc-v9-scout-wave-image')).to_have_attribute('data-v9-frame','4')
+ await page.screenshot(path=str(REPORTS/f'mystery-crew-v9-wave-scene-{name}.png'),
+                       full_page=False,animations='disabled')
+ await page.locator('#mc-scene').screenshot(
+                       path=str(REPORTS/f'mystery-crew-v9-wave-scene-closeup-{name}.png'),
+                       animations='disabled')
  await page.wait_for_timeout(370)
  await expect(page.locator('#mc-v9-scout-wave-image')).to_have_attribute('data-v9-frame','4')
  await page.locator('#mc-market-filter').select_option('presets')
