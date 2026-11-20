@@ -4,13 +4,19 @@ import {CLASSIC_AWARDS,CLASSIC_AWARD_COUNT,AWARD_GRADES,
  awardEarned,awardMetric,awardLevel,freshlyEarned} from '../docs/mahjong-classic-awards.mjs';
 
 test('Classic Turtle has an expansive unique catalogue with genuinely extreme tiers',()=>{
- assert.equal(CLASSIC_AWARD_COUNT,195);
+ assert.equal(CLASSIC_AWARD_COUNT,211);
  assert.equal(new Set(CLASSIC_AWARDS.map(a=>a.id)).size,CLASSIC_AWARDS.length);
  assert.ok(CLASSIC_AWARDS.some(a=>a.category==='speed'&&a.target<=120));
  assert.ok(CLASSIC_AWARDS.some(a=>a.category==='pairs'&&a.target>=100000));
  assert.ok(CLASSIC_AWARDS.some(a=>a.category==='daily-chain'&&a.target>=365));
  assert.ok(CLASSIC_AWARDS.filter(a=>awardLevel(a.grade)>=7).length>=30);
  assert.ok(AWARD_GRADES.includes('Impossible'));
+ assert.equal(CLASSIC_AWARDS.filter(a=>a.category==='turtle-ritual').length,16);
+ for(const kind of ['flower','season','dragon','wind','bamboo','circles','characters']){
+  assert.ok(CLASSIC_AWARDS.some(a=>a.id==='ritual-open-'+kind));
+  assert.ok(CLASSIC_AWARDS.some(a=>a.id==='ritual-close-'+kind));
+ }
+ assert.ok(CLASSIC_AWARDS.some(a=>a.id==='ritual-sevenfold'&&a.grade==='Impossible'));
  for(const family of ['turtle','temple','garden'])
   assert.ok(CLASSIC_AWARDS.some(a=>a.category==='layout-'+family));
  for(const kind of ['flower','season','dragon','wind','bamboo','circles','characters'])
