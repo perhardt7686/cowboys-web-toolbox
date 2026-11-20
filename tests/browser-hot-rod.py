@@ -375,8 +375,12 @@ async def campaign_flow(page, name, *, touch):
     await page.wait_for_function("""() =>
       !document.querySelector('.hot-rod-meters').textContent.includes('WAIT FOR GREEN')
     """, timeout=10000)
+    # Capture the actual active race before Victory changes the scene.
+    # A post-finish screenshot can include the family page beneath a closing modal.
+    await expect(game).to_be_visible()
+    assert await game.get_attribute('data-scene') == 'race'
+    await game.locator('.hot-rod-canvas').screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
     if touch:
-        await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
         await finger(game.locator('[data-drive="up"]'),'pointerdown',1)
         await finger(game.locator('[data-drive="gas"]'),'pointerdown',2)
         await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
@@ -405,7 +409,7 @@ async def campaign_flow(page, name, *, touch):
         await expect(game.get_by_role('heading',name='Victory')).to_be_visible(timeout=23000)
         await page.keyboard.up('ArrowUp')
         assert await page.evaluate("fixture.result()?.outcome") == 'win'
-        await game.locator('.hot-rod-canvas').screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-cockpit.png')
+        # Race artwork was captured while the active race scene was visible.
     await game.get_by_role('button',name='Continue',exact=True).click()
     await scene(game,'garage')
     await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Hall of Fame').click()
