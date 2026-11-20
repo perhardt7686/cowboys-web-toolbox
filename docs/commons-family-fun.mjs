@@ -157,7 +157,28 @@ function renderGame(content,game){
  head.append(el('strong','',game.mark+' '+game.name),
   el('span','family-fun-verified',sourceText(info.state)));
  content.append(head);
+ const recent=activity[game.id];
+ const snapshot=el('div','family-fun-game-activity');
+ snapshot.append(el('strong','','LATEST FAMILY ACTIVITY'));
+ if(recent?.lastPlayedAt){
+  const when=el('time','',formatEasternStamp(recent.lastPlayedAt));
+  when.dateTime=recent.lastPlayedAt;
+  snapshot.append(when,el('span','','Last played by '+recent.lastPlayer));
+  snapshot.append(el('span','',
+   Number(recent.actionsToday).toLocaleString()+' family actions today · '+
+   Number(recent.yourActionsToday).toLocaleString()+' yours'));
+  if(recent.yourLastPlayedAt){
+   const yours=el('time','','Your most recent: '+formatEasternStamp(recent.yourLastPlayedAt));
+   yours.dateTime=recent.yourLastPlayedAt;snapshot.append(yours);
+  }
+ }else snapshot.append(el('span','',game.source==='personal'?
+   'Play history for this activity is not connected.':'No saved play timestamp available for this game.'));
+ content.append(snapshot);
  if(info.state==='verified'&&info.entries.length){
+  const mine=info.entries.find(e=>e.mine);
+  content.append(el('p','family-fun-rank-summary',
+   info.entries.length+' ranked family players'+(mine?
+    ' · You: #'+mine.rank+' · '+Number(mine.score).toLocaleString()+' '+game.unit:'')));
   const rows=el('ol','family-fun-podium');
   for(const [index,entry] of info.entries.slice(0,5).entries()){
    const item=el('li','family-fun-row'+(index===0?' is-first':''));
@@ -206,6 +227,11 @@ function renderGame(content,game){
 function render(){
  if(!root)return;
  const picker=root.querySelector('.family-fun-picker');
+ // Present the same recency ordering in the game selection dropdown.
+ for(const game of sortGamesByRecent(FAMILY_FUN_GAMES,activity)){
+  const option=[...picker.options].find(o=>o.value===game.id);
+  if(option)picker.append(option);
+ }
  picker.value=selected;
  root.querySelector('.family-fun-home').hidden=selected==='all';
  const content=root.querySelector('.family-fun-content');content.replaceChildren();
@@ -213,7 +239,8 @@ function render(){
  if(game)renderGame(content,game);else renderAll(content);
  const linked=FAMILY_FUN_GAMES.filter(g=>getData(g).state==='verified').length;
  root.querySelector('.family-fun-status').textContent=member?
-  linked+' of '+FAMILY_FUN_GAMES.length+' game rankings connected · saved results only':
+  linked+' of '+FAMILY_FUN_GAMES.length+' game rankings linked · '+
+  (activityAt?'Activity checked '+formatEasternStamp(activityAt):'Checking play history'):
   'Member-only standings · no public scores';
  const play=root.querySelector('.family-fun-play');
  play.hidden=!game;
