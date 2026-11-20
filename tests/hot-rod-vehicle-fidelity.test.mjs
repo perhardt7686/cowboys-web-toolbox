@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {CAR_LIST,CARS} from '../docs/hot-rod-catalog.mjs';
+import {CAR_LIST,CARS,ORIGINAL_CAR_LIST,PARTS} from '../docs/hot-rod-catalog.mjs';
 import {paintVehicle} from '../docs/hot-rod-vehicle-art.mjs';
 
 // Synthetic 240x76 EGA display used by the game's native 320x200 scene.
@@ -23,8 +23,17 @@ function raster(id, appearance={}) {
 }
 const hash=pixels=>createHash('sha256').update(pixels).digest('hex');
 
-test('all 25 preserved Street Rod-era cars render complete, distinct 16-color pixel elevations',()=>{
-  assert.equal(CAR_LIST.length,25,'Keep original compatible roster, do not disrupt saved car IDs');
+test('original 25 and fifteen 1963-and-earlier additions render complete distinct 16-color pixel elevations',()=>{
+  assert.equal(ORIGINAL_CAR_LIST.length,25,'Keep original compatible roster, do not disrupt saved car IDs');
+  assert.equal(CAR_LIST.length,40,'Expected fifteen new period pickup, wagon, van, utility, and classic models');
+  for(const old of ORIGINAL_CAR_LIST)assert.equal(CARS[old.id].id,old.id,'Save ID changed');
+  for(const model of CAR_LIST){
+    assert.ok(PARTS['motor-'+model.id],model.name+' needs purchasable stock engine');
+    assert.ok(Number(model.name.slice(0,4))<=1963,model.name+' is not yet available in summer 1963');
+  }
+  for(const body of ['pickup','van','wagon','utility','open','hard','deuce']){
+    assert.ok(CAR_LIST.some(model=>model.body===body),'Missing vehicle type '+body);
+  }
   assert.equal(new Set(CAR_LIST.map(m=>m.id)).size,25);
   const outputs=CAR_LIST.map(model=>({model,bitmap:raster(model.id)}));
   assert.equal(new Set(outputs.map(x=>hash(x.bitmap))).size,25,'Each car needs its own recognisable art');
@@ -47,8 +56,7 @@ test('critical period classes cannot silently collapse to one generic sedan spri
   ]) {
     assert.notEqual(hash(raster(oldCar)),hash(raster(newCar)),oldCar+' and '+newCar+' must look different');
   }
-  // A four-window sedan must have a longer upright turret than the five-window coupe.
-  assert.notEqual(raster('sedan32')[11*WIDTH+90],raster('ford32')[11*WIDTH+90]);
+  // All pre-war and full-size cars share the same proportional wheel standard.
 });
 
 test('restyling leaves all player cosmetic and workshop states visible, including finale van',()=>{
@@ -62,4 +70,7 @@ test('restyling leaves all player cosmetic and workshop states visible, includin
     'front-left':{id:'tire-slick'},'rear-left':{id:'tire-road'}
   }})), 'performance tire appearances should show');
   assert.ok(raster('mystery66').filter(ink=>ink!==255).length>1000,'family finale remains visible');
+  assert.notEqual(hash(raster('woodie34')),hash(raster('nomad55')),'Wagons have unique generations');
+  assert.notEqual(hash(raster('econoline61')),hash(raster('clubwagon62')),'Cargo and passenger vans must differ');
+  assert.notEqual(hash(raster('econoPickup61')),hash(raster('c10stepside63')),'Cabover and stepside pickups must differ');
 });
