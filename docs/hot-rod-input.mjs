@@ -18,9 +18,10 @@ export function connectDrivingInput(panel, active) {
     if (bit & (INPUT.up | INPUT.down)) shifts |= bit;
     else held.set(key, bit);
   };
-  listen(panel, 'keydown', event => {
+  // Keyboard steering must survive focus moving from the race panel to a driving button.
+  listen(window, 'keydown', event => {
     if (!active() || event.ctrlKey || event.altKey || event.metaKey) return;
-    if (event.target?.closest('input,select,textarea')) return;
+    if (event.target?.closest?.('input,select,textarea,[contenteditable="true"]')) return;
     let bit = keys[event.code];
     if (event.code === 'Space' && !event.target?.closest('button')) {
       bit = [...held.values()].includes(INPUT.brake) ? INPUT.down : INPUT.up;
@@ -30,6 +31,14 @@ export function connectDrivingInput(panel, active) {
     if (!event.repeat) set(event.code, bit);
   });
   listen(window, 'keyup', event => held.delete(event.code));
+  // A pointer leaving a pad must never leave gas, brake or clutch stuck down.
+  listen(panel, 'pointerout', event => {
+    const pad = event.target.closest?.('[data-drive]');
+    if (pad && !pad.contains(event.relatedTarget) && !pad.hasPointerCapture?.(event.pointerId)) {
+      held.delete(event.pointerId);
+      pad.classList.remove('is-held');
+    }
+  });
   listen(panel, 'pointerdown', event => {
     const pad = event.target.closest('[data-drive]');
     if (!pad || !active()) return;
