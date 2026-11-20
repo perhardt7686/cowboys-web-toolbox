@@ -126,3 +126,17 @@ test('Bob’s Drive-In faithfully responds to driver, challenge and cash while r
   assert.notEqual(render({...base,cash:500}),picture,'Bankroll caption reflects the save');
   assert.equal(JSON.stringify(base),before,'Diner art cannot alter any server state');
 });
+
+test('Classic-car rebuild keeps all period car shapes original, model-specific and responsive',()=>{
+  const carIDs=['ford32','chevy40','fairlane55','vette56','fairlane57'];
+  const signatures=new Set();
+  for(const id of carIDs) {
+    const model=CARS[id],car=makeCar(model,1),img=frame();
+    paintVehicle(img.screen,model,car,40,86,1);
+    signatures.add(digest(img.pixels));
+    assert.ok(img.pixels.filter(p=>p!==255).length>2600,id+' must visibly fill the garage');
+    const chopped=structuredClone(car);chopped.roof=true;
+    assert.notEqual(render({scene:'garage',car:chopped}),render({scene:'garage',car}),id+' chop option still changes visual design');
+  }
+  assert.equal(signatures.size,carIDs.length);
+});

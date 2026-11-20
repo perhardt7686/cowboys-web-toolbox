@@ -16,10 +16,13 @@ export const vehiclePaint = color => PAINT[color] || PAINT[1];
 // The waist controls the transition from the top of the body to the darker lower panels.
 const PROFILES = {
   ford32:{
-    shell:[[16,47],[23,40],[57,34],[67,17],[75,9],[86,6],[120,6],[131,11],[142,32],[198,33],
-      [209,37],[215,46],[215,56],[207,62],[19,62],[13,57]],
-    glass:[[[76,15],[87,11],[113,11],[116,29],[70,31]],[[120,11],[128,14],[137,31],[120,30]]],
-    waist:38,wheels:[47,189,14],doors:[[118,32,119,53,91]],lamps:[17,46,211,38,'separate'],
+    // Upright five-window Deuce cabin, separate hood and tall radiator.
+    // The original cartoonish swooping roof is deliberately retired.
+    shell:[[12,50],[19,43],[31,39],[55,37],[62,32],[63,17],[69,9],[78,7],[119,7],[126,9],
+      [134,13],[138,18],[139,34],[182,34],[198,37],[209,41],[216,48],[216,57],[208,63],[18,63],[12,59]],
+    glass:[[[68,19],[73,13],[93,12],[93,32],[65,33]],
+      [[100,12],[116,12],[129,17],[134,32],[100,32]]],
+    waist:38,wheels:[47,189,14],doors:[[137,33,136,57,114]],lamps:[17,46,214,38,'separate'],
     fenders:'running',trim:'hood',wall:'thin'
   },
   sedan32:{
@@ -37,9 +40,12 @@ const PROFILES = {
     fenders:'running',trim:'hood',wall:'wide'
   },
   chevy40:{
-    shell:[[7,51],[15,43],[27,38],[47,31],[62,18],[75,12],[96,9],[119,10],[132,15],[142,26],
-      [149,32],[191,32],[215,34],[226,39],[232,48],[233,58],[229,63],[18,63],[7,59]],
-    glass:[[[58,28],[69,19],[78,15],[93,14],[93,31],[55,33]],[[100,14],[117,14],[130,20],[141,32],[100,31]]],
+    // Business coupe: bulbous rear deck, taller turret and separate pontoon
+    // front wings, instead of a low, modern-looking hatchback outline.
+    shell:[[7,51],[13,49],[23,48],[34,47],[42,44],[49,32],[60,18],[73,11],[95,9],[109,11],
+      [119,16],[129,28],[143,35],[176,35],[194,32],[210,34],[225,41],[231,49],[231,59],[224,64],[18,64],[7,58]],
+    glass:[[[55,30],[67,20],[80,15],[93,14],[96,33],[54,35]],
+      [[101,16],[112,17],[122,23],[136,34],[101,34]]],
     waist:36,wheels:[48,194,15],doors:[[143,34,143,57,105]],lamps:[10,48,226,40,'shell'],
     fenders:'step',trim:'hood',wall:'wide'
   },
@@ -58,28 +64,28 @@ const PROFILES = {
     fenders:'step',trim:'fordHood',wall:'thin'
   },
   style49:{
-    shell:[[7,47],[13,40],[32,34],[58,31],[72,20],[87,12],[106,9],[125,10],[144,16],[162,32],
+    shell:[[7,47],[13,40],[32,35],[58,33],[72,21],[87,13],[106,10],[125,10],[145,17],[162,32],
       [196,33],[221,36],[232,42],[236,52],[233,61],[225,65],[16,65],[8,59]],
     glass:[[[70,29],[86,18],[100,15],[111,15],[113,32],[64,33]],[[118,15],[132,17],[145,23],[153,32],[118,32]]],
     waist:37,wheels:[48,194,15],doors:[[163,34,161,60,123]],lamps:[10,45,230,42,'round'],
     fenders:'blend',trim:'straight',wall:'wide'
   },
   olds49:{
-    shell:[[7,47],[16,39],[38,34],[53,33],[79,16],[96,10],[118,9],[137,13],[150,22],[161,33],
+    shell:[[7,47],[16,40],[38,35],[53,34],[77,19],[95,12],[118,10],[138,14],[151,24],[161,33],
       [209,34],[228,37],[237,45],[237,57],[229,64],[15,64],[7,58]],
     glass:[[[64,30],[83,20],[99,15],[112,15],[114,32],[57,34]],[[119,15],[134,18],[148,26],[153,33],[119,33]]],
     waist:37,wheels:[47,193,15],doors:[[162,36,161,59,117]],lamps:[10,45,232,41,'round'],
     fenders:'blend',trim:'rocket',wall:'wide'
   },
   silver50:{
-    shell:[[7,49],[10,39],[49,34],[67,21],[87,12],[112,9],[137,12],[155,20],[167,33],[215,34],
+    shell:[[7,49],[10,41],[49,35],[65,25],[83,15],[110,10],[138,12],[155,22],[167,33],[215,34],
       [229,39],[236,49],[234,59],[227,64],[17,64],[8,59]],
     glass:[[[61,29],[81,19],[99,15],[111,15],[112,33],[54,34]],[[118,15],[134,17],[149,23],[158,33],[118,33]]],
     waist:36,wheels:[49,195,15],doors:[[165,35,164,59,117]],lamps:[11,42,230,42,'round'],
     fenders:'blend',trim:'streak',wall:'wide'
   },
   olds52:{
-    shell:[[6,46],[12,38],[52,35],[66,24],[83,16],[122,14],[143,19],[162,34],[213,35],[228,40],
+    shell:[[6,46],[12,39],[52,36],[67,26],[85,18],[121,15],[143,20],[162,34],[213,35],[228,40],
       [236,45],[236,57],[232,62],[223,65],[12,64],[6,58]],
     glass:[[[60,34],[71,26],[86,20],[107,19],[109,34]],[[113,19],[128,19],[143,24],[153,34],[113,34]]],
     waist:38,wheels:[49,193,15],doors:[[158,35,157,59,112]],lamps:[9,43,231,43,'round'],
@@ -114,9 +120,11 @@ const PROFILES = {
     fenders:'flush',trim:'lancer',wall:'wide'
   },
   vette56:{
-    shell:[[5,49],[9,42],[22,37],[54,35],[77,36],[96,38],[114,38],[117,23],[125,22],[141,35],
-      [171,35],[195,32],[218,33],[229,38],[235,45],[234,55],[228,62],[13,63],[4,56]],
-    glass:[[[119,25],[125,25],[136,34],[116,36]]],
+    // A 1956 Corvette is a low two-seat roadster with a rear deck hump and
+    // long, scalloped nose, not a shortened sedan with a missing roof.
+    shell:[[5,50],[9,43],[22,38],[47,34],[67,34],[89,37],[115,38],[119,24],
+      [125,22],[141,36],[169,36],[193,33],[214,33],[229,38],[235,45],[235,56],[228,63],[13,63],[4,57]],
+    glass:[[[119,26],[126,26],[138,35],[116,37]]],
     waist:39,wheels:[44,190,14],doors:[[139,36,139,59,112]],lamps:[7,46,229,39,'sport'],
     fenders:'sport',trim:'cove',wall:'wide',seat:[96,34]
   },
@@ -445,6 +453,138 @@ function drawVan(sprite) {
   }
 }
 
+
+// Reconstructed period hardware and surface geometry. These are new pixel
+// instructions based on recognizable body architecture, not copied DOS assets.
+// Shared base contours stay intact for color, chop and race rendering.
+function drawClassicIdentity(sprite, profile, id, paint) {
+  const [shade, body, highlight, chrome] = paint;
+  const [rear,front] = profile.wheels;
+  const hoodY = profile.waist;
+  const draw = (points, ink) => sprite.trace(points,ink);
+
+  if(id==='ford32'||id==='sedan32') {
+    // A genuine prewar Ford requires a vertical radiator, a narrow separate
+    // engine bonnet, a square cowl, running boards and exposed wheel wings.
+    const cowl=id==='ford32'?143:143;
+    sprite.line(cowl,34,cowl,59,0);
+    sprite.line(cowl+2,35,cowl+2,52,chrome);
+    sprite.line(cowl+4,36,209,36,highlight);
+    sprite.line(cowl+6,38,205,38,chrome);
+    sprite.polygon([[210,36],[218,37],[223,41],[223,55],[219,59],[211,57]],8);
+    sprite.line(211,38,220,39,chrome);
+    sprite.line(211,39,211,55,15);
+    sprite.line(220,40,220,55,0);
+    for(let y=41;y<=55;y+=3)sprite.line(214,y,218,y, y%2 ? 15 : 7);
+    for(let x=157;x<194;x+=5) {
+      sprite.line(x,41,x+1,49,shade);
+      sprite.pixel(x+2,43,highlight);
+    }
+    draw([[rear+17,61],[rear+36,62],[front-36,62],[front-16,60]],8);
+    sprite.box(rear+34,62,front-rear-69,2,0);
+    sprite.line(rear+37,63,front-36,63,chrome);
+    draw([[rear-27,51],[rear-19,44],[rear-6,40],[rear+4,40],[rear+19,44]],highlight);
+    draw([[front-22,46],[front-12,40],[front+5,40],[front+19,45]],highlight);
+    // Side glass receives explicit rear quarter and vertical door-pillar ink.
+    sprite.line(98,14,98,34,8);
+    sprite.line(99,14,99,32,chrome);
+    return;
+  }
+
+  if(['master38','chevy40','roadster40','ford40'].includes(id)){
+    // 1938-40 coupe's strong independent fenders and narrower hood ridge.
+    // These raised shoulders distinguish it from a postwar pontoon body.
+    const back=rear, nose=front;
+    draw([[back-28,51],[back-23,45],[back-12,41],[back+2,39],[back+17,42],[back+29,49]],shade);
+    draw([[back-22,47],[back-10,42],[back+4,42],[back+18,45]],highlight);
+    draw([[nose-29,51],[nose-22,44],[nose-8,39],[nose+7,39],[nose+21,46],[nose+29,54]],shade);
+    draw([[nose-20,44],[nose-8,41],[nose+5,41],[nose+17,45]],chrome);
+    draw([[nose-43,hoodY-1],[nose-4,hoodY-3],[nose+18,hoodY]],highlight);
+    sprite.line(nose-35,hoodY+1,nose+18,hoodY+2,8);
+    for(let x=nose-43;x<nose-25;x+=5)sprite.line(x,hoodY+3,x,hoodY+8,shade);
+    if(id==='chevy40'){
+      draw([[39,39],[54,29],[64,18],[79,12],[100,11],[116,14]],chrome);
+      // Strong, lower rear wheel-spat edge and separate cabin shut line.
+      sprite.line(146,35,146,58,shade);
+      sprite.line(148,37,148,55,highlight);
+      draw([[32,61],[78,61],[108,62]],0);
+    }
+    return;
+  }
+
+  if(['style49','olds49','silver50','olds52'].includes(id)){
+    // Postwar pontoon shape: wider running waist and proper hood ornament.
+    draw([[11,42],[51,39],[73,39],[145,41],[224,42]],highlight);
+    draw([[front-52,37],[front-34,35],[front-4,35],[front+16,39]],chrome);
+    sprite.line(front-21,33,front-16,31,15);
+    sprite.line(front-16,31,front-11,33,7);
+    for(let x=front+15;x<front+27;x+=3)sprite.line(x,46,x,54,x%2?7:15);
+    draw([[rear+19,61],[front-22,61]],shade);
+    if(id==='silver50'){
+      for(let x=148;x<199;x+=6)sprite.pixel(x,hoodY-1,chrome);
+    }
+    return;
+  }
+
+  if(['belair55','fairlane55','lancer55','mercury54','mercury56','fairlane57','impala58'].includes(id)){
+    // Long chrome flank and high beltline on full-size mid-century cars.
+    draw([[rear+24,hoodY+4],[117,hoodY+5],[front-28,hoodY+3]],chrome);
+    sprite.line(rear+21,59,front-23,59,shade);
+    sprite.line(rear+26,60,front-25,60,7);
+    sprite.line(110,18,110,36,8);
+    sprite.line(112,20,112,35,chrome);
+    if(id==='fairlane57'){
+      // Angular raised tailfin, chrome crest and jet-age rear quarter.
+      sprite.polygon([[4,28],[8,27],[30,39],[37,41],[12,37]],highlight);
+      draw([[4,28],[8,27],[27,37],[44,42]],chrome);
+      draw([[13,43],[44,46],[87,46],[118,48]],15);
+    }else if(id==='belair55'){
+      draw([[12,42],[48,43],[85,46],[128,48],[153,46]],15);
+    }else if(id==='lancer55'){
+      draw([[10,42],[42,43],[82,46],[143,48],[200,43]],15);
+    }else if(id==='impala58'){
+      sprite.box(9,38,12,2,12);
+      draw([[21,40],[48,43],[84,43]],chrome);
+    }
+    return;
+  }
+
+  if(['vette56','vette61','tbird57'].includes(id)){
+    // Two-seat sports cars keep long low hood, painted fender shoulders,
+    // exposed windshield stanchions and chrome coves, not sedan roof lines.
+    draw([[5,49],[23,40],[52,36],[92,37],[115,38]],highlight);
+    draw([[144,38],[181,36],[211,34],[230,40]],chrome);
+    sprite.line(117,24,117,39,8);
+    sprite.line(119,23,119,38,chrome);
+    if(id==='vette56'||id==='vette61'){
+      // Sculpted bright 1956 Corvette cove running through the door.
+      draw([[100,50],[118,46],[147,44],[173,46],[190,49]],15);
+      draw([[103,54],[119,57],[149,57],[169,54]],7);
+      sprite.line(200,43,216,40,highlight);
+    }
+    return;
+  }
+
+  if(id==='vette63'){
+    // Sting Ray fastback roof shoulders and separate side vent blades.
+    draw([[51,35],[78,22],[98,18],[119,19],[139,34]],chrome);
+    draw([[144,40],[182,37],[218,38],[234,43]],highlight);
+    for(let x=151;x<=164;x+=4){
+      sprite.line(x,46,x-2,53,shade);
+      sprite.pixel(x+1,46,chrome);
+    }
+    return;
+  }
+
+  if(id==='mystery66')return; // Keep Cowboy's family finale identity intact.
+
+  // Square-shouldered early 1960s sedans use clean horizontal accents
+  // rather than the postwar car's round swooping trim.
+  draw([[9,hoodY+2],[69,hoodY+2],[115,hoodY+3],[170,hoodY+2],[229,hoodY+2]],chrome);
+  draw([[rear+20,59],[front-18,59]],shade);
+  for(let x=front+17;x<=front+23;x+=3)sprite.line(x,43,x,51,8);
+}
+
 // Period-correct visual landmarks distinguish the car families at the 320x200
 // scale. These are independently drawn details, not extracted game sprites.
 function drawPeriodBodywork(sprite, profile, id, paint) {
@@ -514,7 +654,7 @@ function drawPeriodBodywork(sprite, profile, id, paint) {
   }
 }
 
-function drawWheel(sprite, x, r, part, whitewall, fitted) {
+function drawWheel(sprite, x, r, part, whitewall, fitted, wireSpokes=false) {
   const y = GROUND - r;
   const slick = part === 'tire-slick';
   const sporty = slick || part === 'tire-road';
@@ -530,7 +670,7 @@ function drawWheel(sprite, x, r, part, whitewall, fitted) {
   sprite.ellipse(x-1,y-1,r-1,r-1,8);
   sprite.ellipse(x,y+1,r-1,r-1,0);
   const lip = sporty ? r-5 : r-4;
-  const hub = whitewall==='wide' && !sporty ? lip-4 : lip-2;
+  const hub = wireSpokes && !sporty ? lip-5 : whitewall==='wide' && !sporty ? lip-4 : lip-2;
   sprite.ellipse(x,y,lip+1,lip+1,8);
   sprite.ellipse(x,y,lip,lip,slick?7:15);
   sprite.ellipse(x,y+1,lip-1,lip-1,slick?8:7);
@@ -540,6 +680,17 @@ function drawWheel(sprite, x, r, part, whitewall, fitted) {
   if (sporty) {
     for (const [dx,dy] of [[-hub+1,0],[hub-1,0],[0,-hub+1],[0,hub-1],[-4,-4],[4,-4],[-4,4],[4,4]]) {
       sprite.line(x,y,x+dx,y+dy,7);
+    }
+  } else if (wireSpokes) {
+    // Early Ford wire wheels: bright narrow spokes rather than modern discs.
+    sprite.ellipse(x,y,hub+1,hub+1,7);
+    sprite.ellipse(x,y,hub,hub,8);
+    for(const [dx,dy] of [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]){
+      sprite.line(x,y,x+dx*(lip-2),y+dy*(lip-2),7);
+    }
+    sprite.ellipse(x,y,hub,hub,8);
+    for(const [dx,dy] of [[-hub,0],[hub,0],[0,-hub],[0,hub],[-hub+1,-hub+1],[hub-1,-hub+1],[-hub+1,hub-1],[hub-1,hub-1]]){
+      sprite.line(x,y,x+dx,y+dy,15);
     }
   } else {
     sprite.ellipse(x-1,y-1,hub-1,hub-1,7);
@@ -628,9 +779,10 @@ function vehicleSprite(profile, modelId, car, paint, frontWheel, rearWheel) {
   drawTrim(sprite,profile,paint);
   drawDoors(sprite,profile,paint);
   drawPeriodBodywork(sprite,profile,modelId,paint);
+  drawClassicIdentity(sprite,profile,modelId,paint);
   if (car?.decal && profile.trim !== 'van') drawDecal(sprite,car.decal,profile);
   for (const [x, wheel] of [[rear,rearWheel],[front,frontWheel]]) {
-    drawWheel(sprite,x,r,wheel,profile.wall,Boolean(wheel));
+    drawWheel(sprite,x,r,wheel,profile.wall,Boolean(wheel),modelId==='ford32'||modelId==='sedan32');
   }
   drawEnds(sprite,profile,car);
   if (!visibleJack) return sprite;
