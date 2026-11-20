@@ -4,6 +4,7 @@ import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
 import {loadPainterlyPack,painterlyOutfitHTML,syncPainterlyStage} from './mystery-painterly-stage.mjs?v=layered3';
 import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML} from './mystery-crew-character-v5.mjs?v=crew6';
+import {mountScoutV9SceneLab,syncScoutV9SceneLab} from './mystery-crew-v9-scout-lab.mjs';
 import {mountSceneV4,syncSceneV4} from './mystery-crew-scene-v4.mjs?v=scene4';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
@@ -263,6 +264,7 @@ function updateScene(){
  for(const b of document.querySelectorAll('.mc-views button'))b.setAttribute('aria-pressed',String((b.id==='mc-view-front'&&angle===0)||(b.id==='mc-view-side'&&angle===90)||(b.id==='mc-view-back'&&angle===180)));
  syncPainterlyStage(m,{zoom,angle,motion});
  syncCrewV5(m,{zoom,angle,motion});
+ syncScoutV9SceneLab(m,{zoom,angle,motion});
  syncSceneV4(m);
 }
 function renderRoster(){
@@ -508,6 +510,9 @@ render();
 void loadPainterlyPack(render).then(async loaded=>{
  if(loaded){await mountSceneV4();}
  await loadCrewV5();
+ // Strictly localhost preview-only: V9 artwork is NOT a published player feature.
+ if(isPreview&&new URLSearchParams(location.search).get('artLab')==='scoutV9')
+  await mountScoutV9SceneLab();
  render();
 });
 void initializeAccount();
