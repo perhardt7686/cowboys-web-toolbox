@@ -27,6 +27,11 @@ on:
       - 'tests/browser-streetrod-ega.py'
       - 'tests/browser-arcade-shell.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-retro-arcade.mjs'
+      - 'docs/commons-retro-arcade.css'
+      - 'docs/retro-arcade-cabinet*.mjs'
+      - 'docs/retro-arcade-input.mjs'
+      - 'tests/browser-retro-cabinet.py'
       - 'docs/commons-arcade-titles.mjs'
       - 'tests/browser-arcade-titles.py'
       - 'docs/commons-dash-forge.mjs'
@@ -73,6 +78,11 @@ on:
       - 'docs/hot-rod*'
       - 'tests/browser-hot-rod.py'
       - 'docs/commons-arcade-shell.mjs'
+      - 'docs/commons-retro-arcade.mjs'
+      - 'docs/commons-retro-arcade.css'
+      - 'docs/retro-arcade-cabinet*.mjs'
+      - 'docs/retro-arcade-input.mjs'
+      - 'tests/browser-retro-cabinet.py'
       - 'docs/commons-arcade-titles.mjs'
       - 'tests/browser-arcade-titles.py'
       - 'docs/commons-dash-forge.mjs'
@@ -115,6 +125,7 @@ jobs:
           python tests/browser-streetrod-reborn.py
           python tests/browser-hot-rod.py
           python tests/browser-dash-forge.py
+          python tests/browser-retro-cabinet.py
       - name: Retain test-only iPhone-sized screenshot
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
