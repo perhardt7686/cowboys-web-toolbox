@@ -2,6 +2,7 @@
  * Landmarks are visual previews; only the server decides which level can start.
  * No external images, music, libraries, privileged data, or player writes.
  */
+import {illustratedRegionMap,REGION_MAP_MOTIFS} from './mahjong-region-picture.mjs';
 export const MYSTERY_ROAD_TOTAL=5000;
 export const ROAD_REGION_SIZE=250;
 export const ROAD_REGIONS=Object.freeze([
@@ -36,6 +37,24 @@ export const ROAD_ENCOUNTERS=Object.freeze([
  {kind:'wild',name:'Wild Growth',icon:'🍃',description:'A rugged stretch of the trail'},
  {kind:'sanctuary',name:'Quiet Sanctuary',icon:'🕊️',description:'A gentler rest between challenges'}
 ].map(x=>Object.freeze(x)));
+// Earned trail souvenirs are visual achievements derived from verified server
+// clears. Existing server campaign-bonus points remain authoritative.
+export function roadTrailKeepsake(level){
+ const v=clampRoadLevel(level);
+ if(v%250===0)return {icon:'🏛️',name:'Garden Gate',description:'Complete this whole region'};
+ if(v%50===0)return {icon:'🏆',name:'Golden Bloom',description:'Complete 50 garden steps'};
+ if(v%25===0)return {icon:'🌷',name:'Bloom Arch',description:'Complete 25 garden steps'};
+ if(v%5===0)return {icon:'✦',name:'Trail Star',description:'Complete five garden steps'};
+ return null;
+}
+export function roadKeepsakes(cleared){
+ const done=Math.max(0,Math.min(MYSTERY_ROAD_TOTAL,Math.trunc(Number(cleared)||0)));
+ const last=Math.floor(done/5)*5;
+ const next=Math.min(MYSTERY_ROAD_TOTAL,last+5);
+ return {earned:Math.floor(done/5),
+   last:last>0?{level:last,...roadTrailKeepsake(last)}:null,
+   next:done>=MYSTERY_ROAD_TOTAL?null:{level:next,...roadTrailKeepsake(next)}};
+}
 export function clampRoadLevel(v){return Math.max(1,Math.min(MYSTERY_ROAD_TOTAL,Math.trunc(Number(v)||1)));}
 export function roadRegion(level){return ROAD_REGIONS[Math.floor((clampRoadLevel(level)-1)/ROAD_REGION_SIZE)];}
 export function roadRegionIndex(level){return Math.floor((clampRoadLevel(level)-1)/ROAD_REGION_SIZE);}
@@ -71,23 +90,32 @@ export function mountNatureRoad(container,{onPlay}={}){
  root.id='mahjong-nature-road';root.setAttribute('aria-label','Mystery Road visual campaign map');
  root.innerHTML=`
  <header class="nature-road-header"><div class="nature-road-identity"><span class="nature-road-kicker">THE LIVING MYSTERY ROAD · 20 GARDENS</span>
- <h3 id="nature-road-region">Daisy Lane</h3><p id="nature-road-flora"></p></div>
+ <h3 id="nature-road-region" tabindex="-1">Daisy Lane</h3><p id="nature-road-flora"></p></div>
  <span id="nature-road-creature" class="nature-road-creature" aria-hidden="true">🦋</span></header>
  <div class="nature-road-dashboard"><div><span>YOUR JOURNEY</span><strong id="nature-road-progress">0 / 5,000</strong></div>
  <div><span>WORLD COMPLETE</span><strong id="nature-road-percent">0%</strong></div>
  <div><span>QUALIFYING STREAK</span><strong id="nature-road-streak">0</strong></div>
  <div><span>NEXT GARDEN GATE</span><strong id="nature-road-next">250</strong></div></div>
  <progress id="nature-road-world-progress" max="5000" value="0" aria-label="Mystery Road world completion"></progress>
- <div class="nature-road-garden-title"><strong>20 very different botanical regions</strong><small>Tap a region to explore. You can only play your unlocked stage.</small></div>
+ <div class="nature-road-garden-title"><strong>YOUR ILLUSTRATED WORLD MAP</strong><small>One picture per region · 20 unique areas</small></div>
+ <div class="nature-road-area-picker"><button type="button" id="nature-road-area-prev" aria-label="Previous garden">‹</button>
+ <label for="nature-road-area-select">AREA <select id="nature-road-area-select" aria-label="Choose illustrated region"></select></label>
+ <button type="button" id="nature-road-area-next" aria-label="Next garden">›</button></div>
  <div class="nature-road-regions" id="nature-road-regions" role="group" aria-label="Browse botanical regions"></div>
  <div class="nature-road-stage-title"><div><span class="nature-road-kicker">WINDING GARDEN TRAIL</span>
  <strong id="nature-road-stage-heading">Levels 1–25</strong><small id="nature-road-stage-message">The next stepping stone is glowing.</small></div>
  <div class="nature-road-stage-nav"><button id="nature-road-prev" type="button" aria-label="View previous 25 levels">←</button>
  <button id="nature-road-home" type="button">My level</button>
  <button id="nature-road-next-page" type="button" aria-label="View next 25 levels">→</button></div></div>
- <div class="nature-road-landscape"><span class="nature-road-canopy nature-road-canopy-a" aria-hidden="true">🌿</span><span class="nature-road-canopy nature-road-canopy-b" aria-hidden="true">🌸</span>
- <svg id="nature-road-trail" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none"><path id="nature-road-trail-shadow" d="" fill="none" stroke-width="2.8" stroke-linecap="round"/><path id="nature-road-trail-line" d="" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="2.6 1.5"/></svg>
- <div id="nature-road-nodes" class="nature-road-nodes" role="group" aria-label="Levels in the currently viewed trail"></div></div>
+ <div class="nature-road-landscape" data-picture="0"><div id="nature-road-picture-host" class="nature-road-picture" aria-hidden="true"></div>
+ <svg id="nature-road-trail" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+ <path id="nature-road-trail-shadow" d="" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+ <path id="nature-road-trail-line" d="" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="2.6 1.5"/>
+ <path id="nature-road-trail-lit" d="" fill="none" stroke-width="2.6" stroke-linecap="round"/></svg>
+ <div id="nature-road-nodes" class="nature-road-nodes" role="group" aria-label="Levels along the illustrated trail"></div>
+ <span class="nature-road-map-stamp" aria-hidden="true">✦ FOLLOW THE GLOWING TRAIL ✦</span></div>
+ <div class="nature-road-rewards" role="status" aria-live="polite"><span class="nature-road-reward-icon" aria-hidden="true">🎁</span>
+ <span id="nature-road-reward-label">Your first Trail Star is waiting</span><strong id="nature-road-reward-count">0 earned</strong></div>
  <div class="nature-road-spotlight" role="status" aria-live="polite"><span id="nature-road-spotlight-icon" aria-hidden="true">🌼</span>
  <div><strong id="nature-road-spotlight-name">Level 1 · Bloom Walk</strong><small id="nature-road-spotlight-description">Choose a stage on the map.</small></div></div>
  <button type="button" id="nature-road-play" class="nature-road-play">▶ PLAY CURRENT LEVEL</button>
@@ -96,13 +124,25 @@ export function mountNatureRoad(container,{onPlay}={}){
  const $=sel=>root.querySelector(sel);
  let snapshot={level:1,cleared:0,streak:0,run:null},windowStart=1,focusLevel=1,initialized=false;
  const regionButtons=[];
+ const areaSelect=$('#nature-road-area-select');
+ let drawnRegion=-1;
  ROAD_REGIONS.forEach((r,i)=>{
   const b=button('nature-road-region-button',r.icon+' '+r.name);
   b.setAttribute('aria-label',r.name+', levels '+(i*250+1)+' through '+((i+1)*250));
   b.dataset.index=String(i);
   b.addEventListener('click',()=>{windowStart=i*250+1;focusLevel=windowStart;render();});
   $('#nature-road-regions').append(b);regionButtons.push(b);
+  const opt=create('option','',String(i+1).padStart(2,'0')+' · '+r.name);
+  opt.value=String(i);areaSelect.append(opt);
  });
+ function navigateToRegion(index){
+  const value=Math.max(0,Math.min(ROAD_REGIONS.length-1,Number(index)||0));
+  windowStart=value*ROAD_REGION_SIZE+1;focusLevel=windowStart;
+  render();
+ }
+ areaSelect.addEventListener('change',()=>navigateToRegion(areaSelect.value));
+ $('#nature-road-area-prev').addEventListener('click',()=>navigateToRegion(Number(areaSelect.value)-1));
+ $('#nature-road-area-next').addEventListener('click',()=>navigateToRegion(Number(areaSelect.value)+1));
  function selectStage(level){
   focusLevel=clampRoadLevel(level);
   const region=roadRegion(focusLevel),kind=roadEncounter(focusLevel),isCurrent=focusLevel===snapshot.level;
@@ -121,6 +161,15 @@ export function mountNatureRoad(container,{onPlay}={}){
   for(const [name,val] of [['--nature-sky',region.sky],['--nature-land',region.land],['--nature-ink',region.ink],['--nature-accent',region.accent]])
    root.style.setProperty(name,val);
   root.dataset.region=String(regionIndex);
+  areaSelect.value=String(regionIndex);
+  $('#nature-road-area-prev').disabled=regionIndex===0;
+  $('#nature-road-area-next').disabled=regionIndex===ROAD_REGIONS.length-1;
+  if(drawnRegion!==regionIndex){
+   drawnRegion=regionIndex;
+   const art=illustratedRegionMap(regionIndex,region);
+   $('#nature-road-picture-host').replaceChildren(art);
+   $('.nature-road-landscape').dataset.picture=String(regionIndex);
+  }
   $('#nature-road-region').textContent=region.flower+' '+region.name;
   $('#nature-road-flora').textContent=region.flora+' · '+region.fauna;
   $('#nature-road-creature').textContent=region.icon;
@@ -132,6 +181,13 @@ export function mountNatureRoad(container,{onPlay}={}){
   $('#nature-road-streak').textContent=count(snapshot.streak);
   $('#nature-road-next').textContent=count(progress.nextGate);
   $('#nature-road-world-progress').value=progress.cleared;
+  const keepsakes=roadKeepsakes(progress.cleared);
+  $('#nature-road-reward-count').textContent=count(keepsakes.earned)+' earned';
+  $('.nature-road-reward-icon').textContent=keepsakes.last?.icon||'🎁';
+  $('#nature-road-reward-label').textContent=keepsakes.next?
+   (keepsakes.last?'Last: '+keepsakes.last.name+' · ':'')+'Next reward: '+keepsakes.next.name+' at level '+count(keepsakes.next.level):
+   'All Trail Stars and garden keepsakes earned!';
+  root.dataset.rewardsEarned=String(keepsakes.earned);
   const currentRegion=roadRegionIndex(snapshot.level);
   regionButtons.forEach((b,i)=>{b.classList.toggle('is-current',i===currentRegion);b.classList.toggle('is-preview',i===regionIndex);
    b.classList.toggle('is-cleared',(i+1)*250<=snapshot.cleared);
@@ -144,6 +200,10 @@ export function mountNatureRoad(container,{onPlay}={}){
   $('#nature-road-next-page').disabled=windowStart>=MYSTERY_ROAD_TOTAL-24;
   const path=points.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
   $('#nature-road-trail-shadow').setAttribute('d',path);$('#nature-road-trail-line').setAttribute('d',path);
+  const glowing=points.filter(p=>p.n<=snapshot.cleared||p.n===snapshot.level);
+  const lit=glowing.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
+  $('#nature-road-trail-lit').setAttribute('d',lit);
+  root.dataset.trailLit=String(glowing.length);
   const host=$('#nature-road-nodes');host.replaceChildren();
   for(const p of points){
    const encounter=roadEncounter(p.n),done=p.n<=snapshot.cleared,current=p.n===snapshot.level;
@@ -151,9 +211,14 @@ export function mountNatureRoad(container,{onPlay}={}){
    b.style.setProperty('--nx',p.x+'%');b.style.setProperty('--ny',p.y+'%');
    b.dataset.state=done?'cleared':current?'current':'locked';
    b.dataset.kind=encounter.kind;b.dataset.level=String(p.n);
+   const souvenir=roadTrailKeepsake(p.n);
+   if(souvenir){b.dataset.reward=done?'earned':'upcoming';
+    b.setAttribute('title',souvenir.name+' · '+(done?'Earned':'Unlock by clearing level '+p.n));}
    b.setAttribute('aria-label','Level '+p.n+', '+encounter.name+', '+(done?'cleared':current?'play now':'locked'));
    b.setAttribute('aria-pressed',String(p.n===focusLevel));b.title='';
    const number=create('small','',count(p.n));b.append(number);
+   if(souvenir){const badge=create('span','nature-road-node-reward',done?'✓':'✦');
+    badge.setAttribute('aria-hidden','true');b.append(badge);}
    b.addEventListener('click',()=>{focusLevel=p.n;render();});
    host.append(b);
   }
