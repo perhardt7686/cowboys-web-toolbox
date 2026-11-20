@@ -5,7 +5,7 @@
 import {initialRetro,retroStep,retroReplay,alienAt,ghostsAt,RETRO_MAZE,RETRO_GAME_RULES} from './retro-arcade-engine.mjs?v=arcade2';
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {createRetroInput} from './retro-arcade-input.mjs?v=taps2';
-import {retroStickDirection,retroStickOffset,retroControlSlide} from './retro-arcade-joystick.mjs?v=cabinet2';
+import {createRetroCabinet} from './retro-arcade-cabinet-ui.mjs?v=cabinet1';
 import {createRetroLifecycle} from './retro-arcade-lifecycle.mjs?v=guard1';
 import {retroUnlocks,canEquipRetro,resolveRetroUnlock,retroCosmeticPalette} from './retro-game-unlockables.mjs?v=gear1';
 import {drawFleetWake,drawFleetGear,drawMazeFootprints,drawMazeGear} from './retro-unlock-art.mjs?v=gear1';
@@ -19,7 +19,7 @@ const GAMES=[
   title:'Mystery Maze',subtitle:'Find the clues · Dodge the wandering wisps'}
 ];
 let client,user=null,mounted=false,overview={mine:[],trophies:[],leaders:[]};
-let current=null,actions='',ticker=null,working=false,activeScene='play',gameMode='';
+let current=null,actions='',ticker=null,working=false,activeScene='play',gameMode='',manualPause=false;
 const input=createRetroInput();
 const lifecycle=createRetroLifecycle();
 let confirmed='',runId=null,renderTimer=null;
@@ -36,11 +36,32 @@ function el(name,cls,content){
  if(content!==undefined)node.textContent=String(content);
  return node;
 }
+function updateCabinetPause(){
+ document.querySelectorAll('[data-retro-pause]').forEach(button=>{
+  const active=Boolean(current&&current.game===button.dataset.retroPause&&!current.done);
+  button.disabled=!active||working;
+  button.textContent=manualPause&&active?'B · RESUME':'B · PAUSE';
+  button.setAttribute('aria-pressed',String(active&&manualPause));
+ });
+}
 function stopTimer(){
  if(ticker!==null){clearInterval(ticker);ticker=null;}
- input.reset();
- document.querySelectorAll('.retro-control.is-pressed,.retro-stick-knob.is-pressed')
+ input.reset();manualPause=false;
+ document.querySelectorAll('.retro-cabinet-stick.is-pressed,.retro-cabinet-action.is-pressed')
    .forEach(node=>node.classList.remove('is-pressed'));
+ updateCabinetPause();
+}
+function toggleCabinetPause(game){
+ if(!current||current.game!==game||current.done||working)return;
+ manualPause=!manualPause;input.clearHeld();
+ if(manualPause){
+  if(ticker!==null){clearInterval(ticker);ticker=null;}
+  status('PAUSED · Press B to resume. Your score and lives are safe.');
+ }else if(!document.hidden){
+  ticker=setInterval(tick,RETRO_GAME_RULES[game].interval);
+  status('Round resumed. Joystick to move; A for '+(game==='fleet'?'fire.':'brake.'));
+ }
+ updateCabinetPause();
 }
 function add(parent,...children){parent.append(...children);return parent;}
 function richButton(label,callback,cls=''){
@@ -194,103 +215,12 @@ function makeGame(game){
  canvas.width=game.id==='fleet'?540:450;canvas.height=game.id==='fleet'?540:450;
  canvas.setAttribute('role','img');
  canvas.tabIndex=0;
- canvas.setAttribute('aria-label',game.title+' live game canvas; use the buttons below or arrow keys');
+ canvas.setAttribute('aria-label',game.title+' playfield; use joystick and A/B buttons below or arrow keys');
  const info=el('div','retro-live-readout','SCORE 0 · LIVES 3');
- const controls=el('div','retro-controls');controls.dataset.retroGame=game.id;
- for(const [code,label] of game.id==='fleet'?
- [['L','◀ LEFT'],['F','FIRE ✦'],['R','RIGHT ▶']]:
- [['U','▲ UP'],['L','◀ LEFT'],['D','▼ DOWN'],['R','RIGHT ▶']]){
-  const control=richButton(label,event=>{
-   // Keyboard/assistive-technology button activation emits detail=0.
-   // Pointer taps are queued on pointerdown to avoid double actions.
-   if(event.detail===0&&current?.game===game.id)input.tap(game.id,code);
-  },'retro-control');
-  control.dataset.control=code;
-  control.setAttribute('aria-label',label);
-  control.style.touchAction='none';
-  let pointerId=null,activeCode=code;
-  control.addEventListener('pointerdown',e=>{
-   if(!current||current.game!==game.id||pointerId!==null)return;
-   e.preventDefault();
-   pointerId=e.pointerId;activeCode=code;
-   control.setPointerCapture?.(e.pointerId);
-   control.classList.add('is-pressed');
-   input.press(game.id,code);
-  });
-  control.addEventListener('pointermove',e=>{
-   if(pointerId!==e.pointerId||code==='F'||current?.game!==game.id)return;
-   const next=retroControlSlide(game.id,controls.getBoundingClientRect(),
-     e.clientX,e.clientY,activeCode);
-   if(next===activeCode)return;
-   input.release(activeCode);
-   const old=controls.querySelector('[data-control="'+activeCode+'"]');
-   old?.classList.remove('is-pressed');
-   activeCode=next;
-   input.press(game.id,activeCode);
-   controls.querySelector('[data-control="'+activeCode+'"]')?.classList.add('is-pressed');
-  });
-  function finishPointer(e,cancelled=false){
-   if(pointerId!==e.pointerId)return;
-   pointerId=null;
-   control.classList.remove('is-pressed');
-   controls.querySelector('[data-control="'+activeCode+'"]')?.classList.remove('is-pressed');
-   if(cancelled)input.cancel(activeCode);
-   else input.release(activeCode);
-   activeCode=code;
-  }
-  control.addEventListener('pointerup',e=>finishPointer(e));
-  control.addEventListener('pointercancel',e=>finishPointer(e,true));
-  control.addEventListener('lostpointercapture',e=>finishPointer(e));
-  // On browsers without capture, do not leave an indefinitely held button.
-  control.addEventListener('pointerleave',e=>{
-    if(!control.hasPointerCapture?.(e.pointerId))finishPointer(e);
-  });
-  control.addEventListener('blur',()=>{if(pointerId===null)control.classList.remove('is-pressed');});
-  controls.append(control);
- }
- if(game.id==='maze'){
-  // A physical-style joystick can be dragged in one gesture. Four explicit
-  // buttons remain for keyboard/screen-reader use and precise one-tile taps.
-  const stick=richButton('●',()=>{},'retro-stick-knob');
-  stick.setAttribute('aria-label','Drag joystick in any direction to steer the detective');
-  stick.setAttribute('title','Drag to steer; arrow buttons also work');
-  stick.style.touchAction='none';
-  let activePointer=null,lastDirection='N';
-  function moveStick(e){
-    if(activePointer!==e.pointerId||current?.game!=='maze')return;
-    const box=controls.getBoundingClientRect();
-    const dx=e.clientX-(box.left+box.width/2);
-    const dy=e.clientY-(box.top+box.height/2);
-    const dir=retroStickDirection(dx,dy);
-    const [x,y]=retroStickOffset(dx,dy);
-    stick.style.setProperty('--stick-x',x+'px');
-    stick.style.setProperty('--stick-y',y+'px');
-    if(dir!=='N'&&dir!==lastDirection){
-      if(lastDirection!=='N')input.release(lastDirection);
-      input.press('maze',dir);lastDirection=dir;
-    }
-  }
-  function releaseStick(e){
-    if(activePointer!==e.pointerId)return;
-    activePointer=null;
-    if(lastDirection!=='N')input.release(lastDirection);
-    lastDirection='N';
-    stick.classList.remove('is-pressed');
-    stick.style.setProperty('--stick-x','0px');
-    stick.style.setProperty('--stick-y','0px');
-  }
-  stick.addEventListener('pointerdown',e=>{
-    if(current?.game!=='maze'||activePointer!==null)return;
-    e.preventDefault();activePointer=e.pointerId;
-    stick.setPointerCapture?.(e.pointerId);
-    stick.classList.add('is-pressed');
-    moveStick(e);
-  });
-  stick.addEventListener('pointermove',moveStick);
-  for(const name of ['pointerup','pointercancel','lostpointercapture'])
-    stick.addEventListener(name,releaseStick);
-  controls.append(stick);
- }
+ const controls=createRetroCabinet({game:game.id,input,
+  isLive:kind=>Boolean(current?.game===game.id&&!current.done&&!working&&
+    (kind==='pause'||!manualPause)),
+  onPause:()=>toggleCabinetPause(game.id)});
  const begin=richButton('Start verified round',()=>void start(game.id),'retro-begin');
  const end=richButton('Leave round',()=>abandon(),'retro-end');
  const notification=el('p','retro-status','Choose Start to play. Family trophies are awarded from server-verified results.');
@@ -342,7 +272,7 @@ function renderScene(id,scene){
 }
 function actionForTick(game){return input.action(game,current);}
 function tick(){
- if(!current||working)return;
+ if(!current||working||manualPause)return;
  const action=actionForTick(current.game);
  actions+=action;
  try{current=retroStep(current,action);}catch(error){stopTimer();status(error.message,'error');return;}
@@ -373,8 +303,8 @@ async function start(id){
   if(!visible){abandon();return;}
   if(received.game!==id||!received.run_id)throw new Error('Unexpected game session');
   runId=received.run_id;current=initialRetro(id,received.seed);
-  actions='';input.reset();confirmed='';
-  renderGame(current);
+  actions='';input.reset();confirmed='';manualPause=false;
+  renderGame(current);updateCabinetPause();
   root.querySelector('.retro-canvas')?.focus({preventScroll:true});
   status('Round underway. Score stays unverified until the server checks your full run.');
   ticker=document.hidden?null:setInterval(tick,RETRO_GAME_RULES[id].interval);
@@ -393,7 +323,7 @@ async function start(id){
 function abandon(){
  const couldStillVerify=Boolean(working&&current?.done&&runId);
  lifecycle.invalidate();
- stopTimer();current=null;actions='';runId=null;working=false;
+ stopTimer();current=null;actions='';runId=null;working=false;updateCabinetPause();
  for(const g of GAMES){
   const root=$(g.root);if(!root)continue;
   root.querySelector('.retro-begin').disabled=false;
@@ -426,7 +356,7 @@ async function finish(){
  }finally{
   // Never clear a newer round started while an earlier finish was in flight.
   if(lifecycle.matches(ticket)){
-   working=false;runId=null;current=null;actions='';
+   working=false;runId=null;current=null;actions='';updateCabinetPause();
    for(const g of GAMES){
     const root=$(g.root);if(!root)continue;
     root.querySelector('.retro-begin').disabled=false;
@@ -532,13 +462,17 @@ function onKeyDown(event){
  // Gameplay buttons already map accessible keyboard clicks through tap().
  if(!current||event.repeat||
    document.activeElement?.closest?.('input,textarea,select,button,a,summary,[role="button"],[contenteditable="true"]'))return;
- const code=letters[event.code];if(!code)return;
- if(current.game==='maze'&&code==='F')return;
+ if(event.code==='KeyP'){event.preventDefault();toggleCabinetPause(current.game);return;}
+ const code=current.game==='maze'&&['Space','KeyJ'].includes(event.code)?
+  'B':letters[event.code];
+ if(!code)return;
  if(current.game==='fleet'&&['U','D'].includes(code))return;
- event.preventDefault();input.press(current.game,code);
+ event.preventDefault();if(!manualPause)input.press(current.game,code);
 }
 function onKeyUp(event){
- const code=letters[event.code];if(code)input.release(code);
+ const code=current?.game==='maze'&&['Space','KeyJ'].includes(event.code)?
+  'B':letters[event.code];
+ if(code)input.release(code);
 }
 async function verify(){
  const verification=++verifyEpoch;
@@ -595,7 +529,7 @@ async function boot(){
     if(current&&ticker!==null){clearInterval(ticker);ticker=null;
      status('Round paused while the page is hidden.');}
    }else{
-    if(current&&!current.done&&!working&&ticker===null){
+    if(current&&!current.done&&!working&&!manualPause&&ticker===null){
      ticker=setInterval(tick,RETRO_GAME_RULES[current.game].interval);
      status('Round resumed. Keep playing!');
     }
