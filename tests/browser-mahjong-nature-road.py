@@ -54,6 +54,8 @@ async def main():
     bounds=await root.bounding_box()
     assert bounds and bounds['width']<=width+1,(width,bounds)
     assert await root.locator('#nature-road-regions').evaluate('(el)=>el.scrollWidth>el.clientWidth')
+    assert await root.locator('#nature-road-trail-completed').get_attribute('d') is not None
+    await expect(root.locator('#nature-road-region-select')).to_have_value('4')
     await page.evaluate("""()=>window.__road.update({level:5000,cleared:5000,streak:5000,run:null})""")
     await expect(root.locator('#nature-road-percent')).to_have_text('100.00%')
     await expect(root.locator('#nature-road-region')).to_contain_text('Evergreen Sanctuary')
@@ -67,7 +69,12 @@ async def main():
       document.getElementById('mahjong-root').classList.add('arcade-game-active');
     }""")
     assert await root.is_visible(),'Full-screen arcade Levels view must expose journey map'
-    assert await page.locator('.mahjong-campaign').evaluate('(el)=>getComputedStyle(el).overflowY')=='auto'
+    assert await page.locator('.mahjong-campaign').evaluate('(el)=>getComputedStyle(el).overflowY')=='hidden'
+    assert await root.locator('#nature-road-region-select').count()==1
+    await root.locator('#nature-road-region-select').select_option('19')
+    await expect(root.locator('#nature-road-region')).to_contain_text('Evergreen Sanctuary')
+    assert await root.locator('#nature-road-region-select').input_value()=='19'
+    await root.locator('#nature-road-home').click()
     await page.emulate_media(reduced_motion='reduce')
     assert await root.locator('.nature-road-creature').evaluate('(el)=>getComputedStyle(el).animationName')=='none'
     # The fullscreen compositor migrates the real game into its own shell.
