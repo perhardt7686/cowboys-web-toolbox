@@ -88,8 +88,18 @@ async def main():
     frame_details=await root.evaluate("""el=>({
       box:el.getBoundingClientRect().toJSON(),
       display:getComputedStyle(el).display,
-      parent:el.parentElement?.getBoundingClientRect().toJSON()
+      parent:el.parentElement?.getBoundingClientRect().toJSON(),
+      ancestry:[el,el.parentElement,el.parentElement?.parentElement,el.parentElement?.parentElement?.parentElement]
+       .filter(Boolean).map(e=>({tag:e.tagName,id:e.id,className:e.className,
+         display:getComputedStyle(e).display,height:getComputedStyle(e).height,
+         visibility:getComputedStyle(e).visibility,
+         hidden:e.hidden,mode:document.getElementById('mahjong-root')?.dataset.mahjongMode})),
+      body:{classes:document.body.className,scene:document.body.dataset.arcadeScene,
+       game:document.body.dataset.arcadeGame}
     })""")
+    if not await root.is_visible():
+     (ROOT/'reports').mkdir(exist_ok=True)
+     await page.screenshot(path=str(ROOT/'reports'/f'mahjong-nature-road-hidden-{width}.png'),full_page=False)
     assert await root.is_visible(),('Full-screen Arcade Levels must show map',frame_details)
     assert frame_details['box']['height']>=240,frame_details
     heights=await page.locator('.mahjong-campaign').evaluate("""el=>({
