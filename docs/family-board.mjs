@@ -169,6 +169,15 @@ export function createFamilyBoard() {
         window.dispatchEvent(new CustomEvent('family-unified-scoreboard',{
           detail:{member:memberId,games:rankGames,plateAccess:result.plate_access,asOf:result.as_of}
         }));
+        // Activity is sourced from saved server-side play events. It is not
+        // inferred from opening the scoreboard, which would fake recency.
+        void Promise.resolve().then(()=>client.rpc('community_family_arcade_activity'))
+          .then(({data:activity,error})=>{
+            if(!active()||error||!activity?.games)return;
+            window.dispatchEvent(new CustomEvent('family-arcade-recent-activity',{
+              detail:{member:memberId,games:activity.games,asOf:activity.asOf}
+            }));
+          }).catch(()=>{ /* Leave verified rankings intact if activity is unavailable. */ });
         paintButtonSummaries();
         // Read-only adapters for the other two ranked family games. No scores are
         // fabricated or compared between incompatible metrics.
