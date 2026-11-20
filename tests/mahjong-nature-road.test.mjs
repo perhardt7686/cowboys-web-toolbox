@@ -85,7 +85,7 @@ test('mobile-first map has accessible colors, no art dependency or forced motion
  assert.match(css,/\.nature-road-region-button/);
  assert.match(css,/overflow-x:auto/);
  assert.match(css,/max-height:100%!important/);
- assert.match(html,/mahjong-nature-road\.css\?v=nature1/);
+ assert.match(html,/mahjong-nature-road\.css\?v=nature2/);
  assert.match(profile,/progress\.max=5000/);
  assert.match(profile,/campaign_5000/);
 });
