@@ -196,7 +196,13 @@ async def run_device(browser,width,height):
   assert await page.locator("#arcade-program-grid").is_hidden()
   assert await page.locator("#coco-cast-strip").is_hidden(),"Portrait strip should not appear"
   assert await page.locator("#legacy-family-room").count()==0,"Legacy family panel must be removed"
-  assert await page.locator(".family-reading-bar #family-read-toggle").is_visible(),"Reading comfort should survive"
+  # Reading Comfort has intentionally moved into a compact collapsed toolbar menu.
+  menu=page.locator('#family-reading-menu')
+  assert await menu.locator('summary').is_visible(),"Reading comfort dropdown should survive"
+  assert await menu.locator('#family-read-toggle').is_hidden(),"Reading controls should not cover the board"
+  await menu.locator('summary').click()
+  assert await menu.locator('#family-read-toggle').is_visible(),"Reading comfort remains accessible"
+  await menu.locator('summary').click()
   await page.evaluate("""() => {
     const obsolete=document.createElement('section');
     obsolete.className='family-room';obsolete.id='reinserted-family-room';
