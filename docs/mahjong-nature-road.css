@@ -403,3 +403,20 @@ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
  body.community-page #mahjong-journey-mini-map.mahjong-map-hero-button,
  body.community-page .turtle-mode-tabs button[data-mode=road]{animation:none!important}
 }
+
+
+body.community-page .nature-road-bonus-award{
+ flex:0 0 auto;background:#2b7252;color:#fff9d5;
+ border:2px solid #f0d26c;border-radius:999px;
+ padding:5px 8px;font:900 clamp(10px,1.8vw,12px)/1.2 system-ui;
+ box-shadow:0 0 12px #ecc84b80
+}
+body.community-page .nature-road-bonus-award[hidden]{display:none!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ .nature-road-bonus-award{font-size:9px;padding:3px 5px}
+@media(max-width:430px){
+ body.community-page .nature-road-rewards{flex-wrap:wrap}
+ body.community-page .nature-road-bonus-award{width:100%;text-align:center}
+ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ .nature-road-bonus-award{width:auto}
+}
