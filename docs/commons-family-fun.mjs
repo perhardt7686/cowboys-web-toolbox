@@ -3,6 +3,7 @@
  * Never compare incompatible score units or grant cosmetics from a client score.
  */
 import {retroUnlocks} from './retro-game-unlockables.mjs?v=gear1';
+import {sortGamesByRecent,mostRecentGame,formatEasternStamp,readGameActivity} from './family-arcade-activity.mjs';
 export const FAMILY_FUN_GAMES=Object.freeze([
  {id:'streetrod',name:'Street Rod',toggle:'sr-toggle',source:'family',key:'hotrod',unit:'career points',mark:'▣'},
  {id:'dashforge',name:'Dash Forge',toggle:'dash-forge-toggle',source:'game',unit:'runner points',mark:'◆'},
@@ -17,7 +18,7 @@ export const FAMILY_FUN_GAMES=Object.freeze([
  {id:'study',name:'7A Study Cards',toggle:'vdacs-study-toggle',source:'personal',unit:'learning progress',mark:'▨'}
 ]);
 let selected='all',root=null,hostMenu=null,member=null;
-let family=null,retro=null,extra=Object.create(null);
+let family=null,retro=null,extra=Object.create(null),activity=Object.create(null),activityAt=null;
 const $=id=>document.getElementById(id);
 const el=(tag,cls,txt)=>{
  const node=document.createElement(tag);if(cls)node.className=cls;
@@ -34,11 +35,11 @@ function sanitizeEntries(entries){
 }
 function freshOwner(id){
  if(!id||typeof id!=='string')return false;
- if(member&&member!==id){family=null;retro=null;extra=Object.create(null);}
+ if(member&&member!==id){family=null;retro=null;extra=Object.create(null);activity=Object.create(null);activityAt=null;}
  member=id;return true;
 }
 function clearAll(){
- member=null;family=null;retro=null;extra=Object.create(null);render();
+ member=null;family=null;retro=null;extra=Object.create(null);activity=Object.create(null);activityAt=null;render();
 }
 function getData(game){
  if(!member)return {state:'login',entries:[]};
@@ -118,17 +119,33 @@ export function mountFamilyFun(menu){
  dock();render();
 }
 function renderAll(content){
- const intro=el('p','family-fun-intro','Each title keeps its own verified score rules. Select one for standings and rewards.');
+ const intro=el('p','family-fun-intro','Most recently played game first. Standings remain separate for each title.');
  content.append(intro);
  const rows=el('div','family-fun-all-games');
- for(const game of FAMILY_FUN_GAMES){
-  const info=getData(game),leader=info.entries[0];
-  const card=el('button','family-fun-game-chip');
+ const newest=mostRecentGame(FAMILY_FUN_GAMES,activity);
+ for(const game of sortGamesByRecent(FAMILY_FUN_GAMES,activity)){
+  const info=getData(game),leader=info.entries[0],recent=activity[game.id];
+  const featured=newest?.id===game.id;
+  const card=el('button','family-fun-game-chip'+(featured?' is-most-recent':''));
   card.type='button';card.dataset.familyFunGame=game.id;
-  card.setAttribute('aria-label',game.name+', '+(leader?'leader '+leader.name+', '+Number(leader.score).toLocaleString()+' '+game.unit:sourceText(info.state)));
-  const name=el('strong','',game.mark+' '+game.name);
-  const score=el('span','',leader?leader.name+' · '+Number(leader.score).toLocaleString():sourceText(info.state));
-  card.append(name,score);
+  card.dataset.lastPlayed=recent?.lastPlayedAt||'';
+  if(featured)card.dataset.mostRecent='true';
+  card.setAttribute('aria-label',game.name+
+   (recent?.lastPlayedAt?', last played '+formatEasternStamp(recent.lastPlayedAt)+' by '+recent.lastPlayer:
+    ', no verified recent play'));
+  const heading=el('div','family-fun-chip-header');
+  heading.append(el('strong','',game.mark+' '+game.name));
+  if(featured)heading.append(el('b','family-fun-latest-tag','LATEST PLAY'));
+  card.append(heading);
+  card.append(el('span','family-fun-chip-leader',
+   leader?'LEADER '+leader.name+' · '+Number(leader.score).toLocaleString()+' '+game.unit:sourceText(info.state)));
+  if(recent?.lastPlayedAt){
+   const when=el('time','family-fun-chip-time','PLAYED '+formatEasternStamp(recent.lastPlayedAt));
+   when.dateTime=recent.lastPlayedAt;card.append(when);
+   card.append(el('small','family-fun-chip-activity',
+    'By '+recent.lastPlayer+' · '+Number(recent.actionsToday).toLocaleString()+' family actions today'));
+  }else card.append(el('small','family-fun-chip-activity',
+   game.source==='personal'?'No linked play-history feed':'No recorded play yet'));
   card.addEventListener('click',()=>{selected=game.id;render();});
   rows.append(card);
  }
@@ -225,5 +242,13 @@ window.addEventListener('family-arcade-game-rankings',event=>{
 window.addEventListener('family-retro-gear-changed',event=>{
  if(!retro||!event.detail?.game)return;
  retro={...retro,equipped:{...retro.equipped,[event.detail.game]:event.detail.id}};
+ render();
+});
+
+window.addEventListener('family-arcade-recent-activity',event=>{
+ const data=event.detail;
+ if(!freshOwner(data?.member)||!data?.games)return;
+ activity=readGameActivity(data);
+ activityAt=typeof data.asOf==='string'?data.asOf:null;
  render();
 });
