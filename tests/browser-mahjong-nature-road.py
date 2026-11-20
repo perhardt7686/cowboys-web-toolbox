@@ -10,8 +10,8 @@ async def main():
  async with async_playwright() as playwright:
   browser=await playwright.chromium.launch(headless=True)
   try:
-   for width in (375,390,430,768):
-    page=await browser.new_page(viewport={'width':width,'height':844},has_touch=True,device_scale_factor=1)
+   for width,height in ((375,667),(390,844),(430,932),(768,1024)):
+    page=await browser.new_page(viewport={'width':width,'height':height},has_touch=True,device_scale_factor=1)
     errors=[]
     page.on('pageerror',lambda e:errors.append(str(e)))
     await page.goto(URL,wait_until='domcontentloaded',timeout=30000)
@@ -75,6 +75,14 @@ async def main():
     await expect(root.locator('#nature-road-region')).to_contain_text('Evergreen Sanctuary')
     assert await root.locator('#nature-road-region-select').input_value()=='19'
     await root.locator('#nature-road-home').click()
+    await page.wait_for_timeout(80)
+    sizes=await page.evaluate("""()=>{
+      const box=sel=>{const n=document.querySelector(sel);const r=n.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,client:n.clientHeight,scroll:n.scrollHeight};};
+      return {windowHeight:innerHeight,windowWidth:innerWidth,campaign:box('.mahjong-campaign'),road:box('#mahjong-nature-road'),map:box('.nature-road-landscape'),play:box('#nature-road-play')};
+    }""")
+    assert sizes['play']['bottom']<=sizes['windowHeight']+2,('Play button below visible screen',width,height,sizes)
+    assert sizes['map']['right']<=sizes['windowWidth']+2,('Landscape exceeds screen width',width,height,sizes)
+    assert sizes['road']['scroll']<=sizes['road']['client']+3,('Road has hidden vertical content',width,height,sizes)
     await page.emulate_media(reduced_motion='reduce')
     assert await root.locator('.nature-road-creature').evaluate('(el)=>getComputedStyle(el).animationName')=='none'
     # The fullscreen compositor migrates the real game into its own shell.
