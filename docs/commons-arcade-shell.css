@@ -224,7 +224,10 @@ body.community-page.arcade-on :is(.mahjong-hud,.mahjong-actions,.mahjong-view-to
  flex:0 0 auto!important;margin:0!important
 }
 body.community-page.arcade-on :is(.mahjong-head,.mahjong-pan-help,.mahjong-footnote){display:none!important}
-body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels] #mahjong-inside > .mahjong-campaign{display:grid!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels] #mahjong-inside > .mahjong-campaign{
+ display:flex!important;flex-direction:column;min-height:0;height:100%;
+ max-height:100%;overflow:hidden!important
+}
 body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=scores] #mahjong-inside > .mahjong-bottom,
 body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=badges] #mahjong-inside > .mahjong-bottom{
  display:block!important;overflow:auto!important;min-height:0;height:100%;padding:10px
