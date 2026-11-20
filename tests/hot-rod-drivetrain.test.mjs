@@ -86,3 +86,17 @@ test('legacy races remain on original physics, even after v2 clients and backend
   assert.ok(upgraded.player.throttle>0,'Opt-in v2 uses progressive pedal travel');
   assert.equal(prior.player.gear,upgraded.player.gear);
 });
+
+
+test('pre-upgrade 1963 stock-car trace retains its exact legacy physics fingerprint',()=>{
+  const cfg=contract();delete cfg.physicsVersion;
+  const race=createRace(cfg);race.greenAt=0;
+  for(let i=0;i<110;i++)stepRace(race,INPUT.gas|(i===0?INPUT.up:0));
+  // Measured against the original production simulator before this change.
+  const expected={speed:15.386926361780858,distance:41.81541893963826,
+    engine:4849.402511099823,wear:0.6935167657943797,gear:1};
+  for(const [key,value] of Object.entries(expected)){
+    assert.ok(Math.abs(race.player[key]-value)<1e-9,
+      'Old browser race replay changed '+key+': '+race.player[key]);
+  }
+});
