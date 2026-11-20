@@ -371,6 +371,9 @@ export function startRace(previous, action, context) {
     patrol:kind === 'road' && context.seed % 8 === 0 && rival.tier < 8,
     reaction:rival.reaction, skill:rival.skill,
   };
+  // Only upgraded clients request version 2. Existing tabs and in-progress
+  // campaigns remain on the original deterministic simulation.
+  if(action.physicsVersion===2)state.race.physicsVersion=2;
   return {state, message:rival.line};
 }
 
