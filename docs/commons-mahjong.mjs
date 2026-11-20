@@ -3,8 +3,8 @@ import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
 import {isTileFree,countLegalPairs,adjacentMahjongTile} from './mahjong-moves.mjs?v=keyboard1';
 import {visualForTile} from './mahjong-kids-palette.mjs?v=kid7';
 import {addClassicTileArtwork,classicFaceForTile,playMahjongSound} from './mahjong-classic-tiles.mjs?v=classic1';
-import {mountClassicTurtle} from './mahjong-turtle-ui.mjs?v=turtle2';
-import {mountNatureRoad,MYSTERY_ROAD_TOTAL,roadRegion,roadEncounter} from './mahjong-nature-road.mjs?v=nature1';
+import {mountClassicTurtle} from './mahjong-turtle-ui.mjs?v=turtle3';
+import {mountNatureRoad,MYSTERY_ROAD_TOTAL,roadRegion,roadEncounter} from './mahjong-nature-road.mjs?v=nature2';
 import {celebrateMahjong} from './mahjong-classic-awards.mjs';
 const board=document.getElementById('conversations');
 const config=window.COWBOY_COMMUNITY_CONFIG;
@@ -98,7 +98,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
     <div class="commons-score-tile is-live"><span class="commons-score-label">CURRENT RUN</span><strong id="mahjong-ribbon-current">…</strong><small id="mahjong-ribbon-current-note">No game in progress</small></div>
    </section>
    <div class="mahjong-head"><div><div class="mahjong-kicker">THE COMMONS · MYSTERY MACHINE EDITION</div><h2>Mahjong Solitaire</h2><p>Match two identical free tiles with the same sun or flower corner. A tile is free if nothing covers it and either horizontal side is open. Switch between traditional-style ivory tiles and the colorful family set. Hint highlights a matching pair.</p></div><div class="mahjong-award">🏆 <span>High scores & badges</span></div></div>
-   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 1,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 5000</strong></div>
+   <section class="mahjong-campaign" aria-label="Mahjong campaign"><div class="mahjong-campaign-heading"><div><span class="mahjong-kicker">THE 5,000-LEVEL MYSTERY ROAD</span><h3 id="mahjong-level-name">Your next adventure</h3></div><strong id="mahjong-level-number">Level 1 / 5000</strong></div>
    <div id="mahjong-nature-map-host"></div>
    <progress id="mahjong-progress" max="5000" value="0" aria-label="Mystery Road levels completed"></progress><div class="mahjong-campaign-line" id="mahjong-level-rules"></div><div class="mahjong-campaign-line" id="mahjong-level-streak"></div><p id="mahjong-campaign-goal">Twenty living gardens await, with the Evergreen Crown at level 5,000.</p><details id="mahjong-level-browser"><summary id="mahjong-browse-level">Browse campaign levels</summary><form id="mahjong-level-form"><label>Level <input name="level" type="number" required min="1" max="5000" value="1"></label><button type="submit">See level rules</button></form><p id="mahjong-lookup-result" role="status">Campaign stages unlock in order.</p></details></section>
    <div id="mahjong-stats" class="mahjong-stats" aria-live="polite"></div>
