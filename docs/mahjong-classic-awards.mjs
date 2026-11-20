@@ -30,6 +30,14 @@ for(const [kind,name] of [['dragon','Dragon Whisperer'],['wind','Wind Reader'],[
  ladder('face-'+kind,name,kind+'Pairs',[1,5,10,25,50,100,250,1000]);
 for(const [i,seconds] of [1800,1200,900,720,600,480,360,300,240,180,150,120].entries())
  record('speed-'+seconds,'Time Bender '+seconds+'s','Clear 144 tiles in '+seconds+' seconds or less.','speed','bestWinSeconds',seconds,i,'seconds');
+/* Turtle-only mastery rituals are verified from full, completed 72-pair deals.
+ * No Mystery Road stages, server medals or campaign milestones are involved. */
+for(const [kind,name] of [['dragon','Dragon'],['wind','Wind'],['flower','Flower'],['season','Season'],['bamboo','Bamboo'],['circles','Circle'],['characters','Character']]){
+ record('ritual-open-'+kind,name+' Overture','Finish a full 144-tile board after opening with a '+name.toLowerCase()+' pair.','turtle-ritual','ritualOpen_'+kind,1,4);
+ record('ritual-close-'+kind,name+' Finale','Finish a full 144-tile board with a '+name.toLowerCase()+' pair as the final match.','turtle-ritual','ritualClose_'+kind,1,6);
+}
+record('ritual-fourfold','Fourfold Overture','Complete a board after matching four different tile families in the first four pairs.','turtle-ritual','ritualFourfold',1,8);
+record('ritual-sevenfold','Seven-Family Symphony','Complete a board after matching all seven tile families during the opening twelve pairs.','turtle-ritual','ritualSevenfold',1,10);
 export const CLASSIC_AWARDS=Object.freeze(catalogue);
 export const CLASSIC_AWARD_COUNT=CLASSIC_AWARDS.length;
 export const AWARD_GRADES=Object.freeze(GRADES);

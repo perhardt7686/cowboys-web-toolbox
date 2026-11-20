@@ -1,0 +1,288 @@
+/* Mahjong one-screen pass: a measured play viewport, not a nested scrolling page.
+ * Original family saves, RPCs, Classic layouts, and all twenty regions are unchanged. */
+body.community-page .turtle-rewards-drawer{
+ border:2px solid #c7a86c;border-radius:12px;margin:7px 0;
+ background:#fff4d9;color:#2d4538;min-width:0
+}
+body.community-page .turtle-rewards-summary{
+ display:block;cursor:pointer;padding:9px 11px;
+ font:900 clamp(11px,2.8vw,14px)/1.2 system-ui,sans-serif;
+ letter-spacing:.015em;list-style:revert
+}
+body.community-page .turtle-rewards-summary:focus-visible{outline:3px solid #7744a8;outline-offset:2px}
+body.community-page .turtle-rewards-drawer .turtle-bottom{margin:5px;padding:4px}
+body.community-page .turtle-rewards-drawer .turtle-awards{margin:5px;padding:9px}
+/* FIT really means fit. Panning is a deliberate magnification choice. */
+body.community-page .turtle-board-scroll:not(.is-magnified){
+ overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:manipulation
+}
+body.community-page .turtle-board-scroll.is-magnified{overflow:auto;display:block}
+body.community-page .turtle-tile .turtle-hanzi{
+ font-size:clamp(10px,calc(var(--turtle-tile-size,40px)*.64),50px)
+}
+body.community-page .turtle-tile .turtle-number{
+ font-size:clamp(10px,calc(var(--turtle-tile-size,40px)*.5),38px)
+}
+body.community-page .turtle-tile .turtle-unit{
+ font-size:clamp(7px,calc(var(--turtle-tile-size,40px)*.3),22px)
+}
+/* Region dropdown replaces scrolling through twenty tabs in the Arcade.
+ * All twenty are still browseable and only the authorized stage is playable. */
+body.community-page .nature-road-region-picker{
+ display:grid;gap:3px;flex:0 0 auto;min-width:0;
+ font:850 10px/1.15 system-ui,sans-serif;color:var(--nature-ink)
+}
+body.community-page .nature-road-region-picker select{
+ display:block;width:clamp(110px,31vw,210px);min-width:0;min-height:36px;
+ padding:4px 7px;border:2px solid var(--nature-land);border-radius:9px;
+ background:#fffef5;color:#243d31;font:850 12px/1.2 system-ui,sans-serif
+}
+body.community-page .nature-road-region-picker select:focus-visible{
+ outline:3px solid #7744a8;outline-offset:2px
+}
+body.community-page .nature-road-scenery{
+ position:absolute;z-index:0;pointer-events:none;user-select:none;
+ opacity:.46;font-size:clamp(31px,7vw,65px);
+ filter:drop-shadow(0 4px 3px #314a3f38)
+}
+body.community-page .nature-road-scenery-a{top:14%;left:35%}
+body.community-page .nature-road-scenery-b{bottom:14%;right:25%}
+body.community-page #nature-road-trail-completed{
+ stroke:#e3ff8d;filter:drop-shadow(0 0 2px #317348);
+ stroke-linejoin:round
+}
+body.community-page .nature-road-landscape{
+ background:
+ radial-gradient(ellipse 23% 35% at 18% 66%,#ffefab89,transparent),
+ radial-gradient(ellipse 37% 32% at 84% 28%,#fff7d3a1,transparent),
+ repeating-linear-gradient(154deg,#ffffff0c 0 8px,transparent 8px 24px),
+ radial-gradient(ellipse 43% 38% at 73% 70%,var(--nature-sky),transparent),
+ linear-gradient(145deg,var(--nature-sky),var(--nature-land))
+}
+/* The Arcade header has already reserved its safe-area/top chrome. */
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] #mahjong-inside > .mahjong-campaign{
+ display:flex!important;flex-direction:column!important;
+ flex:1 1 auto!important;min-height:0!important;max-height:100%!important;height:auto!important;
+ overflow:hidden!important;overscroll-behavior:none!important;
+ box-sizing:border-box!important;margin:0!important;padding:3px 4px!important;gap:3px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .mahjong-campaign-heading,
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .mahjong-campaign > :is(progress,#mahjong-level-streak,#mahjong-campaign-goal,#mahjong-level-browser){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] #mahjong-level-rules{
+ display:block!important;flex:0 0 auto!important;min-height:0!important;max-height:24px!important;
+ margin:0!important;padding:3px 5px!important;overflow:hidden!important;
+ font:750 10px/1.15 system-ui,sans-serif!important;text-overflow:ellipsis
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] #mahjong-nature-map-host{
+ display:flex!important;flex:1 1 auto!important;min-height:0!important;
+ width:100%!important;max-width:100%!important;overflow:hidden!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .mahjong-nature-road{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:auto auto 6px auto minmax(110px,1fr) auto auto!important;
+ flex:1 1 auto!important;min-height:0!important;max-height:100%!important;
+ height:100%!important;width:100%!important;
+ margin:0!important;padding:5px!important;gap:3px!important;
+ overflow:hidden!important;border-width:2px!important;border-radius:12px!important;
+ box-sizing:border-box!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-header{
+ display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+ padding:4px 6px!important;min-height:41px!important;gap:6px!important;border-radius:9px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-header h3{
+ font:900 clamp(14px,3.2vw,22px)/1.05 Georgia,serif!important;
+ margin:1px 0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-kicker{
+ font-size:8px!important;letter-spacing:.02em!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-header p{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-creature{
+ font-size:clamp(19px,4vw,30px)!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-region-picker select{
+ width:clamp(110px,30vw,180px)!important;min-height:33px!important;height:33px!important;
+ font-size:11px!important;padding:3px 5px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-dashboard{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ margin:0!important;gap:3px!important;min-height:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-dashboard>div{
+ padding:3px!important;gap:1px!important;border-width:1px!important;min-height:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-dashboard span{
+ font:800 clamp(7px,1.5vw,9px)/1.1 system-ui,sans-serif!important;letter-spacing:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-dashboard strong{
+ font:950 clamp(11px,2.2vw,16px)/1.05 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] #nature-road-world-progress{
+ height:6px!important;min-height:0!important;margin:0!important;border:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] :is(.nature-road-garden-title,.nature-road-regions,.nature-road-footnote){
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-stage-title{
+ display:flex!important;align-items:center!important;flex-wrap:nowrap!important;
+ margin:0!important;padding:2px 3px!important;gap:4px!important;min-height:34px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-stage-title strong{
+ font:900 clamp(12px,2.6vw,17px)/1.05 Georgia,serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-stage-title small{display:none!important}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-stage-nav button{
+ min-height:32px!important;height:32px!important;min-width:32px!important;padding:2px 5px!important;
+ font-size:11px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-landscape{
+ min-height:0!important;max-height:none!important;height:100%!important;
+ margin:0!important;border:2px solid #b59867!important;border-radius:12px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-node{
+ width:clamp(29px,8.7vw,44px)!important;height:clamp(29px,8.7vw,44px)!important;
+ font-size:clamp(12px,3vw,19px)!important;border-width:2px!important;
+ box-shadow:0 2px 0 #274934,0 2px 4px #122c2570!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-node small{
+ font:850 clamp(8px,1.8vw,10px)/1.05 system-ui,sans-serif!important;
+ margin-top:1px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-canopy{
+ font-size:clamp(28px,6vw,50px)!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-spotlight{
+ display:flex!important;align-items:center!important;min-height:36px!important;max-height:50px!important;
+ padding:3px 8px!important;margin:0!important;gap:6px!important;border-width:1px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] #nature-road-spotlight-icon{font-size:22px!important}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-spotlight strong{
+ font:900 12px/1.1 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-spotlight small{
+ font:700 10px/1.15 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-play{
+ min-height:43px!important;height:43px!important;max-height:43px!important;
+ padding:5px!important;border-width:2px!important;border-radius:9px!important;
+ font:950 clamp(13px,3vw,18px)/1.15 system-ui,sans-serif!important;
+ box-shadow:0 2px 0 #224b42!important
+}
+/* Classic Turtle is one screen while the award drawer is closed. The tile
+ * arrangement scales to the available height and width, not just width. */
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-root[data-mahjong-mode="turtle"] #mahjong-inside > #mahjong-classic-root{
+ display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+ height:auto!important;min-height:0!important;max-height:100%!important;overflow:hidden!important;
+ padding:2px 4px!important;margin:0!important;gap:3px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-heading{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-modes{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:4px!important;margin:0!important;flex:0 0 auto!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-modes button{
+ min-height:32px!important;height:32px!important;padding:3px!important;font-size:11px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options{
+ display:grid!important;grid-template-columns:minmax(0,1.8fr) repeat(2,minmax(0,1fr))!important;
+ align-items:end!important;gap:4px!important;margin:0!important;flex:0 0 auto!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options label{
+ min-width:0!important;flex:auto!important;gap:2px!important;font-size:9px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-options :is(select,button){
+ min-width:0!important;width:100%!important;height:34px!important;min-height:34px!important;
+ padding:2px 4px!important;font:850 clamp(9px,2vw,12px)/1.1 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-hud{
+ display:flex!important;flex-wrap:nowrap!important;gap:3px!important;min-height:25px!important;
+ padding:2px 4px!important;flex:0 0 auto!important;
+ font-size:clamp(9px,2vw,12px)!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-hud strong{
+ font-size:clamp(11px,2.4vw,14px)!important;white-space:nowrap
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-hud span{
+ padding:2px 3px!important;white-space:nowrap
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root #turtle-available{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-table{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-height:0!important;overflow:hidden!important;gap:3px!important;padding:4px!important;
+ margin:0!important;border-width:3px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-board-tools{
+ display:flex!important;flex-wrap:nowrap!important;min-height:32px!important;
+ flex:0 0 auto!important;gap:4px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-board-tools button{
+ min-height:31px!important;height:31px!important;min-width:34px!important;
+ padding:2px 5px!important;font-size:11px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root #turtle-zoom-hint{
+ display:none!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-board-scroll{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:1 1 auto!important;min-height:0!important;max-height:none!important;
+ height:auto!important;width:100%!important;padding:0!important;
+ overflow:hidden!important;touch-action:manipulation!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-board-scroll.is-magnified{
+ display:block!important;overflow:auto!important;touch-action:pan-x pan-y!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions{
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ flex:0 0 auto!important;gap:3px!important;margin:0!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-actions button{
+ min-width:0!important;min-height:33px!important;height:33px!important;
+ padding:2px!important;box-shadow:none!important;
+ font:850 clamp(9px,2.15vw,12px)/1.05 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-status{
+ flex:0 0 auto!important;white-space:nowrap!important;text-overflow:ellipsis!important;
+ overflow:hidden!important;min-height:0!important;max-height:17px!important;
+ margin:0!important;padding:1px 3px!important;
+ font:750 10px/1.2 system-ui,sans-serif!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-rewards-drawer{
+ flex:0 0 auto!important;max-height:40%!important;overflow:auto!important;
+ margin:0!important;border-width:1px!important
+}
+body.community-page.arcade-on[data-arcade-game="mahjong"] #mahjong-classic-root .turtle-rewards-summary{
+ padding:6px 9px!important;min-height:27px!important;
+ font-size:clamp(10px,2vw,13px)!important
+}
+@media(max-width:430px){
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-identity{
+  min-width:0!important;flex:1 1 auto!important
+ }
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-creature{
+  display:none!important
+ }
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-region-picker select{
+  width:116px!important
+ }
+}
+@media(max-height:625px){
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-dashboard>div:nth-child(n+3){display:none!important}
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-header{min-height:35px!important}
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-node{
+  width:clamp(23px,7.3vw,35px)!important;height:clamp(23px,7.3vw,35px)!important
+ }
+ body.community-page.arcade-on[data-arcade-game="mahjong"][data-arcade-scene="levels"] .nature-road-landscape{border-width:1px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .nature-road-scenery{transition:none!important}
+}

@@ -72,6 +72,7 @@ export function mountNatureRoad(container,{onPlay}={}){
  root.innerHTML=`
  <header class="nature-road-header"><div class="nature-road-identity"><span class="nature-road-kicker">THE LIVING MYSTERY ROAD · 20 GARDENS</span>
  <h3 id="nature-road-region">Daisy Lane</h3><p id="nature-road-flora"></p></div>
+ <label class="nature-road-region-picker">GARDEN <select id="nature-road-region-select" aria-label="Choose one of twenty botanical regions"></select></label>
  <span id="nature-road-creature" class="nature-road-creature" aria-hidden="true">🦋</span></header>
  <div class="nature-road-dashboard"><div><span>YOUR JOURNEY</span><strong id="nature-road-progress">0 / 5,000</strong></div>
  <div><span>WORLD COMPLETE</span><strong id="nature-road-percent">0%</strong></div>
@@ -86,7 +87,8 @@ export function mountNatureRoad(container,{onPlay}={}){
  <button id="nature-road-home" type="button">My level</button>
  <button id="nature-road-next-page" type="button" aria-label="View next 25 levels">→</button></div></div>
  <div class="nature-road-landscape"><span class="nature-road-canopy nature-road-canopy-a" aria-hidden="true">🌿</span><span class="nature-road-canopy nature-road-canopy-b" aria-hidden="true">🌸</span>
- <svg id="nature-road-trail" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none"><path id="nature-road-trail-shadow" d="" fill="none" stroke-width="2.8" stroke-linecap="round"/><path id="nature-road-trail-line" d="" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="2.6 1.5"/></svg>
+ <span class="nature-road-scenery nature-road-scenery-a" aria-hidden="true">🌼</span><span class="nature-road-scenery nature-road-scenery-b" aria-hidden="true">🦋</span>
+ <svg id="nature-road-trail" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none"><path id="nature-road-trail-shadow" d="" fill="none" stroke-width="2.8" stroke-linecap="round"/><path id="nature-road-trail-line" d="" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="2.6 1.5"/><path id="nature-road-trail-completed" d="" fill="none" stroke-width="1.8" stroke-linecap="round"/></svg>
  <div id="nature-road-nodes" class="nature-road-nodes" role="group" aria-label="Levels in the currently viewed trail"></div></div>
  <div class="nature-road-spotlight" role="status" aria-live="polite"><span id="nature-road-spotlight-icon" aria-hidden="true">🌼</span>
  <div><strong id="nature-road-spotlight-name">Level 1 · Bloom Walk</strong><small id="nature-road-spotlight-description">Choose a stage on the map.</small></div></div>
@@ -95,13 +97,20 @@ export function mountNatureRoad(container,{onPlay}={}){
  container.append(root);
  const $=sel=>root.querySelector(sel);
  let snapshot={level:1,cleared:0,streak:0,run:null},windowStart=1,focusLevel=1,initialized=false;
- const regionButtons=[];
+ const regionButtons=[],regionSelect=$('#nature-road-region-select');
  ROAD_REGIONS.forEach((r,i)=>{
   const b=button('nature-road-region-button',r.icon+' '+r.name);
   b.setAttribute('aria-label',r.name+', levels '+(i*250+1)+' through '+((i+1)*250));
   b.dataset.index=String(i);
   b.addEventListener('click',()=>{windowStart=i*250+1;focusLevel=windowStart;render();});
   $('#nature-road-regions').append(b);regionButtons.push(b);
+  const option=create('option','',r.icon+' '+r.name);
+  option.value=String(i);regionSelect.append(option);
+ });
+ regionSelect.addEventListener('change',event=>{
+  const index=Number(event.target.value);
+  if(!Number.isInteger(index)||index<0||index>=ROAD_REGIONS.length)return;
+  windowStart=index*ROAD_REGION_SIZE+1;focusLevel=windowStart;render();
  });
  function selectStage(level){
   focusLevel=clampRoadLevel(level);
@@ -126,6 +135,9 @@ export function mountNatureRoad(container,{onPlay}={}){
   $('#nature-road-creature').textContent=region.icon;
   $('.nature-road-canopy-a').textContent=region.flower;
   $('.nature-road-canopy-b').textContent=region.icon;
+  $('.nature-road-scenery-a').textContent=region.flower;
+  $('.nature-road-scenery-b').textContent=region.icon;
+  regionSelect.value=String(regionIndex);
   const progress=roadProgress(snapshot.cleared);
   $('#nature-road-progress').textContent=count(progress.cleared)+' / '+count(progress.total);
   $('#nature-road-percent').textContent=progress.percent.toFixed(2)+'%';
@@ -144,6 +156,9 @@ export function mountNatureRoad(container,{onPlay}={}){
   $('#nature-road-next-page').disabled=windowStart>=MYSTERY_ROAD_TOTAL-24;
   const path=points.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
   $('#nature-road-trail-shadow').setAttribute('d',path);$('#nature-road-trail-line').setAttribute('d',path);
+  const clearedPoints=points.filter(p=>p.n<=snapshot.cleared);
+  const clearedPath=clearedPoints.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
+  $('#nature-road-trail-completed').setAttribute('d',clearedPoints.length>1?clearedPath:'');
   const host=$('#nature-road-nodes');host.replaceChildren();
   for(const p of points){
    const encounter=roadEncounter(p.n),done=p.n<=snapshot.cleared,current=p.n===snapshot.level;
