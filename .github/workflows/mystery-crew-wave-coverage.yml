@@ -31,17 +31,18 @@ jobs:
           from PIL import Image
           r=json.loads(Path('reports/mystery-crew-wave-coverage.json').read_text())
           assert r['source_outfits']==48
-          assert r['lab_wave_outfits']==1
+          assert r['lab_wave_outfits']==2
           assert r['art_approved_outfits']==0
-          assert r['remaining_without_authored_wave']==47
+          assert r['remaining_without_authored_wave']==46
           assert r['public_release_ready'] is False
           assert len(r['items'])==48
           assert sum(x['wave_status']=='lab_only' for x in r['items'])==1
+          assert sum(x['wave_status']=='generated_study_only' for x in r['items'])==1
           assert all(not x['art_approved'] for x in r['items'])
           assert r['rejected_studies'][0]['key']=='crew-1-explorer'
           with Image.open('reports/mystery-crew-wave-source-48.png') as im:
               assert im.size==(1640,1692)
-          print('VERIFIED: 48 unchanged originals, 1 experiment, 0 approved; published V5 unaffected')
+          print('VERIFIED: 48 unchanged originals, 2 experimental studies, 0 approved; published V5 unaffected')
           PY
       - name: Upload 48-art image board and per-outfit inventory
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
