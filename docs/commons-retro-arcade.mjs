@@ -313,6 +313,7 @@ async function start(id){
  }finally{
   if(lifecycle.matches(ticket)){
    lifecycle.clearPending(ticket);working=false;
+   updateCabinetPause();
    if(!current){
     root.querySelector('.retro-begin').disabled=false;
     root.querySelector('.retro-end').disabled=true;
