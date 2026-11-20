@@ -12,6 +12,7 @@ import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessa
 
 import {createFamilyBoard} from './family-board.mjs?v=marquee6';
 import {createHotRodBoard} from './hot-rod-board.mjs?v=drivetrain2';
+import {isEdwardTestPreview,edwardTestMember} from './edward-test-persona.mjs';
 
 const familyBoard = createFamilyBoard();
 const hotRodBoard = createHotRodBoard();
@@ -291,7 +292,35 @@ async function refreshAnnouncement(){
 }
 async function openReviewLink(){const {member}=await api('review_link',{token:reviewToken});showDialog(`<p class="eyebrow">A request from your inbox</p><h2 id="content-title">A new voice at the table.</h2><p class="dialog-lead"><b>${esc(member.display_name)}</b> has verified their email and requested membership access. Opening this email link has not changed their account.</p><button class="button-primary" data-review-user="${esc(member.user_id)}" data-decision="approved" data-email-review>Approve membership ↗</button> <button class="button-quiet" data-review-user="${esc(member.user_id)}" data-decision="declined" data-email-review>Decline</button><p class="privacy-notice">Your confirmed decision consumes this single-use review link.</p>`);}
 async function confirmAction(title,description,action,allowUnapproved=false){showDialog(`<p class="eyebrow">A deliberate decision</p><h2 id="content-title">${esc(title)}</h2><p class="dialog-lead">${esc(description)}</p><button class="button-primary" id="confirm-action">Confirm ↗</button> <button class="button-quiet" data-close>Cancel</button>`,{allowUnapproved});$('confirm-action').addEventListener('click',async e=>{const button=e.currentTarget;button.disabled=true;try{await action();$('content-dialog').close();toast(isPreview?'Preview action completed. No real records changed.':'Your decision was saved.');await loadFeed();if(state.member?.role==='owner')await showOwner();}catch(error){formMessage($('dialog-content'),errorMessage(error));button.disabled=false;}});}
-function demoRole(role){state.member=role==='visitor'?null:{user_id:'99999999-9999-4999-8999-999999999999',display_name:role==='owner'?'Cowboy':'Example member',role:role==='owner'?'owner':'member',status:role==='pending'?'pending':'approved'};state.user=null;state.profile=role==='visitor'?null:{...PROFILE_DEFAULTS,user_id:state.member.user_id,display_name:state.member.display_name,headline:role==='owner'?'Collector of good finds. Keeper of good company.':'Making things. Finding things. Sharing the good ones.',bio:'A little curious about everything. Here to trade practical ideas and discover the small tools that make a big difference.',interests:['Making','Exploring','Good tools'],theme:role==='owner'?'forest':'copper',cover:'contours',avatar_mode:'icon',avatar_icon:role==='owner'?'compass':'hammer',published:true,account_active:role!=='pending',badge:role==='owner'?'Owner':null};$('owner-dashboard').hidden=true;powers.refreshOwn(true).then(()=>renderFeed());}
+function demoRole(role){
+  // Edward's persona exists only in the fictitious localhost demo. No JWT,
+  // Supabase Auth user, production moderation grant, or real score is created.
+  const edward=role==='edward'&&isPreview;
+  state.member=role==='visitor'?null:edward?edwardTestMember():{
+    user_id:'99999999-9999-4999-8999-999999999999',
+    display_name:role==='owner'?'Cowboy':'Example member',
+    role:role==='owner'?'owner':'member',
+    status:role==='pending'?'pending':'approved'
+  };
+  state.user=null;
+  state.profile=role==='visitor'?null:{
+    ...PROFILE_DEFAULTS,user_id:state.member.user_id,display_name:state.member.display_name,
+    headline:edward?'AI Test Moderator · Local Preview Only':
+      role==='owner'?'Collector of good finds. Keeper of good company.':
+      'Making things. Finding things. Sharing the good ones.',
+    bio:edward?'I am Edward, an AI test persona. My moderation tools are fictional; gameplay tests use legal moves and never alter real scores or unlocks.':
+      'A little curious about everything. Here to trade practical ideas and discover the small tools that make a big difference.',
+    interests:edward?['Fair-play games','Accessibility','Quality testing']:['Making','Exploring','Good tools'],
+    theme:role==='owner'?'forest':edward?'midnight':'copper',
+    cover:'contours',avatar_mode:'icon',
+    avatar_icon:role==='owner'?'compass':edward?'spark':'hammer',
+    published:true,account_active:role!=='pending',
+    badge:role==='owner'?'Owner':null
+  };
+  document.body.dataset.edwardTestPreview=String(edward);
+  $('owner-dashboard').hidden=true;
+  powers.refreshOwn(true).then(()=>renderFeed());
+}
 async function demoAction(action,payload){
   if(action.startsWith('power_'))return powers.previewAPI(action,payload);
   if(action.startsWith('hub_'))return hub.previewAPI(action,payload);
@@ -360,7 +389,7 @@ let searchTimer;
 $('community-search').addEventListener('input',event=>{state.search=event.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(()=>loadFeed(),250)});$('community-sort').addEventListener('change',event=>{state.sort=event.target.value;loadFeed()});$('preview-role').addEventListener('change',async event=>{demoRole(event.target.value);await loadFeed();});
 async function initialize(){
   try{const response=await fetch('catalog.json',{credentials:'omit'});if(!response.ok)throw new Error();const data=await response.json();catalog=Array.isArray(data.sites)?data.sites.map(s=>({...s,source_urls:s.sources.map(n=>data.videos.find(v=>v.number===n)?.url).filter(Boolean)})):[];}catch{catalog=[];}
-  if(isPreview){for(const thread of demoThreads){const answer=thread.status==='published'?edwardReply(thread,catalog):null;if(answer){demoReplies.set(thread.id,[{id:sampleID(),author_name:'Edward',author_kind:'edward',body:answer,created_at:thread.created_at}]);thread.reply_count=1;}}$('preview-banner').hidden=false;const role=['visitor','pending','member','owner'].includes(query.get('role'))?query.get('role'):'visitor';$('preview-role').value=role;demoRole(role);await loadFeed();}
+  if(isPreview){for(const thread of demoThreads){const answer=thread.status==='published'?edwardReply(thread,catalog):null;if(answer){demoReplies.set(thread.id,[{id:sampleID(),author_name:'Edward',author_kind:'edward',body:answer,created_at:thread.created_at}]);thread.reply_count=1;}}$('preview-banner').hidden=false;const role=['visitor','pending','member','owner','edward'].includes(query.get('role'))?query.get('role'):'visitor';$('preview-role').value=role;demoRole(role);await loadFeed();}
   else if(configured){
     try{
       const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/+esm');
