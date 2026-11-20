@@ -1009,3 +1009,14 @@ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels
  min-height:0!important;height:100%!important;visibility:visible!important;
  overflow:hidden!important
 }
+
+
+/* The older campaign browser intentionally scrolls. The new full-screen
+   illustrated map is self-contained, so turn that legacy scrollbar off here
+   using the actual Arcade panel specificity. */
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-root #mahjong-inside > .mahjong-campaign{
+ display:flex!important;flex-direction:column!important;
+ height:100%!important;max-height:100%!important;min-height:0!important;
+ overflow:hidden!important;overflow-y:hidden!important;overflow-x:hidden!important;
+}
