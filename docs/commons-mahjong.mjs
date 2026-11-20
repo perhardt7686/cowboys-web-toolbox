@@ -144,6 +144,7 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    if(!roadVisitDue(result))return;
    if(roadVisitTimer){clearTimeout(roadVisitTimer);roadVisitTimer=null;}
    setStatus(roadVictoryMessage(result));
+   natureRoad?.announceBonus(result.campaign_bonus_earned,result.completed_level);
    // Only after a qualifying, server-saved level clear. Never mid-board,
    // mid-Turtle game, during a new game, or if this screen is hidden.
    roadVisitTimer=window.setTimeout(()=>{
