@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'docs/mahjong-nature-road.*'
+      - 'docs/mahjong-region-picture.mjs'
+      - 'docs/mahjong-road-invitations.mjs'
+      - 'docs/mahjong-turtle-ui.mjs'
+      - 'tests/mahjong-illustrated-road.test.mjs'
       - 'docs/commons-mahjong.mjs'
       - 'docs/commons-mahjong-profile.mjs'
       - 'docs/community.html'
@@ -14,6 +18,10 @@ on:
     branches: [main]
     paths:
       - 'docs/mahjong-nature-road.*'
+      - 'docs/mahjong-region-picture.mjs'
+      - 'docs/mahjong-road-invitations.mjs'
+      - 'docs/mahjong-turtle-ui.mjs'
+      - 'tests/mahjong-illustrated-road.test.mjs'
       - 'docs/commons-mahjong.mjs'
       - 'docs/commons-mahjong-profile.mjs'
       - 'docs/community.html'
@@ -35,7 +43,10 @@ jobs:
           node-version: '22'
       - run: |
           npm ci
+          node --check docs/mahjong-region-picture.mjs
+          node --check docs/mahjong-road-invitations.mjs
           node --check docs/mahjong-nature-road.mjs
+          node --test tests/mahjong-nature-road.test.mjs tests/mahjong-illustrated-road.test.mjs
           node --check docs/commons-mahjong.mjs
           npm test
   mobile-garden-map:
@@ -49,7 +60,7 @@ jobs:
       - run: |
           python -m pip install 'playwright>=1.50,<2'
           python -m playwright install --with-deps chromium
-      - name: Test 5000-stage garden map on 375/390/430/768 px devices
+      - name: Test 20 illustrated area maps and glowing trail on 375/390/430/768 px devices
         run: |
           python -m http.server 8765 --directory docs >/tmp/nature-road-http.log 2>&1 &
           python tests/browser-mahjong-nature-road.py
