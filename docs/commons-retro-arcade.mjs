@@ -368,12 +368,22 @@ async function finish(){
 }
 function paintReady(canvas,id){
  const ctx=canvas.getContext('2d');if(!ctx)return;
- ctx.fillStyle='#090c2b';ctx.fillRect(0,0,canvas.width,canvas.height);
- ctx.textAlign='center';
- ctx.fillStyle='#ffd783';ctx.font='900 '+Math.floor(canvas.width/13)+'px monospace';
- ctx.fillText(id==='fleet'?'STAR SQUADRON':'MYSTERY MAZE',canvas.width/2,canvas.height*.45);
- ctx.fillStyle='#a0f7e7';ctx.font='bold 20px monospace';
- ctx.fillText('PRESS START TO BEGIN',canvas.width/2,canvas.height*.58);
+ const w=canvas.width,h=canvas.height;
+ ctx.fillStyle='#050b20';ctx.fillRect(0,0,w,h);
+ ctx.lineWidth=3;ctx.strokeStyle=id==='fleet'?'#5bc0de':'#5278f5';
+ ctx.strokeRect(11,11,w-22,h-22);
+ ctx.lineWidth=1;ctx.strokeStyle='#1a3158';ctx.strokeRect(17,17,w-34,h-34);
+ ctx.textAlign='center';ctx.fillStyle='#a8e9e3';
+ ctx.font='bold '+Math.floor(w/33)+'px monospace';
+ ctx.fillText('COWBOY FAMILY ARCADE   ·   PLAYER ONE',w/2,h*.22);
+ ctx.fillStyle='#ffdd8c';ctx.font='900 '+Math.floor(w/13)+'px monospace';
+ ctx.fillText(id==='fleet'?'STAR SQUADRON':'MYSTERY MAZE',w/2,h*.43);
+ ctx.fillStyle='#b8f2e8';ctx.font='bold '+Math.floor(w/25)+'px monospace';
+ ctx.fillText(id==='fleet'?'SWARMS · DIVES · LASERS':'CLUES · CORNERS · WISPS',w/2,h*.53);
+ ctx.fillStyle='#ffafc6';ctx.font='bold '+Math.floor(w/27)+'px monospace';
+ ctx.fillText('JOYSTICK    A ACTION    B PAUSE',w/2,h*.66);
+ ctx.fillStyle='#fce5a8';ctx.font='bold '+Math.floor(w/23)+'px monospace';
+ ctx.fillText('PRESS START',w/2,h*.78);
 }
 function paintFleet(canvas,s,look='patrol'){
  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
@@ -383,6 +393,17 @@ function paintFleet(canvas,s,look='patrol'){
   ctx.fillStyle=i%5?'#91bcf9':'#f7d49e';
   ctx.fillRect(x,y,i%3===0?2:1,i%3===0?2:1);
  }
+ // Cabinet-like one-up / wave strip stays purely decorative.
+ ctx.fillStyle='#071429';ctx.fillRect(0,0,w,47);
+ ctx.strokeStyle='#284778';ctx.lineWidth=2;ctx.beginPath();
+ ctx.moveTo(0,47);ctx.lineTo(w,47);ctx.stroke();
+ ctx.textAlign='left';ctx.fillStyle='#fbd99a';ctx.font='bold 17px monospace';
+ ctx.fillText('1UP',18,19);
+ ctx.fillStyle='#fff0cb';ctx.font='bold 18px monospace';
+ ctx.fillText(String(s.score).padStart(6,'0'),18,39);
+ ctx.textAlign='right';ctx.fillStyle='#8fe8d9';ctx.font='bold 16px monospace';
+ ctx.fillText('WAVE '+String(Math.ceil(s.tick/9)+1).padStart(2,'0'),w-18,29);
+ ctx.textAlign='left';
  const bw=(w-36)/9,x=18+s.lane*bw+bw/2,y=h-72;
  const [hull,trim,cockpit]=retroCosmeticPalette('fleet',look);
  drawFleetWake(ctx,look,s,x,y);
@@ -425,24 +446,32 @@ function paintFleet(canvas,s,look='patrol'){
 }
 function paintMaze(canvas,s,look='scout'){
  const ctx=canvas.getContext('2d');const tile=canvas.width/15;
- ctx.fillStyle='#120e2e';ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle='#030916';ctx.fillRect(0,0,canvas.width,canvas.height);
+ // Maze corridors echo illuminated cabinets without copying any commercial
+ // board, copyrighted sprite, score logic or proprietary animation.
  for(let y=0;y<15;y++)for(let x=0;x<15;x++){
   const cell=RETRO_MAZE[y][x],px=x*tile,py=y*tile;
   if(cell==='#'){
-   ctx.fillStyle='#56458d';ctx.fillRect(px+1,py+1,tile-2,tile-2);
-   ctx.fillStyle='#8d78ca';ctx.fillRect(px+5,py+4,tile-10,3);
-   ctx.strokeStyle='#33295b';ctx.lineWidth=2;ctx.strokeRect(px+1,py+1,tile-2,tile-2);
+   ctx.fillStyle='#07184b';ctx.fillRect(px,py,tile,tile);
+   ctx.strokeStyle='#286be6';ctx.lineWidth=3;ctx.beginPath();
+   if(RETRO_MAZE[y-1]?.[x]!== '#'){ctx.moveTo(px+1,py+1);ctx.lineTo(px+tile-1,py+1);}
+   if(RETRO_MAZE[y+1]?.[x]!== '#'){ctx.moveTo(px+1,py+tile-1);ctx.lineTo(px+tile-1,py+tile-1);}
+   if(RETRO_MAZE[y]?.[x-1]!== '#'){ctx.moveTo(px+1,py+1);ctx.lineTo(px+1,py+tile-1);}
+   if(RETRO_MAZE[y]?.[x+1]!== '#'){ctx.moveTo(px+tile-1,py+1);ctx.lineTo(px+tile-1,py+tile-1);}
+   ctx.stroke();
   }else if(!s.seen.includes(x+','+y)){
-   ctx.fillStyle=cell==='o'?'#ffe7a1':'#a5f0db';
-   ctx.beginPath();ctx.arc(px+tile/2,py+tile/2,cell==='o'?6:2.8,0,Math.PI*2);ctx.fill();
+   const isPower=cell==='o';
+   ctx.fillStyle=isPower?'#ffe6a0':'#bceadc';
+   ctx.beginPath();
+   ctx.arc(px+tile/2,py+tile/2,isPower?5+Math.sin(s.tick*.43)*1.2:2.6,0,Math.PI*2);
+   ctx.fill();
+   if(isPower){ctx.strokeStyle='#f9ab6c';ctx.lineWidth=1.6;ctx.stroke();}
   }
  }
  drawMazeFootprints(ctx,look,s,tile);
- // Distinct wisp colors, eye tracking and frightened poses follow the
- // authoritative positions and power timer without changing danger cells.
  for(const [i,g] of s.ghosts.entries()){
-   const xx=(g.x+.5)*tile,yy=(g.y+.5)*tile;
-   drawMazeWisp(ctx,xx,yy,wispActing(g,s,s.tick,i,s.power),i,s.tick);
+  const xx=(g.x+.5)*tile,yy=(g.y+.5)*tile;
+  drawMazeWisp(ctx,xx,yy,wispActing(g,s,s.tick,i,s.power),i,s.tick);
  }
  const xx=(s.x+.5)*tile,yy=(s.y+.5)*tile;
  const [coat,outline]=retroCosmeticPalette('maze',look);
