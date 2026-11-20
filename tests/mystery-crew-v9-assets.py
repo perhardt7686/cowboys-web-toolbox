@@ -20,7 +20,11 @@ assert np.array_equal(frames[0],source),'Idle frame must be exact original V5 pa
 Y,X=np.indices(source.shape[:2])
 allowed=(X>=261)&(X<410)&(Y>=90)&(Y<350)
 for i,frame in enumerate(frames):
- changed=np.any(frame!=source,axis=2)
+ # Invisible RGB bytes under alpha=0 are not painted pixels. V10 scrubs
+ # those old-hand leftovers while preserving every *visible* source pixel.
+ changed=(frame[:,:,3]!=source[:,:,3])|(
+  np.any(frame[:,:,:3]!=source[:,:,:3],axis=2)&
+  ((frame[:,:,3]>0)|(source[:,:,3]>0)))
  assert not np.any(changed&~allowed),f'Frame {i+1} unexpectedly repainted face, outfit or legs'
  if 0<i<7:
   assert changed.sum()>8000,f'Frame {i+1} appears to be missing its waving pose'
