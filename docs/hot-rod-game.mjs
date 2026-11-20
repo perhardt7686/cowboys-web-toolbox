@@ -89,7 +89,15 @@ export function makeHotRod({client, memberId, launcher}) {
   });
   const quit = makeButton('Back to games', () => close());
   const globalButtons = el('div','hot-rod-top-actions');
-  globalButtons.append(soundButton, quit);
+  const newGameButton = makeButton('New game', () => requestNewGame());
+  newGameButton.classList.add('hot-rod-new-game');
+  const cancelNewButton = makeButton('Keep current game', () => {
+    confirmNew = false;
+    if (scene === 'race' && race) renderRace();
+    else render();
+  });
+  cancelNewButton.hidden = true;
+  globalButtons.append(newGameButton, cancelNewButton, soundButton, quit);
   header.append(title, globalButtons);
 
   const stat = el('div','hot-rod-bank');
@@ -331,6 +339,41 @@ export function makeHotRod({client, memberId, launcher}) {
     bayMode = 'work';
     shelfSelection=0;focusBolt=null;
     show('workbench');
+  }
+
+  function updateNewGameControls() {
+    newGameButton.textContent = confirmNew ? 'Confirm new game' : 'New game';
+    newGameButton.disabled = busy || !loaded;
+    cancelNewButton.hidden = !confirmNew;
+    cancelNewButton.disabled = busy;
+    newGameButton.setAttribute('aria-label', confirmNew ? 'Confirm replacing current Hot Rod campaign' : 'Start a new Hot Rod game');
+  }
+
+  function requestNewGame() {
+    if (busy || !loaded) return;
+    if (!confirmNew) {
+      confirmNew = true;
+      if (scene === 'race' && race && !paused && !staged && !race.result) {
+        paused = true;
+        input.clear();
+        speaker.silence();
+      }
+      if (scene === 'race' && race) renderRace();
+      else render();
+      return;
+    }
+    confirmNew = false;
+    cancelAnimationFrame(frame);
+    input.clear();
+    speaker.silence();
+    void mutate('new', {}, () => {
+      race = null;
+      duel = null;
+      paused = false;
+      staged = false;
+      showForfeit = false;
+      openPaper('cover');
+    });
   }
 
   function renderTitle() {
@@ -956,6 +999,7 @@ export function makeHotRod({client, memberId, launcher}) {
       if (state.status === 'summer' && state.race && !['garage','standings','crew'].includes(scene)) scene = 'garage';
     }
     dialog.dataset.scene = scene;
+    updateNewGameControls();
     housing.setAttribute('aria-busy',String(busy));
     screen.setAttribute('data-cursor',scene === 'workbench' ? 'wrench' : '');
     dialog.dataset.bayMode=scene==='workbench'?bayMode:'';
@@ -1028,6 +1072,7 @@ export function makeHotRod({client, memberId, launcher}) {
 
   function renderRace() {
     if (!race) return;
+    updateNewGameControls();
     tabs.hidden = true;
     consolePanel.hidden = true;
     racePanel.hidden = false;
