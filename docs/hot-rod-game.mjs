@@ -124,10 +124,11 @@ export function makeHotRod({client, memberId, launcher}) {
   function pad(label, name) {
     const control = makeButton(label, () => {});
     control.dataset.drive = name;
+    control.setAttribute('aria-label', label + (name === 'up' ? ', shift to higher gear' : name === 'down' ? ', shift to lower gear' : name === 'clutch' ? ', hold while shifting manual transmission' : ', hold to drive'));
     return control;
   }
   leftPad.append(pad('◀ Left','left'),pad('Right ▶','right'));
-  middlePad.append(pad('− Gear','down'),pad('Clutch','clutch'),pad('+ Gear','up'));
+  middlePad.append(pad('Gear − (Q)','down'),pad('Hold Clutch (X)','clutch'),pad('Gear + (E)','up'));
   rightPad.append(pad('Brake','brake'),pad('Gas','gas'));
   const pads = el('div','hot-rod-pads');
   pads.append(leftPad,middlePad,rightPad);
@@ -1094,7 +1095,7 @@ export function makeHotRod({client, memberId, launcher}) {
       const opponent = race.contract.rival === 'mystery' ? 'Mystery Machine' :
         RIVALS.find(person=>person.id===race.contract.rival)?.name || 'Family challenge';
       raceDetails.append(heading(opponent),copy(race.contract.kind==='drag' ? 'Quarter-mile drag' : 'Two and a half miles of winding road'),
-        copy('Wait for green. Arrows steer and control gas/brake. Original-style Space shifts up with gas or down with brake; E / Q also shift. Lift off the gas to protect the gearbox.'),
+        copy('Wait for green. Hold gas to accelerate, brake to slow, and left/right to steer. Manual cars: hold clutch (X), tap E to shift up or Q to shift down, then release clutch. Space shifts up or down with brake. Avoid shifting at full throttle.'),
         row(action('Stage at the line',goRace,{accent:true,disabled:busy}),action('Forfeit race',()=>{showForfeit=true;renderRace();})));
     } else if (showForfeit) {
       const hasStake = !duel && !['kicks',undefined].includes(race.contract.stake);
