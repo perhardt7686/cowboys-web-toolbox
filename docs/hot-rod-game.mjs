@@ -152,7 +152,7 @@ export function makeHotRod({client, memberId, launcher}) {
   let problem = '', message = '', retry = null, race = null, duel = null, inputLog = [], frame = 0, tickTime = 0, lag = 0;
   let paused = false, staged = false, showForfeit = false, finishing = false, radio = false, submitted = false;
   let soundEnabled = preference('hot-rod-sound') === 'on';
-  let paperMode = 'cover', paperPage = 0, listing = null, selectedSlot = 'carb', bayMode = 'work';
+  let paperMode = 'cover', paperPage = 0, paperVehicleClass = 'all', listing = null, selectedSlot = 'carb', bayMode = 'work';
   let workmanship = false, selectedRival = RIVALS[0], raceType = 'drag', wager = 'kicks';
   let negotiating = false, dinerMenu = '', callerPage=0, crew = null, focusedMember = null, standings = null, fetchingScores = false, fetchingCrew = false;
   const fastenerTurns=new Map(), portraits=new Map();
@@ -443,8 +443,12 @@ export function makeHotRod({client, memberId, launcher}) {
     show('paper');
   }
 
+  const vehicleClass = model => model.body==='pickup'?'pickups':
+    model.body==='van'?'vans':model.body==='wagon'?'wagons':
+    model.body==='utility'?'utility':'cars';
   function paperListings(car) {
-    return paperMode === 'cars' ? CAR_LIST :
+    return paperMode === 'cars' ? CAR_LIST.filter(model=>
+      paperVehicleClass==='all'||vehicleClass(model)===paperVehicleClass) :
       PART_LIST.filter(item => !item.stock && (!car || !item.make || item.make === CARS[car.model].make));
   }
 
@@ -461,7 +465,12 @@ export function makeHotRod({client, memberId, launcher}) {
       return;
     }
     const listings = paperListings(activeCar(state));
-    const totalPages = Math.ceil(listings.length / 5);
+    const totalPages = Math.max(1,Math.ceil(listings.length / 5));
+    const bodyBrowser = paperMode==='cars' ? select('Find a body style',[
+      ['all','All 40 vehicles'],['cars','Classic cars & roadsters'],
+      ['pickups','Pickup trucks'],['vans','Period vans'],
+      ['wagons','Station wagons'],['utility','Car-based pickups']
+    ],paperVehicleClass,value=>{paperVehicleClass=value;paperPage=0;listing=null;render();}) : null;
     pixelButton('Show newspaper front page',controls.cover,cover);
     const navigation = row(action('Front page',cover),
       action('Used cars',cars,{accent:paperMode==='cars'}),
@@ -506,7 +515,8 @@ export function makeHotRod({client, memberId, launcher}) {
     const paging = row(action('‹ Previous',previous,{disabled:paperPage===0,focus:'paper-prev'}),
       el('span','',(paperPage+1)+' / '+totalPages),
       action('Next ›',next,{disabled:paperPage>=totalPages-1,focus:'paper-next'}));
-    panel(paperMode==='cars'?'Used car classifieds':'Auto parts classifieds',navigation,classified,paging);
+    panel(paperMode==='cars'?'Used car classifieds':'Auto parts classifieds',navigation,
+      ...(bodyBrowser?[bodyBrowser]:[]),classified,paging);
   }
 
   function openHood(){
