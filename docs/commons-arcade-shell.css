@@ -224,7 +224,10 @@ body.community-page.arcade-on :is(.mahjong-hud,.mahjong-actions,.mahjong-view-to
  flex:0 0 auto!important;margin:0!important
 }
 body.community-page.arcade-on :is(.mahjong-head,.mahjong-pan-help,.mahjong-footnote){display:none!important}
-body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels] #mahjong-inside > .mahjong-campaign{display:grid!important}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels] #mahjong-inside > .mahjong-campaign{
+ display:flex!important;flex-direction:column;min-height:0;height:100%;
+ max-height:100%;overflow:hidden!important
+}
 body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=scores] #mahjong-inside > .mahjong-bottom,
 body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=badges] #mahjong-inside > .mahjong-bottom{
  display:block!important;overflow:auto!important;min-height:0;height:100%;padding:10px
@@ -990,4 +993,30 @@ body.community-page.arcade-on :is(
  body.community-page.arcade-on :is(
   #star-squadron-root,#mystery-maze-root
  ).arcade-game-active .retro-canvas{max-height:40dvh!important}
+}
+
+
+/* Mystery Road: the actual illustrated map must be visible in the family
+   Arcade's Levels scene. The generic scene-hiding rule above only targets
+   top-level panels, not this one eligible map. */
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-inside > .mahjong-campaign #mahjong-nature-map-host{
+ display:flex!important;flex:1 1 auto!important;min-height:0!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-inside > .mahjong-campaign #mahjong-nature-road{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-height:0!important;height:100%!important;visibility:visible!important;
+ overflow:hidden!important
+}
+
+
+/* The older campaign browser intentionally scrolls. The new full-screen
+   illustrated map is self-contained, so turn that legacy scrollbar off here
+   using the actual Arcade panel specificity. */
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-root #mahjong-inside > .mahjong-campaign{
+ display:flex!important;flex-direction:column!important;
+ height:100%!important;max-height:100%!important;min-height:0!important;
+ overflow:hidden!important;overflow-y:hidden!important;overflow-x:hidden!important;
 }
