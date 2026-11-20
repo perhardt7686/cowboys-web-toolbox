@@ -7,7 +7,7 @@ import {BOLTS, CAR_LIST, CARS, COLORS, DOLLARS, FUEL_TANK, MAKES, PART_LIST, PAR
 import {paintScene} from './hot-rod-art.mjs?v=carprofiles2';
 import {BAY_MENU,IGNITION,SHELF_LIST,workbenchFasteners} from './hot-rod-engine-bay.mjs?v=dosfidelity1';
 import {DRIVE_IN_HOTSPOTS,NEWSPAPER_HOTSPOTS} from './hot-rod-period-scenes.mjs?v=dosfidelity1';
-import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP} from './hot-rod-racing.mjs';
+import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP, INPUT} from './hot-rod-racing.mjs?v=drivetrain2';
 import {connectDrivingInput} from './hot-rod-input.mjs';
 
 const cash = amount => '$' + Number(amount).toLocaleString('en-US');
@@ -129,6 +129,12 @@ export function makeHotRod({client, memberId, launcher}) {
   leftPad.append(pad('◀ Left','left'),pad('Right ▶','right'));
   middlePad.append(pad('− Gear','down'),pad('Clutch','clutch'),pad('+ Gear','up'));
   rightPad.append(pad('Brake','brake'),pad('Gas','gas'));
+  for(const button of [leftPad,middlePad,rightPad].flatMap(el=>[...el.querySelectorAll('[data-drive]')])){
+    button.setAttribute('aria-pressed','false');
+    if(button.dataset.drive==='gas')button.setAttribute('aria-label','Gas pedal');
+    if(button.dataset.drive==='brake')button.setAttribute('aria-label','Brake pedal');
+    if(button.dataset.drive==='clutch')button.setAttribute('aria-label','Clutch pedal');
+  }
   const pads = el('div','hot-rod-pads');
   pads.append(leftPad,middlePad,rightPad);
   const raceOptions = el('div','hot-rod-row hot-rod-race-actions');
@@ -158,6 +164,7 @@ export function makeHotRod({client, memberId, launcher}) {
   const fastenerTurns=new Map(), portraits=new Map();
   let focusBolt=null, shelfSelection=0, timing=0;
   let confirmNew = false, bootTimer = 0, panelName = '', crewError = '', scoreError = '';
+  let lastPedalMask=0;
   const input = connectDrivingInput(racePanel, () => dialog.open && !!race && !paused && !staged && !finishing && !race.result);
   const speaker = audio(soundButton);
   speaker.setMuted(!soundEnabled);
@@ -747,7 +754,7 @@ export function makeHotRod({client, memberId, launcher}) {
   }
   function startChallenge(stake=wager){
     const rival=selectedRival;
-    void mutate('challenge',{rival:rival.id,kind:raceType,stake},()=>prepareRace(state.race));
+    void mutate('challenge',{rival:rival.id,kind:raceType,stake,physicsVersion:2},()=>prepareRace(state.race));
   }
   function challengeChoices(){
     const cancel={label:'Forget it',activate:()=>{dinerMenu='';render();}};
@@ -835,7 +842,7 @@ export function makeHotRod({client, memberId, launcher}) {
         'The King’s title is yours. The Mystery Machine is waiting.'),row(
         bonus?.won ? el('span','hot-rod-achievement','Final boss defeated') :
         action('Challenge the Mystery Machine',() => void mutate('challenge',
-          {rival:'mystery',kind:'road',stake:'kicks'}, () => prepareRace(state.race)),{accent:true,disabled:busy}),
+          {rival:'mystery',kind:'road',stake:'kicks',physicsVersion:2}, () => prepareRace(state.race)),{accent:true,disabled:busy}),
         bonus?.bestMs ? el('span','','Mystery Machine best ' + time(bonus.bestMs)) : el('span'))] : []),
       row(...achievementList.map(badge=>el('span','hot-rod-achievement',badge))),
       row(action('Hall of Fame',() => show('standings')),
@@ -967,7 +974,7 @@ export function makeHotRod({client, memberId, launcher}) {
         item.append(row(action('Accept',() => void mutate('respond',{challengeId:duel.id,accept:true},refreshCrew),{disabled:busy,accent:true}),
           action('Decline',() => void mutate('respond',{challengeId:duel.id,accept:false},refreshCrew),{disabled:busy})));
       } else if (duel.status==='accepted' && !duel.finished) {
-        item.append(action(duel.started ? 'Resume your run' : 'Drive your run',() => void mutate('duel-start',{challengeId:duel.id},
+        item.append(action(duel.started ? 'Resume your run' : 'Drive your run',() => void mutate('duel-start',{challengeId:duel.id,physicsVersion:2},
           reply => prepareRace(reply.race,duel.id)),{accent:true,disabled:busy}));
       }
       list.append(item);
@@ -1104,7 +1111,7 @@ export function makeHotRod({client, memberId, launcher}) {
       const opponent = race.contract.rival === 'mystery' ? 'Mystery Machine' :
         RIVALS.find(person=>person.id===race.contract.rival)?.name || 'Family challenge';
       raceDetails.append(heading(opponent),copy(race.contract.kind==='drag' ? 'Quarter-mile drag' : 'Two and a half miles of winding road'),
-        copy('Wait for green. Arrows steer and control gas/brake. Original-style Space shifts up with gas or down with brake; E / Q also shift. Lift off the gas to protect the gearbox.'),
+        copy('Wait for green. Arrows steer, Up/Down work the gas and brake. Original-style Space shifts up with gas or down with brake; E/Q choose gears directly. Release gas and use X/Shift for the smoothest clutch-assisted shift.'),
         row(action('Stage at the line',goRace,{accent:true,disabled:busy}),action('Forfeit race',()=>{showForfeit=true;renderRace();})));
     } else if (showForfeit) {
       const hasStake = !duel && !['kicks',undefined].includes(race.contract.stake);
@@ -1130,6 +1137,7 @@ export function makeHotRod({client, memberId, launcher}) {
     if (!race || !staged) return;
     staged = false;
     paused = false;
+    lastPedalMask=0;
     if (soundEnabled) speaker.play();
     renderRace();
     racePanel.focus({preventScroll:true});
@@ -1143,7 +1151,16 @@ export function makeHotRod({client, memberId, launcher}) {
       race.tick < race.greenAt ? 'WAIT FOR GREEN' : race.patrolAt !== null ? 'POLICE · SLOW DOWN' :
       raceClock(race).toFixed(1) + ' s';
     meters.textContent = displaySpeed(data) + ' MPH · ' + Math.round(data.engine) + ' RPM · ' +
-      (race.contract.player.automatic ? 'AUTO '+data.gear : 'GEAR '+(data.gear || 'N')) + ' · ' + label;
+      (race.contract.player.automatic ? 'AUTO '+data.gear : 'GEAR '+(data.gear || 'N')) + ' · ' + label +
+      (data.shiftTime>0?' · SHIFTING':lastPedalMask&INPUT.clutch?' · CLUTCH IN':
+       data.engine>race.contract.player.redline*0.92?' · SHIFT UP':'');
+    // Keep the visible pedal deck, keyboard, and server-verified input mask
+    // in agreement without introducing a second, unsaved touch control model.
+    for(const button of pads.querySelectorAll('[data-drive]')){
+      const pressed=!!(lastPedalMask&INPUT[button.dataset.drive]);
+      button.classList.toggle('is-held',pressed);
+      button.setAttribute('aria-pressed',String(pressed));
+    }
   }
 
   function loop(now) {
@@ -1153,6 +1170,7 @@ export function makeHotRod({client, memberId, launcher}) {
     while (lag >= STEP * 1000 && !race.result) {
       lag -= STEP * 1000;
       const mask = input.read();
+      lastPedalMask=mask;
       stepRace(race,mask);
       recordInput(inputLog,mask);
     }

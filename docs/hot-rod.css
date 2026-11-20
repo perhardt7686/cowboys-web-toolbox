@@ -440,3 +440,61 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
 @media (max-width:700px) {
   .hot-rod-monitor[data-scene=workbench] .hot-rod-panel {padding-inline:10px;}
 }
+
+
+/* 1963 pedal box: physical-feeling accelerator/brake/clutch and chrome gate.
+ * The same reachable controls support keyboard, touch and reduced motion.
+ * EGA-style shaded metal rather than modern skeuomorphic photographs. */
+.hot-rod-monitor .hot-rod-pads button[data-drive]{
+  min-height:48px;
+  position:relative;
+  border:2px solid #98999b;
+  border-bottom:4px solid #292b31;
+  border-radius:9px 9px 5px 5px;
+  color:#f9f3dd;
+  font-weight:900;
+  letter-spacing:.018em;
+  text-shadow:0 1px 1px #000;
+  box-shadow:inset 0 2px 1px #ffffff54,0 3px 0 #090a0e,0 4px 7px #0009;
+  transition:transform 65ms ease,box-shadow 65ms ease,filter 65ms ease;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive="gas"]{
+  border-color:#b3aa83;
+  background:repeating-linear-gradient(0deg,#111 0 3px,#3d382d 3px 6px),linear-gradient(#494332,#181818);
+  color:#fff6c1;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive="brake"]{
+  background:repeating-linear-gradient(0deg,#16191d 0 4px,#45484a 4px 8px);
+  color:#fff4e7;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive="clutch"]{
+  border-color:#9a9fa9;
+  background:repeating-linear-gradient(0deg,#161a21 0 3px,#4d525b 3px 7px);
+  color:#f5fcff;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive="up"],
+.hot-rod-monitor .hot-rod-pads button[data-drive="down"]{
+  border-color:#b9b5a4;
+  background:linear-gradient(140deg,#5d5b53,#252730 45%,#3a3e42);
+  color:#faf1bd;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive="left"],
+.hot-rod-monitor .hot-rod-pads button[data-drive="right"]{
+  border-color:#959cac;
+  background:linear-gradient(150deg,#475064,#1d202b);
+  color:#f7f8ff;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive].is-held,
+.hot-rod-monitor .hot-rod-pads button[data-drive][aria-pressed="true"]{
+  transform:translateY(2px);
+  border-bottom-width:2px;
+  filter:brightness(1.22);
+  box-shadow:inset 0 3px 8px #000b,0 1px 0 #0d1116;
+}
+.hot-rod-monitor .hot-rod-pads button[data-drive]:focus-visible{
+  outline:3px solid #ffff55;
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  .hot-rod-monitor .hot-rod-pads button[data-drive]{transition:none}
+}

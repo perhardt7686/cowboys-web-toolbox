@@ -17,7 +17,8 @@ export function courseCurve(distance, seed) {
 const makeDriver = spec => ({
   gear:spec.automatic ? 1 : 0, engine:IDLE, speed:0, distance:0, offset:0, heading:0,
   heat:0, gearbox:0, slip:0, overrev:0, fuel:0, wear:0, reaction:null,
-  shiftTime:0, impact:0, offroad:0,
+  // Deterministic pedal pressure and clutch friction. Replayed by the server.
+  throttle:0, braking:0, clutchGrip:0, shiftTime:0, impact:0, offroad:0,
 });
 
 export function createRace(contract) {
@@ -44,6 +45,78 @@ function result(race, outcome) {
 }
 
 function drive(d, spec, control, curve, ai = false) {
+  // Physical pedal travel is bounded and independent of 20 Hz frame rate.
+  // Digital keyboard/touch input still produces identical server replays.
+  const requestedGas=clamp(control.gas,0,1),requestedBrake=clamp(control.brake,0,1);
+  d.throttle += (requestedGas-d.throttle)*(requestedGas>d.throttle?0.55:0.72);
+  d.braking += (requestedBrake-d.braking)*(requestedBrake>d.braking?0.68:0.56);
+  const gas=d.throttle,brake=d.braking;
+  d.shiftTime=Math.max(0,d.shiftTime-STEP);
+  const before=d.gear;
+  if(spec.automatic){
+    if(d.shiftTime===0){
+      if(d.engine>spec.redline*0.84 && d.gear<spec.ratios.length)d.gear++;
+      else if(d.engine<spec.redline*0.38 && d.gear>1)d.gear--;
+    }
+  } else if(control.shift && d.shiftTime===0){
+    d.gear=clamp(d.gear+control.shift,0,spec.ratios.length);
+  }
+  const ratio=d.gear ? spec.ratios[d.gear-1]*spec.final:0;
+  const speedRpm=d.speed*ratio*60/(2*Math.PI*TIRE_RADIUS);
+  if(before!==d.gear){
+    // 1963-style synchroniser: clutch + throttle lift produces the smoothest
+    // shift. Classic Space shifts still work without holding the clutch.
+    if(!ai&&!spec.automatic&&before>0&&!control.clutch){
+      if(gas>0.5)d.gearbox+=(d.engine/spec.redline)*1.03/spec.transmission;
+      const mismatch=Math.abs(d.engine-Math.max(IDLE,speedRpm));
+      d.gearbox+=Math.min(0.13,Math.max(0,mismatch-1450)/13000)/Math.max(0.7,spec.transmission);
+    }
+    // Dropping to a low gear at excessive road speed can over-rev an engine.
+    if(before>d.gear&&d.gear>0&&speedRpm>spec.redline*1.04&&!ai){
+      d.overrev+=(speedRpm/spec.redline-1)*0.25;
+    }
+    d.shiftTime=spec.automatic?0.14:(control.clutch?0.20:0.27);
+  }
+  const mass=spec.weight*0.453592;
+  const wantsGrip=!control.clutch&&ratio>0&&d.shiftTime===0;
+  d.clutchGrip+=((wantsGrip?1:0)-d.clutchGrip)*(wantsGrip?0.48:0.82);
+  const coupled=wantsGrip&&d.clutchGrip>0.02;
+  const loadRpm=Math.max(IDLE,speedRpm+gas*Math.max(0,900-d.speed*40));
+  const airRpm=IDLE+gas*spec.redline*1.08;
+  const target=coupled?loadRpm*d.clutchGrip+airRpm*(1-d.clutchGrip):airRpm;
+  d.engine+=(target-d.engine)*(coupled?0.36:0.095);
+  d.engine=clamp(d.engine,IDLE*0.85,spec.redline*1.24);
+  const rpmRatio = d.engine / spec.redline;
+  const torqueShape = clamp(1.05 - (rpmRatio - 0.57) ** 2 * 1.2, 0.27, 1.05);
+  const wheelForce=coupled?gas*spec.torque*1.35582*torqueShape*ratio*0.78*d.clutchGrip/TIRE_RADIUS:0;
+  const powerForce = spec.hp * 745.7 * 0.82 / Math.max(5, d.speed);
+  const traction = spec.grip * 9.81 * mass * 0.57;
+  const onPavement = ai || Math.abs(d.offset) <= 1.13;
+  const driven = Math.min(wheelForce, powerForce, traction * (onPavement ? 1 : 0.54));
+  d.slip = clamp((wheelForce - traction) / Math.max(1, traction), 0, 1);
+  // Low-gear engine braking should be stronger than freewheeling in neutral.
+  const engineBrake=coupled?(1-gas)*ratio*(42+35*rpmRatio)*d.clutchGrip:0;
+  const resistance=d.speed>0?0.507*d.speed**2+(onPavement?108:1220)+engineBrake:0;
+  d.speed = clamp(d.speed + (driven - resistance - brake * mass * 7.6 * spec.grip) * STEP / mass, 0, 61);
+  d.distance += d.speed * STEP;
+  if (!ai) {
+    const steering = control.steer * (0.62 + 0.57 * spec.grip) * Math.min(1.36, 0.68 + d.speed * 0.024);
+    const understeer = 1 - Math.max(0, d.speed - 23) * Math.abs(curve) * (1 - spec.grip * 0.58) / 34;
+    d.heading += (steering * understeer - d.heading) * 0.21;
+    d.offset += (d.heading - curve * d.speed / 27 - d.offset * 0.055) * d.speed * STEP / 8.5;
+    d.heat = Math.max(0, d.heat + STEP * ((gas > 0.8 ? 0.035 : -0.085) +
+      Math.max(0, rpmRatio - 0.83) * 1.15 - 0.0034 * d.speed));
+    d.overrev = Math.max(0, d.overrev + STEP * (rpmRatio > 1.02 ? 0.45 + 2.8 * (rpmRatio - 1) : -0.32));
+    d.fuel += STEP * (0.022 + gas * (0.12 + spec.hp * 0.00038 + d.engine * 0.000017));
+    d.wear += STEP * (0.10 + d.slip * 0.16 + Math.max(0, rpmRatio - 0.84) * 1.15 + (onPavement ? 0 : 0.45));
+    d.gearbox = Math.max(0, d.gearbox - STEP * 0.024);
+    d.offroad = onPavement ? 0 : d.offroad + STEP;
+  }
+}
+
+// Frozen original simulation: all already-issued races and old browser tabs
+// continue to produce the exact same server-replayed results as before.
+function driveLegacy(d, spec, control, curve, ai = false) {
   const gas = control.gas;
   const brake = control.brake;
   d.shiftTime = Math.max(0, d.shiftTime - STEP);
@@ -129,7 +202,8 @@ export function stepRace(race, mask) {
   if (green && player.reaction === null && command.gas && !command.clutch && (player.gear || command.shift > 0)) {
     player.reaction = Math.round(time * 1000);
   }
-  drive(player, contract.player, command, curve);
+  const simulate=contract.physicsVersion===2?drive:driveLegacy;
+  simulate(player, contract.player, command, curve);
   if (!green) {
     if (player.distance > 0.44) result(race, 'false_start');
     else if (player.overrev > contract.player.endurance * 1.3) result(race, 'engine');
@@ -139,7 +213,7 @@ export function stepRace(race, mask) {
 
   if (!contract.timeTrial && race.aiFinish === null) {
     const aiCurve = road ? courseCurve(opponent.distance + 28, contract.seed) : 0;
-    drive(opponent, contract.opponent, rivalControl(race, aiCurve, time), aiCurve, true);
+    simulate(opponent, contract.opponent, rivalControl(race, aiCurve, time), aiCurve, true);
     if (opponent.distance >= race.length) race.aiFinish = Math.round(time * 1000);
   }
 

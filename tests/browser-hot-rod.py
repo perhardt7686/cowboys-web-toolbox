@@ -402,6 +402,9 @@ async def campaign_flow(page, name, *, touch):
     if touch:
         await finger(game.locator('[data-drive="up"]'),'pointerdown',1)
         await finger(game.locator('[data-drive="gas"]'),'pointerdown',2)
+        await expect(game.locator('[data-drive="gas"]')).to_have_attribute('aria-pressed','true')
+        await expect(game.locator('[data-drive="brake"]')).to_have_attribute('aria-label','Brake pedal')
+        await expect(game.locator('[data-drive="clutch"]')).to_have_attribute('aria-label','Clutch pedal')
         await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
         await finger(game.locator('[data-drive="gas"]'),'pointerup',2)
         await finger(game.locator('[data-drive="up"]'),'pointerup',1)
@@ -414,16 +417,19 @@ async def campaign_flow(page, name, *, touch):
     else:
         await page.keyboard.down('ArrowUp')
         for gear in [1,2]:
+            # In physics v2 a high-RPM power shift can overheat/over-rev a
+            # low-power 1940 coupe. Shift at a period-plausible 3900 RPM.
+            # Preserve a visible gear-change assertion and an earned race win.
             await page.wait_for_function(r"""gear => {
               const text=document.querySelector('.hot-rod-meters').textContent;
               const rpm=text.match(/(\d+) RPM/);
-              return rpm && Number(rpm[1]) >= 4250 && text.includes('GEAR ' + gear);
-            }""", arg=gear, timeout=12000)
+              return rpm && Number(rpm[1]) >= 3900 && text.includes('GEAR ' + gear) && !text.includes('SHIFTING');
+            }""", arg=gear, timeout=15000)
             await page.keyboard.up('ArrowUp')
             await page.keyboard.press('e')
             await page.wait_for_function("""gear =>
               document.querySelector('.hot-rod-meters').textContent.includes('GEAR ' + gear)
-            """, arg=gear+1, timeout=4500)
+            """, arg=gear+1, timeout=5000)
             await page.keyboard.down('ArrowUp')
         await expect(game.get_by_role('heading',name='Victory')).to_be_visible(timeout=23000)
         await page.keyboard.up('ArrowUp')
