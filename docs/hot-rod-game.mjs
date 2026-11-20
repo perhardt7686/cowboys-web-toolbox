@@ -4,7 +4,7 @@ import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.
 import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, makeCar, matches, repairCost, roadProblem, saleValue} from './hot-rod-campaign.mjs';
 import {BOLTS, CAR_LIST, CARS, COLORS, DOLLARS, FUEL_TANK, MAKES, PART_LIST, PARTS, RIVALS,
   SLOT_NAMES, SLOTS, WAGERS, WHEELS, fullBolts, isWheel} from './hot-rod-catalog.mjs';
-import {paintScene} from './hot-rod-art.mjs?v=dosfidelity1';
+import {paintScene} from './hot-rod-art.mjs?v=carprofiles2';
 import {BAY_MENU,IGNITION,SHELF_LIST,workbenchFasteners} from './hot-rod-engine-bay.mjs?v=dosfidelity1';
 import {DRIVE_IN_HOTSPOTS,NEWSPAPER_HOTSPOTS} from './hot-rod-period-scenes.mjs?v=dosfidelity1';
 import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP} from './hot-rod-racing.mjs';
