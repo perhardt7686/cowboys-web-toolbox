@@ -7,7 +7,7 @@ import {createRace,stepRace,recordInput,replayRace,INPUT,STEP} from '../docs/hot
 const driver = () => carSpec(makeCar(CARS.chevy40,1),'drag');
 const contract = (model=driver()) => ({
   player:model,opponent:model,kind:'drag',seed:17,reaction:0,
-  skill:0.9,timeTrial:true,patrol:false
+  skill:0.9,timeTrial:true,patrol:false,physicsVersion:2
 });
 const stand = () => {const race=createRace(contract());race.greenAt=0;return race;};
 const accelerate=(race,ticks=60) => {
@@ -73,4 +73,16 @@ test('server replay remains deterministic with the same seven-bit classic touch 
   const replay=replayRace(cfg,log);
   assert.deepEqual(replay.result,race.result);
   assert.equal(replay.ticks,race.tick);
+});
+
+test('legacy races remain on original physics, even after v2 clients and backend deploy',()=>{
+  const old=contract(),modern=contract();
+  delete old.physicsVersion;
+  const prior=createRace(old),upgraded=createRace(modern);
+  prior.greenAt=0;upgraded.greenAt=0;
+  stepRace(prior,INPUT.gas|INPUT.up);
+  stepRace(upgraded,INPUT.gas|INPUT.up);
+  assert.equal(prior.player.throttle,0,'Original simulator must not mutate v2 throttle');
+  assert.ok(upgraded.player.throttle>0,'Opt-in v2 uses progressive pedal travel');
+  assert.equal(prior.player.gear,upgraded.player.gear);
 });
