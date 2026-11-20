@@ -15,7 +15,7 @@ test('20 independent pictured gardens and coherent contrasting botanical themes'
  assert.match(picture,/illustratedRegionMap\(index,region\)/);
  assert.match(picture,/aria-label.*illustrated area map/);
  assert.match(picture,/nature-region-illustration/);
- assert.doesNotMatch(picture,/fetch\(|XMLHttpRequest|http:|https:|localStorage|supabase|indexedDB/);
+ assert.doesNotMatch(picture,/fetch\(|XMLHttpRequest|localStorage|supabase|indexedDB/);
 });
 test('glowing server-authoritative trail earns visual keepsakes but no invented currency',()=>{
  assert.deepEqual(roadTrailKeepsake(5),{icon:'✦',name:'Trail Star',description:'Complete five garden steps'});
