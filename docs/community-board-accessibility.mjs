@@ -17,23 +17,38 @@ if(board){
     const key='coco-community-easy-read-v1';
     let easy=false;
     try{easy=localStorage.getItem(key)==='1';}catch{}
-    const reading=main.querySelector('.family-reading-bar')||document.createElement('div');
-    if(!reading.isConnected){
-      reading.className='family-reading-bar';
-      reading.innerHTML='<p><strong>Reading comfort</strong> · Bigger text and clearer menus for everyone.</p><button type="button" id="family-read-toggle" aria-pressed="false">Larger, clearer text</button>';
-      main.prepend(reading);
-    }
+    // Keep reading controls in the search/sort toolbar rather than taking
+    // a full-width block at the top of conversations on small iPhones.
+    const tools=main.querySelector('.community-tools')||main;
+    const previous=main.querySelector('.family-reading-bar');
+    const reading=document.createElement('details');
+    reading.className='family-reading-bar';
+    reading.id='family-reading-menu';
+    reading.innerHTML='<summary id="family-reading-summary">Aa Reading <span class="family-reading-current">Standard</span></summary><div class="family-reading-panel"><p><strong>Reading comfort</strong> · Bigger text and clearer menus for everyone.</p><button type="button" id="family-read-toggle" aria-pressed="false">Larger, clearer text</button></div>';
+    previous?.remove();
+    tools.append(reading);
     const toggle=reading.querySelector('#family-read-toggle');
+    const current=reading.querySelector('.family-reading-current');
     const setRead=on=>{
       easy=!!on;
       document.body.classList.toggle('family-easy-read',easy);
       if(toggle){
         toggle.setAttribute('aria-pressed',String(easy));
-        toggle.textContent=easy?'Standard text size':'Larger, clearer text';
+        toggle.textContent=easy?'Use standard text':'Use larger, clearer text';
       }
+      if(current)current.textContent=easy?'Large':'Standard';
       try{localStorage.setItem(key,easy?'1':'0');}catch{}
     };
     toggle?.addEventListener('click',()=>setRead(!easy));
+    reading.addEventListener('keydown',event=>{
+      if(event.key==='Escape'&&reading.open){
+        event.preventDefault();reading.open=false;
+        reading.querySelector('summary')?.focus();
+      }
+    });
+    document.addEventListener('click',event=>{
+      if(reading.open&&!reading.contains(event.target))reading.open=false;
+    });
     setRead(easy);
     const sort=document.querySelector('label.community-sort');
     if(sort&&!sort.querySelector('.community-sort-label')){
