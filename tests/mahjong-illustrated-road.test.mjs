@@ -52,8 +52,9 @@ test('route invitations only after successful server-cleared milestones, never d
  assert.equal(roadVictoryMessage({...win(5),campaign_event:'retry'}),'');
  const game=src('docs/commons-mahjong.mjs');
  assert.match(game,/if\(roadVisitDue\(data\)\)inviteToMysteryRoad\(data\)/);
- assert.match(game,/if\(document\.hidden\|\|!mounted\|\|busy\|\|!expanded/);
- assert.match(game,/dataset\.mahjongMode==='turtle'\|\|state\?\.run/);
+ assert.match(game,/if\(document\.hidden\|\|!mounted\|\|busy/);
+ assert.match(game,/Number\(state\.run\.remaining_pairs/);
+ assert.match(game,/dataset\.mahjongMode==='turtle'/);
  assert.match(game,/arcadeMahjongNavigate\('levels'\)/);
  assert.match(game,/id="mahjong-journey-mini-map" class="mahjong-map-hero-button"/);
 });
