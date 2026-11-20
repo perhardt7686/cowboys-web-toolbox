@@ -26,10 +26,14 @@ const PROFILES = {
     fenders:'running',trim:'hood',wall:'thin'
   },
   sedan32:{
-    shell:[[10,45],[18,37],[25,19],[32,10],[43,6],[117,6],[129,13],[142,32],[196,32],
-      [211,35],[218,44],[216,58],[207,63],[13,63],[7,57]],
-    glass:[[[34,14],[43,11],[74,11],[75,32],[28,32]],[[80,11],[112,11],[122,14],[135,31],[82,32]]],
-    waist:37,wheels:[45,192,14],doors:[[78,32,77,55,68],[136,33,135,54,91]],
+    // Four-window sedan: long straight turret, upright rear quarter and
+    // two distinct door openings; deliberately not a stretched Deuce coupe.
+    shell:[[9,45],[15,39],[23,34],[25,17],[32,9],[42,6],[115,6],[126,10],[138,20],[144,33],
+      [194,33],[211,37],[218,45],[216,58],[207,63],[13,63],[7,57]],
+    glass:[[[31,16],[42,11],[58,11],[59,32],[27,32]],
+      [[65,11],[87,11],[88,32],[65,32]],
+      [[94,11],[111,12],[123,17],[136,31],[94,32]]],
+    waist:37,wheels:[45,192,14],doors:[[63,32,63,55,69],[138,33,136,55,108]],
     lamps:[10,43,215,37,'separate'],fenders:'running',trim:'hood',wall:'thin'
   },
   master38:{
@@ -85,7 +89,8 @@ const PROFILES = {
     fenders:'blend',trim:'streak',wall:'wide'
   },
   olds52:{
-    shell:[[6,46],[12,39],[52,36],[67,26],[85,18],[121,15],[143,20],[162,34],[213,35],[228,40],
+    // Rocket 88 hardtop: longer, straighter jet-age bonnet than the '49.
+    shell:[[6,41],[15,38],[52,36],[67,26],[85,18],[124,16],[146,20],[162,33],[215,34],[230,38],
       [236,45],[236,57],[232,62],[223,65],[12,64],[6,58]],
     glass:[[[60,34],[71,26],[86,20],[107,19],[109,34]],[[113,19],[128,19],[143,24],[153,34],[113,34]]],
     waist:38,wheels:[49,193,15],doors:[[158,35,157,59,112]],lamps:[9,43,231,43,'round'],
@@ -106,14 +111,17 @@ const PROFILES = {
     fenders:'flush',trim:'belAir',wall:'wide'
   },
   fairlane55:{
-    shell:[[6,39],[16,37],[58,37],[77,23],[94,16],[129,16],[145,20],[162,32],[169,37],
-      [220,35],[234,38],[238,46],[236,56],[229,63],[12,64],[5,58]],
-    glass:[[[64,36],[81,26],[97,21],[110,21],[110,36]],[[115,21],[129,21],[143,25],[160,36],[115,36]]],
+    // Victoria's full-length bright roof, sloped wraparound screen and
+    // stepped rear wing distinguish it from Chevrolet's Bel Air.
+    shell:[[6,35],[15,37],[54,38],[69,33],[81,21],[97,16],[129,16],[146,21],[163,33],[169,38],
+      [218,36],[232,38],[238,45],[236,56],[229,63],[12,64],[5,58]],
+    glass:[[[68,34],[84,25],[98,21],[110,21],[110,36]],[[115,21],[129,21],[143,26],[160,36],[115,36]]],
     waist:40,wheels:[48,195,14],doors:[[166,37,164,59,117]],lamps:[9,40,234,42,'round'],
     fenders:'flush',trim:'fairlane',wall:'wide'
   },
   lancer55:{
-    shell:[[5,37],[16,39],[55,38],[65,34],[80,23],[94,16],[128,16],[144,19],[159,28],[169,37],
+    // Dodge Royal Lancer's more angular rear kick and tall forward-leaning fin.
+    shell:[[5,31],[13,35],[22,39],[55,38],[65,34],[80,23],[94,16],[128,16],[144,19],[159,28],[169,37],
       [222,35],[232,37],[237,44],[237,57],[230,63],[10,64],[4,57]],
     glass:[[[66,35],[84,25],[99,21],[110,21],[110,36]],[[115,21],[135,22],[151,28],[160,36],[115,36]]],
     waist:40,wheels:[48,195,14],doors:[[169,37,165,60,118]],lamps:[8,39,232,40,'brow'],
@@ -129,8 +137,9 @@ const PROFILES = {
     fenders:'sport',trim:'cove',wall:'wide',seat:[96,34]
   },
   mercury56:{
-    shell:[[5,36],[15,39],[55,38],[70,28],[83,20],[101,15],[136,16],[151,22],[168,36],
-      [213,35],[232,38],[238,43],[237,58],[230,64],[11,64],[4,56]],
+    // Distinct '56 Custom rear-quarter flare and longer flatter bonnet.
+    shell:[[5,33],[15,38],[55,39],[70,28],[83,20],[101,15],[136,16],[151,22],[168,36],
+      [212,35],[229,36],[238,42],[237,58],[230,64],[11,64],[4,56]],
     glass:[[[65,35],[81,25],[101,20],[113,20],[113,35]],[[118,20],[135,21],[149,26],[159,35],[118,36]]],
     waist:40,wheels:[44,196,14],doors:[[165,37,164,59,118]],lamps:[7,40,233,41,'brow'],
     fenders:'flush',trim:'dip',wall:'wide'
@@ -150,8 +159,9 @@ const PROFILES = {
     fenders:'flush',trim:'bird',wall:'wide',seat:[98,34]
   },
   impala58:{
-    shell:[[4,37],[17,37],[41,40],[60,37],[78,25],[95,18],[133,17],[152,23],[171,36],
-      [220,35],[233,36],[239,42],[238,57],[226,64],[12,64],[4,54]],
+    // Lower 1958 hardtop, uninterrupted long deck and a rising rear shoulder.
+    shell:[[4,32],[17,35],[41,40],[60,37],[78,25],[95,18],[133,17],[152,23],[171,36],
+      [221,35],[233,36],[239,42],[238,57],[226,64],[12,64],[4,54]],
     glass:[[[67,36],[81,28],[96,23],[111,22],[111,36]],[[116,22],[133,22],[148,27],[162,36],[116,37]]],
     waist:41,wheels:[47,194,14],doors:[[168,37,166,60,122]],lamps:[7,41,233,39,'quad'],
     fenders:'flush',trim:'impala',wall:'wide'
@@ -654,6 +664,214 @@ function drawPeriodBodywork(sprite, profile, id, paint) {
   }
 }
 
+// Car-by-car factory signatures: unique quarter-panel decorations, brightwork,
+// roof architecture and tail/headlight cues at a legible 240x76 sprite scale.
+// Every model stays an original hand-drawn EGA approximation, not a copied asset.
+// Never alter a car's ID, mechanical stats, available parts or saved appearance.
+function drawFactorySignature(sprite, profile, id, paint, car) {
+  const [shade,body,light,chrome] = paint;
+  const bright = 15, steel = 7, ink = 0;
+  const draw = (points,color=chrome) => sprite.trace(points,color);
+  const band = (x,y,w,color=chrome) => sprite.box(x,y,w,1,color);
+  const pip = (x,y,color=bright) => sprite.pixel(x,y,color);
+  const fin = (pts) => {sprite.polygon(pts,light);sprite.trace(pts.slice(0,3),chrome);};
+
+  switch(id) {
+    case 'ford32': {
+      // Five-window hot rod, narrow rear quarter port and exposed louvers.
+      sprite.polygon([[62,21],[68,16],[73,16],[73,29],[62,29]],ink);
+      draw([[61,29],[61,18],[68,14],[74,14]],chrome);
+      draw([[142,44],[155,44],[162,45]],bright);
+      band(151,55,23,shade);
+      break;
+    }
+    case 'sedan32': {
+      // Upright multi-window four-door with a three-pillar greenhouse.
+      for(const x of [61,91]){sprite.line(x,12,x,34,ink);sprite.line(x+1,12,x+1,32,chrome);}
+      band(30,35,110,steel);
+      draw([[13,45],[20,37],[28,35]],bright);
+      break;
+    }
+    case 'master38': {
+      // Chevrolet Master Deluxe: stepped hood, under-door running board.
+      draw([[139,36],[169,35],[192,38]],light);
+      draw([[145,44],[200,44]],steel);
+      for(let x=163;x<=183;x+=4) sprite.line(x,43,x+1,49,shade);
+      sprite.box(81,60,54,2,ink);
+      break;
+    }
+    case 'chevy40': {
+      // Business coupe's beaked nose and stout rear fender.
+      draw([[14,47],[31,46],[41,42],[53,39]],bright);
+      draw([[181,34],[212,35],[226,40]],chrome);
+      for(let x=162;x<=183;x+=6) pip(x,43,steel);
+      break;
+    }
+    case 'roadster40': {
+      // Low open car: windshield frame, cowl and padded cockpit lip.
+      draw([[117,37],[120,22],[127,20],[145,35]],bright);
+      band(83,38,33,ink);band(87,39,25,steel);
+      draw([[42,44],[64,42],[90,42]],light);
+      break;
+    }
+    case 'ford40': {
+      // Ford Deluxe rounded beak, horizontal hood ribs, rolled belt.
+      draw([[155,36],[193,35],[221,40]],bright);
+      for(let x=159;x<=177;x+=4) sprite.line(x,41,x+1,47,shade);
+      draw([[13,53],[26,50],[37,47]],chrome);
+      break;
+    }
+    case 'style49': {
+      // Chevrolet's smooth postwar pontoon: two long bright side spears.
+      draw([[21,46],[64,46],[108,48],[168,47],[225,44]],bright);
+      draw([[23,48],[68,48],[111,50],[166,49],[223,46]],steel);
+      pip(177,38,bright);band(207,36,10,light);
+      break;
+    }
+    case 'olds49': {
+      // Rocket 88 rocket flashes and three-piece rear flank ornament.
+      draw([[26,47],[56,45],[82,46],[126,49],[186,46],[226,41]],bright);
+      draw([[15,54],[30,54],[42,52]],steel);
+      sprite.polygon([[149,49],[161,47],[170,48],[162,51]],bright);
+      for(const x of [185,191,197])pip(x,38,bright);
+      break;
+    }
+    case 'silver50': {
+      // Pontiac "Silver Streak" hood strips and arrowhead wing emblem.
+      for(const dy of [-2,0,2]) draw([[160,37+dy],[184,35+dy],[216,38+dy]],dy===0?bright:steel);
+      sprite.polygon([[99,49],[107,45],[115,49],[107,52]],bright);
+      band(14,52,18,steel);break;
+    }
+    case 'olds52': {
+      // '52 Rocket 88 longer chrome rocket and crisp B pillar.
+      draw([[17,47],[51,46],[88,47],[126,49],[183,47],[230,43]],bright);
+      draw([[27,51],[60,51],[100,52]],steel);
+      sprite.line(110,19,110,34,ink);sprite.line(111,20,111,32,bright);
+      pip(171,37,bright);break;
+    }
+    case 'mercury54': {
+      // Monterey's subtle "dip" side sweep and turbine-style rear badge.
+      draw([[9,44],[60,45],[96,50],[150,50],[198,44],[232,42]],bright);
+      draw([[14,47],[60,48],[96,53],[146,53],[196,47]],steel);
+      for(const y of [46,49,52])pip(24,y,bright);
+      break;
+    }
+    case 'belair55': {
+      // Chevy two-tone hockey-stick spear, chrome across the rear flank.
+      sprite.polygon([[15,44],[64,45],[93,47],[111,49],[130,52],[95,55],[50,53],[16,50]],bright);
+      draw([[17,44],[62,45],[94,47],[111,49],[130,52]],steel);
+      draw([[135,49],[174,46],[224,42]],bright);
+      break;
+    }
+    case 'fairlane55': {
+      // Victoria roof belt and distinctive rising Ford side insert.
+      draw([[71,22],[95,17],[130,17],[146,22]],bright);
+      sprite.polygon([[14,45],[43,46],[82,46],[115,49],[132,54],[91,54],[48,51]],steel);
+      draw([[14,45],[49,45],[83,46],[114,49],[132,54]],bright);
+      break;
+    }
+    case 'lancer55': {
+      // Dodge spear, pronounced forward-leaning fin and rear chrome slash.
+      fin([[5,31],[12,31],[24,39],[10,37]]);
+      sprite.polygon([[11,44],[62,44],[116,47],[151,48],[180,44],[221,42],[204,48],[158,54],[115,52],[63,50]],bright);
+      draw([[12,44],[61,44],[116,47],[151,48],[183,44],[221,42]],steel);
+      break;
+    }
+    case 'vette56': {
+      // '56 roadster with massive white coves and short door shut line.
+      draw([[99,45],[118,42],[147,42],[172,44],[195,48]],bright);
+      draw([[100,53],[115,57],[142,58],[169,54]],steel);
+      draw([[120,23],[124,22],[135,32]],bright);
+      for(const x of [205,209,213]) pip(x,44,bright);
+      break;
+    }
+    case 'mercury56': {
+      // '56 Mercury high side sweep, rear fender hump, broad chrome mouth.
+      fin([[5,33],[10,33],[24,39],[11,39]]);
+      draw([[13,44],[61,46],[99,50],[157,50],[214,43],[234,42]],bright);
+      draw([[17,47],[61,49],[101,53],[157,53],[208,47]],steel);
+      break;
+    }
+    case 'fairlane57': {
+      // 1957 Ford, tall squared fin with wide chrome bi-tone insert.
+      fin([[3,29],[10,29],[33,40],[14,38]]);
+      sprite.polygon([[10,43],[36,46],[83,46],[119,49],[146,49],[123,54],[79,53],[35,51]],bright);
+      draw([[10,43],[36,46],[83,46],[119,49],[146,49]],steel);
+      break;
+    }
+    case 'tbird57': {
+      // Low two-seat Thunderbird with removable-top cues, wing badge.
+      draw([[118,24],[126,22],[142,35]],bright);
+      sprite.polygon([[70,46],[78,46],[82,50],[77,53],[70,51]],bright);
+      draw([[16,47],[51,45],[102,45]],steel);
+      for(const x of [200,206,212])pip(x,43,bright);
+      break;
+    }
+    case 'impala58': {
+      // 1958 Impala broad fin, longer descending quarter and dual chrome strips.
+      fin([[4,32],[12,32],[32,41],[15,39]]);
+      draw([[14,45],[61,46],[101,47],[161,44],[224,41]],bright);
+      draw([[17,48],[61,49],[102,50],[160,47],[224,44]],steel);
+      for(const x of [71,76,81])sprite.line(x,53,x-1,57,bright);
+      break;
+    }
+    case 'valiant61': {
+      // Early Valiant: quirky pointed rear eyebrow, slim side crease.
+      fin([[7,40],[11,34],[17,35],[25,41]]);
+      draw([[11,44],[53,43],[94,45],[151,48],[202,43]],bright);
+      sprite.line(101,22,101,36,ink);
+      break;
+    }
+    case 'vette61': {
+      // Quad-headlamp later Corvette with a shorter, higher rising cove.
+      draw([[106,46],[126,45],[155,43],[186,46]],bright);
+      draw([[110,54],[125,57],[154,57],[180,52]],steel);
+      for(const x of [203,208,213,218])pip(x,43,bright);
+      break;
+    }
+    case 'polara62': {
+      // Dodge Polara long squared bonnet with horizontal bright rocket trim.
+      draw([[9,42],[63,42],[99,45],[153,44],[208,40],[234,41]],bright);
+      draw([[10,45],[65,45],[99,48],[151,47],[210,43]],steel);
+      for(const x of [192,198,204])pip(x,38,bright);
+      break;
+    }
+    case 'valiant63': {
+      // Compact Valiant, short nose and understated slanted rear quarter.
+      draw([[12,45],[44,43],[101,44],[153,46],[208,43]],bright);
+      draw([[13,47],[44,46],[99,47],[153,49]],steel);
+      sprite.line(106,23,107,36,ink);
+      break;
+    }
+    case 'vette63': {
+      // Split-window Sting Ray fastback: roof taper, rear spine and three vents.
+      draw([[53,34],[76,23],[95,18],[119,19],[139,34]],bright);
+      sprite.line(99,23,101,36,ink);
+      sprite.line(100,24,102,33,bright);
+      for(const x of [151,156,161])sprite.line(x,47,x-2,54,steel);
+      draw([[171,38],[198,36],[230,40]],bright);
+      break;
+    }
+    case 'savoy64': {
+      // Plymouth Savoy straight-box two-door roof and conservative body spear.
+      draw([[12,43],[55,42],[106,43],[164,44],[216,41]],bright);
+      draw([[13,45],[55,44],[106,46],[164,47]],steel);
+      sprite.line(111,23,111,36,ink);
+      for(const x of [220,225,230])pip(x,44,bright);
+      break;
+    }
+    case 'mystery66':
+      // The family finale stays exactly as it is.
+      return;
+  }
+  // Single bright door lock and rocker notches preserve the scale of EGA-era
+  // details while adding period character at 320x200 display resolution.
+  if(profile.doors.length && !car?.roof) {
+    const [handle] = profile.doors.at(-1);
+    if(handle>22&&handle<226) pip(handle-2,profile.waist+13,chrome);
+  }
+}
+
 function drawWheel(sprite, x, r, part, whitewall, fitted, wireSpokes=false) {
   const y = GROUND - r;
   const slick = part === 'tire-slick';
@@ -780,6 +998,7 @@ function vehicleSprite(profile, modelId, car, paint, frontWheel, rearWheel) {
   drawDoors(sprite,profile,paint);
   drawPeriodBodywork(sprite,profile,modelId,paint);
   drawClassicIdentity(sprite,profile,modelId,paint);
+  drawFactorySignature(sprite,profile,modelId,paint,car);
   if (car?.decal && profile.trim !== 'van') drawDecal(sprite,car.decal,profile);
   for (const [x, wheel] of [[rear,rearWheel],[front,frontWheel]]) {
     drawWheel(sprite,x,r,wheel,profile.wall,Boolean(wheel),modelId==='ford32'||modelId==='sedan32');
