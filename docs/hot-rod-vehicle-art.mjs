@@ -986,6 +986,135 @@ function drawFactorySignature(sprite, profile, id, paint, car) {
       for(const x of [220,225,230])pip(x,44,bright);
       break;
     }
+    case 'woodie34':{
+      // True wagon profile with timber frames, separate radiator and rear door.
+      sprite.polygon([[16,40],[36,38],[73,40],[110,40],[138,38],[141,57],[16,57]],6);
+      for(const [x1,x2] of [[18,51],[55,79],[82,111],[115,138]]){
+        draw([[x1,40],[x1,56],[x2,56],[x2,41]],14);
+      }
+      draw([[17,49],[140,49]],14);
+      draw([[18,40],[19,20],[28,11],[120,11],[135,19]],steel);
+      break;
+    }
+    case 'town48':{
+      // Genuine wood-panel convertible with fine-grained cabin-side framing.
+      sprite.polygon([[18,41],[75,39],[114,43],[151,42],[151,57],[18,57]],6);
+      draw([[20,43],[49,42],[82,43],[112,46],[150,45]],14);
+      draw([[20,54],[50,55],[83,55],[116,54],[151,55]],14);
+      for(const x of [32,66,97,129])sprite.line(x,44,x,54,14);
+      draw([[139,26],[145,23],[159,37]],bright);
+      break;
+    }
+    case 'chevy3100':{
+      // 1950s stepside cargo bed, exposed rear wheel arch and square truck cab.
+      sprite.line(13,35,94,35,ink);
+      sprite.line(12,57,29,57,steel);
+      sprite.line(84,39,84,58,ink);
+      draw([[97,36],[110,18],[122,13],[149,14]],bright);
+      draw([[174,38],[207,36],[230,42]],steel);
+      for(const x of [181,186,191])sprite.line(x,46,x,52,steel);
+      break;
+    }
+    case 'nomad55':{
+      // Nomad roof stainless, distinctive seven rear bright ribs and low estate.
+      draw([[25,17],[129,17],[146,29]],bright);
+      for(let x=28;x<=52;x+=4)sprite.line(x,46,x+1,56,steel);
+      draw([[8,44],[42,43],[85,44],[126,47],[221,42]],bright);
+      break;
+    }
+    case 'f10057':{
+      // Flareside bed and contrasting cab pillars, separated truck nose.
+      draw([[12,36],[91,36],[93,59]],bright);
+      sprite.line(97,35,97,60,ink);
+      draw([[107,31],[119,15],[153,16],[170,36]],bright);
+      draw([[178,42],[214,40],[234,46]],bright);
+      for(const x of [181,186,191])sprite.line(x,47,x,53,steel);
+      break;
+    }
+    case 'camino59':{
+      // El Camino rear load deck and dramatic 1959 Chevrolet fin.
+      fin([[4,36],[7,28],[14,30],[28,38]]);
+      draw([[15,37],[70,37]],steel);
+      draw([[9,43],[48,44],[102,45],[145,47],[211,42]],bright);
+      draw([[9,47],[48,48],[102,49]],steel);
+      break;
+    }
+    case 'eldorado59':{
+      // Cadillac's enormous towering rocket fins and double deck trim.
+      fin([[3,23],[6,17],[14,19],[29,35]]);
+      draw([[8,40],[55,42],[107,44],[157,44],[220,40]],bright);
+      draw([[10,44],[55,46],[107,48],[158,48],[219,44]],steel);
+      for(const x of [67,74,81,88])sprite.line(x,52,x-1,57,bright);
+      break;
+    }
+    case 'squire60':{
+      // Country Squire wood appliqué, crossbars and three-window roof.
+      sprite.polygon([[12,43],[54,43],[89,44],[144,44],[153,52],[112,57],[27,57],[10,54]],6);
+      draw([[14,43],[58,43],[92,44],[145,44],[153,52]],14);
+      draw([[14,54],[39,56],[111,56],[153,52]],14);
+      for(const x of [36,67,99,127])sprite.line(x,45,x,54,14);
+      draw([[24,17],[131,17],[149,25]],bright);
+      break;
+    }
+    case 'econoline61':{
+      // Cargo van: solid delivery sides, small driver window, flat roof.
+      draw([[14,13],[175,13],[192,17],[216,37]],bright);
+      sprite.line(166,16,166,59,ink);
+      draw([[12,43],[166,43],[226,43]],steel);
+      for(const x of [47,93,129])sprite.line(x,44,x,58,shade);
+      sprite.box(154,44,7,2,steel);
+      break;
+    }
+    case 'clubwagon62':{
+      // Passenger van: five separate window bays, slim door seams.
+      draw([[12,14],[176,14],[192,18],[216,37]],bright);
+      for(const x of [55,90,128,173])sprite.line(x,18,x,37,ink);
+      draw([[12,42],[228,43]],steel);
+      draw([[12,56],[226,56]],bright);
+      break;
+    }
+    case 'econoPickup61':{
+      // Forward-control Econoline: box bed, cab perched over front wheel.
+      draw([[13,36],[145,36],[150,37]],bright);
+      sprite.line(145,36,145,60,ink);
+      sprite.line(16,36,16,57,ink);
+      draw([[160,16],[193,15],[216,34]],bright);
+      draw([[150,44],[231,44]],steel);
+      break;
+    }
+    case 'c10stepside63':{
+      // Separate bed and stepside rear fender, front angular Chevrolet hood.
+      sprite.line(13,35,94,35,ink);
+      sprite.line(92,36,92,59,steel);
+      draw([[105,33],[122,17],[153,17],[174,37]],bright);
+      draw([[176,41],[215,38],[231,43]],steel);
+      for(const x of [206,211,216,221])pip(x,44,bright);
+      break;
+    }
+    case 'd10063':{
+      // Full-width Sweptline load bed and compact short-cab shoulder line.
+      draw([[10,36],[103,36],[175,37],[226,36]],bright);
+      draw([[13,44],[57,44],[101,44],[165,46],[224,43]],steel);
+      draw([[109,21],[123,16],[156,16],[169,27]],bright);
+      sprite.line(101,36,101,60,ink);
+      break;
+    }
+    case 'riviera63':{
+      // Buick Riviera clean coke-bottle shoulder, small formal roof, no fins.
+      draw([[8,42],[58,42],[94,44],[150,44],[212,39],[236,43]],bright);
+      draw([[12,45],[57,45],[95,47],[148,47],[213,42]],steel);
+      for(const x of [173,177,181])sprite.line(x,44,x-1,51,ink);
+      draw([[86,25],[107,18],[138,18],[156,28]],bright);
+      break;
+    }
+    case 'galaxie63':{
+      // Formal Galaxie fastback, full-length bright body spear.
+      draw([[83,27],[101,17],[128,18],[162,34]],bright);
+      draw([[10,44],[62,44],[100,47],[166,47],[231,42]],bright);
+      draw([[13,46],[64,46],[101,49],[168,49]],steel);
+      for(const x of [204,208,212])pip(x,42,bright);
+      break;
+    }
     case 'mystery66':
       // The family finale stays exactly as it is.
       return;
@@ -993,7 +1122,7 @@ function drawFactorySignature(sprite, profile, id, paint, car) {
   // Single bright door lock and rocker notches preserve the scale of EGA-era
   // details while adding period character at 320x200 display resolution.
   if(profile.doors.length && !car?.roof) {
-    const [handle] = profile.doors.at(-1);
+    const handle = profile.doors.at(-1)[4];
     if(handle>22&&handle<226) pip(handle-2,profile.waist+13,chrome);
   }
 }
@@ -1103,7 +1232,10 @@ function vehicleSprite(profile, modelId, car, paint, frontWheel, rearWheel) {
     : points;
   const shell = roof(profile.shell);
   const [dark,,light] = paint;
-  const [rear,front,r] = profile.wheels;
+  const [rear,front,designRadius] = profile.wheels;
+  // In an elevation, tire diameter must be small relative to wheelbase and
+  // height. Earlier oversized circles made realistic cars look toy-like.
+  const r = Math.max(10,Math.round(designRadius*0.79));
   const visibleJack = car?.jack?.endsWith('-left') ? car.jack : '';
   const jackX = visibleJack.startsWith('rear') ? rear : front;
   sprite.polygon([[7,69],[41,67],[194,67],[232,70],[220,74],[44,74],[13,72]],8);
@@ -1123,7 +1255,8 @@ function vehicleSprite(profile, modelId, car, paint, frontWheel, rearWheel) {
   drawTrim(sprite,profile,paint);
   drawDoors(sprite,profile,paint);
   drawPeriodBodywork(sprite,profile,modelId,paint);
-  drawClassicIdentity(sprite,profile,modelId,paint);
+  // Unified factory-fidelity renderer: one silhouette, restrained bodywork,
+  // and one signature accent pass for original and expansion vehicles.
   drawFactorySignature(sprite,profile,modelId,paint,car);
   if (car?.decal && profile.trim !== 'van') drawDecal(sprite,car.decal,profile);
   for (const [x, wheel] of [[rear,rearWheel],[front,frontWheel]]) {
