@@ -115,7 +115,8 @@ export function mountNatureRoad(container,{onPlay}={}){
  <div id="nature-road-nodes" class="nature-road-nodes" role="group" aria-label="Levels along the illustrated trail"></div>
  <span class="nature-road-map-stamp" aria-hidden="true">✦ FOLLOW THE GLOWING TRAIL ✦</span></div>
  <div class="nature-road-rewards" role="status" aria-live="polite"><span class="nature-road-reward-icon" aria-hidden="true">🎁</span>
- <span id="nature-road-reward-label">Your first Trail Star is waiting</span><strong id="nature-road-reward-count">0 earned</strong></div>
+ <span id="nature-road-reward-label">Your first Trail Star is waiting</span><strong id="nature-road-reward-count">0 earned</strong>
+ <span id="nature-road-bonus-award" class="nature-road-bonus-award" hidden></span></div>
  <div class="nature-road-spotlight" role="status" aria-live="polite"><span id="nature-road-spotlight-icon" aria-hidden="true">🌼</span>
  <div><strong id="nature-road-spotlight-name">Level 1 · Bloom Walk</strong><small id="nature-road-spotlight-description">Choose a stage on the map.</small></div></div>
  <button type="button" id="nature-road-play" class="nature-road-play">▶ PLAY CURRENT LEVEL</button>
@@ -237,6 +238,16 @@ export function mountNatureRoad(container,{onPlay}={}){
   if(initial||changed){focusLevel=nextLevel;windowStart=roadWindow(nextLevel)[0];}
   render();
  }
+ function announceBonus(bonus,completedLevel){
+  const points=Math.max(0,Math.trunc(Number(bonus)||0));
+  const level=Number(completedLevel);
+  // The exact amount comes from the confirmed server reward, never a local
+  // calculation that might award fictitious points.
+  if(!points||!Number.isInteger(level)||level<1||level>5000)return;
+  const badge=$('#nature-road-bonus-award');
+  badge.textContent='✦ +'+count(points)+' points · Level '+count(level);
+  badge.hidden=false;
+ }
  update({});
- return {root,update,destroy:()=>root.remove()};
+ return {root,update,announceBonus,destroy:()=>root.remove()};
 }
