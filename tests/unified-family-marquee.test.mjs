@@ -7,6 +7,7 @@ const marquee=read('commons-family-fun.mjs');
 const board=read('family-board.mjs');
 const boardCSS=read('family-board.css');
 const css=read('commons-family-fun.css');
+const neon=read('family-marquee-neon.css');
 const html=read('community.html');
 const shell=read('commons-arcade-shell.mjs');
 
@@ -40,4 +41,12 @@ test('half-height launchers remain legible, original DOS canvas is deleted',()=>
  assert.match(css,/min-height:48px!important/);
  assert.doesNotMatch(shell,/arcade-title-art|function drawArt\(/);
  assert.doesNotMatch(css,/#arcade-title-art/);
+});
+
+test('every game selection stays visible without an inner-scroll trap on mobile',()=>{
+ assert.match(neon,/All eleven game choices remain visible/);
+ assert.match(neon,/\.family-fun-all-games\s*\{\s*max-height:none;\s*overflow:visible;/);
+ assert.match(neon,/@media\(max-width:600px\)\s*\{[\s\S]*?\.family-fun-all-games\s*\{\s*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important;/);
+ assert.match(neon,/\.family-fun-game-chip\s+strong\s*\{\s*white-space:normal;/);
+ assert.match(neon,/min-height:52px/);
 });
