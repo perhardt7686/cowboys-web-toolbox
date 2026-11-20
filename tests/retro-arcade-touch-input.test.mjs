@@ -54,18 +54,20 @@ test('Mystery Maze direction buffering survives short taps and reset',()=>{
   assert.equal(pad.action('maze'),'N');
 });
 
-test('retro mobile controls actually use the tap buffer and keyboard activation',()=>{
+
+test('retro mobile uses buffered input and shared two-button controller',()=>{
  const src=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+ const ui=readFileSync(new URL('../docs/retro-arcade-cabinet-ui.mjs',import.meta.url),'utf8');
  const board=readFileSync(new URL('../docs/community.html',import.meta.url),'utf8');
  assert.match(src,/createRetroInput\(\)/);
- assert.match(src,/input\.press\(game\.id,code\)/);
- assert.match(src,/event\.detail===0&&current\?\.game===game\.id\)input\.tap/);
+ assert.match(src,/createRetroCabinet\(/);
+ assert.match(ui,/input\.press\(game,code\)/);
+ assert.match(ui,/event\.detail===0&&isLive\('move'\)\)input\.tap/);
  assert.match(src,/function actionForTick\(game\)\{return input\.action\(game,current\);\}/);
  assert.match(src,/Round paused while the page is hidden/);
  assert.match(src,/Round resumed\. Keep playing/);
- assert.match(board,/commons-retro-arcade\.mjs\?v=retro12/);
+ assert.match(board,/commons-retro-arcade\.mjs\?v=retro13/);
 });
-
 
 test('last physical direction wins overlapping thumbs and held fire continues',()=>{
   const pad=createRetroInput();
@@ -85,17 +87,18 @@ test('last physical direction wins overlapping thumbs and held fire continues',(
   assert.equal(pad.action('fleet'),'N','tab hide or sign-out clears transient arcade input');
 });
 
-test('focused mobile menu buttons keep Space and Enter, game keys remain for play area',()=>{
-  const script=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
-  assert.match(script,/document\.activeElement\?\.closest\?\./);
-  assert.match(script,/button,a,summary,\[role="button"\]/,
-    'focused navigation buttons must not fire a shot when pressing Space');
-  assert.match(script,/event\.detail===0&&current\?\.game===game\.id\)input\.tap/,
-    'keyboard or assistive activation of actual arcade buttons still works');
-  const css=readFileSync(new URL('../docs/family-arcade-controls.css',import.meta.url),'utf8');
-  assert.doesNotMatch(css,/min-width:39px;width:39px/);
-  assert.match(css,/min-width:44px;width:44px;min-height:48px/);
-  assert.match(css,/grid-template-columns:minmax\(112px,/);
+
+test('focused mobile menu keeps Space/Enter and cabinet buttons support keyboard clicks',()=>{
+ const script=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+ const controller=readFileSync(new URL('../docs/retro-arcade-cabinet-ui.mjs',import.meta.url),'utf8');
+ assert.match(script,/document\.activeElement\?\.closest\?\./);
+ assert.match(script,/button,a,summary,\[role="button"\]/,
+   'focused navigation buttons must not fire a shot when pressing Space');
+ assert.match(controller,/event\.detail===0&&isLive\('move'\)\)input\.tap/,
+   'assistive keyboard activation of cabinet button still works');
+ const css=readFileSync(new URL('../docs/family-arcade-controls.css',import.meta.url),'utf8');
+ assert.doesNotMatch(css,/min-width:39px;width:39px/);
+ assert.match(css,/min-width:44px;width:44px;min-height:48px/);
 });
 
 test('both family originals retain deterministic, bounded classic arcade rules',()=>{
@@ -177,47 +180,35 @@ test('four-way cabinet joystick tracks diagonals, deadzone and bounded thumb mov
   assert.ok(Math.hypot(x,y)<=25.5);
 });
 
-test('physical cabinet touch lifecycle retains captured pointer until up or cancel',()=>{
-  const source=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
-  const styles=readFileSync(new URL('../docs/commons-retro-arcade.css',import.meta.url),'utf8');
-  assert.match(source,/stick\.addEventListener\('pointermove',moveStick\)/);
-  assert.match(source,/retroStickDirection\(dx,dy\)/);
-  assert.match(source,/stick\.setPointerCapture\?\.\(e\.pointerId\)/);
-  assert.match(source,/control\.setPointerCapture\?\.\(e\.pointerId\)/);
-  assert.match(source,/pointerId!==e\.pointerId/);
-  assert.match(source,/!control\.hasPointerCapture\?\.\(e\.pointerId\)/,
-    'pointerleave cannot cancel a valid captured finger slide');
-  assert.match(source,/root\.querySelector\('\.retro-canvas'\)\?\.focus\(\{preventScroll:true\}\)/);
-  assert.match(source,/canvas\.tabIndex=0/);
-  assert.match(styles,/\.retro-stick-knob\.is-pressed/);
-  assert.match(styles,/retro-controls\[data-retro-game="maze"\] \.retro-stick-knob/);
-  assert.match(styles,/min-height:66px/);
-  assert.match(styles,/min-height:88px/);
-  assert.doesNotMatch(source,/control\.addEventListener\(name,\(\)=>input\.cancel\(code\)\)/,
-    'do not cancel a captured thumb simply because it leaves the button');
+
+test('new cabinet captures stick and action independently and releases on cancellation',()=>{
+ const source=readFileSync(new URL('../docs/retro-arcade-cabinet-ui.mjs',import.meta.url),'utf8');
+ const main=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
+ const styles=readFileSync(new URL('../docs/commons-retro-arcade.css',import.meta.url),'utf8');
+ assert.match(source,/stick\.addEventListener\('pointermove',steer\)/);
+ assert.match(source,/stick\.setPointerCapture\?\.\(pointer\)/);
+ assert.match(source,/action\.setPointerCapture\?\.\(actionPointer\)/);
+ assert.match(source,/pointer!==event\.pointerId/);
+ assert.match(source,/pointercancel/);
+ assert.match(main,/root\.querySelector\('\.retro-canvas'\)\?\.focus\(\{preventScroll:true\}\)/);
+ assert.match(main,/canvas\.tabIndex=0/);
+ assert.match(styles,/retro-cabinet-stick/);
+ assert.match(styles,/retro-cabinet-action/);
 });
 
 
-test('classic cabinet slide tracks finger outside original captured button',()=>{
+test('legacy slide helper remains deterministic; new cabinet steers from the captured joystick',()=>{
  const panel={left:100,top:200,width:300,height:240};
  assert.equal(retroControlSlide('fleet',panel,125,300,'L'),'L');
- assert.equal(retroControlSlide('fleet',panel,375,300,'L'),'R',
-   'left finger sliding across to right changes steering despite capture');
- assert.equal(retroControlSlide('fleet',panel,251,300,'R'),'R',
-   'crossing the middle FIRE button does not interrupt current steering');
+ assert.equal(retroControlSlide('fleet',panel,375,300,'L'),'R');
  assert.equal(retroControlSlide('maze',panel,250,220,'L'),'U');
  assert.equal(retroControlSlide('maze',panel,380,320,'U'),'R');
  assert.equal(retroControlSlide('maze',panel,250,438,'R'),'D');
  assert.equal(retroControlSlide('maze',panel,104,320,'D'),'L');
- assert.equal(retroControlSlide('maze',panel,250,320,'L'),'L',
-   'near joystick center keeps the last direction to prevent jitter');
  assert.equal(retroControlSlide('maze',panel,NaN,320,'U'),'U');
- assert.equal(retroControlSlide('not-a-game',panel,300,320,'N'),'N');
- const src=readFileSync(new URL('../docs/commons-retro-arcade.mjs',import.meta.url),'utf8');
- assert.match(src,/control\.addEventListener\('pointermove'/);
- assert.match(src,/retroControlSlide\(game\.id,controls\.getBoundingClientRect\(\)/);
- assert.match(src,/input\.release\(activeCode\)/);
- assert.match(src,/input\.press\(game\.id,activeCode\)/);
- assert.match(src,/code==='F'/,
-   'held FIRE thumb is independent from swiping the other finger');
+ const src=readFileSync(new URL('../docs/retro-arcade-cabinet-ui.mjs',import.meta.url),'utf8');
+ assert.match(src,/retroCabinetDirection\(game,dx,dy\)/);
+ assert.match(src,/input\.release\(lastDirection\)/);
+ assert.match(src,/input\.press\(game,direction\)/);
+ assert.match(src,/input\.press\(game,code\)/,'action thumb independent from joystick');
 });

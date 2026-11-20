@@ -275,3 +275,134 @@ body.community-page .retro-controls[data-retro-game="maze"] .retro-stick-knob.is
  body.community-page .retro-controls .retro-control,
  body.community-page .retro-controls .retro-stick-knob{transition:none}
 }
+
+
+/* 2026-11-20: Dedicated Mystery Maze / Star Squadron cabinet controls.
+ * The left hand owns the joystick; right hand owns two embossed action keys.
+ * No control changes in Mahjong, Dash, Street Rod, word games or Skyboard.
+ */
+body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="maze"],
+body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="fleet"]{
+ display:grid;grid-template-columns:minmax(110px,1fr) minmax(140px,1.1fr);
+ grid-template-rows:auto;align-items:center;justify-content:center;
+ box-sizing:border-box;width:100%;max-width:470px;min-height:143px;gap:clamp(5px,1.8vw,14px);
+ padding:12px;border:4px solid #738ba0;border-radius:21px;
+ background:repeating-linear-gradient(125deg,#1a2638 0 10px,#202c3f 10px 20px);
+ box-shadow:inset 0 5px 2px #ffffff22,inset 0 -8px 12px #020715,
+  0 6px 0 #080e1b,0 9px 17px #0008;
+ touch-action:manipulation;overscroll-behavior:contain;
+}
+body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="maze"]::before{display:none;content:none}
+body.community-page .retro-cabinet-stage,
+body.community-page .retro-cabinet-buttons{
+ min-width:0;display:grid;justify-items:center;align-content:center;gap:5px;
+}
+body.community-page .retro-cabinet-stick{
+ appearance:none;-webkit-appearance:none;position:relative;
+ width:clamp(98px,28vw,124px);height:112px;min-height:112px;
+ border:0;border-radius:50%;
+ background:radial-gradient(circle at center,#0b1927 0 25%,#35495c 26% 32%,#101824 33% 54%,#536879 55% 60%,#152639 61% 100%);
+ box-shadow:inset 0 6px 11px #01050e,0 2px 1px #a4c5d355;
+ touch-action:none!important;user-select:none;-webkit-user-select:none;cursor:grab;
+}
+body.community-page .retro-cabinet-stick.is-pressed{cursor:grabbing}
+body.community-page .retro-stick-plate{
+ position:absolute;inset:30px;border-radius:50%;
+ background:radial-gradient(circle,#9fa9ad 0,#223b52 80%);
+ border:2px solid #a7b7c5;box-shadow:0 2px 3px #000b;pointer-events:none;
+}
+body.community-page .retro-stick-stem{
+ position:absolute;left:calc(50% - 6px);top:calc(50% - 31px);
+ width:12px;height:40px;border-radius:8px;
+ background:linear-gradient(90deg,#171b24,#d2d7dd 38%,#717e93 72%,#131c27);
+ transform:translate(var(--cabinet-x,0px),var(--cabinet-y,0px));
+ box-shadow:1px 1px 3px #020617;pointer-events:none;
+}
+body.community-page .retro-stick-ball{
+ position:absolute;left:calc(50% - 22px);top:calc(50% - 43px);
+ width:44px;height:44px;border-radius:50%;pointer-events:none;
+ border:3px solid #ff929b;
+ background:radial-gradient(circle at 34% 24%,#ffe0dc 0 7%,#e54a67 23%,#a80e3c 67%,#560c2a 100%);
+ box-shadow:inset -5px -7px 8px #3e0726,0 5px 7px #0008;
+ transform:translate(var(--cabinet-x,0px),var(--cabinet-y,0px));
+}
+body.community-page .retro-cabinet-hint{
+ font:900 clamp(9px,2.1vw,12px)/1.3 monospace;
+ letter-spacing:.065em;text-align:center;color:#ffdea5;
+}
+body.community-page .retro-cabinet-buttons{
+ grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-items:center;
+}
+body.community-page .retro-cabinet-buttons .retro-cabinet-hint{
+ grid-column:1/-1;align-self:center;
+}
+body.community-page .retro-cabinet-action{
+ appearance:none;-webkit-appearance:none;
+ display:grid;place-items:center;min-width:59px;width:100%;
+ max-width:86px;height:76px;min-height:60px;
+ padding:4px;border:5px solid #a8a3aa;border-radius:50%;
+ color:#fff8e0;font:950 clamp(11px,2.6vw,14px)/1.1 monospace;
+ text-shadow:0 1px 2px #1b0617;letter-spacing:-.025em;
+ touch-action:none!important;user-select:none;-webkit-user-select:none;
+ cursor:pointer;-webkit-tap-highlight-color:transparent;
+ transition:transform .08s ease,box-shadow .08s ease;
+}
+body.community-page .retro-cabinet-a{
+ background:radial-gradient(circle at 34% 22%,#ffadb0,#ed4560 43%,#a8143b 90%);
+ box-shadow:inset 0 5px 0 #fff5,0 6px 0 #561227,0 9px 7px #0009;
+}
+body.community-page .retro-cabinet-b{
+ background:radial-gradient(circle at 34% 22%,#fff7bd,#f0c144 46%,#a46a1c 91%);
+ color:#2a1b12;text-shadow:0 1px #fff8;
+ box-shadow:inset 0 5px 0 #fff8,0 6px 0 #65400e,0 9px 7px #0009;
+}
+body.community-page .retro-cabinet-action:active,
+body.community-page .retro-cabinet-action.is-pressed,
+body.community-page .retro-cabinet-b[aria-pressed="true"]{
+ transform:translateY(4px);
+ box-shadow:inset 0 5px 8px #24112599,0 2px 0 #2c2330;
+}
+body.community-page .retro-cabinet-action:disabled{opacity:.47;cursor:not-allowed}
+body.community-page .retro-cabinet-stick:focus-visible,
+body.community-page .retro-cabinet-action:focus-visible{
+ outline:3px solid #a3fff0;outline-offset:4px;
+}
+body.community-page .retro-game-root[data-retro-game="fleet"] .retro-inside{
+ border-color:#497eb2;background:linear-gradient(162deg,#07132f,#0a1026 72%);
+}
+body.community-page .retro-game-root[data-retro-game="maze"] .retro-inside{
+ border-color:#4250b9;background:linear-gradient(162deg,#0b1029,#080923 72%);
+}
+body.community-page .retro-game-root .retro-canvas{
+ border:5px ridge #5f7caa;border-radius:17px;
+ background:#05091e;image-rendering:pixelated;
+ box-shadow:inset 0 0 30px #010514,0 8px 22px #000b;
+}
+body.community-page .retro-game-root .retro-live-readout{
+ letter-spacing:.06em;color:#ffdb87;
+ background:#071529;border:1px solid #547596;border-radius:6px;
+ padding:5px 9px;
+}
+@media(max-width:360px){
+ body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="maze"],
+ body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="fleet"]{
+  grid-template-columns:minmax(99px,1fr) minmax(135px,1.14fr);
+  gap:3px;padding:6px;border-width:3px;min-height:131px;
+ }
+ body.community-page .retro-cabinet-stick{width:99px;height:98px;min-height:98px}
+ body.community-page .retro-cabinet-action{height:64px;min-width:58px;font-size:11px;padding:2px}
+ body.community-page .retro-cabinet-hint{font-size:9px}
+}
+@media(orientation:landscape) and (max-height:520px){
+ body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="maze"],
+ body.community-page .retro-controls.retro-cabinet-controls[data-retro-game="fleet"]{
+  min-height:100px;padding:4px
+ }
+ body.community-page .retro-cabinet-stick{width:87px;height:82px;min-height:82px}
+ body.community-page .retro-cabinet-action{height:56px;min-height:56px}
+ body.community-page .retro-cabinet-hint{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page .retro-cabinet-action,
+ body.community-page .retro-cabinet-stick{transition:none!important}
+}

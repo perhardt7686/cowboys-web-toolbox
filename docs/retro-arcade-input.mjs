@@ -18,6 +18,7 @@ export function createRetroInput(){
   let direction='N',lastSteer='N',mazeMotion='N';
   function activate(game,code){
     if(game==='maze'){
+      if(code==='B'){pending.add('B');return;}
       if('LRUD'.includes(code)&&code.length===1)direction=code;
       return;
     }
@@ -34,6 +35,11 @@ export function createRetroInput(){
     cancel(code){held.delete(code);pending.delete(code);},
     action(game,state){
       if(game==='maze'){
+        // The cabinet BRAKE generates a legal neutral step and stops previous
+        // momentum without rewriting the verified score or action vocabulary.
+        const braking=held.has('B')||pending.has('B');
+        pending.delete('B');
+        if(braking){mazeMotion='N';return 'N';}
         // Keep a requested turn queued until the next available junction.
         // Continue the last legal direction rather than stopping at a wall.
         // Only executed actions are recorded, so server replay stays exact.
