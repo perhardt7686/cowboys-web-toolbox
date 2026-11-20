@@ -417,16 +417,19 @@ async def campaign_flow(page, name, *, touch):
     else:
         await page.keyboard.down('ArrowUp')
         for gear in [1,2]:
+            # In physics v2 a high-RPM power shift can overheat/over-rev a
+            # low-power 1940 coupe. Shift at a period-plausible 3900 RPM.
+            # Preserve a visible gear-change assertion and an earned race win.
             await page.wait_for_function(r"""gear => {
               const text=document.querySelector('.hot-rod-meters').textContent;
               const rpm=text.match(/(\d+) RPM/);
-              return rpm && Number(rpm[1]) >= 4250 && text.includes('GEAR ' + gear);
-            }""", arg=gear, timeout=12000)
+              return rpm && Number(rpm[1]) >= 3900 && text.includes('GEAR ' + gear);
+            }""", arg=gear, timeout=15000)
             await page.keyboard.up('ArrowUp')
             await page.keyboard.press('e')
             await page.wait_for_function("""gear =>
               document.querySelector('.hot-rod-meters').textContent.includes('GEAR ' + gear)
-            """, arg=gear+1, timeout=4500)
+            """, arg=gear+1, timeout=5000)
             await page.keyboard.down('ArrowUp')
         await expect(game.get_by_role('heading',name='Victory')).to_be_visible(timeout=23000)
         await page.keyboard.up('ArrowUp')
