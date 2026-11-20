@@ -22,8 +22,10 @@ allowed=(X>=261)&(X<410)&(Y>=90)&(Y<350)
 for i,frame in enumerate(frames):
  changed=np.any(frame!=source,axis=2)
  assert not np.any(changed&~allowed),f'Frame {i+1} unexpectedly repainted face, outfit or legs'
- assert not np.any(frame[:,:,3]>0 & ~np.isfinite(frame[:,:,3]))
- assert changed.sum()>(8000 if 0<i<7 else -1) if 0<i<7 else not changed.any()
+ if 0<i<7:
+  assert changed.sum()>8000,f'Frame {i+1} appears to be missing its waving pose'
+ else:
+  assert not changed.any(),f'Frame {i+1} must equal source original'
  for point in [(175,105),(160,430),(260,490)]:
   x,y=point
   assert (frame[y,x]==source[y,x]).all(),f'Identity source pixel changed frame {i+1}'
