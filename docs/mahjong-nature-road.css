@@ -331,3 +331,75 @@ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels
  body.community-page .nature-road-node,
  body.community-page .nature-road-creature{animation:none!important;transition:none!important}
 }
+
+
+/* The family should never have to hunt for Mystery Road again. */
+body.community-page #mahjong-journey-mini-map.mahjong-map-hero-button{
+ display:flex;align-items:center;justify-content:center;gap:10px;
+ flex:1 1 205px;min-width:160px;min-height:58px;padding:7px 13px;
+ border:3px solid #fff4b7;border-radius:14px;
+ background:linear-gradient(115deg,#4e286b,#74429b 45%,#1c7565);
+ color:#fff8df;text-align:left;white-space:normal;
+ box-shadow:0 0 0 2px #8b55a4,0 0 22px #ffc653,0 4px 0 #3a254c;
+ animation:road-map-beacon 2.5s ease-in-out infinite;
+ position:relative;isolation:isolate
+}
+body.community-page .mahjong-map-hero-art{
+ flex:none;display:flex;flex-direction:column;align-items:center;
+ font-size:30px;line-height:1;filter:drop-shadow(0 2px 2px #151e30a8)
+}
+body.community-page .mahjong-map-hero-art span{font-size:12px;color:#ffed74;line-height:1}
+body.community-page .mahjong-map-hero-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+body.community-page .mahjong-map-hero-copy strong{
+ display:block;font:1000 clamp(16px,3.2vw,22px)/1 system-ui,sans-serif;
+ color:#fff6c4;letter-spacing:.03em;text-shadow:0 2px 3px #1a1b26
+}
+body.community-page .mahjong-map-hero-copy small{
+ display:block;font:850 clamp(10px,2vw,12px)/1.15 system-ui,sans-serif;
+ color:#fff;letter-spacing:.03em
+}
+body.community-page .mahjong-map-hero-arrow{font-size:24px;color:#ffed7c;margin-left:auto}
+body.community-page #mahjong-journey-mini-map:focus-visible{
+ outline:4px solid #ffcf69;outline-offset:4px
+}
+body.community-page #mahjong-journey-mini-map:hover{filter:brightness(1.13)}
+@keyframes road-map-beacon{
+ 0%,100%{box-shadow:0 0 0 2px #8b55a4,0 0 13px #ffc6538c,0 4px 0 #3a254c}
+ 50%{box-shadow:0 0 0 3px #ffc95a,0 0 27px #ffe57ec9,0 4px 0 #3a254c}
+}
+body.community-page .turtle-mode-tabs button[data-mode=road]{
+ position:relative;border:3px solid #f8d473;
+ background:linear-gradient(120deg,#48266e,#7947ab 55%,#266e72);
+ color:#fff6d4;box-shadow:0 0 0 2px #6d4293,0 0 19px #ffd15e;
+ font-weight:1000;animation:road-map-beacon 2.5s ease-in-out infinite
+}
+body.community-page .turtle-mode-tabs button[data-mode=road] small{color:#fff7bf}
+body.community-page .turtle-mode-tabs button[data-mode=road][aria-pressed=true]{
+ background:linear-gradient(115deg,#386c53,#23563c);color:#fff8d8
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ #mahjong-journey-mini-map.mahjong-map-hero-button{
+ flex:1 1 auto;min-height:42px;padding:4px 9px;font-size:12px
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ .mahjong-map-hero-art{font-size:24px}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ .mahjong-map-hero-copy strong{font-size:16px}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ .mahjong-map-hero-copy small{font-size:10px}
+@media(max-width:560px){
+ body.community-page .mahjong-map-hero-copy strong{font-size:17px}
+ body.community-page .mahjong-map-hero-art{font-size:24px}
+ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ .mahjong-journey-mini{flex-wrap:nowrap}
+ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ #mahjong-journey-mini-name{display:none}
+ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ #mahjong-journey-mini-progress{flex:1 1 34px;min-width:34px;max-width:55px}
+ body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=play]
+ #mahjong-journey-mini-map.mahjong-map-hero-button{flex:1 1 210px;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+ body.community-page #mahjong-journey-mini-map.mahjong-map-hero-button,
+ body.community-page .turtle-mode-tabs button[data-mode=road]{animation:none!important}
+}
