@@ -149,8 +149,12 @@ if(board&&config?.enabled===true&&location.pathname.endsWith('community.html')){
    // mid-Turtle game, during a new game, or if this screen is hidden.
    roadVisitTimer=window.setTimeout(()=>{
     roadVisitTimer=null;
-    if(document.hidden||!mounted||busy||!expanded||!$('mahjong-root')?.isConnected)return;
-    if($('mahjong-root').dataset.mahjongMode==='turtle'||state?.run)return;
+    if(document.hidden||!mounted||busy||!$('mahjong-root')?.isConnected)return;
+    if(!expanded&&!document.body.classList.contains('arcade-on'))return;
+    if($('mahjong-root').dataset.mahjongMode==='turtle')return;
+    // Some server snapshots retain the *finished* run for history; only
+    // block travel when a playable board still has pairs remaining.
+    if(state?.run&&Number(state.run.remaining_pairs??(36-Number(state.run.pairs||0)))>0)return;
     openMysteryRoad({automatic:true});
    },1300);
   }
