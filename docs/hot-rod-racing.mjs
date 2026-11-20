@@ -17,7 +17,8 @@ export function courseCurve(distance, seed) {
 const makeDriver = spec => ({
   gear:spec.automatic ? 1 : 0, engine:IDLE, speed:0, distance:0, offset:0, heading:0,
   heat:0, gearbox:0, slip:0, overrev:0, fuel:0, wear:0, reaction:null,
-  shiftTime:0, impact:0, offroad:0,
+  // Deterministic pedal pressure and clutch friction. Replayed by the server.
+  throttle:0, braking:0, clutchGrip:0, shiftTime:0, impact:0, offroad:0,
 });
 
 export function createRace(contract) {
@@ -44,37 +45,58 @@ function result(race, outcome) {
 }
 
 function drive(d, spec, control, curve, ai = false) {
-  const gas = control.gas;
-  const brake = control.brake;
-  d.shiftTime = Math.max(0, d.shiftTime - STEP);
-  const before = d.gear;
-  if (spec.automatic) {
-    if (d.engine > spec.redline * 0.84 && d.gear < spec.ratios.length) d.gear += 1;
-    if (d.engine < spec.redline * 0.38 && d.gear > 1) d.gear -= 1;
-  } else if (control.shift) {
-    d.gear = clamp(d.gear + control.shift, 0, spec.ratios.length);
-    if (!ai && before !== d.gear && before > 0 && gas > 0.5 && !control.clutch) {
-      d.gearbox += (d.engine / spec.redline) * 1.03 / spec.transmission;
+  // Physical pedal travel is bounded and independent of 20 Hz frame rate.
+  // Digital keyboard/touch input still produces identical server replays.
+  const requestedGas=clamp(control.gas,0,1),requestedBrake=clamp(control.brake,0,1);
+  d.throttle += (requestedGas-d.throttle)*(requestedGas>d.throttle?0.55:0.72);
+  d.braking += (requestedBrake-d.braking)*(requestedBrake>d.braking?0.68:0.56);
+  const gas=d.throttle,brake=d.braking;
+  d.shiftTime=Math.max(0,d.shiftTime-STEP);
+  const before=d.gear;
+  if(spec.automatic){
+    if(d.shiftTime===0){
+      if(d.engine>spec.redline*0.84 && d.gear<spec.ratios.length)d.gear++;
+      else if(d.engine<spec.redline*0.38 && d.gear>1)d.gear--;
     }
+  } else if(control.shift && d.shiftTime===0){
+    d.gear=clamp(d.gear+control.shift,0,spec.ratios.length);
   }
-  if (before !== d.gear) d.shiftTime = spec.automatic ? 0.14 : 0.27;
-  const ratio = d.gear ? spec.ratios[d.gear - 1] * spec.final : 0;
-  const mass = spec.weight * 0.453592;
-  const coupled = !control.clutch && ratio > 0 && d.shiftTime <= 0;
-  const speedRpm = d.speed * ratio * 60 / (2 * Math.PI * TIRE_RADIUS);
-  const loadRpm = Math.max(IDLE, speedRpm + gas * Math.max(0, 900 - d.speed * 40));
-  const airRpm = IDLE + gas * spec.redline * 1.08;
-  const target = coupled ? loadRpm : airRpm;
-  d.engine += (target - d.engine) * (coupled ? 0.36 : 0.095);
+  const ratio=d.gear ? spec.ratios[d.gear-1]*spec.final:0;
+  const speedRpm=d.speed*ratio*60/(2*Math.PI*TIRE_RADIUS);
+  if(before!==d.gear){
+    // 1963-style synchroniser: clutch + throttle lift produces the smoothest
+    // shift. Classic Space shifts still work without holding the clutch.
+    if(!ai&&!spec.automatic&&before>0&&!control.clutch){
+      if(gas>0.5)d.gearbox+=(d.engine/spec.redline)*1.03/spec.transmission;
+      const mismatch=Math.abs(d.engine-Math.max(IDLE,speedRpm));
+      d.gearbox+=Math.min(0.13,Math.max(0,mismatch-1450)/13000)/Math.max(0.7,spec.transmission);
+    }
+    // Dropping to a low gear at excessive road speed can over-rev an engine.
+    if(before>d.gear&&d.gear>0&&speedRpm>spec.redline*1.04&&!ai){
+      d.overrev+=(speedRpm/spec.redline-1)*0.25;
+    }
+    d.shiftTime=spec.automatic?0.14:(control.clutch?0.20:0.27);
+  }
+  const mass=spec.weight*0.453592;
+  const wantsGrip=!control.clutch&&ratio>0&&d.shiftTime===0;
+  d.clutchGrip+=((wantsGrip?1:0)-d.clutchGrip)*(wantsGrip?0.48:0.82);
+  const coupled=wantsGrip&&d.clutchGrip>0.02;
+  const loadRpm=Math.max(IDLE,speedRpm+gas*Math.max(0,900-d.speed*40));
+  const airRpm=IDLE+gas*spec.redline*1.08;
+  const target=coupled?loadRpm*d.clutchGrip+airRpm*(1-d.clutchGrip):airRpm;
+  d.engine+=(target-d.engine)*(coupled?0.36:0.095);
+  d.engine=clamp(d.engine,IDLE*0.85,spec.redline*1.24);
   const rpmRatio = d.engine / spec.redline;
   const torqueShape = clamp(1.05 - (rpmRatio - 0.57) ** 2 * 1.2, 0.27, 1.05);
-  const wheelForce = coupled ? gas * spec.torque * 1.35582 * torqueShape * ratio * 0.78 / TIRE_RADIUS : 0;
+  const wheelForce=coupled?gas*spec.torque*1.35582*torqueShape*ratio*0.78*d.clutchGrip/TIRE_RADIUS:0;
   const powerForce = spec.hp * 745.7 * 0.82 / Math.max(5, d.speed);
   const traction = spec.grip * 9.81 * mass * 0.57;
   const onPavement = ai || Math.abs(d.offset) <= 1.13;
   const driven = Math.min(wheelForce, powerForce, traction * (onPavement ? 1 : 0.54));
   d.slip = clamp((wheelForce - traction) / Math.max(1, traction), 0, 1);
-  const resistance = d.speed > 0 ? 0.507 * d.speed ** 2 + (onPavement ? 108 : 1220) + (coupled && !gas ? 226 : 0) : 0;
+  // Low-gear engine braking should be stronger than freewheeling in neutral.
+  const engineBrake=coupled?(1-gas)*ratio*(42+35*rpmRatio)*d.clutchGrip:0;
+  const resistance=d.speed>0?0.507*d.speed**2+(onPavement?108:1220)+engineBrake:0;
   d.speed = clamp(d.speed + (driven - resistance - brake * mass * 7.6 * spec.grip) * STEP / mass, 0, 61);
   d.distance += d.speed * STEP;
   if (!ai) {
