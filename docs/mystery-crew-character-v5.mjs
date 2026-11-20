@@ -2,6 +2,7 @@
  * Display-only recipes; family state, unlocks, and IDs remain server-owned.
  */
 import {CREW_ANCHORS} from './mystery-crew-art.mjs?v=paint2';
+import {mountPaintedRig,setPaintedRigMotion,setPaintedRigSprite,PAINTED_MOTIONS} from './mystery-crew-motion-v6.mjs';
 const SVG='http://www.w3.org/2000/svg',PACK='./mystery-crew-v5-illustrated.tar';
 const OUTFITS=Object.freeze(['detective','explorer','viking','pilot','space','knight','outdoors','stealth']);
 const COLORS=Object.freeze({
@@ -48,7 +49,7 @@ export function paintedAnchor(m){
 export function paintedRecipe(m,opt={}){
  const index=paintedAnchor(m);
  if(index<0||!OUTFITS.includes(m.outfit)||m.shirt!==COLORS[m.outfit]||
-  (opt.motion&&opt.motion!=='idle')||
+  (opt.motion&&!PAINTED_MOTIONS.includes(opt.motion))||
   m.hat!=='none'||m.gear!=='none'||(opt.angle||0)!==0)return null;
  return 'crew-'+index+'-'+m.outfit+'.webp';
 }
@@ -69,11 +70,8 @@ export async function loadCrewV5(){
   if(!actor||!actor.parentNode||!scene)throw Error('Creator stage missing');
   const group=document.createElementNS(SVG,'g');group.id='mc-v5-illustrated-actor';
   group.setAttribute('aria-hidden','true');group.style.pointerEvents='none';
-  const image=document.createElementNS(SVG,'image');image.id='mc-v5-illustrated-image';
-  for(const [a,b] of [['x','208'],['y','10'],['width','390'],['height','520'],['preserveAspectRatio','xMidYMid meet']])
-   image.setAttribute(a,b);
-  image.setAttribute('aria-hidden','true');
-  group.append(image);actor.parentNode.insertBefore(group,actor.nextSibling);
+  mountPaintedRig(group);
+  actor.parentNode.insertBefore(group,actor.nextSibling);
   group.style.display='none';visual=group;ready=true;
   scene.dataset.crewArtPack='ready';return true;
  })().catch(error=>{
@@ -89,9 +87,9 @@ export function syncCrewV5(member,options={}){
  const recipe=paintedRecipe(member,options),scene=document.getElementById('mc-scene');
  visual.style.display=recipe?'':'none';
  if(!recipe){if(scene)scene.dataset.crewArt='legacy';return false;}
- const image=visual.querySelector('image'),url=urls.get(recipe);
- if(!url){visual.style.display='none';return false;}
- if(image.getAttribute('href')!==url)image.setAttribute('href',url);
+ const url=urls.get(recipe);
+ if(!url||!setPaintedRigSprite(visual,url)){visual.style.display='none';return false;}
+ setPaintedRigMotion(visual,options.motion);
  const original=document.getElementById('mc-painted-hero'),actor=document.getElementById('mc-actor');
  if(original)original.style.display='none';if(actor)actor.style.opacity='0';
  const zoom=Math.max(.8,Math.min(1.5,Number(options.zoom)||1));

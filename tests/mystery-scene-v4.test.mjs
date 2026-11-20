@@ -49,8 +49,8 @@ test('runtime uses two independently decoded, same-origin illustrations with rol
  assert.match(creator,/void loadPainterlyPack\(render\)\.then\(async loaded=>/);
  assert.match(creator,/syncSceneV4\(m\)/);
  assert.match(css,/#mc-scene\[data-v4-vehicle="van"\] #mc-vector-van/);
- assert.match(html,/mystery-crew-creator\.mjs\?v=crew5/);
- assert.match(html,/mystery-crew-creator\.css\?v=crew5/);
+ assert.match(html,/mystery-crew-creator\.mjs\?v=crew6/);
+ assert.match(html,/mystery-crew-creator\.css\?v=crew6/);
  const assets=v4AssetUrls();
  assert.ok(assets.landscape.endsWith('mystery-workshop-v4.webp'));
  assert.ok(assets.van.endsWith('mystery-van-v4.svg'));

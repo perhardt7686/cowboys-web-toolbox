@@ -1,0 +1,122 @@
+name: Mystery Crew painted sprite source review
+on:
+  push:
+    branches:
+      - feature/mystery-crew-v6-painted-articulation-20261119
+    paths:
+      - '.github/workflows/mystery-crew-v6-art-source-review.yml'
+      - 'scripts/build_mystery_crew_v7_parts.py'
+      - 'scripts/build_mystery_crew_v7_source_layers.py'
+      - 'scripts/build_mystery_crew_v7_pose_studio.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-art:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify original art is unchanged
+        run: |
+          test -s docs/mystery-crew-v5-atlas.png
+          test -s docs/mystery-crew-v5-illustrated.tar
+          sha256sum docs/mystery-crew-v5-atlas.png docs/mystery-crew-v5-illustrated.tar
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install source-only art segmentation tools
+        run: python -m pip install 'pillow>=11,<13' 'numpy>=2,<3'
+      - name: Rebuild exact painted source parts and visual proof
+        run: python scripts/build_mystery_crew_v7_source_layers.py
+      - name: Check source-art proof and separate image count
+        run: |
+          python - <<'PY'
+          import io,json,tarfile
+          from pathlib import Path
+          from PIL import Image
+          p=Path('reports/mystery-crew-v7-source-layers.tar')
+          proof=json.loads(Path('reports/mystery-crew-v7-source-proof.json').read_text())
+          assert proof['production_ready'] is False
+          assert proof['original_unchanged'] is True
+          assert proof['source_exact_reconstruction'] is True
+          assert proof['total_illustrated_parts']==384
+          with tarfile.open(p) as archive:
+              names=archive.getnames()
+              assert len(names)==384 and len(set(names))==384
+              for file in archive:
+                  im=Image.open(io.BytesIO(archive.extractfile(file).read()))
+                  im.load()
+                  assert im.size==(430,574)
+          print('384 painted pieces decoded. Production still gated.')
+          PY
+      - name: Assemble all-outfit standalone Pose Studio and inspect JavaScript
+        run: |
+          python scripts/build_mystery_crew_v7_pose_studio.py
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('reports/Mystery_Crew_V7_Pose_Studio.html').read_text()
+          assert s.count('data:image/webp;base64,')==48
+          assert s.count('data:image/png;base64,')==8
+          assert '<script src=' not in s
+          assert not any(x in s for x in ('localStorage','supabase.co','indexedDB','XMLHttpRequest('))
+          Path('/tmp/mystery-v7-pose-studio.js').write_text(s.split('<script>',1)[1].split('</script>',1)[0])
+          PY
+          node --check /tmp/mystery-v7-pose-studio.js
+      - name: Install Chromium browser for experimental pose review
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Validate source artwork on desktop and iPhone-sized browsers
+        run: |
+          python -m http.server 8769 --directory reports >/tmp/v7-studio-server.log 2>&1 &
+          python - <<'PY'
+          import asyncio
+          from pathlib import Path
+          from playwright.async_api import async_playwright,expect
+          async def main():
+              async with async_playwright() as p:
+                  browser=await p.chromium.launch(headless=True)
+                  for w,h,label in [(390,844,'phone'),(1672,941,'desktop')]:
+                      page=await browser.new_page(viewport={'width':w,'height':h})
+                      errors=[]
+                      page.on('pageerror',lambda e:errors.append(str(e)))
+                      await page.goto('http://127.0.0.1:8769/Mystery_Crew_V7_Pose_Studio.html')
+                      await expect(page.locator('#status')).to_contain_text('Original loaded',timeout=20000)
+                      await page.locator('[data-pose="wave"]').click()
+                      await expect(page.locator('[data-pose="wave"]')).to_have_attribute('aria-pressed','true')
+                      await expect(page.locator('#right')).to_have_value('-114')
+                      for i in ('0','1','2','3','4','5'):
+                          await page.locator('#crew').select_option(i)
+                          await expect(page.locator('#status')).to_contain_text('Original loaded',timeout=10000)
+                      for outfit in ('detective','explorer','viking','pilot','space','knight','outdoors','stealth'):
+                          await page.locator('#outfit').select_option(outfit)
+                          await expect(page.locator('#status')).to_contain_text('Original loaded',timeout=10000)
+                      pixels=await page.locator('#posed').evaluate('node=>{let a=node.getContext("2d").getImageData(0,0,430,574).data;let n=0;for(let i=3;i<a.length;i+=4)if(a[i]>0)n++;return n}')
+                      assert pixels>30000,{'viewport':label,'painted_pixels':pixels}
+                      await page.screenshot(path='reports/mystery-crew-v7-pose-studio-'+label+'.png',full_page=True)
+                      assert not errors,errors
+                      print(label,'painted portrait and pose controls PASS',pixels)
+                      await page.close()
+                  await browser.close()
+          asyncio.run(main())
+          PY
+      - name: Upload preview layers and exact source proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mystery-crew-v7-source-layer-lab
+          path: |
+            reports/mystery-crew-v7-source-proof.png
+            reports/mystery-crew-v7-source-proof.json
+            reports/mystery-crew-v7-source-layers.tar
+            reports/Mystery_Crew_V7_Pose_Studio.html
+            reports/mystery-crew-v7-pose-studio-*.png
+          retention-days: 7
+      - name: Upload V5 source for bounded per-piece artwork inspection
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: v5-painterly-source-reference
+          path: |
+            docs/mystery-crew-v5-atlas.png
+            docs/mystery-crew-v5-illustrated.tar
+          retention-days: 1

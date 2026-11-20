@@ -1,0 +1,60 @@
+name: Mystery Crew Scout Explorer Wave source-locked art study
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_scout_explorer_wave_study.py'
+      - 'scripts/build_scout_v10_wave.py'
+      - '.github/workflows/mystery-crew-scout-explorer-art.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scout-explorer-art-lab:
+    name: scout-explorer-eight-source-locked-frames
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install art image libraries
+        run: python -m pip install 'pillow>=11,<13' 'numpy>=2,<3'
+      - name: Build the previously vetted Scout V10 movement source
+        run: python scripts/build_scout_v10_wave.py
+      - name: Produce original-pixel-preserving Explorer outfit candidate
+        run: python scripts/build_scout_explorer_wave_study.py
+      - name: Check eight unique frame assets and non-release status
+        run: |
+          python - <<'PY'
+          import io,json,tarfile,numpy as np
+          from pathlib import Path
+          from PIL import Image
+          root=Path('reports/scout-explorer-wave-study')
+          report=json.loads((root/'scout-explorer-wave-report.json').read_text())
+          assert report['frame_count']==8 and report['approved'] is False
+          assert report['published'] is False and report['experimental_art_only'] is True
+          with tarfile.open('docs/mystery-crew-v5-illustrated.tar') as a:
+              original=np.asarray(Image.open(io.BytesIO(a.extractfile('crew-0-explorer.webp').read())).convert('RGBA'))
+          yy,xx=np.indices((574,430))
+          allowed=(xx>=261)&(xx<=405)&(yy>=95)&(yy<=347)
+          for i in range(1,9):
+              p=root/f'scout-explorer-wave-{i:02}.png'
+              im=Image.open(p);im.load()
+              assert im.size==(430,574) and im.mode=='RGBA'
+              frame=np.asarray(im)
+              changed=np.any(frame!=original,axis=2)
+              assert not np.any(changed&~allowed),f'Source identity escaped: frame {i}'
+              if i in (1,8):assert np.array_equal(frame,original)
+              else:assert changed.sum()>6000
+          assert len(report['frames'])==8
+          print('PASS 8 Explorer frame assets source-locked; still NOT approved')
+          PY
+      - name: Save Explorer art frames and original-side-by-side contact sheet
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: scout-explorer-wave-experimental-art
+          path: |
+            reports/scout-explorer-wave-study/scout-explorer-wave-*.png
+            reports/scout-explorer-wave-study/scout-explorer-wave-report.json
+          retention-days: 10
