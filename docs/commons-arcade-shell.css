@@ -994,3 +994,18 @@ body.community-page.arcade-on :is(
   #star-squadron-root,#mystery-maze-root
  ).arcade-game-active .retro-canvas{max-height:40dvh!important}
 }
+
+
+/* Mystery Road: the actual illustrated map must be visible in the family
+   Arcade's Levels scene. The generic scene-hiding rule above only targets
+   top-level panels, not this one eligible map. */
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-inside > .mahjong-campaign #mahjong-nature-map-host{
+ display:flex!important;flex:1 1 auto!important;min-height:0!important
+}
+body.community-page.arcade-on[data-arcade-game=mahjong][data-arcade-scene=levels]
+ #mahjong-inside > .mahjong-campaign #mahjong-nature-road{
+ display:flex!important;flex-direction:column!important;flex:1 1 auto!important;
+ min-height:0!important;height:100%!important;visibility:visible!important;
+ overflow:hidden!important
+}
