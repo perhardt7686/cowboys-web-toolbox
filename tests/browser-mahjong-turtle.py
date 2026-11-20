@@ -63,7 +63,11 @@ async def main():
       document.getElementById('mahjong-root').classList.remove('arcade-game-active');
     }""")
     assert await page.locator('#turtle-hint').is_visible()
-    assert await page.locator('#turtle-board-scroll').evaluate('(el)=>el.scrollWidth>el.clientWidth'),'zoom should allow pan'
+    assert await page.locator('#turtle-zoom-label').inner_text()=='FIT'
+    assert not await page.locator('#turtle-board-scroll').evaluate('(el)=>el.scrollWidth>el.clientWidth+2'),'default board must fit screen'
+    await page.locator('#turtle-zoom-in').tap()
+    assert await page.locator('#turtle-board-scroll').evaluate('(el)=>el.scrollWidth>el.clientWidth'),'zoom must still permit panning'
+    await page.locator('#turtle-fit').tap()
     # The default board is 144 tiles, built from all five vertical levels.
     layers=await page.locator('.turtle-tile').evaluate_all('els=>[...new Set(els.map(e=>Number(e.getAttribute("aria-label").match(/layer (\\d+)/)[1])))].sort()')
     assert layers==[1,2,3,4,5],(width,layers)
@@ -72,11 +76,13 @@ async def main():
     await expect(page.locator('.turtle-tile.is-selected')).to_have_count(1)
     await page.locator(f'.turtle-tile[data-tile-id="{pair[1]}"]').tap()
     await expect(page.locator('.turtle-tile')).to_have_count(142)
-    await expect(page.locator('#turtle-awards-count')).to_contain_text('/ 195 trophies')
+    await expect(page.locator('#turtle-awards-count')).to_contain_text('/ 211 Turtle-only trophies')
     assert await page.locator('#turtle-awards-list .turtle-award.is-earned').count()>=1
+    await page.locator('.turtle-rewards-summary').click()
     await page.locator('#turtle-award-filter').select_option('extreme')
     assert await page.locator('#turtle-awards-list .turtle-award').count()>0
     await page.locator('#turtle-award-filter').select_option('all')
+    await page.locator('.turtle-rewards-summary').click()
     await page.locator('#turtle-pause').tap()
     await expect(page.locator('#turtle-pause-screen')).to_be_visible()
     await page.reload(wait_until='domcontentloaded')
@@ -126,9 +132,11 @@ async def main():
      await expect(page.locator('.mahjong-spectacle-words strong')).to_have_text('TURTLE MASTER!')
      awards=await page.evaluate("""()=>{
        const saved=JSON.parse(localStorage.getItem('cowboy-mahjong-turtle-v1:synthetic-turtle-test'));
-       return {earned:saved.achievements.length,pairs:saved.stats.pairs,wins:saved.stats.wins,streak:saved.stats.bestStreak};
+       return {earned:saved.achievements.length,pairs:saved.stats.pairs,wins:saved.stats.wins,streak:saved.stats.bestStreak,
+       open:['dragon','wind','flower','season','bamboo','circles','characters'].reduce((n,k)=>n+(saved.stats['ritualOpen_'+k]||0),0),
+       close:['dragon','wind','flower','season','bamboo','circles','characters'].reduce((n,k)=>n+(saved.stats['ritualClose_'+k]||0),0)};
      }""")
-     assert awards['earned']>=10 and awards['pairs']>=72 and awards['wins']>=1 and awards['streak']>=50,awards
+     assert awards['earned']>=10 and awards['pairs']>=72 and awards['wins']>=1 and awards['streak']>=50 and awards['open']==1 and awards['close']==1,awards
      await page.locator('button[data-kind="daily"]').tap()
      await expect(page.locator('.turtle-tile')).to_have_count(144)
      await page.locator('button[data-kind="free"]').tap()
