@@ -1,6 +1,6 @@
 // Independently drawn EGA scenes. All strokes and textures resolve to whole pixels.
 import {CARS} from './hot-rod-catalog.mjs';
-import {paintVehicle,vehiclePaint as tone} from './hot-rod-vehicle-art.mjs?v=dosfidelity1';
+import {paintVehicle,vehiclePaint as tone} from './hot-rod-vehicle-art.mjs?v=carprofiles2';
 import {paintWorkbench} from './hot-rod-engine-bay.mjs?v=dosfidelity1';
 import {paintCalendar,paintDriveIn,paintNewspaper,paintTrafficTicket} from './hot-rod-period-scenes.mjs?v=dosfidelity1';
 import {courseCurve, displaySpeed, raceClock} from './hot-rod-racing.mjs';
