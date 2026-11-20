@@ -40,7 +40,7 @@ export function createHotRodBoard() {
       button.setAttribute('aria-busy', 'true');
       try {
         if (!game) {
-          const {makeHotRod} = await import('./hot-rod-game.mjs?v=carprofiles2');
+          const {makeHotRod} = await import('./hot-rod-game.mjs?v=drivetrain2');
           if (identity !== next || !button.isConnected || board.hidden) return;
           game = makeHotRod({client, memberId:next, launcher:button});
         }
