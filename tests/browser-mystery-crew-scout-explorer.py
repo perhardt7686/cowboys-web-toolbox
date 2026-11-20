@@ -58,10 +58,30 @@ async def run(browser,w,h,label):
  print('PASS source-authored Explorer Wave in actual Creator scene',label,details,flush=True)
  await page.close()
 
+async def verify_optional_asset_failure(browser):
+ page=await browser.new_page(viewport={'width':390,'height':844})
+ await page.route('**/mystery-crew-v9-scout-explorer/*.png',
+                  lambda route:route.fulfill(status=404,body='Not found'))
+ await page.goto(URL,wait_until='domcontentloaded')
+ scene=page.locator('#mc-scene')
+ await expect(scene).to_have_attribute('data-v9-lab','ready',timeout=20000)
+ await expect(scene).to_have_attribute('data-v9-explorer','fallback')
+ await page.locator('.mc-card[data-item="explorer"]').click()
+ await page.locator('.mc-performance [data-motion="wave"]').click()
+ await expect(scene).to_have_attribute('data-v9-costume','none')
+ await expect(page.locator('#mc-v9-scout-wave-image')).to_be_hidden()
+ await expect(page.locator('#mc-v6-painted-rig')).to_be_visible()
+ await page.locator('.mc-card[data-item="detective"]').click()
+ await expect(scene).to_have_attribute('data-v9-costume','detective')
+ await expect(page.locator('#mc-v9-scout-wave-image')).to_be_visible()
+ await page.close()
+ print('PASS missing Explorer art falls back without breaking Detective')
+
 async def main():
  async with async_playwright() as p:
   browser=await p.chromium.launch(headless=True)
   for w,h,label in [(375,667,'iphone-short'),(390,844,'iphone'),(1365,900,'desktop'),(1672,941,'reference')]:
    await run(browser,w,h,label)
+  await verify_optional_asset_failure(browser)
   await browser.close()
 if __name__=='__main__':asyncio.run(main())
