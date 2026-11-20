@@ -34,9 +34,9 @@ test('original 25 and fifteen 1963-and-earlier additions render complete distinc
   for(const body of ['pickup','van','wagon','utility','open','hard','deuce']){
     assert.ok(CAR_LIST.some(model=>model.body===body),'Missing vehicle type '+body);
   }
-  assert.equal(new Set(CAR_LIST.map(m=>m.id)).size,25);
+  assert.equal(new Set(CAR_LIST.map(m=>m.id)).size,40);
   const outputs=CAR_LIST.map(model=>({model,bitmap:raster(model.id)}));
-  assert.equal(new Set(outputs.map(x=>hash(x.bitmap))).size,25,'Each car needs its own recognisable art');
+  assert.equal(new Set(outputs.map(x=>hash(x.bitmap))).size,40,'Each car needs its own recognisable art');
   for(const {model,bitmap} of outputs){
     const active=bitmap.filter(ink=>ink!==255);
     assert.ok(active.length>1200,model.name+' silhouette appears incomplete');
