@@ -23,7 +23,7 @@ async def test_scene(browser,w,h,name):
  await expect(page.locator('#mc-v9-scout-wave-image')).to_be_visible()
  await expect(page.locator('#mc-v6-painted-rig')).to_be_hidden()
  await expect(page.locator('#mc-scene')).to_have_attribute('data-crew-art','painted')
- await page.wait_for_function("document.querySelector('#mc-v9-scout-wave-image').dataset.v9Frame !== '0'",timeout=5000)
+ await expect(page.locator('#mc-v9-scout-wave-image')).not_to_have_attribute('data-v9-frame','0',timeout=5000)
  details=await page.locator('#mc-v9-scout-wave-image').evaluate("""async node=>{
    let url=node.getAttribute('href'),img=new Image();img.src=url;await img.decode();
    return {href:url,width:img.naturalWidth,height:img.naturalHeight,
