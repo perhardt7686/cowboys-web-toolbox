@@ -443,7 +443,7 @@ async def campaign_flow(page, name, *, touch):
 
 
 async def capture_vehicle_gallery(page, label):
-    # Screenshot all 25 original-era models at their native pixel-art size.
+    # Screenshot the original twenty-five and fifteen new era-correct vehicles at native pixel size.
     # This is an inspectable visual artifact, not proof of 1:1 DOS fidelity.
     count = await page.evaluate("""async () => {
         const [{CARS},{makeCar},{paintVehicle},{EGA}] = await Promise.all([
@@ -478,9 +478,9 @@ async def capture_vehicle_gallery(page, label):
         document.body.append(grid);
         return models.length;
     }""")
-    assert count == 25, f'Expected 25 distinct period cars, got {count}'
+    assert count == 40, f'Expected 40 distinct period cars, got {count}'
     await page.locator('#hotrod-gallery').screenshot(
-        path=ROOT / 'reports' / f'hot-rod-{label}-all-25-cars.png'
+        path=ROOT / 'reports' / f'hot-rod-{label}-all-40-cars.png'
     )
     await page.locator('#hotrod-gallery').evaluate('(node)=>node.remove()')
 
