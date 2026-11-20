@@ -20,8 +20,8 @@ test('All revised modules parse and are versioned for Safari',()=>{
   assert.doesNotThrow(()=>execFileSync(process.execPath,['--check',fileURLToPath(file(path))],{stdio:'pipe'}),'Syntax error in '+path);
  }
  for(const asset of ['commons-compact-ui.css?v=compact6','commons-board-compact.mjs?v=compact1',
-  'commons-arcade-shell.mjs?v=arcade10','commons-plates.mjs?v=guess1',
-  'commons-mahjong.mjs?v=keyboard1','community-coco.mjs?v=family3','community-board-accessibility.mjs?v=board-access4'])
+  'commons-arcade-shell.mjs?v=arcade11-activity1','commons-plates.mjs?v=guess1',
+  'commons-mahjong.mjs?v=keyboard1','community-coco.mjs?v=family3','community-board-accessibility.mjs?v=board-access5'])
   assert.ok(html.includes(asset),'Live page missing '+asset);
 });
 

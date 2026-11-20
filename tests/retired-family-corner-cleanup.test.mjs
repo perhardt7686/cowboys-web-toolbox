@@ -14,8 +14,8 @@ test('Retired Family Corner is deleted instead of just hidden',()=>{
 
 test('Actual family reading controls and stale-cache guard remain',()=>{
  const html=read('community.html'),active=read('community-board-accessibility.mjs');
- assert.match(html,/community-board-accessibility\.mjs\?v=board-access4/);
- assert.match(html,/community-readable\.css\?v=readability6/);
+ assert.match(html,/community-board-accessibility\.mjs\?v=board-access5/);
+ assert.match(html,/community-readable\.css\?v=readability7/);
  assert.match(html,/commons-games-polish\.css\?v=arcade2/);
  assert.doesNotMatch(html,/community-family\.mjs/);
  assert.match(active,/removeLegacyCorner/);
