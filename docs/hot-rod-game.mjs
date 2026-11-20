@@ -754,7 +754,7 @@ export function makeHotRod({client, memberId, launcher}) {
   }
   function startChallenge(stake=wager){
     const rival=selectedRival;
-    void mutate('challenge',{rival:rival.id,kind:raceType,stake},()=>prepareRace(state.race));
+    void mutate('challenge',{rival:rival.id,kind:raceType,stake,physicsVersion:2},()=>prepareRace(state.race));
   }
   function challengeChoices(){
     const cancel={label:'Forget it',activate:()=>{dinerMenu='';render();}};
@@ -842,7 +842,7 @@ export function makeHotRod({client, memberId, launcher}) {
         'The King’s title is yours. The Mystery Machine is waiting.'),row(
         bonus?.won ? el('span','hot-rod-achievement','Final boss defeated') :
         action('Challenge the Mystery Machine',() => void mutate('challenge',
-          {rival:'mystery',kind:'road',stake:'kicks'}, () => prepareRace(state.race)),{accent:true,disabled:busy}),
+          {rival:'mystery',kind:'road',stake:'kicks',physicsVersion:2}, () => prepareRace(state.race)),{accent:true,disabled:busy}),
         bonus?.bestMs ? el('span','','Mystery Machine best ' + time(bonus.bestMs)) : el('span'))] : []),
       row(...achievementList.map(badge=>el('span','hot-rod-achievement',badge))),
       row(action('Hall of Fame',() => show('standings')),
@@ -974,7 +974,7 @@ export function makeHotRod({client, memberId, launcher}) {
         item.append(row(action('Accept',() => void mutate('respond',{challengeId:duel.id,accept:true},refreshCrew),{disabled:busy,accent:true}),
           action('Decline',() => void mutate('respond',{challengeId:duel.id,accept:false},refreshCrew),{disabled:busy})));
       } else if (duel.status==='accepted' && !duel.finished) {
-        item.append(action(duel.started ? 'Resume your run' : 'Drive your run',() => void mutate('duel-start',{challengeId:duel.id},
+        item.append(action(duel.started ? 'Resume your run' : 'Drive your run',() => void mutate('duel-start',{challengeId:duel.id,physicsVersion:2},
           reply => prepareRace(reply.race,duel.id)),{accent:true,disabled:busy}));
       }
       list.append(item);
