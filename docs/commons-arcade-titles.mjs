@@ -15,7 +15,7 @@ export const titleProfiles={
   eyebrow:'STAR SQUADRON · FAMILY ARCADE',
   name:'STAR SQUADRON',tag:'One pilot against an alien swarm.',
   subtitle:'A waiting enemy formation sends brightly marked attackers diving toward your ship. Stay alive, fire, and reach the next wave.',
-  help:'Steer left and right with the arcade buttons or arrow keys. Hold FIRE or Space to shoot. The dim formation is waiting scenery; shoot the BRIGHT diving attacker in its marked lane. Every fifth commander earns bonus points. Trophies and scores count only after server verification.',
+  help:'Use the big LEFT/RIGHT cabinet controls and hold the circular FIRE button or Space. In Classic V1, target the bright diving attacker and earn existing trophies. Select GAMEPLAY V2 for three staggered shootable enemies per formation, commander captures and rescues, and a separate V2 scoreboard. Both modes verify every shot and score on the server.',
   first:'DEFEND THE STARLANES',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
   accent:'#91f4e7',scene:'fleet'
  },
@@ -23,7 +23,7 @@ export const titleProfiles={
   eyebrow:'MYSTERY MAZE · FAMILY ARCADE',
   name:'MYSTERY MAZE',tag:'Follow the clues. Escape the wisps.',
   subtitle:'Explore an original twisting labyrinth and collect clue lights while evading wandering ghosts.',
-  help:'Use the four-way arcade controls or arrow keys. Press a turn before the junction: it stays queued while you follow the current hallway, then turns when the path opens. Collect clue lights only once per tile. Power orbs make wisps harmless briefly. Scores and trophies require server verification.',
+  help:'Drag the center four-way joystick, tap any direction, or use arrow keys. A requested turn queues until an open junction. Classic V1 preserves existing trophies. GAMEPLAY V2 adds three distinct ghost hunters, timed chase and scatter rounds, and frightened ghosts that can be caught for points. V2 high scores are separate and server verified.',
   first:'ENTER THE LABYRINTH',secondary:[['trophies','TROPHY CABINET'],['leaders','FAMILY SCORES']],
   accent:'#f5d487',scene:'maze'
  },
