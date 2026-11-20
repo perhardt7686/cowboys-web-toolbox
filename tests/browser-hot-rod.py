@@ -423,7 +423,7 @@ async def campaign_flow(page, name, *, touch):
             await page.wait_for_function(r"""gear => {
               const text=document.querySelector('.hot-rod-meters').textContent;
               const rpm=text.match(/(\d+) RPM/);
-              return rpm && Number(rpm[1]) >= 3900 && text.includes('GEAR ' + gear);
+              return rpm && Number(rpm[1]) >= 3900 && text.includes('GEAR ' + gear) && !text.includes('SHIFTING');
             }""", arg=gear, timeout=15000)
             await page.keyboard.up('ArrowUp')
             await page.keyboard.press('e')
