@@ -79,9 +79,23 @@ async def main():
       document.body.classList.add('arcade-on');
       document.body.dataset.arcadeGame='mahjong';document.body.dataset.arcadeScene='levels';
       document.documentElement.classList.add('arcade-on');
-      document.getElementById('mahjong-root').classList.add('arcade-game-active');
+      const host=document.getElementById('mahjong-root');
+      host.classList.add('arcade-game-active');
+      // Reproduce the real Arcade shell's bounded game viewport.
+      host.style.height=Math.max(500,innerHeight-120)+'px';
+      document.getElementById('mahjong-inside').style.height='100%';
     }""")
-    assert await root.is_visible(),'Full-screen arcade Levels view must expose journey map'
+    frame_details=await root.evaluate("""el=>({
+      box:el.getBoundingClientRect().toJSON(),
+      display:getComputedStyle(el).display,
+      parent:el.parentElement?.getBoundingClientRect().toJSON()
+    })""")
+    assert await root.is_visible(),('Full-screen Arcade Levels must show map',frame_details)
+    assert frame_details['box']['height']>=240,frame_details
+    heights=await page.locator('.mahjong-campaign').evaluate("""el=>({
+      height:el.clientHeight,scroll:el.scrollHeight,overflow:getComputedStyle(el).overflowY
+    })""")
+    assert heights['scroll']<=heights['height']+5,(width,heights)
     assert await page.locator('.mahjong-campaign').evaluate('(el)=>getComputedStyle(el).overflowY')=='hidden'
     assert await root.locator('#nature-road-picture-host svg').count()==1
     await expect(root.locator('#nature-road-area-select')).to_be_visible()
@@ -95,7 +109,9 @@ async def main():
       document.body.classList.remove('arcade-on');
       document.documentElement.classList.remove('arcade-on');
       delete document.body.dataset.arcadeGame;delete document.body.dataset.arcadeScene;
-      document.getElementById('mahjong-root').classList.remove('arcade-game-active');
+      const host=document.getElementById('mahjong-root');
+      host.classList.remove('arcade-game-active');host.style.removeProperty('height');
+      document.getElementById('mahjong-inside').style.removeProperty('height');
     }""")
     await expect(root).to_be_visible()
     box=await root.bounding_box()
