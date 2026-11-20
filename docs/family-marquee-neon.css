@@ -63,3 +63,43 @@ body.community-page .family-fun-empty{background:#161d42;border-color:#5b55aa}
  body.community-page .family-fun-footer{flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){body.community-page .family-fun-game-chip{transform:none!important}}
+
+
+/* All eleven game choices remain visible without a nested scrolling trap.
+   On phones, three shorter cabinet keys form four rows; the long game names
+   wrap instead of disappearing behind an ellipsis.  Rankings are unaffected. */
+body.community-page .family-fun-all-games{
+  max-height:none;
+  overflow:visible;
+}
+body.community-page .family-fun-game-chip strong{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:break-word;
+  line-height:1.2;
+}
+@media(max-width:600px){
+  body.community-page .family-fun-all-games{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    max-height:none;
+    overflow:visible;
+    gap:6px;
+  }
+  body.community-page .family-fun-game-chip{
+    min-height:52px;
+    padding:5px 6px;
+    align-items:flex-start;
+  }
+  body.community-page .family-fun-game-chip strong{
+    font-size:11px;
+    line-height:1.15;
+  }
+  body.community-page .family-fun-game-chip span{
+    font-size:10px;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
