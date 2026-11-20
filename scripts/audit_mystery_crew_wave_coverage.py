@@ -29,7 +29,8 @@ with tarfile.open(PACK) as tar:
             contact.paste(thumb,(x,y),thumb)
             draw.text((column*205+8,actor*282+260),name+' / '+outfit,fill=(31,45,60))
             items.append({'key':key,'character':name,'outfit':outfit,'source_verified':True,
-                          'wave_status':'lab_only' if key=='crew-0-detective' else 'not_authored',
+                          'wave_status':('lab_only' if key=='crew-0-detective' else
+                                         'generated_study_only' if key=='crew-0-explorer' else 'not_authored'),
                           'art_approved':False})
 assert len(items)==48
 # Independently authored Juniper explorer draft was visually REJECTED, not counted as a lab.
@@ -38,10 +39,12 @@ for n in range(1,9):
     p=ROOT/f'docs/mystery-crew-v9-scout/scout-v9-frame-{n:02}.png'
     assert p.is_file(),p
     im=Image.open(p);im.load();assert im.size==(430,574) and im.mode=='RGBA'
+assert (ROOT/'scripts/build_scout_explorer_wave_study.py').exists()
+assert (ROOT/'scripts/refine_scout_explorer_wave_wrist.py').exists()
 contact.save(OUT/'mystery-crew-wave-source-48.png',optimize=True)
 report={'source_sha256':hashlib.sha256(PACK.read_bytes()).hexdigest(),
-        'source_outfits':len(items),'lab_wave_outfits':1,'art_approved_outfits':0,
-        'remaining_without_authored_wave':47,'rejected_studies':rejected,
+        'source_outfits':len(items),'lab_wave_outfits':2,'art_approved_outfits':0,
+        'remaining_without_authored_wave':46,'rejected_studies':rejected,
         'public_release_ready':False,
         'full_48_art_gate':'still mandatory and currently failing on V6 rotated-limb art',
         'items':items}
