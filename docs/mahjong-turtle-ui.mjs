@@ -62,7 +62,7 @@ export function mountClassicTurtle(root,{userId}){
  if(!inside)return ()=>{};
  const key='cowboy-mahjong-turtle-v1:'+userId;
  const prefKey='cowboy-mahjong-turtle-preferences-v1:'+userId;
- let saved=readStorage(key),activeKind='free',selected=null,highlight=[],zoom=2,awardFilter='all',awardLimit=30,
+ let saved=readStorage(key),activeKind='free',selected=null,highlight=[],zoom=0,awardFilter='all',awardLimit=30,
   destroyed=false,clock=null,resize=null,prefs={sound:false,showFree:false},mode='turtle',lastStatus='';
  try{const val=JSON.parse(window.localStorage.getItem(prefKey)||'{}');
   if(val&&typeof val==='object')prefs={sound:val.sound===true,showFree:val.showFree===true};
@@ -75,6 +75,8 @@ export function mountClassicTurtle(root,{userId}){
  const counts=['pairs','wins','dailyWins','dailyChain','bestStreak','bestRush','flawlessWins','unassistedWins','noUndoWins','noPauseWins',
   'layoutturtleWins','layouttempleWins','layoutgardenWins','dragonPairs','windPairs','flowerPairs','seasonPairs',
   'bambooPairs','circlesPairs','charactersPairs','mistakes'];
+ for(const kind of ['dragon','wind','flower','season','bamboo','circles','characters'])counts.push('ritualOpen_'+kind,'ritualClose_'+kind);
+ counts.push('ritualFourfold','ritualSevenfold');
  for(const metric of counts){if(!Number.isSafeInteger(stats[metric])||stats[metric]<0)stats[metric]=0;}
  stats.wins=Math.max(stats.wins,saved.history.length);
  stats.dailyWins=Math.max(stats.dailyWins,new Set(saved.history.filter(g=>g.kind==='daily').map(g=>g.date)).size);
@@ -107,6 +109,13 @@ export function mountClassicTurtle(root,{userId}){
  <label>Show <select id="turtle-award-filter" aria-label="Filter Classic Turtle achievements"><option value="all">All challenges</option><option value="earned">Unlocked</option><option value="extreme">Legendary and above</option></select></label></div>
  <div id="turtle-awards-list" class="turtle-awards-list"></div><button type="button" id="turtle-awards-more">Show more challenges</button>
  <p class="turtle-local-note">These Classic Turtle trophies are saved on this browser only. Mystery Road's existing account badges remain separate.</p></section>`;
+ // Keep play in one viewport. Only this mode's locally-earned trophies
+ // live in the expandable gallery; account campaign awards remain untouched.
+ const rewardsDrawer=make('details','turtle-rewards-drawer');
+ rewardsDrawer.id='turtle-rewards-drawer';
+ const rewardsSummary=make('summary','turtle-rewards-summary','🏆 TURTLE TROPHIES · VIEW MASTERY TRIALS');
+ rewardsDrawer.append(rewardsSummary,section.querySelector('.turtle-bottom'),section.querySelector('.turtle-awards'));
+ section.append(rewardsDrawer);
  inside.prepend(section);inside.prepend(tabs);
  const view=sel=>$(section,sel);
  function status(msg){lastStatus=msg;const el=view('#turtle-status');if(el)el.textContent=msg;}
@@ -127,6 +136,15 @@ export function mountClassicTurtle(root,{userId}){
   const record={kind:game.kind,layout:game.layout,date:game.date||null,elapsed:game.elapsed,hints:game.hints,moves:game.moves.length,completedAt:game.completedAt};
   if(saved.history.some(r=>r.kind===record.kind&&r.layout===record.layout&&r.completedAt===record.completedAt))return;
   saved.history.unshift(record);
+  // Count a signature once, at full-board victory, never on a partial match.
+  // Older histories stay intact; rituals are not fabricated retroactively.
+  const deal=buildTurtleDeal(game.layout,game.seed);
+  const pairKind=pair=>faceById(deal.tiles[pair[0]].face).kind;
+  const opener=pairKind(game.moves[0]),closer=pairKind(game.moves.at(-1));
+  stats['ritualOpen_'+opener]=(stats['ritualOpen_'+opener]||0)+1;
+  stats['ritualClose_'+closer]=(stats['ritualClose_'+closer]||0)+1;
+  if(new Set(game.moves.slice(0,4).map(pairKind)).size===4)stats.ritualFourfold++;
+  if(new Set(game.moves.slice(0,12).map(pairKind)).size===7)stats.ritualSevenfold++;
   stats.wins++;
   stats['layout'+game.layout+'Wins']++;
   if(game.misses===0&&game.hints===0&&game.undos===0)stats.flawlessWins++;
@@ -252,9 +270,15 @@ export function mountClassicTurtle(root,{userId}){
   const host=view('#turtle-board'),scroller=view('#turtle-board-scroll');
   if(!host)return;
   const maxX=Math.max(...deal.tiles.map(t=>t.x)),maxY=Math.max(...deal.tiles.map(t=>t.y));
-  const usableWidth=Math.max(275,scroller.clientWidth||window.innerWidth-50);
-  const fitSize=Math.max(18,Math.floor((usableWidth-24)/(maxX+1.15)));
+  const usableWidth=Math.max(150,scroller.clientWidth||window.innerWidth-38);
+  const usableHeight=Math.max(140,scroller.clientHeight||window.innerHeight*.4);
+  // Fit both axes, including the iPhone's smaller visible height.
+  const fitSize=Math.max(12,Math.floor(Math.min(
+   (usableWidth-24)/(maxX+1.15),
+   (usableHeight-37)/((maxY+1.12)*HEIGHT)
+  )));
   const sz=Math.min(85,Math.round(fitSize*ZOOMS[zoom]));
+  scroller.classList.toggle('is-magnified',zoom>0);
   host.style.setProperty('--turtle-tile-size',sz+'px');
   host.style.width=Math.ceil(24+(maxX+1.08)*sz)+'px';
   host.style.height=Math.ceil(37+(maxY+1.12)*HEIGHT*sz)+'px';
@@ -307,7 +331,8 @@ export function mountClassicTurtle(root,{userId}){
   const earned=new Set(saved.achievements),filter=awardFilter;
   const available=CLASSIC_AWARDS.filter(a=>filter==='earned'?earned.has(a.id):filter==='extreme'?awardLevel(a.grade)>=7:true);
   available.sort((a,b)=>Number(earned.has(b.id))-Number(earned.has(a.id))||awardLevel(a.grade)-awardLevel(b.grade));
-  view('#turtle-awards-count').textContent=earned.size+' / '+CLASSIC_AWARDS.length+' trophies unlocked · '+available.length+' shown in this category';
+  view('#turtle-awards-count').textContent=earned.size+' / '+CLASSIC_AWARDS.length+' Turtle-only trophies unlocked · '+available.length+' shown';
+  rewardsSummary.textContent='🏆 TURTLE TROPHIES · '+earned.size+' / '+CLASSIC_AWARDS.length+' UNLOCKED · OPEN GALLERY';
   const list=view('#turtle-awards-list');list.replaceChildren();
   for(const award of available.slice(0,awardLimit)){
    const unlocked=earned.has(award.id);
