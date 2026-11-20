@@ -7,6 +7,8 @@ import {paintedRecipe} from './mystery-crew-character-v5.mjs?v=crew6';
 const SVG='http://www.w3.org/2000/svg';
 const FRAMES=Object.freeze(Array.from({length:8},(_,i)=>
  'scout-v9-frame-'+String(i+1).padStart(2,'0')+'.png'));
+const EXPLORER_FRAMES=Object.freeze(Array.from({length:8},(_,i)=>
+ 'scout-explorer-wave-'+String(i+1).padStart(2,'0')+'.png'));
 const FRAME_MS=155;
 let lab=null;
 
@@ -17,6 +19,9 @@ export function isScoutV9LocalPreview(locationInfo){
 }
 export function isScoutV9Supported(member,options={}){
  return options.motion==='wave'&&paintedRecipe(member,options)==='crew-0-detective.webp';
+}
+export function isScoutExplorerLabSupported(member,options={}){
+ return options.motion==='wave'&&paintedRecipe(member,options)==='crew-0-explorer.webp';
 }
 function changeFrame(index){
  if(!lab)return;
@@ -79,6 +84,17 @@ export async function mountScoutV9SceneLab(){
   console.warn('Scout V9 art lab disabled; V5/V6 painting still works:',error?.message||String(error));
   return false;
  }
+ // The second costume remains an optional lab asset. If absent or broken, the
+ // Explorer outfit falls back to the existing painted V6 renderer.
+ const possibleExplorer=EXPLORER_FRAMES.map(file=>new URL('./mystery-crew-v9-scout-explorer/'+file,import.meta.url).href);
+ let explorerUrls=null;
+ try{
+  await Promise.all(possibleExplorer.map(async source=>{
+   const picture=new Image();picture.src=source;await picture.decode();
+   if(picture.naturalWidth!==430||picture.naturalHeight!==574)throw Error('Explorer art dimension mismatch');
+  }));
+  explorerUrls=possibleExplorer;
+ }catch{scene.dataset.v9Explorer='fallback';}
  const image=document.createElementNS(SVG,'image');
  image.id='mc-v9-scout-wave-image';image.setAttribute('x','208');image.setAttribute('y','10');
  image.setAttribute('width','390');image.setAttribute('height','520');
@@ -86,7 +102,8 @@ export async function mountScoutV9SceneLab(){
  image.setAttribute('aria-hidden','true');image.style.pointerEvents='none';
  image.style.display='none';image.setAttribute('href',urls[0]);image.dataset.v9Frame='0';
  actor.append(image);
- lab={scene,actor,rig,image,urls,index:0,last:null,raf:null,active:false};
+ lab={scene,actor,rig,image,urls,originalUrls:urls,explorerUrls,profile:null,index:0,last:null,raf:null,active:false};
+ scene.dataset.v9Explorer=explorerUrls?'ready':'fallback';
  scene.dataset.v9Lab='ready';scene.dataset.v9Wave='inactive';
  document.addEventListener('visibilitychange',()=>{
   if(!lab)return;
@@ -97,8 +114,18 @@ export async function mountScoutV9SceneLab(){
 }
 export function syncScoutV9SceneLab(member,options={}){
  if(!lab)return false;
- const supported=isScoutV9Supported(member,options)&&lab.actor.style.display!=='none';
- activate(supported);
- return supported;
+ const eligible=lab.actor.style.display!=='none';
+ const profile=eligible&&isScoutV9Supported(member,options)?'detective':
+  eligible&&lab.explorerUrls&&isScoutExplorerLabSupported(member,options)?'explorer':null;
+ if(profile!==lab.profile){
+  stop();lab.profile=profile;
+  lab.urls=profile==='explorer'?lab.explorerUrls:lab.originalUrls;
+  lab.index=-1;
+  if(profile)changeFrame(0);
+ }
+ activate(Boolean(profile));
+ lab.scene.dataset.v9Costume=profile||'none';
+ return Boolean(profile);
 }
 export const SCOUT_V9_FRAMES=FRAMES;
+export const SCOUT_EXPLORER_LAB_FRAMES=EXPLORER_FRAMES;
