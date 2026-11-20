@@ -125,7 +125,9 @@ export function makeHotRodHandler({auth, rpc, origins, now = () => Date.now(), i
       const state = saved.state;
       let next;
       if (body.type === 'new') {
-        if (state && (state.status === 'summer' || state.race)) throw new GameError('Your current summer is still active.');
+        // The client requires a second explicit confirmation before requesting
+        // a fresh campaign. The authenticated, revision-checked 'new' mutation
+        // intentionally replaces an active summer, including a pending race.
         next = {state:newCampaign(), message:'You have $750 and a whole summer.'};
       } else if (!state) throw new GameError('Start Classic 1963 first.');
       else if (body.type === 'challenge') {
