@@ -1,0 +1,84 @@
+name: Scout Explorer painted wrist in actual Mystery Crew scene
+on:
+  pull_request:
+    paths:
+      - 'scripts/refine_scout_explorer_wave_wrist.py'
+      - 'scripts/build_scout_explorer_wave_study.py'
+      - 'docs/mystery-crew-v9-scout-lab.mjs'
+      - 'tests/browser-mystery-crew-scout-explorer.py'
+      - '.github/workflows/mystery-crew-explorer-scene.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  explorer-preview:
+    name: Explorer-Wave-real-scene-four-viewports
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install source-art and Chromium tools
+        run: |
+          python -m pip install 'pillow>=11,<13' 'numpy>=2,<3' 'opencv-python-headless>=4.10,<5' 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Preserve original V5 and generate source-locked green Explorer Wave
+        run: |
+          node --check docs/mystery-crew-v9-scout-lab.mjs
+          python scripts/build_scout_v10_wave.py
+          python scripts/build_scout_explorer_wave_study.py
+          python scripts/refine_scout_explorer_wave_wrist.py
+      - name: Independently audit source pixels and prototype-only status
+        run: |
+          python - <<'PY'
+          import io,json,tarfile
+          from pathlib import Path
+          import numpy as np
+          from PIL import Image
+          p=Path('reports/scout-explorer-wave-refined')
+          report=json.loads((p/'refined-explorer-report.json').read_text())
+          assert report['status']=='experimental_not_approved'
+          assert report['all_48_art_gate_still_required'] is True
+          assert report['source_idle_and_return_exact'] is True
+          assert len(report['review'])==8
+          with tarfile.open('docs/mystery-crew-v5-illustrated.tar') as t:
+              original=np.asarray(Image.open(io.BytesIO(t.extractfile('crew-0-explorer.webp').read())).convert('RGBA'))
+          yy,xx=np.indices((574,430))
+          allowed=(xx>=261)&(xx<=405)&(yy>=95)&(yy<=347)
+          for i in range(1,9):
+              with Image.open(p/f'scout-explorer-wave-{i:02}.png') as im:
+                  assert im.size==(430,574) and im.mode=='RGBA'
+                  frame=np.asarray(im).copy()
+              if i in (1,8):assert np.array_equal(frame,original)
+              delta=(frame[:,:,3]!=original[:,:,3])|(
+                  np.any(frame[:,:,:3]!=original[:,:,:3],axis=2)&
+                  ((frame[:,:,3]>0)|(original[:,:,3]>0)))
+              assert not np.any(delta&~allowed),f'Outfit/identity changed in frame {i}'
+              if i in range(2,8):assert delta.sum()>3000
+          print('PASS 8 source-locked refined frames; artistic approval still pending')
+          PY
+      - name: Stage experimental frames only in ephemeral CI working tree
+        run: |
+          mkdir -p docs/mystery-crew-v9-scout-explorer
+          cp reports/scout-explorer-wave-refined/scout-explorer-wave-*.png docs/mystery-crew-v9-scout-explorer/
+      - name: Full workshop/van/dog scene Wave and fallback acceptance
+        run: |
+          python -m http.server 8765 --directory docs >/tmp/scout-explorer-web.log 2>&1 &
+          python tests/browser-mystery-crew-scout-explorer.py
+      - name: Keep real-scene visual proof and refined prototype art
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: scout-explorer-refined-real-scene-evidence
+          path: |
+            reports/scout-explorer-wave-refined/*.png
+            reports/scout-explorer-wave-refined/*.json
+            reports/scout-explorer-in-scene-*.png
+            reports/scout-explorer-in-stage-*.png
+          retention-days: 10
+          if-no-files-found: warn
