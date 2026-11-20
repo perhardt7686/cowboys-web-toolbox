@@ -37,8 +37,8 @@ async def main():
  async with async_playwright() as p:
   browser=await p.chromium.launch(headless=True)
   try:
-   for width in (375,390,430,768):
-    page=await browser.new_page(viewport={'width':width,'height':844},has_touch=True,device_scale_factor=1)
+   for width,height in ((375,667),(390,844),(430,932),(768,1024)):
+    page=await browser.new_page(viewport={'width':width,'height':height},has_touch=True,device_scale_factor=1)
     errors=[]
     page.on('pageerror',lambda err:errors.append(str(err)))
     await install_fixture(page)
@@ -56,6 +56,13 @@ async def main():
       document.getElementById('mahjong-root').classList.add('arcade-game-active');
     }""")
     assert await page.locator('#turtle-zoom-in').is_visible(),'Turtle must be playable in real Arcade mode'
+    await page.wait_for_timeout(80)
+    measures=await page.evaluate("""()=>{
+      const box=sel=>{const el=document.querySelector(sel),r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right}};
+      return {height:innerHeight,width:innerWidth,board:box('#turtle-board'),scroll:box('#turtle-board-scroll'),actions:box('.turtle-actions'),root:box('#mahjong-classic-root')};
+    }""")
+    assert measures['board']['right']<=measures['scroll']['right']+2 and measures['board']['bottom']<=measures['scroll']['bottom']+2,('Classic board clipped',width,height,measures)
+    assert measures['actions']['bottom']<=measures['height']+2,('Turtle actions below screen',width,height,measures)
     await page.evaluate("""()=>{
       document.body.classList.remove('arcade-ready','arcade-on');
       document.documentElement.classList.remove('arcade-on');
