@@ -402,6 +402,9 @@ async def campaign_flow(page, name, *, touch):
     if touch:
         await finger(game.locator('[data-drive="up"]'),'pointerdown',1)
         await finger(game.locator('[data-drive="gas"]'),'pointerdown',2)
+        await expect(game.locator('[data-drive="gas"]')).to_have_attribute('aria-pressed','true')
+        await expect(game.locator('[data-drive="brake"]')).to_have_attribute('aria-label','Brake pedal')
+        await expect(game.locator('[data-drive="clutch"]')).to_have_attribute('aria-label','Clutch pedal')
         await expect(game.locator('.hot-rod-meters')).to_have_text(re.compile(r'[1-9]\d* MPH.*GEAR 1'))
         await finger(game.locator('[data-drive="gas"]'),'pointerup',2)
         await finger(game.locator('[data-drive="up"]'),'pointerup',1)
