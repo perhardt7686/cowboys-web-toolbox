@@ -51,7 +51,7 @@ test('Family Fun uses verified activity events, no fake scores, and Eastern time
  assert.match(board,/yourLastPlayedAt/);
  assert.match(board,/activityAt\?/);
  assert.match(board,/family-unified-scoreboard-clear/);
- assert.match(board,/data\.lastPlayedAt/);
+ assert.match(board,/recent\?\.lastPlayedAt/);
  assert.match(sender,/client\.rpc\('community_family_arcade_activity'\)/);
  assert.match(sender,/if\(!active\(\)\|\|error\|\|!activity\?\.games\)return/);
  assert.match(css,/\.family-fun-game-chip\.is-most-recent/);
