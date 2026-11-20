@@ -1111,7 +1111,7 @@ export function makeHotRod({client, memberId, launcher}) {
       const opponent = race.contract.rival === 'mystery' ? 'Mystery Machine' :
         RIVALS.find(person=>person.id===race.contract.rival)?.name || 'Family challenge';
       raceDetails.append(heading(opponent),copy(race.contract.kind==='drag' ? 'Quarter-mile drag' : 'Two and a half miles of winding road'),
-        copy('Wait for green. Arrows steer, Up/Down work the gas and brake. Space shifts up with gas or down with brake (classic); E/Q choose gears directly. Release gas and use X/Shift for the smoothest clutch-assisted shift.'),
+        copy('Wait for green. Arrows steer, Up/Down work the gas and brake. Original-style Space shifts up with gas or down with brake; E/Q choose gears directly. Release gas and use X/Shift for the smoothest clutch-assisted shift.'),
         row(action('Stage at the line',goRace,{accent:true,disabled:busy}),action('Forfeit race',()=>{showForfeit=true;renderRace();})));
     } else if (showForfeit) {
       const hasStake = !duel && !['kicks',undefined].includes(race.contract.stake);
