@@ -38,6 +38,6 @@ test('final control stylesheet is linked and keeps labels beneath active buttons
  assert.match(css,/min-height:48px/);
  assert.match(css,/@media\(orientation:landscape\)/);
  assert.match(css, /focus-visible/);
- assert.match(html,/commons-board-rush\.mjs\?v=skyboard8/);
- assert.match(html,/commons-dash-forge\.mjs\?v=dash8/);
+ assert.match(html,/commons-board-rush\.mjs\?v=skyboard9/);
+ assert.match(html,/commons-dash-forge\.mjs\?v=dash9/);
 });
