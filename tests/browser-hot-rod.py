@@ -240,6 +240,18 @@ async def campaign_flow(page, name, *, touch):
     await expect(game.locator('.hot-rod-bank')).to_contain_text('$750')
     await expect(game.get_by_role('heading',name='Los Angeles News')).to_be_visible()
     await game.locator('.hot-rod-panel').get_by_role('button',name='Used cars').click()
+    # Keep the original 25 readily available, with accessible new body classes.
+    types=game.get_by_role('combobox',name='Find a body style')
+    await expect(types).to_be_visible()
+    await types.select_option('pickups')
+    await expect(game.locator('.hot-rod-classifieds').get_by_role('button',name=re.compile('1954 Chevrolet 3100 Stepside Pickup'))).to_be_visible()
+    await types.select_option('vans')
+    await expect(game.locator('.hot-rod-classifieds').get_by_role('button',name=re.compile('1961 Ford Econoline Cargo Van'))).to_be_visible()
+    await types.select_option('wagons')
+    await expect(game.locator('.hot-rod-classifieds').get_by_role('button',name=re.compile('1934 Ford Woodie Wagon'))).to_be_visible()
+    await types.select_option('utility')
+    await expect(game.locator('.hot-rod-classifieds').get_by_role('button',name=re.compile('1959 Chevrolet El Camino'))).to_be_visible()
+    await types.select_option('all')
     await game.locator('.hot-rod-panel').get_by_role('button',name=re.compile('1940 Chevrolet Coupe')).click()
     await expect(game.get_by_role('heading',name='1940 Chevrolet Coupe')).to_be_visible()
     await game.get_by_role('spinbutton',name='Your offer').fill('380')
@@ -443,7 +455,7 @@ async def campaign_flow(page, name, *, touch):
 
 
 async def capture_vehicle_gallery(page, label):
-    # Screenshot all 25 original-era models at their native pixel-art size.
+    # Screenshot the original twenty-five and fifteen new era-correct vehicles at native pixel size.
     # This is an inspectable visual artifact, not proof of 1:1 DOS fidelity.
     count = await page.evaluate("""async () => {
         const [{CARS},{makeCar},{paintVehicle},{EGA}] = await Promise.all([
@@ -478,9 +490,9 @@ async def capture_vehicle_gallery(page, label):
         document.body.append(grid);
         return models.length;
     }""")
-    assert count == 25, f'Expected 25 distinct period cars, got {count}'
+    assert count == 40, f'Expected 40 distinct period cars, got {count}'
     await page.locator('#hotrod-gallery').screenshot(
-        path=ROOT / 'reports' / f'hot-rod-{label}-all-25-cars.png'
+        path=ROOT / 'reports' / f'hot-rod-{label}-all-40-cars.png'
     )
     await page.locator('#hotrod-gallery').evaluate('(node)=>node.remove()')
 
