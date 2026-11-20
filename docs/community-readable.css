@@ -115,3 +115,23 @@ body.community-page #lab-intro .lab-intro-copy h2 em{color:#0c5967!important;fon
 body.community-page #lab-intro .lab-intro-copy>p:last-child{color:#48364b!important;max-width:760px;font-size:clamp(16px,2vw,19px)!important;font-weight:600!important;line-height:1.6}
 body.community-page #lab-intro .lab-intro-copy>.eyebrow{color:#653476!important;font-size:clamp(11px,1.7vw,14px)!important;font-weight:900!important;line-height:1.5}
 @media(max-width:650px){body.community-page #lab-intro.lab-intro{padding-top:10px;padding-bottom:25px;margin-bottom:27px}body.community-page #lab-intro .lab-intro-copy h2{font-size:clamp(34px,8.2vw,43px)!important}body.community-page #lab-intro .lab-intro-copy>p:last-child{font-size:16px!important}}
+
+/* Compact reading control shares the conversation search/sort toolbar. */
+body.community-page .community-tools.has-reading-dropdown{
+ grid-template-columns:minmax(0,1fr) minmax(115px,155px) auto!important;
+ align-items:center;
+}
+@media(max-width:620px){
+ body.community-page .community-tools.has-reading-dropdown{
+  grid-template-columns:minmax(0,1fr) auto!important;
+ }
+ body.community-page .community-tools.has-reading-dropdown .community-search{
+  grid-column:1/-1;grid-row:1;
+ }
+ body.community-page .community-tools.has-reading-dropdown .community-sort{
+  grid-column:1;grid-row:2;flex:initial;min-width:0;
+ }
+ body.community-page .community-tools.has-reading-dropdown .family-reading-bar{
+  grid-column:2;grid-row:2;margin:0;
+ }
+}
