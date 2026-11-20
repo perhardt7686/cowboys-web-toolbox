@@ -18,9 +18,10 @@ export function connectDrivingInput(panel, active) {
     if (bit & (INPUT.up | INPUT.down)) shifts |= bit;
     else held.set(key, bit);
   };
-  listen(panel, 'keydown', event => {
+  // The driving pad buttons can take focus; keep race keys available while the race is active.
+  listen(window, 'keydown', event => {
     if (!active() || event.ctrlKey || event.altKey || event.metaKey) return;
-    if (event.target?.closest('input,select,textarea')) return;
+    if (event.target?.closest?.('input,select,textarea,[contenteditable="true"]')) return;
     let bit = keys[event.code];
     if (event.code === 'Space' && !event.target?.closest('button')) {
       bit = [...held.values()].includes(INPUT.brake) ? INPUT.down : INPUT.up;
