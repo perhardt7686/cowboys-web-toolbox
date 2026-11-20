@@ -89,7 +89,15 @@ export function makeHotRod({client, memberId, launcher}) {
   });
   const quit = makeButton('Back to games', () => close());
   const globalButtons = el('div','hot-rod-top-actions');
-  globalButtons.append(soundButton, quit);
+  const newGameButton = makeButton('New game', () => requestNewGame());
+  newGameButton.classList.add('hot-rod-new-game');
+  const cancelNewButton = makeButton('Keep current game', () => {
+    confirmNew = false;
+    if (scene === 'race' && race) renderRace();
+    else render();
+  });
+  cancelNewButton.hidden = true;
+  globalButtons.append(newGameButton, cancelNewButton, soundButton, quit);
   header.append(title, globalButtons);
 
   const stat = el('div','hot-rod-bank');
@@ -331,6 +339,42 @@ export function makeHotRod({client, memberId, launcher}) {
     bayMode = 'work';
     shelfSelection=0;focusBolt=null;
     show('workbench');
+  }
+
+  function updateNewGameControls() {
+    newGameButton.textContent = confirmNew ? 'Confirm new game' : 'New game';
+    newGameButton.disabled = busy || !loaded;
+    cancelNewButton.hidden = !confirmNew;
+    cancelNewButton.disabled = busy;
+    newGameButton.setAttribute('aria-label', confirmNew ? 'Confirm replacing current Hot Rod campaign' : 'Start a new Hot Rod game');
+    newGameButton.title = confirmNew ? 'This replaces your current summer, garage and pending race.' : 'Start a fresh summer (confirmation required).';
+  }
+
+  function requestNewGame() {
+    if (busy || !loaded) return;
+    if (!confirmNew) {
+      confirmNew = true;
+      if (scene === 'race' && race && !paused && !staged && !race.result) {
+        paused = true;
+        input.clear();
+        speaker.silence();
+      }
+      if (scene === 'race' && race) renderRace();
+      else render();
+      return;
+    }
+    confirmNew = false;
+    cancelAnimationFrame(frame);
+    input.clear();
+    speaker.silence();
+    void mutate('new', {}, () => {
+      race = null;
+      duel = null;
+      paused = false;
+      staged = false;
+      showForfeit = false;
+      openPaper('cover');
+    });
   }
 
   function renderTitle() {
@@ -729,12 +773,18 @@ export function makeHotRod({client, memberId, launcher}) {
         if(!busy&&!disabled)pixelButton(label,zones.menu[index],activate,'art-diner-'+index);
       });
     }
+    const rivalBanter = rival.id === 'king' ? 'The King studies your tires before he talks money.' :
+      state.beaten.includes(rival.id) ? 'You got me last time. That does not mean you get a free pass tonight.' :
+      state.dragWins + state.roadWins === 0 ? 'First night at Bob’s? Get your motor warm before you talk big.' :
+      state.dragWins >= rival.drag && state.roadWins >= rival.road ? 'You have the wins. Now show me what that machine can do.' :
+      'Bring a few more wins and we will talk about a serious wager.';
     const info=negotiating?copy(model.name+' · '+model.hp+' hp · '+model.weight+' lb · '+
       (model.auto?'Automatic':'Manual transmission')):copy(model.name+' · “'+rival.line+'”');
     const blocked=challengeProblem(state,rival,raceType,wager);
     panel('Bob’s Drive-In',row(select('Call a driver',RIVALS.map(person=>[person.id,person.name+
       (state.beaten.includes(person.id)?' ✓':'')]),rival.id,chooseRival),
       action(negotiating?'Close rival’s hood':'Inspect car',inspect,{focus:'inspect-rival'}),action('Garage',()=>show('garage'))),info,
+      negotiating ? el('span') : copy('At the curb: “'+rivalBanter+'”'),
       requirements?copy('Required wins: '+rival.drag+' drag · '+rival.road+' road.'):el('span'),
       row(select('Race',courseLabels,raceType,kind=>{chooseCourse(kind);render();}),
         select('Wager',WAGERS[raceType].map(key=>[key,wagerLabel(key)]),wager,value=>{wager=value;render();}),
@@ -956,6 +1006,7 @@ export function makeHotRod({client, memberId, launcher}) {
       if (state.status === 'summer' && state.race && !['garage','standings','crew'].includes(scene)) scene = 'garage';
     }
     dialog.dataset.scene = scene;
+    updateNewGameControls();
     housing.setAttribute('aria-busy',String(busy));
     screen.setAttribute('data-cursor',scene === 'workbench' ? 'wrench' : '');
     dialog.dataset.bayMode=scene==='workbench'?bayMode:'';
@@ -1028,6 +1079,7 @@ export function makeHotRod({client, memberId, launcher}) {
 
   function renderRace() {
     if (!race) return;
+    updateNewGameControls();
     tabs.hidden = true;
     consolePanel.hidden = true;
     racePanel.hidden = false;
@@ -1059,7 +1111,7 @@ export function makeHotRod({client, memberId, launcher}) {
           action(duel ? 'Back to challenges' : 'Continue',finishView,{accent:true}));
       }
     } else if (paused) {
-      raceDetails.append(copy('Paused. Resume when you’re ready.'));
+      raceDetails.append(copy(confirmNew ? 'Race paused. Confirm New game above to replace this campaign, or keep the current game.' : 'Paused. Resume when you’re ready.'));
     }
     racePanel.classList.toggle('hot-rod-driving',!staged && !paused && !finishing && !race.result);
   }

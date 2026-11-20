@@ -229,6 +229,12 @@ async def access_flow(page):
 async def campaign_flow(page, name, *, touch):
     await access_flow(page)
     game = await open_game(page)
+    # The New game action is persistent and must not discard saves on first tap.
+    await expect(game.get_by_role('button',name='Start a new Hot Rod game')).to_be_visible()
+    await game.get_by_role('button',name='Start a new Hot Rod game').click()
+    await expect(game.get_by_role('button',name='Confirm replacing current Hot Rod campaign')).to_be_visible()
+    await game.get_by_role('button',name='Keep current game').click()
+    await expect(game.get_by_role('button',name='Start a new Hot Rod game')).to_be_visible()
     await game.get_by_role('button',name='Start Classic 1963').click()
     await scene(game,'paper')
     await expect(game.locator('.hot-rod-bank')).to_contain_text('$750')
@@ -239,6 +245,7 @@ async def campaign_flow(page, name, *, touch):
     await game.get_by_role('spinbutton',name='Your offer').fill('380')
     await game.get_by_role('button',name='Make offer').click()
     await scene(game,'garage')
+    await expect(game.get_by_role('button',name='Start a new Hot Rod game')).to_be_visible()
     await expect(game.locator('.hot-rod-bank')).to_contain_text('$370')
     await fit(page,game)
     await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-garage.png')
