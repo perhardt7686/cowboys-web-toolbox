@@ -18,7 +18,7 @@ test('Emma Skyboard uses joystick and real A/B/C actions with labels below',()=>
  assert.ok(!src.includes('◀ LEFT</button>'),'Old steering strip must be replaced');
 });
 
-test('Elliot Dash Forge action follows true level physics rather than inventing steering',()=>{
+test('Eliot Dash Forge action follows true level physics rather than inventing steering',()=>{
  const src=read('commons-dash-forge.mjs');
  assert.match(src,/id="dash-jump" class="arcade-button-a"/);
  assert.match(src,/id="dash-action-label" class="arcade-button-caption"/);
@@ -39,5 +39,5 @@ test('final control stylesheet is linked and keeps labels beneath active buttons
  assert.match(css,/@media\(orientation:landscape\)/);
  assert.match(css, /focus-visible/);
  assert.match(html,/commons-board-rush\.mjs\?v=skyboard8/);
- assert.match(html,/commons-dash-forge\.mjs\?v=dash8/);
+ assert.match(html,/commons-dash-forge\.mjs\?v=dash10-creator/);
 });

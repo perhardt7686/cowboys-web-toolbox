@@ -33,7 +33,7 @@ Current production renderer | Known save paths, owned items, member history | Pr
 4. **Pet quality:** Animate species-specific walk, play, idle and affection; add bond UI that reads authoritative server state only in private member integration. No local fake achievements. Integrate trade under existing row-level security, do not rewrite ownership.
 5. **Rewards:** Reillustrate all established items through a prioritized asset pipeline while preserving exact IDs, required achievements, ownership and incompatible states. Showcase each reward on a real equipped character and in an isolated collection card.
 6. **Account adapter:** Implement read-only normalized legacy recipe mapping first. Only later wire server saves through existing authorized session and RLS, with explicit Saving/Saved/Error and rollback. Test with synthetic accounts; never silently migrate production records.
-7. **Family acceptance:** Compare existing and new editors on real iPhones with Emma and Elliot. Record tap counts and completion rate for make character, preview award, find pet, remove item, save. Require that V8 wins clarity and artistic quality, not just unit tests, before switching the public family member entry.
+7. **Family acceptance:** Compare existing and new editors on real iPhones with Emma and Eliot. Record tap counts and completion rate for make character, preview award, find pet, remove item, save. Require that V8 wins clarity and artistic quality, not just unit tests, before switching the public family member entry.
 
 ## CI and rollback
 - PR workflow: .github/workflows/avatar-v8-pilot.yml.

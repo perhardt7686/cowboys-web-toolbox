@@ -2,6 +2,7 @@ import {
   addDays, boardTime, button, clockTime, dateFromKey, dayKey, easternMidnight, el, eventOnDate,
   field, persistentFold, preference, reportError, shiftMonth, startOfMonth, startOfWeek, statusLine
 } from './family-board-core.mjs?v=family3';
+import {familyDisplayText} from './family-display-name.mjs';
 
 const categories = {plans: 'Family plans', appointment: 'Appointment', work: 'Work', celebration: 'Celebration', other: 'Other'};
 const headingFormat = new Intl.DateTimeFormat('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
@@ -128,7 +129,7 @@ export function makeCalendar({rpc}) {
       row.addEventListener('toggle', () => row.open ? expanded.add(event.id) : expanded.delete(event.id));
       const header = el('summary');
       const time = event.all_day ? 'All day' : clockTime(event.start) + '–' + clockTime(event.end);
-      const span = el('span', 'family-event-title', event.title);
+      const span = el('span', 'family-event-title', familyDisplayText(event.title));
       const metadata = (view === 'agenda' ? dayFormat.format(dateFromKey(dayKey(event.start))) + ' · ' : '') + time;
       header.append(span, el('small', '', metadata));
       const detail = el('div', 'family-event-body');
@@ -138,7 +139,7 @@ export function makeCalendar({rpc}) {
       if (startDay !== endDay) detail.append(el('p', '', dayFormat.format(dateFromKey(startDay)) + ' – ' + dayFormat.format(dateFromKey(endDay))));
       detail.append(el('p', 'family-event-tag', event.source === 'google' ? 'Google Family Calendar' : categories[event.category] || 'Family plans'));
       if (event.location) detail.append(el('p', 'family-event-location', event.location));
-      if (event.description) detail.append(el('p', 'family-event-description', event.description));
+      if (event.description) detail.append(el('p', 'family-event-description', familyDisplayText(event.description)));
       if (event.status === 'tentative') detail.append(el('small', '', 'Tentative'));
       const controls = el('div', 'family-controls');
       if (event.editable) {

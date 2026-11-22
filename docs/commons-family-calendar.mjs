@@ -3,6 +3,7 @@
  * Source Google Calendar is the existing, now-cleared primary calendar named Family.
  */
 import {createAuthStorage} from './auth-flow.mjs?v=recovery1';
+import {familyDisplayText} from './family-display-name.mjs';
 const host=document.getElementById('conversations');
 const cfg=window.COWBOY_COMMUNITY_CONFIG;
 const tz='America/New_York';
@@ -134,12 +135,12 @@ if(host && cfg?.enabled && location.pathname.endsWith('community.html')){
   const article=el('article','family-calendar-event');
   const header=el('div','family-calendar-event-header');
   const label=el('div');
-  label.append(el('strong','',item.title||'Untitled event'),el('small','',dateFmt.format(new Date(item.start))+' · '+formatEventTime(item)));
+  label.append(el('strong','',familyDisplayText(item.title||'Untitled event')),el('small','',dateFmt.format(new Date(item.start))+' · '+formatEventTime(item)));
   header.append(label);
   if(item.status==='tentative')header.append(el('span','family-calendar-tentative','Tentative'));
   article.append(header);
   if(item.location){const where=el('p','family-calendar-where','Location: '+item.location);article.append(where);}
-  if(item.description){article.append(el('p','family-calendar-description',item.description));}
+  if(item.description){article.append(el('p','family-calendar-description',familyDisplayText(item.description)));}
   return article;
  }
  function monthRender(parent,events){

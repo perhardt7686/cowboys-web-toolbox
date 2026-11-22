@@ -1,5 +1,10 @@
 /* Dash Forge: tablet-first original geometric arcade, family members only. */
 body.community-page #dash-forge-root,body.community-page #dash-forge-root *{box-sizing:border-box}
+/* The canvas is a touch control, so a jump must not paint the browser's tap
+   highlight across the playfield. Keyboard focus indicators remain intact. */
+body.community-page #dash-forge-root,
+body.community-page #dash-forge-root canvas,
+body.community-page #dash-forge-root button{-webkit-tap-highlight-color:transparent}
 body.community-page #dash-forge-root{margin:14px 0 22px;min-width:0;font-family:system-ui,-apple-system,sans-serif;color:#f9f5ff}
 body.community-page #dash-forge-root > #dash-forge-toggle{
  display:flex;width:100%;align-items:center;gap:12px;border:3px solid #9465e9;border-radius:15px;
@@ -264,7 +269,7 @@ body.community-page #dash-forge-root .dash-phase-guide>span:nth-child(3){border-
  body.community-page #dash-forge-root .dash-builder-form{gap:4px;margin:4px 0}
 }
 
-/* Elliot's Creator: actual-game preview, clear sections and finger-friendly controls. */
+/* Eliot's Creator: actual-game preview, clear sections and finger-friendly controls. */
 body.community-page #dash-forge-root #dash-pane-builder{min-width:0;overflow-x:hidden}
 body.community-page #dash-forge-root .dash-editor-walkthrough{
  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-width:960px;margin:9px 0;
@@ -436,7 +441,7 @@ body.community-page #dash-forge-inside .dash-layer-bar button[aria-pressed=true]
 body.community-page #dash-forge-inside .dash-stage-modules{color:#a4f4ed;font-weight:800}
 body.community-page #dash-forge-inside .dash-creator-preview{box-shadow:0 5px 18px #050c213d}
 
-/* Elliot's rhythm HUD: readable attempt count without covering the level canvas. */
+/* Eliot's rhythm HUD: readable attempt count without covering the level canvas. */
 body.community-page #dash-forge-root #dash-attempt-count{
  color:#ffe79d;font:900 clamp(11px,1.6vw,15px)/1.1 system-ui,sans-serif;
  letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;
