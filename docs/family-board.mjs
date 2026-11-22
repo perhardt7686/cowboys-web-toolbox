@@ -1,6 +1,6 @@
 import {el} from './family-board-core.mjs?v=family3';
 import {makeFridge} from './family-fridge.mjs?v=family3';
-import {makeCalendar} from './family-calendar.mjs?v=calendar6';
+import {makeCalendar} from './family-calendar.mjs?v=calendar7-eliot';
 
 const games = {
   mahjong: {label: 'Mahjong', unit: 'best score', achievement: 'wins', entry: 'mahjong-toggle'},

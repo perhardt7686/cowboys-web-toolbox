@@ -10,7 +10,7 @@ import {validateLabPost} from './lab-core.mjs';
 import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
-import {createFamilyBoard} from './family-board.mjs?v=marquee7-activity1';
+import {createFamilyBoard} from './family-board.mjs?v=marquee8-eliot';
 import {createHotRodBoard} from './hot-rod-board.mjs?v=drivetrain2';
 import {isEdwardTestPreview,edwardTestMember} from './edward-test-persona.mjs';
 

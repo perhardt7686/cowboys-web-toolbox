@@ -74,6 +74,9 @@ async def run_one(browser,width,height):
   await page.route(URL,lambda route:route.fulfill(body=HTML,content_type='text/html'))
   await page.route('https://cdn.jsdelivr.net/**',lambda route:route.fulfill(body=SUPABASE_STUB,
     content_type='application/javascript',headers={'access-control-allow-origin':'*'}))
+  if width==390:
+   await page.add_init_script("""const legacy={id:null,title:'Legacy Draft',difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none'};
+    localStorage.setItem('dash-forge-draft-v2-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',JSON.stringify({draft:legacy,dirty:true,undo:[{...legacy,title:'Old Undo'}],tile:9}));""")
   await page.goto(URL,wait_until='domcontentloaded')
   await page.locator('#dash-forge-root').wait_for(timeout=15000)
   assert await page.locator('#dash-forge-toggle').is_visible()
@@ -83,6 +86,22 @@ async def run_one(browser,width,height):
   assert await page.locator('#dash-campaign-list').get_by_text('Neon Canopy',exact=False).count()>=1
   assert 'ONE BILLION NUMBERED STAGES' in await page.locator('.dash-forever-counter').inner_text()
   assert await page.locator('[data-dash-play="2"]').is_disabled(), 'Next campaign stage locked'
+  if width==390:
+   await page.locator('[data-dash-tab="builder"]').click()
+   assert await page.locator('#dash-editor-grid .dash-cell').count()==24, 'Pre-layer device drafts must still render'
+   assert await page.locator('#dash-title').input_value()=='Legacy Draft'
+   await page.locator('#dash-undo').click()
+   assert await page.locator('#dash-title').input_value()=='Old Undo', 'Legacy undo history must still be editable'
+  # The title-screen Creator actions used to omit layout/song and crash the grid.
+  # Exercise both real controller entry events, not just the existing Studio tab.
+  for boss,length in [(True,88),(False,48)]:
+   await page.evaluate('(boss)=>window.dispatchEvent(new CustomEvent("dashforge:creator-mode",{detail:{boss}}))',boss)
+   assert await page.locator('#dash-editor-grid .dash-cell').count()==24, 'Fresh creator has a populated tile field'
+   assert await page.locator('#dash-editor-overview .dash-overview-tile').count()==length
+   await page.locator('#dash-editor-grid [data-dash-cell="9"]').click()
+   assert 'Spike' in await page.locator('#dash-selected-tile').inner_text()
+   await page.locator('#dash-undo').click()
+   assert 'Clear' in await page.locator('#dash-selected-tile').inner_text()
   await page.locator('#dash-forge-root [data-dash-tab="builder"]').click()
   await page.locator('#dash-world').select_option('Volcanic Foundry')
   await page.locator('#dash-boss-style').select_option('volcanic')
@@ -214,6 +233,8 @@ async def run_one(browser,width,height):
   assert box and box['x']>=-2 and box['x']+box['width']<=width+3, ('Horizontal overflow',width,box)
   assert box['height']>145,('Game collapsed vertically',height,box)
   await page.locator('#dash-jump').tap()
+  for selector in ['#dash-canvas','#dash-jump']:
+   assert await page.locator(selector).evaluate('el=>getComputedStyle(el).webkitTapHighlightColor')=='rgba(0, 0, 0, 0)', 'Jump controls must not flash the browser tap overlay'
   assert await page.locator('#dash-action-label').inner_text() in ('JUMP','THRUST','FLIP','TELEPORT')
   assert await page.locator('#dash-jump').get_attribute('aria-describedby')=='dash-action-label'
   button_box=await page.locator('#dash-jump').bounding_box()

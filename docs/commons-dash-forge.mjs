@@ -43,6 +43,9 @@ const PAINT_GROUPS=[
 ];
 const dataKey=()=>user?'dash-forge-draft-v2-'+user:null;
 const defaultDraft=(title='My First Dash')=>({id:null,title,difficulty:2,pattern:'.'.repeat(48),world:'Maker Studio',bossStyle:'none',layout:[],song:'pulse'});
+// Earlier device drafts predate layers and soundtracks. Fill missing fields
+// before any grid, inspector, preview or undo operation reads the draft.
+const completeDraft=value=>({...defaultDraft(),...value,layout:value?.layout??[],song:DASH_SONGS[value?.song]?value.song:'pulse'});
 let tileSelected=4,zoom=1,zoomStart=null,clipboard=null,pickTool='paint',paintGroup='Hazards',editLayer='track',drag=null,autoTimer=0;
 let inputTapped=false,lastRun=null,draftLoadedFor=null,attemptKey='',attemptCount=0;
 const dashControls=createSourceHolds(['jump']);
@@ -84,8 +87,11 @@ function restoreDraft(){
  try{
   const saved=JSON.parse(localStorage.getItem(key)||'null');
   if(!saved?.draft)return;
-  createDashCourse(saved.draft.pattern,210,{layout:saved.draft.layout});
-  draft=saved.draft;draftDirty=Boolean(saved.dirty);undoHistory=saved.undo||[];redoHistory=saved.redo||[];
+  const restored=completeDraft(saved.draft);
+  createDashCourse(restored.pattern,210,{layout:restored.layout});
+  draft=restored;draftDirty=Boolean(saved.dirty);
+  undoHistory=Array.isArray(saved.undo)?saved.undo.slice(-24).map(completeDraft):[];
+  redoHistory=Array.isArray(saved.redo)?saved.redo.slice(-24).map(completeDraft):[];
   tileSelected=editableTile(saved.tile)?saved.tile:4;editorPage=Math.floor(tileSelected/EDITOR_SPAN);
  }catch{}
 }
@@ -100,7 +106,7 @@ function saveUndo(){
 function travelHistory(direction){
  const from=direction==='undo'?undoHistory:redoHistory,to=direction==='undo'?redoHistory:undoHistory;
  if(!from.length)return;
- to.push(draftSnapshot());const old=draft.id;draft=from.pop();draft.id=old;
+ to.push(draftSnapshot());const old=draft.id;draft=completeDraft(from.pop());draft.id=old;
  markDirty();renderBuilder();
 }
 function detailAt(index){
@@ -375,11 +381,11 @@ function build(){
  const main=board.querySelector('.community-main');if(!main)return;
  root=document.createElement('section');root.id='dash-forge-root';root.className='mahjong-game dash-forge';
  root.innerHTML='<button type="button" id="dash-forge-toggle" class="mahjong-entry-button" aria-expanded="false" aria-controls="dash-forge-inside">'+
- '<span class="mahjong-entry-icon" aria-hidden="true">◆</span><span class="mahjong-entry-copy"><strong>Elliot’s Dash Forge</strong>'+
+ '<span class="mahjong-entry-icon" aria-hidden="true">◆</span><span class="mahjong-entry-copy"><strong>Eliot’s Dash Forge</strong>'+
  '<small id="dash-forge-summary">Tablet racer · Family levels, achievements & builder awards</small></span>'+
  '<span class="mahjong-chevron" aria-hidden="true">▾</span></button>'+
  '<div id="dash-forge-inside" hidden>'+
-  '<header class="dash-top"><div><small>ELLIOT’S EDITION · ONE-TAP RHYTHM PLATFORMER</small><h2>◆ ELLIOT’S DASH FORGE</h2>'+
+  '<header class="dash-top"><div><small>ELIOT’S EDITION · ONE-TAP RHYTHM PLATFORMER</small><h2>◆ ELIOT’S DASH FORGE</h2>'+
     '<p>Leap the spikes. Build your own levels. Earn verified family awards.</p></div>'+
     '<div id="dash-head-stats" class="dash-head-stats"></div></header>'+
   '<nav class="dash-tabs" aria-label="Dash Forge locations">'+TABS.map(([id,name])=>'<button data-dash-tab="'+id+
@@ -432,7 +438,7 @@ function build(){
     '<div class="dash-canvas-wrap"><canvas id="dash-canvas" width="960" height="360" tabindex="0" role="img" aria-label="Running level. Tap or hold anywhere on the playfield; press Space or Up on a keyboard."></canvas>'+
      '<div class="dash-run-overlay" id="dash-run-message" hidden></div></div>'+
     '<footer class="dash-game-controls arcade-control-deck" aria-label="Dash Forge arcade controls">'+
-    '<div class="arcade-control-info"><strong>ELLIOT’S EDITION · TAP THE GAME TO PLAY</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap anywhere in the level. Hold for flight. Space / ↑ on keyboard.</p></div>'+
+    '<div class="arcade-control-info"><strong>ELIOT’S EDITION · TAP THE GAME TO PLAY</strong><small id="dash-control-mode">Cube · auto-run</small><p id="dash-live-status">Tap anywhere in the level. Hold for flight. Space / ↑ on keyboard.</p></div>'+
     '<div class="arcade-action-cluster"><div class="arcade-key-station">'+
     '<button type="button" id="dash-jump" class="arcade-button-a" aria-label="Arcade A, jump" aria-describedby="dash-action-label"><span class="arcade-button-face">A</span><span class="arcade-button-symbol" aria-hidden="true">↗</span></button>'+
     '<span id="dash-action-label" class="arcade-button-caption">JUMP</span><small class="arcade-keyboard-hint">SPACE / ↑ · HOLD</small></div></div></footer>'+
@@ -1016,9 +1022,11 @@ window.addEventListener('dashforge:audio-setting',event=>{
 window.addEventListener('dashforge:creator-mode',event=>{
  if(!root?.isConnected||run)return;
  const boss=Boolean(event.detail?.boss);
- draft={id:null,title:boss?'My First Boss Arena':'My New Level',difficulty:boss?6:2,
+ draft={...defaultDraft(boss?'My First Boss Arena':'My New Level'),difficulty:boss?6:2,
   pattern:'.'.repeat(boss?88:48),world:boss?'Neon Canopy':'Maker Studio',
   bossStyle:boss?'canopy':'none'};
+ tileSelected=4;editorPage=0;undoHistory=[];redoHistory=[];zoom=1;zoomStart=null;
+ editLayer='track';paintGroup='Hazards';pickTool='paint';brush='s';markDirty();
  scene='builder';choosePane('builder');
  setStatus(boss?'Boss Creator: choose a world, boss form, and attack tiles. Playtest to publish.':
   'Level Creator: choose your scenery and place obstacles. Playtest to publish.');

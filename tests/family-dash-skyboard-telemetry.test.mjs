@@ -9,9 +9,9 @@ const skyScene = read('skyboard-scene.mjs');
 const dashCss = read('commons-dash-forge.css');
 const skyCss = read('commons-board-rush.css');
 
-test('Elliot owns the Dash Forge presentation, without renaming persistent game identifiers',()=>{
-  assert.match(dash, /Elliot’s Dash Forge/);
-  assert.match(dash, /ELLIOT’S DASH FORGE/);
+test('Eliot owns the Dash Forge presentation, without renaming persistent game identifiers',()=>{
+  assert.match(dash, /Eliot’s Dash Forge/);
+  assert.match(dash, /ELIOT’S DASH FORGE/);
   assert.match(dash, /id='dash-forge-root'|root.id='dash-forge-root'/);
   assert.match(dash, /submitArcadeReplay\(client,cfg,'dash'/);
 });

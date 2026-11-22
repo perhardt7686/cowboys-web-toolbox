@@ -1,4 +1,4 @@
-/* Multi-touch input primitives shared by Elliot's Dash Forge and Emma's Skyboard Sprint.
+/* Multi-touch input primitives shared by Eliot's Dash Forge and Emma's Skyboard Sprint.
  * A key, pointer, or joystick must never release a different active input source.
  * Presentation only: scoring, physics and server replay validation are unchanged.
  */
