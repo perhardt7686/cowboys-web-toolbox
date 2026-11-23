@@ -6149,6 +6149,21 @@
         "https://themarkup.org/blacklight",
         "https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector"
       ]
+    },
+    {
+      "id": "spiderfoot",
+      "name": "SpiderFoot",
+      "url": "https://github.com/smicallef/spiderfoot",
+      "category": "Utilities",
+      "description": "Open-source OSINT research tool for examining public information, domains and authorized digital assets; install locally to run the web dashboard.",
+      "origin": "web",
+      "destinationCheck": {
+        "status": "official_documentation_checked_workflow_untested"
+      },
+      "source_urls": [
+        "https://github.com/smicallef/spiderfoot",
+        "https://github.com/smicallef/spiderfoot/blob/master/README.md"
+      ]
     }
   ]
 }
