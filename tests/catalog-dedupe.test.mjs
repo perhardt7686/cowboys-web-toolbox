@@ -39,3 +39,16 @@ test('Blacklight entry credits its public sources and explains scanning limitati
   assert.match(entry.privacyNote,/cach(?:es|ed) reports/i);
   assert.equal(entry.uploadTool,false);
 });
+
+test('SpiderFoot has its own OSINT investigation category and transparent local-install boundaries',()=>{
+  const entry=catalog.sites.find(s=>s.id==='spiderfoot');
+  assert.ok(entry,'SpiderFoot must be discoverable');
+  assert.equal(entry.url,'https://github.com/smicallef/spiderfoot');
+  assert.equal(entry.group,'OSINT & Investigations');
+  assert.equal(entry.verification,'official');
+  assert.deepEqual(entry.sources,[],'User screenshot is not a verified public source-video link');
+  assert.match(entry.accessLabel,/local installation required/i);
+  assert.match(entry.privacyNote,/authorized|own/i);
+  assert.equal(entry.destinationCheck.status,'official_documentation_checked_workflow_untested');
+  assert.equal(entry.uploadTool,false);
+});
