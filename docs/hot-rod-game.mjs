@@ -1,14 +1,14 @@
 import {button as makeButton, el, preference} from './family-board-core.mjs?v=family3';
 import {getAvatarPhoto} from './family-avatar-cache.mjs?v=workshop1';
 import {avatarProjections,cacheAvatarCharacter} from './avatar-character-images.mjs?v=workshop1';
-import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, makeCar, matches, repairCost, roadProblem, saleValue} from './hot-rod-campaign.mjs';
+import {activeCar, carOffer, carSpec, challengeProblem, dateLabel, gasCost, makeCar, matches, repairCost, roadProblem, saleValue, spareSaleValue} from './hot-rod-campaign.mjs?v=playerreport3';
 import {BOLTS, CAR_LIST, CARS, COLORS, DOLLARS, FUEL_TANK, MAKES, PART_LIST, PARTS, RIVALS,
   SLOT_NAMES, SLOTS, WAGERS, WHEELS, fullBolts, isWheel} from './hot-rod-catalog.mjs';
-import {paintScene} from './hot-rod-art.mjs?v=carprofiles2';
+import {paintScene} from './hot-rod-art.mjs?v=playerreport3';
 import {BAY_MENU,IGNITION,SHELF_LIST,workbenchFasteners} from './hot-rod-engine-bay.mjs?v=dosfidelity1';
 import {DRIVE_IN_HOTSPOTS,NEWSPAPER_HOTSPOTS} from './hot-rod-period-scenes.mjs?v=dosfidelity1';
-import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP, INPUT} from './hot-rod-racing.mjs?v=drivetrain2';
-import {connectDrivingInput} from './hot-rod-input.mjs';
+import {createRace, displaySpeed, raceClock, recordInput, stepRace, STEP, INPUT} from './hot-rod-racing.mjs?v=playerreport3';
+import {connectDrivingInput} from './hot-rod-input.mjs?v=playerreport3';
 
 const cash = amount => '$' + Number(amount).toLocaleString('en-US');
 const time = ms => ms === null || ms === undefined ? '—' : (ms / 1000).toFixed(2) + ' s';
@@ -162,7 +162,7 @@ export function makeHotRod({client, memberId, launcher}) {
   let workmanship = false, selectedRival = RIVALS[0], raceType = 'drag', wager = 'kicks';
   let negotiating = false, dinerMenu = '', callerPage=0, crew = null, focusedMember = null, standings = null, fetchingScores = false, fetchingCrew = false;
   const fastenerTurns=new Map(), portraits=new Map();
-  let focusBolt=null, shelfSelection=0, timing=0;
+  let focusBolt=null, shelfSelection=0, timing=0, inventoryFilter='all';
   let confirmNew = false, bootTimer = 0, panelName = '', crewError = '', scoreError = '';
   let lastPedalMask=0;
   const input = connectDrivingInput(racePanel, () => dialog.open && !!race && !paused && !staged && !finishing && !race.result);
@@ -214,7 +214,7 @@ export function makeHotRod({client, memberId, launcher}) {
     const rivalModel=CARS[selectedRival.model];
     const view = {
       scene:scene === 'crew' && currentMemberCar ? 'garage' : scene === 'clip' ? 'garage' :
-        scene === 'clock' || scene === 'body' ? 'garage' :
+        scene === 'clock' || scene === 'body' || scene === 'inventory' ? 'garage' :
         scene === 'standings' || scene === 'crew' ? 'title' :
         scene === 'diner' && negotiating ? 'diner-inspect' : scene,
       car:scene === 'crew' && focusedMember ? currentMemberCar :
@@ -438,6 +438,7 @@ export function makeHotRod({client, memberId, launcher}) {
       copy(car ? [spec.hp + ' hp',Math.floor(car.fuel) / 10 + ' gal',issue || 'Ready for the road.'].join(' · ') :
         'The garage is empty. Pick up the newspaper to find your first car.'),
       row(action('Newspaper', () => openPaper('cover'), {accent:!car}), action('Hit the street', cruise, {accent:!!car}),
+        action('Spare parts ('+(state?.inventory.length||0)+')',()=>show('inventory')),
         action('Under the hood', openHood, {disabled:!car}), action('Car info', () => show('clip'), {disabled:!car})),
       counts.length > 1 ? select('Garage bay',counts.map(item=>[item.number,CARS[item.model].name]),car.number,
         number => void mutate('select-car',{number:Number(number)})) : el('span'));
@@ -511,7 +512,11 @@ export function makeHotRod({client, memberId, launcher}) {
       const disabled=paperMode==='parts'&&(busy||item.price>state?.cash);
       if(!disabled)pixelButton((paperMode==='cars'?'Inspect ':'Buy spare ')+item.name,NEWSPAPER_HOTSPOTS.listing[index],open,'art-paper-'+item.id);
       itemRow.append(action(item.name+' · '+cash(item.price),open,{disabled,focus:'paper-'+item.id}));
-      if (paperMode === 'parts') itemRow.append(el('small','',item.slot === 'tire' ? 'Each tire' : garageSlots[item.slot]));
+      if (paperMode === 'parts') {
+        const car=activeCar(state),fits=car&&SLOTS.some(slot=>matches(car,slot,item.id));
+        itemRow.append(el('small','',(item.slot==='tire'?'Each tire':garageSlots[item.slot])+
+          (car?(fits?' · Fits your current setup':' · Spare only: does not fit your current setup'):'')));
+      }
       else itemRow.append(el('small','',item.wear+'% · '+(item.auto?'Automatic':'Manual')+' · '+
         (carOffer(item)<=state?.cash?'Within your budget':'Above your budget')));
       classified.append(itemRow);
@@ -638,7 +643,7 @@ export function makeHotRod({client, memberId, launcher}) {
       panel('Parts shelf',mount,copy(item?'Finish removing the installed part before fitting a spare.':
         blocked||(!spare.length?'No matching spare in the garage. Try the newspaper.':'Select a part and choose Change.')),
       row(...selectors),row(action('Change',change,{accent:true,disabled:busy||!!item||!!blocked||!spare.length}),
-        action('Parts classifieds',()=>openPaper('parts')),
+        action('All spare parts & resale',()=>show('inventory')),action('Parts classifieds',()=>openPaper('parts')),
         ...(sell&&PARTS[sell.part.id].slot!=='tire'?[action('Sell this spare',doWork('sell-part',{index:sell.index},()=>{shelfSelection=0;}),{disabled:busy})]:[]),
         action('Back',back),action('Done',done)));
       return;
@@ -677,6 +682,34 @@ export function makeHotRod({client, memberId, launcher}) {
     const condition=item?copy(item.wear+'% condition · '+loose+' loose'):el('span');
     condition.classList.add('hot-rod-work-meta');
     panel(item?PARTS[item.id].name:SLOT_NAMES[slot],mount,detail,condition,controls);
+  }
+
+  function renderInventory() {
+    const car=activeCar(state);
+    const entries=state.inventory.map((part,index)=>({part,index,detail:PARTS[part.id]}));
+    const fits=(bay,part)=>bay&&SLOTS.some(slot=>matches(bay,slot,part.id));
+    const shown=entries.filter(({part,detail})=>inventoryFilter==='all'||
+      (inventoryFilter==='compatible'?fits(car,part):detail.slot===inventoryFilter));
+    const list=el('ul','hot-rod-inventory');
+    for(const {part,index,detail} of shown){
+      const item=el('li','hot-rod-inventory-item');
+      const compatible=state.cars.filter(bay=>fits(bay,part));
+      const value=spareSaleValue(part);
+      item.append(heading(detail.name),copy(part.wear+'% condition · '+(detail.slot==='tire'?'Tire':garageSlots[detail.slot])),
+        copy(compatible.length?'Compatible with: '+compatible.map(bay=>CARS[bay.model].name+' · bay '+bay.number).join('; '):
+          'Does not fit an owned car’s current setup. Keep it for a later build or sell it.'),
+        row(action('Sell '+detail.name+' for '+cash(value),doWork('sell-part',{index}),{disabled:busy||!value}),
+          ...(car&&fits(car,part)?[action('Open fitting area',()=>work(detail.slot==='tire'?WHEELS[0]:detail.slot),{disabled:busy})]:[])));
+      if(!value)item.append(copy('The shop will buy unused tires; used tires can stay as spares.'));
+      list.append(item);
+    }
+    if(!shown.length)list.append(copy(entries.length?'No parts match this filter. Choose All spare parts.':
+      'No loose parts yet. Purchases and parts removed from any car are stored here.'));
+    panel('Spare parts inventory',copy(entries.length+' of 120 shelf spaces used. Shared across all of your garage cars; saved with your campaign.'),
+      select('Inventory filter',[['all','All spare parts'],['compatible','Fits current car'],['engine','Engines'],
+        ['manifold','Intake manifolds'],['carb','Carburetors'],['gearbox','Gearboxes'],['tire','Tires']],inventoryFilter,
+        value=>{inventoryFilter=value;render();}),list,
+      row(action('Parts classifieds',()=>openPaper('parts')),action('Back to garage',()=>show('garage'))));
   }
 
   function renderClip() {
@@ -754,7 +787,7 @@ export function makeHotRod({client, memberId, launcher}) {
   }
   function startChallenge(stake=wager){
     const rival=selectedRival;
-    void mutate('challenge',{rival:rival.id,kind:raceType,stake,physicsVersion:2},()=>prepareRace(state.race));
+    void mutate('challenge',{rival:rival.id,kind:raceType,stake,physicsVersion:3},()=>prepareRace(state.race));
   }
   function challengeChoices(){
     const cancel={label:'Forget it',activate:()=>{dinerMenu='';render();}};
@@ -842,7 +875,7 @@ export function makeHotRod({client, memberId, launcher}) {
         'The King’s title is yours. The Mystery Machine is waiting.'),row(
         bonus?.won ? el('span','hot-rod-achievement','Final boss defeated') :
         action('Challenge the Mystery Machine',() => void mutate('challenge',
-          {rival:'mystery',kind:'road',stake:'kicks',physicsVersion:2}, () => prepareRace(state.race)),{accent:true,disabled:busy}),
+          {rival:'mystery',kind:'road',stake:'kicks',physicsVersion:3}, () => prepareRace(state.race)),{accent:true,disabled:busy}),
         bonus?.bestMs ? el('span','','Mystery Machine best ' + time(bonus.bestMs)) : el('span'))] : []),
       row(...achievementList.map(badge=>el('span','hot-rod-achievement',badge))),
       row(action('Hall of Fame',() => show('standings')),
@@ -974,7 +1007,7 @@ export function makeHotRod({client, memberId, launcher}) {
         item.append(row(action('Accept',() => void mutate('respond',{challengeId:duel.id,accept:true},refreshCrew),{disabled:busy,accent:true}),
           action('Decline',() => void mutate('respond',{challengeId:duel.id,accept:false},refreshCrew),{disabled:busy})));
       } else if (duel.status==='accepted' && !duel.finished) {
-        item.append(action(duel.started ? 'Resume your run' : 'Drive your run',() => void mutate('duel-start',{challengeId:duel.id,physicsVersion:2},
+        item.append(action(duel.started ? 'Resume your run' : 'Drive your run',() => void mutate('duel-start',{challengeId:duel.id,physicsVersion:3},
           reply => prepareRace(reply.race,duel.id)),{accent:true,disabled:busy}));
       }
       list.append(item);
@@ -1004,7 +1037,7 @@ export function makeHotRod({client, memberId, launcher}) {
   }
 
   function renderTabs() {
-    const rooms = state ? [['garage','Garage'],['paper','Newspaper'],['crew','Family garages'],['standings','Hall of Fame']] :
+    const rooms = state ? [['garage','Garage'],['paper','Newspaper'],['inventory','Spare parts'],['crew','Family garages'],['standings','Hall of Fame']] :
       [['title','Main menu']];
     if (state && state.status !== 'summer') rooms.splice(0,2,['ending','Summer results']);
     tabs.replaceChildren(...rooms.map(([id,label]) => {
@@ -1042,6 +1075,7 @@ export function makeHotRod({client, memberId, launcher}) {
       else if (scene === 'garage') renderGarage();
       else if (scene === 'paper') renderPaper();
       else if (scene === 'workbench') renderWorkbench();
+      else if (scene === 'inventory') renderInventory();
       else if (scene === 'clip') renderClip();
       else if (scene === 'diner') renderDiner();
       else if (scene === 'fuel') renderFuel();
@@ -1152,7 +1186,7 @@ export function makeHotRod({client, memberId, launcher}) {
       raceClock(race).toFixed(1) + ' s';
     meters.textContent = displaySpeed(data) + ' MPH · ' + Math.round(data.engine) + ' RPM · ' +
       (race.contract.player.automatic ? 'AUTO '+data.gear : 'GEAR '+(data.gear || 'N')) + ' · ' + label +
-      (data.shiftTime>0?' · SHIFTING':lastPedalMask&INPUT.clutch?' · CLUTCH IN':
+      (Math.abs(data.offset)>1.13?' · SHOULDER: STEER '+(data.offset>0?'LEFT':'RIGHT')+' AND EASE OFF':data.shiftTime>0?' · SHIFTING':lastPedalMask&INPUT.clutch?' · CLUTCH IN':
        data.engine>race.contract.player.redline*0.92?' · SHIFT UP':'');
     // Keep the visible pedal deck, keyboard, and server-verified input mask
     // in agreement without introducing a second, unsaved touch control model.

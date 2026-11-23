@@ -498,3 +498,10 @@ body.community-page:has(#hot-rod-entry) #streetrod-root:not(.arcade-game-active)
 @media(prefers-reduced-motion:reduce){
   .hot-rod-monitor .hot-rod-pads button[data-drive]{transition:none}
 }
+
+/* Every spare stays reachable, including parts incompatible with the active car. */
+.hot-rod-inventory{list-style:none;padding:0;display:grid;gap:10px;max-width:100%}
+.hot-rod-inventory-item{border:1px solid #a7a08c;padding:10px;background:#11141a;color:#faf1d6;overflow-wrap:anywhere}
+.hot-rod-inventory-item h3{margin:0;font-size:1rem}
+.hot-rod-inventory-item .hot-rod-row{flex-wrap:wrap}
+.hot-rod-inventory-item button{white-space:normal;min-height:48px}

@@ -262,6 +262,29 @@ async def campaign_flow(page, name, *, touch):
     await fit(page,game)
     await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-garage.png')
 
+    # A newly bought, incompatible carb used to disappear from the filtered shelf.
+    await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Newspaper',exact=True).click()
+    await game.locator('.hot-rod-panel').get_by_role('button',name='Auto parts',exact=True).click()
+    for _ in range(12):
+        buy=game.locator('.hot-rod-classifieds').get_by_role('button',name=re.compile('4-barrel race carburetor'))
+        if await buy.count():
+            await expect(buy.locator('..')).to_contain_text('does not fit your current setup')
+            await buy.click()
+            break
+        await game.get_by_role('button',name='Next ›',exact=True).click()
+    else:
+        raise AssertionError('The real parts classifieds never exposed the carburetor')
+    await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Spare parts',exact=True).click()
+    await scene(game,'inventory')
+    await expect(game.get_by_role('heading',name='Spare parts inventory',exact=True)).to_be_visible()
+    await expect(game.locator('.hot-rod-inventory')).to_contain_text('Does not fit an owned car')
+    await fit(page,game)
+    await game.screenshot(path=ROOT / 'reports' / f'hot-rod-{name}-inventory.png')
+    await game.get_by_role('button',name='Sell 4-barrel race carburetor for $82',exact=True).click()
+    await expect(game.get_by_text('No loose parts yet.',exact=False)).to_be_visible()
+    await game.get_by_role('navigation',name='Hot Rod rooms').get_by_role('button',name='Garage',exact=True).click()
+    await expect(game.locator('.hot-rod-bank')).to_contain_text('$334')
+
     await game.get_by_role('button',name='Open the hood').click()
     await scene(game,'workbench')
     await expect(game.get_by_role('heading',name=re.compile('Carburetor|Carter',re.I))).to_be_visible()
@@ -300,7 +323,7 @@ async def campaign_flow(page, name, *, touch):
     game = await open_game(page)
     await game.get_by_role('button',name='Continue Classic 1963').click()
     await scene(game,'garage')
-    await expect(game.locator('.hot-rod-bank')).to_contain_text('$370')
+    await expect(game.locator('.hot-rod-bank')).to_contain_text('$334')
     await game.get_by_role('button',name='Open the hood').click()
     await expect(game.get_by_text('1 loose',exact=False)).to_be_visible()
     await game.get_by_role('button',name='Seat bolt 1',exact=True).click()
@@ -415,6 +438,7 @@ async def campaign_flow(page, name, *, touch):
         await game.get_by_role('button',name='Confirm forfeit').click()
         await expect(game.get_by_role('heading',name='Forfeited')).to_be_visible()
     else:
+        await page.evaluate('document.activeElement.blur()')
         await page.keyboard.down('ArrowUp')
         for gear in [1,2]:
             # In physics v2 a high-RPM power shift can overheat/over-rev a

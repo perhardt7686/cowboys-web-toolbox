@@ -1,6 +1,6 @@
 // Independently drawn EGA scenes. All strokes and textures resolve to whole pixels.
 import {CARS} from './hot-rod-catalog.mjs';
-import {paintVehicle,vehiclePaint as tone} from './hot-rod-vehicle-art.mjs?v=carprofiles2';
+import {paintVehicle,paintRaceVehicle,vehiclePaint as tone} from './hot-rod-vehicle-art.mjs?v=playerreport3';
 import {paintWorkbench} from './hot-rod-engine-bay.mjs?v=dosfidelity1';
 import {paintCalendar,paintDriveIn,paintNewspaper,paintTrafficTicket} from './hot-rod-period-scenes.mjs?v=dosfidelity1';
 import {courseCurve, displaySpeed, raceClock} from './hot-rod-racing.mjs';
@@ -274,39 +274,6 @@ function lightTree(s,x,y,phase) {
   bulb(x-4,y+19,phase==='green'?10:2);bulb(x+4,y+19,phase==='green'?10:2);
   s.box(x-8,y+29,16,3,0);s.box(x-12,y+37,24,2,8);
 }
-function rearCar(s,model,color,x,y,size) {
-  const shape=model?.body, [shadow,base,light,shine]=tone(color ?? model?.color);
-  const maxWidth=shape==='van'?1.09:1;
-  const xx=(a)=>x+a*size*maxWidth, yy=(a)=>y+a*size;
-  const box=(a,b,w,h,c)=>s.box(xx(a),yy(b),w*size*maxWidth,Math.max(1,h*size),c);
-  const poly=(points,c)=>s.poly(points.map(([a,b])=>[xx(a),yy(b)]),c);
-  poly([[-25,-1],[-23,-20],[-19,-33],[19,-33],[24,-19],[25,-1]],0);
-  if(shape==='van') {
-    poly([[-24,-1],[-24,-43],[-20,-49],[20,-49],[24,-43],[24,-1]],base);
-    box(-19,-40,38,12,0);
-    box(-18,-40,17,1,shine);box(1,-40,17,1,shine);
-    box(-1,-40,2,24,shadow);
-    poly([[-24,-22],[-11,-17],[5,-23],[23,-29],[23,-17],[4,-13],[-23,-12]],10);
-    if(size>0.22) {
-      box(-14,-16,3,7,12);box(-16,-14,7,3,12);box(-14,-14,3,3,14);
-      box(10,-22,3,9,12);box(7,-19,9,3,12);box(10,-19,3,3,14);
-    }
-  } else {
-    poly([[-25,-3],[-23,-18],[-17,-31],[16,-31],[22,-18],[25,-3]],base);
-    poly([[-18,-19],[-14,-29],[14,-29],[18,-19]],0);
-    box(-14,-28,26,1,9);
-    poly([[-24,-16],[-15,-19],[19,-19],[23,-15]],light);
-    box(-23,-10,46,2,shadow);
-    if(shape==='fin') {
-      poly([[-26,-17],[-22,-25],[-18,-11],[-26,-10]],light);
-      poly([[26,-17],[22,-25],[18,-11],[26,-10]],light);
-    }
-  }
-  box(-25,-3,50,3,shine);box(-23,0,6,4,0);box(17,0,6,4,0);
-  box(-22,-8,9,4,12);box(13,-8,9,4,12);
-  box(-4,-7,8,4,15);
-}
-
 function roadScene(s,race) {
   const {contract,player,opponent}=race;
   const distance=player.distance;
@@ -372,6 +339,21 @@ function roadScene(s,race) {
       s.line(x,y-height+2,x+3,y-height+6,15);
     }
   }
+  // Continuous near-field ground flow is driven by metres travelled, not
+  // horsepower or an artificial speed multiplier. Quiet EGA road grain and
+  // edge posts make 30/60/100 MPH visibly different without camera shake.
+  for(let i=0;i<18;i++){
+    const z=8+i*8-(distance%8);
+    if(z<4)continue;
+    const y=Math.round(53+1050/(z+9));
+    if(y<58||y>137)continue;
+    const {center,edge,ratio}=projection(y);
+    const h=Math.max(1,Math.round(ratio*3));
+    for(const side of [-1,1]){
+      s.box(center+side*edge*0.72,y,Math.max(1,ratio),h,8);
+      if(i%2===0)s.box(center+side*(edge+6*ratio),y,Math.max(1,ratio*2),h,6);
+    }
+  }
   if (distance<32) {
     const y=trunc(Math.round(110+(distance*2.1)),110,135);
     const {center,edge}=projection(y);
@@ -390,7 +372,7 @@ function roadScene(s,race) {
     const y=trunc(56+Math.round(2300/(Math.max(0,nearby)+29)),57,122);
     const {center,edge}=projection(y);
     const size=trunc(edge/87,0.15,0.83);
-    rearCar(s,CARS[contract.opponent?.model],contract.opponent?.color,center-edge*0.47,y,size);
+    paintRaceVehicle(s,CARS[contract.opponent?.model],contract.opponent,center-edge*0.47,y,size);
   }
   if(race.patrolAt!==null) {
     s.text('PATROL',14,14,race.tick%8<4?12:15);
@@ -414,8 +396,7 @@ function mirror(s,x,y,w,h,race) {
   const other=race.opponent.distance-race.player.distance;
   if(!race.contract.timeTrial && other< -3 && other> -120) {
     const xx=x+Math.floor(w*0.47);
-    s.box(xx-4,y+h-7,9,3,tone(race.contract.opponent.color)[2]);
-    s.box(xx-2,y+h-9,5,2,7);s.box(xx+3,y+h-6,2,1,12);
+    paintRaceVehicle(s,CARS[race.contract.opponent.model],race.contract.opponent,xx,y+h-4,0.21,true);
   }
   if(race.patrolAt!==null){
     s.box(x+w/2-5,y+4,5,2,race.tick%8<4?9:4);
@@ -549,6 +530,9 @@ function cockpit(s,view) {
     s.center(race.greenAt-race.tick<15?'GET READY':'STAGE',163,24,race.greenAt-race.tick<15?14:12);
   } else if (race.tick-race.greenAt<15) {
     s.frame(133,18,60,18,0,8,0);s.center('GO',163,24,10);
+  }
+  if(!race.result&&Math.abs(race.player.offset)>1.13){
+    s.frame(63,22,202,16,0,8,0);s.center('EASE OFF / STEER '+(race.player.offset>0?'LEFT':'RIGHT'),164,27,14);
   }
   if(race.result?.outcome==='crash'){
     for(const [dx,dy] of [[36,46],[75,31],[108,24],[158,10],[209,34],[244,43],[281,68],[267,101],[209,98]]) {

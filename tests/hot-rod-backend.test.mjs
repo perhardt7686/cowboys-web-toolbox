@@ -128,6 +128,23 @@ test('Hot Rod verifies private campaign and family racing updates through the da
     } finally { await pg.exec('reset role'); }
   });
 
+  await t.test('v3 campaign and family contracts are issued by the authenticated server without changing existing saves', async()=>{
+    await pg.exec('begin');
+    try {
+      const saved=await request('alpha',{type:'load'});
+      const started=await request('alpha',raceCommand('challenge',{rival:'earl',kind:'drag',stake:'kicks',revision:saved.revision,physicsVersion:3}));
+      assert.equal(started.state.race.physicsVersion,3);
+      assert.equal(started.state.race.player.model,'ford32');
+      assert.equal(started.state.race.player.rear,true);
+      await request('alpha',raceCommand('forfeit',{raceId:started.state.race.id,revision:started.revision}));
+      const invite=await request('alpha',raceCommand('invite',{memberId:ids.bravo,kind:'drag'}));
+      await request('bravo',{type:'respond',challengeId:invite.challenge.id,accept:true});
+      const duel=await request('alpha',{type:'duel-start',challengeId:invite.challenge.id,physicsVersion:3});
+      assert.equal(duel.race.physicsVersion,3);
+      assert.equal(duel.race.timeTrial,true);
+    } finally {await pg.exec('rollback');}
+  });
+
   await t.test('each family driver has one authenticated replay on a shared course and a verified result', async () => {
     const invite = raceCommand('invite',{memberId:ids.bravo,kind:'drag'});
     await request('alpha',{...invite,memberId:ids.alpha},422);

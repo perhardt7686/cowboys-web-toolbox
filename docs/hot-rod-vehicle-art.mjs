@@ -1283,6 +1283,157 @@ function vehicleSprite(profile, modelId, car, paint, frontWheel, rearWheel) {
 
 const spriteCache = new Map();
 
+// Racing uses the same model profiles and paint as inspection, with a proper
+// rear/front elevation rather than one generic sedan for every opponent.
+const raceSpriteCache=new Map();
+function raceVehicleSprite(model,car,frontView){
+  const p=PROFILES[model.id],s=new Sprite();
+  const paint=vehiclePaint(car?.color??model.color),[dark,body,light,chrome]=paint;
+  const van=model.body==='van',pickup=model.body==='pickup'||model.body==='utility';
+  const wagon=model.body==='wagon';
+  const early=['ford32','sedan32','master38','chevy40','roadster40','ford40'].includes(model.id);
+  const open=Boolean(p.seat)||['vette56','vette61','tbird57','roadster40'].includes(model.id);
+  const fin=['fairlane57','fairlane55','lancer55','impala58'].includes(model.id);
+  const half=Math.round((van?48:pickup?49:early?39:51)+(p.wheels[1]-p.wheels[0]-145)*0.06);
+  const top=Math.round((van?9:pickup?18:open?35:early?15:23)+(car?.roof?7:0));
+  const cx=120,left=cx-half,right=cx+half,waist=van?42:pickup?44:46;
+  const cabinHalf=Math.round(half*(van?0.88:pickup?0.67:early?0.65:0.72));
+  const roofCrown=early?6:van?3:5;
+  s.ellipse(cx,72,half+5,3,0);
+  s.box(left+3,57,10,15,0);s.box(right-13,57,10,15,0);
+  s.box(left+5,59,2,9,8);s.box(right-7,59,2,9,8);
+  const shell=[[left,66],[left+1,waist+5],[left+5,waist-5],[cx-cabinHalf,top+roofCrown],
+    [cx-cabinHalf+roofCrown,top],[cx+cabinHalf-roofCrown,top],[cx+cabinHalf,top+roofCrown],
+    [right-5,waist-5],[right-1,waist+5],[right,66]];
+  s.polygon(shell,bodyPaint(0,waist-7,paint));s.trace([...shell,shell[0]],0);
+  s.trace(shell.slice(2,8).map(([x,y])=>[x,y+1]),light);
+  if(!open){
+    const glassTop=top+5,glassBottom=pickup?34:van?35:waist-7;
+    const glassHalf=cabinHalf-5;
+    const glass=[[cx-glassHalf,glassTop+2],[cx-glassHalf+4,glassTop],
+      [cx+glassHalf-4,glassTop],[cx+glassHalf,glassTop+2],
+      [cx+glassHalf+3,glassBottom],[cx-glassHalf-3,glassBottom]];
+    s.polygon(glass,0);s.trace([...glass,glass[0]],chrome);
+    s.line(cx-glassHalf+5,glassTop+3,cx-5,glassTop+3,9);
+    s.line(cx+4,glassTop+3,cx+glassHalf-4,glassTop+3,8);
+    if(model.id==='vette63'||van)s.line(cx,glassTop,cx,glassBottom,body);
+    if(van&&!frontView){
+      s.line(cx,glassBottom,cx,64,dark);
+      s.box(cx-5,45,3,2,chrome);s.box(cx+3,45,3,2,chrome);
+    }
+  }else{
+    s.line(cx-cabinHalf,top,cx+cabinHalf,top,chrome);
+    for(const seat of [cx-14,cx+14]){
+      s.polygon([[seat-9,43],[seat-7,34],[seat+6,34],[seat+9,43]],0);
+      s.line(seat-5,35,seat+4,35,8);
+    }
+  }
+  if(pickup&&!frontView){
+    s.polygon([[left+6,40],[right-6,40],[right-4,51],[left+4,51]],dark);
+    s.line(left+6,40,right-6,40,chrome);
+    s.box(left+8,51,half*2-16,12,body);s.box(left+9,53,half*2-18,1,light);
+    s.box(cx-9,56,18,1,chrome);
+  }else{
+    s.line(left+5,waist,right-5,waist,light);
+    s.line(left+8,waist+2,right-8,waist+2,dark);
+  }
+  if(wagon&&!frontView){
+    s.box(left+8,48,half*2-16,9,6);s.box(left+10,50,half*2-20,1,14);
+    s.line(cx,47,cx,60,dark);
+  }
+  if(fin){
+    for(const sign of [-1,1]){
+      const x=cx+sign*(half-3);
+      s.polygon([[x,57],[x-sign*7,waist+4],[x,waist-9],[x+sign*3,56]],light);
+      s.line(x,waist-9,x+sign*3,56,chrome);
+    }
+  }
+  if(early&&!frontView){
+    s.polygon([[cx-17,45],[cx-14,top+20],[cx+14,top+20],[cx+17,58]],body);
+    s.trace([[cx-17,45],[cx-14,top+20],[cx+14,top+20],[cx+17,58]],dark);
+    s.box(cx-4,49,8,2,chrome);
+    if(model.id==='ford32'||model.id==='sedan32'){
+      s.ellipse(cx,54,12,12,0);s.ellipse(cx,54,8,8,15);s.ellipse(cx,54,5,5,8);
+    }
+  }
+  const round=['vette56','vette61','vette63','tbird57','fairlane57','impala58','galaxie63'].includes(model.id);
+  const lampY=van?57:early?58:55;
+  for(const sign of [-1,1]){
+    const x=cx+sign*(half-11);
+    if(round){
+      const count=frontView?1:model.id==='impala58'?3:model.id==='vette63'||model.id==='vette61'?2:1;
+      for(let i=0;i<count;i++){
+        const xx=x-sign*i*7;
+        s.ellipse(xx,lampY,4,4,chrome);s.ellipse(xx,lampY,3,3,frontView?15:4);
+        s.pixel(xx-1,lampY-1,frontView?14:12);
+      }
+    }else{
+      const vertical=van||fin;
+      s.box(x-4,lampY-3,vertical?5:10,vertical?9:5,chrome);
+      s.box(x-3,lampY-2,vertical?3:8,vertical?6:3,frontView?15:12);
+    }
+  }
+  if(frontView){
+    s.box(cx-19,55,38,6,0);
+    for(let x=cx-17;x<cx+18;x+=3)s.line(x,56,x,59,7);
+  }else{
+    // Distinct deck and lamp treatments survive the small racing view.
+    switch(model.id){
+      case 'style49':
+        s.trace([[left+12,54],[cx-16,48],[cx,47],[cx+16,48],[right-12,54]],chrome);
+        s.box(cx-12,51,24,2,7);break;
+      case 'valiant61':
+        s.ellipse(cx,51,13,8,dark);s.ellipse(cx,50,11,6,light);s.ellipse(cx,50,8,4,body);
+        for(const sign of [-1,1])s.trace([[cx+sign*(half-18),51],[cx+sign*(half-5),47],[cx+sign*(half-10),57]],chrome);
+        break;
+      case 'polara62':
+        for(const sign of [-1,1])for(const dx of [0,8]){
+          const x=cx+sign*(half-11-dx);s.ellipse(x,55,3,3,7);s.ellipse(x,55,2,2,12);
+        }
+        s.trace([[left+9,49],[cx-12,51],[cx,48],[cx+12,51],[right-9,49]],chrome);break;
+      case 'olds49':
+        s.ellipse(cx,52,3,3,7);s.line(cx-11,52,cx+11,52,chrome);
+        s.trace([[left+13,47],[left+11,55],[left+15,60]],light);break;
+      case 'belair55':
+        s.trace([[left+13,48],[cx,56],[right-13,48]],chrome);
+        for(const x of [left+7,right-12]){s.box(x,49,6,12,chrome);s.box(x+1,51,4,7,12);}
+        break;
+      case 'savoy64':
+        s.box(left+5,52,half*2-10,8,dark);
+        for(const x of [left+8,right-23]){s.box(x,53,16,5,7);s.box(x+1,54,14,3,12);}
+        s.line(left+9,50,right-9,50,chrome);break;
+      case 'olds52':
+        s.line(left+11,50,right-11,50,chrome);s.ellipse(cx,50,3,3,15);
+        s.line(cx-8,54,cx+8,54,7);break;
+      case 'riviera63':
+        s.box(left+5,50,half*2-10,10,dark);
+        for(const x of [left+9,right-26]){s.box(x,53,18,3,chrome);s.box(x+2,53,14,2,12);}
+        s.line(cx,49,cx,60,light);break;
+    }
+  }
+  if((frontView?car?.front:car?.rear)!==false){
+    s.box(left-1,65,half*2+2,4,8);s.box(left,65,half*2,1,chrome);s.box(left+2,67,half*2-4,1,7);
+  }
+  s.box(cx-7,60,14,6,0);s.box(cx-5,61,10,4,15);
+  if(car?.decal)s.box(cx+11,waist+4,3+(car.decal%3)*2,2,14);
+  if(model.id==='mystery66'&&!frontView){
+    s.polygon([[left+5,39],[cx-7,43],[cx+10,38],[right-4,33],[right-4,43],[cx+9,47],[cx-8,48],[left+5,44]],10);
+    for(const [x,y] of [[cx-20,49],[cx+23,44]]){s.box(x-5,y,11,3,12);s.box(x-1,y-4,3,11,12);s.box(x-1,y,3,3,14);}
+  }
+  return s;
+}
+
+export function paintRaceVehicle(screen,model,car,x,y,size,frontView=false){
+  if(!model||!PROFILES[model.id])return;
+  const key=[model.id,car?.color??model.color,car?.roof===true,car?.front!==false,car?.rear!==false,car?.decal||0,frontView].join('/');
+  if(!raceSpriteCache.has(key)){
+    if(raceSpriteCache.size>=100)raceSpriteCache.delete(raceSpriteCache.keys().next().value);
+    raceSpriteCache.set(key,raceVehicleSprite(model,car,frontView));
+  }
+  const scale=Math.max(0.09,size*0.60);
+  raceSpriteCache.get(key).blit(screen,x-120*scale,y-72*scale,scale);
+}
+
 export function paintVehicle(screen, model, car, x, y, scale) {
   if (!model) return;
   const profile = PROFILES[model.id];

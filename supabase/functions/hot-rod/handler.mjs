@@ -66,7 +66,7 @@ export function makeHotRodHandler({auth, rpc, origins, now = () => Date.now(), i
       const contract = {id:id(),seed:active.seed,kind,stake:'kicks',rival:'family',
         issuedAt:now(),car:car.number,player:spec,opponent:spec,timeTrial:true,
         patrol:false,reaction:0,skill:1};
-      if(body.physicsVersion===2)contract.physicsVersion=2;
+      if([2,3].includes(body.physicsVersion))contract.physicsVersion=body.physicsVersion;
       return {race:await call('duel_start', {p_member,p_id,p_expected:saved.revision,p_race:contract})};
     }
     if (!active.race || body.raceId !== active.race.id) throw new GameError('That run is unavailable.');

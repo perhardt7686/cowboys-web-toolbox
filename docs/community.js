@@ -11,7 +11,7 @@ import {canReadBoard,accessCopy} from './board-access.mjs?v=private1';
 import {createAuthStorage,createRecoveryStep,requestPasswordReset,authErrorMessage,resetRetrySeconds} from './auth-flow.mjs?v=recovery1';
 
 import {createFamilyBoard} from './family-board.mjs?v=marquee8-eliot';
-import {createHotRodBoard} from './hot-rod-board.mjs?v=drivetrain2';
+import {createHotRodBoard} from './hot-rod-board.mjs?v=playerreport3';
 import {isEdwardTestPreview,edwardTestMember} from './edward-test-persona.mjs';
 
 const familyBoard = createFamilyBoard();
