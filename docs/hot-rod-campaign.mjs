@@ -43,6 +43,8 @@ export const isStarter = item => item.price <= 750;
 export const carOffer = model => Math.floor(model.price * 0.9);
 export const gasCost = units => Math.ceil(units * GAS_PRICE / 10);
 const resale = (item, percent) => Math.max(1, Math.floor(PARTS[item.id].price * item.wear * percent / 10000));
+// Unused tires can be returned; the period shop still refuses used tires.
+export const spareSaleValue=item=>item&&PARTS[item.id]&&(PARTS[item.id].slot!=='tire'||item.wear===100)?resale(item,70):0;
 const requiredCar = state => {
   const car = activeCar(state);
   need(car, 'Buy a car from the newspaper first.');
@@ -110,7 +112,7 @@ export function carSpec(car, kind = 'road') {
     redline:motor?.redline || 4500, ratios:trans?.ratios || [2.92, 1.68, 1], final:trans?.final || 3.65,
     automatic:!!trans?.auto, endurance:0.55 + condition * 0.0045,
     transmission:(trans?.strength ?? 1) * (0.55 + (car.installed.gearbox?.wear || 0) * 0.0045),
-    grip:tireGrip, fuel:car.fuel, color:car.color, model:car.model, bumpers:Number(car.front) + Number(car.rear)
+    grip:tireGrip, fuel:car.fuel, color:car.color, model:car.model, front:car.front,rear:car.rear,roof:car.roof,decal:car.decal, bumpers:Number(car.front) + Number(car.rear)
   };
 }
 
@@ -294,8 +296,8 @@ export function applyWorkshop(previous, action) {
     case 'sell-part': {
       const item = state.inventory[action.index];
       need(Number.isInteger(action.index) && item, 'Choose a part from your shelf.');
-      need(PARTS[item.id].slot !== 'tire', 'The shop won’t buy used tires.');
-      const price = resale(item, 70);
+      const price = spareSaleValue(item);
+      need(price>0, 'The shop won’t buy used tires.');
       state.cash += price;
       state.inventory.splice(action.index, 1);
       state.hours += 1;
@@ -371,9 +373,9 @@ export function startRace(previous, action, context) {
     patrol:kind === 'road' && context.seed % 8 === 0 && rival.tier < 8,
     reaction:rival.reaction, skill:rival.skill,
   };
-  // Only upgraded clients request version 2. Existing tabs and in-progress
+  // Upgraded clients explicitly request their physics version. Existing tabs and in-progress
   // campaigns remain on the original deterministic simulation.
-  if(action.physicsVersion===2)state.race.physicsVersion=2;
+  if([2,3].includes(action.physicsVersion))state.race.physicsVersion=action.physicsVersion;
   return {state, message:rival.line};
 }
 
