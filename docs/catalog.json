@@ -21066,6 +21066,60 @@
       "bestFor": "A first-pass check of trackers and third-party cookies on a public website.",
       "uploadTool": false,
       "privacyNote": "Use public website domains, not private invitation or tokenized links. Blacklight visits the inspected domain remotely and caches reports; automated findings are not definitive proof of tracking or privacy violations."
+    },
+    {
+      "id": "spiderfoot",
+      "name": "SpiderFoot",
+      "url": "https://github.com/smicallef/spiderfoot",
+      "category": "Utilities",
+      "description": "Open-source OSINT research tool for examining public information, domains and authorized digital assets; install locally to run the web dashboard.",
+      "sources": [],
+      "monogram": "SF",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "evidence": "The supplied reel shows SpiderFoot v4 in a local browser at 127.0.0.1:5001. The maintained GitHub repository documents the software and installation.",
+      "evidenceUrls": [
+        "https://github.com/smicallef/spiderfoot",
+        "https://github.com/smicallef/spiderfoot/blob/master/README.md"
+      ],
+      "destinationCheck": {
+        "url": "https://github.com/smicallef/spiderfoot",
+        "title": "SpiderFoot — open-source OSINT automation",
+        "status": "official_documentation_checked_workflow_untested",
+        "checkedDate": "2026-11-23",
+        "notes": "Official GitHub README identifies a Python 3 OSINT tool with local web UI, released source archives and Docker support. Source documentation reviewed; no installation, scan, hosted service or authenticated workflow was performed."
+      },
+      "topic": "OSINT & public-source research",
+      "group": "OSINT & Investigations",
+      "addedAt": "2026-11-23",
+      "accessLabel": "Free open source; local installation required",
+      "accessReviewedAt": "2026-11-23",
+      "accessNote": "Official public repository checked; local Python/Docker setup and optional data-source credentials have not been tested. No always-on hosted service is included.",
+      "access": {
+        "pricing": "free",
+        "signup": "no",
+        "platform": [
+          "windows",
+          "mac",
+          "linux"
+        ],
+        "offline": "no",
+        "processing": "mixed",
+        "commercial": "unknown",
+        "kind": "download",
+        "region": "global",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "unknown"
+        ]
+      },
+      "bestFor": "Authorized OSINT research and publicly available digital-footprint investigations.",
+      "uploadTool": false,
+      "privacyNote": "Run only on targets you own or are authorized to assess. Some modules contact third-party services; do not expose the local web dashboard to the public internet.",
+      "licenseNote": "Open-source MIT license; examine the current repository for license and dependency terms."
     }
   ],
   "tips": [
@@ -22689,18 +22743,18 @@
     "videosWithMappings": 63,
     "videosWithTips": 31,
     "videosPending": 0,
-    "destinationLinks": 422,
+    "destinationLinks": 423,
     "addedDestinationLinks": 41,
-    "independentWebFinds": 347,
+    "independentWebFinds": 348,
     "videoDestinationLinks": 75,
     "savedCollectionLastChecked": "2026-11-04",
     "savedCollectionLastObservedVideos": 44,
     "savedCollectionNewRecords": 9,
     "destinationVerificationHolds": 1
   },
-  "scope": "422 website destinations: 75 traced to source videos and 347 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
+  "scope": "423 website destinations: 75 traced to source videos and 348 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
   "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
-  "updatedAt": "2026-11-17",
+  "updatedAt": "2026-11-23",
   "releases": [
     {
       "date": "2026-10-30",
@@ -22719,6 +22773,13 @@
       "sourceVideosAdded": 9,
       "tipsAdded": 3,
       "review": "Six source-linked destinations; one Word demo, one past-event offer and one destination-verification hold. Provider-source review, not full workflow tests."
+    },
+    {
+      "date": "2026-11-23",
+      "added": 1,
+      "sourceVideosAdded": 0,
+      "tipsAdded": 0,
+      "review": "SpiderFoot from user-supplied screenshot and official GitHub project documentation; dedicated OSINT & Investigations browsing group. No runtime, account, scan, paid service or deployment of SpiderFoot performed."
     }
   ],
   "discovery": {
@@ -22734,7 +22795,8 @@
       "Media & culture",
       "Games & play",
       "Health & family",
-      "Shopping & reuse"
+      "Shopping & reuse",
+      "OSINT & Investigations"
     ],
     "packs": [
       {
