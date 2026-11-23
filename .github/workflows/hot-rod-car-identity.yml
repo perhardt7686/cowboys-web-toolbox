@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - 'docs/hot-rod-catalog.mjs'
+      - 'docs/hot-rod-racing.mjs'
+      - 'docs/hot-rod-campaign.mjs'
+      - 'docs/hot-rod-input.mjs'
+      - 'tests/hot-rod-player-report.test.mjs'
       - 'docs/hot-rod-vehicle-art.mjs'
       - 'docs/hot-rod-art.mjs'
       - 'docs/hot-rod-game.mjs'
@@ -14,6 +18,10 @@ on:
   pull_request:
     paths:
       - 'docs/hot-rod-catalog.mjs'
+      - 'docs/hot-rod-racing.mjs'
+      - 'docs/hot-rod-campaign.mjs'
+      - 'docs/hot-rod-input.mjs'
+      - 'tests/hot-rod-player-report.test.mjs'
       - 'docs/hot-rod-vehicle-art.mjs'
       - 'docs/hot-rod-art.mjs'
       - 'docs/hot-rod-game.mjs'
@@ -38,7 +46,7 @@ jobs:
           node --check docs/hot-rod-vehicle-art.mjs
           node --check docs/hot-rod-catalog.mjs
           node --check docs/hot-rod-game.mjs
-          node --test tests/hot-rod-vehicle-fidelity.test.mjs
+          node --test tests/hot-rod-vehicle-fidelity.test.mjs tests/hot-rod-player-report.test.mjs tests/hot-rod-drivetrain.test.mjs
   forty-vehicle-gallery-and-play:
     runs-on: ubuntu-24.04
     container:
@@ -59,6 +67,7 @@ jobs:
           path: |
             reports/hot-rod-*-all-40-cars.png
             reports/hot-rod-*-garage.png
+            reports/hot-rod-*-inventory.png
             reports/hot-rod-*-drive-in.png
             reports/hot-rod-*-cockpit.png
           if-no-files-found: ignore

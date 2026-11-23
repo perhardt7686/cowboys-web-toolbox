@@ -257,6 +257,7 @@ export function makeHotRod({client, memberId, launcher}) {
     if (next !== 'garage') speaker.silence();
     else if (radio && soundEnabled) speaker.radio();
     render();
+    dialog.scrollTop=0;
     if (next === 'standings') void refreshScores();
     if (next === 'crew') void refreshCrew();
   }

@@ -488,7 +488,7 @@ async def capture_vehicle_gallery(page, label):
     # Screenshot the original twenty-five and fifteen new era-correct vehicles at native pixel size.
     # This is an inspectable visual artifact, not proof of 1:1 DOS fidelity.
     count = await page.evaluate("""async () => {
-        const [{CARS},{makeCar},{paintVehicle},{EGA}] = await Promise.all([
+        const [{CARS},{makeCar},{paintVehicle,paintRaceVehicle},{EGA}] = await Promise.all([
             import('/hot-rod-catalog.mjs'),
             import('/hot-rod-campaign.mjs'),
             import('/hot-rod-vehicle-art.mjs'),
@@ -514,7 +514,17 @@ async def capture_vehicle_gallery(page, label):
                 ctx.fillStyle=EGA[ink];ctx.fillRect(x,y,w,h);
             }};
             paintVehicle(screen,model,makeCar(model,1),0,0,1);
-            card.append(label,canvas);
+            const racing=document.createElement('canvas');
+            racing.width=240;racing.height=76;
+            racing.style.cssText=canvas.style.cssText;
+            const rctx=racing.getContext('2d',{alpha:false});
+            rctx.fillStyle='#24252c';rctx.fillRect(0,0,240,76);
+            const raceScreen={box:(x,y,w,h,ink)=>{rctx.fillStyle=EGA[ink];rctx.fillRect(x,y,w,h);}};
+            paintRaceVehicle(raceScreen,model,makeCar(model,1),65,70,1.15);
+            paintRaceVehicle(raceScreen,model,makeCar(model,1),175,70,1.15,true);
+            const caption=document.createElement('div');caption.textContent='Inspection above · race rear / mirror front below';
+            caption.style.cssText='font:12px monospace;';
+            card.append(label,canvas,caption,racing);
             grid.append(card);
         }
         document.body.append(grid);
