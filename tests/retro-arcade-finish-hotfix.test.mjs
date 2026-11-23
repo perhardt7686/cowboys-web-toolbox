@@ -38,8 +38,11 @@ test('approved member finishes genuine replay traces and retains earned trophies
    const start=await member('SELECT public.community_retro_start($1) AS value',[game]);
    assert.ok(start.run_id,game+' creates a server run');
    await pg.query("UPDATE public.community_retro_runs SET started_at=now()-interval '10 seconds' WHERE id=$1",[start.run_id]);
+   // Idle at the maze spawn can lose all lives before tick eight for some
+   // random seeds. Walk down its safe opening corridor to test a valid finish.
+   const actions=(game==='maze'?'D':'N').repeat(8);
    const finished=await member('SELECT public.community_retro_finish($1,$2) AS value',
-     [start.run_id,'N'.repeat(8)]);
+     [start.run_id,actions]);
    assert.equal(typeof finished.score,'number');
    assert.equal(finished.steps,8);
    assert.ok(Array.isArray(finished.trophies));
