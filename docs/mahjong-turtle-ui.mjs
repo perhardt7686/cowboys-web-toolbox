@@ -62,7 +62,7 @@ export function mountClassicTurtle(root,{userId}){
  if(!inside)return ()=>{};
  const key='cowboy-mahjong-turtle-v1:'+userId;
  const prefKey='cowboy-mahjong-turtle-preferences-v1:'+userId;
- let saved=readStorage(key),activeKind='free',selected=null,highlight=[],zoom=2,awardFilter='all',awardLimit=30,
+ let saved=readStorage(key),activeKind='free',selected=null,highlight=[],zoom=0,awardFilter='all',awardLimit=30,
   destroyed=false,clock=null,resize=null,prefs={sound:false,showFree:false},mode='turtle',lastStatus='';
  try{const val=JSON.parse(window.localStorage.getItem(prefKey)||'{}');
   if(val&&typeof val==='object')prefs={sound:val.sound===true,showFree:val.showFree===true};
@@ -97,7 +97,7 @@ export function mountClassicTurtle(root,{userId}){
  <div class="turtle-options"><label>Layout <select id="turtle-layout"><option value="turtle">Classic Turtle · 5 layers</option><option value="temple">Layered Temple · 3 layers</option><option value="garden">Open Garden · 1 layer</option></select></label><button type="button" id="turtle-new">New solvable deal</button><button type="button" id="turtle-restart">Restart layout</button></div>
  <div class="turtle-hud"><strong id="turtle-remaining">144 tiles remain</strong><span id="turtle-pairs">0 / 72 pairs</span><span id="turtle-available">Matching pairs: 0</span><span id="turtle-time">00:00</span></div>
  <p class="turtle-daily-banner" id="turtle-daily-banner" hidden></p>
- <div class="turtle-table"><div class="turtle-board-tools" role="group" aria-label="Turtle board controls"><button type="button" id="turtle-fit">Fit board</button><button type="button" id="turtle-zoom-out" aria-label="Zoom out">−</button><strong id="turtle-zoom-label" aria-live="off">160%</strong><button type="button" id="turtle-zoom-in" aria-label="Zoom in">+</button><span id="turtle-zoom-hint">Swipe to pan</span></div>
+ <div class="turtle-table"><div class="turtle-board-tools" role="group" aria-label="Turtle board controls"><button type="button" id="turtle-fit">Fit board</button><button type="button" id="turtle-zoom-out" aria-label="Zoom out">−</button><strong id="turtle-zoom-label" aria-live="off">FIT</strong><button type="button" id="turtle-zoom-in" aria-label="Zoom in">+</button><span id="turtle-zoom-hint">Whole board visible</span></div>
  <div id="turtle-board-scroll" class="turtle-board-scroll" tabindex="-1"><div id="turtle-board" class="turtle-board" role="group" aria-label="Classic Turtle Mahjong tiles"></div><div id="turtle-pause-screen" class="turtle-pause-screen" hidden><strong>Game paused</strong><span>Progress is saved in this browser.</span><button type="button" id="turtle-resume">Resume</button></div></div>
  <div class="turtle-actions"><button type="button" id="turtle-undo">↶ Undo</button><button type="button" id="turtle-hint">♧ Hint</button><button type="button" id="turtle-pause">⏸ Pause</button><button type="button" id="turtle-show-free" aria-pressed="false">Show free tiles</button><button type="button" id="turtle-sound" aria-pressed="false">Sound off</button></div>
  <p class="turtle-status" id="turtle-status" role="status" aria-live="polite">Choose two matching exposed tiles.</p></div>
@@ -231,15 +231,15 @@ export function mountClassicTurtle(root,{userId}){
     rush?'Lightning hands! '+game.fastStreak+' fast matches without a mistake.':
     streak?'Great job! '+game.streak+' correct matches in a row.':'Pair matched!');
  }
- function faceNode(tile,removed,free,sz){
+ function faceNode(tile,removed,free,sz,minX,minY){
   const face=faceById(tile.face),button=make('button','turtle-tile');
   button.type='button';button.dataset.tileId=String(tile.id);
   button.classList.toggle('is-free',free);button.classList.toggle('is-blocked',!free);
   button.classList.toggle('is-selected',selected===tile.id);
   button.classList.toggle('is-hinted',highlight.includes(tile.id));
   button.style.width=sz+'px';button.style.height=Math.round(sz*HEIGHT)+'px';
-  button.style.left=Math.round(8+(tile.x+tile.z*.07)*sz)+'px';
-  button.style.top=Math.round(14+(tile.y-tile.z*.12)*sz*HEIGHT)+'px';
+  button.style.left=Math.round(8+(tile.x+tile.z*.07-minX)*sz)+'px';
+  button.style.top=Math.round(14+(tile.y-tile.z*.12-minY)*sz*HEIGHT)+'px';
   button.style.zIndex=String(10+tile.z*1000+Math.round(tile.y*10));
   button.setAttribute('aria-label',face.label+', layer '+(tile.z+1)+', '+(free?'free':'blocked'));
   // No native long-press tooltip over the board; the accessible name already describes the tile.
@@ -251,21 +251,32 @@ export function mountClassicTurtle(root,{userId}){
  function renderBoard(deal,removed,paused){
   const host=view('#turtle-board'),scroller=view('#turtle-board-scroll');
   if(!host)return;
-  const maxX=Math.max(...deal.tiles.map(t=>t.x)),maxY=Math.max(...deal.tiles.map(t=>t.y));
-  const usableWidth=Math.max(275,scroller.clientWidth||window.innerWidth-50);
-  const fitSize=Math.max(18,Math.floor((usableWidth-24)/(maxX+1.15)));
-  const sz=Math.min(85,Math.round(fitSize*ZOOMS[zoom]));
+  // Fit the entire five-layer footprint on both axes; top layers are offset.
+  // Never assume a 275px phone viewport or a minimum tile size that clips edges.
+  const xs=deal.tiles.map(t=>t.x+t.z*.07),ys=deal.tiles.map(t=>t.y-t.z*.12);
+  const minX=Math.min(...xs),minY=Math.min(...ys);
+  const spanX=Math.max(...xs)+1-minX,spanY=Math.max(...ys)+1-minY;
+  const usableWidth=scroller.clientWidth||Math.max(1,window.innerWidth-50);
+  const usableHeight=scroller.clientHeight||Math.max(1,Math.min(window.innerHeight*.49,470));
+  const fitSize=Math.max(1,Math.floor(Math.min(
+   (usableWidth-20)/spanX,(usableHeight-32)/(spanY*HEIGHT)
+  )));
+  const sz=Math.min(85,Math.max(1,Math.floor(fitSize*ZOOMS[zoom])));
   host.style.setProperty('--turtle-tile-size',sz+'px');
-  host.style.width=Math.ceil(24+(maxX+1.08)*sz)+'px';
-  host.style.height=Math.ceil(37+(maxY+1.12)*HEIGHT*sz)+'px';
+  host.style.width=Math.ceil(16+spanX*sz)+'px';
+  host.style.height=Math.ceil(28+spanY*HEIGHT*sz)+'px';
+  host.style.marginInline=zoom===0?'auto':'0';
+  scroller.classList.toggle('turtle-fit-view',zoom===0);
+  if(zoom===0){scroller.scrollLeft=0;scroller.scrollTop=0;}
   const last=host.contains(document.activeElement)?document.activeElement.dataset.tileId:null;
   const remaining=deal.tiles.filter(t=>!removed.has(t.id));
   const free=remaining.filter(t=>isFreeTile(deal.tiles,t,removed));
   const focusId=free.find(t=>String(t.id)===last)?.id??free.find(t=>t.id===selected)?.id??free[0]?.id;
   const fragment=document.createDocumentFragment();
-  for(const tile of remaining){const isFree=free.some(f=>f.id===tile.id);const button=faceNode(tile,removed,isFree,sz);button.tabIndex=tile.id===focusId?0:-1;fragment.append(button);}
+  for(const tile of remaining){const isFree=free.some(f=>f.id===tile.id);const button=faceNode(tile,removed,isFree,sz,minX,minY);button.tabIndex=tile.id===focusId?0:-1;fragment.append(button);}
   host.replaceChildren(fragment);
   view('#turtle-zoom-label').textContent=zoom===0?'FIT':Math.round(ZOOMS[zoom]*100)+'%';
+  view('#turtle-zoom-hint').textContent=zoom===0?'Whole board visible':'Swipe to pan';
   view('#turtle-zoom-out').disabled=zoom===0;view('#turtle-zoom-in').disabled=zoom===ZOOMS.length-1;
   const pauseOverlay=view('#turtle-pause-screen');pauseOverlay.hidden=!paused;
   host.inert=paused;host.setAttribute('aria-hidden',String(paused));
