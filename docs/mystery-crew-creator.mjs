@@ -3,7 +3,7 @@
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
 import {loadPainterlyPack,painterlyOutfitHTML,syncPainterlyStage} from './mystery-painterly-stage.mjs?v=layered3';
-import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML} from './mystery-crew-character-v5.mjs?v=crew5';
+import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML} from './mystery-crew-character-v5.mjs?v=crew6';
 import {mountSceneV4,syncSceneV4} from './mystery-crew-scene-v4.mjs?v=scene4';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
@@ -426,6 +426,7 @@ document.addEventListener('click',async event=>{
  if(el.dataset.jump){view=el.dataset.jump;setFilter(view);return;}
  if(el.dataset.motion){
   motion=el.dataset.motion;app.dataset.motion=motion;
+  updateScene(); // Refresh painted motion immediately.
   for(const b of document.querySelectorAll('[data-motion]'))b.setAttribute('aria-pressed',String(b.dataset.motion===motion));
   if(!draft.rewardedDesigns.includes('motion:'+motion)&&motion!=='idle'){
     try{
