@@ -100,6 +100,15 @@ export function syncCrewV5(member,options={}){
  if(scene)scene.dataset.crewArt='painted';
  return true;
 }
+export function paintedOutfitRecipe(member,outfit){
+ const anchor=paintedAnchor(member);
+ return anchor>=0&&OUTFITS.includes(outfit)?'crew-'+anchor+'-'+outfit+'.webp':null;
+}
+export function paintedCrewOutfitHTML(member,outfit){
+ if(!ready)return null;
+ const src=urls.get(paintedOutfitRecipe(member,outfit));
+ return src?'<img class="mc-painted-outfit" data-crew-costume="'+outfit+'" src="'+src+'" alt="" loading="eager" decoding="async">':null;
+}
 export function paintedCrewPortraitHTML(member){
  if(!ready)return null;
  const anchor=paintedAnchor(member);
