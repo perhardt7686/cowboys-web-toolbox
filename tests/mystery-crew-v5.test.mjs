@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {CREW_ANCHORS} from '../docs/mystery-crew-art.mjs';
-import {V5_MANIFEST,unpackCrewV5,paintedRecipe,paintedAnchor} from '../docs/mystery-crew-character-v5.mjs';
+import {V5_MANIFEST,unpackCrewV5,paintedRecipe,paintedAnchor,paintedOutfitRecipe} from '../docs/mystery-crew-character-v5.mjs';
 import {fileURLToPath} from 'node:url';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -79,4 +79,11 @@ test('V5 changes illustration only and keeps exact V4 account paths',()=>{
  assert.doesNotMatch(runtime,/supabase|localStorage|indexedDB|XMLHttpRequest|eval\(/i);
  assert.match(html,/mystery-crew-creator\.css\?v=crew6/);
  assert.match(html,/mystery-crew-creator\.mjs\?v=crew6/);
+});
+
+test('wardrobe previews use the selected painted identity and requested costume',()=>{
+ for(let i=0;i<6;i++)for(const o of outfits)assert.equal(paintedOutfitRecipe(make(i,'detective'),o),'crew-'+i+'-'+o+'.webp');
+ assert.equal(paintedOutfitRecipe(make(0,'detective'),'invented'),null);
+ assert.equal(paintedOutfitRecipe({...make(0,'detective'),hair:'#000000'},'explorer'),null);
+ assert.match(read('docs/mystery-crew-creator.mjs'),/paintedCrewOutfitHTML\(current\(\),item.id\)/);
 });
