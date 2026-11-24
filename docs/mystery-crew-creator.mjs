@@ -3,7 +3,7 @@
 import {connectMysteryCrew} from './mystery-crew-sync.mjs?v=account1';
 import {enhanceMysteryScene} from './mystery-crew-stage-art.mjs?v=paint2';
 import {loadPainterlyPack,painterlyOutfitHTML,syncPainterlyStage} from './mystery-painterly-stage.mjs?v=layered3';
-import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML} from './mystery-crew-character-v5.mjs?v=crew6';
+import {loadCrewV5,syncCrewV5,paintedCrewPortraitHTML,paintedCrewOutfitHTML} from './mystery-crew-character-v5.mjs?v=crew6-wardrobe1';
 import {mountSceneV4,syncSceneV4} from './mystery-crew-scene-v4.mjs?v=scene4';
 import {CREW_OPTIONS,CREW_ANCHORS,crewHeadMarkup,crewHeadPreviewSVG} from './mystery-crew-art.mjs?v=paint2';
 import {mysteryCrewPortraitSVG} from './mystery-crew-portrait.mjs?v=paint2';
@@ -365,7 +365,7 @@ function renderCards(){
    const label=equipped?'✓ Equipped':owned?'Equip':'★ '+item.cost+' coins';
    const badge=equipped?'equipped':owned?'available':'locked';
    card.setAttribute('aria-label',item.name+'. '+(equipped?'Equipped':owned?'Equip':'Unlock for '+item.cost+' crew coins'));
-   const illustrated=filter==='outfits'?painterlyOutfitHTML(item.id):null;
+   const illustrated=item.type==='outfits'?(paintedCrewOutfitHTML(current(),item.id)||painterlyOutfitHTML(item.id)):null;
    card.innerHTML='<span class="mc-card-art">'+(illustrated||icon(item))+'</span><span class="mc-card-name">'+safe(item.name)+'</span><span class="mc-card-state '+badge+'">'+safe(label)+'</span>';
   }
   panel.append(card);
