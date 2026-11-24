@@ -53,7 +53,7 @@ async def verify(browser,width,height,label):
     await expect(page.locator('#mc-vector-van')).to_be_hidden()
     assert await page.locator('#mc-v4-complete-van').get_attribute('href')!='', 'Independent complete van missing'
     assert await page.locator('#mc-painted-hero image').count()==6,'Hero must have six independent painted parts'
-    assert await page.locator('#mc-cards .mc-painted-outfit').count()>0,'Working gallery must display actual painted outfits'
+    assert await page.locator('#mc-cards .mc-painted-outfit[data-crew-costume]').count()>0,'Working gallery must display actual painted outfits'
     assert await page.locator('#mc-painted-workshop image').count()==1
     # Validate actual browser decoding, not merely the presence of SVG <image>
     # elements or gallery <img> tags. A CSP-blocked Blob can pass those tests
