@@ -33,6 +33,18 @@ async def witness_pair(page,kind='free'):
       return deal.witness[session.moves.length];
     }""",kind)
 
+async def assert_board_fits(page, label):
+    measure=await page.locator('#turtle-board-scroll').evaluate("""scroller=>{
+      const box=scroller.getBoundingClientRect();
+      const tiles=[...scroller.querySelectorAll('.turtle-tile')].map(el=>el.getBoundingClientRect());
+      return {count:tiles.length,overflowX:scroller.scrollWidth-scroller.clientWidth,
+       overflowY:scroller.scrollHeight-scroller.clientHeight,
+       outside:tiles.filter(r=>r.left<box.left-3||r.right>box.right+3||r.top<box.top-3||r.bottom>box.bottom+3).length};
+    }""")
+    assert measure['count']>0, (label,measure)
+    assert measure['overflowX']<=3 and measure['overflowY']<=3, (label,measure)
+    assert measure['outside']==0,(label,measure)
+
 async def main():
  async with async_playwright() as p:
   browser=await p.chromium.launch(headless=True)
@@ -46,6 +58,8 @@ async def main():
     await expect(page.locator('.turtle-tile')).to_have_count(144)
     assert await page.locator('#turtle-remaining').inner_text()=='144 tiles remain'
     assert await page.locator('#turtle-zoom-in').is_visible()
+    assert await page.locator('#turtle-zoom-label').inner_text()=='FIT'
+    await assert_board_fits(page,'normal phone/desktop view')
     # Simulate the real family Arcade compositor. It hides all game children
     # unless this mode's explicit CSS override exposes them.
     await page.evaluate("""()=>{
@@ -56,6 +70,7 @@ async def main():
       document.getElementById('mahjong-root').classList.add('arcade-game-active');
     }""")
     assert await page.locator('#turtle-zoom-in').is_visible(),'Turtle must be playable in real Arcade mode'
+    await assert_board_fits(page,'arcade scene')
     await page.evaluate("""()=>{
       document.body.classList.remove('arcade-ready','arcade-on');
       document.documentElement.classList.remove('arcade-on');
@@ -63,7 +78,11 @@ async def main():
       document.getElementById('mahjong-root').classList.remove('arcade-game-active');
     }""")
     assert await page.locator('#turtle-hint').is_visible()
+    await page.locator('#turtle-zoom-in').tap()
+    await page.locator('#turtle-zoom-in').tap()
     assert await page.locator('#turtle-board-scroll').evaluate('(el)=>el.scrollWidth>el.clientWidth'),'zoom should allow pan'
+    await page.locator('#turtle-fit').tap()
+    await assert_board_fits(page,'Fit button restores whole board')
     # The default board is 144 tiles, built from all five vertical levels.
     layers=await page.locator('.turtle-tile').evaluate_all('els=>[...new Set(els.map(e=>Number(e.getAttribute("aria-label").match(/layer (\\d+)/)[1])))].sort()')
     assert layers==[1,2,3,4,5],(width,layers)
