@@ -41,7 +41,8 @@ test('non-matching colors, invented recipes, hats and side views fall back safel
  assert.equal(paintedRecipe(m,{angle:90}),null);
  assert.equal(paintedRecipe(m,{angle:180}),null);
  for(const motion of ['wave','cheer','think','run','action'])
-  assert.equal(paintedRecipe(m,{motion}),null,'Keep the established animated rig for '+motion);
+  assert.equal(paintedRecipe(m,{motion}),'crew-1-explorer.webp','Keep original paint for '+motion);
+ assert.equal(paintedRecipe(m,{motion:'injected'}),null);
  assert.equal(paintedRecipe({}),null);
 });
 test('every sprite is a genuine independently decodable 430×574 painterly WebP',()=>{
@@ -76,6 +77,6 @@ test('V5 changes illustration only and keeps exact V4 account paths',()=>{
  assert.match(js,/await loadCrewV5\(\)/);
  assert.match(runtime,/data-crew-art-pack|crewArtPack/);
  assert.doesNotMatch(runtime,/supabase|localStorage|indexedDB|XMLHttpRequest|eval\(/i);
- assert.match(html,/mystery-crew-creator\.css\?v=crew5/);
- assert.match(html,/mystery-crew-creator\.mjs\?v=crew5/);
+ assert.match(html,/mystery-crew-creator\.css\?v=crew6/);
+ assert.match(html,/mystery-crew-creator\.mjs\?v=crew6/);
 });
