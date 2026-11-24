@@ -615,3 +615,14 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @keyframes mc-v6-action{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(2deg)}}
 @keyframes mc-v6-hair{0%,100%{transform:rotate(0)}50%{transform:rotate(1.8deg)}}
 @media(prefers-reduced-motion:reduce){#mc-v6-painted-rig [data-v6-part]{animation:none!important;transform:none!important}}
+
+/* Keep wardrobe figures and portrait rail readable on tall phones too. */
+@media(max-width:650px){
+ .mc-roster .mc-portrait{min-width:0;min-height:34px;position:relative}
+ .mc-roster .mc-portrait .mc-v5-portrait-art{position:absolute;inset:0;width:100%;height:100%;background-size:auto 260%;background-position:center top}
+ .mc-cards .mc-card{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:2px 4px;min-height:0}
+ .mc-cards .mc-card .mc-card-art{grid-column:1;grid-row:1/3;position:relative;width:100%;height:100%;min-height:0!important;padding:0;overflow:hidden}
+ .mc-cards .mc-card .mc-card-art img.mc-painted-outfit{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center}
+ .mc-cards .mc-card .mc-card-name{grid-column:2;grid-row:1;align-self:end;min-height:0;overflow-wrap:anywhere}
+ .mc-cards .mc-card .mc-card-state{grid-column:2;grid-row:2;align-self:start;min-height:18px}
+}
