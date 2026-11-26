@@ -21120,6 +21120,159 @@
       "uploadTool": false,
       "privacyNote": "Run only on targets you own or are authorized to assess. Some modules contact third-party services; do not expose the local web dashboard to the public internet.",
       "licenseNote": "Open-source MIT license; examine the current repository for license and dependency terms."
+    },
+    {
+      "id": "cliprecipe",
+      "name": "Clip Recipe",
+      "url": "https://www.cliprecipe.com/",
+      "category": "Learning",
+      "description": "Convert a cooking video link into a written recipe, then adjust servings or units and save the result.",
+      "sources": [],
+      "monogram": "CR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "evidence": "Matty McTech's public October 5, 2026 newsletter, item 300, identifies ClipRecipe. Provider homepage independently retrieved November 26; no extraction performed.",
+      "evidenceUrls": [
+        "https://www.mattymctech.com/p/powerful-websites-296-301",
+        "https://www.cliprecipe.com/",
+        "https://www.cliprecipe.com/pricing"
+      ],
+      "destinationCheck": {
+        "url": "https://www.cliprecipe.com/",
+        "title": "Clip Recipe",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-11-26",
+        "notes": "Provider documents video-link extraction, serving adjustment, and export. Pricing page states card required and automatic billing after the seven-day trial; current plan amount not independently confirmed. No signup, payment or extraction performed."
+      },
+      "topic": "Food & everyday life",
+      "group": "Health & family",
+      "addedAt": "2026-11-26",
+      "accessLabel": "7-day trial; payment card required; paid subscription",
+      "accessReviewedAt": "2026-11-26",
+      "accessNote": "Provider pricing page states a payment card is required and billing starts automatically after the seven-day trial unless cancelled. No signup or cancellation tested.",
+      "access": {
+        "pricing": "paid",
+        "signup": "yes",
+        "platform": [
+          "browser"
+        ],
+        "offline": "no",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "tool",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "beginner"
+        ]
+      },
+      "bestFor": "Turn publicly shared cooking videos into a convenient written ingredient list and recipe.",
+      "uploadTool": false,
+      "privacyNote": "Use publicly shared video links; review the provider's privacy terms before sending private content."
+    },
+    {
+      "sources": [],
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "addedAt": "2026-11-26",
+      "accessReviewedAt": "2026-11-26",
+      "uploadTool": false,
+      "id": "dungeon-scrawl",
+      "name": "Dungeon Scrawl",
+      "url": "https://www.dungeonscrawl.com/",
+      "category": "Games",
+      "description": "Draw tabletop RPG dungeon maps and battle maps in the browser, with export options for virtual tabletops or printing.",
+      "monogram": "DS",
+      "evidence": "Matty McTech's July 11, 2026 newsletter, item 288, links to Dungeon Scrawl; official homepage retrieved November 26.",
+      "evidenceUrls": [
+        "https://www.mattymctech.com/p/powerful-websites-287-295",
+        "https://www.dungeonscrawl.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.dungeonscrawl.com/",
+        "title": "Dungeon Scrawl",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-11-26",
+        "notes": "Official page describes free browser mapping without signup, export and optional Pro. No map creation or export tested."
+      },
+      "topic": "Worldbuilding & tabletop",
+      "group": "Create & design",
+      "accessLabel": "Free core map maker; optional Pro",
+      "accessNote": "Provider states no signup required for basic browser use; optional Pro. Commercial terms vary; review before selling maps.",
+      "access": {
+        "pricing": "freemium",
+        "signup": "no",
+        "platform": [
+          "browser"
+        ],
+        "offline": "unknown",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "tool",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "beginner"
+        ]
+      },
+      "bestFor": "Create a printable dungeon or encounter map for tabletop games."
+    },
+    {
+      "sources": [],
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "addedAt": "2026-11-26",
+      "accessReviewedAt": "2026-11-26",
+      "uploadTool": false,
+      "id": "food-mood",
+      "name": "Food Mood",
+      "url": "https://artsandculture.google.com/experiment/HwHnGalZ3up0EA",
+      "category": "Learning",
+      "description": "Google Arts & Culture experiment generating meal ideas that combine influences from two cuisines.",
+      "monogram": "FM",
+      "evidence": "Matty McTech's July 7, 2026 newsletter, item 278; Google Arts & Culture experiment listing and official announcement independently checked November 26.",
+      "evidenceUrls": [
+        "https://www.mattymctech.com/p/powerful-websites-277-285",
+        "https://artsandculture.google.com/experiment/HwHnGalZ3up0EA",
+        "https://blog.google/company-news/outreach-and-initiatives/arts-culture/new-gen-ai-experiments-from-google-arts-culture-artists-in-residence/"
+      ],
+      "destinationCheck": {
+        "url": "https://artsandculture.google.com/experiment/HwHnGalZ3up0EA",
+        "title": "Food Mood — Google Arts & Culture",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-11-26",
+        "notes": "Official listing describes AI-assisted culinary inspiration. No recipe generated or tested."
+      },
+      "topic": "Food & everyday life",
+      "group": "Health & family",
+      "accessLabel": "Public experiment; access terms not tested",
+      "accessNote": "Recipe generation, account requirements and pricing not independently tested. Verify ingredient quantities, allergens and safe cooking temperatures.",
+      "access": {
+        "pricing": "unknown",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "no",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "experience",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "beginner"
+        ]
+      },
+      "bestFor": "Find creative ideas for combining two culinary traditions."
     }
   ],
   "tips": [
@@ -22743,18 +22896,18 @@
     "videosWithMappings": 63,
     "videosWithTips": 31,
     "videosPending": 0,
-    "destinationLinks": 423,
+    "destinationLinks": 426,
     "addedDestinationLinks": 41,
-    "independentWebFinds": 348,
+    "independentWebFinds": 351,
     "videoDestinationLinks": 75,
     "savedCollectionLastChecked": "2026-11-04",
     "savedCollectionLastObservedVideos": 44,
     "savedCollectionNewRecords": 9,
     "destinationVerificationHolds": 1
   },
-  "scope": "423 website destinations: 75 traced to source videos and 348 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
+  "scope": "426 website destinations: 75 traced to source videos and 351 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
   "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-26",
   "releases": [
     {
       "date": "2026-10-30",
@@ -22780,6 +22933,13 @@
       "sourceVideosAdded": 0,
       "tipsAdded": 0,
       "review": "SpiderFoot from user-supplied screenshot and official GitHub project documentation; dedicated OSINT & Investigations browsing group. No runtime, account, scan, paid service or deployment of SpiderFoot performed."
+    },
+    {
+      "date": "2026-11-26",
+      "added": 3,
+      "sourceVideosAdded": 0,
+      "tipsAdded": 0,
+      "review": "Clip Recipe, Dungeon Scrawl and Food Mood from publicly accessible Matty McTech newsletter entries and official provider sources. Correct coverage totals and disclose trial billing; no workflows or new private Facebook saved reels tested."
     }
   ],
   "discovery": {
