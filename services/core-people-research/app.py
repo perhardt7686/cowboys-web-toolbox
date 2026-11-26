@@ -239,6 +239,40 @@ class JobManager:
                 job.status = "cancelled" if job.cancel.is_set() else "failed"
                 job.finished_at, job.process = utc_now(), None
 
+
+class BoundedHTTPServer(ThreadingHTTPServer):
+    daemon_threads = True
+    request_queue_size = 16
+    def __init__(self, address, handler, max_requests=16):
+        self.capacity = threading.BoundedSemaphore(max_requests)
+        super().__init__(address, handler)
+    def get_request(self):
+        connection, address = super().get_request()
+        connection.settimeout(10)
+        return connection, address
+    def process_request(self, request, client_address):
+        if not self.capacity.acquire(blocking=False):
+            try:
+                body = b'{"error":"worker_busy"}'
+                request.sendall(b"HTTP/1.0 503 Service Unavailable\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: "
+                    + str(len(body)).encode() + b"\r\n\r\n" + body)
+            except OSError:
+                pass
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except Exception:
+            self.capacity.release()
+            raise
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self.capacity.release()
+    def handle_error(self, request, client_address):
+        pass
+
 def make_handler(auth, manager, allowed_origins):
     class Handler(BaseHTTPRequestHandler):
         server_version = "CoreResearch/1"
@@ -324,7 +358,7 @@ def make_handler(auth, manager, allowed_origins):
 def main():
     auth = SupabaseAuth(os.environ.get("SUPABASE_URL", ""), os.environ.get("SUPABASE_PUBLISHABLE_KEY", ""))
     origins = frozenset(o.strip() for o in os.environ.get("CORE_ALLOWED_ORIGINS", "").split(",") if o.strip())
-    server = ThreadingHTTPServer(("0.0.0.0", int(os.environ.get("PORT", "10000"))),
+    server = BoundedHTTPServer(("0.0.0.0", int(os.environ.get("PORT", "10000"))),
         make_handler(auth, JobManager(), origins))
     server.daemon_threads = True
     server.serve_forever()

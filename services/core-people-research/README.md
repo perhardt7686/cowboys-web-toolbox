@@ -55,3 +55,6 @@ The GitHub workflow runs real container imports/discovery, worker HTTP authoriza
 an offline engine scan with synthetic responses and networking disabled, and real Postgres RLS tests.
 No real-person target is searched by CI. The Postgres fixture mocks only existing Core membership,
 not the new policies/functions under test.
+
+The Public Suffix List is bundled at build time from publicsuffix/list commit 88b076a1fb2ae58cd2a6959d570f075e04d21867 (Mozilla Public License 2.0; original header retained). Scan startup loads this local file.
+Core-only migrations live under this service because the Toolbox migration chain does not contain the private Core membership helper. Apply them only to the existing Core backend.

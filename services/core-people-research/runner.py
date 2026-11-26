@@ -94,7 +94,7 @@ def main():
     install_adapter()
     from spiderfoot import SpiderFootDb
     db = SpiderFootDb({"__database": str(args.work / "data" / "spiderfoot.db")})
-    db.configSet({"_fetchtimeout": "4", "_maxthreads": "1", "sfp_accounts:permutate": "0"})
+    db.configSet({"_fetchtimeout": "4", "_maxthreads": "1", "sfp_accounts:permutate": "0", "_internettlds": "@/opt/spiderfoot/public_suffix_list.dat"})
     db.conn.close()
     sys.argv = [str(SF / "sf.py"), "-s", target, "-m", "sfp_accounts",
                 "-o", "json", "-q", "-max-threads", "1"]

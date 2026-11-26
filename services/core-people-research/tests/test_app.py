@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
-from app import APIError, Job, JobManager, SupabaseAuth, engine_target, make_handler, read_results, validate_target
+from app import BoundedHTTPServer, APIError, Job, JobManager, SupabaseAuth, engine_target, make_handler, read_results, validate_target
 
 OWNER="11111111-1111-4111-8111-111111111111"
 OTHER="22222222-2222-4222-8222-222222222222"
@@ -97,7 +97,7 @@ class HTTPTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manager=JobManager(runner=lambda *_:None)
-        cls.server=ThreadingHTTPServer(("127.0.0.1",0),make_handler(FakeAuth(),cls.manager,{ORIGIN}))
+        cls.server=BoundedHTTPServer(("127.0.0.1",0),make_handler(FakeAuth(),cls.manager,{ORIGIN}))
         cls.server.daemon_threads=True
         cls.thread=threading.Thread(target=cls.server.serve_forever,daemon=True)
         cls.thread.start()

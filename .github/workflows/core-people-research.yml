@@ -4,16 +4,18 @@ on:
     paths:
       - 'services/core-people-research/**'
       - 'supabase/functions/core-people-research/**'
-      - 'supabase/migrations/*core_people_research.sql'
+      - 'services/core-people-research/migrations/*core_people_research.sql'
       - 'tests/core-people-*.test.mjs'
+      - 'integrations/cowboys-core/**'
       - '.github/workflows/core-people-research.yml'
   push:
     branches: [main]
     paths:
       - 'services/core-people-research/**'
       - 'supabase/functions/core-people-research/**'
-      - 'supabase/migrations/*core_people_research.sql'
+      - 'services/core-people-research/migrations/*core_people_research.sql'
       - 'tests/core-people-*.test.mjs'
+      - 'integrations/cowboys-core/**'
       - '.github/workflows/core-people-research.yml'
   workflow_dispatch:
 permissions:
@@ -37,14 +39,14 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - run: node --test tests/core-people-gateway.test.mjs
+      - run: node --test tests/core-people-gateway.test.mjs tests/core-people-navigation.test.mjs
       - name: Ownership, shared-editor, rate-limit and evidence tests
         env:
           PGPASSWORD: fixture-password
         run: >-
           psql -h 127.0.0.1 -U postgres -d core_fixture -v ON_ERROR_STOP=1
           -f services/core-people-research/tests/database_fixture.sql
-          -f supabase/migrations/20261126210000_core_people_research.sql
+          -f services/core-people-research/migrations/20261126210000_core_people_research.sql
           -f services/core-people-research/tests/database_acceptance.sql
   pinned-engine:
     runs-on: ubuntu-latest
@@ -59,3 +61,18 @@ jobs:
         run: docker run --rm --network none --memory 512m core-people-fixture python runner.py --self-test
       - name: Offline engine lifecycle and committed result recovery
         run: docker run --rm --network none --memory 512m core-people-fixture python tests/engine_smoke.py
+
+  private-shell-components:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: python3 -m pip install playwright
+      - run: python3 -m playwright install --with-deps chromium webkit
+      - run: python3 services/core-people-research/tests/ui_acceptance.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: core-people-integration-screenshots
+          path: reports/core-people/
+          retention-days: 14
