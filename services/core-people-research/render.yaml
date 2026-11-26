@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: cowboys-core-people-research
+    runtime: docker
+    plan: free
+    region: virginia
+    branch: codex/core-people-research-20261126
+    rootDir: services/core-people-research
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: off
+    healthCheckPath: /healthz
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: CORE_ALLOWED_ORIGINS
+        sync: false
