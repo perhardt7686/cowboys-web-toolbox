@@ -79,6 +79,7 @@ class WorkerTests(unittest.TestCase):
                 self.stdin=io.BytesIO()
                 work=Path(command[command.index("--work")+1])
                 fixture_db(work/"data"/"spiderfoot.db")
+                (work/"adapter-ready.json").write_text(json.dumps({"sites":12,"threads":1,"permutate":False}),"utf-8")
             def poll(self): return 0
             def __enter__(self): return self
             def __exit__(self,*_): return None
