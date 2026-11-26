@@ -107,7 +107,7 @@ class HTTPTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
     def request(self,path,method="GET",token=None,body=None,origin=None):
-        headers={}
+        headers={"Content-Type":"application/json"}
         if token: headers["Authorization"]="Bearer "+token
         if origin: headers["Origin"]=origin
         payload=None if body is None else json.dumps(body).encode()

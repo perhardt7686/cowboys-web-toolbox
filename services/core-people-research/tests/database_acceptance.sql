@@ -73,7 +73,7 @@ DO $$ DECLARE r uuid; c uuid; i int; BEGIN
     PERFORM public.cowboys_core_people_begin_run(c,gen_random_uuid());
     RAISE EXCEPTION 'hourly limit not enforced';
   EXCEPTION WHEN SQLSTATE 'P0001' THEN
-    IF SQLERRM<>'scan_rate_limited' THEN RAISE; END IF;
+    IF SQLERRM<>'scan_limit_reached' THEN RAISE; END IF;
   END;
 END $$;
 

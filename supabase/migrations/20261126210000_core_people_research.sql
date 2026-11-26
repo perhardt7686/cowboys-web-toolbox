@@ -85,10 +85,6 @@ grant select on public.cowboys_core_people_runs,public.cowboys_core_people_findi
 grant update(review_state,review_note) on public.cowboys_core_people_findings to authenticated;
 grant all on public.cowboys_core_people_cases,public.cowboys_core_people_runs,public.cowboys_core_people_findings,public.cowboys_core_people_rate_log,public.cowboys_core_people_config to service_role;
 
-grant select,delete on public.cowboys_core_people_cases to authenticated;
-grant insert(title,kind,query,notes),update(title,notes) on public.cowboys_core_people_cases to authenticated;
-grant select on public.cowboys_core_people_runs,public.cowboys_core_people_findings to authenticated;
-grant update(review_state,review_note) on public.cowboys_core_people_findings to authenticated;
 
 create function public.cowboys_core_people_touch() returns trigger language plpgsql set search_path='' as $$
 begin new.updated_at=now(); return new; end;
@@ -123,14 +119,6 @@ begin
     raise exception 'scan_limit_reached' using errcode='P0001';
   end if;
   delete from public.cowboys_core_people_rate_log where owner_id=v_owner and created_at<now()-interval '30 days';
-  if (select count(*) from public.cowboys_core_people_rate_log l where l.owner_id=v_owner and l.created_at>now()-interval '1 hour')>=3
-    or (select count(*) from public.cowboys_core_people_rate_log l where l.owner_id=v_owner and l.created_at>now()-interval '24 hours')>=12 then
-    raise exception 'scan_rate_limited' using errcode='P0001';
-  end if;
-  if (select count(*) from public.cowboys_core_people_rate_log l where l.owner_id=v_owner and l.created_at>now()-interval '1 hour')>=3
-    or (select count(*) from public.cowboys_core_people_rate_log l where l.owner_id=v_owner and l.created_at>now()-interval '1 day')>=12 then
-    raise exception 'scan_rate_limited' using errcode='P0001';
-  end if;
   insert into public.cowboys_core_people_rate_log(owner_id,request_id) values(v_owner,p_request_id);
   insert into public.cowboys_core_people_runs(owner_id,case_id,requested_by,client_request_id)
     values(v_owner,p_case_id,auth.uid(),p_request_id) returning * into v_run;
