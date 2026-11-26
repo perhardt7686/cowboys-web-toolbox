@@ -21120,6 +21120,57 @@
       "uploadTool": false,
       "privacyNote": "Run only on targets you own or are authorized to assess. Some modules contact third-party services; do not expose the local web dashboard to the public internet.",
       "licenseNote": "Open-source MIT license; examine the current repository for license and dependency terms."
+    },
+    {
+      "id": "cliprecipe",
+      "name": "Clip Recipe",
+      "url": "https://www.cliprecipe.com/",
+      "category": "Learning",
+      "description": "Convert a cooking video link into a written recipe, then adjust servings or units and save the result.",
+      "sources": [],
+      "monogram": "CR",
+      "role": "researched",
+      "verification": "official",
+      "origin": "web",
+      "evidence": "Matty McTech's public October 5, 2026 newsletter, item 300, identifies ClipRecipe. Provider homepage independently retrieved November 26; no extraction performed.",
+      "evidenceUrls": [
+        "https://www.mattymctech.com/p/powerful-websites-296-301",
+        "https://www.cliprecipe.com/"
+      ],
+      "destinationCheck": {
+        "url": "https://www.cliprecipe.com/",
+        "title": "Clip Recipe",
+        "status": "official_source_checked_workflow_untested",
+        "checkedDate": "2026-11-26",
+        "notes": "Provider describes video-link extraction, serving adjustment, recipe saving and export. Provider advertises a seven-day trial followed by $3.95/month. No signup, payment or extraction performed."
+      },
+      "topic": "Food & everyday life",
+      "group": "Health & family",
+      "addedAt": "2026-11-26",
+      "accessLabel": "7-day trial; then $3.95/month (provider states)",
+      "accessReviewedAt": "2026-11-26",
+      "accessNote": "Trial and monthly price advertised; cancellation and signup requirements not independently tested.",
+      "access": {
+        "pricing": "paid",
+        "signup": "unknown",
+        "platform": [
+          "browser"
+        ],
+        "offline": "no",
+        "processing": "unknown",
+        "commercial": "unknown",
+        "kind": "tool",
+        "region": "unknown",
+        "language": [
+          "en"
+        ],
+        "audience": [
+          "beginner"
+        ]
+      },
+      "bestFor": "Turn publicly shared cooking videos into a convenient written ingredient list and recipe.",
+      "uploadTool": false,
+      "privacyNote": "Use publicly shared video links; review the provider's privacy terms before sending private content."
     }
   ],
   "tips": [
@@ -22752,9 +22803,9 @@
     "savedCollectionNewRecords": 9,
     "destinationVerificationHolds": 1
   },
-  "scope": "423 website destinations: 75 traced to source videos and 348 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
+  "scope": "424 website destinations: 75 traced to source videos and 349 independently researched web finds, plus 31 tips and demonstrations and 94 source-video records. One remote-job destination remains unverified; past Halloween offers are labeled as a past event.",
   "method": "Video discoveries retain their original attribution. Independent web finds link official sources and describe the scope of checks. Page checks are not full product tests; pricing and availability can change.",
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-26",
   "releases": [
     {
       "date": "2026-10-30",
@@ -22780,6 +22831,13 @@
       "sourceVideosAdded": 0,
       "tipsAdded": 0,
       "review": "SpiderFoot from user-supplied screenshot and official GitHub project documentation; dedicated OSINT & Investigations browsing group. No runtime, account, scan, paid service or deployment of SpiderFoot performed."
+    },
+    {
+      "date": "2026-11-26",
+      "added": 1,
+      "sourceVideosAdded": 0,
+      "tipsAdded": 0,
+      "review": "Clip Recipe from Matty McTech's publicly accessible newsletter; provider page and advertised paid terms checked. No claim that a new Facebook saved reel was viewed or that extraction was tested."
     }
   ],
   "discovery": {
