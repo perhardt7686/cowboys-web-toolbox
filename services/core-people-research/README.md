@@ -58,3 +58,20 @@ not the new policies/functions under test.
 
 The Public Suffix List is bundled at build time from publicsuffix/list commit 88b076a1fb2ae58cd2a6959d570f075e04d21867 (Mozilla Public License 2.0; original header retained). Scan startup loads this local file.
 Core-only migrations live under this service because the Toolbox migration chain does not contain the private Core membership helper. Apply them only to the existing Core backend.
+
+
+## Verified release checkpoint — 2026-11-26
+
+- Both release workflows passed for a2f17ed2e4758c17f61ab300220cb1faa4defe40, including
+  the 512-MB engine container and offline positive-profile recovery.
+- Navigation and research components passed Chromium and WebKit at 375×667, 390×844 and 1365×900.
+- Five owner-protected research tables and the guarded RPC functions were installed in the existing Core backend.
+  The migration was applied in four additive chunks (tables, timestamps, queue, payload/results).
+- The new core-people-research Edge gateway is ACTIVE with JWT verification enabled.
+- A rollback-only production permission test verified the current Core owner, existing shared editor, unrelated-user
+  denial and shared idempotency. No temporary cases, runs or lookups were retained.
+- The optional automatic rate-log purge was removed; the shared hourly/daily limits still use timestamps.
+- Render's reviewed plan contains a single free service, one instance, no paid storage/add-ons and automatic deploys off.
+  Application waits for the user's required first-sync approval.
+- Core's existing private UI remains unmodified until its source workspace is attached. The components in integrations/
+  are ready for integration; do not claim they are published on Core yet.

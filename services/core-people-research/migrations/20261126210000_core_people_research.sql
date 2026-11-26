@@ -118,7 +118,6 @@ begin
      or (select count(*) from public.cowboys_core_people_rate_log l where l.owner_id=v_owner and l.created_at>now()-interval '24 hours')>=12 then
     raise exception 'scan_limit_reached' using errcode='P0001';
   end if;
-  delete from public.cowboys_core_people_rate_log where owner_id=v_owner and created_at<now()-interval '30 days';
   insert into public.cowboys_core_people_rate_log(owner_id,request_id) values(v_owner,p_request_id);
   insert into public.cowboys_core_people_runs(owner_id,case_id,requested_by,client_request_id)
     values(v_owner,p_case_id,auth.uid(),p_request_id) returning * into v_run;
