@@ -1,0 +1,78 @@
+name: Core people research acceptance
+on:
+  pull_request:
+    paths:
+      - 'services/core-people-research/**'
+      - 'supabase/functions/core-people-research/**'
+      - 'services/core-people-research/migrations/*core_people_research.sql'
+      - 'tests/core-people-*.test.mjs'
+      - 'integrations/cowboys-core/**'
+      - '.github/workflows/core-people-research.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'services/core-people-research/**'
+      - 'supabase/functions/core-people-research/**'
+      - 'services/core-people-research/migrations/*core_people_research.sql'
+      - 'tests/core-people-*.test.mjs'
+      - 'integrations/cowboys-core/**'
+      - '.github/workflows/core-people-research.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gateway-and-rls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: fixture-password
+          POSTGRES_DB: core_fixture
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: node --test tests/core-people-gateway.test.mjs tests/core-people-navigation.test.mjs
+      - name: Ownership, shared-editor, rate-limit and evidence tests
+        env:
+          PGPASSWORD: fixture-password
+        run: >-
+          psql -h 127.0.0.1 -U postgres -d core_fixture -v ON_ERROR_STOP=1
+          -f services/core-people-research/tests/database_fixture.sql
+          -f services/core-people-research/migrations/20261126210000_core_people_research.sql
+          -f services/core-people-research/tests/database_acceptance.sql
+  pinned-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Build pinned SpiderFoot image
+        run: docker build -t core-people-fixture services/core-people-research
+      - name: Worker HTTP, validation, isolation and partial-result tests
+        run: docker run --rm --network none --memory 512m core-people-fixture python -m unittest discover -s tests -v
+      - name: Upstream module discovery and forced limits
+        run: docker run --rm --network none --memory 512m core-people-fixture python runner.py --self-test
+      - name: Offline engine lifecycle and committed result recovery
+        run: docker run --rm --network none --memory 512m core-people-fixture python tests/engine_smoke.py
+
+  private-shell-components:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: python3 -m pip install playwright
+      - run: python3 -m playwright install --with-deps chromium webkit
+      - run: python3 services/core-people-research/tests/ui_acceptance.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: core-people-integration-screenshots
+          path: reports/core-people/
+          retention-days: 14
