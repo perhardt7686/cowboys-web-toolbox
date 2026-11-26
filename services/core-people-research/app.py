@@ -127,7 +127,12 @@ def read_results(database):
                     "association": "unverified", "module": "sfp_accounts"})
                 if len(findings) >= MAX_FINDINGS:
                     break
-            return str(scan["status"]), findings
+            status = str(scan["status"])
+            if conn.execute("SELECT 1 FROM sqlite_master WHERE name='tbl_scan_log'").fetchone():
+                error = conn.execute("SELECT 1 FROM tbl_scan_log WHERE scan_instance_id=? AND type IN ('ERROR','CRITICAL','FATAL') LIMIT 1", (scan["guid"],)).fetchone()
+                if error:
+                    status = "ERROR-MODULE"
+            return status, findings
         finally:
             conn.close()
     except (sqlite3.Error, ValueError, OverflowError):

@@ -21,10 +21,20 @@ with tempfile.TemporaryDirectory() as tmp:
             "content":("corefixture "+site["e_string"]) if present else site["m_string"],
             "headers":{},"realurl":url}
     SpiderFoot.fetchUrl=fake_fetch
+    class FakeSF:
+        def __init__(self): self.cache={}
+        def cachePut(self,key,value): self.cache[key]=value
+        def cacheGet(self,key,_): return self.cache.get(key)
+        def fetchUrl(self,url,**kwargs): return fake_fetch(self,url,**kwargs)
+    probe=module.sfp_accounts()
+    probe.setup(FakeSF(),{"_useragent":"fixture"})
+    probe.checkSite("corefixture",probe.sites[0])
+    assert any(probe.siteResults.values()),"Direct detection probe failed"
+    print("Direct account matcher passed.")
     db=SpiderFootDb({"__database":str(work/"data"/"spiderfoot.db")})
     db.configSet({"_fetchtimeout":"4","_maxthreads":"1","sfp_accounts:permutate":"0","_internettlds":"@/opt/spiderfoot/public_suffix_list.dat"})
     db.conn.close()
-    sys.argv=[str(SF/"sf.py"),"-s",'"corefixture"',"-m","sfp_accounts","-o","json","-q","-max-threads","1"]
+    sys.argv=[str(SF/"sf.py"),"-s",'"corefixture"',"-m","sfp_accounts","-o","json","-d","-max-threads","1"]
     try:
         runpy.run_path(str(SF/"sf.py"),run_name="__main__")
     except SystemExit as exc:

@@ -37,8 +37,8 @@ async def main():
                 await page.get_by_role("button",name="Quick receipt",exact=True).click()
                 assert await page.evaluate("window.lastAction")=="receipt"
                 await page.get_by_role("button",name="+ New case",exact=True).click()
-                await page.get_by_label("Case name",exact=True).fill("Synthetic research fixture")
-                await page.get_by_label("Search clue",exact=True).fill("corefixture")
+                await page.get_by_label("Case title",exact=True).fill("Synthetic research fixture")
+                await page.get_by_label("Clue",exact=True).fill("corefixture")
                 await page.get_by_role("button",name="Save case",exact=True).click()
                 await page.get_by_role("button",name="Search public profiles",exact=True).wait_for()
                 await page.get_by_role("button",name="Search public profiles",exact=True).click()

@@ -97,7 +97,7 @@ def main():
     db.configSet({"_fetchtimeout": "4", "_maxthreads": "1", "sfp_accounts:permutate": "0", "_internettlds": "@/opt/spiderfoot/public_suffix_list.dat"})
     db.conn.close()
     sys.argv = [str(SF / "sf.py"), "-s", target, "-m", "sfp_accounts",
-                "-o", "json", "-q", "-max-threads", "1"]
+                "-o", "json", "-max-threads", "1"]
     runpy.run_path(str(SF / "sf.py"), run_name="__main__")
 
 if __name__ == "__main__":
