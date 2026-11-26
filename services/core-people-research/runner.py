@@ -13,6 +13,10 @@ BASE = Path(__file__).resolve().parent
 SF = Path("/opt/spiderfoot")
 
 def install_adapter():
+    if mp.get_start_method(allow_none=True) not in (None, "fork"):
+        raise RuntimeError("The pinned engine adapter requires fork")
+    if mp.get_start_method(allow_none=True) is None:
+        mp.set_start_method("fork")
     sys.path.insert(0, str(SF))
     import modules.sfp_accounts as accounts
     manifest = json.loads((BASE / "accounts-sites.json").read_text("utf-8"))

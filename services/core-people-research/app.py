@@ -282,6 +282,8 @@ def make_handler(auth, manager, allowed_origins):
                 if self.command == "POST" and self.path == "/v1/scans":
                     if self.headers.get("Transfer-Encoding"):
                         raise APIError(400, "content_length_required")
+                    if self.headers.get_content_type() != "application/json":
+                        raise APIError(415, "json_required")
                     try:
                         length = int(self.headers.get("Content-Length", "0"))
                         if not 0 < length <= MAX_BODY:
@@ -290,17 +292,8 @@ def make_handler(auth, manager, allowed_origins):
                         data = json.loads(self.rfile.read(length))
                         if not isinstance(data, dict):
                             raise ValueError()
-                    except (ValueError, TimeoutError):
+                    except (ValueError, UnicodeError, TimeoutError):
                         raise APIError(400, "invalid_body") from None
-                    length = self.headers.get("Content-Length", "")
-                    if not length.isdigit() or not 0 < int(length) <= MAX_BODY:
-                        raise APIError(413, "invalid_body_size")
-                    if self.headers.get_content_type() != "application/json":
-                        raise APIError(415, "json_required")
-                    try:
-                        data = json.loads(self.rfile.read(int(length)))
-                    except (ValueError, UnicodeError):
-                        raise APIError(400, "invalid_json") from None
                     if not isinstance(data, dict) or set(data) != {"run_id"}:
                         raise APIError(400, "run_id_required")
                     run_id = canonical_uuid(data["run_id"])
