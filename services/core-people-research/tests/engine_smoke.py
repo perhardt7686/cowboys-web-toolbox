@@ -31,6 +31,14 @@ with tempfile.TemporaryDirectory() as tmp:
         assert exc.code in (None,0), "CLI did not exit successfully"
     status,findings=read_results(work/"data"/"spiderfoot.db")
     assert status=="FINISHED",status
+    if not findings:
+        import sqlite3
+        connection=sqlite3.connect(work/"data"/"spiderfoot.db")
+        try:
+            print("Synthetic fixture events:",connection.execute("SELECT type,module,data FROM tbl_scan_results LIMIT 20").fetchall())
+            print("Synthetic fixture logs:",connection.execute("SELECT * FROM tbl_scan_log ORDER BY rowid DESC LIMIT 30").fetchall())
+        finally:
+            connection.close()
     assert findings, "Fixture scan should produce committed public-profile events"
     assert len(findings)<=12,len(findings)
     assert all(row["association"]=="unverified" for row in findings)
