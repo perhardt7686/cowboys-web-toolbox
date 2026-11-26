@@ -228,6 +228,12 @@ class JobManager:
                             break
                         time.sleep(0.2)
                     engine_status, findings = read_results(work / "data" / "spiderfoot.db")
+                    try:
+                        limits = json.loads((work / "adapter-ready.json").read_text("utf-8"))
+                    except (OSError, ValueError):
+                        limits = None
+                    if limits != {"sites": 12, "threads": 1, "permutate": False}:
+                        engine_status, findings = "ERROR-ADAPTER-LIMITS", []
                     with self.lock:
                         job.engine_status, job.findings = engine_status, findings
                         if job.cancel.is_set():

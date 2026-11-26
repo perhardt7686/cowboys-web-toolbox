@@ -39,6 +39,8 @@ with tempfile.TemporaryDirectory() as tmp:
         runpy.run_path(str(SF/"sf.py"),run_name="__main__")
     except SystemExit as exc:
         assert exc.code in (None,0), "CLI did not exit successfully"
+    marker=json.loads((work/"adapter-ready.json").read_text("utf-8"))
+    assert marker=={"sites":12,"threads":1,"permutate":False},marker
     status,findings=read_results(work/"data"/"spiderfoot.db")
     assert status=="FINISHED",status
     if not findings:

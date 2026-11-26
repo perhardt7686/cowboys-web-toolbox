@@ -13,11 +13,11 @@ BASE = Path(__file__).resolve().parent
 SF = Path("/opt/spiderfoot")
 
 def install_adapter():
-    if mp.get_start_method(allow_none=True) not in (None, "fork"):
-        raise RuntimeError("The pinned engine adapter requires fork")
-    if mp.get_start_method(allow_none=True) is None:
-        mp.set_start_method("fork")
     sys.path.insert(0, str(SF))
+    # sf.py imports sfwebui even in CLI mode. That module forces spawn at import,
+    # so import it BEFORE selecting fork in this isolated, Linux-only runner.
+    importlib.import_module("sfwebui")
+    mp.set_start_method("fork", force=True)
     import modules.sfp_accounts as accounts
     manifest = json.loads((BASE / "accounts-sites.json").read_text("utf-8"))
     sites = manifest["sites"]
@@ -38,6 +38,8 @@ def install_adapter():
         if (self.opts.get("_maxthreads") != 1 or self.opts.get("_fetchtimeout") != 4
                 or self.opts.get("permutate") is not False or not 1 <= len(self.sites) <= 12):
             raise RuntimeError("Account limits were not applied")
+        marker = Path(os.environ["SPIDERFOOT_DATA"]).parent / "adapter-ready.json"
+        marker.write_text(json.dumps({"sites": len(self.sites), "threads": 1, "permutate": False}), "utf-8")
 
     accounts.sfp_accounts.setup = bounded_setup
     return accounts, bounded_setup
